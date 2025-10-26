@@ -1,0 +1,21 @@
+@use 'keyframes.scss';
+
+/**
+ * Collapsible component styles
+ */
+.collapsible {
+  overflow: hidden;
+
+  & .collapsible__content {
+
+    &[data-state="closed"] {
+      animation: slideUp 200ms ease-out;
+    }
+
+    &[data-state="open"] {
+      animation: slideDown 200ms ease-out;
+    }
+
+  }
+
+}
