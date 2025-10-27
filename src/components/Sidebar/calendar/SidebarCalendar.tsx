@@ -1,4 +1,5 @@
 import { SidebarDataContext } from "@/api/contexts/SidebarDataContext.ts";
+import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -50,17 +51,22 @@ export default function SidebarCalendar({ ...props }) {
             </Button>
           </div>
           <div className="flex w-full flex-col gap-2">
-            {calendarEvents.map((event) => (
-              <div
-                key={event.title}
-                className="bg-muted after:bg-primary/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full"
-              >
-                <div className="font-medium">{event.title}</div>
-                <div className="text-muted-foreground text-xs">
-                  {formatRangeCompat(new Date(event.from), new Date(event.to))}
+            <ListMapper items={calendarEvents}>
+              {(event) => (
+                <div
+                  key={event.title}
+                  className="bg-muted after:bg-primary/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full"
+                >
+                  <div className="font-medium">{event.title}</div>
+                  <div className="text-muted-foreground text-xs">
+                    {formatRangeCompat(
+                      new Date(event.from),
+                      new Date(event.to)
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )}
+            </ListMapper>
           </div>
         </CardFooter>
       </Card>
