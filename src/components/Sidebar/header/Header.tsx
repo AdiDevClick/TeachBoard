@@ -6,6 +6,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar.tsx";
 import { use } from "react";
+import { Link } from "react-router-dom";
 
 /**
  * Team header component for the sidebar.
@@ -27,10 +28,10 @@ export default function Header() {
             className="data-[slot=sidebar-menu-button]:p-1.5"
             title={tooltip}
           >
-            <a href={url}>
+            <Link to={url}>
               {Icon && <Icon className="size-5!" />}
               <span className="text-base font-semibold">{title}</span>
-            </a>
+            </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
