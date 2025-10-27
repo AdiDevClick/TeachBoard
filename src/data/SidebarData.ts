@@ -207,8 +207,8 @@ export const sidebarDatas = {
       title: "Dark Mode",
       url: "#",
       icon: buttonVariants({ variant: "ghost" }).includes("dark")
-        ? IconMoon
-        : IconSun,
+        ? IconSun
+        : IconMoon,
       switchIcon: true,
     },
   ],
