@@ -20,7 +20,7 @@ import { cloneElement, Fragment, isValidElement } from "react";
  * > ```tsx
  * > <ListMapper items={myItems}>
  * >    {(item, index) => (
- * >       // My custom logic here
+ * >       // return (My custom logic here) or component :
  * >       <MyListItem key={item.id} item={item} index={index} />
  * >    )}
  * > </ListMapper>
