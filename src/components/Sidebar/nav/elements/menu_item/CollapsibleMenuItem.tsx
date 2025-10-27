@@ -1,17 +1,13 @@
+import { CollapsibleContents } from "@/components/Sidebar/nav/collapsible/collapsible_contents/CollapsibleContents.tsx";
 import CollapsibleMenu from "@/components/Sidebar/nav/collapsible/collapsible_menu/CollapsibleMenu";
 import QuickButton from "@/components/Sidebar/nav/elements/quick_button/QuickButton";
 import type {
   CollapsibleMenuItemProps,
   NavMainMenuItem,
 } from "@/components/Sidebar/nav/types/NavTypes.ts";
-import {
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-} from "@/components/ui/sidebar.tsx";
+import { SidebarMenuItem } from "@/components/ui/sidebar.tsx";
 import "@css/Collapsible.scss";
-import { Collapsible, CollapsibleContent } from "@radix-ui/react-collapsible";
+import { Collapsible } from "@radix-ui/react-collapsible";
 
 /**
  * Menu Item component for Sidebar navigation
@@ -40,21 +36,7 @@ export default function CollapsibleMenuItem({
 
         {isQuickButtonEnabled && <QuickButton item={quickButton} />}
 
-        {subMenus && (
-          <CollapsibleContent className="collapsible__content">
-            <SidebarMenuSub>
-              {subMenus.map((subMenu) => (
-                <SidebarMenuSubItem key={subMenu.title}>
-                  <SidebarMenuSubButton asChild>
-                    <a href={subMenu.url}>
-                      <span>{subMenu.title}</span>
-                    </a>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-              ))}
-            </SidebarMenuSub>
-          </CollapsibleContent>
-        )}
+        {subMenus && <CollapsibleContents subMenus={subMenus} />}
       </SidebarMenuItem>
     </Collapsible>
   );
