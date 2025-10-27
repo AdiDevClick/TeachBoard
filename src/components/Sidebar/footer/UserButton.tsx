@@ -1,5 +1,3 @@
-import { IconDotsVertical } from "@tabler/icons-react";
-
 import { SidebarDataContext } from "@/api/contexts/SidebarDataContext.ts";
 import { TriggeredSettingsPopup } from "@/components/Sidebar/footer/settings_popup/TriggeredSettingsPopup.tsx";
 import { UserDisplay } from "@/components/Sidebar/footer/UserDisplay.tsx";
@@ -13,14 +11,15 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { IconDotsVertical } from "@tabler/icons-react";
 import { use } from "react";
 
 /**
  * User navigation component for Sidebar
  *
- * @description Displays the user info and actions in the sidebar
+ * @description Displays the user info and actions in sidebar
  */
-export function NavUser() {
+export function UserButton() {
   const { isMobile } = useSidebar();
   const sidebar = use(SidebarDataContext);
 
