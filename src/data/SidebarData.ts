@@ -24,8 +24,8 @@ import { GraduationCap } from "lucide-react";
 
 export const sidebarDatas = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
+    name: "shadcn very very long name example",
+    email: "myveryveryverylongemail@example.com",
     avatar: "/avatars/shadcn.jpg",
     settings: [
       {
