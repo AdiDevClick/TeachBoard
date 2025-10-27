@@ -1,5 +1,6 @@
 import type { UserDisplayProps } from "@/components/Sidebar/footer/types/FooterTypes.ts";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import "@css/UserDisplay.scss";
 
 /**
  * User display component for Sidebar footer
@@ -13,14 +14,14 @@ export function UserDisplay({ props }: UserDisplayProps) {
   const { avatar, name, email } = props;
 
   return (
-    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-      <Avatar className="h-8 w-8 rounded-lg grayscale">
-        <AvatarImage src={avatar} alt={name} />
-        <AvatarFallback className="rounded-lg">TB</AvatarFallback>
+    <div className="user-display-container">
+      <Avatar className="user-display__avatar grayscale">
+        <AvatarImage className="avatar__img" src={avatar} alt={name} />
+        <AvatarFallback className="avatar__img-fallback">TB</AvatarFallback>
       </Avatar>
-      <div className="grid flex-1 text-left text-sm leading-tight">
-        <span className="truncate font-medium">{name}</span>
-        <span className="text-muted-foreground truncate text-xs">{email}</span>
+      <div className="user-display__info">
+        <p className="info__name">{name}</p>
+        <p className="info__email">{email}</p>
       </div>
     </div>
   );
