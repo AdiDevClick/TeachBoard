@@ -16,20 +16,19 @@ export default function PrimaryMenuButton({
   setStyle = () => "",
   ...props
 }: MenuContentProps) {
+  if (!item) return null;
   const isQuickButtonEnabled = item.quickButton?.enabled;
+
   return (
     <SidebarMenuButton
       {...props}
       className={`${setStyle({ isQuickButtonEnabled, isMenu: false })} ${
         props.className ?? ""
       }`}
-      // className={setStyle({ item, isMenu: false })}
       title={item.tooltip}
     >
-      {/* <a href="#"> */}
       {item.icon && <item.icon />}
-      <span>{item.title}</span>
-      {/* </a> */}
+      <p>{item.title}</p>
 
       {item.subMenus && (
         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
