@@ -29,8 +29,10 @@ export default function Header() {
             title={tooltip}
           >
             <Link to={url}>
-              {Icon && <Icon className="size-5!" />}
-              <span className="text-base font-semibold">{title}</span>
+              {Icon && (
+                <Icon className="p-1 bg-muted-foreground/20 rounded-lg w-8! h-10!" />
+              )}
+              <p className="text-base font-semibold">{title}</p>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
