@@ -26,6 +26,8 @@ type NavSecondaryMenuItem = dataContext["navSecondary"][number];
 type SidebarHeader = dataContext["sidebarHeader"];
 type QuickButton = NonNullable<NavMainMenuItem["quickButton"]>;
 
+type SubMenus = NonNullable<NavMainMenuItem["subMenus"]>;
+
 type GenericMenuItemProps<T> = {
   item?: T;
   setStyle: (props: SetStyleMenuProps) => string;
@@ -77,3 +79,14 @@ export type ButtonsGroupListProps<T = NavMainMenuItem | NavSecondaryMenuItem> =
     label?: string;
     items: T[];
   };
+
+/** Props for the collapsible submenus contents component */
+export type CollapsibleContentsProps = {
+  subMenus: SubMenus;
+};
+
+/** Props for the submenu button component */
+export type SubMenuButtonProps<T = SubMenus[number]> = ComponentPropsWithRef<
+  typeof SidebarMenuButton
+> &
+  Partial<T>;
