@@ -1,5 +1,5 @@
-import { NavUser } from "@/components/Sidebar/footer/nav-user";
 import SidebarCalendar from "@/components/Sidebar/calendar/SidebarCalendar.tsx";
+import { UserButton } from "@/components/Sidebar/footer/UserButton.tsx";
 import GroupSeparator from "@/components/Sidebar/group_separator/GroupSeparator.tsx";
 import Header from "@/components/Sidebar/header/Header.tsx";
 import { MainNavigation } from "@/components/Sidebar/nav/MainNavigation";
@@ -31,7 +31,7 @@ export function AppSidebar({ ...props }: SidebarProps) {
         <SecondaryNavigation />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser />
+        <UserButton />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
