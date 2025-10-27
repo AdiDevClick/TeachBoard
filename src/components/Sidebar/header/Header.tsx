@@ -4,7 +4,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar.tsx";
+import "@css/SidebarHeader.scss";
 import { use } from "react";
 import { Link } from "react-router-dom";
 
@@ -14,6 +16,7 @@ import { Link } from "react-router-dom";
  * @description Hardcoded for now, to be replaced with dynamic data later.
  */
 export default function Header() {
+  const { state } = useSidebar();
   const sidebar = use(SidebarDataContext);
   if (!sidebar) return null;
 
@@ -25,14 +28,13 @@ export default function Header() {
         <SidebarMenuItem>
           <SidebarMenuButton
             asChild
-            className="data-[slot=sidebar-menu-button]:p-1.5"
+            size={state === "collapsed" ? "lg" : "default"}
+            className="data-[slot=sidebar-menu-button]:p-0.5"
             title={tooltip}
           >
-            <Link to={url}>
-              {Icon && (
-                <Icon className="p-1 bg-muted-foreground/20 rounded-lg w-8! h-10!" />
-              )}
-              <p className="text-base font-semibold">{title}</p>
+            <Link to={url} className="sidebar-header__link">
+              {Icon && <Icon className="link__icon" />}
+              <p>{title}</p>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
