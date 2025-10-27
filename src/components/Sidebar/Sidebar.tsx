@@ -28,7 +28,7 @@ export function AppSidebar({ ...props }: SidebarProps) {
         <SidebarCalendar className="card-container" />
         {/* <NavDocuments items={documents} /> */}
         <GroupSeparator />
-        <SecondaryNavigation />
+        <SecondaryNavigation className="pb-5" />
       </SidebarContent>
       <SidebarFooter>
         <UserButton />
