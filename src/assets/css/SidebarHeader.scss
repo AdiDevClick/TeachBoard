@@ -1,0 +1,15 @@
+  .sidebar-header__link {
+    & .link__icon {
+      padding: calc(var(--spacing) * 1);
+      background-color: color-mix(in oklab, var(--muted-foreground) 20%, transparent);
+      border-radius: var(--radius-lg);
+      width: calc(var(--spacing) * 8);
+      height: calc(var(--spacing) * 10);
+    }
+
+    & p {
+      font-size: var(--text-base);
+      line-height: var(--tw-leading);
+      font-weight: var(--font-weight-semibold);
+    }
+  }
