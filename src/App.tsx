@@ -5,6 +5,11 @@ import "@css/PageTitle.scss";
 import { type ReactNode } from "react";
 import { useLocation, useMatches } from "react-router-dom";
 
+type MatchWithTitle = {
+  loaderData?: { pageTitle?: string };
+  pathname?: string;
+};
+
 /**
  * App component to wrap all pages
  *
@@ -17,8 +22,8 @@ export default function App({ children }: { children: ReactNode }) {
   const location = useLocation().pathname;
   const matches = useMatches().find(
     (m) => m.loaderData && m.pathname === location
-  );
-  const title = matches ? matches.loaderData?.pageTitle : "TeachBoard";
+  ) as MatchWithTitle;
+  const title = matches.loaderData?.pageTitle ?? "TeachBoard";
 
   return (
     <>
