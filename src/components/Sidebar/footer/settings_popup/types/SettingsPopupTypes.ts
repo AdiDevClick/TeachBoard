@@ -2,5 +2,5 @@ import type { dataContext } from "@/api/providers/types/SidebarDataProviderTypes
 
 export type SettingsPopupProps = {
   isMobile: boolean;
-  sidebar: dataContext;
+  userData: dataContext["user"];
 };
