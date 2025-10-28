@@ -38,7 +38,17 @@ const router = createBrowserRouter([
     element: <Root />,
     errorElement: <Root contentType="error" />,
     children: [
-      { index: true, element: <Home />, loader: async () => null },
+      {
+        index: true,
+        element: <Home />,
+        loader: async () => {
+          setDocumentTitle(CompleteDatas.sidebarHeader.tooltip);
+          return {
+            loaderData: CompleteDatas.sidebarHeader,
+            pageTitle: "Dashboard",
+          };
+        },
+      },
       {
         path: "about",
         element: <About />,
@@ -46,12 +56,38 @@ const router = createBrowserRouter([
       {
         path: "evaluations",
         element: <Evaluations />,
-        loader: async () => null,
+        loader: async () => {
+          setDocumentTitle(CompleteDatas.navMain.menus[2].title);
+          return {
+            pageTitle: CompleteDatas.navMain.menus[2].title,
+            loaderData: CompleteDatas.navMain.menus[2],
+          };
+        },
         children: [
           {
             path: "create",
             element: <CreateEvaluations />,
-            loader: async () => null,
+            loader: async () => {
+              const date = new Date().toLocaleDateString();
+              setDocumentTitle(CompleteDatas.navMain.menus[0].title);
+              return {
+                pageTitle: "Evaluation - " + date,
+                loaderData: CompleteDatas.navMain.menus[0],
+              };
+            },
+
+            // let done = false;
+
+            // CompleteDatas.navMain.menus.map((element) => {
+            //   if (done) return;
+            //   const location = window.location.pathname;
+            //   element.isActive = "/" + element.url === location;
+
+            //   if (element.isActive) {
+            //     document.title = "TeachBoard - " + element.title;
+            //     done = true;
+            //   }
+            // });
           },
         ],
       },
@@ -98,10 +134,27 @@ export function Root({ contentType }: RootProps) {
           <AppSidebar variant="inset" />
           <SidebarInset className="m-0!">
             <SiteHeader />
-            <App>{errorContent ? <PageError /> : <Outlet />}</App>
+            <App>
+              {errorContent ? <PageError /> : <Outlet context={null} />}
+            </App>
           </SidebarInset>
         </SidebarDataProvider>
       </SidebarProvider>
     </>
   );
+}
+
+/**
+ * Set the document title based on the selected menu item
+ *
+ * @param menu - The menu item to set the title for
+ */
+function setDocumentTitle(menu: string) {
+  const oldTitle = document.title;
+
+  if (menu) {
+    document.title = "TeachBoard - " + menu;
+  } else {
+    document.title = oldTitle;
+  }
 }
