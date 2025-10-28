@@ -6,6 +6,8 @@ import { calendarEvents } from "@/data/CalendarData.ts";
 import { sidebarDatas } from "@/data/SidebarData";
 import { About } from "@/pages/About/About.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
+import { CreateEvaluations } from "@/pages/Evaluations/CreateEvaluations.tsx";
+import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
 import type { RootProps } from "@/types/MainTypes.ts";
 import { StrictMode, type CSSProperties } from "react";
@@ -35,10 +37,22 @@ const router = createBrowserRouter([
     element: <Root />,
     errorElement: <Root contentType="error" />,
     children: [
-      { index: true, element: <Home />, loader: () => null },
+      { index: true, element: <Home />, loader: async () => null },
       {
         path: "about",
         element: <About />,
+      },
+      {
+        path: "evaluations",
+        element: <Evaluations />,
+        loader: async () => null,
+        children: [
+          {
+            path: "create",
+            element: <CreateEvaluations />,
+            loader: async () => null,
+          },
+        ],
       },
       {
         path: "error",
