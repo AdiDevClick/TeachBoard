@@ -13,14 +13,23 @@ import { Label } from "recharts";
 
 export function CreateEvaluations() {
   return (
-    <div className="flex w-full max-w-sm flex-col gap-6">
-      <Tabs defaultValue="account">
+    <div className="flex w-full flex-col gap-6">
+      <Tabs defaultValue="select">
         <TabsList>
-          <TabsTrigger value="account">Account</TabsTrigger>
-          <TabsTrigger value="password">Password</TabsTrigger>
+          <TabsTrigger value="select">Sélectionner une classe</TabsTrigger>
+          <TabsTrigger value="present">Elèves présents</TabsTrigger>
+          <TabsTrigger value="evaluation">Evaluation</TabsTrigger>
+          <TabsTrigger value="archive">Archiver</TabsTrigger>
         </TabsList>
-        <TabsContent value="account">
-          <Card>
+        <TabsContent value="select">
+          <Card
+            className="test"
+            style={{
+              width: "95%",
+              justifySelf: "center",
+              marginTop: 20,
+            }}
+          >
             <CardHeader>
               <CardTitle>Account</CardTitle>
               <CardDescription>
@@ -43,10 +52,10 @@ export function CreateEvaluations() {
             </CardFooter>
           </Card>
         </TabsContent>
-        <TabsContent value="password">
+        <TabsContent value="present">
           <Card>
             <CardHeader>
-              <CardTitle>Password</CardTitle>
+              <CardTitle>Elèves présents</CardTitle>
               <CardDescription>
                 Change your password here. After saving, you&apos;ll be logged
                 out.
@@ -54,16 +63,18 @@ export function CreateEvaluations() {
             </CardHeader>
             <CardContent className="grid gap-6">
               <div className="grid gap-3">
-                <Label htmlFor="tabs-demo-current">Current password</Label>
+                <Label htmlFor="tabs-demo-current">
+                  Current élèves présents
+                </Label>
                 <Input id="tabs-demo-current" type="password" />
               </div>
               <div className="grid gap-3">
-                <Label htmlFor="tabs-demo-new">New password</Label>
+                <Label htmlFor="tabs-demo-new">New élèves présents</Label>
                 <Input id="tabs-demo-new" type="password" />
               </div>
             </CardContent>
             <CardFooter>
-              <Button>Save password</Button>
+              <Button>Save élèves présents</Button>
             </CardFooter>
           </Card>
         </TabsContent>
