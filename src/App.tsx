@@ -1,4 +1,4 @@
-import "@css/App.css";
+// import "@css/App.css";
 import "@css/index-tailwind.css";
 import type { ReactNode } from "react";
 
