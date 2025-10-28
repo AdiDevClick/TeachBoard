@@ -1,7 +1,8 @@
 import { SidebarDataProvider } from "@/api/providers/SidebarDataProvider.tsx";
 import App from "@/App.tsx";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
-import { SidebarProvider } from "@/components/ui/sidebar.tsx";
+import { SiteHeader } from "@/components/site-header.tsx";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { calendarEvents } from "@/data/CalendarData.ts";
 import { sidebarDatas } from "@/data/SidebarData";
 import { About } from "@/pages/About/About.tsx";
@@ -95,7 +96,10 @@ export function Root({ contentType }: RootProps) {
       >
         <SidebarDataProvider value={CompleteDatas}>
           <AppSidebar variant="inset" />
-          <App>{errorContent ? <PageError /> : <Outlet />}</App>
+          <SidebarInset className="m-0!">
+            <SiteHeader />
+            <App>{errorContent ? <PageError /> : <Outlet />}</App>
+          </SidebarInset>
         </SidebarDataProvider>
       </SidebarProvider>
     </>
