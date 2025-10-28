@@ -1,4 +1,3 @@
-import { SidebarDataContext } from "@/api/contexts/SidebarDataContext.ts";
 import { TriggeredSettingsPopup } from "@/components/Sidebar/footer/settings_popup/TriggeredSettingsPopup.tsx";
 import { UserDisplay } from "@/components/Sidebar/footer/UserDisplay.tsx";
 import {
@@ -11,8 +10,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useSidebarDataContext } from "@/hooks/contexts/useSidebarDataContext.ts";
 import { IconDotsVertical } from "@tabler/icons-react";
-import { use } from "react";
 
 /**
  * User navigation component for Sidebar
@@ -21,9 +20,7 @@ import { use } from "react";
  */
 export function UserButton() {
   const { isMobile } = useSidebar();
-  const sidebar = use(SidebarDataContext);
-
-  if (!sidebar) return null;
+  const userData = useSidebarDataContext().user;
 
   return (
     <SidebarMenu>
@@ -34,11 +31,11 @@ export function UserButton() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <UserDisplay props={sidebar.user} />
+              <UserDisplay props={userData} />
               <IconDotsVertical className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <TriggeredSettingsPopup isMobile={isMobile} sidebar={sidebar} />
+          <TriggeredSettingsPopup isMobile={isMobile} userData={userData} />
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>

@@ -1,10 +1,7 @@
-"use client";
-
-import { SidebarDataContext } from "@/api/contexts/SidebarDataContext.ts";
 import { SecondaryMenuButton } from "@/components/Sidebar/nav/elements/menu_button/SecondaryMenuButton";
 import { ButtonsGroupList } from "@/components/Sidebar/nav/elements/menu_group_list/ButtonsGroupList";
 import type { SecondaryProps } from "@/components/Sidebar/nav/types/NavTypes.ts";
-import { use } from "react";
+import { useSidebarDataContext } from "@/hooks/contexts/useSidebarDataContext.ts";
 
 /**
  * Secondary navigation menu
@@ -14,8 +11,7 @@ import { use } from "react";
  * @param props - Additional props
  */
 export function SecondaryNavigation({ ...props }: SecondaryProps) {
-  const sidebar = use(SidebarDataContext);
-  if (!sidebar) return null;
+  const sidebar = useSidebarDataContext();
 
   const { navSecondary } = sidebar;
 

@@ -1,14 +1,14 @@
-import { SidebarDataContext } from "@/api/contexts/SidebarDataContext.ts";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { SidebarGroup } from "@/components/ui/sidebar.tsx";
+import { useSidebarDataContext } from "@/hooks/contexts/useSidebarDataContext.ts";
 import { formatDate, formatRangeCompat } from "@/lib/utils.ts";
 import "@css/Calendar.scss";
 import { fr } from "date-fns/locale";
 import { PlusIcon } from "lucide-react";
-import { use, useState } from "react";
+import { useState } from "react";
 
 /**
  * Sidebar Menu Calendar Component
@@ -16,7 +16,7 @@ import { use, useState } from "react";
  * @param props - Additional props for the SidebarGroup (e.g., className)
  */
 export default function SidebarCalendar({ ...props }) {
-  const events = use(SidebarDataContext);
+  const events = useSidebarDataContext();
   const [date, setDate] = useState<Date>(new Date(2025, 5, 12));
 
   if (!events) return null;

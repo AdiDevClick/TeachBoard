@@ -1,4 +1,3 @@
-import { SidebarDataContext } from "@/api/contexts/SidebarDataContext.ts";
 import {
   SidebarHeader,
   SidebarMenu,
@@ -6,8 +5,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar.tsx";
+import { useSidebarDataContext } from "@/hooks/contexts/useSidebarDataContext.ts";
 import "@css/SidebarHeader.scss";
-import { use } from "react";
 import { Link } from "react-router-dom";
 
 /**
@@ -17,8 +16,7 @@ import { Link } from "react-router-dom";
  */
 export default function Header() {
   const { state } = useSidebar();
-  const sidebar = use(SidebarDataContext);
-  if (!sidebar) return null;
+  const sidebar = useSidebarDataContext();
 
   const { url, tooltip, title, icon: Icon } = sidebar.sidebarHeader || {};
 

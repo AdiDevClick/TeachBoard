@@ -1,8 +1,7 @@
-import { SidebarDataContext } from "@/api/contexts/SidebarDataContext.ts";
 import { ButtonsGroupList } from "@/components/Sidebar/nav/elements/menu_group_list/ButtonsGroupList";
 import CollapsibleMenuItem from "@/components/Sidebar/nav/elements/menu_item/CollapsibleMenuItem";
 import type { SetStyleMenuProps } from "@/components/Sidebar/nav/types/NavTypes";
-import { use } from "react";
+import { useSidebarDataContext } from "@/hooks/contexts/useSidebarDataContext.ts";
 
 /**
  * Main Navigation component for Sidebar
@@ -12,8 +11,7 @@ import { use } from "react";
  * @returns
  */
 export function MainNavigation() {
-  const sidebar = use(SidebarDataContext);
-  if (!sidebar) return null;
+  const sidebar = useSidebarDataContext();
 
   const { groupLabel, menus: navItems } = sidebar.navMain;
 
