@@ -10,7 +10,12 @@ import { Home } from "@/pages/Home/Home.tsx";
 import type { RootProps } from "@/types/MainTypes.ts";
 import { StrictMode, type CSSProperties } from "react";
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  Outlet,
+  RouterProvider,
+} from "react-router-dom";
 
 /**
  * Complete sidebar data including calendar events
@@ -34,6 +39,14 @@ const router = createBrowserRouter([
       {
         path: "about",
         element: <About />,
+      },
+      {
+        path: "error",
+        element: <PageError />,
+      },
+      {
+        path: "*",
+        element: <Navigate to={"/error"} />,
       },
     ],
   },
