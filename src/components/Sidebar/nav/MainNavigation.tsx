@@ -33,8 +33,8 @@ function setStyle({ isQuickButtonEnabled, isMenu }: SetStyleMenuProps): string {
   if (!isQuickButtonEnabled) return "";
 
   if (isMenu) {
-    return "flex items-center gap-2";
+    return "sidebarButton--menu";
   }
 
-  return "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear";
+  return "sidebarButton";
 }
