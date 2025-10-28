@@ -1,4 +1,5 @@
 import { Pencil } from "lucide-react";
+import type { ReactNode } from "react";
 
 /**
  * PageTitle component
@@ -8,7 +9,7 @@ import { Pencil } from "lucide-react";
  *
  * @param children - title content
  */
-export function PageTitle({ children }: { children: string }) {
+export function PageTitle({ children }: { children: ReactNode }) {
   return (
     <div className="page-title-container">
       <h1>{children}</h1>
