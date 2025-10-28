@@ -9,12 +9,17 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
+/**
+ * Settings popup component for Sidebar footer
+ *
+ * @param isMobile - Indicates if the sidebar is in mobile view
+ * @param userData - User data from sidebar context
+ */
 export function TriggeredSettingsPopup({
   isMobile,
-  sidebar,
+  userData,
 }: SettingsPopupProps) {
-  const user = sidebar.user;
-  const settings = user.settings;
+  const settings = userData.settings;
 
   return (
     <DropdownMenuContent
@@ -24,7 +29,7 @@ export function TriggeredSettingsPopup({
       sideOffset={4}
     >
       <DropdownMenuLabel className="p-0 font-normal">
-        <UserDisplay props={user} />
+        <UserDisplay props={userData} />
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
