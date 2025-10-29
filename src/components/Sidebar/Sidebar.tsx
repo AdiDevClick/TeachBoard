@@ -12,6 +12,7 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Activity } from "react";
 
 /**
  * Full App Sidebar component
@@ -31,13 +32,11 @@ export function AppSidebar({ ...props }: SidebarProps) {
       <SidebarContent>
         <MainNavigation />
         <GroupSeparator />
-        {state === "expanded" && (
-          <>
-            <SidebarCalendar className="card-container" />
-            {/* <NavDocuments items={documents} /> */}
-            <GroupSeparator />
-          </>
-        )}
+        <Activity mode={state === "expanded" ? "visible" : "hidden"}>
+          <SidebarCalendar className="card-container" />
+          {/* <NavDocuments items={documents} /> */}
+          <GroupSeparator />
+        </Activity>
         <SecondaryNavigation className="pb-5" />
       </SidebarContent>
       <SidebarFooter>
