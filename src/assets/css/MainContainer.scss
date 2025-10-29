@@ -1,0 +1,10 @@
+/**
+  * Styles for the main application container.
+  * This removes default margins, box shadows, and background styles
+  * to allow for a cleaner and more integrated layout.
+  */
+.main-app-container {
+  margin: 0;
+  box-shadow: none;
+  background: none;
+}

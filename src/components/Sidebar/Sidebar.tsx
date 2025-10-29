@@ -22,7 +22,11 @@ export function AppSidebar({ ...props }: SidebarProps) {
   const { state } = useSidebar();
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar
+      collapsible="icon"
+      className="sidebar-collapsible-container"
+      {...props}
+    >
       <Header />
       <SidebarContent>
         <MainNavigation />

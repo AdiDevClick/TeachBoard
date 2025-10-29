@@ -11,6 +11,7 @@ import { CreateEvaluations } from "@/pages/Evaluations/CreateEvaluations.tsx";
 import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
 import type { RootProps } from "@/types/MainTypes.ts";
+import "@css/MainContainer.scss";
 import { StrictMode, type CSSProperties } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -127,12 +128,14 @@ export function Root({ contentType }: RootProps) {
           {
             "--sidebar-width": "calc(var(--spacing) * 72)",
             "--header-height": "calc(var(--spacing) * 12)",
+            paddingInline: 5,
           } as CSSProperties
         }
+        className="sidebar-wrapper"
       >
         <SidebarDataProvider value={CompleteDatas}>
           <AppSidebar variant="inset" />
-          <SidebarInset className="m-0!">
+          <SidebarInset className="main-app-container">
             <SiteHeader />
             <App>
               {errorContent ? <PageError /> : <Outlet context={null} />}
