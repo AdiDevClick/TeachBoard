@@ -4,8 +4,9 @@ import path from "node:path";
 
 const workspace = process.cwd();
 const vscodeDir = path.join(workspace, ".vscode");
-const templateFile = path.join(vscodeDir, "launch.template.json");
-const skipFile = path.join(vscodeDir, "skipFiles.json");
+const scriptDir = path.join(workspace, "scripts");
+const templateFile = path.join(scriptDir, "launch.template.json");
+const skipFile = path.join(scriptDir, "skipFiles.json");
 const outFile = path.join(vscodeDir, "launch.json");
 
 function main() {
