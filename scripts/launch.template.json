@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Launch Chrome against localhost",
+      "url": "http://localhost:5173/",
+      "webRoot": "${workspaceFolder}",
+      "skipFiles": "__INJECT_SKIP_FILES__",
+      "smartStep": true,
+      "trace": true,
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**",
+        "!**/node_modules/**",
+        "!**/.vite/**"
+      ],
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${workspaceFolder}/src/*",
+        "webpack:///*": "${workspaceFolder}/*",
+        "/src/*": "${workspaceFolder}/src/*",
+        "/@fs/*": "${workspaceFolder}/*",
+        "/@vite/*": "${workspaceFolder}/*",
+        "*/.vite/deps/*": "${workspaceFolder}/node_modules/.vite/deps/*",
+        "*/node_modules/.vite/*": "${workspaceFolder}/node_modules/.vite/*"
+      }
+    }
+  ]
+}

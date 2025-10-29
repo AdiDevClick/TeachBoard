@@ -44,7 +44,7 @@ export const sidebarDatas = {
   sidebarHeader: {
     title: "TeachBoard",
     tooltip: "Outil de gestion pour enseignants",
-    url: "#",
+    url: "/",
     icon: IconInnerShadowTop,
   },
   settings: {
@@ -59,7 +59,7 @@ export const sidebarDatas = {
       {
         title: "Créer une évaluation",
         tooltip: "Créer rapidement une évaluation",
-        url: "#",
+        url: "evaluations/create",
         icon: IconCirclePlusFilled,
         // style: {
         //   menuItem: "flex items-center gap-2",

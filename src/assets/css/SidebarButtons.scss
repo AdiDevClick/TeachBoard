@@ -1,0 +1,40 @@
+/**
+  * Styles for the Sidebar Buttons
+  */
+
+@property --width {
+  initial-value: 100%;
+  inherits: false;
+  syntax: '<percentage>'
+}
+
+.sidebarButton {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: 1px solid var(--primary);
+  transition: background-color 0.2s ease;
+  min-width: 34px;
+
+  &--menu {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &--submenu {
+    --buttonMaxWidth: calc(var(--width) - 50%);
+
+    flex: 1;
+    transition: transform 0.3s ease;
+    transform: translateX(calc(var(--buttonMaxWidth) - 12px));
+
+    :is([data-state="open"]) & {
+      transform: translateX(var(--buttonMaxWidth)) rotate(90deg);
+    }
+  }
+
+  &:hover {
+    background-color: var(--primary-hover);
+    color: var(--primary-foreground-hover);
+  }
+}

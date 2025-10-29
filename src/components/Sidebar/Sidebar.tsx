@@ -10,24 +10,34 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 /**
  * Full App Sidebar component
  *
  * @param props - Component props
- * @returns
  */
 export function AppSidebar({ ...props }: SidebarProps) {
+  const { state } = useSidebar();
+
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar
+      collapsible="icon"
+      className="sidebar-collapsible-container"
+      {...props}
+    >
       <Header />
       <SidebarContent>
         <MainNavigation />
         <GroupSeparator />
-        <SidebarCalendar className="card-container" />
-        {/* <NavDocuments items={documents} /> */}
-        <GroupSeparator />
+        {state === "expanded" && (
+          <>
+            <SidebarCalendar className="card-container" />
+            {/* <NavDocuments items={documents} /> */}
+            <GroupSeparator />
+          </>
+        )}
         <SecondaryNavigation className="pb-5" />
       </SidebarContent>
       <SidebarFooter>

@@ -47,7 +47,7 @@ export default function SidebarCalendar({ ...props }) {
               title="Add Event"
             >
               <PlusIcon />
-              <span className="sr-only">Add Event</span>
+              <p className="sr-only">Add Event</p>
             </Button>
           </div>
           <div className="flex w-full flex-col gap-2">
