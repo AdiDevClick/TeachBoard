@@ -6,7 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import * as React from "react";
+import { useId } from "react";
 
 type VerticalSelectProps = React.ComponentProps<typeof Select> & {
   label?: React.ReactNode;
@@ -23,20 +23,21 @@ export function VerticalFieldSelect({
   fullWidth = true,
   className,
   children,
-  triggerId,
   ...props
 }: VerticalSelectProps) {
+  const id = useId();
+
   return (
     <div className={cn("flex flex-col items-start gap-2", className)}>
-      {label ? (
-        <Label className="w-full" htmlFor={triggerId ?? undefined}>
+      {label && (
+        <Label className="w-full" htmlFor={id}>
           {label}
         </Label>
-      ) : null}
+      )}
 
       <Select {...props}>
         <SelectTrigger
-          id={triggerId}
+          id={id}
           className={cn(fullWidth ? "w-full" : "w-fit")}
           size="default"
         >
