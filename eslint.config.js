@@ -23,6 +23,9 @@ export default defineConfig([
       // Enforce 2 spaces indentation and forbid tabs
       indent: ['error', 2, { SwitchCase: 1 }],
       'no-tabs': 'error'
+      // Prefer value imports rather than always using `import type` when possible
+      ,
+      '@typescript-eslint/consistent-type-imports': ['error', { 'prefer': 'no-type-imports' }]
     }
   },
 ])
