@@ -1,4 +1,3 @@
-import { Separator } from "@radix-ui/react-separator";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { IconArrowLeft, IconArrowRightDashed } from "@tabler/icons-react";
 import {
@@ -11,10 +10,15 @@ import {
 } from "../ui/card.tsx";
 import VerticalFieldSelect from "../ui/select-vertical.tsx";
 import { SelectGroup, SelectItem, SelectLabel } from "../ui/select.tsx";
+import { Separator } from "../ui/separator.tsx";
 
 export function TabContent({ value, children, handleOnClick }) {
   return (
-    <TabsContent value={value} className="page-content">
+    <TabsContent
+      value={value}
+      className="page-content"
+      style={{ height: "100%" }}
+    >
       <Card
         className="test"
         style={{
@@ -24,22 +28,36 @@ export function TabContent({ value, children, handleOnClick }) {
           boxShadow: "none",
           border: "none",
           borderLeft: "7px solid",
+          display: "flex",
+          flexDirection: "row",
+          // justifyContent: "space-between",
         }}
       >
         <CardHeader>
           <IconArrowLeft onClick={handleOnClick} data-name="step-previous" />
         </CardHeader>
         {children}
-        <CardContent className="grid gap-6">
-          <div>
+        <CardContent
+          className="flex gap-6 tab-card-content"
+          style={{
+            alignItems: "center",
+            placeSelf: "center",
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          <div style={{ width: "100%" }}>
             <CardTitle>1.</CardTitle>
             <CardTitle>Sélectionner une classe</CardTitle>
             <CardDescription>
               Choisir la classe d’élèves qui participent au TP.
             </CardDescription>
           </div>
-          <Separator orientation="vertical" style={{ height: 10, width: 10 }} />
-          <Card>
+          <Separator
+            orientation="vertical"
+            style={{ height: "50%", width: 1, margin: "auto" }}
+          />
+          <Card style={{ width: "100%" }}>
             {/* <CardHeader>
                   <CardTitle>Les classes disponibles</CardTitle>
                   <CardDescription>Les classes disponibles</CardDescription>
