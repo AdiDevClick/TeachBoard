@@ -9,17 +9,15 @@ import {
 } from "@/components/ui/card.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
-import VerticalFieldSelect from "@/components/ui/select-vertical.tsx";
-import {
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-} from "@/components/ui/select.tsx";
-import { Separator } from "@/components/ui/separator.tsx";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { IconArrowLeft } from "@tabler/icons-react";
+import { TabContent } from "../../components/Tabs/TabContent.tsx";
 
 export function CreateEvaluations() {
+  const handleOnClick = (e: React.MouseEvent<SVGElement>) => {
+    e.preventDefault();
+    console.log(e.currentTarget.dataset.name + " IconArrow clicked");
+  };
+
   return (
     <div className="flex w-full flex-col gap-6 h-full">
       <Tabs
@@ -38,7 +36,8 @@ export function CreateEvaluations() {
           <TabsTrigger value="evaluation">Evaluation</TabsTrigger>
           <TabsTrigger value="archive">Archiver</TabsTrigger>
         </TabsList>
-        <TabsContent value="select">
+        <TabContent value="select" handleOnClick={handleOnClick} />
+        {/* <TabsContent value="select">
           <Card
             className="test"
             style={{
@@ -70,7 +69,7 @@ export function CreateEvaluations() {
                   <CardTitle>Les classes disponibles</CardTitle>
                   <CardDescription>Les classes disponibles</CardDescription>
                 </CardHeader> */}
-                <CardContent className="grid gap-6">
+        {/*<CardContent className="grid gap-6">
                   <div className="grid gap-3">
                     <Label htmlFor="tabs-demo-name">
                       Les classes disponibles
@@ -100,9 +99,10 @@ export function CreateEvaluations() {
             </CardContent>
             <CardFooter>
               <Button>Save changes</Button>
+              <IconArrowRightDashed onClick={handleOnClick} />
             </CardFooter>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
         <TabsContent value="present">
           <Card>
             <CardHeader>
