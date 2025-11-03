@@ -5,6 +5,7 @@ import { defineConfig } from "vite";
 
 const mainPath = "./src";
 const assetsPath = "./src/assets";
+const backendUrl = process.env.dev.VITE_BACKEND_URL || "https://localhost:8443";
 
 export default defineConfig({
   plugins: [
@@ -26,6 +27,15 @@ export default defineConfig({
       "@icons": path.resolve(__dirname, `${assetsPath}/icons`),
       "@data": path.resolve(__dirname, `${mainPath}/data`),
       "@images": path.resolve(__dirname, `${assetsPath}/images`),
+    },
+  },
+  server: {
+    proxy: {
+      "/api": {
+        target: backendUrl,
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

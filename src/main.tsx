@@ -4,15 +4,17 @@ import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
 import { SiteHeader } from "@/components/site-header.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { calendarEvents } from "@/data/CalendarData.ts";
+import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas.tsx";
 import { sidebarDatas } from "@/data/SidebarData";
 import { About } from "@/pages/About/About.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
-import { CreateEvaluations } from "@/pages/Evaluations/CreateEvaluations.tsx";
+import { CreateEvaluations } from "@/pages/Evaluations/create/CreateEvaluations";
 import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
-import type { RootProps } from "@/types/MainTypes.ts";
+import { RootProps } from "@/types/MainTypes.ts";
 import "@css/MainContainer.scss";
-import { StrictMode, type CSSProperties } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { CSSProperties, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import {
   createBrowserRouter,
@@ -20,6 +22,8 @@ import {
   Outlet,
   RouterProvider,
 } from "react-router-dom";
+
+const queryClient = new QueryClient();
 
 /**
  * Complete sidebar data including calendar events
@@ -74,6 +78,7 @@ const router = createBrowserRouter([
               return {
                 pageTitle: "Evaluation - " + date,
                 loaderData: CompleteDatas.navMain.menus[0],
+                pageDatas: EvaluationPageTabsDatas,
               };
             },
 
@@ -106,7 +111,9 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   </StrictMode>
 );
 
