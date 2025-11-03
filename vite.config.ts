@@ -5,7 +5,7 @@ import { defineConfig } from "vite";
 
 const mainPath = "./src";
 const assetsPath = "./src/assets";
-const backendUrl = process.env.dev.VITE_BACKEND_URL || "https://localhost:8443";
+const backendUrl = process.env.VITE_BACKEND_URL || "https://localhost:8443";
 
 export default defineConfig({
   plugins: [
