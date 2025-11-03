@@ -1,0 +1,23 @@
+/**
+  * Styles for the navigation tabs component.
+  */
+.nav-tabs-container {
+  position: relative;
+  display: flex;
+  transform: translateY(-20px);
+  flex-wrap: wrap;
+
+  @media screen and (max-width: 768px) {
+    background: var(--background);
+  }
+
+}
+
+/**
+ * !! IMPORTANT !!
+ * Styles for the navigation tabs select group
+ * when opened on mobile.
+ */
+.bg-popover:is([data-state="open"]):has(.nav-tabs__select-group) {
+  transform: translateX(-5px);
+}
