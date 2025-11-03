@@ -1,5 +1,5 @@
 import type { dataContext } from "@/api/providers/types/SidebarDataProviderTypes.ts";
-import {
+import type {
   SidebarGroup,
   SidebarHeader,
   SidebarMenuButton,
