@@ -1,0 +1,13 @@
+/**
+ * Styles for the page content container.
+ *
+ * The inner part of a page.
+ * It will have a border around the area and will allow the content to fully use the height of the page.
+ */
+.page__content-container {
+  height: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding-bottom: 10px;
+  margin-bottom: 5px;
+}
