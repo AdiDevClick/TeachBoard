@@ -2,7 +2,7 @@
 import { PageTitle } from "@/components/Header/PageTitle.tsx";
 import "@css/index-tailwind.css";
 import "@css/PageTitle.scss";
-import { type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useLocation, useMatches } from "react-router-dom";
 
 type MatchWithTitle = {
