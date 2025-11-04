@@ -11,10 +11,10 @@ import { PageError } from "@/pages/Error/PageError.tsx";
 import { CreateEvaluations } from "@/pages/Evaluations/create/CreateEvaluations";
 import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
-import { RootProps } from "@/types/MainTypes.ts";
+import type { RootProps } from "@/types/MainTypes.ts";
 import "@css/MainContainer.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { CSSProperties, StrictMode } from "react";
+import { StrictMode, type CSSProperties } from "react";
 import { createRoot } from "react-dom/client";
 import {
   createBrowserRouter,
@@ -48,6 +48,7 @@ const router = createBrowserRouter([
         element: <Home />,
         loader: async () => {
           setDocumentTitle(CompleteDatas.sidebarHeader.tooltip);
+
           return {
             loaderData: CompleteDatas.sidebarHeader,
             pageTitle: "Dashboard",
@@ -63,6 +64,7 @@ const router = createBrowserRouter([
         element: <Evaluations />,
         loader: async () => {
           setDocumentTitle(CompleteDatas.navMain.menus[2].title);
+
           return {
             pageTitle: CompleteDatas.navMain.menus[2].title,
             loaderData: CompleteDatas.navMain.menus[2],
@@ -75,6 +77,7 @@ const router = createBrowserRouter([
             loader: async () => {
               const date = new Date().toLocaleDateString();
               setDocumentTitle(CompleteDatas.navMain.menus[0].title);
+
               return {
                 pageTitle: "Evaluation - " + date,
                 loaderData: CompleteDatas.navMain.menus[0],
