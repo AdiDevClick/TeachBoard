@@ -1,0 +1,16 @@
+/**
+ * Styles for DropdownMenu component
+ * 
+ * Applied to DropdownMenuContent in #TriggeredSettingsPopup component
+ */
+.dropdown-menu-container {
+  width: var(--radix-dropdown-menu-trigger-width);
+  min-width: calc(var(--spacing) * 56);
+  border-radius: var(--radius);
+
+  .menu__label {
+    padding: 0;
+    font-weight: normal;
+  }
+
+}
