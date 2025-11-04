@@ -8,6 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import "@css/DropdownMenu.scss";
 
 /**
  * Settings popup component for Sidebar footer
@@ -23,12 +24,12 @@ export function TriggeredSettingsPopup({
 
   return (
     <DropdownMenuContent
-      className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+      className="dropdown-menu-container"
       side={isMobile ? "bottom" : "right"}
       align="end"
       sideOffset={4}
     >
-      <DropdownMenuLabel className="p-0 font-normal">
+      <DropdownMenuLabel className="menu__label">
         <UserDisplay props={userData} />
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
