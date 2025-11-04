@@ -9,40 +9,52 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import "@css/PageHeader.scss";
+import { Link, useLocation } from "react-router-dom";
 
-export function SiteHeader() {
+/** Page header component
+ *
+ * @description This component renders the page header including breadcrumb navigation and action buttons.
+ */
+export function PageHeader() {
+  const { pathname } = useLocation();
+
+  if (pathname === "/login" || pathname === "/register") {
+    return null;
+  }
+
   return (
-    <header className="page__breadcrumb-container flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-      <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6 pl-0!">
-        <SidebarTrigger className="-ml-1" />
+    <header className="page__header-container">
+      <div className="header__breadcrumb-container">
+        <SidebarTrigger className="page__sidebar-trigger" />
         <Separator
           orientation="vertical"
-          className="mx-2 data-[orientation=vertical]:h-4"
+          className="page__sidebar-trigger--separator"
         />
         {/* <h1 className="text-base font-medium">Documents</h1> */}
         <Breadcrumb>
           <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
+            <BreadcrumbItem className="header__breadcrumb-item">
               <BreadcrumbLink href="#">
                 Building Your Application
               </BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden md:block" />
+            <BreadcrumbSeparator className="header__breadcrumb-separator" />
             <BreadcrumbItem>
               <BreadcrumbPage>Data Fetching</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <div className="ml-auto flex items-center gap-2">
-          <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
-            <a
-              href="https://github.com/shadcn-ui/ui/tree/main/apps/v4/app/(examples)/dashboard"
+        <div className="header__actions-container">
+          <Button variant="ghost" asChild size="sm" className="actions__button">
+            <Link
+              to="https://github.com/shadcn-ui/ui/tree/main/apps/v4/app/(examples)/dashboard"
               rel="noopener noreferrer"
               target="_blank"
               className="dark:text-foreground"
             >
               GitHub
-            </a>
+            </Link>
           </Button>
         </div>
       </div>
