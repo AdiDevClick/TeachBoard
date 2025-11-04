@@ -1,16 +1,23 @@
 import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
+import "@css/LoginPage.scss";
 import { GalleryVerticalEnd } from "lucide-react";
+import { Link } from "react-router-dom";
 
+/**
+ * Login page component
+ *
+ * @description This component renders the login page with a company logo and login form.
+ */
 export function Login() {
   return (
-    <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-      <div className="flex w-full max-w-sm flex-col gap-6">
-        <a href="#" className="flex items-center gap-2 self-center font-medium">
-          <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
-            <GalleryVerticalEnd className="size-4" />
+    <div className="login-page-container">
+      <div className="login-page__content">
+        <Link to="/" className="login-page__logo">
+          <div className="login-page__logo--background">
+            <GalleryVerticalEnd className="login-page__logo--icon" />
           </div>
           Acme Inc.
-        </a>
+        </Link>
         <LoginForm />
       </div>
     </div>
