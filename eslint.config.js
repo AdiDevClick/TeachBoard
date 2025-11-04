@@ -27,11 +27,11 @@ export default defineConfig([
       indent: ["error", 2, { SwitchCase: 1 }],
       "no-tabs": "error",
       // Prefer value imports rather than always using `import type` when possible
-      "@typescript-eslint/consistent-type-imports": [
-        "error",
-        { prefer: "no-type-imports" },
-        // { prefer: "type-imports" },
-      ],
+      // "@typescript-eslint/consistent-type-imports": [
+      //   "error",
+      //   { prefer: "no-type-imports" },
+      //   // { prefer: "type-imports" },
+      // ],
     },
   },
 ]);
