@@ -1,7 +1,7 @@
 import { SidebarDataProvider } from "@/api/providers/SidebarDataProvider.tsx";
 import App from "@/App.tsx";
+import { PageHeader } from "@/components/Header/PageHeader";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
-import { SiteHeader } from "@/components/site-header.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { calendarEvents } from "@/data/CalendarData.ts";
 import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas.tsx";
@@ -11,6 +11,7 @@ import { PageError } from "@/pages/Error/PageError.tsx";
 import { CreateEvaluations } from "@/pages/Evaluations/create/CreateEvaluations";
 import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
+import { Login } from "@/pages/Login/Login.tsx";
 import type { RootProps } from "@/types/MainTypes.ts";
 import "@css/MainContainer.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -53,6 +54,15 @@ const router = createBrowserRouter([
             loaderData: CompleteDatas.sidebarHeader,
             pageTitle: "Dashboard",
           };
+        },
+      },
+      {
+        path: "login",
+        element: <Login />,
+        loader: async () => {
+          setDocumentTitle("Login");
+
+          return { pageTitle: "hidden" };
         },
       },
       {
@@ -146,7 +156,7 @@ export function Root({ contentType }: RootProps) {
         <SidebarDataProvider value={CompleteDatas}>
           <AppSidebar variant="inset" />
           <SidebarInset className="main-app-container">
-            <SiteHeader />
+            <PageHeader />
             <App>
               {errorContent ? <PageError /> : <Outlet context={null} />}
             </App>
