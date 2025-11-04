@@ -1,4 +1,4 @@
-import type { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import VerticalFieldSelect from "@/components/Selects/VerticalFieldSelect.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import {
@@ -14,19 +14,14 @@ export function StepOne({ title, placeholder }) {
     queryFn: async () => {
       const response = await fetch("/api/classes/", {
         method: "GET",
-        // cache: "no-cache",
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
 
-      if (!response.ok) throw new Error("Network response was not ok");
+      if (!response.ok || response.status !== 200)
+        throw new Error("Network response was not ok");
 
-      return response.json();
+      return await response.json();
     },
   });
-
-  console.log(data);
 
   return (
     <Card className="content__right">
@@ -37,22 +32,22 @@ export function StepOne({ title, placeholder }) {
           onValueChange={(value) => console.log(value)}
           label={title}
         >
-          <SelectGroup>
-            {/* <SelectLabel>BTS</SelectLabel>
+          {data && (
+            <SelectGroup>
+              {/* <SelectLabel>BTS</SelectLabel>
             <SelectItem value="class-1ereA">
               1ère A - Sciences de l'Ingénieur
             </SelectItem> */}
-            <ListMapper items={data}>
-              {(item) => (
-                <>
-                  <SelectLabel>{item.label}</SelectLabel>
-                  <SelectItem key={item.value} value={item.value}>
-                    {item.label}
-                  </SelectItem>
-                </>
-              )}
-            </ListMapper>
-          </SelectGroup>
+              <ListMapper items={data.data}>
+                {(item) => (
+                  <>
+                    <SelectLabel>{item.entityTypeName}</SelectLabel>
+                    <SelectItem value={item.id}>{item.name}</SelectItem>
+                  </>
+                )}
+              </ListMapper>
+            </SelectGroup>
+          )}
         </VerticalFieldSelect>
       </CardContent>
     </Card>
