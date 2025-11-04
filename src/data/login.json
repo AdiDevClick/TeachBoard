@@ -1,0 +1,42 @@
+[
+  {
+    "resource": "src/pages/Login/Login.tsx",
+    "owner": "typescript",
+    "code": {
+      "value": "80001",
+      "target": {
+        "$mid": 1,
+        "path": "/microsoft/TypeScript/-/blob/main/src/compiler/diagnosticMessages.json",
+        "scheme": "https",
+        "authority": "gitlab.com"
+      }
+    },
+    "severity": 8,
+    "message": "'Link' is declared but its value is never read.",
+    "source": "ts",
+    "startLineNumber": 3,
+    "startColumn": 8,
+    "endLineNumber": 3,
+    "endColumn": 12
+  },
+  {
+    "resource": "src/components/LoginForms/LoginForm.tsx",
+    "owner": "typescript",
+    "code": {
+      "value": "80001",
+      "target": {
+        "$mid": 1,
+        "path": "/microsoft/TypeScript/-/blob/main/src/compiler/diagnosticMessages.json",
+        "scheme": "https",
+        "authority": "gitlab.com"
+      }
+    },
+    "severity": 8,
+    "message": "'Link' is declared but its value is never read.",
+    "source": "ts",
+    "startLineNumber": 17,
+    "startColumn": 8,
+    "endLineNumber": 17,
+    "endColumn": 12
+  }
+]
