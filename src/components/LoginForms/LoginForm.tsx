@@ -17,40 +17,120 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useSidebar } from "@/components/ui/sidebar.tsx";
+import { formsRegex } from "@/configs/formsRegex.config.ts";
 import { loginButtonsSvgs } from "@/configs/social.config.ts";
+import { useQueryOnSubmit } from "@/hooks/queries/useQueryOnSubmit.ts";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Activity, type ComponentProps, type CSSProperties } from "react";
+import {
+  Activity,
+  useEffect,
+  type ComponentProps,
+  type FormEvent,
+} from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import z from "zod";
 
 const formSchema = z.object({
-  email: z
-    .email()
-    .min(5, "Votre email doit contenir au moins 5 caractères.")
-    .max(32, "Votre email doit ne peut contenir plus de 32 caractères."),
+  identifier: z
+    .string()
+    .min(3, "Votre identifiant doit contenir au moins 3 caractères.")
+    .max(64, "Votre identifiant ne peut contenir plus de 64 caractères.")
+    .nonempty("L'identifiant est requis.")
+    .transform((val) => {
+      let cleaned = val;
+      try {
+        cleaned = cleaned.normalize("NFKD");
+        cleaned = cleaned.replaceAll(/[\u0300-\u036f]/g, "");
+      } catch {
+        /* ignore if normalize not supported */
+      }
+
+      const pattern = cleaned.includes("@")
+        ? formsRegex.allowedCharsEmailRemove
+        : formsRegex.allowedCharsUsernameRemove;
+      return cleaned.replaceAll(pattern, "");
+    })
+    .superRefine((val, ctx) => {
+      // Conditional validation against server regexes
+      if (val.includes("@")) {
+        if (!formsRegex.serverEmail.test(val)) {
+          ctx.addIssue({
+            code: "custom",
+            message: "Veuillez entrer une adresse email valide.",
+          });
+        }
+      } else if (!formsRegex.serverUsername.test(val)) {
+        ctx.addIssue({
+          code: "custom",
+          message:
+            "Le nom d'utilisateur doit contenir au moins 3 caractères et être composé uniquement de lettres, chiffres, '.', '_' ou '-'.",
+        });
+      }
+    })
+    .transform((v) => v.trim().toLowerCase()),
   password: z
     .string()
     .min(1, "Votre mot de passe doit contenir au moins 1 caractère.")
-    .max(100, "Votre mot de passe ne peut contenir plus de 100 caractères."),
+    .max(100, "Votre mot de passe ne peut contenir plus de 100 caractères.")
+    .nonempty("Le mot de passe est requis."),
 });
 
+const toastId = "login-loading";
+
 /**
+ * Login form component
  *
- * @param param0
- * @returns
+ * @param className - Additional class names for the component
+ * @param props - Additional props for the component
  */
 export function LoginForm({ className, ...props }: ComponentProps<"div">) {
+  const navigate = useNavigate();
+  const { open, setOpen } = useSidebar();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onTouched",
     defaultValues: {
-      email: "",
+      identifier: "",
       password: "",
     },
   });
+
+  const { data, queryFn, isLoading, error } = useQueryOnSubmit([
+    "login",
+    {
+      url: "/api/auth/login",
+      method: "POST",
+      successDescription: "Vous êtes maintenant connecté(e).",
+    },
+  ]);
+
+  /**
+   * Effect to handle loading, success, and error states
+   *
+   * @description It will open the sidebar upon successful login and navigate to the home page.
+   */
+  useEffect(() => {
+    if (isLoading) {
+      toast.loading("Connexion en cours...", {
+        id: toastId,
+      });
+    }
+
+    if (error || data) {
+      toast.dismiss(toastId);
+    }
+
+    if (data) {
+      form.reset();
+      navigate("/", { replace: true });
+      if (!open) setOpen(true);
+      toast.dismiss(toastId);
+    }
+  }, [isLoading, error, data, open]);
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -64,7 +144,7 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
         <CardContent>
           <form
             id="login-form"
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={form.handleSubmit(queryFn)}
             className="grid gap-4"
           >
             <FieldGroup>
@@ -77,18 +157,53 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
                 Ou continuez avec
               </FieldSeparator>
               <Controller
-                name="email"
+                name="identifier"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="email">Email</FieldLabel>
+                    <FieldLabel htmlFor="identifier">Identifiant</FieldLabel>
                     <Input
                       {...field}
-                      id="email"
-                      type="email"
+                      id="identifier"
+                      type="text"
+                      // type="email"
                       placeholder="m@example.com"
                       aria-invalid={fieldState.invalid}
                       required
+                      // Prevent forbidden chars on input (UX-friendly) and
+                      // sanitize on change as a fallback.
+                      onBeforeInput={(e: FormEvent<HTMLInputElement>) => {
+                        const data = (e.nativeEvent as InputEvent).data;
+                        // if the incoming character isn't allowed for ASCII email/username,
+                        // prevent it immediately. Allow '@' so user can start an email.
+                        if (
+                          data &&
+                          !formsRegex.allowedCharEmailTest.test(data)
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                      onChange={(e) => {
+                        const raw = (e.target as HTMLInputElement).value;
+                        // normalize & remove diacritics first so accents become base letters
+                        let normalized = raw;
+                        try {
+                          normalized = normalized.normalize("NFKD");
+                          normalized = normalized.replaceAll(
+                            /[\u0300-\u036f]/g,
+                            ""
+                          );
+                        } catch {
+                          /* ignore if normalize not supported */
+                        }
+
+                        const pattern = normalized.includes("@")
+                          ? formsRegex.allowedCharsEmailRemove
+                          : formsRegex.allowedCharsUsernameRemove;
+                        const cleaned = normalized.replaceAll(pattern, "");
+                        field.onChange(cleaned);
+                      }}
+                      value={field.value ?? ""}
                     />
                     <Activity mode={fieldState.invalid ? "visible" : "hidden"}>
                       <FieldError errors={[fieldState.error]} />
@@ -148,27 +263,4 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
       </FieldDescription>
     </div>
   );
-}
-
-/**
- * Handle form submission
- *
- * @param data - Form data
- */
-function onSubmit(data: z.infer<typeof formSchema>) {
-  toast("You submitted the following values:", {
-    description: (
-      <pre>
-        <code>{JSON.stringify(data, null, 2)}</code>
-      </pre>
-    ),
-    position: "top-right",
-    classNames: {
-      content: "flex flex-col gap-2",
-    },
-    style: {
-      "--border-radius": "calc(var(--radius) + 4px)",
-    } as CSSProperties,
-  });
-  // toast.success("Form submitted successfully!");
 }
