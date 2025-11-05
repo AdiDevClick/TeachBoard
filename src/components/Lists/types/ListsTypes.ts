@@ -7,6 +7,6 @@ export type ListMapperProps<T> = {
     | ((item: T, index: number) => ReactNode);
 };
 
-export type ListMapper<T> =
+export type ListMapperType<T> =
   | ReactElement<Partial<{ item: T; index: number }>>
   | ReactNode;
