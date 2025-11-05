@@ -1,6 +1,6 @@
 import type {
-  ListMapper,
   ListMapperProps,
+  ListMapperType,
 } from "@/components/Lists/types/ListsTypes.ts";
 import { cloneElement, Fragment, isValidElement } from "react";
 
@@ -36,7 +36,7 @@ import { cloneElement, Fragment, isValidElement } from "react";
 export function ListMapper<T>({
   items,
   children,
-}: ListMapperProps<T>): ListMapper<T> {
+}: Readonly<ListMapperProps<T>>): ListMapperType<T> {
   return (
     <>
       {items.map((item, index) => {
@@ -49,16 +49,22 @@ export function ListMapper<T>({
             ? item.id
             : index * Math.random();
 
-        return typeof children === "function" ? (
-          children(item, index)
-        ) : isValidElement(children) ? (
-          <Fragment key={String(itemId)}>
-            {cloneElement(children, {
-              ...item,
-              index,
-            })}
-          </Fragment>
-        ) : null;
+        if (typeof children === "function") {
+          return children(item, index);
+        }
+
+        if (isValidElement(children)) {
+          return (
+            <Fragment key={String(itemId)}>
+              {cloneElement(children, {
+                ...item,
+                index,
+              })}
+            </Fragment>
+          );
+        }
+
+        return null;
       })}
     </>
   );

@@ -3,6 +3,7 @@ import App from "@/App.tsx";
 import { PageHeader } from "@/components/Header/PageHeader";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
+import { Toaster } from "@/components/ui/sonner";
 import { calendarEvents } from "@/data/CalendarData.ts";
 import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas.tsx";
 import { sidebarDatas } from "@/data/SidebarData";
@@ -14,6 +15,7 @@ import { Home } from "@/pages/Home/Home.tsx";
 import { Login } from "@/pages/Login/Login.tsx";
 import type { RootProps } from "@/types/MainTypes.ts";
 import "@css/MainContainer.scss";
+import "@css/Toaster.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode, type CSSProperties } from "react";
 import { createRoot } from "react-dom/client";
@@ -94,19 +96,6 @@ const router = createBrowserRouter([
                 pageDatas: EvaluationPageTabsDatas,
               };
             },
-
-            // let done = false;
-
-            // CompleteDatas.navMain.menus.map((element) => {
-            //   if (done) return;
-            //   const location = window.location.pathname;
-            //   element.isActive = "/" + element.url === location;
-
-            //   if (element.isActive) {
-            //     document.title = "TeachBoard - " + element.title;
-            //     done = true;
-            //   }
-            // });
           },
         ],
       },
@@ -138,32 +127,34 @@ createRoot(document.getElementById("root")!).render(
  * @param contentType - type of content to render
  * @returns
  */
-export function Root({ contentType }: RootProps) {
+export function Root({ contentType }: Readonly<RootProps>) {
   const errorContent = contentType === "error";
 
   return (
-    <>
-      <SidebarProvider
-        style={
-          {
-            "--sidebar-width": "calc(var(--spacing) * 72)",
-            "--header-height": "calc(var(--spacing) * 12)",
-            paddingInline: 5,
-          } as CSSProperties
-        }
-        className="sidebar-wrapper"
-      >
-        <SidebarDataProvider value={CompleteDatas}>
-          <AppSidebar variant="inset" />
-          <SidebarInset className="main-app-container">
-            <PageHeader />
-            <App>
-              {errorContent ? <PageError /> : <Outlet context={null} />}
-            </App>
-          </SidebarInset>
-        </SidebarDataProvider>
-      </SidebarProvider>
-    </>
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+          paddingInline: 5,
+        } as CSSProperties
+      }
+      className="sidebar-wrapper"
+    >
+      <SidebarDataProvider value={CompleteDatas}>
+        <AppSidebar variant="inset" />
+        <SidebarInset className="main-app-container">
+          <PageHeader />
+          <App>{errorContent ? <PageError /> : <Outlet context={null} />}</App>
+          <Toaster
+            position="top-right"
+            className={"toaster-redefined"}
+            richColors
+            closeButton
+          />
+        </SidebarInset>
+      </SidebarDataProvider>
+    </SidebarProvider>
   );
 }
 
