@@ -1,17 +1,20 @@
 import { SidebarDataProvider } from "@/api/providers/SidebarDataProvider.tsx";
 import App from "@/App.tsx";
+import { PageHeader } from "@/components/Header/PageHeader";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
-import { SiteHeader } from "@/components/site-header.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { calendarEvents } from "@/data/CalendarData.ts";
+import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas.tsx";
 import { sidebarDatas } from "@/data/SidebarData";
 import { About } from "@/pages/About/About.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
-import { CreateEvaluations } from "@/pages/Evaluations/CreateEvaluations.tsx";
+import { CreateEvaluations } from "@/pages/Evaluations/create/CreateEvaluations";
 import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
+import { Login } from "@/pages/Login/Login.tsx";
 import type { RootProps } from "@/types/MainTypes.ts";
 import "@css/MainContainer.scss";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode, type CSSProperties } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -20,6 +23,8 @@ import {
   Outlet,
   RouterProvider,
 } from "react-router-dom";
+
+const queryClient = new QueryClient();
 
 /**
  * Complete sidebar data including calendar events
@@ -44,10 +49,20 @@ const router = createBrowserRouter([
         element: <Home />,
         loader: async () => {
           setDocumentTitle(CompleteDatas.sidebarHeader.tooltip);
+
           return {
             loaderData: CompleteDatas.sidebarHeader,
             pageTitle: "Dashboard",
           };
+        },
+      },
+      {
+        path: "login",
+        element: <Login />,
+        loader: async () => {
+          setDocumentTitle("Login");
+
+          return { pageTitle: "hidden" };
         },
       },
       {
@@ -59,6 +74,7 @@ const router = createBrowserRouter([
         element: <Evaluations />,
         loader: async () => {
           setDocumentTitle(CompleteDatas.navMain.menus[2].title);
+
           return {
             pageTitle: CompleteDatas.navMain.menus[2].title,
             loaderData: CompleteDatas.navMain.menus[2],
@@ -71,9 +87,11 @@ const router = createBrowserRouter([
             loader: async () => {
               const date = new Date().toLocaleDateString();
               setDocumentTitle(CompleteDatas.navMain.menus[0].title);
+
               return {
                 pageTitle: "Evaluation - " + date,
                 loaderData: CompleteDatas.navMain.menus[0],
+                pageDatas: EvaluationPageTabsDatas,
               };
             },
 
@@ -106,7 +124,9 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
   </StrictMode>
 );
 
@@ -136,7 +156,7 @@ export function Root({ contentType }: RootProps) {
         <SidebarDataProvider value={CompleteDatas}>
           <AppSidebar variant="inset" />
           <SidebarInset className="main-app-container">
-            <SiteHeader />
+            <PageHeader />
             <App>
               {errorContent ? <PageError /> : <Outlet context={null} />}
             </App>

@@ -1,7 +1,7 @@
 /**
   * Styles for the PageTitle component
   */
-.page-title-container {
+.page__title-container {
   display: flex;
   font-size: 3rem;
   padding-inline: 25px;
@@ -15,7 +15,7 @@
     gap: 0.2rem;
   }
 
-  .page-title-icon {
+  .title__icon {
     margin-left: 3px;
     padding-top: 10px;
     color: var(--tb-color-primary);

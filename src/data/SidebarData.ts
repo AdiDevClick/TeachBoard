@@ -10,7 +10,7 @@ import {
   IconFileWord,
   IconHelp,
   IconInnerShadowTop,
-  IconLogout,
+  IconLogin,
   IconMail,
   IconMoon,
   IconNotification,
@@ -24,21 +24,33 @@ import { GraduationCap } from "lucide-react";
 
 export const sidebarDatas = {
   user: {
-    name: "shadcn very very long name example",
-    email: "myveryveryverylongemail@example.com",
+    name: "Invité",
+    email: "Non connecté",
     avatar: "/avatars/shadcn.jpg",
     settings: [
       {
         title: "Mon Compte",
         url: "#",
         icon: IconUserCircle,
+        isActive: false,
+        showToUser: true,
       },
       {
         title: "Notifications",
         url: "#",
         icon: IconNotification,
+        isActive: false,
+        showToUser: false,
       },
-      { title: "Déconnexion", url: "#", icon: IconLogout, divider: true },
+      {
+        title: "Me connecter",
+        url: "/login",
+        icon: IconLogin,
+        divider: true,
+        showToUser: true,
+        isActive: true,
+      },
+      // { title: "Déconnexion", url: "#", icon: IconLogout, divider: true },
     ],
   },
   sidebarHeader: {

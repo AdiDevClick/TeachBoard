@@ -3,6 +3,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu.tsx";
+import { Activity } from "react";
+import { NavLink } from "react-router-dom";
 
 /**
  * Dropdown component for rendering a single dropdown item.
@@ -12,15 +14,17 @@ import {
 export function Dropdown({ ...item }: DropdownsProps) {
   const { title, icon: Icon, divider } = item;
 
-  // const id = useId();
-
   return (
     <>
       {divider && <DropdownMenuSeparator />}
-      <DropdownMenuItem>
-        {Icon && <Icon />}
-        {title}
-      </DropdownMenuItem>
+      <Activity mode={item.showToUser ? "visible" : "hidden"}>
+        <NavLink to={item.url ? item.url : "#"} replace={true}>
+          <DropdownMenuItem disabled={!item.isActive}>
+            {Icon && <Icon />}
+            {title}
+          </DropdownMenuItem>
+        </NavLink>
+      </Activity>
     </>
   );
 }

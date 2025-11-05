@@ -1,0 +1,67 @@
+/**
+ * Styles for the Evaluation Page component.
+ */
+.evaluation-page-container {
+  --gap-spacing: calc(var(--spacing) * 6);
+  height: 100%;
+
+  & .evaluation-page__cards-container {
+    display: flex;
+    flex-direction: row;
+    justify-self: center;
+    width: 97%;
+    height: 100%;
+    box-shadow: none;
+    border: none;
+    border-left: 7px solid;
+
+    .cards-container__header {}
+
+    .cards-container__content {
+      display: grid;
+      grid-template-columns: 1.5fr 0fr 3fr;
+      gap: var(--gap-spacing);
+      width: 100%;
+      align-items: center;
+
+      @media screen and (max-width: 768px) {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 0fr 1fr;
+      }
+
+      .content__left {
+        width: 100%;
+      }
+
+      .content__separator {
+        height: 50%;
+        width: 1px;
+        margin: auto;
+
+        @media screen and (max-width: 768px) {
+          width: 50%;
+          height: 1px;
+        }
+      }
+
+      .content__right {
+        place-self: center;
+        min-width: 40%;
+
+        .right__content-container {
+          display: grid;
+          gap: var(--gap-spacing);
+
+          .right__content {
+            display: grid;
+            gap: calc(var(--spacing) * 3);
+          }
+        }
+      }
+    }
+
+    .cards-container__footer {
+      padding-left: 0;
+    }
+  }
+}

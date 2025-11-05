@@ -1,0 +1,51 @@
+/**
+ * Styles for the Login Page
+ */
+.login-page-container {
+  --localSpacing: calc(var(--spacing) * 6);
+
+  background-color: var(--muted);
+  display: flex;
+  // flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--localSpacing);
+  min-height: 100svh;
+  padding: var(--localSpacing);
+
+  .login-page__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--localSpacing);
+    // width: 100%;
+    max-width: var(--container-sm);
+  }
+
+  .login-page__logo {
+    display: flex;
+    align-items: center;
+    align-self: center;
+    gap: calc(var(--spacing) * 2);
+    font-weight: var(--font-weight-medium);
+
+    &--background {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--localSpacing);
+      height: var(--localSpacing);
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+      border-radius: calc(var(--radius) - 2px);
+    }
+
+    &--icon {
+      width: calc(var(--spacing) * 4);
+      height: calc(var(--spacing) * 4);
+    }
+  }
+
+  @media screen and (min-width: 48rem) {
+    padding: calc(var(--spacing) * 10);
+  }
+}
