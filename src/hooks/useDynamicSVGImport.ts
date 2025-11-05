@@ -1,6 +1,7 @@
 import type { UseDynamicSVGImportTypes } from "@/hooks/types/useDynamicSVGImportTypes.ts";
 import { useEffect, useState, type ComponentType, type SVGProps } from "react";
 
+/** Map of all available icons */
 const icons = import.meta.glob("/src/assets/icons/*.svg", {
   import: "default",
 });
