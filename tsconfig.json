@@ -5,19 +5,20 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
-    "strict": true,
-    "baseUrl": "./src",
-    "paths": {
-      "@/*": ["./*"],
-      "@assets/*": ["assets/*"],
-      "@css/*": ["assets/css/*"],
-      "@images/*": ["assets/images/*"],
-      "@icons/*": ["assets/icons/*"],
-      "@data/*": ["data/*"],
-      "@utils/*": ["utils/*"],
-      "@hooks/*": ["hooks/*"]
-    }
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+    "forceConsistentCasingInFileNames": true,
+    "strict": true
+    // "baseUrl": "./src",
+    // "paths": {
+    //   "@/*": ["./*"],
+    //   "@assets/*": ["assets/*"],
+    //   "@css/*": ["assets/css/*"],
+    //   "@images/*": ["assets/images/*"],
+    //   "@icons/*": ["assets/icons/*"],
+    //   "@data/*": ["data/*"],
+    //   "@utils/*": ["utils/*"],
+    //   "@hooks/*": ["hooks/*"]
+    // }
+  }
+  // "include": ["src/**/*"],
+  // "exclude": ["node_modules"]
 }
