@@ -7,6 +7,14 @@ import { GalleryVerticalEnd } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
+const {
+  containerStyle,
+  contentStyle,
+  logoStyle,
+  logoBackgroundStyle,
+  logoIconStyle,
+} = loginStyle();
+
 /**
  * Login page component
  *
@@ -21,11 +29,11 @@ export function Login() {
   }, []);
 
   return (
-    <div className="login-page-container">
-      <div className="login-page__content">
-        <Link to="/" className="login-page__logo">
-          <div className="login-page__logo--background">
-            <GalleryVerticalEnd className="login-page__logo--icon" />
+    <div {...containerStyle}>
+      <div {...contentStyle}>
+        <Link to="/" {...logoStyle}>
+          <div {...logoBackgroundStyle}>
+            <GalleryVerticalEnd {...logoIconStyle} />
           </div>
           Acme Inc.
         </Link>
@@ -33,4 +41,21 @@ export function Login() {
       </div>
     </div>
   );
+}
+
+/**
+ * Styles for the login page
+ *
+ * @returns An object containing class names for the login page elements.
+ */
+function loginStyle() {
+  const loginPage = "login-page";
+
+  return {
+    containerStyle: { className: `${loginPage}-container` },
+    contentStyle: { className: `${loginPage}__content` },
+    logoStyle: { className: `${loginPage}__logo` },
+    logoBackgroundStyle: { className: `${loginPage}__logo--background` },
+    logoIconStyle: { className: `${loginPage}__logo--icon` },
+  };
 }
