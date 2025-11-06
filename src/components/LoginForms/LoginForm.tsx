@@ -1,4 +1,5 @@
 import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
+import { Inputs } from "@/components/Inputs/Inputs.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import type {
   LoginFormProps,
@@ -15,20 +16,17 @@ import {
 import {
   Field,
   FieldDescription,
-  FieldError,
   FieldGroup,
-  FieldLabel,
   FieldSeparator,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
 import { loginButtonsSvgs } from "@/configs/social.config.ts";
 import { useQueryOnSubmit } from "@/hooks/queries/useQueryOnSubmit.ts";
 import { cn } from "@/lib/utils";
 import { formSchema } from "@/models/login.models.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Activity, useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -120,34 +118,7 @@ export function LoginForm({
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Ou continuez avec
               </FieldSeparator>
-              <ListMapper items={inputControllers}>
-                {({ name, title, type, placeholder }) => (
-                  <Controller
-                    key={name}
-                    name={name}
-                    control={form.control}
-                    render={({ field, fieldState }) => (
-                      <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel htmlFor={name}>{title}</FieldLabel>
-                        <Input
-                          {...field}
-                          id={name}
-                          type={type}
-                          placeholder={placeholder}
-                          aria-invalid={fieldState.invalid}
-                          required
-                          value={field.value ?? ""}
-                        />
-                        <Activity
-                          mode={fieldState.invalid ? "visible" : "hidden"}
-                        >
-                          <FieldError errors={[fieldState.error]} />
-                        </Activity>
-                      </Field>
-                    )}
-                  />
-                )}
-              </ListMapper>
+              <Inputs items={inputControllers} form={form} />
               <Field>
                 <Button
                   type="submit"
