@@ -1,7 +1,9 @@
+import type { LoginInputItem } from "@/components/LoginForms/types/LoginFormsTypes.ts";
+
 /**
  * Input controllers for the login form.
  */
-export const inputControllers = [
+export const inputControllers: LoginInputItem[] = [
   {
     name: "identifier",
     title: "Identifiant",
