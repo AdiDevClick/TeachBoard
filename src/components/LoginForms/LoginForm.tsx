@@ -23,12 +23,7 @@ import { loginButtonsSvgs } from "@/configs/social.config.ts";
 import { useQueryOnSubmit } from "@/hooks/queries/useQueryOnSubmit.ts";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Activity,
-  useEffect,
-  type ComponentProps,
-  type FormEvent,
-} from "react";
+import { Activity, useEffect, type ComponentProps } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -40,22 +35,21 @@ const formSchema = z.object({
     .min(3, "Votre identifiant doit contenir au moins 3 caractères.")
     .max(64, "Votre identifiant ne peut contenir plus de 64 caractères.")
     .nonempty("L'identifiant est requis.")
-    .transform((val) => {
-      let cleaned = val;
-      try {
-        cleaned = cleaned.normalize("NFKD");
-        cleaned = cleaned.replaceAll(/[\u0300-\u036f]/g, "");
-      } catch {
-        /* ignore if normalize not supported */
-      }
+    // .transform((val) => {
+    //   let cleaned = val;
+    //   try {
+    //     cleaned = cleaned.normalize("NFKD");
+    //     cleaned = cleaned.replaceAll(/[\u0300-\u036f]/g, "");
+    //   } catch {
+    //     /* ignore if normalize not supported */
+    //   }
 
-      const pattern = cleaned.includes("@")
-        ? formsRegex.allowedCharsEmailRemove
-        : formsRegex.allowedCharsUsernameRemove;
-      return cleaned.replaceAll(pattern, "");
-    })
+    //   const pattern = cleaned.includes("@")
+    //     ? formsRegex.allowedCharsEmailRemove
+    //     : formsRegex.allowedCharsUsernameRemove;
+    //   return cleaned.replaceAll(pattern, "");
+    // })
     .superRefine((val, ctx) => {
-      // Conditional validation against server regexes
       if (val.includes("@")) {
         if (!formsRegex.serverEmail.test(val)) {
           ctx.addIssue({
@@ -63,12 +57,6 @@ const formSchema = z.object({
             message: "Veuillez entrer une adresse email valide.",
           });
         }
-      } else if (!formsRegex.serverUsername.test(val)) {
-        ctx.addIssue({
-          code: "custom",
-          message:
-            "Le nom d'utilisateur doit contenir au moins 3 caractères et être composé uniquement de lettres, chiffres, '.', '_' ou '-'.",
-        });
       }
     })
     .transform((v) => v.trim().toLowerCase()),
@@ -124,11 +112,17 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
       toast.dismiss(toastId);
     }
 
+    if (error?.cause?.status === 400 || error?.cause?.status === 401) {
+      toast.dismiss();
+      toast.error(
+        "Identidiant ou mot de passe incorrect. Veuillez vérifier vos informations et réessayer."
+      );
+    }
+
     if (data) {
       form.reset();
       navigate("/", { replace: true });
       if (!open) setOpen(true);
-      toast.dismiss(toastId);
     }
   }, [isLoading, error, data, open]);
 
@@ -170,39 +164,6 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
                       placeholder="m@example.com"
                       aria-invalid={fieldState.invalid}
                       required
-                      // Prevent forbidden chars on input (UX-friendly) and
-                      // sanitize on change as a fallback.
-                      onBeforeInput={(e: FormEvent<HTMLInputElement>) => {
-                        const data = (e.nativeEvent as InputEvent).data;
-                        // if the incoming character isn't allowed for ASCII email/username,
-                        // prevent it immediately. Allow '@' so user can start an email.
-                        if (
-                          data &&
-                          !formsRegex.allowedCharEmailTest.test(data)
-                        ) {
-                          e.preventDefault();
-                        }
-                      }}
-                      onChange={(e) => {
-                        const raw = (e.target as HTMLInputElement).value;
-                        // normalize & remove diacritics first so accents become base letters
-                        let normalized = raw;
-                        try {
-                          normalized = normalized.normalize("NFKD");
-                          normalized = normalized.replaceAll(
-                            /[\u0300-\u036f]/g,
-                            ""
-                          );
-                        } catch {
-                          /* ignore if normalize not supported */
-                        }
-
-                        const pattern = normalized.includes("@")
-                          ? formsRegex.allowedCharsEmailRemove
-                          : formsRegex.allowedCharsUsernameRemove;
-                        const cleaned = normalized.replaceAll(pattern, "");
-                        field.onChange(cleaned);
-                      }}
                       value={field.value ?? ""}
                     />
                     <Activity mode={fieldState.invalid ? "visible" : "hidden"}>
