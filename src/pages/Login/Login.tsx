@@ -1,5 +1,4 @@
 import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
-import type { InputController } from "@/components/LoginForms/types/LoginFormsTypes.ts";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
 import { inputControllers } from "@/data/loginInputControllers";
 import "@css/LoginPage.scss";
@@ -41,7 +40,7 @@ export function Login() {
           </div>
           Acme Inc.
         </Link>
-        <LoginForm inputControllers={inputControllers as InputController[]} />
+        <LoginForm inputControllers={inputControllers} />
       </div>
     </div>
   );
