@@ -7,6 +7,10 @@ import { GalleryVerticalEnd } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
+/** Use it once or insert it into the component
+ * if you need to add dynamic styles based on props or state
+ * in the future.
+ */
 const {
   containerStyle,
   contentStyle,
