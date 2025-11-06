@@ -1,5 +1,7 @@
 import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
+import type { InputController } from "@/components/LoginForms/types/LoginFormsTypes.ts";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
+import { inputControllers } from "@/data/loginInputControllers";
 import "@css/LoginPage.scss";
 import { GalleryVerticalEnd } from "lucide-react";
 import { useEffect } from "react";
@@ -27,7 +29,7 @@ export function Login() {
           </div>
           Acme Inc.
         </Link>
-        <LoginForm />
+        <LoginForm inputControllers={inputControllers as InputController[]} />
       </div>
     </div>
   );
