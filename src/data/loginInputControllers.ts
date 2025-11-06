@@ -1,3 +1,6 @@
+/**
+ * Input controllers for the login form.
+ */
 export const inputControllers = [
   {
     name: "identifier",
