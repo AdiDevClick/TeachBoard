@@ -1,4 +1,4 @@
-import type { MutationResponse } from "@/hooks/queries/types/QueriesTypes.ts";
+import type { ErrorInterface, ErrorMeta } from "@/types/MainTypes.ts";
 
 /**
  * Get a user-friendly error message based on the HTTP status code and response.
@@ -7,19 +7,20 @@ import type { MutationResponse } from "@/hooks/queries/types/QueriesTypes.ts";
  * @param response - The response object containing error details.
  * @returns A user-friendly error message.
  */
-export function getErrorMessage(status?: number, response?: MutationResponse) {
+export function getErrorMessage(
+  status?: number,
+  errorPayload?: Partial<ErrorInterface & ErrorMeta> | undefined
+): string {
   const fallback =
     "HTTP Error! Please try again later or verify if you are connected to the internet.";
 
-  if (!status && response?.message) {
-    return response.message;
-  }
-
   if (!status) {
-    return fallback;
+    return (
+      errorPayload?.message ?? errorPayload?.error ?? fallback
+    );
   }
 
-  const errorMessage = response?.error ?? undefined;
+  const errorMessage = errorPayload?.message ?? errorPayload?.error;
 
   switch (status) {
     case 400:
