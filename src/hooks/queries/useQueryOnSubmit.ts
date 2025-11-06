@@ -5,54 +5,43 @@ import type {
   MutationVariables,
   QueryKeyDescriptor,
 } from "@/hooks/queries/types/QueriesTypes.ts";
+import type { ApiError, CustomError } from "@/types/MainTypes.ts";
+import type { UseMutationOptions } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
 /**
+ * Options for the mutation hook.
+ * @description Centralizing mutation functions
+ */
+const mutationOptions = (
+  queryKeys: QueryKeyDescriptor
+): UseMutationOptions<
+  MutationResponse,
+  CustomError<ApiError>,
+  MutationVariables
+> => {
+  const { url, method = "GET", successDescription } = queryKeys[1];
+
+  return {
+    mutationKey: queryKeys,
+    mutationFn: (variables) => onFetch(variables, method, url),
+    onSuccess: (response) => onQuerySuccess(response, successDescription),
+    onError: (error) => onQueryError(error),
+  };
+};
+
+/**
  * Handles form submission by triggering the query function.
  *
- * @param queryKey The query key descriptor containing task and descriptor.
+ * @param queryKeys The query key descriptor containing task and descriptor.
  * @returns An object containing data, isLoading, error, and queryFn.
  */
-export function useQueryOnSubmit(queryKey: QueryKeyDescriptor) {
-  const { url, method = "GET", successDescription } = queryKey[1];
-
-  const { mutateAsync, data, isPending, error } = useMutation<
-    MutationResponse,
-    Error,
-    MutationVariables
-  >({
-    mutationKey: queryKey,
-    mutationFn: async (variables) => {
-      const response = await fetchJSON(getUrl(url), {
-        method: method,
-        json: variables,
-      });
-
-      if (!response.ok) {
-        const status = response.status;
-
-        const message = getErrorMessage(status, response);
-
-        throw new Error(message, {
-          cause: { status, response },
-        });
-      }
-
-      return response;
-    },
-    onSuccess: (response) => {
-      const successMessage = response.success ?? undefined;
-      toast(successMessage ?? "Success", {
-        description: successDescription,
-        position: "top-right",
-      });
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+export function useQueryOnSubmit(queryKeys: QueryKeyDescriptor) {
+  const { mutateAsync, data, isPending, error } = useMutation(
+    mutationOptions(queryKeys)
+  );
 
   /**
    * Handles form submission by triggering the mutation function.
@@ -83,6 +72,38 @@ export function useQueryOnSubmit(queryKey: QueryKeyDescriptor) {
 }
 
 /**
+ * Fetch data from the API using the provided variables.
+ *
+ * @description This function is used as the mutation function for the useMutation hook.
+ *
+ * @param variables The variables to be sent in the request body.
+ * @returns The mutation response object.
+ */
+async function onFetch(
+  variables: MutationVariables,
+  queryMethod: string,
+  queryUrl?: string
+) {
+  const response = await fetchJSON(getUrl(queryUrl), {
+    method: queryMethod,
+    json: variables,
+  });
+
+  if (!response.ok || response === undefined) {
+    const status = response.status;
+    const message = getErrorMessage(status, response);
+    const apiError = new Error(message, {
+      cause: { status, response },
+    });
+    // }) as CustomError<ApiError>;
+
+    throw apiError;
+  }
+
+  return response;
+}
+
+/**
  * Get the URL from the query descriptor.
  *
  * @param descriptor Endpoint's string
@@ -96,4 +117,33 @@ function getUrl(url?: string): string {
   }
 
   return url;
+}
+
+/**
+ * Handle query success by showing a toast notification.
+ *
+ * @description Use this function to centralize success handling logic if needed.
+ *
+ * @param response The mutation response object.
+ */
+function onQuerySuccess(
+  response: MutationResponse,
+  querySuccessDescription?: string
+) {
+  const successMessage = response.success ?? undefined;
+  toast(successMessage ?? "Success", {
+    description: querySuccessDescription,
+    position: "top-right",
+  });
+}
+
+/**
+ * Handle query error by showing a toast notification.
+ *
+ * @description Use this function to centralize error handling logic if needed.
+ *
+ * @param error The mutation error object.
+ */
+function onQueryError(error: CustomError<ApiError>) {
+  toast.error(error.message);
 }
