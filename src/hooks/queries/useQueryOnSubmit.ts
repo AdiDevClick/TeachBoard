@@ -104,22 +104,6 @@ async function onFetch(
 }
 
 /**
- * Get the URL from the query descriptor.
- *
- * @param descriptor Endpoint's string
- * @returns
- */
-function getUrl(url?: string): string {
-  if (!url || url === null) {
-    throw new Error(
-      "Missing url in query descriptor passed to useQueryOnSubmit."
-    );
-  }
-
-  return url;
-}
-
-/**
  * Handle query success by showing a toast notification.
  *
  * @description Use this function to centralize success handling logic if needed.
@@ -145,5 +129,22 @@ function onQuerySuccess(
  * @param error The mutation error object.
  */
 function onQueryError(error: CustomError<ApiError>) {
+  toast.dismiss();
   toast.error(error.message);
+}
+
+/**
+ * Get the URL from the query descriptor.
+ *
+ * @param descriptor Endpoint's string
+ * @returns
+ */
+function getUrl(url?: string): string {
+  if (!url || url === null) {
+    throw new Error(
+      "Missing url in query descriptor passed to useQueryOnSubmit."
+    );
+  }
+
+  return url;
 }
