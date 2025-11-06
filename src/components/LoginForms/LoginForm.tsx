@@ -36,6 +36,7 @@ const toastId = "login-loading";
  * Login form component
  *
  * @param className - Additional class names for the component
+ * @param inputControllers - Array of input controller objects
  * @param props - Additional props for the component
  */
 export function LoginForm({
