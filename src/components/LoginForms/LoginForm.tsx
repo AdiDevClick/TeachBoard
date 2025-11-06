@@ -1,5 +1,9 @@
 import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import type {
+  LoginFormProps,
+  LoginFormSchema,
+} from "@/components/LoginForms/types/LoginFormsTypes.ts";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,54 +22,15 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
-import { formsRegex } from "@/configs/formsRegex.config.ts";
 import { loginButtonsSvgs } from "@/configs/social.config.ts";
 import { useQueryOnSubmit } from "@/hooks/queries/useQueryOnSubmit.ts";
 import { cn } from "@/lib/utils";
+import { formSchema } from "@/models/login.models.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Activity, useEffect, type ComponentProps } from "react";
+import { Activity, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import z from "zod";
-
-const formSchema = z.object({
-  identifier: z
-    .string()
-    .min(3, "Votre identifiant doit contenir au moins 3 caractères.")
-    .max(64, "Votre identifiant ne peut contenir plus de 64 caractères.")
-    .nonempty("L'identifiant est requis.")
-    // .transform((val) => {
-    //   let cleaned = val;
-    //   try {
-    //     cleaned = cleaned.normalize("NFKD");
-    //     cleaned = cleaned.replaceAll(/[\u0300-\u036f]/g, "");
-    //   } catch {
-    //     /* ignore if normalize not supported */
-    //   }
-
-    //   const pattern = cleaned.includes("@")
-    //     ? formsRegex.allowedCharsEmailRemove
-    //     : formsRegex.allowedCharsUsernameRemove;
-    //   return cleaned.replaceAll(pattern, "");
-    // })
-    .superRefine((val, ctx) => {
-      if (val.includes("@")) {
-        if (!formsRegex.serverEmail.test(val)) {
-          ctx.addIssue({
-            code: "custom",
-            message: "Veuillez entrer une adresse email valide.",
-          });
-        }
-      }
-    })
-    .transform((v) => v.trim().toLowerCase()),
-  password: z
-    .string()
-    .min(1, "Votre mot de passe doit contenir au moins 1 caractère.")
-    .max(100, "Votre mot de passe ne peut contenir plus de 100 caractères.")
-    .nonempty("Le mot de passe est requis."),
-});
 
 const toastId = "login-loading";
 
@@ -75,10 +40,15 @@ const toastId = "login-loading";
  * @param className - Additional class names for the component
  * @param props - Additional props for the component
  */
-export function LoginForm({ className, ...props }: ComponentProps<"div">) {
+export function LoginForm({
+  className,
+  inputControllers,
+  ...props
+}: Readonly<LoginFormProps>) {
   const navigate = useNavigate();
   const { open, setOpen } = useSidebar();
-  const form = useForm<z.infer<typeof formSchema>>({
+
+  const form = useForm<LoginFormSchema>({
     resolver: zodResolver(formSchema),
     mode: "onTouched",
     defaultValues: {
@@ -150,56 +120,34 @@ export function LoginForm({ className, ...props }: ComponentProps<"div">) {
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Ou continuez avec
               </FieldSeparator>
-              <Controller
-                name="identifier"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="identifier">Identifiant</FieldLabel>
-                    <Input
-                      {...field}
-                      id="identifier"
-                      type="text"
-                      // type="email"
-                      placeholder="m@example.com"
-                      aria-invalid={fieldState.invalid}
-                      required
-                      value={field.value ?? ""}
-                    />
-                    <Activity mode={fieldState.invalid ? "visible" : "hidden"}>
-                      <FieldError errors={[fieldState.error]} />
-                    </Activity>
-                  </Field>
+              <ListMapper items={inputControllers}>
+                {({ name, title, type, placeholder }) => (
+                  <Controller
+                    key={name}
+                    name={name}
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor={name}>{title}</FieldLabel>
+                        <Input
+                          {...field}
+                          id={name}
+                          type={type}
+                          placeholder={placeholder}
+                          aria-invalid={fieldState.invalid}
+                          required
+                          value={field.value ?? ""}
+                        />
+                        <Activity
+                          mode={fieldState.invalid ? "visible" : "hidden"}
+                        >
+                          <FieldError errors={[fieldState.error]} />
+                        </Activity>
+                      </Field>
+                    )}
+                  />
                 )}
-              />
-              <Controller
-                name="password"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="flex items-center">
-                      <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
-                      <Link
-                        to="#"
-                        className="ml-auto text-sm underline-offset-4 hover:underline"
-                      >
-                        Mot de passe oublié ?
-                      </Link>
-                    </div>
-                    <Input
-                      {...field}
-                      id="password"
-                      type="password"
-                      placeholder="********"
-                      required
-                      aria-invalid={fieldState.invalid}
-                    />
-                    <Activity mode={fieldState.invalid ? "visible" : "hidden"}>
-                      <FieldError errors={[fieldState.error]} />
-                    </Activity>
-                  </Field>
-                )}
-              />
+              </ListMapper>
               <Field>
                 <Button
                   type="submit"
