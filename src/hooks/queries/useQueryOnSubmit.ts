@@ -129,7 +129,6 @@ function onQuerySuccess(
  * @param error The mutation error object.
  */
 function onQueryError(error: CustomError<ApiError>) {
-  toast.dismiss();
   toast.error(error.message);
 }
 
