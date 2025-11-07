@@ -9,7 +9,7 @@ export type fetchJSONOptions = {
 export type FetchJSONError<TErrorBody = Record<string, unknown>> = {
   status: Response["status"];
   statusText?: Response["statusText"];
-  ok: Response["ok"];
+  ok: false;
 } & Partial<TErrorBody>;
 
 /** Success object returned on OK responses */
