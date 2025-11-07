@@ -1,3 +1,7 @@
+import type {
+  AuthLoginError,
+  AuthLoginSuccess,
+} from "@/api/types/routes/auth.types";
 import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
 import { Inputs } from "@/components/Inputs/Inputs.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
@@ -56,7 +60,10 @@ export function LoginForm({
     },
   });
 
-  const { data, queryFn, isLoading, error } = useQueryOnSubmit([
+  const { data, queryFn, isLoading, error } = useQueryOnSubmit<
+    AuthLoginSuccess,
+    AuthLoginError
+  >([
     "login",
     {
       url: "/api/auth/login",
@@ -78,17 +85,21 @@ export function LoginForm({
     }
 
     if (error || data) {
+      const status = error?.status;
       toast.dismiss(toastId);
-    }
 
-    if (error?.cause?.status === 400 || error?.cause?.status === 401) {
-      toast.dismiss();
-      toast.error(
-        "Identidiant ou mot de passe incorrect. Veuillez vérifier vos informations et réessayer."
-      );
+      if (status === 400 || status === 401) {
+        toast.dismiss();
+        toast.error(
+          "Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations et réessayer."
+        );
+      }
     }
 
     if (data) {
+      if (import.meta.env.DEV) {
+        console.debug("Mutation resolved", data);
+      }
       form.reset();
       navigate("/", { replace: true });
       if (!open) setOpen(true);
