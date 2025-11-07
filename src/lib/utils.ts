@@ -37,3 +37,17 @@ export function formatDate(date: Date) {
     year: "numeric",
   });
 }
+
+/**
+ * Crer une promesse qui se resoudra
+ * après un délai défini en paramètre
+ * @param duration - La durée de l'attente
+ * @param message - Message à retourner dans la promesse si besoin
+ */
+export function wait(duration: number, message = "") {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(message);
+    }, duration);
+  });
+}
