@@ -1,12 +1,7 @@
 import type { InputItem } from "@/components/Inputs/types/InputsTypes.ts";
-import type { formSchema } from "@/models/login.models.ts";
+import { formSchema } from "@/models/login.models.ts";
 import type { ComponentProps } from "react";
-import type z from "zod";
-
-export interface LoginFormData {
-  email: string;
-  password: string;
-}
+import { z } from "zod";
 
 export type LoginFormSchema = z.infer<typeof formSchema>;
 
