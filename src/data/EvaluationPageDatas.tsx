@@ -2,7 +2,8 @@ import { StepOne } from "@/pages/Evaluations/create/steps/StepOne.tsx";
 
 export const EvaluationPageTabsDatas = {
   step1: {
-    tabTitle: "Classe",
+    id: "step-1",
+    name: "Classe",
     leftSide: {
       number: 1,
       title: "Classe à évaluer",
@@ -20,7 +21,8 @@ export const EvaluationPageTabsDatas = {
     },
   },
   step2: {
-    tabTitle: "Elèves",
+    id: "step-2",
+    name: "Elèves",
     leftSide: {
       number: 2,
       title: "Elèves présents",
@@ -33,7 +35,8 @@ export const EvaluationPageTabsDatas = {
     },
   },
   step3: {
-    tabTitle: "Evaluation",
+    id: "step-3",
+    name: "Evaluation",
     leftSide: {
       number: 3,
       title: "Evaluation des élèves",
@@ -46,7 +49,8 @@ export const EvaluationPageTabsDatas = {
     },
   },
   step4: {
-    tabTitle: "Archiver",
+    id: "step-4",
+    name: "Archiver",
     leftSide: {
       number: 4,
       title: "Archiver l'évaluation du jour",
