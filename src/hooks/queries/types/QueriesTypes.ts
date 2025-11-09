@@ -30,7 +30,7 @@ export type MutationResponse = Record<string, unknown> & {
   // debugs?: MutationDebugInfo;
 };
 
-export type MutationVariables = Record<string, unknown>;
+export type MutationVariables = Record<string, unknown> | undefined;
 
 export type QueryOnSubmitMutationState = {
   response: MutationResponse;
