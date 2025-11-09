@@ -33,13 +33,15 @@ import { cloneElement, Fragment, isValidElement } from "react";
  * ```
  */
 
-export function ListMapper<T>({
+export function ListMapper<T extends Record<string, unknown>>({
   items,
   children,
 }: Readonly<ListMapperProps<T>>): ListMapperType<T> {
+  const itemsArray = Array.isArray(items) ? items : Object.entries(items);
+
   return (
     <>
-      {items.map((item, index) => {
+      {itemsArray.map((item, index) => {
         if (!item) {
           return null;
         }
@@ -50,7 +52,10 @@ export function ListMapper<T>({
             : index * Math.random();
 
         if (typeof children === "function") {
-          return children(item, index);
+          return children(
+            item as T extends Record<string, unknown> ? [string, T] : T,
+            index
+          );
         }
 
         if (isValidElement(children)) {
