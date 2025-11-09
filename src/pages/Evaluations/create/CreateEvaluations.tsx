@@ -1,5 +1,8 @@
 import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs.tsx";
+import { ListMapper } from "@/components/Lists/ListMapper.js";
 import { Tabs } from "@/components/ui/tabs";
+import { RightSidePageContent } from "@/pages/Evaluations/create/right-content/RightSidePageContent.js";
+import type { CreateEvaluationsLoaderData } from "@/routes/routes.config.js";
 import "@css/PageContent.scss";
 import { useState, type MouseEvent } from "react";
 import { useLoaderData } from "react-router-dom";
@@ -7,21 +10,33 @@ import { TabContent } from "../../../components/Tabs/TabContent.js";
 
 const tabValues: string[] = [];
 
+/**
+ * Create Evaluations page component
+ *
+ * @description This component renders the Create Evaluations page with tabbed navigation.
+ */
 export function CreateEvaluations() {
-  const { pageDatas } = useLoaderData();
+  const { pageDatas } = useLoaderData<CreateEvaluationsLoaderData>();
+
   const [tabValue, setTabValue] = useState<string | undefined>(
-    pageDatas.step1.tabTitle
+    pageDatas?.step1.name
   );
 
+  if (!pageDatas) {
+    return <div>Loading...</div>;
+  }
+
+  /**
+   * Props for TabContent components
+   */
   const tabContentProps = {
     arrayLength: Object.keys(pageDatas).length,
-    handleOnClick,
+    onClick: handleOnArrowClick,
     setTabValue,
     tabValues,
   };
 
   return (
-    // <div className="flex w-full flex-col gap-6 h-full page__content-container">
     <Tabs
       value={tabValue}
       onValueChange={setTabValue}
@@ -32,16 +47,23 @@ export function CreateEvaluations() {
         value={tabValue}
         onValueChange={setTabValue}
       />
-      {Object.entries(pageDatas).map(([key, item], index) => {
-        tabValues.push(extractTabValues(item));
-        return (
-          <TabContent key={key} item={item} index={index} {...tabContentProps}>
-            {item.rightSide.content && <item.rightSide.content />}
-          </TabContent>
-        );
-      })}
+      <ListMapper items={pageDatas}>
+        {([key, item], index) => {
+          tabValues.push(extractTabValues(item));
+
+          return (
+            <TabContent
+              key={key}
+              item={item}
+              index={index}
+              {...tabContentProps}
+            >
+              <RightSidePageContent item={item.rightSide} />
+            </TabContent>
+          );
+        }}
+      </ListMapper>
     </Tabs>
-    // </div>
   );
 }
 type handleOnClickProps<T> = {
@@ -55,9 +77,9 @@ type handleOnClickProps<T> = {
  * @param e - Mouse event from the click
  * @param clickProps - Object containing index, arrayLength, setTabValue, and tabValues
  */
-function handleOnClick<T extends Record<string, unknown>>({
+function handleOnArrowClick<T extends Record<string, unknown>>({
   e,
-  clickProps,
+  ...clickProps
 }: handleOnClickProps<T>) {
   e.preventDefault();
   const { index, arrayLength, setTabValue, tabValues } = clickProps;
@@ -80,6 +102,6 @@ function handleOnClick<T extends Record<string, unknown>>({
   setTabValue(tabValues[newIndex]);
 }
 
-function extractTabValues(item: { tabTitle: string }) {
-  return item.tabTitle;
+function extractTabValues(item: { name: string }) {
+  return item.name;
 }
