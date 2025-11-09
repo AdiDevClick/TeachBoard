@@ -5,6 +5,7 @@ import {
   type FetchJSONSuccess,
 } from "@/api/types/api.types";
 import type {
+  HttpMethod,
   MutationVariables,
   QueryKeyDescriptor,
 } from "@/hooks/queries/types/QueriesTypes.ts";
@@ -57,7 +58,7 @@ export function useQueryOnSubmit<
    * @param variables The variables to be passed to the mutation function.
    */
   const queryFn = useCallback(
-    async (variables: MutationVariables) => {
+    async (variables: MutationVariables = undefined) => {
       try {
         await mutateAsync(variables);
       } catch (error) {
@@ -73,6 +74,7 @@ export function useQueryOnSubmit<
   return {
     data,
     isLoading: isPending,
+    isLoaded: !!data,
     error,
     queryFn,
   };
@@ -91,7 +93,7 @@ async function onFetch<
   TError extends ApiError
 >(
   variables: MutationVariables,
-  queryMethod: string,
+  queryMethod: HttpMethod,
   queryUrl?: string,
   retry = 3,
   timeout = 1000
@@ -152,8 +154,8 @@ function onQuerySuccess<TSuccess extends ResponseInterface>(
  * @param error The mutation error object.
  */
 function onQueryError<TError extends ApiError>(error: FetchJSONError<TError>) {
-  toast.error(error.message, {
-    style: { zIndex: 10000 },
+  toast.error(error.error, {
+    style: { zIndex: 10000 + 1 },
   });
 }
 
