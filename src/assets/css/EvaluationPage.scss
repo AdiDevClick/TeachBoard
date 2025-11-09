@@ -30,7 +30,25 @@
       }
 
       .content__left {
+        display: grid;
+        gap: var(--gap-spacing);
         width: 100%;
+
+        &--number {
+          font-size: calc(var(--text-xl) * 3);
+          font-weight: bold;
+        }
+
+        &--title {
+          font-size: calc(var(--text-sm) * 1.2);
+          margin-bottom: var(--gap-spacing);
+          font-weight: bold;
+        }
+
+        &--description {
+          font-size: var(--text-md);
+
+        }
       }
 
       .content__separator {
