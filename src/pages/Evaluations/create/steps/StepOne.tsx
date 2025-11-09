@@ -1,8 +1,8 @@
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import {
   LabelledGroup,
-  LabelledGroupItem,
-} from "@/components/Selects/labelled-item/LabelledSelectItem.tsx";
+  NonLabelledGroupItem,
+} from "@/components/Selects/non-labelled-item/NonLabelledGroupItem";
 import VerticalFieldSelect from "@/components/Selects/VerticalFieldSelect.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { SelectItem, SelectSeparator } from "@/components/ui/select.tsx";
@@ -113,7 +113,7 @@ export function StepOne({
           {data && (
             <ListMapper items={data.data}>
               <LabelledGroup>
-                <LabelledGroupItem />
+                <NonLabelledGroupItem />
               </LabelledGroup>
             </ListMapper>
           )}
