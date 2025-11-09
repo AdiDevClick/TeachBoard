@@ -1,8 +1,6 @@
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import {
-  LabelledGroup,
-  NonLabelledGroupItem,
-} from "@/components/Selects/non-labelled-item/NonLabelledGroupItem";
+import { LabelledGroup } from "@/components/Selects/labelled-group/LabelledGroup.tsx";
+import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem";
 import VerticalFieldSelect from "@/components/Selects/VerticalFieldSelect.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { SelectItem, SelectSeparator } from "@/components/ui/select.tsx";
