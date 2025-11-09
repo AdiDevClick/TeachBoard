@@ -1,27 +1,81 @@
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import {
+  LabelledGroup,
+  LabelledGroupItem,
+} from "@/components/Selects/labelled-item/LabelledSelectItem.tsx";
 import VerticalFieldSelect from "@/components/Selects/VerticalFieldSelect.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
-import {
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-} from "@/components/ui/select.tsx";
-import { useQuery } from "@tanstack/react-query";
+import { SelectItem, SelectSeparator } from "@/components/ui/select.tsx";
+import { useQueryOnSubmit } from "@/hooks/queries/useQueryOnSubmit.ts";
+import { wait } from "@/lib/utils.ts";
+import { SelectIcon } from "@radix-ui/react-select";
+import { useEffect, useState, type PointerEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
-export function StepOne({ title, placeholder }) {
-  const { isPending, error, data } = useQuery({
-    queryKey: ["classes"],
-    queryFn: async () => {
-      const response = await fetch("/api/classes/", {
-        method: "GET",
-      });
+const loadingName = "load-classes";
+export function StepOne({
+  title,
+  placeholder,
+}: {
+  readonly title: string;
+  readonly placeholder?: string;
+}) {
+  const [selected, setSelected] = useState(false);
+  const navigate = useNavigate();
 
-      if (!response.ok || response.status !== 200)
-        throw new Error("Network response was not ok");
-
-      return await response.json();
+  const { data, queryFn, isLoading, isLoaded, error } = useQueryOnSubmit([
+    "classes",
+    {
+      url: "/api/classes/",
+      method: "GET",
+      successDescription: "All classes fetched successfully.",
     },
-  });
+  ]);
+
+  /**
+   * Handles the addition of a new class.
+   *
+   * @description A hack is used here to simulate a 'click' effect on the non-selectable item by toggling the `inert` prop and restauring it's state with a slight delay.
+   *
+   * You can use this function to add any additional logic needed when the 'Add Class' item is clicked.
+   *
+   * @param e - The pointer event triggered on adding a class.
+   */
+  const onClassAdd = async (e: PointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setSelected(true);
+    await wait(150);
+    setSelected(false);
+  };
+
+  useEffect(() => {
+    if (isLoading) {
+      toast.loading("Chargement des classes...", { id: loadingName });
+    }
+
+    if (data || error) {
+      toast.dismiss(loadingName);
+      console.log(data);
+      if (data && data.data.length === 0) {
+        toast.dismiss();
+        toast.info("Aucune classe disponible. \nCréez-en une nouvelle !", {
+          style: { whiteSpace: "pre-wrap", zIndex: 10001 },
+        });
+      }
+    }
+
+    if (error) {
+      if (error.status === 403) {
+        navigate("/");
+        toast.dismiss();
+        toast.error(
+          `Vous n'avez pas la permission d'accéder à cette ressource. \nVeillez à être connecté avec un compte disposant des droits nécessaires.`,
+          { style: { whiteSpace: "pre-wrap" } }
+        );
+      }
+    }
+  }, [data, error, isLoading]);
 
   return (
     <Card className="content__right">
@@ -29,24 +83,39 @@ export function StepOne({ title, placeholder }) {
         <VerticalFieldSelect
           className="right__content"
           placeholder={placeholder}
-          onValueChange={(value) => console.log(value)}
+          onValueChange={(value) => {
+            console.log("value => ", value);
+          }}
           label={title}
+          onOpenChange={(value) => {
+            if (value && !isLoaded) queryFn();
+          }}
         >
+          <SelectItem
+            inert={selected}
+            value="add-class"
+            onPointerDown={onClassAdd}
+          >
+            Ajouter une classe
+            {/* <SelectItemIndicator>...</SelectItemIndicator> */}
+            <SelectIcon
+              style={{
+                flexDirection: "row-reverse",
+                flexGrow: 1,
+                justifyContent: "space-between",
+              }}
+            >
+              +
+            </SelectIcon>
+          </SelectItem>
+
+          <SelectSeparator />
           {data && (
-            <SelectGroup>
-              {/* <SelectLabel>BTS</SelectLabel>
-            <SelectItem value="class-1ereA">
-              1ère A - Sciences de l'Ingénieur
-            </SelectItem> */}
-              <ListMapper items={data.data}>
-                {(item) => (
-                  <>
-                    <SelectLabel>{item.entityTypeName}</SelectLabel>
-                    <SelectItem value={item.id}>{item.name}</SelectItem>
-                  </>
-                )}
-              </ListMapper>
-            </SelectGroup>
+            <ListMapper items={data.data}>
+              <LabelledGroup>
+                <LabelledGroupItem />
+              </LabelledGroup>
+            </ListMapper>
           )}
         </VerticalFieldSelect>
       </CardContent>
