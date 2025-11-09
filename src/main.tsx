@@ -5,26 +5,16 @@ import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { Toaster } from "@/components/ui/sonner";
 import { calendarEvents } from "@/data/CalendarData.ts";
-import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas.tsx";
 import { sidebarDatas } from "@/data/SidebarData";
-import { About } from "@/pages/About/About.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
-import { CreateEvaluations } from "@/pages/Evaluations/create/CreateEvaluations";
-import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
-import { Home } from "@/pages/Home/Home.tsx";
-import { Login } from "@/pages/Login/Login.tsx";
+import { routeChildren } from "@/routes/routes.config.tsx";
 import type { RootProps } from "@/types/MainTypes.ts";
 import "@css/MainContainer.scss";
 import "@css/Toaster.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode, type CSSProperties } from "react";
 import { createRoot } from "react-dom/client";
-import {
-  createBrowserRouter,
-  Navigate,
-  Outlet,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
@@ -40,74 +30,17 @@ export const CompleteDatas = {
   calendarEvents: calendarEvents,
 } as const;
 
+/**
+ * Application router configuration
+ *
+ * @description !! IMPORTANT !! Routes object is imported from {@link routeChildren}
+ */
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
     errorElement: <Root contentType="error" />,
-    children: [
-      {
-        index: true,
-        element: <Home />,
-        loader: async () => {
-          setDocumentTitle(CompleteDatas.sidebarHeader.tooltip);
-
-          return {
-            loaderData: CompleteDatas.sidebarHeader,
-            pageTitle: "Dashboard",
-          };
-        },
-      },
-      {
-        path: "login",
-        element: <Login />,
-        loader: async () => {
-          setDocumentTitle("Login");
-
-          return { pageTitle: "hidden" };
-        },
-      },
-      {
-        path: "about",
-        element: <About />,
-      },
-      {
-        path: "evaluations",
-        element: <Evaluations />,
-        loader: async () => {
-          setDocumentTitle(CompleteDatas.navMain.menus[2].title);
-
-          return {
-            pageTitle: CompleteDatas.navMain.menus[2].title,
-            loaderData: CompleteDatas.navMain.menus[2],
-          };
-        },
-        children: [
-          {
-            path: "create",
-            element: <CreateEvaluations />,
-            loader: async () => {
-              const date = new Date().toLocaleDateString();
-              setDocumentTitle(CompleteDatas.navMain.menus[0].title);
-
-              return {
-                pageTitle: "Evaluation - " + date,
-                loaderData: CompleteDatas.navMain.menus[0],
-                pageDatas: EvaluationPageTabsDatas,
-              };
-            },
-          },
-        ],
-      },
-      {
-        path: "error",
-        element: <PageError />,
-      },
-      {
-        path: "*",
-        element: <Navigate to={"/error"} />,
-      },
-    ],
+    children: routeChildren,
   },
 ]);
 
@@ -156,19 +89,4 @@ export function Root({ contentType }: Readonly<RootProps>) {
       </SidebarDataProvider>
     </SidebarProvider>
   );
-}
-
-/**
- * Set the document title based on the selected menu item
- *
- * @param menu - The menu item to set the title for
- */
-function setDocumentTitle(menu: string) {
-  const oldTitle = document.title;
-
-  if (menu) {
-    document.title = "TeachBoard - " + menu;
-  } else {
-    document.title = oldTitle;
-  }
 }
