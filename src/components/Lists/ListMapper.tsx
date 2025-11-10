@@ -11,7 +11,7 @@ import { cloneElement, Fragment, isValidElement } from "react";
  * or let you access the individual items through a custom function.
  * If you do not need to access the individual items or a custom logic,
  * the props item and index will be passed over to the children.
- * @param items - The items array to render.
+ * @param items - The items array or object to render.
  * @param children - Either a React Component (will automatically receive the `item` and `index` props),
  * or a function `(item, index) => ReactNode` for custom logic.
  * @example
@@ -33,11 +33,12 @@ import { cloneElement, Fragment, isValidElement } from "react";
  * ```
  */
 
-export function ListMapper<T extends Record<string, unknown>>({
+export function ListMapper<T>({
   items,
   children,
 }: Readonly<ListMapperProps<T>>): ListMapperType<T> {
-  const itemsArray = Array.isArray(items) ? items : Object.entries(items);
+  const isArrayInput = Array.isArray(items);
+  const itemsArray = isArrayInput ? items : Object.entries(items);
 
   return (
     <>
@@ -52,10 +53,7 @@ export function ListMapper<T extends Record<string, unknown>>({
             : index * Math.random();
 
         if (typeof children === "function") {
-          return children(
-            item as T extends Record<string, unknown> ? [string, T] : T,
-            index
-          );
+          return children(item as T, index);
         }
 
         if (isValidElement(children)) {
