@@ -17,11 +17,11 @@ import { Link, useLocation } from "react-router-dom";
  * @description This component renders the page header including breadcrumb navigation and action buttons.
  */
 export function PageHeader() {
-  const { pathname } = useLocation();
+  // const { pathname } = useLocation();
 
-  if (pathname === "/login" || pathname === "/register") {
-    return null;
-  }
+  // if (pathname === "/login" || pathname === "/register") {
+  //   return null;
+  // }
 
   return (
     <header className="page__header-container">
