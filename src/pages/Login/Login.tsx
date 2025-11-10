@@ -24,11 +24,14 @@ const {
  * @description This component renders the login page with a company logo and login form.
  */
 export function Login() {
-  const { open, setOpen } = useSidebar();
+  const { open, setOpen, openMobile, setOpenMobile } = useSidebar();
 
   /** Close sidebar on login page */
   useEffect(() => {
-    if (open) setOpen(false);
+    if (open || openMobile) {
+      setOpen(false);
+      setOpenMobile(false);
+    }
   }, []);
 
   return (
