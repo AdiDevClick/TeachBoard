@@ -1,7 +1,4 @@
-import type {
-  InputItem,
-  InputsProps,
-} from "@/components/Inputs/types/InputsTypes.ts";
+import type { InputsProps } from "@/components/Inputs/types/InputsTypes.ts";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field.tsx";
 import { Input } from "@/components/ui/input.tsx";
@@ -14,12 +11,12 @@ import { Controller, type FieldValues } from "react-hook-form";
  * @param items - Array of input controller objects.
  * @param form - React Hook Form instance for managing form state.
  */
-export function Inputs<TFieldValues extends FieldValues>({
+export function Inputs<T extends FieldValues>({
   items,
   form,
-}: Readonly<InputsProps<TFieldValues>>) {
+}: Readonly<InputsProps<T>>) {
   return (
-    <ListMapper<InputItem<TFieldValues>> items={items}>
+    <ListMapper items={items}>
       {({ name, title, type, placeholder }) => (
         <Controller
           key={name}

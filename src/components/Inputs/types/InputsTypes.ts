@@ -1,14 +1,14 @@
 import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
 
-export type InputItem<TFieldValues extends FieldValues> = {
-  name: Path<TFieldValues>;
+export type InputItem<T extends FieldValues> = {
+  name: Path<T>;
   title: string;
   type?: string;
   placeholder?: string;
 };
 
 /** Props for the Inputs component */
-export type InputsProps<TFieldValues extends FieldValues> = {
-  items: Array<InputItem<TFieldValues>>;
-  form: UseFormReturn<TFieldValues>;
+export type InputsProps<T extends FieldValues> = {
+  items: InputItem<T>[];
+  form: UseFormReturn<T>;
 };
