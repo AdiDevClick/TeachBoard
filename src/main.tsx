@@ -2,6 +2,7 @@ import { SidebarDataProvider } from "@/api/providers/SidebarDataProvider.tsx";
 import App from "@/App.tsx";
 import { PageHeader } from "@/components/Header/PageHeader";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
+import { Dialog } from "@/components/ui/dialog.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { Toaster } from "@/components/ui/sonner";
 import { calendarEvents } from "@/data/CalendarData.ts";
@@ -47,7 +48,15 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <Dialog>
+        <RouterProvider router={router} />
+        <Toaster
+          position="top-right"
+          className={"toaster-redefined"}
+          richColors
+          closeButton
+        />
+      </Dialog>
     </QueryClientProvider>
   </StrictMode>
 );
@@ -79,12 +88,6 @@ export function Root({ contentType }: Readonly<RootProps>) {
         <SidebarInset className="main-app-container">
           <PageHeader />
           <App>{errorContent ? <PageError /> : <Outlet context={null} />}</App>
-          <Toaster
-            position="top-right"
-            className={"toaster-redefined"}
-            richColors
-            closeButton
-          />
         </SidebarInset>
       </SidebarDataProvider>
     </SidebarProvider>
