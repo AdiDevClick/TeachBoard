@@ -49,7 +49,7 @@ export function CreateEvaluations() {
       />
       <ListMapper items={pageDatas}>
         {([key, item], index) => {
-          tabValues.push(extractTabValues(item));
+          tabValues.push(item.name);
 
           return (
             <TabContent
@@ -102,6 +102,6 @@ function handleOnArrowClick<T extends Record<string, unknown>>({
   setTabValue(tabValues[newIndex]);
 }
 
-function extractTabValues(item: { name: string }) {
-  return item.name;
-}
+// function extractTabValues(item: { name: string }) {
+//   return item.name;
+// }
