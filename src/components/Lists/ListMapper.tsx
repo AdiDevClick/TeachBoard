@@ -1,8 +1,10 @@
 import type {
   ListMapperProps,
+  ListMapperPropsArray,
+  ListMapperPropsObject,
   ListMapperType,
 } from "@/components/Lists/types/ListsTypes.ts";
-import { cloneElement, Fragment, isValidElement } from "react";
+import { cloneElement, Fragment, isValidElement, type ReactNode } from "react";
 
 /**
  * A generic list component that will map over its items list
@@ -16,12 +18,19 @@ import { cloneElement, Fragment, isValidElement } from "react";
  * or a function `(item, index) => ReactNode` for custom logic.
  * @example
  *
- * > **Use with a function for custom logic :**
+ * > **Use with a function for custom logic with an array:**
  * > ```tsx
- * > <ListMapper items={myItems}>
+ * > <ListMapper items={myItemsArray}>
  * >    {(item, index) => (
- * >       // return (My custom logic here) or component :
  * >       <MyListItem key={item.id} item={item} index={index} />
+ * >    )}
+ * > </ListMapper>
+ *
+ * > **Use with a function for custom logic with an object:**
+ * > ```tsx
+ * > <ListMapper items={myItemsObject}>
+ * >    {([key, item], index) => (
+ * >       <MyListItem key={key} item={item} index={index} />
  * >    )}
  * > </ListMapper>
  *
@@ -33,6 +42,17 @@ import { cloneElement, Fragment, isValidElement } from "react";
  * ```
  */
 
+// Surcharge pour les arrays
+export function ListMapper<T>(
+  props: Readonly<ListMapperPropsArray<T>>
+): ListMapperType<T>;
+
+// Surcharge pour les objets
+export function ListMapper<T>(
+  props: Readonly<ListMapperPropsObject<T>>
+): ListMapperType<T>;
+
+// Implémentation
 export function ListMapper<T>({
   items,
   children,
@@ -53,7 +73,9 @@ export function ListMapper<T>({
             : index * Math.random();
 
         if (typeof children === "function") {
-          return children(item as T, index);
+          return (
+            children as (item: T | [string, T], index: number) => ReactNode
+          )(item, index);
         }
 
         if (isValidElement(children)) {
