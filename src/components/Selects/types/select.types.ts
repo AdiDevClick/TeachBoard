@@ -1,4 +1,4 @@
-import type { ListMapperProps } from "@/components/Lists/types/ListsTypes.ts";
+import type { ListMapperPartialChildrenObject } from "@/components/Lists/types/ListsTypes.ts";
 
 /** Props for the LabelledGroup component */
 export type LabelledGroupProps<
@@ -7,4 +7,5 @@ export type LabelledGroupProps<
   [0]?: string;
   [1]?: T[];
   index?: number;
-} & Partial<ListMapperProps<T>>;
+  children?: ListMapperPartialChildrenObject<T>;
+};

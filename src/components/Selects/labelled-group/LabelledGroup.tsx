@@ -12,16 +12,16 @@ export function LabelledGroup({
   children,
   ...items
 }: Readonly<LabelledGroupProps>) {
-  if (!items) {
+  const { [0]: name, [1]: groupItems } = items;
+
+  if (!items || !name || !groupItems) {
     return <div>Loading...</div>;
   }
-
-  const { [0]: name, [1]: groupItems } = items;
 
   return (
     <SelectGroup>
       <SelectLabel>{name}</SelectLabel>
-      {children && <ListMapper items={groupItems ?? []}>{children}</ListMapper>}
+      {children && <ListMapper items={groupItems}>{children}</ListMapper>}
     </SelectGroup>
   );
 }
