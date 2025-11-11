@@ -1,10 +1,27 @@
+import type { MouseEvent as ReactMouseEvent } from "react";
 import { createContext } from "react";
-type DialogContextType = {
+
+export type DialogState = {
   isDialogOpen: boolean;
-  openDialog: (isDialogOpen: boolean) => void;
+  container: HTMLDivElement | null;
+};
+
+export type DialogTriggerHandler = (
+  event: ReactMouseEvent<HTMLElement>
+) => void;
+
+export type DialogOpenChangeHandler = (open: boolean) => void;
+
+export type DialogContextType = {
+  isDialogOpen: boolean;
+  openDialog: () => void;
+  closeDialog: () => void;
+  onOpenChange: (open: boolean) => void;
 };
 
 /**
  * Context for Dialog component
  */
-export const DialogContext = createContext<DialogContextType>(null!);
+export const DialogContext = createContext<DialogContextType | undefined>(
+  undefined
+);

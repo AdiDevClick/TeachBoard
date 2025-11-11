@@ -1,6 +1,6 @@
 import { DialogContext } from "@/api/contexts/DialogContext.ts";
 import { Dialog } from "@/components/ui/dialog.tsx";
-import { useMemo, useState, type PropsWithChildren } from "react";
+import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
 /**
  * Provider for Dialog component.
@@ -12,19 +12,33 @@ import { useMemo, useState, type PropsWithChildren } from "react";
  * @returns The DialogProvider component that wraps its children with Dialog context.
  */
 export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogState, setDialogState] = useState(false);
+
+  const openDialog = useCallback(() => {
+    setDialogState(true);
+  }, []);
+
+  const closeDialog = useCallback(() => {
+    setDialogState(false);
+  }, []);
+
+  const onOpenChange = useCallback((open: boolean) => {
+    setDialogState(open);
+  }, []);
 
   const value = useMemo(
     () => ({
-      isDialogOpen,
-      openDialog: setIsDialogOpen,
+      isDialogOpen: dialogState,
+      openDialog: openDialog,
+      closeDialog: closeDialog,
+      onOpenChange: onOpenChange,
     }),
-    [isDialogOpen]
+    [dialogState]
   );
 
   return (
     <DialogContext.Provider value={value}>
-      <Dialog open={value.isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={dialogState} onOpenChange={onOpenChange}>
         {children}
       </Dialog>
     </DialogContext.Provider>
