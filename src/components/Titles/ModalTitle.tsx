@@ -1,10 +1,12 @@
-import type { ModalTitleProps } from "@/components/Titles/types/titles.types.ts";
+import type { HeaderTitleProps } from "@/components/Titles/types/titles.types.ts";
 import {
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.tsx";
+import { DialogHeader } from "@/components/ui/dialog.tsx";
 import { cn } from "@/lib/utils.ts";
+import type { ComponentType } from "react";
 
 /**
  * ModalTitle component for displaying a title and description in a modal dialog.
@@ -14,7 +16,10 @@ import { cn } from "@/lib/utils.ts";
  *
  * @returns
  */
-export function ModalTitle({ className, ...props }: Readonly<ModalTitleProps>) {
+export function HeaderTitle({
+  className,
+  ...props
+}: Readonly<HeaderTitleProps>) {
   return (
     <CardHeader className={cn("text-center", className)} {...props}>
       <CardTitle className="text-xl">Welcome back</CardTitle>
@@ -24,3 +29,13 @@ export function ModalTitle({ className, ...props }: Readonly<ModalTitleProps>) {
     </CardHeader>
   );
 }
+
+function withDialogHeader(Component: ComponentType): ComponentType {
+  return (props) => (
+    <DialogHeader>
+      <Component {...props} />
+    </DialogHeader>
+  );
+}
+
+export const WithDialogHeader = withDialogHeader(HeaderTitle);
