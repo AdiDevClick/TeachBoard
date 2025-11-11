@@ -1,5 +1,5 @@
-import type { LoginButtonsSvgsType } from "@/configs/social.config.ts";
+import type { ComponentProps } from "react";
 
-export type LoginButtonProps<
-  T extends LoginButtonsSvgsType = LoginButtonsSvgsType
-> = Partial<T>;
+export type LoginButtonProps<T> = {
+  icon: T;
+} & ComponentProps<"button">;
