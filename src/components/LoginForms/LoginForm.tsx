@@ -9,14 +9,10 @@ import type {
   LoginFormProps,
   LoginFormSchema,
 } from "@/components/LoginForms/types/LoginFormsTypes.ts";
+import { ModalTitle } from "@/components/Titles/ModalTitle.tsx";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { DialogHeader } from "@/components/ui/dialog.tsx";
 import {
   Field,
   FieldDescription,
@@ -25,11 +21,12 @@ import {
 } from "@/components/ui/field";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
 import { loginButtonsSvgs } from "@/configs/social.config.ts";
+import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useQueryOnSubmit } from "@/hooks/queries/useQueryOnSubmit.ts";
 import { cn } from "@/lib/utils";
 import { formSchema } from "@/models/login.models.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -46,10 +43,17 @@ const toastId = "login-loading";
 export function LoginForm({
   className,
   inputControllers,
+  modalMode = false,
   ...props
 }: Readonly<LoginFormProps>) {
   const navigate = useNavigate();
   const { open, setOpen } = useSidebar();
+  const { isDialogOpen, openDialog } = useDialog();
+  const [button, setButton] = useState({
+    isClicked: false,
+    name: "",
+    id: "",
+  });
 
   const form = useForm<LoginFormSchema>({
     resolver: zodResolver(formSchema),
@@ -106,15 +110,22 @@ export function LoginForm({
     }
   }, [isLoading, error, data, open]);
 
+  /**
+   * Determine the title component based on modal mode
+   * @description Uses ModalTitle directly in modal mode, otherwise wraps it in DialogHeader
+   */
+  const Title = modalMode
+    ? ModalTitle
+    : () => (
+        <DialogHeader>
+          <ModalTitle />
+        </DialogHeader>
+      );
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
-          <CardDescription>
-            Connectez-vous avec un de vos comptes sociaux ou par email
-          </CardDescription>
-        </CardHeader>
+        <Title />
         <CardContent>
           <form
             id="login-form"
@@ -122,9 +133,53 @@ export function LoginForm({
             className="grid gap-4"
           >
             <FieldGroup>
+              {/* <DialogTrigger
+                asChild
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (isDialogOpen) {
+                    console.log(
+                      "The inner part should respond on click and this message will appear. This area is fully customizable => ",
+                      isDialogOpen
+                    );
+                    console.log("Here is the button actual state => ", button);
+                  } else {
+                    console.log(
+                      "The click occured outside the modal or on the close button, the button state will be reset - We need to be false => ",
+                      isDialogOpen
+                    );
+                    setButton({
+                      isClicked: false,
+                      name: "",
+                      id: "",
+                    });
+                  }
+                }}
+              > */}
               <Field>
                 <ListMapper items={loginButtonsSvgs}>
-                  <LoginButton />
+                  {(icon) => (
+                    // <div
+                    //   key={icon.name}
+                    //   className="w-full max-w-full"
+                    //   id={icon.name}
+                    // >
+                    <LoginButton
+                      icon={icon}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        openDialog(true);
+                        setButton({
+                          isClicked: true,
+                          name: icon.name,
+                          id: icon.name,
+                        });
+                      }}
+                    />
+                  )}
                 </ListMapper>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
@@ -148,11 +203,6 @@ export function LoginForm({
           </form>
         </CardContent>
       </Card>
-      <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our{" "}
-        <Link to="#">Terms of Service</Link> and{" "}
-        <Link to="#">Privacy Policy</Link>.
-      </FieldDescription>
     </div>
   );
 }
