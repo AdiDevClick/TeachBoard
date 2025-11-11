@@ -9,10 +9,12 @@ import type {
   LoginFormProps,
   LoginFormSchema,
 } from "@/components/LoginForms/types/LoginFormsTypes.ts";
-import { ModalTitle } from "@/components/Titles/ModalTitle.tsx";
+import {
+  HeaderTitle,
+  WithDialogHeader,
+} from "@/components/Titles/ModalTitle.tsx";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { DialogHeader } from "@/components/ui/dialog.tsx";
 import {
   Field,
   FieldDescription,
@@ -20,6 +22,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { loginButtonsSvgs } from "@/configs/social.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useQueryOnSubmit } from "@/hooks/queries/useQueryOnSubmit.ts";
@@ -48,7 +51,7 @@ export function LoginForm({
 }: Readonly<LoginFormProps>) {
   const navigate = useNavigate();
   const { open, setOpen } = useSidebar();
-  const { isDialogOpen, openDialog } = useDialog();
+  const { isDialogOpen, openDialog, closeDialog } = useDialog();
   const [button, setButton] = useState({
     isClicked: false,
     name: "",
@@ -70,7 +73,7 @@ export function LoginForm({
   >([
     "login",
     {
-      url: "/api/auth/login",
+      url: API_ENDPOINTS.POST.AUTH.LOGIN,
       method: "POST",
       successDescription: "Vous êtes maintenant connecté(e).",
     },
@@ -105,22 +108,19 @@ export function LoginForm({
         console.debug("Mutation resolved", data);
       }
       form.reset();
-      navigate("/", { replace: true });
+      if (modalMode) {
+        closeDialog();
+      } else {
+        navigate("/", { replace: true });
+      }
       if (!open) setOpen(true);
     }
-  }, [isLoading, error, data, open]);
-
+  }, [isLoading, error, data, open, modalMode]);
   /**
    * Determine the title component based on modal mode
-   * @description Uses ModalTitle directly in modal mode, otherwise wraps it in DialogHeader
+   * @description Uses HeaderTitle directly in modal mode, otherwise wraps it with the dialog header HOC
    */
-  const Title = modalMode
-    ? ModalTitle
-    : () => (
-        <DialogHeader>
-          <ModalTitle />
-        </DialogHeader>
-      );
+  const Title = modalMode ? HeaderTitle : WithDialogHeader;
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -166,18 +166,19 @@ export function LoginForm({
                     //   id={icon.name}
                     // >
                     <LoginButton
+                      key={icon.name}
                       icon={icon}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
+                      // onClick={(e) => {
+                      //   e.preventDefault();
+                      //   e.stopPropagation();
 
-                        openDialog(true);
-                        setButton({
-                          isClicked: true,
-                          name: icon.name,
-                          id: icon.name,
-                        });
-                      }}
+                      //   openDialog(true);
+                      //   setButton({
+                      //     isClicked: true,
+                      //     name: icon.name,
+                      //     id: icon.name,
+                      //   });
+                      // }}
                     />
                   )}
                 </ListMapper>
