@@ -116,7 +116,11 @@ async function onFetch<
     // At this point response.ok is true, so cast to the success variant
     return response;
   } catch (error) {
-    const errorCause = (error as Error).cause as FetchJSONError<TError>;
+    const err = error as Error;
+    const errorCause = {
+      message: err.message,
+      ...(err.cause as FetchJSONError<TError>),
+    };
 
     if (shouldRetry(errorCause.status, retry)) {
       await wait(timeout);
@@ -154,7 +158,7 @@ function onQuerySuccess<TSuccess extends ResponseInterface>(
  * @param error The mutation error object.
  */
 function onQueryError<TError extends ApiError>(error: FetchJSONError<TError>) {
-  toast.error(error.error, {
+  toast.error(error.error ?? error.message, {
     style: { zIndex: 10000 + 1 },
   });
 }
