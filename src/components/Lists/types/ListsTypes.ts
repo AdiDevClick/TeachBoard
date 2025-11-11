@@ -1,10 +1,13 @@
 import type { ReactElement, ReactNode } from "react";
 
+export type ListMapperPartialChildrenObject<T> = ReactElement<
+  Partial<{ item: T; index: number }>
+>;
 /** Props for the ListMapper component when items is an array */
 export type ListMapperPropsArray<T> = {
   items: T[];
   children:
-    | ReactElement<Partial<{ item: T; index: number }>>
+    | ListMapperPartialChildrenObject<T>
     | ((item: T, index: number) => ReactNode);
 };
 
@@ -12,7 +15,7 @@ export type ListMapperPropsArray<T> = {
 export type ListMapperPropsObject<T> = {
   items: { [key: string]: T };
   children:
-    | ReactElement<Partial<{ item: T; index: number }>>
+    | ListMapperPartialChildrenObject<T>
     | ((item: [string, T], index: number) => ReactNode);
 };
 
@@ -21,6 +24,4 @@ export type ListMapperProps<T> =
   | ListMapperPropsObject<T>
   | ListMapperPropsArray<T>;
 
-export type ListMapperType<T> =
-  | ReactElement<Partial<{ item: T; index: number }>>
-  | ReactNode;
+export type ListMapperType<T> = ListMapperPartialChildrenObject<T> | ReactNode;
