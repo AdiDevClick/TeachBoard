@@ -1,8 +1,8 @@
+import { DialogProvider } from "@/api/providers/DialogProvider.tsx";
 import { SidebarDataProvider } from "@/api/providers/SidebarDataProvider.tsx";
 import App from "@/App.tsx";
 import { PageHeader } from "@/components/Header/PageHeader";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
-import { Dialog } from "@/components/ui/dialog.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { Toaster } from "@/components/ui/sonner";
 import { calendarEvents } from "@/data/CalendarData.ts";
@@ -47,8 +47,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <Dialog>
+    <DialogProvider>
+      <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
         <Toaster
           position="top-right"
@@ -56,8 +56,8 @@ createRoot(document.getElementById("root")!).render(
           richColors
           closeButton
         />
-      </Dialog>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </DialogProvider>
   </StrictMode>
 );
 
