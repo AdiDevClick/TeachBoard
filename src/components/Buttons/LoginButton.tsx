@@ -11,11 +11,14 @@ import type { LoginButtonsSvgsType } from "@/configs/social.config.ts";
  *
  * @param item - Icon item data
  */
-export function LoginButton({ ...item }: Readonly<LoginButtonProps>) {
+export function LoginButton<T extends LoginButtonsSvgsType>({
+  icon,
+  ...rest
+}: Readonly<LoginButtonProps<T>>) {
   return (
-    <Button variant="outline" type="button">
-      <Icon icon={item as LoginButtonsSvgsType} />
-      {item.name}
+    <Button variant="outline" type="button" {...rest}>
+      <Icon icon={icon} />
+      {icon.name}
     </Button>
   );
 }
