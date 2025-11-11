@@ -1,4 +1,5 @@
 import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
+import { FieldDescription } from "@/components/ui/field.tsx";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
 import { inputControllers } from "@/data/loginInputControllers";
 import "@css/LoginPage.scss";
@@ -44,6 +45,11 @@ export function Login() {
           Acme Inc.
         </Link>
         <LoginForm inputControllers={inputControllers} />
+        <FieldDescription className="px-6 text-center">
+          En cliquant sur "Se connecter", vous acceptez nos{" "}
+          <Link to="#">Conditions d'utilisation</Link> et{" "}
+          <Link to="#">Politique de confidentialité</Link>.
+        </FieldDescription>
       </div>
     </div>
   );
