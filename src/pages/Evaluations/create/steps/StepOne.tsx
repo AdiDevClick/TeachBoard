@@ -4,6 +4,7 @@ import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/Non
 import VerticalFieldSelect from "@/components/Selects/VerticalFieldSelect.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { SelectItem, SelectSeparator } from "@/components/ui/select.tsx";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { useQueryOnSubmit } from "@/hooks/queries/useQueryOnSubmit.ts";
 import { wait } from "@/lib/utils.ts";
 import { SelectIcon } from "@radix-ui/react-select";
@@ -25,7 +26,7 @@ export function StepOne({
   const { data, queryFn, isLoading, isLoaded, error } = useQueryOnSubmit([
     "classes",
     {
-      url: "/api/classes/",
+      url: API_ENDPOINTS.GET.CLASSES.ALL,
       method: "GET",
       successDescription: "All classes fetched successfully.",
     },
@@ -54,7 +55,9 @@ export function StepOne({
 
     if (data || error) {
       toast.dismiss(loadingName);
-      console.log(data);
+      if (import.meta.env.DEV) {
+        console.debug("useQueryOnSubmit data", data);
+      }
       if (data && data.data.length === 0) {
         toast.dismiss();
         toast.info("Aucune classe disponible. \nCréez-en une nouvelle !", {
@@ -65,7 +68,7 @@ export function StepOne({
 
     if (error) {
       if (error.status === 403) {
-        navigate("/");
+        navigate("/login", { replace: true });
         toast.dismiss();
         toast.error(
           `Vous n'avez pas la permission d'accéder à cette ressource. \nVeillez à être connecté avec un compte disposant des droits nécessaires.`,
