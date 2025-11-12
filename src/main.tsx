@@ -82,12 +82,15 @@ export function Root({ contentType }: Readonly<RootProps>) {
       url: API_ENDPOINTS.POST.AUTH.SESSION_CHECK,
       method: "POST",
       successDescription: "Session checked successfully.",
+      silent: true,
     },
   ]);
 
   useEffect(() => {
-    queryFn({});
-  }, []);
+    if (!user.isUserConnected && !isLoaded) {
+      queryFn({});
+    }
+  }, [isLoaded, user.isUserConnected]);
 
   useEffect(() => {
     if (isLoading) {
