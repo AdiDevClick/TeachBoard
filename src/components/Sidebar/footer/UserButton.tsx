@@ -18,9 +18,10 @@ import { IconDotsVertical } from "@tabler/icons-react";
  *
  * @description Displays the user info and actions in sidebar
  */
-export function UserButton() {
+export function UserButton({ user }: { user: any }) {
   const { isMobile } = useSidebar();
   const userData = useSidebarDataContext().user;
+  const userState = { ...userData, ...user };
 
   return (
     <SidebarMenu>
@@ -31,11 +32,11 @@ export function UserButton() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <UserDisplay props={userData} />
+              <UserDisplay props={userState} />
               <IconDotsVertical className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <TriggeredSettingsPopup isMobile={isMobile} userData={userData} />
+          <TriggeredSettingsPopup isMobile={isMobile} userData={userState} />
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
