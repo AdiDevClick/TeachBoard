@@ -1,8 +1,15 @@
 import type { ReactElement, ReactNode } from "react";
+type ListMapperInjectedMeta<T> = {
+  item: T | [string, T];
+  index: number;
+  __mapped: true;
+};
 
+/** Type for children that will receive mapped props - props become optional */
 export type ListMapperPartialChildrenObject<T> = ReactElement<
-  Partial<{ item: T; index: number }>
+  ListMapperInjectedMeta<T>
 >;
+
 /** Props for the ListMapper component when items is an array */
 export type ListMapperPropsArray<T> = {
   items: T[];
@@ -24,4 +31,4 @@ export type ListMapperProps<T> =
   | ListMapperPropsObject<T>
   | ListMapperPropsArray<T>;
 
-export type ListMapperType<T> = ListMapperPartialChildrenObject<T> | ReactNode;
+export type ListMapperType = ReactElement | ReactNode;
