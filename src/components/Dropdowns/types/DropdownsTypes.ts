@@ -7,5 +7,6 @@ export type DropdownItem = (typeof sidebarDatas.user.settings)[number];
 //   divider?: boolean;
 // };
 
-export type DropdownsProps<T extends DropdownItem = DropdownItem> =
-  {} & Partial<T>;
+export type DropdownsProps<T extends DropdownItem = DropdownItem> = {
+  userData: typeof sidebarDatas.user;
+} & Partial<T>;
