@@ -45,7 +45,6 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
   );
 
   const onOpenChange = useCallback((id: string) => {
-    console.log("Dialog state change for", id);
     setOpenDialogs((prev) => {
       const next = new Set(prev);
       next.delete(id);
