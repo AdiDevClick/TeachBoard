@@ -7,7 +7,7 @@ import { useDynamicSVGImport } from "@/hooks/useDynamicSVGImport.ts";
  * @description This component dynamically imports an SVG icon based on the provided path.
  * It uses the `useDynamicSVGImport` hook to handle the import and loading state.
  *
- * @param icon - Object containing the icon's path and other properties.
+ * @param icon - The icon path to import.
  * @param props - Additional properties to pass to the SVG element.
  */
 export function Icon({ icon, ...props }: IconPropsTypes) {
