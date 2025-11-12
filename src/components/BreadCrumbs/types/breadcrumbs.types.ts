@@ -1,4 +1,5 @@
 import type { ListMapperPartialChildrenObject } from "@/components/Lists/types/ListsTypes.ts";
+import type { ExcludeProps } from "@/utils/types/types.utils.ts";
 import type { ComponentProps } from "react";
 /**
  * Types for breadcrumb components
@@ -7,7 +8,7 @@ import type { ComponentProps } from "react";
 /**
  * SECTION AppBreadcrumbAutoList types
  */
-type BreadcrumbItem = {
+export type BreadcrumbItem = {
   name: string;
   url: string;
 };
@@ -21,21 +22,33 @@ export type AppBreadCrumbListProps = {
 /**
  * SECTION AppBreadcrumb types
  */
-/** Base props that are always required */
-type AppBreadcrumbBaseProps = {
-  segmentsLength: number;
-} & ComponentProps<"li">;
 
-/** Props that are needed for the breadcrumb segments */
-type AppBreadcrumbAutoProps = {
+/** Standalone props */
+type ListMapperProvidedProps = {
   name: string;
   url: string;
   index: number;
 };
 
+/** Base props common to both usage modes */
+type AppBreadcrumbBaseProps = { segmentsLength: number };
+
+/** Props that are needed for the breadcrumb segments when used standalone */
+type AppBreadcrumbStandaloneProps = AppBreadcrumbBaseProps &
+  ListMapperProvidedProps & {
+    __mapped?: false;
+  };
+
+/** Props when used within ListMapper - all segment props become optional */
+type AppBreadcrumbMappedProps = AppBreadcrumbBaseProps &
+  ExcludeProps<ListMapperProvidedProps> & {
+    __mapped?: true;
+  };
+
 /**
- * Smart type that requires all auto props if at least one is provided
- * This ensures type safety: either provide none (ListMapper usage) or all (standalone usage)
+ * Smart type that requires all segment props in standalone usage
+ * but makes them optional when used with ListMapper
  */
-export type AppBreadcrumbProps = AppBreadcrumbBaseProps &
-  (AppBreadcrumbAutoProps | { name?: never; url?: never; index?: never });
+export type AppBreadcrumbProps =
+  | ComponentProps<"li"> &
+      (AppBreadcrumbMappedProps | AppBreadcrumbStandaloneProps);
