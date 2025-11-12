@@ -28,13 +28,19 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
   FetchJSONError<E>,
   MutationVariables
 > => {
-  const { url, method = "GET", successDescription } = queryKeys[1];
+  const { url, method = "GET", successDescription, silent } = queryKeys[1];
 
   return {
     mutationKey: queryKeys,
     mutationFn: (variables) => onFetch<S, E>(variables, method, url),
-    onSuccess: (response) => onQuerySuccess(response, successDescription),
-    onError: (error) => onQueryError<E>(error),
+    onSuccess: (response) => {
+      if (silent) return;
+      onQuerySuccess(response, successDescription);
+    },
+    onError: (error) => {
+      if (silent) return;
+      onQueryError<E>(error);
+    },
   };
 };
 
