@@ -28,5 +28,13 @@
   "**/*react*_compiler*.js",
   "**/*jsx-dev-runtime*.js",
   "**/*react-refresh*.js",
-  "**/*react_refresh*.js"
+  "**/*react_refresh*.js",
+  "**/.vite/deps/react_compiler-runtime.js",
+  "**/.vite/deps/react_jsx-dev-runtime.js",
+  "**/.vite/deps/jsx-runtime*.js",
+  "**/.vite/deps/development*.js",
+  "${workspaceFolder}/node_modules/.vite/deps/react_compiler-runtime.js",
+  "${workspaceFolder}/node_modules/.vite/deps/react_jsx-dev-runtime.js",
+  "**/node_modules/@react-refresh/**",
+  "**/node_modules/react-refresh/**"
 ]
