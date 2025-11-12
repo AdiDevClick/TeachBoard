@@ -17,18 +17,21 @@ import {
  * @param url - URL of the breadcrumb segment
  * @param index - Index of the current segment
  */
-export function AppBreadCrumb({
-  segmentsLength,
-  ...segment
-}: Readonly<AppBreadcrumbProps>) {
-  const { name, url, index, ...rest } = segment;
+export function AppBreadCrumb({ ...segment }: Readonly<AppBreadcrumbProps>) {
+  const { name, url, index, segmentsLength, ...rest } = segment;
+
+  if (segmentsLength === null) {
+    throw new Error(
+      "AppBreadCrumb: segmentsLength prop is required in all usages."
+    );
+  }
 
   const useSeparator = index !== undefined && index < segmentsLength - 1;
 
   return (
     <>
       <BreadcrumbItem className="header__breadcrumb-item" {...rest}>
-        <BreadcrumbLink href={url}>{name}</BreadcrumbLink>
+        <BreadcrumbLink href={url ?? "#"}>{name ?? "Unnamed"}</BreadcrumbLink>
       </BreadcrumbItem>
       {useSeparator && (
         <BreadcrumbSeparator className="header__breadcrumb-separator" />
