@@ -1,12 +1,7 @@
+import { AppBreadCrumb } from "@/components/BreadCrumbs/AppBreadCrumb";
+import { AppBreadCrumbList } from "@/components/BreadCrumbs/AppBreadCrumbList.tsx";
 import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb.tsx";
+import { Breadcrumb } from "@/components/ui/breadcrumb.tsx";
 import { Button } from "@/components/ui/button";
 import { DialogContent } from "@/components/ui/dialog.tsx";
 import { Separator } from "@/components/ui/separator";
@@ -33,19 +28,22 @@ export function PageHeader() {
       closeDialog();
     };
 
-    window.addEventListener("popstate", handlePopState);
+    globalThis.addEventListener("popstate", handlePopState);
 
     return () => {
-      window.removeEventListener("popstate", handlePopState);
+      globalThis.removeEventListener("popstate", handlePopState);
     };
   }, []);
 
   useEffect(() => {
+    if (isDialogOpen) {
+      // Define here any actions needed when the dialog opens
+    }
+
+    // !! IMPORTANT !! Be aware that if the ref is not set, we should not proceed. As the page triggers this effect before the ref is set.
     if (!ref.current) return;
 
-    if (isDialogOpen) {
-      console.log("Dialog open state changed:", isDialogOpen);
-    } else if (location.state?.background) {
+    if (!isDialogOpen && location.state?.background) {
       navigate(location.state.background, { replace: true, state: {} });
     }
   }, [isDialogOpen, location.state]);
@@ -53,12 +51,13 @@ export function PageHeader() {
   const handleLoginClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-
+    openDialog();
     location.state = { background: location.pathname };
     history.pushState(location.state, "", "/login");
-
-    openDialog();
   };
+
+  // Generate breadcrumb segments from the current URL path
+  const splitPaths = buildBreadcrumbsFromPath(location.pathname);
 
   return (
     <header className="page__header-container">
@@ -70,22 +69,14 @@ export function PageHeader() {
         />
         {/* <h1 className="text-base font-medium">Documents</h1> */}
         <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem className="header__breadcrumb-item">
-              <BreadcrumbLink href="#">
-                Building Your Application
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="header__breadcrumb-separator" />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
+          <AppBreadCrumbList items={splitPaths}>
+            <AppBreadCrumb segmentsLength={splitPaths.length} />
+          </AppBreadCrumbList>
         </Breadcrumb>
         <div className="header__actions-container">
           <Button variant="ghost" asChild size="sm" className="actions__button">
             <Link
-              to="https://github.com/shadcn-ui/ui/tree/main/apps/v4/app/(examples)/dashboard"
+              to="https://github.com/adidevclick"
               rel="noopener noreferrer"
               target="_blank"
               className="dark:text-foreground"
@@ -112,4 +103,26 @@ export function PageHeader() {
       </div>
     </header>
   );
+}
+
+/**
+ * Builds breadcrumb segments from the given URL path.
+ *
+ * @param pathname - Current URL path
+ * @returns Array of breadcrumb segments with name and URL
+ */
+function buildBreadcrumbsFromPath(
+  pathname: string
+): { url: string; name: string }[] {
+  return pathname
+    .split("/")
+    .filter(Boolean)
+    .reduce<{ url: string; name: string }[]>((acc, segment) => {
+      const trimmedSegment = segment.trim();
+      acc.push({
+        url: acc.map((item) => item.url).join("") + "/" + trimmedSegment,
+        name: trimmedSegment.charAt(0).toUpperCase() + trimmedSegment.slice(1),
+      });
+      return acc;
+    }, []);
 }
