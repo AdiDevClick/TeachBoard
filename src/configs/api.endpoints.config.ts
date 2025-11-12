@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
     AUTH: {
       LOGIN: `${BASE_API_URL}/auth/login`,
       REGISTER: `${BASE_API_URL}/auth/register`,
+      SESSION_CHECK: `${BASE_API_URL}/auth/session`,
     },
   },
 };
