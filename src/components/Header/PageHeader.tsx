@@ -3,7 +3,7 @@ import { AppBreadCrumbList } from "@/components/BreadCrumbs/AppBreadCrumbList.ts
 import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
 import { Breadcrumb } from "@/components/ui/breadcrumb.tsx";
 import { Button } from "@/components/ui/button";
-import { DialogContent } from "@/components/ui/dialog.tsx";
+import { Dialog, DialogContent } from "@/components/ui/dialog.tsx";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { inputControllers } from "@/data/loginInputControllers.ts";
@@ -19,13 +19,13 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 export function PageHeader() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isDialogOpen, openDialog, closeDialog } = useDialog();
+  const { isDialogOpen, openDialog, closeDialog, onOpenChange } = useDialog();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
       e.preventDefault();
-      closeDialog();
+      closeDialog("login");
     };
 
     globalThis.addEventListener("popstate", handlePopState);
@@ -33,25 +33,29 @@ export function PageHeader() {
     return () => {
       globalThis.removeEventListener("popstate", handlePopState);
     };
-  }, []);
+  }, [closeDialog]);
 
   useEffect(() => {
-    if (isDialogOpen) {
+    if (isDialogOpen("login")) {
       // Define here any actions needed when the dialog opens
+      console.log("DialogOpen dans le page header");
     }
 
     // !! IMPORTANT !! Be aware that if the ref is not set, we should not proceed. As the page triggers this effect before the ref is set.
     if (!ref.current) return;
 
-    if (!isDialogOpen && location.state?.background) {
+    if (!isDialogOpen("login") && location.state?.background) {
       navigate(location.state.background, { replace: true, state: {} });
+    }
+    if (!isDialogOpen("login")) {
+      console.log("DialogOpen dans le page header essai de fermer");
     }
   }, [isDialogOpen, location.state]);
 
   const handleLoginClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    openDialog();
+    openDialog("login");
     location.state = { background: location.pathname };
     history.pushState(location.state, "", "/login");
   };
@@ -73,33 +77,43 @@ export function PageHeader() {
             <AppBreadCrumb segmentsLength={splitPaths.length} />
           </AppBreadCrumbList>
         </Breadcrumb>
-        <div className="header__actions-container">
-          <Button variant="ghost" asChild size="sm" className="actions__button">
-            <Link
-              to="https://github.com/adidevclick"
-              rel="noopener noreferrer"
-              target="_blank"
-              className="dark:text-foreground"
+        <Dialog
+          open={isDialogOpen("login")}
+          onOpenChange={() => onOpenChange("login")}
+        >
+          <div className="header__actions-container">
+            <Button
+              variant="ghost"
+              asChild
+              size="sm"
+              className="actions__button"
             >
-              GitHub
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="actions__button dark:text-foreground"
-            onClick={handleLoginClick}
-          >
-            Se connecter
-          </Button>
-          <DialogContent style={{ overflow: "hidden", padding: 0 }}>
-            <LoginForm
-              ref={ref}
-              inputControllers={inputControllers}
-              modalMode={true}
-            />
-          </DialogContent>
-        </div>
+              <Link
+                to="https://github.com/adidevclick"
+                rel="noopener noreferrer"
+                target="_blank"
+                className="dark:text-foreground"
+              >
+                GitHub
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="actions__button dark:text-foreground"
+              onClick={handleLoginClick}
+            >
+              Se connecter
+            </Button>
+            <DialogContent style={{ overflow: "hidden", padding: 0 }}>
+              <LoginForm
+                ref={ref}
+                inputControllers={inputControllers}
+                modalMode={true}
+              />
+            </DialogContent>
+          </div>
+        </Dialog>
       </div>
     </header>
   );
