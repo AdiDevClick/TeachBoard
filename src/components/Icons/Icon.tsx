@@ -10,8 +10,8 @@ import { useDynamicSVGImport } from "@/hooks/useDynamicSVGImport.ts";
  * @param icon - The icon path to import.
  * @param props - Additional properties to pass to the SVG element.
  */
-export function Icon({ icon, ...props }: IconPropsTypes) {
-  const { SvgIcon, error } = useDynamicSVGImport({ icon });
+export function Icon({ iconPath, ...props }: IconPropsTypes) {
+  const { SvgIcon, error } = useDynamicSVGImport({ iconPath });
 
   if (error) {
     return <div>Can't load the icon</div>;

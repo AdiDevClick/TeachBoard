@@ -1,7 +1,5 @@
-import type { LoginButtonsSvgsType } from "@/configs/social.config.ts";
-
 export type UseDynamicSVGImportTypes = {
-  icon: LoginButtonsSvgsType;
+  iconPath: string;
   options?: {
     [key: string]: unknown;
   };
