@@ -1,4 +1,4 @@
-import type { ErrorInterface, ErrorMeta } from "@/types/AppErrorInterface.ts";
+import type { ErrorInterface, ErrorMeta } from "@/types/AppErrorInterface";
 import { toast } from "sonner";
 
 /**

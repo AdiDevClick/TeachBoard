@@ -1,6 +1,6 @@
-import type { ApiError } from "@/types/AppErrorInterface.ts";
-import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
-import type { CustomError } from "@/types/MainTypes.ts";
+import type { ApiError } from "@/types/AppErrorInterface";
+import type { ResponseInterface } from "@/types/AppResponseInterface";
+import type { CustomError } from "@/types/MainTypes";
 
 export type MutationViolation = Record<string, unknown> & {
   propertyPath?: string;

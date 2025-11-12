@@ -9,9 +9,9 @@ import type {
   MutationVariables,
   QueryKeyDescriptor,
 } from "@/hooks/queries/types/QueriesTypes.ts";
-import { wait } from "@/lib/utils.ts";
-import type { ApiError } from "@/types/AppErrorInterface.ts";
-import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
+import type { ApiError } from "@/types/AppErrorInterface";
+import type { ResponseInterface } from "@/types/AppResponseInterface";
+import { wait } from "@/utils/utils";
 import type { UseMutationOptions } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback } from "react";

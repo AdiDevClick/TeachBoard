@@ -4,7 +4,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { SidebarGroup } from "@/components/ui/sidebar.tsx";
 import { useSidebarDataContext } from "@/hooks/contexts/useSidebarDataContext.ts";
-import { formatDate, formatRangeCompat } from "@/lib/utils.ts";
+import { formatDate, formatRangeCompat } from "@/utils/utils";
 import "@css/Calendar.scss";
 import { fr } from "date-fns/locale";
 import { PlusIcon } from "lucide-react";

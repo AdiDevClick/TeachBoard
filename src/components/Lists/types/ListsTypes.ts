@@ -9,6 +9,9 @@ type ListMapperInjectedMeta<T> = {
 export type ListMapperPartialChildrenObject<T> = ReactElement<
   ListMapperInjectedMeta<T>
 >;
+// export type ListMapperPartialChildrenObject<T> = ReactElement<
+//   ListMapperInjectedMeta<T> | Partial<ListMapperInjectedMeta<T>>
+// >;
 
 /** Props for the ListMapper component when items is an array */
 export type ListMapperPropsArray<T> = {

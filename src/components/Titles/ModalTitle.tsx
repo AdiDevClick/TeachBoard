@@ -5,7 +5,7 @@ import {
   CardTitle,
 } from "@/components/ui/card.tsx";
 import { DialogHeader } from "@/components/ui/dialog.tsx";
-import { cn } from "@/lib/utils.ts";
+import { cn } from "@/utils/utils";
 import type { ComponentType } from "react";
 
 /**

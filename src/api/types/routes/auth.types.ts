@@ -2,8 +2,8 @@ import type {
   ApiError,
   ServerErrorDebugs,
   ValidationViolation,
-} from "@/types/AppErrorInterface.ts";
-import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
+} from "@/types/AppErrorInterface";
+import type { ResponseInterface } from "@/types/AppResponseInterface";
 
 /**
  * Request payload accepted by the authentication login endpoint.
