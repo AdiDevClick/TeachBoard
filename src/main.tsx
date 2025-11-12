@@ -9,7 +9,7 @@ import { calendarEvents } from "@/data/CalendarData.ts";
 import { sidebarDatas } from "@/data/SidebarData";
 import { PageError } from "@/pages/Error/PageError.tsx";
 import { routeChildren } from "@/routes/routes.config.tsx";
-import type { RootProps } from "@/types/MainTypes.ts";
+import type { RootProps } from "@/types/MainTypes";
 import "@css/MainContainer.scss";
 import "@css/Toaster.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
