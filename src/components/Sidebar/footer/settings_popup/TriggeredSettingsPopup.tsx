@@ -19,7 +19,7 @@ import "@css/DropdownMenu.scss";
 export function TriggeredSettingsPopup({
   isMobile,
   userData,
-}: SettingsPopupProps) {
+}: Readonly<SettingsPopupProps>) {
   const settings = userData.settings;
 
   return (
@@ -35,7 +35,7 @@ export function TriggeredSettingsPopup({
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
         <ListMapper items={settings}>
-          <Dropdown />
+          <Dropdown userData={userData} />
         </ListMapper>
       </DropdownMenuGroup>
     </DropdownMenuContent>
