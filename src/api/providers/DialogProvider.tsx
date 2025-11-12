@@ -1,5 +1,4 @@
 import { DialogContext } from "@/api/contexts/DialogContext.ts";
-import { Dialog } from "@/components/ui/dialog.tsx";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
 /**
@@ -7,40 +6,64 @@ import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
  * Currently wrapping the whole application.
  *
  * @description Provides context for managing the state of the Dialog component.
+ * Uses a stack-based approach to handle nested/multiple dialogs simultaneously.
  *
  * @param children  The child components that will have access to the Dialog context.
  * @returns The DialogProvider component that wraps its children with Dialog context.
  */
 export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
-  const [dialogState, setDialogState] = useState(false);
+  // Use a Set to track all open dialog IDs (supports multiple dialogs)
+  const [openDialogs, setOpenDialogs] = useState<Set<string>>(new Set());
 
-  const openDialog = useCallback(() => {
-    setDialogState(true);
+  const openDialog = useCallback((id: string) => {
+    setOpenDialogs((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
   }, []);
 
-  const closeDialog = useCallback(() => {
-    setDialogState(false);
+  const closeDialog = useCallback((id?: string) => {
+    setOpenDialogs((prev) => {
+      const next = new Set(prev);
+      if (id) {
+        next.delete(id);
+      } else {
+        // If no ID provided, close the most recent dialog
+        const lastId = Array.from(next).pop();
+        if (lastId) next.delete(lastId);
+      }
+      return next;
+    });
   }, []);
 
-  const onOpenChange = useCallback((open: boolean) => {
-    setDialogState(open);
+  const isDialogOpen = useCallback(
+    (id: string) => {
+      return openDialogs.has(id);
+    },
+    [openDialogs]
+  );
+
+  const onOpenChange = useCallback((id: string) => {
+    console.log("Dialog state change for", id);
+    setOpenDialogs((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
   }, []);
 
   const value = useMemo(
     () => ({
-      isDialogOpen: dialogState,
-      openDialog: openDialog,
-      closeDialog: closeDialog,
-      onOpenChange: onOpenChange,
+      isDialogOpen,
+      openDialog,
+      closeDialog,
+      onOpenChange,
     }),
-    [dialogState]
+    [openDialogs]
   );
 
   return (
-    <DialogContext.Provider value={value}>
-      <Dialog open={dialogState} onOpenChange={onOpenChange}>
-        {children}
-      </Dialog>
-    </DialogContext.Provider>
+    <DialogContext.Provider value={value}>{children}</DialogContext.Provider>
   );
 }
