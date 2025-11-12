@@ -5,15 +5,18 @@ import { PageHeader } from "@/components/Header/PageHeader";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { Toaster } from "@/components/ui/sonner";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { calendarEvents } from "@/data/CalendarData.ts";
 import { sidebarDatas } from "@/data/SidebarData";
+import { useDialog } from "@/hooks/contexts/useDialog.ts";
+import { useQueryOnSubmit } from "@/hooks/queries/useQueryOnSubmit.ts";
 import { PageError } from "@/pages/Error/PageError.tsx";
 import { routeChildren } from "@/routes/routes.config.tsx";
 import type { RootProps } from "@/types/MainTypes";
 import "@css/MainContainer.scss";
 import "@css/Toaster.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { StrictMode, type CSSProperties } from "react";
+import { StrictMode, useEffect, useState, type CSSProperties } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
@@ -70,8 +73,52 @@ createRoot(document.getElementById("root")!).render(
  * @returns
  */
 export function Root({ contentType }: Readonly<RootProps>) {
+  const [user, setUser] = useState<any>({});
+  const { openDialog } = useDialog();
   const errorContent = contentType === "error";
+  const { data, isLoading, queryFn, isLoaded, error } = useQueryOnSubmit([
+    "session-check",
+    {
+      url: API_ENDPOINTS.POST.AUTH.SESSION_CHECK,
+      method: "POST",
+      successDescription: "Session checked successfully.",
+    },
+  ]);
 
+  useEffect(() => {
+    queryFn({});
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) {
+      if (import.meta.env.DEV) {
+        console.debug("Session Check Loading...");
+      }
+    }
+
+    if (data) {
+      setUser((prev) => ({ ...prev, isUserConnected: true, ...data }));
+      if (import.meta.env.DEV) {
+        console.debug("Session Check Data:", data);
+      }
+    }
+
+    if (error) {
+      // navigate("/login");
+      openDialog("login");
+      // openDialog({
+      //   title: "Session Error",
+      //   description: "There was an error with your session. Please log in again.",
+      //   onClose: () => {
+      //     closeDialog();
+      //     navigate("/login");
+      //   },
+      // });
+      if (import.meta.env.DEV) {
+        console.error("Session Check Error:", error);
+      }
+    }
+  }, [data, error, isLoading]);
   return (
     <SidebarProvider
       style={
@@ -84,10 +131,10 @@ export function Root({ contentType }: Readonly<RootProps>) {
       className="sidebar-wrapper"
     >
       <SidebarDataProvider value={CompleteDatas}>
-        <AppSidebar variant="inset" />
+        <AppSidebar variant="inset" user={user} />
         <SidebarInset className="main-app-container">
           <PageHeader />
-          <App>{errorContent ? <PageError /> : <Outlet context={null} />}</App>
+          <App>{errorContent ? <PageError /> : <Outlet context={user} />}</App>
         </SidebarInset>
       </SidebarDataProvider>
     </SidebarProvider>
