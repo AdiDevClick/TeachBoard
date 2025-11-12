@@ -3,6 +3,7 @@ import type {
   AuthLoginSuccess,
 } from "@/api/types/routes/auth.types";
 import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
+import type { LoginButtonProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import { Inputs } from "@/components/Inputs/Inputs.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import type {
@@ -29,7 +30,7 @@ import { useQueryOnSubmit } from "@/hooks/queries/useQueryOnSubmit.ts";
 import { cn } from "@/lib/utils";
 import { formSchema } from "@/models/login.models.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -51,12 +52,7 @@ export function LoginForm({
 }: Readonly<LoginFormProps>) {
   const navigate = useNavigate();
   const { open, setOpen } = useSidebar();
-  const { isDialogOpen, openDialog, closeDialog } = useDialog();
-  const [button, setButton] = useState({
-    isClicked: false,
-    name: "",
-    id: "",
-  });
+  const { closeDialog } = useDialog();
 
   const form = useForm<LoginFormSchema>({
     resolver: zodResolver(formSchema),
@@ -116,6 +112,7 @@ export function LoginForm({
       if (!open) setOpen(true);
     }
   }, [isLoading, error, data, open, modalMode]);
+
   /**
    * Determine the title component based on modal mode
    * @description Uses HeaderTitle directly in modal mode, otherwise wraps it with the dialog header HOC
@@ -133,54 +130,9 @@ export function LoginForm({
             className="grid gap-4"
           >
             <FieldGroup>
-              {/* <DialogTrigger
-                asChild
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (isDialogOpen) {
-                    console.log(
-                      "The inner part should respond on click and this message will appear. This area is fully customizable => ",
-                      isDialogOpen
-                    );
-                    console.log("Here is the button actual state => ", button);
-                  } else {
-                    console.log(
-                      "The click occured outside the modal or on the close button, the button state will be reset - We need to be false => ",
-                      isDialogOpen
-                    );
-                    setButton({
-                      isClicked: false,
-                      name: "",
-                      id: "",
-                    });
-                  }
-                }}
-              > */}
               <Field>
                 <ListMapper items={loginButtonsSvgs}>
-                  {(icon) => (
-                    // <div
-                    //   key={icon.name}
-                    //   className="w-full max-w-full"
-                    //   id={icon.name}
-                    // >
-                    <LoginButton
-                      key={icon.name}
-                      icon={icon}
-                      // onClick={(e) => {
-                      //   e.preventDefault();
-                      //   e.stopPropagation();
-
-                      //   openDialog(true);
-                      //   setButton({
-                      //     isClicked: true,
-                      //     name: icon.name,
-                      //     id: icon.name,
-                      //   });
-                      // }}
-                    />
-                  )}
+                  <LoginButton {...({} as LoginButtonProps)} />
                 </ListMapper>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
