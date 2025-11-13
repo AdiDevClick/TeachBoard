@@ -16,14 +16,24 @@ export function Dropdown({ ...item }: Readonly<DropdownsProps>) {
     throw new Error("Dropdown item data is required");
   }
 
-  const { title, icon: Icon, divider, url, isUserConnected } = item;
+  const {
+    title,
+    icon: Icon,
+    divider,
+    url,
+    isUserConnected,
+    isActivated,
+    displayWhenConnected,
+    showToUserWhenNotConnected,
+    onSelect,
+    ...rest
+  } = item;
 
   const itemVisible = isUserConnected
-    ? item.displayWhenConnected
-    : item.showToUserWhenNotConnected;
-  const itemIsActive = isUserConnected
-    ? item.displayWhenConnected
-    : item.isActivated;
+    ? displayWhenConnected
+    : showToUserWhenNotConnected;
+  const itemIsActive = isUserConnected ? displayWhenConnected : isActivated;
+
   const isUrlActive = itemVisible && itemIsActive;
 
   return (
@@ -31,7 +41,7 @@ export function Dropdown({ ...item }: Readonly<DropdownsProps>) {
       {divider && <DropdownMenuSeparator />}
       <Activity mode={itemVisible ? "visible" : "hidden"}>
         <NavLink to={isUrlActive ? url ?? "#" : "#"} replace={true}>
-          <DropdownMenuItem disabled={!itemIsActive}>
+          <DropdownMenuItem {...rest} disabled={!itemIsActive}>
             {Icon && <Icon />}
             {title ?? "untitled"}
           </DropdownMenuItem>
