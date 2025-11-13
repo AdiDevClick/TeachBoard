@@ -42,19 +42,11 @@ export type ListMapperProps<
       /** Component mode: requires an array of object items */
       items: TItems;
       // items: TItems & ReadonlyArray<ExtractItemType<TItems>>;
-      optional?: TOptional;
+      optional?: never;
       component: C;
       children?: never;
-    } & MissingRequiredProps<
-      ComponentProps<C>,
-      MergeProvided<ExtractItemType<TItems>, TOptional>
-    > &
-      Partial<
-        RemainingProps<
-          ComponentProps<C>,
-          MergeProvided<ExtractItemType<TItems>, TOptional>
-        >
-      >)
+    } & MissingRequiredProps<ComponentProps<C>, ExtractItemType<TItems>> &
+      Partial<RemainingProps<ComponentProps<C>, ExtractItemType<TItems>>>)
   | {
       // | ({
       //     /** Component mode: requires an array of object items */
