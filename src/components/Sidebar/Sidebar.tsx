@@ -19,7 +19,7 @@ import { Activity } from "react";
  *
  * @param props - Component props
  */
-export function AppSidebar({ user, ...props }: SidebarProps) {
+export function AppSidebar({ ...props }: SidebarProps) {
   const { state } = useSidebar();
 
   return (
@@ -40,7 +40,7 @@ export function AppSidebar({ user, ...props }: SidebarProps) {
         <SecondaryNavigation className="pb-5" />
       </SidebarContent>
       <SidebarFooter>
-        <UserButton user={user} />
+        <UserButton />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
