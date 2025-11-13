@@ -1,4 +1,4 @@
-import { CompleteDatas } from "@/main.tsx";
+import { completeDatas } from "@/main.tsx";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -17,20 +17,18 @@ export function useDocumentTitle(data) {
 
     const oldTitle = document.title;
 
-    CompleteDatas.navMain.menus.map((element) => {
-      if (done) return;
-
+    for (const element of data.navMain.menus) {
       element.isActive = "/" + element.url === location;
 
       if (element.isActive) {
         document.title = "TeachBoard - " + element.title;
         setDone(true);
+        break;
       }
+    }
 
-      return () => {
-        document.title = oldTitle;
-        setDone(false);
-      };
-    });
-  }, [done, location]);
+    return () => {
+      document.title = oldTitle;
+    };
+  }, [done, location, data]);
 }
