@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { inputControllers } from "@/data/loginInputControllers.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
+import "@css/Dialog.scss";
 import "@css/PageHeader.scss";
 import { useEffect, useRef, type MouseEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -105,7 +106,8 @@ export function PageHeader() {
             >
               Se connecter
             </Button>
-            <DialogContent style={{ overflow: "hidden", padding: 0 }}>
+
+            <DialogContent className="dialog__content--login">
               <LoginForm
                 ref={ref}
                 inputControllers={inputControllers}
