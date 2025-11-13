@@ -16,72 +16,56 @@ import type {
  */
 export type ListMapperInjectedMeta<T, TOptional = undefined> = {
   index: number;
-} & T &
-  TOptional;
+} & MergeProvided<T, TOptional>;
 
 /**
  * Type for children that will receive mapped props
  * All item props and optional props are injected, making them available but not required
  */
-export type ListMapperPartialChildrenObject<T, TOptional = undefined> =
-  | ReactElement<Partial<ListMapperInjectedMeta<T, TOptional>>>
-  | ReactElement;
+export type ListMapperPartialChildrenObject<
+  T,
+  TOptional = undefined
+> = ReactElement<Partial<ListMapperInjectedMeta<T, TOptional>>>;
 
 /**
  * Props for the ListMapper component
- * Supports two mutually exclusive modes:
+ * Supports 3 mutually exclusive modes:
  * - component mode: render the provided component per item
+ * - children function mode: render function with item, index, and optional props
  * - children mode: render function or element to be cloned
  */
 export type ListMapperProps<
   TItems,
   C extends ElementType,
-  TOptional = undefined
+  TOptional extends Record<string, unknown> | undefined = undefined
 > =
   | ({
-      /** Component mode: requires an array of object items */
+      /** Component mode: component receives item props automatically */
       items: TItems;
-      // items: TItems & ReadonlyArray<ExtractItemType<TItems>>;
       optional?: never;
       component: C;
       children?: never;
     } & MissingRequiredProps<ComponentProps<C>, ExtractItemType<TItems>> &
       Partial<RemainingProps<ComponentProps<C>, ExtractItemType<TItems>>>)
   | {
-      // | ({
-      //     /** Component mode: requires an array of object items */
-      //     items: TItems;
-      //     // items: TItems & ReadonlyArray<ExtractItemType<TItems>>;
-      //     optional?: TOptional;
-      //     component: C;
-      //     children?: never;
-      //   } & MissingRequiredProps<
-      //     ComponentPropsWithoutRef<C>,
-      //     MergeProvided<ExtractItemType<TItems>, TOptional>
-      //   > &
-      //     Partial<
-      //       RemainingProps<
-      //         ComponentPropsWithoutRef<C>,
-      //         MergeProvided<ExtractItemType<TItems>, TOptional>
-      //       >
-      //     >)
-      // | {
-      /** Children mode: function or ReactElement that will receive injected props */
+      /** Children function mode: full type safety with render function */
       items: TItems;
       optional?: TOptional;
       component?: never;
-      children:
-        | ListMapperPartialChildrenObject<TItems, TOptional>
-        | ((
-            item: ExtractItemType<TItems>,
-            index: number,
-            optional: TOptional
-          ) => ReactNode);
-      // children:
-      //   | ListMapperPartialChildrenObject<ExtractItemType<TItems>, TOptional>
-      //   | ((
-      //       item: ExtractItemType<TItems>,
-      //       index: number,
-      //       optional: TOptional
-      //     ) => ReactNode);
+      children: (
+        item: ExtractItemType<TItems>,
+        index: number,
+        optional: TOptional
+      ) => ReactNode;
+    }
+  | {
+      /** Children ReactElement mode: cloneElement will inject item props */
+      items: TItems;
+      optional?: TOptional;
+      component?: never;
+      children: ReactNode;
+      // children: ListMapperPartialChildrenObject<
+      //   ExtractItemType<TItems>,
+      //   TOptional
+      // >;
     };
