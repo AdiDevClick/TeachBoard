@@ -1,5 +1,10 @@
 import type { ListMapperProps } from "@/components/Lists/types/ListsTypes.ts";
-import { cloneElement, isValidElement } from "react";
+import {
+  cloneElement,
+  isValidElement,
+  type ElementType,
+  type ReactNode,
+} from "react";
 import { Fragment } from "react/jsx-runtime";
 
 /**
@@ -44,13 +49,15 @@ import { Fragment } from "react/jsx-runtime";
  */
 export function ListMapper<
   TItems extends readonly unknown[] | Record<string, unknown>,
+  C extends ElementType = ElementType,
   TOptional = undefined
 >({
   items,
   optional,
   children,
-  components,
-}: Readonly<ListMapperProps<TItems, TOptional>>) {
+  component,
+  ...props
+}: Readonly<ListMapperProps<TItems, C, TOptional>>) {
   const isArrayInput = Array.isArray(items);
   const itemsArray = isArrayInput ? items : Object.entries(items);
 
@@ -67,18 +74,23 @@ export function ListMapper<
             : index * Math.random();
 
         // Case A: component prop provided (act as a Component but you provide the child to display as a prop)
-        if (components) {
-          const Components = components;
+        if (component) {
+          const Component = component;
           return (
             <Fragment key={String(itemId)}>
-              <Components {...item} index {...optional} __mapped />
+              <Component {...item} {...optional} {...props} />
             </Fragment>
           );
         }
 
         // Case B: Render function - best type safety (act as a function with params)
         if (typeof children === "function") {
-          return children(item, index, optional as TOptional);
+          const renderFn = children as (
+            item: unknown,
+            index: number,
+            optional?: TOptional
+          ) => ReactNode;
+          return renderFn(item, index, optional);
         }
 
         // Case C: ReactElement - render its type with injected props
@@ -89,7 +101,6 @@ export function ListMapper<
                 ...item,
                 index,
                 ...optional,
-                __mapped: true,
               })}
             </Fragment>
           );
