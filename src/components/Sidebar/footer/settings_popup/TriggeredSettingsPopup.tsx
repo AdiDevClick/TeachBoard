@@ -20,7 +20,7 @@ export function TriggeredSettingsPopup({
   isMobile,
   userData,
 }: Readonly<SettingsPopupProps>) {
-  const settings = userData.settings;
+  const { settings, ...rest } = userData;
 
   return (
     <DropdownMenuContent
@@ -34,9 +34,7 @@ export function TriggeredSettingsPopup({
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <ListMapper items={settings}>
-          <Dropdown userData={userData} />
-        </ListMapper>
+        <ListMapper components={Dropdown} optional={rest} items={settings} />
       </DropdownMenuGroup>
     </DropdownMenuContent>
   );
