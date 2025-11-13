@@ -50,7 +50,7 @@ import { Fragment } from "react/jsx-runtime";
 export function ListMapper<
   TItems extends readonly unknown[] | Record<string, unknown>,
   C extends ElementType = ElementType,
-  TOptional = undefined
+  TOptional extends Record<string, unknown> | undefined = undefined
 >({
   items,
   optional,
