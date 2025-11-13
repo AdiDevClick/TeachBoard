@@ -1,12 +1,21 @@
+import type { TriggeredSettingsPopup } from "@/components/Sidebar/footer/settings_popup/TriggeredSettingsPopup.tsx";
 import type { sidebarDatas } from "@/data/SidebarData.ts";
+import type { ComponentProps } from "react";
 
+/** Props for each item in the list */
 export type DropdownItem = (typeof sidebarDatas.user.settings)[number];
-// export type DropdownItem = {
-//   title: ReactNode;
-//   icon?: ComponentType | null;
-//   divider?: boolean;
-// };
 
-export type DropdownsProps<T extends DropdownItem = DropdownItem> = {
-  userData: typeof sidebarDatas.user;
-} & Partial<T>;
+/** Details about the user data excluding settings */
+export type DropdownUserData = Omit<
+  Parameters<typeof TriggeredSettingsPopup>[0]["userData"],
+  "settings"
+> & {
+  isUserConnected?: boolean;
+};
+
+/**
+ * @description The items do not inherently need user data, but it might not be displayed to the user if they are not connected.
+ */
+export type DropdownsProps = ComponentProps<"div"> &
+  DropdownItem &
+  DropdownUserData;

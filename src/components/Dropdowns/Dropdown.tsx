@@ -11,20 +11,20 @@ import { NavLink } from "react-router-dom";
  * @param item - The dropdown item to render.
  * @returns The rendered dropdown item.
  */
-export function Dropdown({ ...item }: DropdownsProps) {
-  const { title, icon: Icon, divider, url, userData } = item;
-
-  let itemIsActive = item.isActivated;
-  let itemVisible = item.showToUserWhenNotConnected;
-  let isUrlActive = itemVisible && item.isActivated;
-
-  const userIsConnected = userData?.isUserConnected ?? false;
-
-  if (userIsConnected) {
-    itemVisible = item.displayWhenConnected;
-    itemIsActive = item.displayWhenConnected;
-    isUrlActive = item.displayWhenConnected;
+export function Dropdown({ ...item }: Readonly<DropdownsProps>) {
+  if (!item) {
+    throw new Error("Dropdown item data is required");
   }
+
+  const { title, icon: Icon, divider, url, isUserConnected } = item;
+
+  const itemVisible = isUserConnected
+    ? item.displayWhenConnected
+    : item.showToUserWhenNotConnected;
+  const itemIsActive = isUserConnected
+    ? item.displayWhenConnected
+    : item.isActivated;
+  const isUrlActive = itemVisible && itemIsActive;
 
   return (
     <>
@@ -33,7 +33,7 @@ export function Dropdown({ ...item }: DropdownsProps) {
         <NavLink to={isUrlActive ? url ?? "#" : "#"} replace={true}>
           <DropdownMenuItem disabled={!itemIsActive}>
             {Icon && <Icon />}
-            {title}
+            {title ?? "untitled"}
           </DropdownMenuItem>
         </NavLink>
       </Activity>
