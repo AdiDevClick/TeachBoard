@@ -29,3 +29,8 @@ export type ExtractItemType<TItems> = TItems extends Array<infer T>
   : TItems extends Record<string, infer T>
   ? [string, T]
   : never;
+
+/**
+ * Extract props type from a ReactElement type
+ */
+export type ExtractPropsFromElement<T> = T extends { props: infer P } ? P : never;
