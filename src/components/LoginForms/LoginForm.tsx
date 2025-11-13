@@ -148,15 +148,15 @@ export function LoginForm({
             >
               <FieldGroup>
                 <Field>
-                  <ListMapper items={loginButtonsSvgs}>
-                    <LoginButton
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        openDialog("apple");
-                      }}
-                    />
-                  </ListMapper>
+                  <ListMapper
+                    component={LoginButton}
+                    items={loginButtonsSvgs}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      openDialog("apple");
+                    }}
+                  />
                   <DialogContent>test</DialogContent>
                 </Field>
                 <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
