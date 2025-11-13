@@ -8,7 +8,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import { useSidebarDataContext } from "@/hooks/contexts/useSidebarDataContext.ts";
 import { IconDotsVertical } from "@tabler/icons-react";
@@ -18,10 +17,14 @@ import { IconDotsVertical } from "@tabler/icons-react";
  *
  * @description Displays the user info and actions in sidebar
  */
-export function UserButton({ user }: { user: any }) {
-  const { isMobile } = useSidebar();
-  const userData = useSidebarDataContext().user;
-  const userState = { ...userData, ...user };
+export function UserButton() {
+  const { name, email, avatar, ...rest } = useSidebarDataContext().user;
+
+  const userDisplay = {
+    name: name,
+    email: email,
+    avatar: avatar,
+  };
 
   return (
     <SidebarMenu>
@@ -32,11 +35,11 @@ export function UserButton({ user }: { user: any }) {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <UserDisplay props={userState} />
+              <UserDisplay props={userDisplay} />
               <IconDotsVertical className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <TriggeredSettingsPopup isMobile={isMobile} userData={userState} />
+          <TriggeredSettingsPopup userData={rest} userDisplay={userDisplay} />
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
