@@ -16,9 +16,21 @@ import type { RootProps } from "@/types/MainTypes";
 import "@css/MainContainer.scss";
 import "@css/Toaster.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { StrictMode, useEffect, useState, type CSSProperties } from "react";
+import {
+  StrictMode,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Outlet,
+  RouterProvider,
+  useNavigate,
+} from "react-router-dom";
 
 const queryClient = new QueryClient();
 
@@ -29,10 +41,10 @@ const queryClient = new QueryClient();
  * dynamic calendar events to provide a comprehensive data set
  * for the sidebar navigation.
  */
-export const CompleteDatas = {
+export const completeDatas = {
   ...sidebarDatas,
   calendarEvents: calendarEvents,
-} as const;
+};
 
 /**
  * Application router configuration
@@ -99,8 +111,14 @@ export function Root({ contentType }: Readonly<RootProps>) {
       }
     }
 
-    if (data) {
-      setUser((prev) => ({ ...prev, isUserConnected: true, ...data }));
+    if (data && !user.isUserConnected) {
+      setUser((prev) => ({
+        ...prev,
+        isUserConnected: true,
+        reloaded: false,
+        ...data,
+      }));
+
       if (import.meta.env.DEV) {
         console.debug("Session Check Data:", data);
       }
@@ -121,7 +139,13 @@ export function Root({ contentType }: Readonly<RootProps>) {
         console.error("Session Check Error:", error);
       }
     }
-  }, [data, error, isLoading]);
+  }, [data, error, isLoading, user.isUserConnected]);
+
+  const userData = useMemo(() => {
+    const userCopy = { ...completeDatas.user, ...user };
+    return { ...completeDatas, user: userCopy };
+  }, [user]);
+
   return (
     <SidebarProvider
       style={
@@ -133,11 +157,13 @@ export function Root({ contentType }: Readonly<RootProps>) {
       }
       className="sidebar-wrapper"
     >
-      <SidebarDataProvider value={CompleteDatas}>
-        <AppSidebar variant="inset" user={user} />
+      <SidebarDataProvider value={userData}>
+        <AppSidebar variant="inset" />
         <SidebarInset className="main-app-container">
           <PageHeader />
-          <App>{errorContent ? <PageError /> : <Outlet context={user} />}</App>
+          <App>
+            {errorContent ? <PageError /> : <Outlet context={userData} />}
+          </App>
         </SidebarInset>
       </SidebarDataProvider>
     </SidebarProvider>
