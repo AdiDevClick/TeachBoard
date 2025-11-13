@@ -1,10 +1,6 @@
-import type {
-  ListMapperProps,
-  ListMapperPropsArray,
-  ListMapperPropsObject,
-  ListMapperType,
-} from "@/components/Lists/types/ListsTypes.ts";
-import { cloneElement, Fragment, isValidElement, type ReactNode } from "react";
+import type { ListMapperProps } from "@/components/Lists/types/ListsTypes.ts";
+import { cloneElement, isValidElement } from "react";
+import { Fragment } from "react/jsx-runtime";
 
 /**
  * A generic list component that will map over its items list
@@ -13,9 +9,10 @@ import { cloneElement, Fragment, isValidElement, type ReactNode } from "react";
  * or let you access the individual items through a custom function.
  * If you do not need to access the individual items or a custom logic,
  * the props item and index will be passed over to the children.
- * @param items - The items array or object to render.
- * @param children - Either a React Component (will automatically receive the `item` and `index` props),
- * or a function `(item, index) => ReactNode` for custom logic.
+ * @param items - The items array or object to render. Prefer the function if you need access to the item key when using an object (the item we not be merged)
+ * @param optional - Optional additional props to pass to each child (Will not be iterated). All props will be merged.
+ * @param children - Either a React Component (will automatically receive the `item` and `index` and `optional` props),
+ * or a function `(item, index, optional) => ReactNode` for custom logic.
  * @example
  *
  * > **Use with a function for custom logic with an array:**
@@ -36,27 +33,24 @@ import { cloneElement, Fragment, isValidElement, type ReactNode } from "react";
  *
  * > **Use with a children**
  * > ```tsx
- * > <ListMapper items={myItems}>
- * >    <MyListItem /> // { item, index } props will be passed automatically
+ * > <ListMapper items={myItems} optional={myOptionalProps}>
+ * >    <MyListItem /> // { item, index, optional } props will be passed automatically
  * > </ListMapper>
+ *
+ * > **Use like a Component (type safety as it's a component)**
+ * > ```tsx
+ * > <ListMapper components={MyListItem} items={myItems} optional={myOptionalProps}/>
  * ```
  */
-
-// Surcharge pour les arrays
-export function ListMapper<T>(
-  props: Readonly<ListMapperPropsArray<T>>
-): ListMapperType;
-
-// Surcharge pour les objets
-export function ListMapper<T>(
-  props: Readonly<ListMapperPropsObject<T>>
-): ListMapperType;
-
-// Implémentation
-export function ListMapper<T>({
+export function ListMapper<
+  TItems extends readonly unknown[] | Record<string, unknown>,
+  TOptional = undefined
+>({
   items,
+  optional,
   children,
-}: Readonly<ListMapperProps<T>>): ListMapperType {
+  components,
+}: Readonly<ListMapperProps<TItems, TOptional>>) {
   const isArrayInput = Array.isArray(items);
   const itemsArray = isArrayInput ? items : Object.entries(items);
 
@@ -72,18 +66,29 @@ export function ListMapper<T>({
             ? item.id
             : index * Math.random();
 
-        if (typeof children === "function") {
+        // Case A: component prop provided (act as a Component but you provide the child to display as a prop)
+        if (components) {
+          const Components = components;
           return (
-            children as (item: T | [string, T], index: number) => ReactNode
-          )(item, index);
+            <Fragment key={String(itemId)}>
+              <Components {...item} index {...optional} __mapped />
+            </Fragment>
+          );
         }
 
+        // Case B: Render function - best type safety (act as a function with params)
+        if (typeof children === "function") {
+          return children(item, index, optional as TOptional);
+        }
+
+        // Case C: ReactElement - render its type with injected props
         if (isValidElement(children)) {
           return (
             <Fragment key={String(itemId)}>
               {cloneElement(children, {
                 ...item,
                 index,
+                ...optional,
                 __mapped: true,
               })}
             </Fragment>

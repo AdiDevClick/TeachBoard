@@ -1,37 +1,53 @@
-import type { ReactElement, ReactNode } from "react";
-type ListMapperInjectedMeta<T> = {
-  item: T | [string, T];
+import type { ElementType, ReactElement, ReactNode } from "react";
+
+/**
+ * Metadata injected by ListMapper when used with a component child
+ */
+export type ListMapperInjectedMeta<T, TOptional = undefined> = {
   index: number;
   __mapped: true;
-};
+} & T &
+  (TOptional extends Record<string, unknown> ? TOptional : object);
 
-/** Type for children that will receive mapped props - props become optional */
-export type ListMapperPartialChildrenObject<T> = ReactElement<
-  ListMapperInjectedMeta<T>
->;
-// export type ListMapperPartialChildrenObject<T> = ReactElement<
-//   ListMapperInjectedMeta<T> | Partial<ListMapperInjectedMeta<T>>
-// >;
+/**
+ * Type for children that will receive mapped props
+ * All item props and optional props are injected, making them available but not required
+ */
+export type ListMapperPartialChildrenObject<T, TOptional = undefined> =
+  | ReactElement<Partial<ListMapperInjectedMeta<T, TOptional>>>
+  | ReactElement;
 
-/** Props for the ListMapper component when items is an array */
-export type ListMapperPropsArray<T> = {
-  items: T[];
-  children:
-    | ListMapperPartialChildrenObject<T>
-    | ((item: T, index: number) => ReactNode);
-};
+/**
+ * Extract the item type from items array or object
+ */
+type ExtractItemType<TItems> = TItems extends Array<infer T>
+  ? T
+  : TItems extends Record<string, infer T>
+  ? [string, T]
+  : never;
 
-/** Props for the ListMapper component when items is an object */
-export type ListMapperPropsObject<T> = {
-  items: { [key: string]: T };
-  children:
-    | ListMapperPartialChildrenObject<T>
-    | ((item: [string, T], index: number) => ReactNode);
-};
-
-/** Props for the ListMapper component */
-export type ListMapperProps<T> =
-  | ListMapperPropsObject<T>
-  | ListMapperPropsArray<T>;
-
-export type ListMapperType = ReactElement | ReactNode;
+/**
+ * Props for the ListMapper component
+ * Supports two mutually exclusive modes:
+ * - component mode: render the provided component per item
+ * - children mode: render function or element to be cloned
+ */
+export type ListMapperProps<TItems, TOptional = undefined> =
+  | {
+      items: TItems;
+      optional: TOptional;
+      components: ElementType;
+      children?: never;
+    }
+  | {
+      items: TItems;
+      optional?: TOptional;
+      components?: never;
+      children:
+        | ListMapperPartialChildrenObject<ExtractItemType<TItems>, TOptional>
+        | ((
+            item: ExtractItemType<TItems>,
+            index: number,
+            optional: TOptional
+          ) => ReactNode);
+    };
