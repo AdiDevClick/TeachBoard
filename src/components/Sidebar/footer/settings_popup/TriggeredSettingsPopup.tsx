@@ -34,7 +34,12 @@ export function TriggeredSettingsPopup({
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <ListMapper components={Dropdown} optional={rest} items={settings} />
+        <ListMapper
+          component={Dropdown}
+          optional={rest}
+          items={settings}
+          onClick={(e) => console.log(e)}
+        />
       </DropdownMenuGroup>
     </DropdownMenuContent>
   );
