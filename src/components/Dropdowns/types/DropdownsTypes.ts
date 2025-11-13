@@ -3,10 +3,10 @@ import type { sidebarDatas } from "@/data/SidebarData.ts";
 import type { ComponentProps } from "react";
 
 /** Props for each item in the list */
-export type DropdownItem = (typeof sidebarDatas.user.settings)[number];
+type DropdownItem = (typeof sidebarDatas.user.settings)[number];
 
 /** Details about the user data excluding settings */
-export type DropdownUserData = Omit<
+type DropdownUserData = Omit<
   Parameters<typeof TriggeredSettingsPopup>[0]["userData"],
   "settings"
 > & {
