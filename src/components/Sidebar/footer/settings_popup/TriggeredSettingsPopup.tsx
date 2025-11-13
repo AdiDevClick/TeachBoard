@@ -36,9 +36,9 @@ export function TriggeredSettingsPopup({
       <DropdownMenuGroup>
         <ListMapper
           component={Dropdown}
-          optional={rest}
           items={settings}
           onClick={(e) => console.log(e)}
+          {...rest}
         />
       </DropdownMenuGroup>
     </DropdownMenuContent>
