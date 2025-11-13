@@ -50,7 +50,8 @@
     "tailwindcss": "^4.1.15",
     "vaul": "^1.1.2",
     "vite-plugin-svgr": "^4.5.0",
-    "zod": "^4.1.12"
+    "zod": "^4.1.12",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
