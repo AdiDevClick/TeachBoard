@@ -1,11 +1,11 @@
 import type { ListMapperProps } from "@/components/Lists/types/ListsTypes.ts";
 import {
   cloneElement,
+  Fragment,
   isValidElement,
   type ElementType,
   type ReactNode,
 } from "react";
-import { Fragment } from "react/jsx-runtime";
 
 /**
  * A generic list component that will map over its items list
@@ -61,53 +61,52 @@ export function ListMapper<
   const isArrayInput = Array.isArray(items);
   const itemsArray = isArrayInput ? items : Object.entries(items);
 
-  return (
-    <>
-      {itemsArray.map((item, index) => {
-        if (!item) {
-          return null;
-        }
+  return itemsArray.map((item, index) => {
+    if (!item) {
+      return null;
+    }
 
-        const itemId =
-          typeof item === "object" && "id" in item
-            ? item.id
-            : index * Math.random();
+    const itemId =
+      typeof item === "object" && "id" in item
+        ? item.id
+        : index * Math.random();
 
-        // Case A: component prop provided (act as a Component but you provide the child to display as a prop)
-        if (component) {
-          const Component = component;
-          return (
-            <Fragment key={String(itemId)}>
-              <Component {...item} {...optional} {...props} />
-            </Fragment>
-          );
-        }
+    // Case A: component prop provided (act as a Component but you provide the child to display as a prop)
 
-        // Case B: Render function - best type safety (act as a function with params)
-        if (typeof children === "function") {
-          const renderFn = children as (
-            item: unknown,
-            index: number,
-            optional?: TOptional
-          ) => ReactNode;
-          return renderFn(item, index, optional);
-        }
+    if (component) {
+      const Component = component;
+      return (
+        <Fragment key={String(itemId)}>
+          <Component {...item} {...optional} {...props} />
+        </Fragment>
+      );
+    }
 
-        // Case C: ReactElement - render its type with injected props
-        if (isValidElement(children)) {
-          return (
-            <Fragment key={String(itemId)}>
-              {cloneElement(children, {
-                ...item,
-                index,
-                ...optional,
-              })}
-            </Fragment>
-          );
-        }
+    // Case B: Render function - best type safety (act as a function with params)
+    if (typeof children === "function") {
+      const renderFn = children as (
+        item: unknown,
+        index: number,
+        optional?: TOptional
+      ) => ReactNode;
+      return renderFn(item, index, optional);
+    }
 
-        return null;
-      })}
-    </>
-  );
+    // Case C: ReactElement - render its type with injected props
+    if (isValidElement(children)) {
+      const injectedProps = {
+        ...item,
+        index: index,
+        ...optional,
+      };
+
+      return (
+        <Fragment key={String(itemId)}>
+          {cloneElement(children, injectedProps)}
+        </Fragment>
+      );
+    }
+
+    return null;
+  });
 }
