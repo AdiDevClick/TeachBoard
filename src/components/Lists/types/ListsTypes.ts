@@ -64,8 +64,4 @@ export type ListMapperProps<
       optional?: TOptional;
       component?: never;
       children: ReactNode;
-      // children: ListMapperPartialChildrenObject<
-      //   ExtractItemType<TItems>,
-      //   TOptional
-      // >;
     };
