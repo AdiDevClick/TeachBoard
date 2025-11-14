@@ -1,3 +1,18 @@
+import type { ApiError } from "@/types/AppErrorInterface.ts";
+import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
+
+/**
+ * Utility types for type manipulations
+ */
+
+/**
+ * Ensure you can use the ListMapper with props that have never type
+ * (e.g. injected props from ListMapper)
+ */
+export type SafeListMapperProp<T extends Record<string, unknown>> = {
+  ischild: true;
+} & ExcludeProps<T>;
+
 /** Utility type pour exclure automatiquement des props avec never */
 export type ExcludeProps<T extends Record<string, unknown>> = {
   [K in keyof T]?: never;
@@ -33,4 +48,9 @@ export type ExtractItemType<TItems> = TItems extends Array<infer T>
 /**
  * Extract props type from a ReactElement type
  */
-export type ExtractPropsFromElement<T> = T extends { props: infer P } ? P : never;
+export type ExtractPropsFromElement<T> = T extends { props: infer P }
+  ? P
+  : never;
+
+type GenericSuccess<T extends ResponseInterface> = T;
+type GenericError<T extends ApiError> = T;
