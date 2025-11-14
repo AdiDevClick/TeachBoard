@@ -1,4 +1,4 @@
-import { LANGUAGE } from "@/configs/AppConfig.ts";
+import { LANGUAGE } from "@/configs/app.config";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
