@@ -6,10 +6,11 @@ import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { Toaster } from "@/components/ui/sonner";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import { DEV_MODE } from "@/configs/app.config.ts";
 import { calendarEvents } from "@/data/CalendarData.ts";
 import { sidebarDatas } from "@/data/SidebarData";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
-import { useQueryOnSubmit } from "@/hooks/queries/useQueryOnSubmit.ts";
+import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
 import { PageError } from "@/pages/Error/PageError.tsx";
 import { routeChildren } from "@/routes/routes.config.tsx";
 import type { RootProps } from "@/types/MainTypes";
@@ -20,17 +21,11 @@ import {
   StrictMode,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type CSSProperties,
 } from "react";
 import { createRoot } from "react-dom/client";
-import {
-  createBrowserRouter,
-  Outlet,
-  RouterProvider,
-  useNavigate,
-} from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
@@ -95,6 +90,24 @@ export function Root({ contentType }: Readonly<RootProps>) {
       method: "POST",
       successDescription: "Session checked successfully.",
       silent: true,
+      onSuccess: (data) => {
+        if (!user.isUserConnected) {
+          setUser((prev) => ({
+            ...prev,
+            isUserConnected: true,
+            reloaded: false,
+            ...data,
+          }));
+        }
+        if (DEV_MODE) {
+          console.debug("Session Check onSuccess:", data);
+        }
+      },
+      onError: (error) => {
+        if (DEV_MODE) {
+          console.error("Session Check onError:", error);
+        }
+      },
     },
   ]);
 
@@ -106,26 +119,18 @@ export function Root({ contentType }: Readonly<RootProps>) {
 
   useEffect(() => {
     if (isLoading) {
-      if (import.meta.env.DEV) {
+      if (DEV_MODE) {
         console.debug("Session Check Loading...");
       }
     }
 
     if (data && !user.isUserConnected) {
-      setUser((prev) => ({
-        ...prev,
-        isUserConnected: true,
-        reloaded: false,
-        ...data,
-      }));
-
-      if (import.meta.env.DEV) {
+      if (DEV_MODE) {
         console.debug("Session Check Data:", data);
       }
     }
 
     if (error) {
-      // navigate("/login");
       openDialog("login");
       // openDialog({
       //   title: "Session Error",
@@ -139,7 +144,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
         console.error("Session Check Error:", error);
       }
     }
-  }, [data, error, isLoading, user.isUserConnected]);
+  }, [data, error, isLoading]);
 
   const userData = useMemo(() => {
     const userCopy = { ...completeDatas.user, ...user };
