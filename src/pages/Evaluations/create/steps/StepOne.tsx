@@ -5,7 +5,7 @@ import VerticalFieldSelect from "@/components/Selects/VerticalFieldSelect.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { SelectItem, SelectSeparator } from "@/components/ui/select.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { useQueryOnSubmit } from "@/hooks/queries/useQueryOnSubmit.ts";
+import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
 import { wait } from "@/utils/utils";
 import { SelectIcon } from "@radix-ui/react-select";
 import { useEffect, useState, type PointerEvent } from "react";
@@ -109,11 +109,10 @@ export function StepOne({
               +
             </SelectIcon>
           </SelectItem>
-
           <SelectSeparator />
           {data && (
             <ListMapper items={data.data}>
-              <LabelledGroup>
+              <LabelledGroup ischild>
                 <NonLabelledGroupItem />
               </LabelledGroup>
             </ListMapper>

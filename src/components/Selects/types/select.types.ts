@@ -1,11 +1,18 @@
-import type { ListMapperPartialChildrenObject } from "@/components/Lists/types/ListsTypes.ts";
+import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
+import type { ReactNode } from "react";
 
-/** Props for the LabelledGroup component */
-export type LabelledGroupProps<
-  T extends Record<string, unknown> = Record<string, unknown>
-> = {
-  [0]?: string;
-  [1]?: T[];
-  index?: number;
-  children?: ListMapperPartialChildrenObject<T>;
+type LabelledGroupBaseProps<T> = {
+  readonly ["0"]: string;
+  readonly ["1"]: T[];
 };
+
+/**
+ * Props for the LabelledGroup component
+ *
+ * @description This component can be used in two modes:
+ * - Direct props mode: pass a tuple with the group name and items array.
+ * - ListMapper mode: use SafeListMapperProp to map over items.
+ */
+export type LabelledGroupProps<T = Record<string, unknown>> = {
+  children?: ReactNode;
+} & (LabelledGroupBaseProps<T> | SafeListMapperProp<LabelledGroupBaseProps<T>>);

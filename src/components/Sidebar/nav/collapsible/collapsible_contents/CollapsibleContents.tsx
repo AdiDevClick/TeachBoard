@@ -16,7 +16,7 @@ export function CollapsibleContents({
     <CollapsibleContent className="collapsible__content">
       <SidebarMenuSub>
         <ListMapper items={subMenus}>
-          <SubMenuButton />
+          <SubMenuButton ischild />
         </ListMapper>
       </SidebarMenuSub>
     </CollapsibleContent>

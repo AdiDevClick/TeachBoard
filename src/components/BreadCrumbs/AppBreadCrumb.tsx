@@ -18,7 +18,7 @@ import {
  * @param index - Index of the current segment
  */
 export function AppBreadCrumb({ ...segment }: Readonly<AppBreadcrumbProps>) {
-  const { name, url, index, segmentsLength, __mapped, ...rest } = segment;
+  const { name, url, index, segmentsLength, ...rest } = segment;
 
   if (segmentsLength === null) {
     throw new Error(

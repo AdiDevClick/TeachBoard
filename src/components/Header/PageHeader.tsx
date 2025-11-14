@@ -75,7 +75,7 @@ export function PageHeader() {
         {/* <h1 className="text-base font-medium">Documents</h1> */}
         <Breadcrumb>
           <AppBreadCrumbList items={splitPaths}>
-            <AppBreadCrumb segmentsLength={splitPaths.length} />
+            <AppBreadCrumb ischild segmentsLength={splitPaths.length} />
           </AppBreadCrumbList>
         </Breadcrumb>
         <Dialog

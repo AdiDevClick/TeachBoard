@@ -26,7 +26,7 @@ import { useSidebar } from "@/components/ui/sidebar.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { loginButtonsSvgs } from "@/configs/social.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
-import { useQueryOnSubmit } from "@/hooks/queries/useQueryOnSubmit.ts";
+import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
 import { formSchema } from "@/models/login.models.ts";
 import { cn } from "@/utils/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -148,17 +148,19 @@ export function LoginForm({
             >
               <FieldGroup>
                 <Field>
-                  <ListMapper
-                    component={LoginButton}
-                    items={loginButtonsSvgs}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      openDialog("apple");
-                    }}
-                  />
+                  <ListMapper items={loginButtonsSvgs}>
+                    <LoginButton
+                      ischild
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openDialog("apple");
+                      }}
+                    />
+                  </ListMapper>
                   <DialogContent>test</DialogContent>
                 </Field>
+
                 <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                   Ou continuez avec
                 </FieldSeparator>
