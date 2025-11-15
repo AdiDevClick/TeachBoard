@@ -2,8 +2,8 @@ import type {
   dataContext,
   dataContextUser,
 } from "@/api/providers/types/SidebarDataProviderTypes.ts";
+import type { UserButtonProps } from "@/components/Sidebar/footer/types/FooterTypes.ts";
 import type { AppStore } from "@/hooks/store/types/store.types.ts";
-import type { MouseEvent } from "react";
 
 /**
  * User display fields for SettingsPopupProps
@@ -21,5 +21,5 @@ type UserData = Omit<dataContextUser, UserDisplay> &
 export type SettingsPopupProps = {
   userData: UserData;
   userDisplay: Pick<dataContext["user"], UserDisplay>;
-  onHandleClick: (e: MouseEvent<HTMLDivElement>) => void;
+  handleOnFooterButtonsClick: UserButtonProps["handleOnFooterButtonsClick"];
 };
