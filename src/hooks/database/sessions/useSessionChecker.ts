@@ -1,31 +1,34 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { DEV_MODE } from "@/configs/app.config.ts";
-import { useDialog } from "@/hooks/contexts/useDialog.ts";
+import { DEV_MODE, USER_ACTIVITIES } from "@/configs/app.config.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
+import { useAppStore } from "@/hooks/store/AppStore.ts";
 
+/**
+ * Custom hook to check user session.
+ *
+ * @returns An object containing session check data, loading state, query function, loaded state, and any error encountered.
+ */
 export function useSessionChecker() {
-  const { openDialog } = useDialog();
+  const clearUserStateOnError = useAppStore(
+    (state) => state.clearUserStateOnError
+  );
+  const updateSession = useAppStore((state) => state.updateSession);
+
   const { data, isLoading, queryFn, isLoaded, error } = useQueryOnSubmit([
-    "session-check",
+    USER_ACTIVITIES.sessionCheck,
     {
       url: API_ENDPOINTS.POST.AUTH.SESSION_CHECK,
-      method: "POST",
+      method: API_ENDPOINTS.POST.METHOD,
       successDescription: "Session checked successfully.",
       silent: true,
       onSuccess: (data) => {
-        if (!user.isUserConnected) {
-          setUser((prev) => ({
-            ...prev,
-            isUserConnected: true,
-            reloaded: false,
-            ...data,
-          }));
-        }
+        updateSession(true, USER_ACTIVITIES.sessionCheck);
         if (DEV_MODE) {
           console.debug("Session Check onSuccess:", data);
         }
       },
       onError: (error) => {
+        clearUserStateOnError();
         if (DEV_MODE) {
           console.error("Session Check onError:", error);
         }
@@ -33,5 +36,11 @@ export function useSessionChecker() {
     },
   ]);
 
-  return { data, isLoading, queryFn, isLoaded, error };
+  return {
+    data,
+    isLoading,
+    queryFn,
+    isLoaded,
+    error,
+  };
 }
