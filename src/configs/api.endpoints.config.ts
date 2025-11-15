@@ -1,4 +1,9 @@
 const BASE_API_URL = "/api";
+const API_VERSION = "v1";
+
+//
+
+const AUTH = `${BASE_API_URL}/auth`;
 
 /**
  * API Endpoints Configuration
@@ -19,9 +24,10 @@ export const API_ENDPOINTS = {
     METHOD: "POST",
     CREATE_CLASS: `${BASE_API_URL}/classes/create`,
     AUTH: {
-      LOGIN: `${BASE_API_URL}/auth/login`,
-      REGISTER: `${BASE_API_URL}/auth/register`,
-      SESSION_CHECK: `${BASE_API_URL}/auth/session`,
+      LOGIN: `${AUTH}/login`,
+      REGISTER: `${AUTH}/register`,
+      SESSION_CHECK: `${AUTH}/session`,
+      LOGOUT: `${AUTH}/logout`,
     },
   },
-};
+} as const;
