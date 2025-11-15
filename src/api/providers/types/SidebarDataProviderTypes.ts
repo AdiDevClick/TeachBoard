@@ -7,6 +7,8 @@ import type { ReactNode } from "react";
  * @description Change this type if the structure of sidebarDatas changes
  */
 export type dataContext = typeof completeDatas;
+export type dataContextUser = dataContext["user"];
+export type dataContextUserSettings = dataContext["user"]["settings"];
 
 /** Props for the Sidebar Data Provider component */
 export type SidebarDataProviderProps = {

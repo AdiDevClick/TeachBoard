@@ -17,7 +17,7 @@ import type { RootProps } from "@/types/MainTypes";
 import "@css/MainContainer.scss";
 import "@css/Toaster.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { StrictMode, useEffect, useMemo, type CSSProperties } from "react";
+import { StrictMode, useEffect, type CSSProperties } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
@@ -76,17 +76,27 @@ createRoot(document.getElementById("root")!).render(
 export function Root({ contentType }: Readonly<RootProps>) {
   const errorContent = contentType === "error";
 
-  const user = useAppStore((state) => state.user);
   const lastUserActivity = useAppStore((state) => state.lastUserActivity);
+  const sessionSynced = useAppStore((state) => state.sessionSynced);
   const { openDialog } = useDialog();
 
   const { data, isLoading, queryFn, isLoaded, error } = useSessionChecker();
 
+  /**
+   * Automatically check session on app load unless the last user activity was a logout
+   */
   useEffect(() => {
-    if (isLoaded || lastUserActivity === "logout" || user?.isLoggedIn) return;
+    // const userExists = user !== null;
+    const lastActivityWasLogout = lastUserActivity === "logout";
+    const doNotCheckSession =
+      isLoaded || lastActivityWasLogout || sessionSynced;
+    // const shouldCheckSession = userExists && !doNotCheckSession;
 
+    if (doNotCheckSession) return;
     queryFn();
-  }, [isLoaded, user, lastUserActivity]);
+    // if (userExists) queryFn();
+  }, [isLoaded, lastUserActivity, sessionSynced]);
+  // }, [isLoaded, user, lastUserActivity, sessionSynced]);
 
   useEffect(() => {
     if (isLoading) {
@@ -95,7 +105,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
       }
     }
 
-    if (data && !user?.isLoggedIn) {
+    if (data) {
       if (DEV_MODE) {
         console.debug("Session Check Data:", data);
       }
@@ -107,12 +117,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
         console.error("Session Check Error:", error);
       }
     }
-  }, [data, error, isLoading, user]);
-
-  const userData = useMemo(() => {
-    const userCopy = { ...completeDatas.user, ...user };
-    return { ...completeDatas, user: userCopy };
-  }, [user]);
+  }, [data, error, isLoading]);
 
   return (
     <SidebarProvider
@@ -125,12 +130,12 @@ export function Root({ contentType }: Readonly<RootProps>) {
       }
       className="sidebar-wrapper"
     >
-      <SidebarDataProvider value={userData}>
+      <SidebarDataProvider value={completeDatas}>
         <AppSidebar variant="inset" />
         <SidebarInset className="main-app-container">
           <PageHeader />
           <App>
-            {errorContent ? <PageError /> : <Outlet context={userData} />}
+            {errorContent ? <PageError /> : <Outlet context={completeDatas} />}
           </App>
         </SidebarInset>
       </SidebarDataProvider>

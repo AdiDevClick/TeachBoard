@@ -1,7 +1,3 @@
-import type {
-  AuthLoginError,
-  AuthLoginSuccess,
-} from "@/api/types/routes/auth.types";
 import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
 import { Inputs } from "@/components/Inputs/Inputs.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
@@ -23,10 +19,10 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
-import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { loginButtonsSvgs } from "@/configs/social.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
-import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
+import { useLogin } from "@/hooks/database/login/useLogin.ts";
+import { useAppStore } from "@/hooks/store/AppStore.ts";
 import { formSchema } from "@/models/login.models.ts";
 import { cn } from "@/utils/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -53,6 +49,7 @@ export function LoginForm({
   const navigate = useNavigate();
   const { open, setOpen } = useSidebar();
   const { closeDialog, openDialog, isDialogOpen, onOpenChange } = useDialog();
+  const user = useAppStore((state) => state.user);
 
   const form = useForm<LoginFormSchema>({
     resolver: zodResolver(formSchema),
@@ -63,17 +60,7 @@ export function LoginForm({
     },
   });
 
-  const { data, queryFn, isLoading, error } = useQueryOnSubmit<
-    AuthLoginSuccess,
-    AuthLoginError
-  >([
-    "login",
-    {
-      url: API_ENDPOINTS.POST.AUTH.LOGIN,
-      method: "POST",
-      successDescription: "Vous êtes maintenant connecté(e).",
-    },
-  ]);
+  const { data, queryFn, isLoading, error } = useLogin();
 
   useEffect(() => {
     if (isDialogOpen("apple")) {
@@ -88,6 +75,14 @@ export function LoginForm({
     }
   }, [isDialogOpen]);
 
+  useEffect(() => {
+    if (user) {
+      if (import.meta.env.DEV) {
+        console.debug("User in LoginForm useEffect:", user);
+      }
+    }
+  }, [user]);
+
   /**
    * Effect to handle loading, success, and error states
    *
@@ -101,15 +96,8 @@ export function LoginForm({
     }
 
     if (error || data) {
-      const status = error?.status;
       toast.dismiss(toastId);
-
-      if (status === 400 || status === 401) {
-        toast.dismiss();
-        toast.error(
-          "Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations et réessayer."
-        );
-      }
+      // If there's an error, show an error toast
     }
 
     if (data) {

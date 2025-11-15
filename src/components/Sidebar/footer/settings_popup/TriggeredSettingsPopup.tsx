@@ -20,6 +20,7 @@ import "@css/DropdownMenu.scss";
 export function TriggeredSettingsPopup({
   userData,
   userDisplay,
+  onHandleClick,
 }: Readonly<SettingsPopupProps>) {
   const { isMobile } = useSidebar();
   const { settings, ...rest } = userData;
@@ -36,12 +37,9 @@ export function TriggeredSettingsPopup({
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <ListMapper
-          component={Dropdown}
-          items={settings}
-          onClick={(e) => console.log(e)}
-          {...rest}
-        />
+        <ListMapper items={settings}>
+          <Dropdown ischild {...rest} onClick={onHandleClick} />
+        </ListMapper>
       </DropdownMenuGroup>
     </DropdownMenuContent>
   );

@@ -8,9 +8,10 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { inputControllers } from "@/data/loginInputControllers.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
+import { useAppStore } from "@/hooks/store/AppStore.ts";
 import "@css/Dialog.scss";
 import "@css/PageHeader.scss";
-import { useEffect, useRef, type MouseEvent } from "react";
+import { Activity, useEffect, useRef, type MouseEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 /** Page header component
@@ -21,6 +22,7 @@ export function PageHeader() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isDialogOpen, openDialog, closeDialog, onOpenChange } = useDialog();
+  const isLoggedIn = useAppStore((state) => state.isLoggedIn);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -98,14 +100,16 @@ export function PageHeader() {
                 GitHub
               </Link>
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="actions__button dark:text-foreground"
-              onClick={handleLoginClick}
-            >
-              Se connecter
-            </Button>
+            <Activity mode={isLoggedIn ? "hidden" : "visible"}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="actions__button dark:text-foreground"
+                onClick={handleLoginClick}
+              >
+                Se connecter
+              </Button>
+            </Activity>
 
             <DialogContent className="dialog__content--login">
               <LoginForm

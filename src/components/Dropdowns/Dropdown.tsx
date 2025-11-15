@@ -25,7 +25,6 @@ export function Dropdown({ ...item }: Readonly<DropdownsProps>) {
     isActivated,
     displayWhenConnected,
     showToUserWhenNotConnected,
-    onSelect,
     ...rest
   } = item;
 
