@@ -19,7 +19,9 @@ import { IconDotsVertical } from "@tabler/icons-react";
  *
  * @description Displays the user info and actions in sidebar
  */
-export function UserButton({ onHandleClick }: Readonly<UserButtonProps>) {
+export function UserButton({
+  handleOnFooterButtonsClick,
+}: Readonly<UserButtonProps>) {
   const { name, email, avatar, settings } = useSidebarDataContext().user;
 
   const isLoggedIn = useAppStore((state) => state.isLoggedIn);
@@ -38,18 +40,15 @@ export function UserButton({ onHandleClick }: Readonly<UserButtonProps>) {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer"
-            >
+            <SidebarMenuButton size="lg" className="sidebarButton--menu">
               <UserDisplay props={userDisplay} />
-              <IconDotsVertical className="ml-auto size-4" />
+              <IconDotsVertical className="sidebarButton--menu-dots" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <TriggeredSettingsPopup
             userData={userData}
             userDisplay={userDisplay}
-            onHandleClick={onHandleClick}
+            handleOnFooterButtonsClick={handleOnFooterButtonsClick}
           />
         </DropdownMenu>
       </SidebarMenuItem>
