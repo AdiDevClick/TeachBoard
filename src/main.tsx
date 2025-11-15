@@ -5,25 +5,19 @@ import { PageHeader } from "@/components/Header/PageHeader";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { Toaster } from "@/components/ui/sonner";
-import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE } from "@/configs/app.config.ts";
 import { calendarEvents } from "@/data/CalendarData.ts";
-import { sidebarDatas } from "@/data/SidebarData";
+import { sidebarDatas } from "@/data/SidebarData.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
-import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
+import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
+import { useAppStore } from "@/hooks/store/AppStore.ts";
 import { PageError } from "@/pages/Error/PageError.tsx";
 import { routeChildren } from "@/routes/routes.config.tsx";
 import type { RootProps } from "@/types/MainTypes";
 import "@css/MainContainer.scss";
 import "@css/Toaster.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  StrictMode,
-  useEffect,
-  useMemo,
-  useState,
-  type CSSProperties,
-} from "react";
+import { StrictMode, useEffect, useMemo, type CSSProperties } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
@@ -80,42 +74,19 @@ createRoot(document.getElementById("root")!).render(
  * @returns
  */
 export function Root({ contentType }: Readonly<RootProps>) {
-  const [user, setUser] = useState<any>({});
-  const { openDialog } = useDialog();
   const errorContent = contentType === "error";
-  const { data, isLoading, queryFn, isLoaded, error } = useQueryOnSubmit([
-    "session-check",
-    {
-      url: API_ENDPOINTS.POST.AUTH.SESSION_CHECK,
-      method: "POST",
-      successDescription: "Session checked successfully.",
-      silent: true,
-      onSuccess: (data) => {
-        if (!user.isUserConnected) {
-          setUser((prev) => ({
-            ...prev,
-            isUserConnected: true,
-            reloaded: false,
-            ...data,
-          }));
-        }
-        if (DEV_MODE) {
-          console.debug("Session Check onSuccess:", data);
-        }
-      },
-      onError: (error) => {
-        if (DEV_MODE) {
-          console.error("Session Check onError:", error);
-        }
-      },
-    },
-  ]);
+
+  const user = useAppStore((state) => state.user);
+  const lastUserActivity = useAppStore((state) => state.lastUserActivity);
+  const { openDialog } = useDialog();
+
+  const { data, isLoading, queryFn, isLoaded, error } = useSessionChecker();
 
   useEffect(() => {
-    if (!user.isUserConnected && !isLoaded) {
-      queryFn({});
-    }
-  }, [isLoaded, user.isUserConnected]);
+    if (isLoaded || lastUserActivity === "logout" || user?.isLoggedIn) return;
+
+    queryFn();
+  }, [isLoaded, user, lastUserActivity]);
 
   useEffect(() => {
     if (isLoading) {
@@ -124,7 +95,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
       }
     }
 
-    if (data && !user.isUserConnected) {
+    if (data && !user?.isLoggedIn) {
       if (DEV_MODE) {
         console.debug("Session Check Data:", data);
       }
@@ -132,19 +103,11 @@ export function Root({ contentType }: Readonly<RootProps>) {
 
     if (error) {
       openDialog("login");
-      // openDialog({
-      //   title: "Session Error",
-      //   description: "There was an error with your session. Please log in again.",
-      //   onClose: () => {
-      //     closeDialog();
-      //     navigate("/login");
-      //   },
-      // });
-      if (import.meta.env.DEV) {
+      if (DEV_MODE) {
         console.error("Session Check Error:", error);
       }
     }
-  }, [data, error, isLoading]);
+  }, [data, error, isLoading, user]);
 
   const userData = useMemo(() => {
     const userCopy = { ...completeDatas.user, ...user };
