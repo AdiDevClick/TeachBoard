@@ -15,10 +15,45 @@
   transition: background-color 0.2s ease;
   min-width: 34px;
 
+
   &--menu {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+
+    &[data-state="open"] {
+      background-color: var(--sidebar-accent);
+      color: var(--sidebar-accent-foreground);
+    }
+
+    &-dots {
+      margin-left: auto;
+      width: calc(var(--spacing) * 4);
+      height: calc(var(--spacing) * 4);
+    }
+
+    &-icon {
+      stroke: "#404040";
+
+      :hover {
+        cursor: pointer;
+      }
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+
+
+  &--quickbutton {
+    width: calc(var(--spacing) * 8);
+    height: calc(var(--spacing) * 8);
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   &--submenu {
@@ -31,9 +66,14 @@
     :is([data-state="open"]) & {
       transform: translateX(var(--buttonMaxWidth)) rotate(90deg);
     }
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   &:hover {
+    cursor: pointer;
     background-color: var(--primary-hover);
     color: var(--primary-foreground-hover);
   }
