@@ -18,7 +18,7 @@ type MatchWithTitle = {
  * @param pageTitle Title of the page
  * @param children Page content
  */
-export default function App({ children }: { children: ReactNode }) {
+export default function App({ children }: Readonly<{ children: ReactNode }>) {
   const location = useLocation().pathname;
   const matches = useMatches().find(
     (m) => m.loaderData && m.pathname === location
