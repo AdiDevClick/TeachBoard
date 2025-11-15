@@ -4,12 +4,10 @@ import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/Non
 import VerticalFieldSelect from "@/components/Selects/VerticalFieldSelect.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { SelectItem, SelectSeparator } from "@/components/ui/select.tsx";
-import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
+import { useClasses } from "@/hooks/database/classes/useClasses.ts";
 import { wait } from "@/utils/utils";
 import { SelectIcon } from "@radix-ui/react-select";
 import { useEffect, useState, type PointerEvent } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const loadingName = "load-classes";
@@ -21,16 +19,8 @@ export function StepOne({
   readonly placeholder?: string;
 }) {
   const [selected, setSelected] = useState(false);
-  const navigate = useNavigate();
 
-  const { data, queryFn, isLoading, isLoaded, error } = useQueryOnSubmit([
-    "classes",
-    {
-      url: API_ENDPOINTS.GET.CLASSES.ALL,
-      method: "GET",
-      successDescription: "All classes fetched successfully.",
-    },
-  ]);
+  const { data, queryFn, isLoading, isLoaded, error } = useClasses();
 
   /**
    * Handles the addition of a new class.
@@ -58,23 +48,11 @@ export function StepOne({
       if (import.meta.env.DEV) {
         console.debug("useQueryOnSubmit data", data);
       }
-      if (data && data.data.length === 0) {
-        toast.dismiss();
-        toast.info("Aucune classe disponible. \nCréez-en une nouvelle !", {
-          style: { whiteSpace: "pre-wrap", zIndex: 10001 },
-        });
-      }
+      // You can handle additional side effects here if needed
     }
 
     if (error) {
-      if (error.status === 403) {
-        navigate("/login", { replace: true });
-        toast.dismiss();
-        toast.error(
-          `Vous n'avez pas la permission d'accéder à cette ressource. \nVeillez à être connecté avec un compte disposant des droits nécessaires.`,
-          { style: { whiteSpace: "pre-wrap" } }
-        );
-      }
+      // Errors are handled in onError callback
     }
   }, [data, error, isLoading]);
 
