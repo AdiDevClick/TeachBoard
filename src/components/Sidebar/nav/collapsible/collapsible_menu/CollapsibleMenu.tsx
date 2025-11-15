@@ -15,7 +15,7 @@ import { useRef } from "react";
 export default function CollapsibleMenu({
   item,
   setStyle,
-}: CollapsibleMenuProps) {
+}: Readonly<CollapsibleMenuProps>) {
   const menuContentRef = useRef<HTMLButtonElement>(null);
 
   return (
