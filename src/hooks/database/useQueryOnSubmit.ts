@@ -13,8 +13,8 @@ import type { ApiError } from "@/types/AppErrorInterface";
 import type { ResponseInterface } from "@/types/AppResponseInterface";
 import { wait } from "@/utils/utils";
 import type { UseMutationOptions } from "@tanstack/react-query";
-import { useMutation } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useMutation, useQueryErrorResetBoundary } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 
 /**
@@ -35,12 +35,14 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
     silent,
     onSuccess,
     onError,
-  } = queryKeys[1];
+    reset,
+  } = queryKeys[1] ?? {};
 
   return {
     mutationKey: queryKeys,
     mutationFn: (variables) => onFetch<S, E>(variables, method, url),
     onSuccess: (response) => {
+      reset?.();
       onSuccess?.(response);
       if (silent) return;
       onQuerySuccess(response, successDescription);
@@ -56,15 +58,21 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
 /**
  * Handles form submission by triggering the query function.
  *
+ * @description When a success occurs, an error reset is performed to clear any previous errors.
+ *
  * @param queryKeys The query key descriptor containing task and descriptor.
  */
 export function useQueryOnSubmit<
   S extends ResponseInterface,
   E extends ApiError
 >(queryKeys: QueryKeyDescriptor<S, E>) {
-  const { mutateAsync, data, isPending, error } = useMutation(
-    mutationOptions<S, E>(queryKeys)
-  );
+  const { reset } = useQueryErrorResetBoundary();
+  queryKeys[1].reset = reset;
+
+  // Memoize mutation options to prevent observer recreation on every render
+  const options = useMemo(() => mutationOptions<S, E>(queryKeys), [queryKeys]);
+
+  const { mutateAsync, data, isPending, error } = useMutation(options);
 
   /**
    * Handles form submission by triggering the mutation function.
@@ -75,6 +83,9 @@ export function useQueryOnSubmit<
   const queryFn = useCallback(
     async (variables: MutationVariables = undefined) => {
       try {
+        if (import.meta.env.DEV) {
+          console.debug("useQueryOnSubmit executing mutation");
+        }
         await mutateAsync(variables);
       } catch (error) {
         // Errors are handled via the mutation onError callback.
