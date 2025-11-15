@@ -31,6 +31,7 @@ export function useLogin() {
           role: "Student",
           token: "data.token",
           refreshToken: "data.refreshToken",
+          avatar: "https://i.pravatar.cc/150?img=3",
         });
         if (import.meta.env.DEV) {
           console.debug("Login onSuccess:", data);
