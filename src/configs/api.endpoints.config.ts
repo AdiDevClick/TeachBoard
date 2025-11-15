@@ -8,7 +8,7 @@ const AUTH = `${BASE_API_URL}/auth`;
 /**
  * API Endpoints Configuration
  */
-export const API_ENDPOINTS = {
+export const API_ENDPOINTS = Object.freeze({
   GET: {
     METHOD: "GET",
     CLASSES: {
@@ -30,4 +30,4 @@ export const API_ENDPOINTS = {
       LOGOUT: `${AUTH}/logout`,
     },
   },
-} as const;
+} as const);
