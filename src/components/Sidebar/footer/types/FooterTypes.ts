@@ -1,5 +1,5 @@
 import type { dataContextUser } from "@/api/providers/types/SidebarDataProviderTypes.ts";
-import type { MouseEvent } from "react";
+import type { MouseEventHandler } from "react";
 
 /** Props for the UserDisplay component */
 export type UserDisplayProps = {
@@ -8,5 +8,5 @@ export type UserDisplayProps = {
 
 /** Props for the UserButton component */
 export type UserButtonProps = {
-  onHandleClick: (e: MouseEvent<HTMLDivElement>) => void;
+  handleOnFooterButtonsClick: MouseEventHandler<HTMLDivElement>;
 };
