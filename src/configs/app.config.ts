@@ -22,3 +22,15 @@ export const HTTP_METHODS = [
   "CONNECT",
   "TRACE",
 ] as const;
+
+/**
+ * User activities constants
+ * @description These constants represent different user activities within the application.
+ */
+export const USER_ACTIVITIES = Object.freeze({
+  login: "login",
+  logout: "logout",
+  none: "none",
+  sessionCheck: "session-check",
+  classes: "classes",
+});
