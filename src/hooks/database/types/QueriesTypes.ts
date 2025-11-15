@@ -2,7 +2,7 @@ import type {
   FetchJSONError,
   FetchJSONSuccess,
 } from "@/api/types/api.types.ts";
-import type { HTTP_METHODS } from "@/configs/app.config.ts";
+import type { HTTP_METHODS, USER_ACTIVITIES } from "@/configs/app.config.ts";
 import type { ApiError } from "@/types/AppErrorInterface";
 import type { ResponseInterface } from "@/types/AppResponseInterface";
 
@@ -51,7 +51,7 @@ export type GenericQueryResults<S, E> = {
 };
 
 export type QueryKeyDescriptor<S, E> = [
-  task: string | null,
+  task: (typeof USER_ACTIVITIES)[keyof typeof USER_ACTIVITIES],
   descriptor: {
     url: string;
     method?: HttpMethod;
@@ -59,23 +59,10 @@ export type QueryKeyDescriptor<S, E> = [
     silent?: boolean;
     onSuccess?: (data: FetchJSONSuccess<S>) => void;
     onError?: (error: FetchJSONError<E>) => void;
+    reset?: () => void;
   } & Record<string, unknown>
 ];
 
-export interface QueryHookInterface<
-  S extends ResponseInterface,
-  E extends ApiError
-> {
-  task: string | null;
-  descriptor: {
-    url: string;
-    method?: HttpMethod;
-    successDescription?: string;
-    silent?: boolean;
-    onSuccess?: (data: S) => void;
-    onError?: (error: E) => void;
-  } & Record<string, unknown>;
-}
 // export interface QueryHookInterface<
 //   S extends ResponseInterface,
 //   E extends ApiError
