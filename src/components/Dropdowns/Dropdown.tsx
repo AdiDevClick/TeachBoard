@@ -21,7 +21,7 @@ export function Dropdown({ ...item }: Readonly<DropdownsProps>) {
     icon: Icon,
     divider,
     url,
-    isUserConnected,
+    isLoggedIn,
     isActivated,
     displayWhenConnected,
     showToUserWhenNotConnected,
@@ -29,10 +29,10 @@ export function Dropdown({ ...item }: Readonly<DropdownsProps>) {
     ...rest
   } = item;
 
-  const itemVisible = isUserConnected
+  const itemVisible = isLoggedIn
     ? displayWhenConnected
     : showToUserWhenNotConnected;
-  const itemIsActive = isUserConnected ? displayWhenConnected : isActivated;
+  const itemIsActive = isLoggedIn ? displayWhenConnected : isActivated;
 
   const isUrlActive = itemVisible && itemIsActive;
 
@@ -41,7 +41,11 @@ export function Dropdown({ ...item }: Readonly<DropdownsProps>) {
       {divider && <DropdownMenuSeparator />}
       <Activity mode={itemVisible ? "visible" : "hidden"}>
         <NavLink to={isUrlActive ? url ?? "#" : "#"} replace={true}>
-          <DropdownMenuItem {...rest} disabled={!itemIsActive}>
+          <DropdownMenuItem
+            className="menu__item"
+            {...rest}
+            disabled={!itemIsActive}
+          >
             {Icon && <Icon />}
             {title ?? "untitled"}
           </DropdownMenuItem>
