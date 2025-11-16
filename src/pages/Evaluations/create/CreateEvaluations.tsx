@@ -1,13 +1,25 @@
 import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.js";
 import { Tabs } from "@/components/ui/tabs";
-import { RightSidePageContent } from "@/pages/Evaluations/create/right-content/RightSidePageContent.js";
 import type { CreateEvaluationsLoaderData } from "@/routes/routes.config.js";
 import "@css/PageContent.scss";
-import { useState, type MouseEvent } from "react";
-import { useLoaderData } from "react-router-dom";
+import { useEffect, useState, type MouseEvent } from "react";
+import {
+  Outlet,
+  useLoaderData,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { TabContent } from "../../../components/Tabs/TabContent.js";
+import type { CreateEvaluationArrowsClickHandlerProps } from "@/pages/Evaluations/create/types/create.types.js";
 
+type handleOnClickProps = {
+  e: MouseEvent<SVGElement>;
+  index: number;
+  arrayLength: number;
+  setTabValue: (v: string | undefined) => void;
+  tabValues: string[];
+};
 const tabValues: string[] = [];
 
 /**
@@ -17,10 +29,15 @@ const tabValues: string[] = [];
  */
 export function CreateEvaluations() {
   const { pageDatas } = useLoaderData<CreateEvaluationsLoaderData>();
+  const navigate = useNavigate();
 
   const [tabValue, setTabValue] = useState<string | undefined>(
     pageDatas?.step1.name
   );
+
+  useEffect(() => {
+    navigate(tabValue?.toLocaleLowerCase() ?? "", { replace: true });
+  }, [tabValue]);
 
   if (!pageDatas) {
     return <div>Loading...</div>;
@@ -28,12 +45,16 @@ export function CreateEvaluations() {
 
   /**
    * Props for TabContent components
+   *
+   * @description index needs to be passed for arrow navigation
    */
-  const tabContentProps = {
-    arrayLength: Object.keys(pageDatas).length,
+  const tabContentPropsAndFunctions = {
     onClick: handleOnArrowClick,
-    setTabValue,
-    tabValues,
+    clickProps: {
+      arrayLength: Object.keys(pageDatas).length,
+      setTabValue,
+      tabValues,
+    },
   };
 
   return (
@@ -56,9 +77,10 @@ export function CreateEvaluations() {
               key={key}
               item={item}
               index={index}
-              {...tabContentProps}
+              {...tabContentPropsAndFunctions}
             >
-              <RightSidePageContent item={item.rightSide} />
+              {<Outlet />}
+              {/* <RightSidePageContent item={item.rightSide} /> */}
             </TabContent>
           );
         }}
@@ -66,10 +88,6 @@ export function CreateEvaluations() {
     </Tabs>
   );
 }
-type handleOnClickProps<T> = {
-  e: MouseEvent<SVGElement>;
-  clickProps: T;
-};
 
 /**
  * Handle click events for tab navigation.
@@ -77,10 +95,10 @@ type handleOnClickProps<T> = {
  * @param e - Mouse event from the click
  * @param clickProps - Object containing index, arrayLength, setTabValue, and tabValues
  */
-function handleOnArrowClick<T extends Record<string, unknown>>({
+function handleOnArrowClick({
   e,
   ...clickProps
-}: handleOnClickProps<T>) {
+}: CreateEvaluationArrowsClickHandlerProps) {
   e.preventDefault();
   const { index, arrayLength, setTabValue, tabValues } = clickProps;
   let newIndex = 0;
@@ -101,7 +119,3 @@ function handleOnArrowClick<T extends Record<string, unknown>>({
 
   setTabValue(tabValues[newIndex]);
 }
-
-// function extractTabValues(item: { name: string }) {
-//   return item.name;
-// }

@@ -2,7 +2,7 @@
  * Types for the create evaluations page
  */
 
-import type { ComponentType } from "react";
+import type { ComponentType, MouseEvent } from "react";
 
 /**
  * Types for the left content component props
@@ -15,9 +15,23 @@ export type LeftContentProps = {
   };
 };
 
+/**
+ * Types for the right content component props
+ */
 export type RightContentProps = {
   item: {
     content?: ComponentType;
     [key: string]: unknown;
   };
+};
+
+/**
+ * Types for the create evaluations arrow click handler props
+ */
+export type CreateEvaluationArrowsClickHandlerProps = {
+  e: MouseEvent<SVGElement>;
+  index: number;
+  arrayLength: number;
+  setTabValue: (v: string | undefined) => void;
+  tabValues: string[];
 };

@@ -1,5 +1,3 @@
-import { StepOne } from "@/pages/Evaluations/create/steps/StepOne.tsx";
-
 export const EvaluationPageTabsDatas = {
   step1: {
     id: "step-1",
@@ -10,14 +8,8 @@ export const EvaluationPageTabsDatas = {
       description: "Choisir la classe d’élèves qui participent à l'évaluation.",
     },
     rightSide: {
-      // title: "Les classes disponibles",
-      // subTitle: "Choisir...",
-      content: () => {
-        const title = "Les classes disponibles";
-        const placeholder = "Choisir...";
-
-        return <StepOne title={title} placeholder={placeholder} />;
-      },
+      title: "Les classes disponibles",
+      subTitle: "Choisir...",
     },
   },
   step2: {

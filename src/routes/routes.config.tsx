@@ -3,6 +3,7 @@ import { completeDatas } from "@/main.tsx";
 import { About } from "@/pages/About/About.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
 import { CreateEvaluations } from "@/pages/Evaluations/create/CreateEvaluations.tsx";
+import { StepOne } from "@/pages/Evaluations/create/steps/StepOne.tsx";
 import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
 import { Login } from "@/pages/Login/Login.tsx";
@@ -84,6 +85,57 @@ export const routeChildren = [
             pageDatas: EvaluationPageTabsDatas,
           };
         },
+        children: [
+          {
+            path: EvaluationPageTabsDatas.step1.name,
+            element: (
+              <StepOne
+                title={EvaluationPageTabsDatas.step1.rightSide.title}
+                placeholder={EvaluationPageTabsDatas.step1.rightSide.subTitle}
+              />
+            ),
+            loader: async () => {
+              const date = new Date().toLocaleDateString();
+              // setDocumentTitle(EvaluationPageTabsDatas.step1.name);
+              return {
+                pageTitle: "Evaluation - " + date,
+              };
+            },
+          },
+          {
+            path: EvaluationPageTabsDatas.step2.name,
+            element: <StepOne title="bots" placeholder="bots" />,
+            loader: async () => {
+              const date = new Date().toLocaleDateString();
+              // setDocumentTitle(EvaluationPageTabsDatas.step2.name);
+              return {
+                pageTitle: "Evaluation - " + date,
+              };
+            },
+          },
+          {
+            path: EvaluationPageTabsDatas.step3.name,
+            element: <StepOne title="dsq" placeholder="dsq" />,
+            loader: async () => {
+              const date = new Date().toLocaleDateString();
+              // setDocumentTitle(EvaluationPageTabsDatas.step3.name);
+              return {
+                pageTitle: "Evaluation - " + date,
+              };
+            },
+          },
+          {
+            path: EvaluationPageTabsDatas.step4.name,
+            element: <StepOne title="gfgg" placeholder="gfgg" />,
+            loader: async () => {
+              const date = new Date().toLocaleDateString();
+              // setDocumentTitle(EvaluationPageTabsDatas.step4.name);
+              return {
+                pageTitle: "Evaluation - " + date,
+              };
+            },
+          },
+        ],
       },
     ],
   },
