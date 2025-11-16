@@ -44,7 +44,6 @@ export function TabContent({
         </CardContent>
         <CardFooter className="cards-container__footer">
           <IconArrowRightDashed
-            {...props.functions}
             onClick={(e) => onClickHandler({ e, ...clickProps, index })}
             data-name="next-step"
           />
