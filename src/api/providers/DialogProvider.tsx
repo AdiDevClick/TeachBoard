@@ -37,6 +37,10 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
     });
   }, []);
 
+  const closeAllDialogs = useCallback(() => {
+    setOpenDialogs(new Set());
+  }, []);
+
   const isDialogOpen = useCallback(
     (id: string) => {
       return openDialogs.has(id);
@@ -58,6 +62,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
       openDialog,
       closeDialog,
       onOpenChange,
+      closeAllDialogs,
     }),
     [openDialogs]
   );

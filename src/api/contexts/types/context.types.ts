@@ -6,4 +6,5 @@ export type DialogContextType = {
   openDialog: (id: string) => void;
   closeDialog: (id?: string) => void;
   onOpenChange: (id: string) => void;
+  closeAllDialogs: () => void;
 };
