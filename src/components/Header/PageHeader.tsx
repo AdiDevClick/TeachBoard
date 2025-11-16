@@ -62,9 +62,8 @@ export function PageHeader() {
     location.state = { background: location.pathname };
     history.pushState(location.state, "", "/login");
   };
-
   // Generate breadcrumb segments from the current URL path
-  const splitPaths = buildBreadcrumbsFromPath(location.pathname);
+  const splitPaths = buildBreadcrumbsFromPath(decodeURI(location.pathname));
 
   return (
     <header className="page__header-container">
@@ -139,10 +138,15 @@ function buildBreadcrumbsFromPath(
     .filter(Boolean)
     .reduce<{ url: string; name: string }[]>((acc, segment) => {
       const trimmedSegment = segment.trim();
+      // Construct url based on the url positionned at index - 1 if a route is nested (easier to produce correct urls)
+      const baseUrl = acc.at(-1)?.url ?? "";
+      const url = `${baseUrl}/${trimmedSegment}`;
+
       acc.push({
-        url: acc.map((item) => item.url).join("") + "/" + trimmedSegment,
+        url,
         name: trimmedSegment.charAt(0).toUpperCase() + trimmedSegment.slice(1),
       });
+
       return acc;
     }, []);
 }
