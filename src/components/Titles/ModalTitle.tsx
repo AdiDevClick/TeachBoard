@@ -4,9 +4,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.tsx";
-import { DialogHeader } from "@/components/ui/dialog.tsx";
+import {
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog.tsx";
+import { headerDescription, headerTitle } from "@/data/login-header.data.ts";
 import { cn } from "@/utils/utils";
-import type { ComponentType } from "react";
+import { type ComponentType } from "react";
 
 /**
  * ModalTitle component for displaying a title and description in a modal dialog.
@@ -17,25 +22,48 @@ import type { ComponentType } from "react";
  * @returns
  */
 export function HeaderTitle({
-  className,
+  className = "",
+  title = headerTitle,
+  description = headerDescription,
   ...props
 }: Readonly<HeaderTitleProps>) {
   return (
-    <CardHeader className={cn("text-center", className)} {...props}>
-      <CardTitle className="text-xl">Welcome back</CardTitle>
-      <CardDescription>
-        Connectez-vous avec un de vos comptes sociaux ou par email
-      </CardDescription>
+    <CardHeader
+      id={"login-header"}
+      className={cn("text-center", className)}
+      {...props}
+    >
+      <CardTitle className="text-xl">{title}</CardTitle>
+      <CardDescription>{description}</CardDescription>
     </CardHeader>
   );
 }
 
-function withDialogHeader(Component: ComponentType): ComponentType {
-  return (props) => (
-    <DialogHeader>
-      <Component {...props} />
-    </DialogHeader>
-  );
+/**
+ * Higher-order component that wraps a component with a dialog header.
+ *
+ * @param Component - The component to be wrapped.
+ */
+function withDialogHeader<
+  P extends HeaderTitleProps = HeaderTitleProps
+>(): ComponentType<P> {
+  return ({
+    title = headerTitle,
+    description = headerDescription,
+    className = "",
+    ...rest
+  }: Readonly<P>) => {
+    return (
+      <DialogHeader
+        id={"login-header-dialog"}
+        className={cn("text-center!", className)}
+        {...rest}
+      >
+        <DialogTitle className="text-xl">{title}</DialogTitle>
+        <DialogDescription>{description}</DialogDescription>
+      </DialogHeader>
+    );
+  };
 }
 
-export const WithDialogHeader = withDialogHeader(HeaderTitle);
+export const WithDialogHeader = withDialogHeader();
