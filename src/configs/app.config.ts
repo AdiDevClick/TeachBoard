@@ -40,4 +40,4 @@ export const USER_ACTIVITIES = Object.freeze({
  *
  * @description Defines the names of modals used in the application.
  */
-export type AppModalNames = "login" | "apple" | "none";
+export type AppModalNames = "login" | "apple" | "none" | "signup";
