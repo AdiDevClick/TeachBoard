@@ -7,6 +7,7 @@ import { StepOne } from "@/pages/Evaluations/create/steps/StepOne.tsx";
 import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
 import { Login } from "@/pages/Login/Login.tsx";
+import { Signup } from "@/pages/Signup/Signup";
 import { Navigate, type RouteObject } from "react-router-dom";
 type NavMenu = (typeof completeDatas.navMain.menus)[number];
 
@@ -53,6 +54,14 @@ export const routeChildren = [
     loader: async () => {
       setDocumentTitle("Login");
 
+      return { pageTitle: "hidden" };
+    },
+  },
+  {
+    path: "signup",
+    element: <Signup />,
+    loader: async () => {
+      setDocumentTitle("S'enregistrer");
       return { pageTitle: "hidden" };
     },
   },
