@@ -34,3 +34,10 @@ export const USER_ACTIVITIES = Object.freeze({
   sessionCheck: "session-check",
   classes: "classes",
 });
+
+/**
+ * App modal names
+ *
+ * @description Defines the names of modals used in the application.
+ */
+export type AppModalNames = "login" | "apple" | "none";

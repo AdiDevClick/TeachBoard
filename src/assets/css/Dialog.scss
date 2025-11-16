@@ -1,9 +1,24 @@
 /**
  * Styles for dialog components
+ *
+ * In order to customize the dialog for the login form,
+ * we define specific styles for the dialog content
+ * 
+ * SETTINGS :
+ * 1 : Synchronize the name with the className passed to the Modale component
+ * 2 : Customize styles as needed
+ *
+ * Example :
+ * Your modale name is "login" -> 
+ * .dialog__content--login { my-custom-styles }
  */
-.dialog__content--login {
-  overflow: hidden;
-  padding: 0;
-  border: none;
-  background: transparent;
+.dialog__content {
+
+  &--login {
+    overflow: hidden;
+    padding: 0;
+    border: none;
+    background: transparent;
+  }
+
 }
