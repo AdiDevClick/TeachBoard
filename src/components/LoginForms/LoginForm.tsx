@@ -24,7 +24,6 @@ import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useLogin } from "@/hooks/database/login/useLogin.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
 import { formSchema } from "@/models/login.models.ts";
-import { cn } from "@/utils/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -118,54 +117,52 @@ export function LoginForm({
    * Determine the title component based on modal mode
    * @description Uses HeaderTitle directly in modal mode, otherwise wraps it with the dialog header HOC
    */
-  const Title = modalMode ? HeaderTitle : WithDialogHeader;
+  const Title = modalMode ? WithDialogHeader : HeaderTitle;
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <Title />
-        <CardContent>
-          <form
-            id="login-form"
-            onSubmit={form.handleSubmit(queryFn)}
-            className="grid gap-4"
-          >
-            <FieldGroup>
-              <Field>
-                <Modale modaleName="apple" modaleContent={"test"}>
-                  <ListMapper items={loginButtonsSvgs}>
-                    <LoginButton
-                      ischild
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        openDialog("apple");
-                      }}
-                    />
-                  </ListMapper>
-                </Modale>
-              </Field>
-              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                Ou continuez avec
-              </FieldSeparator>
-              <Inputs items={inputControllers} form={form} />
-              <Field>
-                <Button
-                  type="submit"
-                  disabled={!form.formState.isValid}
-                  form="login-form"
-                >
-                  Se connecter
-                </Button>
-                <FieldDescription className="text-center">
-                  Vous n'avez pas de compte ?{" "}
-                  <Link to="/signup">Inscrivez-vous ici</Link>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+    <Card className={className} {...props}>
+      <Title />
+      <CardContent>
+        <form
+          id="login-form"
+          onSubmit={form.handleSubmit(queryFn)}
+          className="grid gap-4"
+        >
+          <FieldGroup>
+            <Field>
+              <Modale modaleName="apple" modaleContent={"test"}>
+                <ListMapper items={loginButtonsSvgs}>
+                  <LoginButton
+                    ischild
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      openDialog("apple");
+                    }}
+                  />
+                </ListMapper>
+              </Modale>
+            </Field>
+            <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
+              Ou continuez avec
+            </FieldSeparator>
+            <Inputs items={inputControllers} form={form} />
+            <Field>
+              <Button
+                type="submit"
+                disabled={!form.formState.isValid}
+                form="login-form"
+              >
+                Se connecter
+              </Button>
+              <FieldDescription className="text-center">
+                Vous n'avez pas de compte ?{" "}
+                <Link to="/signup">Inscrivez-vous ici</Link>
+              </FieldDescription>
+            </Field>
+          </FieldGroup>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
