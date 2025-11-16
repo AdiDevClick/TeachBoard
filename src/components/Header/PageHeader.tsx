@@ -1,9 +1,9 @@
 import { AppBreadCrumb } from "@/components/BreadCrumbs/AppBreadCrumb";
 import { AppBreadCrumbList } from "@/components/BreadCrumbs/AppBreadCrumbList.tsx";
 import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
+import { Modale } from "@/components/Modale/Modale.tsx";
 import { Breadcrumb } from "@/components/ui/breadcrumb.tsx";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog.tsx";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { inputControllers } from "@/data/loginInputControllers.ts";
@@ -21,7 +21,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 export function PageHeader() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isDialogOpen, openDialog, closeDialog, onOpenChange } = useDialog();
+  const { isDialogOpen, openDialog, closeDialog } = useDialog();
   const isLoggedIn = useAppStore((state) => state.isLoggedIn);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -79,26 +79,27 @@ export function PageHeader() {
             <AppBreadCrumb ischild segmentsLength={splitPaths.length} />
           </AppBreadCrumbList>
         </Breadcrumb>
-        <Dialog
-          open={isDialogOpen("login")}
-          onOpenChange={() => onOpenChange("login")}
-        >
-          <div className="header__actions-container">
-            <Button
-              variant="ghost"
-              asChild
-              size="sm"
-              className="actions__button"
+        <div className="header__actions-container">
+          <Button variant="ghost" asChild size="sm" className="actions__button">
+            <Link
+              to="https://github.com/adidevclick"
+              rel="noopener noreferrer"
+              target="_blank"
+              className="dark:text-foreground"
             >
-              <Link
-                to="https://github.com/adidevclick"
-                rel="noopener noreferrer"
-                target="_blank"
-                className="dark:text-foreground"
-              >
-                GitHub
-              </Link>
-            </Button>
+              GitHub
+            </Link>
+          </Button>
+          <Modale
+            modaleName="login"
+            modaleContent={
+              <LoginForm
+                ref={ref}
+                inputControllers={inputControllers}
+                modalMode={true}
+              />
+            }
+          >
             <Activity mode={isLoggedIn ? "hidden" : "visible"}>
               <Button
                 variant="ghost"
@@ -109,16 +110,8 @@ export function PageHeader() {
                 Se connecter
               </Button>
             </Activity>
-
-            <DialogContent className="dialog__content--login">
-              <LoginForm
-                ref={ref}
-                inputControllers={inputControllers}
-                modalMode={true}
-              />
-            </DialogContent>
-          </div>
-        </Dialog>
+          </Modale>
+        </div>
       </div>
     </header>
   );

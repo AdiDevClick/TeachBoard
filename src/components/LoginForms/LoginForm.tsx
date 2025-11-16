@@ -5,13 +5,13 @@ import type {
   LoginFormProps,
   LoginFormSchema,
 } from "@/components/LoginForms/types/LoginFormsTypes.ts";
+import { Modale } from "@/components/Modale/Modale.tsx";
 import {
   HeaderTitle,
   WithDialogHeader,
 } from "@/components/Titles/ModalTitle.tsx";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent } from "@/components/ui/dialog.tsx";
 import {
   Field,
   FieldDescription,
@@ -48,7 +48,7 @@ export function LoginForm({
 }: Readonly<LoginFormProps>) {
   const navigate = useNavigate();
   const { open, setOpen } = useSidebar();
-  const { closeDialog, openDialog, isDialogOpen, onOpenChange } = useDialog();
+  const { closeDialog, openDialog, isDialogOpen } = useDialog();
   const user = useAppStore((state) => state.user);
 
   const form = useForm<LoginFormSchema>({
@@ -130,12 +130,9 @@ export function LoginForm({
             onSubmit={form.handleSubmit(queryFn)}
             className="grid gap-4"
           >
-            <Dialog
-              open={isDialogOpen("apple")}
-              onOpenChange={() => onOpenChange("apple")}
-            >
-              <FieldGroup>
-                <Field>
+            <FieldGroup>
+              <Field>
+                <Modale modaleName="apple" modaleContent={"test"}>
                   <ListMapper items={loginButtonsSvgs}>
                     <LoginButton
                       ischild
@@ -146,28 +143,26 @@ export function LoginForm({
                       }}
                     />
                   </ListMapper>
-                  <DialogContent>test</DialogContent>
-                </Field>
-
-                <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                  Ou continuez avec
-                </FieldSeparator>
-                <Inputs items={inputControllers} form={form} />
-                <Field>
-                  <Button
-                    type="submit"
-                    disabled={!form.formState.isValid}
-                    form="login-form"
-                  >
-                    Se connecter
-                  </Button>
-                  <FieldDescription className="text-center">
-                    Vous n'avez pas de compte ?{" "}
-                    <Link to="/signup">Inscrivez-vous ici</Link>
-                  </FieldDescription>
-                </Field>
-              </FieldGroup>
-            </Dialog>
+                </Modale>
+              </Field>
+              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
+                Ou continuez avec
+              </FieldSeparator>
+              <Inputs items={inputControllers} form={form} />
+              <Field>
+                <Button
+                  type="submit"
+                  disabled={!form.formState.isValid}
+                  form="login-form"
+                >
+                  Se connecter
+                </Button>
+                <FieldDescription className="text-center">
+                  Vous n'avez pas de compte ?{" "}
+                  <Link to="/signup">Inscrivez-vous ici</Link>
+                </FieldDescription>
+              </Field>
+            </FieldGroup>
           </form>
         </CardContent>
       </Card>
