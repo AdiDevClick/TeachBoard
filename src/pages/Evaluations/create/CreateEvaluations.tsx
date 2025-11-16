@@ -1,25 +1,13 @@
 import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.js";
 import { Tabs } from "@/components/ui/tabs";
+import type { CreateEvaluationArrowsClickHandlerProps } from "@/pages/Evaluations/create/types/create.types.js";
 import type { CreateEvaluationsLoaderData } from "@/routes/routes.config.js";
 import "@css/PageContent.scss";
-import { useEffect, useState, type MouseEvent } from "react";
-import {
-  Outlet,
-  useLoaderData,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Outlet, useLoaderData, useNavigate } from "react-router-dom";
 import { TabContent } from "../../../components/Tabs/TabContent.js";
-import type { CreateEvaluationArrowsClickHandlerProps } from "@/pages/Evaluations/create/types/create.types.js";
 
-type handleOnClickProps = {
-  e: MouseEvent<SVGElement>;
-  index: number;
-  arrayLength: number;
-  setTabValue: (v: string | undefined) => void;
-  tabValues: string[];
-};
 const tabValues: string[] = [];
 
 /**
@@ -80,7 +68,6 @@ export function CreateEvaluations() {
               {...tabContentPropsAndFunctions}
             >
               {<Outlet />}
-              {/* <RightSidePageContent item={item.rightSide} /> */}
             </TabContent>
           );
         }}
