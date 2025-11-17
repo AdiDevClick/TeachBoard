@@ -7,8 +7,8 @@ import type {
 } from "@/components/LoginForms/types/LoginFormsTypes.ts";
 import { Modale } from "@/components/Modale/Modale.tsx";
 import {
+  DialogHeaderTitle,
   HeaderTitle,
-  WithDialogHeader,
 } from "@/components/Titles/ModalTitle.tsx";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,6 +24,7 @@ import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useLogin } from "@/hooks/database/login/useLogin.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
 import { formSchema } from "@/models/login.models.ts";
+import { Signup } from "@/pages/Signup/Signup.tsx";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -117,7 +118,7 @@ export function LoginForm({
    * Determine the title component based on modal mode
    * @description Uses HeaderTitle directly in modal mode, otherwise wraps it with the dialog header HOC
    */
-  const Title = modalMode ? WithDialogHeader : HeaderTitle;
+  const Title = modalMode ? DialogHeaderTitle : HeaderTitle;
 
   return (
     <Card className={className} {...props}>
@@ -157,7 +158,21 @@ export function LoginForm({
               </Button>
               <FieldDescription className="text-center">
                 Vous n'avez pas de compte ?{" "}
-                <Link to="/signup">Inscrivez-vous ici</Link>
+                <Modale
+                  modaleName="signup"
+                  modaleContent={<Signup modaleMode />}
+                >
+                  <Link
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      openDialog("signup");
+                    }}
+                    to="/signup"
+                  >
+                    Inscrivez-vous ici
+                  </Link>
+                </Modale>
               </FieldDescription>
             </Field>
           </FieldGroup>
