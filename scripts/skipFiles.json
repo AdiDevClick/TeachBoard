@@ -36,5 +36,16 @@
   "${workspaceFolder}/node_modules/.vite/deps/react_compiler-runtime.js",
   "${workspaceFolder}/node_modules/.vite/deps/react_jsx-dev-runtime.js",
   "**/node_modules/@react-refresh/**",
-  "**/node_modules/react-refresh/**"
+  "**/node_modules/react-refresh/**",
+  "debug:**/installHook.js*",
+  "debug:**/installHook.js*",
+  "**/installHook.js*",
+  "debug:**/@react-refresh*",
+  "debug:*/@react-refresh*",
+  "**/@react-refresh*",
+  "debug:fmkadmapgofadopljbjfkapdkoienihi/**",
+  "debug:localhost*/@react-refresh*",
+  "debug:localhost*%40react-refresh*",
+  "*%40react-refresh*",
+  "**/*%40react-refresh*"
 ]
