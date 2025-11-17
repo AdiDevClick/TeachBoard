@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog.tsx";
 import { headerDescription, headerTitle } from "@/data/login-header.data.ts";
 import { cn } from "@/utils/utils";
-import { type ComponentType } from "react";
 
 /**
  * ModalTitle component for displaying a title and description in a modal dialog.
@@ -44,26 +43,23 @@ export function HeaderTitle({
  *
  * @param Component - The component to be wrapped.
  */
-function withDialogHeader<
-  P extends HeaderTitleProps = HeaderTitleProps
->(): ComponentType<P> {
-  return ({
-    title = headerTitle,
-    description = headerDescription,
-    className = "",
-    ...rest
-  }: Readonly<P>) => {
-    return (
-      <DialogHeader
-        id={"login-header-dialog"}
-        className={cn("text-center!", className)}
-        {...rest}
-      >
-        <DialogTitle className="text-xl">{title}</DialogTitle>
-        <DialogDescription>{description}</DialogDescription>
-      </DialogHeader>
-    );
-  };
+export function DialogHeaderTitle({
+  title = headerTitle,
+  description = headerDescription,
+  className = "",
+  ...rest
+}: Readonly<HeaderTitleProps>) {
+  return (
+    <DialogHeader
+      id={"login-header-dialog"}
+      className={cn("text-center!", className)}
+      {...rest}
+    >
+      <DialogTitle className="text-xl">{title}</DialogTitle>
+      <DialogDescription>{description}</DialogDescription>
+    </DialogHeader>
+  );
 }
 
-export const WithDialogHeader = withDialogHeader();
+// export const LoginDialogHeader = withDialogHeader(HeaderTitle);
+// export const SignupDialogHeader = withDialogHeader(HeaderTitle);
