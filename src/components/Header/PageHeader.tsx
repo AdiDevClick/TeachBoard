@@ -34,30 +34,6 @@ export function PageHeader() {
     };
   }, [closeDialog]);
 
-  useEffect(() => {
-    // if (isDialogOpen("login")) {
-    //   // Define here any actions needed when the dialog opens
-    //   console.log("DialogOpen dans le page header");
-    // }
-
-    // !! IMPORTANT !! Be aware that if the ref is not set, we should not proceed. As the page triggers this effect before the ref is set.
-    // if (!ref.current) return;
-
-    // if (!isDialogOpen("login") && location.state?.background) {
-    //   navigate(location.state.background, { replace: true, state: {} });
-    // }
-    // if (!isDialogOpen("login")) {
-    //   console.log(
-    //     "DialogOpen dans le page header essai de fermer",
-    //     openedDialogs
-    //   );
-    // }
-    console.log(
-      "DialogOpen dans le page header essai de fermer",
-      openedDialogs
-    );
-  }, [isDialogOpen, location.state]);
-
   const handleLoginClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
