@@ -8,9 +8,22 @@
   min-width: calc(var(--spacing) * 56);
   border-radius: var(--radius);
 
+  // Resets item parent cursors
+  a {
+    cursor: default;
+  }
+
   .menu__label {
     padding: 0;
     font-weight: normal;
+  }
+
+  .menu__item {
+    cursor: pointer;
+
+    &[data-disabled] {
+      cursor: "none" !important;
+    }
   }
 
 }

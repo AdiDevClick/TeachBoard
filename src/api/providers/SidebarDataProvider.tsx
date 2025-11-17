@@ -7,7 +7,7 @@ import type { SidebarDataProviderProps } from "@/api/providers/types/SidebarData
 export function SidebarDataProvider({
   value,
   children,
-}: SidebarDataProviderProps) {
+}: Readonly<SidebarDataProviderProps>) {
   return (
     <SidebarDataContext.Provider value={value}>
       {children}

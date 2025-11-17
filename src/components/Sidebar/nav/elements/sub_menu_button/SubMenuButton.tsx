@@ -6,16 +6,20 @@ import {
 import { Link } from "react-router";
 
 /**
- * Submenu button component
+ * Sidebar Submenu button component
+ *
+ * @description Currently used in the CollapsibleContents component to render submenu items
  *
  * @param item - Submenu item to display
  */
 export function SubMenuButton({ ...item }: SubMenuButtonProps) {
+  const { title, url, icon } = item;
+
   return (
     <SidebarMenuSubItem>
       <SidebarMenuSubButton asChild>
-        <Link to={item.url ?? "#"}>
-          <span>{item.title}</span>
+        <Link to={url ?? "#"}>
+          <span>{title ?? "untitled submenu"}</span>
         </Link>
       </SidebarMenuSubButton>
     </SidebarMenuSubItem>

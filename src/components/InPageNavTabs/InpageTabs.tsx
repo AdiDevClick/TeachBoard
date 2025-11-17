@@ -1,17 +1,10 @@
+import type { InpageTabsProps } from "@/components/InPageNavTabs/types/navtabs.types.ts";
+import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import VerticalFieldSelect from "@/components/Selects/VerticalFieldSelect";
 import { SelectGroup, SelectItem } from "@/components/ui/select.tsx";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import "@css/NavTabs.scss";
-
-/**
- *
- */
-type InpageTabsProps = {
-  datas: Record<string, unknown>;
-  value?: string;
-  onValueChange?: (value: string) => void;
-};
 
 /**
  * In-page navigation tabs component
@@ -22,7 +15,11 @@ type InpageTabsProps = {
  * @param value  - Current selected tab value
  * @param onValueChange - Callback when the tab value changes
  */
-export function InpageTabs({ datas, value, onValueChange }: InpageTabsProps) {
+export function InpageTabs({
+  datas,
+  value,
+  onValueChange,
+}: Readonly<InpageTabsProps>) {
   const { isMobile } = useSidebar();
 
   if (isMobile) {
@@ -34,11 +31,13 @@ export function InpageTabs({ datas, value, onValueChange }: InpageTabsProps) {
         onValueChange={onValueChange}
       >
         <SelectGroup className="nav-tabs__select-group">
-          {Object.entries(datas).map(([key, item]) => (
-            <SelectItem key={key} value={item.tabTitle}>
-              {item.tabTitle}
-            </SelectItem>
-          ))}
+          <ListMapper items={datas}>
+            {([key, item]) => (
+              <SelectItem key={key} value={item.name}>
+                {item.name}
+              </SelectItem>
+            )}
+          </ListMapper>
         </SelectGroup>
       </VerticalFieldSelect>
     );
@@ -47,8 +46,8 @@ export function InpageTabs({ datas, value, onValueChange }: InpageTabsProps) {
   return (
     <TabsList className="nav-tabs-container">
       {Object.entries(datas).map(([key, item]) => (
-        <TabsTrigger key={key} value={item.tabTitle}>
-          {item.tabTitle}
+        <TabsTrigger key={key} value={item.name}>
+          {item.name}
         </TabsTrigger>
       ))}
     </TabsList>

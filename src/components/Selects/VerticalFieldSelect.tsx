@@ -5,8 +5,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { ReactNode, useId, type ComponentProps } from "react";
+import { cn } from "@/utils/utils";
+import { type ComponentProps, ReactNode, useId } from "react";
 
 type VerticalSelectProps = ComponentProps<typeof Select> & {
   label?: ReactNode;

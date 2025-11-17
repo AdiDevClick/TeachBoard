@@ -12,7 +12,8 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Activity } from "react";
+import { useUserLogout } from "@/hooks/database/logout/useUserLogout.ts";
+import { Activity, type MouseEvent } from "react";
 
 /**
  * Full App Sidebar component
@@ -21,6 +22,18 @@ import { Activity } from "react";
  */
 export function AppSidebar({ ...props }: SidebarProps) {
   const { state } = useSidebar();
+  const { data, queryFn } = useUserLogout();
+
+  const handleOnFooterButtonsClick = (e: MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLDivElement;
+    const parentElement = target.parentElement as HTMLAnchorElement;
+
+    if (parentElement?.href.includes("/logout")) {
+      e.preventDefault();
+      e.stopPropagation();
+      queryFn();
+    }
+  };
 
   return (
     <Sidebar
@@ -40,7 +53,7 @@ export function AppSidebar({ ...props }: SidebarProps) {
         <SecondaryNavigation className="pb-5" />
       </SidebarContent>
       <SidebarFooter>
-        <UserButton />
+        <UserButton handleOnFooterButtonsClick={handleOnFooterButtonsClick} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

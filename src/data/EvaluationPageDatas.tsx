@@ -1,26 +1,20 @@
-import { StepOne } from "@/pages/Evaluations/create/steps/StepOne.tsx";
-
 export const EvaluationPageTabsDatas = {
   step1: {
-    tabTitle: "Classe",
+    id: "step-1",
+    name: "Classe",
     leftSide: {
       number: 1,
       title: "Classe à évaluer",
       description: "Choisir la classe d’élèves qui participent à l'évaluation.",
     },
     rightSide: {
-      // title: "Les classes disponibles",
-      // subTitle: "Choisir...",
-      content: () => {
-        const title = "Les classes disponibles";
-        const placeholder = "Choisir...";
-
-        return <StepOne title={title} placeholder={placeholder} />;
-      },
+      title: "Les classes disponibles",
+      subTitle: "Choisir...",
     },
   },
   step2: {
-    tabTitle: "Elèves",
+    id: "step-2",
+    name: "Elèves",
     leftSide: {
       number: 2,
       title: "Elèves présents",
@@ -33,7 +27,8 @@ export const EvaluationPageTabsDatas = {
     },
   },
   step3: {
-    tabTitle: "Evaluation",
+    id: "step-3",
+    name: "Evaluation",
     leftSide: {
       number: 3,
       title: "Evaluation des élèves",
@@ -46,7 +41,8 @@ export const EvaluationPageTabsDatas = {
     },
   },
   step4: {
-    tabTitle: "Archiver",
+    id: "step-4",
+    name: "Archiver",
     leftSide: {
       number: 4,
       title: "Archiver l'évaluation du jour",

@@ -1,4 +1,4 @@
-import type { CompleteDatas } from "@/main.tsx";
+import type { completeDatas } from "@/main.tsx";
 import type { ReactNode } from "react";
 
 /**
@@ -6,7 +6,9 @@ import type { ReactNode } from "react";
  *
  * @description Change this type if the structure of sidebarDatas changes
  */
-export type dataContext = typeof CompleteDatas;
+export type dataContext = typeof completeDatas;
+export type dataContextUser = dataContext["user"];
+export type dataContextUserSettings = dataContext["user"]["settings"];
 
 /** Props for the Sidebar Data Provider component */
 export type SidebarDataProviderProps = {

@@ -3,9 +3,10 @@
  */
 .page__header-container {
   display: flex;
-  height: calc(var(--spacing) * 16);
+  height: var(--page-header-height);
+  // height: calc(var(--spacing) * 16);
   align-items: center;
-  gap: calc(var(--spacing) * 2);
+  gap: var(--app-overall-gap);
   transition: width 0.2s ease-in-out, height 0.2s ease-in-out;
   padding-left: 0 !important;
   flex-shrink: 0;
@@ -18,7 +19,7 @@
     margin-left: calc(var(--spacing) * -1);
 
     &--separator {
-      margin-inline: calc(var(--spacing) * 2);
+      margin-inline: var(--app-overall-gap);
 
       &[data-orientation="vertical"] {
         height: calc(var(--spacing) * 4);
@@ -30,7 +31,7 @@
     display: flex;
     width: 100%;
     align-items: center;
-    gap: calc(var(--spacing) * 1);
+    gap: var(--app-overall-gap);
     padding-inline: calc(var(--spacing) * 3);
     // padding-inline: calc(var(--spacing) * 4) !important;
     // padding-left: calc(var(--spacing) * 0) !important;
@@ -53,11 +54,11 @@
   .header__actions-container {
     margin-left: auto;
     display: flex;
-    align-items: center;
-    gap: calc(var(--spacing) * 2);
+    // align-items: center;
+    // gap: calc(var(--spacing) * 2) !important;
 
     .actions__button {
-      display: flex;
+      // display: flex;
 
       @media screen and (max-width: 640px) {
         display: none;

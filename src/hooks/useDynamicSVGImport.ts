@@ -1,4 +1,4 @@
-import type { UseDynamicSVGImportTypes } from "@/hooks/types/useDynamicSVGImportTypes.ts";
+import type { UseDynamicSVGImportTypes } from "@/hooks/types/use-dynamic-svg-import.types";
 import { useEffect, useState, type ComponentType, type SVGProps } from "react";
 
 /** Map of all available icons */
@@ -13,7 +13,7 @@ const icons = import.meta.glob("/src/assets/icons/*.svg", {
  * @param options - Additional options for the import.
  */
 export function useDynamicSVGImport({
-  icon,
+  iconPath,
   options = {},
 }: UseDynamicSVGImportTypes) {
   const [SvgIcon, setSvgIcon] = useState<
@@ -29,12 +29,11 @@ export function useDynamicSVGImport({
   useEffect(() => {
     const importIcon = async () => {
       try {
-        if (icon == null) {
+        if (iconPath == null) {
           throw new Error("Icon is undefined");
         }
 
-        const key = `/src/assets/icons/${icon.path}.svg`;
-
+        const key = `/src/assets/icons/${iconPath}.svg`;
         if (!icons[key]) {
           throw new Error(`Icon not found: ${key}`);
         }
@@ -47,7 +46,7 @@ export function useDynamicSVGImport({
       }
     };
     importIcon();
-  }, [icon]);
+  }, [iconPath]);
 
   return { SvgIcon, error };
 }

@@ -11,12 +11,12 @@ import { CollapsibleContent } from "@radix-ui/react-collapsible";
  */
 export function CollapsibleContents({
   subMenus = [],
-}: CollapsibleContentsProps) {
+}: Readonly<CollapsibleContentsProps>) {
   return (
     <CollapsibleContent className="collapsible__content">
       <SidebarMenuSub>
         <ListMapper items={subMenus}>
-          <SubMenuButton />
+          <SubMenuButton ischild />
         </ListMapper>
       </SidebarMenuSub>
     </CollapsibleContent>

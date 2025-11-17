@@ -4,7 +4,13 @@ import type {
   SidebarHeader,
   SidebarMenuButton,
 } from "@/components/ui/sidebar.tsx";
-import type { ComponentPropsWithRef, ReactElement, ReactNode } from "react";
+import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
+import type {
+  ComponentProps,
+  ComponentPropsWithRef,
+  ReactElement,
+  ReactNode,
+} from "react";
 
 /**
  * All types related to the sidebar navigation
@@ -85,8 +91,9 @@ export type CollapsibleContentsProps = {
   subMenus: SubMenus;
 };
 
-/** Props for the submenu button component */
-export type SubMenuButtonProps<T = SubMenus[number]> = ComponentPropsWithRef<
-  typeof SidebarMenuButton
-> &
-  Partial<T>;
+/** Props for the submenu button component
+ * @description This could be used with ListMapper or as a standalone component
+ */
+export type SubMenuButtonProps<
+  T extends Record<string, unknown> = SubMenus[number]
+> = ComponentProps<typeof SidebarMenuButton> & (T | SafeListMapperProp<T>);

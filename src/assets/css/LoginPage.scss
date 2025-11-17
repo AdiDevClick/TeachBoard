@@ -3,21 +3,24 @@
  */
 .login-page-container {
   --localSpacing: calc(var(--spacing) * 6);
+  --iconSpacing: calc(var(--spacing) * 4);
+  --paddingMinusPageHeaderSize: var(--page-header-height);
 
   background-color: var(--muted);
   display: flex;
-  // flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--localSpacing);
-  min-height: 100svh;
+  // min-height: 100svh;
   padding: var(--localSpacing);
+  overflow: hidden;
+  min-height: max-content;
+  height: 100%;
 
   .login-page__content {
     display: flex;
     flex-direction: column;
     gap: var(--localSpacing);
-    // width: 100%;
     max-width: var(--container-sm);
   }
 
@@ -25,7 +28,7 @@
     display: flex;
     align-items: center;
     align-self: center;
-    gap: calc(var(--spacing) * 2);
+    gap: var(--app-overall-gap);
     font-weight: var(--font-weight-medium);
 
     &--background {
@@ -40,12 +43,16 @@
     }
 
     &--icon {
-      width: calc(var(--spacing) * 4);
-      height: calc(var(--spacing) * 4);
+      width: var(--iconSpacing);
+      height: var(--iconSpacing);
     }
   }
 
   @media screen and (min-width: 48rem) {
     padding: calc(var(--spacing) * 10);
+  }
+
+  @media screen and (max-width: 48rem) {
+    padding-bottom: var(--paddingMinusPageHeaderSize);
   }
 }

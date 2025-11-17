@@ -22,20 +22,19 @@ export default function PrimaryMenuButton({
   const isQuickButtonEnabled = item.quickButton?.enabled;
 
   return (
-    <>
-      <Link to={item.url ?? "#"} className="w-full">
-        <SidebarMenuButton
-          {...props}
-          className={`${setStyle({ isQuickButtonEnabled, isMenu: false })} ${
-            props.className ?? ""
-          }`}
-          title={item.tooltip}
-        >
-          {item.icon && <item.icon style={{ stroke: "#404040" }} />}
-          <p>{item.title}</p>
-          {item.subMenus && <ChevronRight className="sidebarButton--submenu" />}
-        </SidebarMenuButton>
-      </Link>
-    </>
+    <Link to={item.url ?? "#"} className="w-full">
+      <SidebarMenuButton
+        {...props}
+        className={`sidebarButton--menu ${setStyle({
+          isQuickButtonEnabled,
+          isMenu: false,
+        })} ${props.className ?? ""}`}
+        title={item.tooltip}
+      >
+        {item.icon && <item.icon className="sidebarButton--menu-icon" />}
+        <p>{item.title}</p>
+        {item.subMenus && <ChevronRight className="sidebarButton--submenu" />}
+      </SidebarMenuButton>
+    </Link>
   );
 }

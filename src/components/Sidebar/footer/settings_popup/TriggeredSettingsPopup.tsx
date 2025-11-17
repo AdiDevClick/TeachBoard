@@ -8,6 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { useSidebar } from "@/components/ui/sidebar.tsx";
 import "@css/DropdownMenu.scss";
 
 /**
@@ -17,10 +18,12 @@ import "@css/DropdownMenu.scss";
  * @param userData - User data from sidebar context
  */
 export function TriggeredSettingsPopup({
-  isMobile,
   userData,
-}: SettingsPopupProps) {
-  const settings = userData.settings;
+  userDisplay,
+  handleOnFooterButtonsClick,
+}: Readonly<SettingsPopupProps>) {
+  const { isMobile } = useSidebar();
+  const { settings, ...rest } = userData;
 
   return (
     <DropdownMenuContent
@@ -30,12 +33,12 @@ export function TriggeredSettingsPopup({
       sideOffset={4}
     >
       <DropdownMenuLabel className="menu__label">
-        <UserDisplay props={userData} />
+        <UserDisplay props={userDisplay} />
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
         <ListMapper items={settings}>
-          <Dropdown />
+          <Dropdown ischild {...rest} onClick={handleOnFooterButtonsClick} />
         </ListMapper>
       </DropdownMenuGroup>
     </DropdownMenuContent>

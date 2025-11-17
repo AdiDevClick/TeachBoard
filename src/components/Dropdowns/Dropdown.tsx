@@ -11,17 +11,42 @@ import { NavLink } from "react-router-dom";
  * @param item - The dropdown item to render.
  * @returns The rendered dropdown item.
  */
-export function Dropdown({ ...item }: DropdownsProps) {
-  const { title, icon: Icon, divider } = item;
+export function Dropdown({ ...item }: Readonly<DropdownsProps>) {
+  if (!item) {
+    throw new Error("Dropdown item data is required");
+  }
+
+  const {
+    title,
+    icon: Icon,
+    divider,
+    url,
+    isLoggedIn,
+    isActivated,
+    displayWhenConnected,
+    showToUserWhenNotConnected,
+    ...rest
+  } = item;
+
+  const itemVisible = isLoggedIn
+    ? displayWhenConnected
+    : showToUserWhenNotConnected;
+  const itemIsActive = isLoggedIn ? displayWhenConnected : isActivated;
+
+  const isUrlActive = itemVisible && itemIsActive;
 
   return (
     <>
       {divider && <DropdownMenuSeparator />}
-      <Activity mode={item.showToUser ? "visible" : "hidden"}>
-        <NavLink to={item.url ? item.url : "#"} replace={true}>
-          <DropdownMenuItem disabled={!item.isActive}>
+      <Activity mode={itemVisible ? "visible" : "hidden"}>
+        <NavLink to={isUrlActive ? url ?? "#" : "#"} replace={true}>
+          <DropdownMenuItem
+            className="menu__item"
+            {...rest}
+            disabled={!itemIsActive}
+          >
             {Icon && <Icon />}
-            {title}
+            {title ?? "untitled"}
           </DropdownMenuItem>
         </NavLink>
       </Activity>

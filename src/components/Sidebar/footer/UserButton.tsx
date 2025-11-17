@@ -1,4 +1,5 @@
 import { TriggeredSettingsPopup } from "@/components/Sidebar/footer/settings_popup/TriggeredSettingsPopup.tsx";
+import type { UserButtonProps } from "@/components/Sidebar/footer/types/FooterTypes.ts";
 import { UserDisplay } from "@/components/Sidebar/footer/UserDisplay.tsx";
 import {
   DropdownMenu,
@@ -8,9 +9,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import { useSidebarDataContext } from "@/hooks/contexts/useSidebarDataContext.ts";
+import { useAppStore } from "@/hooks/store/AppStore.ts";
 import { IconDotsVertical } from "@tabler/icons-react";
 
 /**
@@ -18,24 +19,37 @@ import { IconDotsVertical } from "@tabler/icons-react";
  *
  * @description Displays the user info and actions in sidebar
  */
-export function UserButton() {
-  const { isMobile } = useSidebar();
-  const userData = useSidebarDataContext().user;
+export function UserButton({
+  handleOnFooterButtonsClick,
+}: Readonly<UserButtonProps>) {
+  const { name, email, avatar, settings } = useSidebarDataContext().user;
+
+  const isLoggedIn = useAppStore((state) => state.isLoggedIn);
+  const user = useAppStore((state) => state.user);
+
+  const userDisplay = {
+    name: user?.name ?? name,
+    email: user?.email ?? email,
+    avatar: user?.avatar ?? avatar,
+  };
+
+  const userData = { settings, isLoggedIn };
 
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <UserDisplay props={userData} />
-              <IconDotsVertical className="ml-auto size-4" />
+            <SidebarMenuButton size="lg" className="sidebarButton--menu">
+              <UserDisplay props={userDisplay} />
+              <IconDotsVertical className="sidebarButton--menu-dots" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <TriggeredSettingsPopup isMobile={isMobile} userData={userData} />
+          <TriggeredSettingsPopup
+            userData={userData}
+            userDisplay={userDisplay}
+            handleOnFooterButtonsClick={handleOnFooterButtonsClick}
+          />
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>

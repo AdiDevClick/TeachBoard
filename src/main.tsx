@@ -1,30 +1,26 @@
+import { DialogProvider } from "@/api/providers/DialogProvider.tsx";
 import { SidebarDataProvider } from "@/api/providers/SidebarDataProvider.tsx";
 import App from "@/App.tsx";
 import { PageHeader } from "@/components/Header/PageHeader";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { Toaster } from "@/components/ui/sonner";
+import { DEV_MODE } from "@/configs/app.config.ts";
 import { calendarEvents } from "@/data/CalendarData.ts";
-import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas.tsx";
-import { sidebarDatas } from "@/data/SidebarData";
-import { About } from "@/pages/About/About.tsx";
+import { sidebarDatas } from "@/data/SidebarData.ts";
+import { useDialog } from "@/hooks/contexts/useDialog.ts";
+import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
+import { useAppStore } from "@/hooks/store/AppStore.ts";
+import { AppModales } from "@/pages/AllModales/AppModales.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
-import { CreateEvaluations } from "@/pages/Evaluations/create/CreateEvaluations";
-import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
-import { Home } from "@/pages/Home/Home.tsx";
-import { Login } from "@/pages/Login/Login.tsx";
-import type { RootProps } from "@/types/MainTypes.ts";
+import { routeChildren } from "@/routes/routes.config.tsx";
+import type { RootProps } from "@/types/MainTypes";
 import "@css/MainContainer.scss";
 import "@css/Toaster.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { StrictMode, type CSSProperties } from "react";
+import { StrictMode, useEffect, type CSSProperties } from "react";
 import { createRoot } from "react-dom/client";
-import {
-  createBrowserRouter,
-  Navigate,
-  Outlet,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
@@ -35,87 +31,38 @@ const queryClient = new QueryClient();
  * dynamic calendar events to provide a comprehensive data set
  * for the sidebar navigation.
  */
-export const CompleteDatas = {
+export const completeDatas = {
   ...sidebarDatas,
   calendarEvents: calendarEvents,
-} as const;
+};
 
+/**
+ * Application router configuration
+ *
+ * @description !! IMPORTANT !! Routes object is imported from {@link routeChildren}
+ */
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
     errorElement: <Root contentType="error" />,
-    children: [
-      {
-        index: true,
-        element: <Home />,
-        loader: async () => {
-          setDocumentTitle(CompleteDatas.sidebarHeader.tooltip);
-
-          return {
-            loaderData: CompleteDatas.sidebarHeader,
-            pageTitle: "Dashboard",
-          };
-        },
-      },
-      {
-        path: "login",
-        element: <Login />,
-        loader: async () => {
-          setDocumentTitle("Login");
-
-          return { pageTitle: "hidden" };
-        },
-      },
-      {
-        path: "about",
-        element: <About />,
-      },
-      {
-        path: "evaluations",
-        element: <Evaluations />,
-        loader: async () => {
-          setDocumentTitle(CompleteDatas.navMain.menus[2].title);
-
-          return {
-            pageTitle: CompleteDatas.navMain.menus[2].title,
-            loaderData: CompleteDatas.navMain.menus[2],
-          };
-        },
-        children: [
-          {
-            path: "create",
-            element: <CreateEvaluations />,
-            loader: async () => {
-              const date = new Date().toLocaleDateString();
-              setDocumentTitle(CompleteDatas.navMain.menus[0].title);
-
-              return {
-                pageTitle: "Evaluation - " + date,
-                loaderData: CompleteDatas.navMain.menus[0],
-                pageDatas: EvaluationPageTabsDatas,
-              };
-            },
-          },
-        ],
-      },
-      {
-        path: "error",
-        element: <PageError />,
-      },
-      {
-        path: "*",
-        element: <Navigate to={"/error"} />,
-      },
-    ],
+    children: routeChildren,
   },
 ]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <DialogProvider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <Toaster
+          position="top-right"
+          className={"toaster-redefined"}
+          richColors
+          closeButton
+        />
+      </QueryClientProvider>
+    </DialogProvider>
   </StrictMode>
 );
 
@@ -130,6 +77,49 @@ createRoot(document.getElementById("root")!).render(
 export function Root({ contentType }: Readonly<RootProps>) {
   const errorContent = contentType === "error";
 
+  const lastUserActivity = useAppStore((state) => state.lastUserActivity);
+  const sessionSynced = useAppStore((state) => state.sessionSynced);
+  const { openDialog } = useDialog();
+
+  const { data, isLoading, queryFn, isLoaded, error } = useSessionChecker();
+
+  /**
+   * Automatically check session on app load unless the last user activity was a logout
+   */
+  useEffect(() => {
+    // const userExists = user !== null;
+    const lastActivityWasLogout = lastUserActivity === "logout";
+    const doNotCheckSession =
+      isLoaded || lastActivityWasLogout || sessionSynced;
+    // const shouldCheckSession = userExists && !doNotCheckSession;
+
+    if (doNotCheckSession) return;
+    queryFn();
+    // if (userExists) queryFn();
+  }, [isLoaded, lastUserActivity, sessionSynced]);
+  // }, [isLoaded, user, lastUserActivity, sessionSynced]);
+
+  useEffect(() => {
+    if (isLoading) {
+      if (DEV_MODE) {
+        console.debug("Session Check Loading...");
+      }
+    }
+
+    if (data) {
+      if (DEV_MODE) {
+        console.debug("Session Check Data:", data);
+      }
+    }
+
+    if (error) {
+      openDialog("login");
+      if (DEV_MODE) {
+        console.error("Session Check Error:", error);
+      }
+    }
+  }, [data, error, isLoading]);
+
   return (
     <SidebarProvider
       style={
@@ -141,34 +131,16 @@ export function Root({ contentType }: Readonly<RootProps>) {
       }
       className="sidebar-wrapper"
     >
-      <SidebarDataProvider value={CompleteDatas}>
+      <SidebarDataProvider value={completeDatas}>
         <AppSidebar variant="inset" />
         <SidebarInset className="main-app-container">
           <PageHeader />
-          <App>{errorContent ? <PageError /> : <Outlet context={null} />}</App>
-          <Toaster
-            position="top-right"
-            className={"toaster-redefined"}
-            richColors
-            closeButton
-          />
+          <App>
+            {errorContent ? <PageError /> : <Outlet context={completeDatas} />}
+          </App>
         </SidebarInset>
       </SidebarDataProvider>
+      <AppModales />
     </SidebarProvider>
   );
-}
-
-/**
- * Set the document title based on the selected menu item
- *
- * @param menu - The menu item to set the title for
- */
-function setDocumentTitle(menu: string) {
-  const oldTitle = document.title;
-
-  if (menu) {
-    document.title = "TeachBoard - " + menu;
-  } else {
-    document.title = oldTitle;
-  }
 }

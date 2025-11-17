@@ -10,7 +10,7 @@ import "@css/UserDisplay.scss";
  *
  * @param props - User properties: avatar, name, email
  */
-export function UserDisplay({ props }: UserDisplayProps) {
+export function UserDisplay({ props }: Readonly<UserDisplayProps>) {
   const { avatar, name, email } = props;
 
   return (
