@@ -1,11 +1,11 @@
+import type { DialogContextType } from "@/api/contexts/types/context.types.ts";
 import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
 import { Inputs } from "@/components/Inputs/Inputs.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import type {
   LoginFormProps,
   LoginFormSchema,
-} from "@/components/LoginForms/types/LoginFormsTypes.ts";
-import { Modale } from "@/components/Modale/Modale.tsx";
+} from "@/components/LoginForms/types/login-forms.types";
 import {
   DialogHeaderTitle,
   HeaderTitle,
@@ -24,9 +24,8 @@ import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useLogin } from "@/hooks/database/login/useLogin.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
 import { formSchema } from "@/models/login.models.ts";
-import { Signup } from "@/pages/Signup/Signup.tsx";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, type MouseEvent } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -38,17 +37,19 @@ const toastId = "login-loading";
  *
  * @param className - Additional class names for the component
  * @param inputControllers - Array of input controller objects
+ * @param modalMode - Flag to indicate if the form is in modal mode (default: false)
  * @param props - Additional props for the component
  */
 export function LoginForm({
+  ref,
   className,
   inputControllers,
-  modalMode = false,
+  modaleMode = false,
   ...props
 }: Readonly<LoginFormProps>) {
   const navigate = useNavigate();
   const { open, setOpen } = useSidebar();
-  const { closeDialog, openDialog, isDialogOpen } = useDialog();
+  const { closeDialog, openDialog, closeAllDialogs } = useDialog();
   const user = useAppStore((state) => state.user);
 
   const form = useForm<LoginFormSchema>({
@@ -61,19 +62,6 @@ export function LoginForm({
   });
 
   const { data, queryFn, isLoading, error } = useLogin();
-
-  useEffect(() => {
-    if (isDialogOpen("apple")) {
-      // Define here any actions needed when the dialog opens
-      console.log("DialogOpen dans le loginforml");
-    }
-
-    if (!isDialogOpen("apple")) {
-      console.log(
-        "DialogOpen dans le loginforml essai de fermer autre chose que apple"
-      );
-    }
-  }, [isDialogOpen]);
 
   useEffect(() => {
     if (user) {
@@ -105,23 +93,23 @@ export function LoginForm({
         console.debug("Mutation resolved", data);
       }
       form.reset();
-      if (modalMode) {
+      if (modaleMode) {
         closeDialog("login");
       } else {
         navigate("/", { replace: true });
       }
       if (!open) setOpen(true);
     }
-  }, [isLoading, error, data, open, modalMode]);
+  }, [isLoading, error, data, open, modaleMode]);
 
   /**
    * Determine the title component based on modal mode
    * @description Uses HeaderTitle directly in modal mode, otherwise wraps it with the dialog header HOC
    */
-  const Title = modalMode ? DialogHeaderTitle : HeaderTitle;
+  const Title = modaleMode ? DialogHeaderTitle : HeaderTitle;
 
   return (
-    <Card className={className} {...props}>
+    <Card ref={ref} className={className} {...props}>
       <Title />
       <CardContent>
         <form
@@ -131,18 +119,16 @@ export function LoginForm({
         >
           <FieldGroup>
             <Field>
-              <Modale modaleName="apple" modaleContent={"test"}>
-                <ListMapper items={loginButtonsSvgs}>
-                  <LoginButton
-                    ischild
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      openDialog("apple");
-                    }}
-                  />
-                </ListMapper>
-              </Modale>
+              <ListMapper items={loginButtonsSvgs}>
+                <LoginButton
+                  ischild
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openDialog("apple-login");
+                  }}
+                />
+              </ListMapper>
             </Field>
             <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
               Ou continuez avec
@@ -158,21 +144,17 @@ export function LoginForm({
               </Button>
               <FieldDescription className="text-center">
                 Vous n'avez pas de compte ?{" "}
-                <Modale
-                  modaleName="signup"
-                  modaleContent={<Signup modaleMode />}
+                <Link
+                  onClick={(e) =>
+                    handleSignupModaleOpening({
+                      e,
+                      dialogFns: { closeAllDialogs, openDialog },
+                    })
+                  }
+                  to="/signup"
                 >
-                  <Link
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      openDialog("signup");
-                    }}
-                    to="/signup"
-                  >
-                    Inscrivez-vous ici
-                  </Link>
-                </Modale>
+                  Inscrivez-vous ici
+                </Link>
               </FieldDescription>
             </Field>
           </FieldGroup>
@@ -180,4 +162,17 @@ export function LoginForm({
       </CardContent>
     </Card>
   );
+}
+
+function handleSignupModaleOpening({
+  e,
+  dialogFns,
+}: {
+  e: MouseEvent<HTMLAnchorElement>;
+  dialogFns: Pick<DialogContextType, "closeAllDialogs" | "openDialog">;
+}) {
+  e.preventDefault();
+  e.stopPropagation();
+  dialogFns.closeAllDialogs();
+  dialogFns.openDialog("signup");
 }
