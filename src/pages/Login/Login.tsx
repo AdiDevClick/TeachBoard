@@ -1,7 +1,8 @@
 import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
 import { FieldDescription } from "@/components/ui/field.tsx";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
-import { inputControllers } from "@/data/loginInputControllers";
+import { inputLoginControllers } from "@/data/inputs-controllers.data";
+import type { LoginPageProps } from "@/pages/Login/types/login-page.types.ts";
 import "@css/LoginPage.scss";
 import { GalleryVerticalEnd } from "lucide-react";
 import { useEffect } from "react";
@@ -24,7 +25,9 @@ const {
  *
  * @description This component renders the login page with a company logo and login form.
  */
-export function Login() {
+export function Login({
+  inputControllers = inputLoginControllers,
+}: LoginPageProps) {
   const { open, setOpen, openMobile, setOpenMobile } = useSidebar();
 
   /** Close sidebar on login page */
