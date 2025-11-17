@@ -1,4 +1,4 @@
-import type { UseDynamicSVGImportTypes } from "@/hooks/types/useDynamicSVGImportTypes.ts";
+import type { UseDynamicSVGImportTypes } from "@/hooks/types/use-dynamic-svg-import.types";
 import { useEffect, useState, type ComponentType, type SVGProps } from "react";
 
 /** Map of all available icons */
