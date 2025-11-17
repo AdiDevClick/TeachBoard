@@ -1,95 +1,84 @@
-import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
 import { Inputs } from "@/components/Inputs/Inputs.tsx";
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import type { LoginFormSchema } from "@/components/LoginForms/types/LoginFormsTypes.ts";
-import { Modale } from "@/components/Modale/Modale.tsx";
+import type {
+  SignupFormProps,
+  SignupFormSchema,
+  SignupInputItem,
+} from "@/components/SignupForm/types/signup.types.ts";
+import {
+  DialogHeaderTitle,
+  HeaderTitle,
+} from "@/components/Titles/ModalTitle.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldSeparator,
-} from "@/components/ui/field.tsx";
-import { loginButtonsSvgs } from "@/configs/social.config.ts";
-import { inputControllers } from "@/data/loginInputControllers.ts";
-import { useDialog } from "@/hooks/contexts/useDialog.ts";
-import { formSchema } from "@/models/login.models.ts";
+import { Field, FieldGroup } from "@/components/ui/field.tsx";
+import { signupSchema } from "@/models/signup.models.ts";
 import { cn } from "@/utils/utils.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Title } from "@radix-ui/react-dialog";
-import { Link } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 /**
  *
  * @param className
- * @returns
  */
-export function Signup({ className, ...props }: Readonly<{}>) {
-  const { closeDialog, openDialog, isDialogOpen } = useDialog();
+export type SignupProps = Readonly<{
+  modaleMode?: boolean;
+  className?: string;
+  inputControllers: SignupInputItem[];
+}>;
 
-  const form = useForm<LoginFormSchema>({
-    resolver: zodResolver(formSchema),
+export function Signup({
+  modaleMode = false,
+  className,
+  inputControllers,
+  ...props
+}: SignupFormProps) {
+  const form = useForm<SignupFormSchema>({
+    resolver: zodResolver(signupSchema),
     mode: "onTouched",
     defaultValues: {
-      identifier: "",
-      password: "",
+      email: "",
+      username: "",
     },
   });
 
-  const queryFn = (data: any) => {
+  const queryFn = (data: SignupFormSchema) => {
     console.log("Register data:", data);
     toast.success("Inscription réussie !");
   };
 
+  /**
+   * Determine the title component based on modal mode
+   * @description Uses HeaderTitle directly in modal mode, otherwise wraps it with the dialog header HOC
+   */
+  const Title = modaleMode ? DialogHeaderTitle : HeaderTitle;
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <Title />
-        <CardContent>
-          <form
-            id="login-form"
-            onSubmit={form.handleSubmit(queryFn)}
-            className="grid gap-4"
-          >
-            <FieldGroup>
-              <Field>
-                <Modale modaleName="register" modaleContent={"test"}>
-                  <ListMapper items={loginButtonsSvgs}>
-                    <LoginButton
-                      ischild
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        openDialog("register");
-                      }}
-                    />
-                  </ListMapper>
-                </Modale>
-              </Field>
-              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                Ou continuez avec
-              </FieldSeparator>
-              <Inputs items={inputControllers} form={form} />
-              <Field>
-                <Button
-                  type="submit"
-                  disabled={!form.formState.isValid}
-                  form="login-form"
-                >
-                  Se connecter
-                </Button>
-                <FieldDescription className="text-center">
-                  Vous n'avez pas de compte ?{" "}
-                  <Link to="/signup">Inscrivez-vous ici</Link>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+    <Card className={cn("flex flex-col gap-6", className)} {...props}>
+      <Title
+        title="S'enregistrer"
+        description="Rejoignez-nous pour faciliter votre quotidien !"
+      />
+      <CardContent>
+        <form
+          id="signup-form"
+          onSubmit={form.handleSubmit(queryFn)}
+          className="grid gap-4"
+        >
+          <FieldGroup>
+            <Inputs items={inputControllers} form={form} />
+            <Field>
+              <Button
+                type="submit"
+                disabled={!form.formState.isValid}
+                form="signup-form"
+              >
+                S'enregistrer
+              </Button>
+            </Field>
+          </FieldGroup>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
