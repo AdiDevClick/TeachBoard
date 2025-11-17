@@ -1,17 +1,14 @@
 import { AppBreadCrumb } from "@/components/BreadCrumbs/AppBreadCrumb";
 import { AppBreadCrumbList } from "@/components/BreadCrumbs/AppBreadCrumbList.tsx";
-import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
-import { Modale } from "@/components/Modale/Modale.tsx";
 import { Breadcrumb } from "@/components/ui/breadcrumb.tsx";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { inputControllers } from "@/data/loginInputControllers.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
 import "@css/Dialog.scss";
 import "@css/PageHeader.scss";
-import { Activity, useEffect, useRef, type MouseEvent } from "react";
+import { Activity, useEffect, type MouseEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 /** Page header component
@@ -21,9 +18,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 export function PageHeader() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isDialogOpen, openDialog, closeDialog } = useDialog();
+  const { openedDialogs, isDialogOpen, openDialog, closeDialog } = useDialog();
   const isLoggedIn = useAppStore((state) => state.isLoggedIn);
-  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
@@ -39,28 +35,33 @@ export function PageHeader() {
   }, [closeDialog]);
 
   useEffect(() => {
-    if (isDialogOpen("login")) {
-      // Define here any actions needed when the dialog opens
-      console.log("DialogOpen dans le page header");
-    }
+    // if (isDialogOpen("login")) {
+    //   // Define here any actions needed when the dialog opens
+    //   console.log("DialogOpen dans le page header");
+    // }
 
     // !! IMPORTANT !! Be aware that if the ref is not set, we should not proceed. As the page triggers this effect before the ref is set.
-    if (!ref.current) return;
+    // if (!ref.current) return;
 
-    if (!isDialogOpen("login") && location.state?.background) {
-      navigate(location.state.background, { replace: true, state: {} });
-    }
-    if (!isDialogOpen("login")) {
-      console.log("DialogOpen dans le page header essai de fermer");
-    }
+    // if (!isDialogOpen("login") && location.state?.background) {
+    //   navigate(location.state.background, { replace: true, state: {} });
+    // }
+    // if (!isDialogOpen("login")) {
+    //   console.log(
+    //     "DialogOpen dans le page header essai de fermer",
+    //     openedDialogs
+    //   );
+    // }
+    console.log(
+      "DialogOpen dans le page header essai de fermer",
+      openedDialogs
+    );
   }, [isDialogOpen, location.state]);
 
   const handleLoginClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     openDialog("login");
-    location.state = { background: location.pathname };
-    history.pushState(location.state, "", "/login");
   };
   // Generate breadcrumb segments from the current URL path
   const splitPaths = buildBreadcrumbsFromPath(decodeURI(location.pathname));
@@ -90,27 +91,16 @@ export function PageHeader() {
               GitHub
             </Link>
           </Button>
-          <Modale
-            modaleName="login"
-            modaleContent={
-              <LoginForm
-                ref={ref}
-                inputControllers={inputControllers}
-                modalMode={true}
-              />
-            }
-          >
-            <Activity mode={isLoggedIn ? "hidden" : "visible"}>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="actions__button dark:text-foreground"
-                onClick={handleLoginClick}
-              >
-                Se connecter
-              </Button>
-            </Activity>
-          </Modale>
+          <Activity mode={isLoggedIn ? "hidden" : "visible"}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="actions__button dark:text-foreground"
+              onClick={handleLoginClick}
+            >
+              Se connecter
+            </Button>
+          </Activity>
         </div>
       </div>
     </header>
