@@ -13,13 +13,14 @@
  * .dialog__content--login { my-custom-styles }
  */
 .dialog__content {
+  overflow: hidden;
+  padding: 0;
+  border: none;
+  background: transparent;
 
-  &--login {
+  &--login,
+  &--signup {
     max-width: 400px;
-    overflow: hidden;
-    padding: 0;
-    border: none;
-    background: transparent;
   }
 
 }

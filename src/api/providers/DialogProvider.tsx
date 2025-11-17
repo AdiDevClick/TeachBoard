@@ -1,4 +1,5 @@
 import { DialogContext } from "@/api/contexts/DialogContext.ts";
+import type { AppModalNames } from "@/configs/app.config.ts";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
 /**
@@ -13,9 +14,9 @@ import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
  */
 export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
   // Use a Set to track all open dialog IDs (supports multiple dialogs)
-  const [openDialogs, setOpenDialogs] = useState<Set<string>>(new Set());
+  const [openDialogs, setOpenDialogs] = useState<Set<AppModalNames>>(new Set());
 
-  const openDialog = useCallback((id: string) => {
+  const openDialog = useCallback((id: AppModalNames) => {
     setOpenDialogs((prev) => {
       const next = new Set(prev);
       next.add(id);
@@ -23,7 +24,9 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
     });
   }, []);
 
-  const closeDialog = useCallback((id?: string) => {
+  const openedDialogs = useMemo(() => Array.from(openDialogs), [openDialogs]);
+
+  const closeDialog = useCallback((id?: AppModalNames) => {
     setOpenDialogs((prev) => {
       const next = new Set(prev);
       if (id) {
@@ -42,13 +45,13 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
   }, []);
 
   const isDialogOpen = useCallback(
-    (id: string) => {
+    (id: AppModalNames) => {
       return openDialogs.has(id);
     },
     [openDialogs]
   );
 
-  const onOpenChange = useCallback((id: string) => {
+  const onOpenChange = useCallback((id: AppModalNames) => {
     setOpenDialogs((prev) => {
       const next = new Set(prev);
       next.delete(id);
@@ -58,6 +61,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
 
   const value = useMemo(
     () => ({
+      openedDialogs,
       isDialogOpen,
       openDialog,
       closeDialog,

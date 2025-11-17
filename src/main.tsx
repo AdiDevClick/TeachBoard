@@ -11,6 +11,7 @@ import { sidebarDatas } from "@/data/SidebarData.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
+import { AppModales } from "@/pages/AllModales/AppModales.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
 import { routeChildren } from "@/routes/routes.config.tsx";
 import type { RootProps } from "@/types/MainTypes";
@@ -139,6 +140,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
           </App>
         </SidebarInset>
       </SidebarDataProvider>
+      <AppModales />
     </SidebarProvider>
   );
 }
