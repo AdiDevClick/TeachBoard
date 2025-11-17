@@ -9,5 +9,5 @@ export type LoginInputItem = InputItem<LoginFormSchema>;
 
 export interface LoginFormProps extends ComponentProps<"div"> {
   inputControllers: LoginInputItem[];
-  modalMode?: boolean;
+  modaleMode?: boolean;
 }
