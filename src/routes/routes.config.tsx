@@ -1,4 +1,8 @@
 import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas.tsx";
+import {
+  inputLoginControllers,
+  inputSignupControllers,
+} from "@/data/inputs-controllers.data.ts";
 import { completeDatas } from "@/main.tsx";
 import { About } from "@/pages/About/About.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
@@ -50,7 +54,7 @@ export const routeChildren = [
   },
   {
     path: "login",
-    element: <Login />,
+    element: <Login inputControllers={inputLoginControllers} />,
     loader: async () => {
       setDocumentTitle("Login");
 
@@ -59,7 +63,7 @@ export const routeChildren = [
   },
   {
     path: "signup",
-    element: <Signup />,
+    element: <Signup inputControllers={inputSignupControllers} />,
     loader: async () => {
       setDocumentTitle("S'enregistrer");
       return { pageTitle: "hidden" };
