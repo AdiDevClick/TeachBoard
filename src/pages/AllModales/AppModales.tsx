@@ -11,10 +11,7 @@ import { Signup } from "@/pages/Signup/Signup.tsx";
  * AppModales component to render all modals used in the application.
  */
 export function AppModales() {
-  const { setRef, observedRef, observer } = useMutationObserver({});
-
-  console.log("node   ", observedRef);
-  console.log("observer   ", observer);
+  const { setRef, observedRef } = useMutationObserver({});
 
   return (
     <>
