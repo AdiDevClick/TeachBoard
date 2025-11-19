@@ -12,3 +12,17 @@ export type ModaleProps = {
   onOpen?: (id: string) => boolean;
   onNodeReady?: HTMLElement;
 };
+
+export type ModalState = {
+  forward: boolean | null;
+  isReady: HTMLElement | false;
+  previousUrl: string;
+  modaleName: string;
+  isOpen: boolean;
+  locationState: string;
+  url: string;
+  historyIdx: number | null | undefined;
+  isHandledByPopState: boolean;
+  isHandledByUserEvent: boolean;
+  userInput: string | number | null;
+};
