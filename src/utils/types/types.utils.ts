@@ -1,9 +1,15 @@
 import type { ApiError } from "@/types/AppErrorInterface.ts";
 import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
+import type { MouseEvent } from "react";
 
 /**
  * Utility types for type manipulations
  */
+export type PreventDefaultAndStopPropagation =
+  | MouseEvent<HTMLElement>
+  | undefined
+  | null
+  | Event;
 
 /**
  * Ensure you can use the ListMapper with props that have never type
