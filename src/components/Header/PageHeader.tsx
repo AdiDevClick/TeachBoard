@@ -51,7 +51,13 @@ export function PageHeader() {
               GitHub
             </Link>
           </Button>
-          <Activity mode={isLoggedIn ? "hidden" : "visible"}>
+          <Activity
+            mode={
+              isLoggedIn || location.pathname === "/login"
+                ? "hidden"
+                : "visible"
+            }
+          >
             <Button
               variant="ghost"
               size="sm"
