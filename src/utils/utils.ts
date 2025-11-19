@@ -1,4 +1,5 @@
 import { LANGUAGE } from "@/configs/app.config";
+import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -50,4 +51,17 @@ export function wait(duration: number, message = "") {
       resolve(message);
     }, duration);
   });
+}
+
+/**
+ * Prevent the default action and stop propagation of an event.
+ *
+ * @param e  Event to prevent default action and stop propagation
+ */
+export function preventDefaultAndStopPropagation(
+  e: PreventDefaultAndStopPropagation
+) {
+  if (!e) return;
+  e.preventDefault();
+  e.stopPropagation();
 }
