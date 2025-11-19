@@ -8,8 +8,8 @@ import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
 import "@css/Dialog.scss";
 import "@css/PageHeader.scss";
-import { Activity, useEffect, type MouseEvent } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Activity, type MouseEvent } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 /** Page header component
  *
@@ -17,27 +17,11 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
  */
 export function PageHeader() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { openedDialogs, isDialogOpen, openDialog, closeDialog } = useDialog();
+  const { openDialog } = useDialog();
   const isLoggedIn = useAppStore((state) => state.isLoggedIn);
 
-  useEffect(() => {
-    const handlePopState = (e: PopStateEvent) => {
-      e.preventDefault();
-      closeDialog("login");
-    };
-
-    globalThis.addEventListener("popstate", handlePopState);
-
-    return () => {
-      globalThis.removeEventListener("popstate", handlePopState);
-    };
-  }, [closeDialog]);
-
   const handleLoginClick = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    openDialog("login");
+    openDialog(e, "login");
   };
   // Generate breadcrumb segments from the current URL path
   const splitPaths = buildBreadcrumbsFromPath(decodeURI(location.pathname));
