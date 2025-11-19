@@ -1,5 +1,5 @@
-// import "@css/App.css";
 import { PageTitle } from "@/components/Header/PageTitle.tsx";
+import "@css/App.scss";
 import "@css/index-tailwind.css";
 import "@css/PageTitle.scss";
 import { Activity, type ReactNode } from "react";
