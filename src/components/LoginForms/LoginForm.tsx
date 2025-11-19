@@ -94,7 +94,7 @@ export function LoginForm({
       }
       form.reset();
       if (modaleMode) {
-        closeDialog("login");
+        closeDialog(null, "login");
       } else {
         navigate("/", { replace: true });
       }
@@ -123,9 +123,7 @@ export function LoginForm({
                 <LoginButton
                   ischild
                   onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    openDialog("apple-login");
+                    openDialog(e, "apple-login");
                   }}
                 />
               </ListMapper>
@@ -171,8 +169,6 @@ function handleSignupModaleOpening({
   e: MouseEvent<HTMLAnchorElement>;
   dialogFns: Pick<DialogContextType, "closeAllDialogs" | "openDialog">;
 }) {
-  e.preventDefault();
-  e.stopPropagation();
   dialogFns.closeAllDialogs();
-  dialogFns.openDialog("signup");
+  dialogFns.openDialog(e, "signup");
 }
