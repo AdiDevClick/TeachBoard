@@ -17,16 +17,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-/**
- *
- * @param className
- */
-export type SignupProps = Readonly<{
-  modaleMode?: boolean;
-  className?: string;
-  inputControllers: SignupInputItem[];
-}>;
-
 export function Signup({
   modaleMode = false,
   className,
