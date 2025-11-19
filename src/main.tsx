@@ -95,9 +95,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
 
     if (doNotCheckSession) return;
     queryFn();
-    // if (userExists) queryFn();
   }, [isLoaded, lastUserActivity, sessionSynced]);
-  // }, [isLoaded, user, lastUserActivity, sessionSynced]);
 
   useEffect(() => {
     if (isLoading) {
@@ -113,7 +111,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
     }
 
     if (error) {
-      openDialog("login");
+      openDialog(null, "login");
       if (DEV_MODE) {
         console.error("Session Check Error:", error);
       }
