@@ -2,6 +2,7 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, USER_ACTIVITIES } from "@/configs/app.config.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
+import { data } from "react-router-dom";
 
 /**
  * Custom hook to check user session.
@@ -14,7 +15,7 @@ export function useSessionChecker() {
   );
   const updateSession = useAppStore((state) => state.updateSession);
 
-  const { data, isLoading, queryFn, isLoaded, error } = useQueryOnSubmit([
+  return useQueryOnSubmit([
     USER_ACTIVITIES.sessionCheck,
     {
       url: API_ENDPOINTS.POST.AUTH.SESSION_CHECK,
@@ -35,12 +36,4 @@ export function useSessionChecker() {
       },
     },
   ]);
-
-  return {
-    data,
-    isLoading,
-    queryFn,
-    isLoaded,
-    error,
-  };
 }
