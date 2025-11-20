@@ -42,7 +42,12 @@ export const useAppStore = create(
               set((state) => {
                 state.lastUserActivity = USER_ACTIVITIES.signup;
                 state.isLoggedIn = false;
-                // state.user = user;
+              });
+            },
+            signupValidation() {
+              set((state) => {
+                state.lastUserActivity = USER_ACTIVITIES.signupValidation;
+                state.isLoggedIn = false;
               });
             },
             login(user: User) {
