@@ -2,6 +2,7 @@ import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
 import { FieldDescription } from "@/components/ui/field.tsx";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
 import { inputLoginControllers } from "@/data/inputs-controllers.data";
+import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import type { LoginPageProps } from "@/pages/Login/types/login-page.types.ts";
 import "@css/LoginPage.scss";
 import { GalleryVerticalEnd } from "lucide-react";
@@ -29,6 +30,7 @@ export function Login({
   inputControllers = inputLoginControllers,
 }: LoginPageProps) {
   const { open, setOpen, openMobile, setOpenMobile } = useSidebar();
+  const { closeAllDialogs } = useDialog();
 
   /** Close sidebar on login page */
   useEffect(() => {
@@ -36,6 +38,7 @@ export function Login({
       setOpen(false);
       setOpenMobile(false);
     }
+    closeAllDialogs();
   }, []);
 
   return (
