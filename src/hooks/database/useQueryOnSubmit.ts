@@ -14,7 +14,7 @@ import type { ResponseInterface } from "@/types/AppResponseInterface";
 import { wait } from "@/utils/utils";
 import type { UseMutationOptions } from "@tanstack/react-query";
 import { useMutation, useQueryErrorResetBoundary } from "@tanstack/react-query";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { toast } from "sonner";
 
 /**
@@ -36,12 +36,25 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
     onSuccess,
     onError,
     reset,
-  } = queryKeys[1] ?? {};
+    abortController,
+  } = queryKeys[1];
+  // } = queryKeys[1] ?? {};
 
   return {
     mutationKey: queryKeys,
-    mutationFn: (variables) => onFetch<S, E>(variables, method, url),
+    mutationFn: (variables) =>
+      onFetch<S, E>(
+        variables,
+        method,
+        url,
+        3,
+        1000,
+        abortController as AbortController
+      ),
     onSuccess: (response) => {
+      abortController?.abort(
+        new Error("Request completed", { cause: response })
+      );
       reset?.();
       onSuccess?.(response);
       if (silent) return;
@@ -67,6 +80,9 @@ export function useQueryOnSubmit<
   E extends ApiError
 >(queryKeys: QueryKeyDescriptor<S, E>) {
   const { reset } = useQueryErrorResetBoundary();
+  const abortControllerRef = useRef(new AbortController());
+
+  queryKeys[1].abortController = abortControllerRef.current;
   queryKeys[1].reset = reset;
 
   // Memoize mutation options to prevent observer recreation on every render
@@ -86,8 +102,13 @@ export function useQueryOnSubmit<
         if (import.meta.env.DEV) {
           console.debug("useQueryOnSubmit executing mutation");
         }
-        await mutateAsync(variables);
+        return await mutateAsync(variables);
       } catch (error) {
+        // throw new Error(error);
+        if ((error as Error).message === "Request completed") {
+          return error.cause.success;
+        }
+        return await error;
         // Errors are handled via the mutation onError callback.
         if (import.meta.env.DEV) {
           console.debug("useQueryOnSubmit mutation rejected", error);
@@ -122,18 +143,27 @@ async function onFetch<
   queryMethod: HttpMethod,
   queryUrl?: string,
   retry = 3,
-  timeout = 1000
+  timeout = 1000,
+  abortController?: AbortController
 ): Promise<FetchJSONSuccess<TSuccess>> {
+  if (abortController?.signal.aborted) {
+    return;
+  }
   try {
     const response = await fetchJSON<TSuccess, TError>(getUrl(queryUrl), {
       method: queryMethod,
       json: variables,
+      signal: abortController?.signal,
     });
 
     if (!response.ok || response === undefined) {
       const status = response.status;
       const message = getErrorMessage(status, response, retry);
-
+      // throw abortController?.abort(
+      //   new Error(message, {
+      //     cause: { ...response },
+      //   })
+      // );
       throw new Error(message, {
         cause: { ...response },
       });
@@ -150,7 +180,14 @@ async function onFetch<
 
     if (shouldRetry(errorCause.status, retry)) {
       await wait(timeout);
-      return onFetch(variables, queryMethod, queryUrl, retry - 1);
+      return onFetch(
+        variables,
+        queryMethod,
+        queryUrl,
+        retry - 1,
+        timeout,
+        abortController
+      );
     }
 
     throw errorCause;
