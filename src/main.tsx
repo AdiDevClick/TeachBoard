@@ -20,7 +20,12 @@ import "@css/Toaster.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode, useEffect, type CSSProperties } from "react";
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Outlet,
+  RouterProvider,
+  useLocation,
+} from "react-router-dom";
 
 const queryClient = new QueryClient();
 
@@ -80,7 +85,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
   const lastUserActivity = useAppStore((state) => state.lastUserActivity);
   const sessionSynced = useAppStore((state) => state.sessionSynced);
   const { openDialog } = useDialog();
-
+  const location = useLocation();
   const { data, isLoading, queryFn, isLoaded, error } = useSessionChecker();
 
   /**
@@ -88,14 +93,19 @@ export function Root({ contentType }: Readonly<RootProps>) {
    */
   useEffect(() => {
     // const userExists = user !== null;
+    const path = location.pathname;
     const lastActivityWasLogout = lastUserActivity === "logout";
     const doNotCheckSession =
-      isLoaded || lastActivityWasLogout || sessionSynced;
+      isLoaded ||
+      lastActivityWasLogout ||
+      sessionSynced ||
+      path === "/login" ||
+      path.startsWith("/signup");
     // const shouldCheckSession = userExists && !doNotCheckSession;
 
     if (doNotCheckSession) return;
     queryFn();
-  }, [isLoaded, lastUserActivity, sessionSynced]);
+  }, [isLoaded, lastUserActivity, sessionSynced, location.pathname]);
 
   useEffect(() => {
     if (isLoading) {
