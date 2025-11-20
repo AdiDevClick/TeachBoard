@@ -105,7 +105,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
 
     if (doNotCheckSession) return;
     queryFn();
-  }, [isLoaded, lastUserActivity, sessionSynced, location.pathname]);
+  }, [isLoaded, lastUserActivity, sessionSynced]);
 
   useEffect(() => {
     if (isLoading) {
