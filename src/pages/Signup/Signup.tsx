@@ -10,10 +10,12 @@ import {
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { Field, FieldGroup } from "@/components/ui/field.tsx";
+import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSignup } from "@/hooks/database/signup/useSignup.ts";
 import { signupSchema } from "@/models/signup.models.ts";
 import { cn } from "@/utils/utils.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 export function Signup({
@@ -23,6 +25,7 @@ export function Signup({
   ...props
 }: SignupFormProps) {
   const { data, isLoaded, isLoading, queryFn, error } = useSignup();
+  const { closeAllDialogs } = useDialog();
 
   const form = useForm<SignupFormSchema>({
     resolver: zodResolver(signupSchema),
@@ -32,6 +35,17 @@ export function Signup({
       username: "",
     },
   });
+
+  useEffect(() => {
+    if (data && isLoaded) {
+      form.reset();
+      closeAllDialogs();
+      // closeDialog(null, "signup");
+    }
+    if (import.meta.env.DEV) {
+      console.debug("Signup Component:", { data, isLoaded, isLoading, error });
+    }
+  }, [data, isLoaded]);
 
   /**
    * Determine the title component based on modal mode
@@ -48,7 +62,7 @@ export function Signup({
       <CardContent>
         <form
           id="signup-form"
-          onSubmit={form.handleSubmit(queryFn)}
+          onSubmit={isLoading ? undefined : form.handleSubmit(queryFn)}
           className="grid gap-4"
         >
           <FieldGroup>
