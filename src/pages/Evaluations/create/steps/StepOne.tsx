@@ -46,7 +46,7 @@ export function StepOne({
     if (data || error) {
       toast.dismiss(loadingName);
       if (import.meta.env.DEV) {
-        console.debug("useQueryOnSubmit data", data);
+        console.debug("useQueryOnSubmit data", data ?? error);
       }
       // You can handle additional side effects here if needed
     }
