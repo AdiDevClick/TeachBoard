@@ -15,7 +15,7 @@ export function useSignup() {
   return useQueryOnSubmit([
     USER_ACTIVITIES.signup,
     {
-      url: API_ENDPOINTS.POST.AUTH.REGISTER,
+      url: API_ENDPOINTS.POST.AUTH.SIGNUP,
       method: API_ENDPOINTS.POST.METHOD,
       successDescription:
         "Veuillez vérifier votre email pour confirmer votre inscription.",
@@ -29,6 +29,7 @@ export function useSignup() {
         // refreshToken: "data.refreshToken",
         // avatar: "https://i.pravatar.cc/150?img=3",
         // });
+
         if (import.meta.env.DEV) {
           console.debug("Signup onSuccess:", data);
         }
