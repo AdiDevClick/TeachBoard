@@ -33,6 +33,7 @@ export const USER_ACTIVITIES = Object.freeze({
   none: "none",
   sessionCheck: "session-check",
   classes: "classes",
+  signup: "signup",
 });
 
 /**
