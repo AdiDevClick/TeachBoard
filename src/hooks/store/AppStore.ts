@@ -50,6 +50,12 @@ export const useAppStore = create(
                 state.isLoggedIn = false;
               });
             },
+            passwordCreation() {
+              set((state) => {
+                state.lastUserActivity = USER_ACTIVITIES.passwordCreation;
+                state.isLoggedIn = false;
+              });
+            },
             login(user: User) {
               set((state) => {
                 state.lastUserActivity = USER_ACTIVITIES.login;
