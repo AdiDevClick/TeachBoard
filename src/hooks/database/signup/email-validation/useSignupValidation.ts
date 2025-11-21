@@ -2,7 +2,6 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, USER_ACTIVITIES } from "@/configs/app.config.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
-import { data } from "react-router-dom";
 import { toast } from "sonner";
 
 export function useSignupValidation({
@@ -42,6 +41,4 @@ export function useSignupValidation({
       },
     },
   ]);
-
-  return { data, isLoading, isLoaded, error, queryFn };
 }
