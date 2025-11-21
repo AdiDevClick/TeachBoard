@@ -24,14 +24,11 @@ export function HeaderTitle({
   className = "",
   title = headerTitle,
   description = headerDescription,
+  id = "login-header",
   ...props
 }: Readonly<HeaderTitleProps>) {
   return (
-    <CardHeader
-      id={"login-header"}
-      className={cn("text-center", className)}
-      {...props}
-    >
+    <CardHeader id={id} className={cn("text-center", className)} {...props}>
       <CardTitle className="text-xl">{title}</CardTitle>
       <CardDescription>{description}</CardDescription>
     </CardHeader>
