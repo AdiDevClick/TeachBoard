@@ -33,6 +33,7 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
     method = "GET",
     successDescription,
     silent,
+    headers,
     onSuccess,
     onError,
     reset,
@@ -49,7 +50,8 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
         url,
         3,
         1000,
-        abortController as AbortController
+        abortController as AbortController,
+        headers
       ),
     onSuccess: (response) => {
       abortController?.abort(
@@ -96,7 +98,7 @@ export function useQueryOnSubmit<
    *
    * @param variables The variables to be passed to the mutation function.
    */
-  const queryFn = useCallback(
+  const onSubmit = useCallback(
     async (variables: MutationVariables = undefined) => {
       try {
         if (import.meta.env.DEV) {
@@ -123,7 +125,7 @@ export function useQueryOnSubmit<
     isLoading: isPending,
     isLoaded: !!data,
     error,
-    queryFn,
+    onSubmit,
   };
 }
 
@@ -144,7 +146,8 @@ async function onFetch<
   queryUrl?: string,
   retry = 3,
   timeout = 1000,
-  abortController?: AbortController
+  abortController?: AbortController,
+  queryHeaders?: Record<string, string>
 ): Promise<FetchJSONSuccess<TSuccess>> {
   if (abortController?.signal.aborted) {
     return;
@@ -154,6 +157,7 @@ async function onFetch<
       method: queryMethod,
       json: variables,
       signal: abortController?.signal,
+      headers: queryHeaders,
     });
 
     if (!response.ok || response === undefined) {
