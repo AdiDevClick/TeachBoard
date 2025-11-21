@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/Header/PageHeader";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { Toaster } from "@/components/ui/sonner";
-import { DEV_MODE } from "@/configs/app.config.ts";
+import { DEV_MODE, NO_SESSIONS_CHECK_PAGES } from "@/configs/app.config.ts";
 import { calendarEvents } from "@/data/CalendarData.ts";
 import { sidebarDatas } from "@/data/SidebarData.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
@@ -86,7 +86,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
   const sessionSynced = useAppStore((state) => state.sessionSynced);
   const { openDialog } = useDialog();
   const location = useLocation();
-  const { data, isLoading, queryFn, isLoaded, error } = useSessionChecker();
+  const { data, isLoading, onSubmit, isLoaded, error } = useSessionChecker();
 
   /**
    * Automatically check session on app load unless the last user activity was a logout
@@ -94,17 +94,27 @@ export function Root({ contentType }: Readonly<RootProps>) {
   useEffect(() => {
     // const userExists = user !== null;
     const path = location.pathname;
+    const doesContainNoSessionPage = NO_SESSIONS_CHECK_PAGES.some((page) =>
+      path.startsWith(page)
+    );
+
     const lastActivityWasLogout = lastUserActivity === "logout";
     const doNotCheckSession =
       isLoaded ||
       lastActivityWasLogout ||
       sessionSynced ||
-      path === "/login" ||
-      path.startsWith("/signup");
+      doesContainNoSessionPage;
     // const shouldCheckSession = userExists && !doNotCheckSession;
 
+    // const doNotCheckSession =
+    //   isLoaded ||
+    //   lastActivityWasLogout ||
+    //   sessionSynced ||
+    //   path === "/login" ||
+    //   path.startsWith("/signup");
+
     if (doNotCheckSession) return;
-    queryFn();
+    onSubmit();
   }, [isLoaded, lastUserActivity, sessionSynced]);
 
   useEffect(() => {
