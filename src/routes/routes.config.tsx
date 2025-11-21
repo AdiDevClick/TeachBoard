@@ -2,6 +2,7 @@ import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas.tsx";
 import {
   inputLoginControllers,
   inputSignupControllers,
+  passwordCreationInputControllers,
 } from "@/data/inputs-controllers.data.ts";
 import { completeDatas } from "@/main.tsx";
 import { About } from "@/pages/About/About.tsx";
@@ -11,6 +12,7 @@ import { StepOne } from "@/pages/Evaluations/create/steps/StepOne.tsx";
 import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
 import { Login } from "@/pages/Login/Login.tsx";
+import { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
 import { EmailValidation } from "@/pages/Signup/email-validation/EmailValidation.tsx";
 import { Signup } from "@/pages/Signup/Signup";
 import { Navigate, type RouteObject } from "react-router-dom";
@@ -78,10 +80,20 @@ export const routeChildren = [
         element: <EmailValidation />,
         loader: async () => {
           setDocumentTitle("Vérification de l'inscription");
-          return { pageTitle: "Validation de votre inscription" };
+          return { pageTitle: "hidden" };
         },
       },
     ],
+  },
+  {
+    path: "password-creation",
+    element: (
+      <PasswordCreation inputControllers={passwordCreationInputControllers} />
+    ),
+    loader: async () => {
+      setDocumentTitle("Création du mot de passe");
+      return { pageTitle: "hidden" };
+    },
   },
   {
     path: "about",
