@@ -20,7 +20,7 @@ export function StepOne({
 }) {
   const [selected, setSelected] = useState(false);
 
-  const { data, queryFn, isLoading, isLoaded, error } = useClasses();
+  const { data, onSubmit, isLoading, isLoaded, error } = useClasses();
 
   /**
    * Handles the addition of a new class.
@@ -67,7 +67,7 @@ export function StepOne({
           }}
           label={title}
           onOpenChange={(value) => {
-            if (value && !isLoaded) queryFn();
+            if (value && !isLoaded) onSubmit();
           }}
         >
           <SelectItem
