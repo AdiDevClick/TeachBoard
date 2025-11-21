@@ -14,15 +14,13 @@ import { toast } from "sonner";
 export function useLogin() {
   const login = useAppStore((state) => state.login);
 
-  const { data, queryFn, isLoading, error } = useQueryOnSubmit<
-    AuthLoginSuccess,
-    AuthLoginError
-  >([
+  return useQueryOnSubmit<AuthLoginSuccess, AuthLoginError>([
     USER_ACTIVITIES.login,
     {
       url: API_ENDPOINTS.POST.AUTH.LOGIN,
       method: API_ENDPOINTS.POST.METHOD,
       successDescription: "Vous êtes maintenant connecté(e).",
+      silent: true,
       onSuccess(data) {
         login({
           userId: "data.userId",
@@ -47,6 +45,4 @@ export function useLogin() {
       },
     },
   ]);
-
-  return { data, queryFn, error, isLoading };
 }
