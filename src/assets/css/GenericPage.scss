@@ -1,7 +1,7 @@
 /**
- * Styles for the Login Page
+ * Generic Styles for Pages containing a card centered in the page
  */
-.login-page-container {
+.generic-page-container {
   --localSpacing: calc(var(--spacing) * 6);
   --iconSpacing: calc(var(--spacing) * 4);
   --paddingMinusPageHeaderSize: var(--page-header-height);
@@ -17,14 +17,15 @@
   min-height: max-content;
   height: 100%;
 
-  .login-page__content {
+  .generic-page__content {
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: var(--localSpacing);
     max-width: var(--container-sm);
   }
 
-  .login-page__logo {
+  .generic-page__logo {
     display: flex;
     align-items: center;
     align-self: center;
