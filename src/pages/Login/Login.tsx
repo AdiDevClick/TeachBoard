@@ -4,12 +4,14 @@ import { useSidebar } from "@/components/ui/sidebar.tsx";
 import { inputLoginControllers } from "@/data/inputs-controllers.data";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import type { LoginPageProps } from "@/pages/Login/types/login-page.types.ts";
-import "@css/LoginPage.scss";
+import { genericStyle } from "@/utils/styles/generic-styles.ts";
+import "@css/GenericPage.scss";
 import { GalleryVerticalEnd } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
-/** Use it once or insert it into the component
+/**
+ * Use it once or insert it into the component
  * if you need to add dynamic styles based on props or state
  * in the future.
  */
@@ -19,7 +21,7 @@ const {
   logoStyle,
   logoBackgroundStyle,
   logoIconStyle,
-} = loginStyle();
+} = genericStyle();
 
 /**
  * Login page component
@@ -59,21 +61,4 @@ export function Login({
       </div>
     </div>
   );
-}
-
-/**
- * Styles for the login page
- *
- * @returns An object containing class names for the login page elements.
- */
-function loginStyle() {
-  const loginPage = "login-page";
-
-  return {
-    containerStyle: { className: `${loginPage}-container` },
-    contentStyle: { className: `${loginPage}__content` },
-    logoStyle: { className: `${loginPage}__logo` },
-    logoBackgroundStyle: { className: `${loginPage}__logo--background` },
-    logoIconStyle: { className: `${loginPage}__logo--icon` },
-  };
 }
