@@ -9,7 +9,7 @@ import { useAppStore } from "@/hooks/store/AppStore.ts";
 export function useUserLogout() {
   const logout = useAppStore((state) => state.logout);
 
-  const { data, isLoading, queryFn, isLoaded, error } = useQueryOnSubmit([
+  const { data, isLoading, onSubmit, isLoaded, error } = useQueryOnSubmit([
     USER_ACTIVITIES.logout,
     {
       url: API_ENDPOINTS.POST.AUTH.LOGOUT,
@@ -33,7 +33,7 @@ export function useUserLogout() {
   return {
     data,
     isLoading,
-    queryFn,
+    onSubmit,
     isLoaded,
     error,
   };
