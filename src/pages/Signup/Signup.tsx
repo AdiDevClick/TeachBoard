@@ -24,7 +24,7 @@ export function Signup({
   inputControllers,
   ...props
 }: SignupFormProps) {
-  const { data, isLoaded, isLoading, queryFn, error } = useSignup();
+  const { data, isLoaded, isLoading, onSubmit, error } = useSignup();
   const { closeAllDialogs } = useDialog();
 
   const form = useForm<SignupFormSchema>({
@@ -62,7 +62,7 @@ export function Signup({
       <CardContent>
         <form
           id="signup-form"
-          onSubmit={isLoading ? undefined : form.handleSubmit(queryFn)}
+          onSubmit={isLoading ? undefined : form.handleSubmit(onSubmit)}
           className="grid gap-4"
         >
           <FieldGroup>

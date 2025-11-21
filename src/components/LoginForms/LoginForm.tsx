@@ -61,7 +61,7 @@ export function LoginForm({
     },
   });
 
-  const { data, queryFn, isLoading, error } = useLogin();
+  const { data, onSubmit, isLoading, error } = useLogin();
 
   useEffect(() => {
     if (user) {
@@ -114,7 +114,7 @@ export function LoginForm({
       <CardContent>
         <form
           id="login-form"
-          onSubmit={form.handleSubmit(queryFn)}
+          onSubmit={form.handleSubmit(onSubmit)}
           className="grid gap-4"
         >
           <FieldGroup>

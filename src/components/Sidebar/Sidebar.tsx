@@ -22,7 +22,7 @@ import { Activity, type MouseEvent } from "react";
  */
 export function AppSidebar({ ...props }: SidebarProps) {
   const { state } = useSidebar();
-  const { data, queryFn } = useUserLogout();
+  const { data, onSubmit } = useUserLogout();
 
   const handleOnFooterButtonsClick = (e: MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLDivElement;
@@ -31,7 +31,7 @@ export function AppSidebar({ ...props }: SidebarProps) {
     if (parentElement?.href.includes("/logout")) {
       e.preventDefault();
       e.stopPropagation();
-      queryFn();
+      onSubmit();
     }
   };
 

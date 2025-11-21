@@ -31,7 +31,7 @@ export function SignupForm({
       username: "",
     },
   });
-  const queryFn = (data: SignupFormSchema) => {
+  const onSubmit = (data: SignupFormSchema) => {
     console.log("Register data:", data);
     toast.success("Inscription réussie !");
   };
@@ -51,7 +51,7 @@ export function SignupForm({
       <CardContent>
         <form
           id="login-form"
-          onSubmit={form.handleSubmit(queryFn)}
+          onSubmit={form.handleSubmit(onSubmit)}
           className="grid gap-4"
         >
           <FieldGroup>
