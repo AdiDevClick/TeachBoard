@@ -3,8 +3,6 @@ import type {
   FetchJSONSuccess,
 } from "@/api/types/api.types.ts";
 import type { HTTP_METHODS, USER_ACTIVITIES } from "@/configs/app.config.ts";
-import type { ApiError } from "@/types/AppErrorInterface";
-import type { ResponseInterface } from "@/types/AppResponseInterface";
 
 export type MutationViolation = Record<string, unknown> & {
   propertyPath?: string;
@@ -79,7 +77,7 @@ export type QueryKeyDescriptor<S, E> = [
 //   S extends ResponseInterface,
 //   E extends ApiError
 // > {
-//   queryFn: QueryHookInterface<S, E>["mutateAsync"];
+//   onSubmit: QueryHookInterface<S, E>["mutateAsync"];
 //   data: QueryHookInterface<S, E>["data"];
 //   isLoading: QueryHookInterface<S, E>["isPending"];
 //   error: QueryHookInterface<S, E>["error"];
