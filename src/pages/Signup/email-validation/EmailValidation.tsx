@@ -5,17 +5,13 @@ import { DEV_MODE } from "@/configs/app.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSignupValidation } from "@/hooks/database/signup/email-validation/useSignupValidation.ts";
 import type { EmailValidationProps } from "@/pages/Signup/types/signup.types.ts";
-import { genericStyle } from "@/utils/styles/generic-styles.ts";
+import {
+  GENERIC_CONTAINER_STYLE,
+  GENERIC_CONTENT_STYLE,
+} from "@/utils/styles/generic-styles.ts";
 import { cn, wait } from "@/utils/utils.ts";
 import { useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-
-/**
- * Use it once or insert it into the component
- * if you need to add dynamic styles based on props or state
- * in the future.
- */
-const { containerStyle, contentStyle } = genericStyle();
 
 /**
  *
@@ -86,8 +82,8 @@ export function EmailValidation({
     : "Validation de votre inscription";
 
   return (
-    <div className={containerStyle.className}>
-      <div className={contentStyle.className}>
+    <div className={GENERIC_CONTAINER_STYLE.className}>
+      <div className={GENERIC_CONTENT_STYLE.className}>
         <Card className={cn("flex flex-col gap-6", className)} {...props}>
           <HeaderTitle
             id="email-validation-header"
