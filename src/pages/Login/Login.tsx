@@ -4,24 +4,17 @@ import { useSidebar } from "@/components/ui/sidebar.tsx";
 import { inputLoginControllers } from "@/data/inputs-controllers.data";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import type { LoginPageProps } from "@/pages/Login/types/login-page.types.ts";
-import { genericStyle } from "@/utils/styles/generic-styles.ts";
+import {
+  GENERIC_CONTAINER_STYLE,
+  GENERIC_CONTENT_STYLE,
+  GENERIC_LOGO_BACKGROUND_STYLE,
+  GENERIC_LOGO_ICON_STYLE,
+  GENERIC_LOGO_STYLE,
+} from "@/utils/styles/generic-styles.ts";
 import "@css/GenericPage.scss";
 import { GalleryVerticalEnd } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-
-/**
- * Use it once or insert it into the component
- * if you need to add dynamic styles based on props or state
- * in the future.
- */
-const {
-  containerStyle,
-  contentStyle,
-  logoStyle,
-  logoBackgroundStyle,
-  logoIconStyle,
-} = genericStyle();
 
 /**
  * Login page component
@@ -44,11 +37,11 @@ export function Login({
   }, []);
 
   return (
-    <div {...containerStyle}>
-      <div {...contentStyle}>
-        <Link to="/" {...logoStyle}>
-          <div {...logoBackgroundStyle}>
-            <GalleryVerticalEnd {...logoIconStyle} />
+    <div {...GENERIC_CONTAINER_STYLE}>
+      <div {...GENERIC_CONTENT_STYLE}>
+        <Link to="/" {...GENERIC_LOGO_STYLE}>
+          <div {...GENERIC_LOGO_BACKGROUND_STYLE}>
+            <GalleryVerticalEnd {...GENERIC_LOGO_ICON_STYLE} />
           </div>
           Acme Inc.
         </Link>
