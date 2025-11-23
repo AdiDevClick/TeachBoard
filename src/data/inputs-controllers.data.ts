@@ -55,3 +55,13 @@ export const passwordCreationInputControllers = [
     placeholder: "********",
   },
 ] satisfies Parameters<typeof PasswordCreation>[0]["inputControllers"];
+
+/** Password recovery page controllers  */
+export const passwordRecoveryInputControllers = [
+  {
+    name: "identifier",
+    title: "Votre adresse e-mail",
+    type: "email",
+    placeholder: "m@example.com",
+  },
+] satisfies Parameters<typeof PasswordCreation>[0]["inputControllers"];
