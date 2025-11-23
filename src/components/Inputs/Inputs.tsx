@@ -2,7 +2,7 @@ import type { InputsProps } from "@/components/Inputs/types/InputsTypes.ts";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field.tsx";
 import { Input } from "@/components/ui/input.tsx";
-import { Activity } from "react";
+import { Activity, useId } from "react";
 import { Controller, type FieldValues } from "react-hook-form";
 
 /**
@@ -12,18 +12,21 @@ import { Controller, type FieldValues } from "react-hook-form";
  * @param form - React Hook Form instance for managing form state.
  */
 export function Inputs<T extends FieldValues>({
+  ref,
   items,
   form,
+  ...props
 }: Readonly<InputsProps<T>>) {
+  const ids = useId();
   return (
     <ListMapper items={items}>
       {({ name, title, type, placeholder }) => (
         <Controller
-          key={name}
+          key={`${ids}-${title}`}
           name={name}
           control={form.control}
           render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
+            <Field ref={ref} {...props} data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor={name}>{title}</FieldLabel>
               <Input
                 {...field}
