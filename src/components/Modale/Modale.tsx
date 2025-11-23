@@ -2,12 +2,20 @@ import type {
   ModaleProps,
   ModalState,
 } from "@/components/Modale/types/modale.types.ts";
-import { Dialog, DialogContent } from "@/components/ui/dialog.tsx";
+import { DialogHeaderTitle } from "@/components/Titles/ModalTitle.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import { Card } from "@/components/ui/card.tsx";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+} from "@/components/ui/dialog.tsx";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useUserEventListener } from "@/hooks/events/useUserEventListener";
 import { wait } from "@/utils/utils.ts";
 import "@css/Dialog.scss";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType, type Ref } from "react";
 import { useLocation } from "react-router-dom";
 
 /**
@@ -296,4 +304,45 @@ async function waitAndPush(state: object, url: string, timer = 70) {
 async function waitAndReplace(state: object, url: string, timer = 70) {
   await wait(timer);
   history.replaceState(state, "", url);
+}
+type SimpleAlertExtraProps = {
+  headerTitle?: string;
+  headerDescription?: string;
+  ref?: Ref<HTMLDivElement>;
+};
+
+type WithSimpleAlertProps = Omit<ModaleProps, "modaleContent"> &
+  SimpleAlertExtraProps;
+
+/**
+ * Higher-order component to create a simple alert modal
+ *
+ * @description This contains a title, description and an Ok button to close the modale.
+ */
+export const WithSimpleAlert = withSimpleAlert(Modale);
+
+function withSimpleAlert(WrappedComponent: ComponentType<ModaleProps>) {
+  return ({
+    headerTitle,
+    headerDescription,
+    ref,
+    ...rest
+  }: WithSimpleAlertProps) => (
+    <WrappedComponent
+      {...rest}
+      modaleContent={
+        <Card ref={ref}>
+          <DialogHeaderTitle
+            title={headerTitle}
+            description={headerDescription}
+          />
+          <DialogFooter>
+            <DialogClose asChild className="m-auto">
+              <Button variant="outline">Ok</Button>
+            </DialogClose>
+          </DialogFooter>
+        </Card>
+      }
+    />
+  );
 }

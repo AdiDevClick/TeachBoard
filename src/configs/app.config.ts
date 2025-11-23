@@ -43,7 +43,13 @@ export const USER_ACTIVITIES = Object.freeze({
  *
  * @description Defines the names of modals used in the application.
  */
-export type AppModalNames = "login" | "apple-login" | "none" | "signup";
+export type AppModalNames =
+  | "login"
+  | "apple-login"
+  | "none"
+  | "signup"
+  | "pw-recovery"
+  | "pw-recovery-email-sent";
 
 /**
  * Pages that do not require session checks
@@ -55,5 +61,6 @@ export const NO_SESSIONS_CHECK_PAGES = [
   "/signup",
   "/error",
   "/password-creation",
+  "/forgot-password",
 ];
 // export const NO_SESSIONS_PAGES = ["/login", "/signup", "/signup/validate"];

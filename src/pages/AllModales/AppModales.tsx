@@ -1,5 +1,5 @@
 import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
-import { Modale } from "@/components/Modale/Modale.tsx";
+import { Modale, WithSimpleAlert } from "@/components/Modale/Modale.tsx";
 import {
   inputLoginControllers,
   inputSignupControllers,
@@ -46,6 +46,13 @@ export function AppModales() {
             ref={setRef}
           />
         }
+        onNodeReady={observedRef}
+      />
+      <WithSimpleAlert
+        headerTitle="Demande envoyée"
+        headerDescription="Vérifiez votre boîte mail pour réinitialiser votre mot de passe."
+        modaleName="pw-recovery-email-sent"
+        ref={setRef}
         onNodeReady={observedRef}
       />
     </>
