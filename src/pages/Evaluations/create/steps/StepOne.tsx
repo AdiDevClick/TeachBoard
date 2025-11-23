@@ -89,7 +89,7 @@ export function StepOne({
           </SelectItem>
           <SelectSeparator />
           {data && (
-            <ListMapper items={data.data}>
+            <ListMapper items={data.data.classes}>
               <LabelledGroup ischild>
                 <NonLabelledGroupItem />
               </LabelledGroup>
