@@ -30,6 +30,7 @@ export const API_ENDPOINTS = Object.freeze({
       LOGIN: `${AUTH}/login`,
       SIGNUP: `${AUTH}/signup`,
       PASSWORD_CREATION: `${AUTH}/password-creation`,
+      PASSWORD_RECOVERY: `${AUTH}/password-recovery`,
       SESSION_CHECK: `${AUTH}/session`,
       LOGOUT: `${AUTH}/logout`,
     },
