@@ -1,6 +1,7 @@
 import type {
   ModaleProps,
   ModalState,
+  WithSimpleAlertProps,
 } from "@/components/Modale/types/modale.types.ts";
 import { DialogHeaderTitle } from "@/components/Titles/ModalTitle.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -305,14 +306,6 @@ async function waitAndReplace(state: object, url: string, timer = 70) {
   await wait(timer);
   history.replaceState(state, "", url);
 }
-type SimpleAlertExtraProps = {
-  headerTitle?: string;
-  headerDescription?: string;
-  ref?: Ref<HTMLDivElement>;
-};
-
-type WithSimpleAlertProps = Omit<ModaleProps, "modaleContent"> &
-  SimpleAlertExtraProps;
 
 /**
  * Higher-order component to create a simple alert modal
