@@ -8,19 +8,16 @@ import { passwordCreationInputControllers } from "@/data/inputs-controllers.data
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { usePasswordCreation } from "@/hooks/database/pw-creation/usePasswordCreation.ts";
 import { pwCreationSchema } from "@/models/password-creation.models.ts";
-import { genericStyle } from "@/utils/styles/generic-styles.ts";
-import { cn } from "@/utils/utils.ts";
+import {
+  GENERIC_CONTAINER_STYLE,
+  GENERIC_CONTENT_STYLE,
+} from "@/utils/styles/generic-styles.ts";
+import { cn, wait } from "@/utils/utils.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-
-/**
- * Use it once or insert it into the component
- * if you need to add dynamic styles based on props or state
- * in the future.
- */
-const { containerStyle, contentStyle } = genericStyle();
 
 /**
  * Password Creation Form Schema
@@ -37,6 +34,7 @@ export function PasswordCreation({
   ...props
 }: PasswordCreationProps) {
   const { closeAllDialogs } = useDialog();
+  const navigate = useNavigate();
   const { data, error, isLoading, onSubmit } = usePasswordCreation();
 
   const form = useForm<PasswordCreationFormSchema>({
@@ -52,6 +50,13 @@ export function PasswordCreation({
   useEffect(() => {
     const toastLoaderId = "password-creation-loading";
 
+    const triggerNavigation = async () => {
+      form.reset();
+      closeAllDialogs();
+      await wait(1500);
+      navigate("/login");
+    };
+
     if (isLoading) {
       toast.loading("Création du mot de passe en cours...", {
         id: toastLoaderId,
@@ -63,8 +68,7 @@ export function PasswordCreation({
     }
 
     if (data && !isLoading) {
-      form.reset();
-      closeAllDialogs();
+      triggerNavigation();
     }
 
     if (DEV_MODE) {
@@ -72,29 +76,48 @@ export function PasswordCreation({
     }
   }, [data, isLoading, error]);
 
+  const title = isLoading
+    ? "Création du mot de passe"
+    : "Créer un mot de passe";
+  const description = isLoading
+    ? "Veuillez patienter pendant que nous créons votre mot de passe sécurisé."
+    : data
+    ? ""
+    : "Choisissez un mot de passe sécurisé pour protéger votre compte.";
+
   return (
-    <div {...containerStyle}>
-      <div {...contentStyle}>
+    <div {...GENERIC_CONTAINER_STYLE}>
+      <div {...GENERIC_CONTENT_STYLE}>
         <Card className={cn("flex flex-col gap-6", className)} {...props}>
-          <HeaderTitle
-            title="Créer un mot de passe"
-            description="Choisissez un mot de passe sécurisé pour protéger votre compte."
-          />
+          <HeaderTitle title={title} description={description} />
           <CardContent>
-            <form
-              id="password-creation-form"
-              onSubmit={isLoading ? undefined : form.handleSubmit(onSubmit)}
-              className="grid gap-4"
-            >
-              <FieldGroup>
-                <Inputs items={passwordCreationInputControllers} form={form} />
-                <Field>
-                  <Button type="submit" disabled={isLoading}>
-                    Créer
-                  </Button>
-                </Field>
-              </FieldGroup>
-            </form>
+            {!data && (
+              <form
+                id="password-creation-form"
+                onSubmit={isLoading ? undefined : form.handleSubmit(onSubmit)}
+                className="grid gap-4"
+              >
+                <FieldGroup>
+                  <Inputs
+                    items={passwordCreationInputControllers}
+                    form={form}
+                  />
+                  <Field>
+                    <Button type="submit" disabled={isLoading}>
+                      Créer
+                    </Button>
+                  </Field>
+                </FieldGroup>
+              </form>
+            )}
+            {data && (
+              <div className="text-center text-green-600">
+                <p>
+                  Votre mot de passe a été créé avec succès ! Vous pouvez
+                  maintenant vous connecter.
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
