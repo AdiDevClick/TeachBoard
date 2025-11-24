@@ -83,7 +83,6 @@ export function handleModaleOpening({
   dialogFns: Pick<DialogContextType, "closeAllDialogs" | "openDialog">;
   modalName?: AppModalNames;
 }) {
-  preventDefaultAndStopPropagation(e);
   dialogFns.closeAllDialogs();
   dialogFns.openDialog(e, modalName);
 }
