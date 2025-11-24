@@ -21,7 +21,7 @@ function genericStyle() {
  * @description These styles can be imported and used across different components and pages
  * to maintain a consistent look and feel.
  *
- * {@link #genericStyle()}
+ * {@link genericStyle()}
  */
 export const {
   containerStyle: GENERIC_CONTAINER_STYLE,

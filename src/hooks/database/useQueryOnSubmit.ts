@@ -190,7 +190,8 @@ async function onFetch<
         queryUrl,
         retry - 1,
         timeout,
-        abortController
+        abortController,
+        queryHeaders
       );
     }
 

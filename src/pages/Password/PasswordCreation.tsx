@@ -6,6 +6,7 @@ import { Field, FieldGroup } from "@/components/ui/field.tsx";
 import { DEV_MODE } from "@/configs/app.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { usePasswordCreation } from "@/hooks/database/pw-creation/usePasswordCreation.ts";
+import { useAuthMemoryStore } from "@/hooks/store/AuthMemoryStore";
 import { pwCreationSchema } from "@/models/password-creation.models.ts";
 import type {
   PasswordCreationFormSchema,
@@ -43,7 +44,10 @@ export function PasswordCreation({
 }: Readonly<PageWithControllers<PasswordCreationInputItem>>) {
   const { closeAllDialogs } = useDialog();
   const navigate = useNavigate();
-  const { data, error, isLoading, onSubmit } = usePasswordCreation();
+  const signupToken = useAuthMemoryStore((state) => state.signupToken);
+  const { data, error, isLoading, onSubmit } = usePasswordCreation({
+    token: signupToken,
+  });
 
   const form = useForm<PasswordCreationFormSchema>({
     resolver: zodResolver(pwCreationSchema),
@@ -54,7 +58,21 @@ export function PasswordCreation({
     },
   });
 
-  /** Main */
+  /**
+   * Initial check for signup token
+   */
+  useEffect(() => {
+    if (!signupToken) {
+      toast.dismiss();
+      toast.error("Session invalide. Veuillez valider votre email.");
+      navigate("/login");
+    }
+  }, []);
+
+  /**
+   * Main -
+   * It can only happen if a valid signup token is present
+   */
   useEffect(() => {
     const toastLoaderId = "password-creation-loading";
 
@@ -73,6 +91,8 @@ export function PasswordCreation({
 
     if (data || error) {
       toast.dismiss(toastLoaderId);
+
+      triggerNavigation();
     }
 
     if (data && !isLoading) {

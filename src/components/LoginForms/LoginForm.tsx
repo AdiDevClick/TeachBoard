@@ -28,6 +28,7 @@ import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import {
   handleModaleOpening,
   preventDefaultAndStopPropagation,
+  wait,
 } from "@/utils/utils.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState, type MouseEvent } from "react";
@@ -96,16 +97,13 @@ export function LoginForm({
    * @description It will open the sidebar upon successful login and navigate to the home page.
    */
   useEffect(() => {
-    const resetFormAndTriggerNavigation = () => {
-      // await wait(2000);
+    const resetFormAndTriggerNavigation = async () => {
+      await wait(500);
       if (!open) setOpen(true);
       form.reset();
 
-      if (modaleMode) {
-        closeDialog(null, "login");
-      } else {
-        navigate("/", { replace: true });
-      }
+      closeDialog(null, "login");
+      navigate("/", { replace: true });
     };
 
     if (isLoading) {
@@ -135,11 +133,11 @@ export function LoginForm({
   }, [isLoading, error, data, open, modaleMode]);
 
   const handleRecoverPasswordClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    preventDefaultAndStopPropagation(e);
     if (isPwForgotten) {
       // already in recovery mode; allow navigation
       setIsPwForgotten(false);
     } else {
-      preventDefaultAndStopPropagation(e);
       setIsPwForgotten(true);
       form.reset();
     }
