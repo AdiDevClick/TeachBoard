@@ -70,13 +70,7 @@ export function AppModales({
       {(modale) => {
         if (!modale.type) return null;
 
-        const { modaleName } = modale;
-
-        const commonProps = {
-          onNodeReady: observedRef,
-          modaleName: modaleName,
-          key: modaleName,
-        };
+        const modaleName = modale.modaleName;
 
         if (isStandardModale(modale)) {
           const StandardModaleComponent = modale.type;
@@ -88,7 +82,9 @@ export function AppModales({
 
           return (
             <StandardModaleComponent
-              {...commonProps}
+              key={modaleName}
+              onNodeReady={observedRef}
+              modaleName={modaleName}
               modaleContent={renderedContent}
               {...(modale.modaleProps ?? {})}
             />
@@ -99,7 +95,9 @@ export function AppModales({
 
         return (
           <SimpleAlertComponent
-            {...commonProps}
+            key={modaleName}
+            onNodeReady={observedRef}
+            modaleName={modaleName}
             ref={setRef}
             {...modale.modaleProps}
           />
