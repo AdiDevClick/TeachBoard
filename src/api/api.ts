@@ -37,6 +37,7 @@ export async function fetchJSON<
     } else {
       options.body = JSON.stringify(json);
     }
+    delete options.json;
     headers["Content-Type"] = "application/json; charset=UTF-8";
   }
 
