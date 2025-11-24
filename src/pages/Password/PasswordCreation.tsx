@@ -4,10 +4,14 @@ import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { Field, FieldGroup } from "@/components/ui/field.tsx";
 import { DEV_MODE } from "@/configs/app.config.ts";
-import { passwordCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { usePasswordCreation } from "@/hooks/database/pw-creation/usePasswordCreation.ts";
 import { pwCreationSchema } from "@/models/password-creation.models.ts";
+import type {
+  PasswordCreationFormSchema,
+  PasswordCreationInputItem,
+} from "@/pages/Password/types/password-page.types.ts";
+import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import {
   GENERIC_CONTAINER_STYLE,
   GENERIC_CONTENT_STYLE,
@@ -18,6 +22,10 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+
+let title = "Créer un mot de passe";
+let description =
+  "Choisissez un mot de passe sécurisé pour protéger votre compte.";
 
 /**
  * Password Creation Form Schema
@@ -32,7 +40,7 @@ export function PasswordCreation({
   className,
   inputControllers,
   ...props
-}: PasswordCreationProps) {
+}: Readonly<PageWithControllers<PasswordCreationInputItem>>) {
   const { closeAllDialogs } = useDialog();
   const navigate = useNavigate();
   const { data, error, isLoading, onSubmit } = usePasswordCreation();
@@ -76,14 +84,11 @@ export function PasswordCreation({
     }
   }, [data, isLoading, error]);
 
-  const title = isLoading
-    ? "Création du mot de passe"
-    : "Créer un mot de passe";
-  const description = isLoading
-    ? "Veuillez patienter pendant que nous créons votre mot de passe sécurisé."
-    : data
-    ? ""
-    : "Choisissez un mot de passe sécurisé pour protéger votre compte.";
+  if (isLoading) {
+    title = "Création du mot de passe";
+    description =
+      "Veuillez patienter pendant que nous créons votre mot de passe sécurisé.";
+  }
 
   return (
     <div {...GENERIC_CONTAINER_STYLE}>
@@ -98,10 +103,7 @@ export function PasswordCreation({
                 className="grid gap-4"
               >
                 <FieldGroup>
-                  <Inputs
-                    items={passwordCreationInputControllers}
-                    form={form}
-                  />
+                  <Inputs items={inputControllers} form={form} />
                   <Field>
                     <Button type="submit" disabled={isLoading}>
                       Créer
