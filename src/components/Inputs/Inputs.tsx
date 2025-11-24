@@ -20,7 +20,7 @@ export function Inputs<T extends FieldValues>({
   const ids = useId();
   return (
     <ListMapper items={items}>
-      {({ name, title, type, placeholder }) => (
+      {({ name, title, type, placeholder, autoComplete }) => (
         <Controller
           key={`${ids}-${title}`}
           name={name}
@@ -33,6 +33,7 @@ export function Inputs<T extends FieldValues>({
                 id={name}
                 type={type}
                 placeholder={placeholder}
+                autoComplete={autoComplete}
                 aria-invalid={fieldState.invalid}
                 required
                 value={field.value ?? ""}
