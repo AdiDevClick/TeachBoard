@@ -8,6 +8,7 @@ import type {
   ComponentLike,
   ContentPropsFor,
   EnsureContentList,
+  RemainingProps,
 } from "@/utils/types/types.utils.ts";
 import type { ComponentType } from "react";
 
@@ -26,8 +27,11 @@ type SimpleAlertModaleProps = SimpleAlertRequiredProps &
     >
   >;
 
-export type StandardModaleConfig<TComponent extends ComponentLike<unknown>> = {
-  modaleName: AppModalNames;
+export type StandardModaleConfig<
+  Name = AppModalNames,
+  TComponent extends ComponentLike<unknown> = AnyComponentLike
+> = {
+  modaleName: Name;
   type: ComponentType<ModaleProps>;
   modaleContent: TComponent;
   modaleProps?: StandardModaleProps;
@@ -37,17 +41,15 @@ export type StandardModaleConfig<TComponent extends ComponentLike<unknown>> = {
 /**
  * WithSimpleAlert wrapper config (returns a prewired modal without a modaleContent prop)
  */
-export type SimpleAlertConfig = {
-  modaleName: AppModalNames;
+export type SimpleAlertConfig<Name = AppModalNames> = {
+  modaleName: Name;
   type: ComponentType<WithSimpleAlertProps>;
   modaleProps: SimpleAlertModaleProps;
   contentProps?: never;
   modaleContent?: never;
 };
 
-export type AppModale =
-  | StandardModaleConfig<AnyComponentLike>
-  | SimpleAlertConfig;
+export type AppModale = StandardModaleConfig | SimpleAlertConfig;
 
 type StrictModalesList<T extends readonly AppModale[]> = EnsureContentList<
   T,
