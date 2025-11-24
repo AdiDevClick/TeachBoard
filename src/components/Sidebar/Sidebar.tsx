@@ -13,6 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useUserLogout } from "@/hooks/database/logout/useUserLogout.ts";
+import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { Activity, type MouseEvent } from "react";
 
 /**
@@ -29,8 +30,7 @@ export function AppSidebar({ ...props }: SidebarProps) {
     const parentElement = target.parentElement as HTMLAnchorElement;
 
     if (parentElement?.href.includes("/logout")) {
-      e.preventDefault();
-      e.stopPropagation();
+      preventDefaultAndStopPropagation(e);
       onSubmit();
     }
   };
