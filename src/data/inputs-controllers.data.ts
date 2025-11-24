@@ -15,12 +15,14 @@ export const inputLoginControllers = [
     title: "Identifiant",
     type: "text",
     placeholder: "m@example.com",
+    autoComplete: "username",
   },
   {
     name: "password",
     title: "Mot de passe",
     type: "password",
     placeholder: "********",
+    autoComplete: "current-password",
   },
 ] satisfies Parameters<typeof LoginForm>[0]["inputControllers"];
 
@@ -31,12 +33,14 @@ export const inputSignupControllers = [
     title: "Votre adresse e-mail",
     type: "email",
     placeholder: "m@example.com",
+    autoComplete: "email",
   },
   {
     name: "username",
     title: "Votre nom d'utilisateur",
     type: "text",
     placeholder: "John Doe",
+    autoComplete: "username",
   },
 ] satisfies Parameters<typeof Signup>[0]["inputControllers"];
 
@@ -63,5 +67,6 @@ export const passwordRecoveryInputControllers = [
     title: "Votre adresse e-mail",
     type: "email",
     placeholder: "m@example.com",
+    autoComplete: "email",
   },
 ] satisfies Parameters<typeof PasswordCreation>[0]["inputControllers"];
