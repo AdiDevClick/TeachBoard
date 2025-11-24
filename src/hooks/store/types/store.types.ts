@@ -19,6 +19,9 @@ export interface User {
 export type LastUserActivityType =
   (typeof USER_ACTIVITIES)[keyof typeof USER_ACTIVITIES];
 
+/**
+ * Persisting Application store.
+ */
 export interface AppStore {
   lastUserActivity: LastUserActivityType;
   isLoggedIn: boolean;
@@ -26,3 +29,13 @@ export interface AppStore {
   sessionSynced: boolean;
   // Setters are not needed in the type definition and are managed by Zustand/combine internally
 }
+
+/**
+ * In-memory Authentication store.
+ *
+ * @description This store is used to hold temporary authentication data that should not persist across page reloads.
+ */
+export type AuthMemoryState = {
+  signupToken: string | null;
+  // Setters are not needed in the type definition and are managed by Zustand/combine internally
+};

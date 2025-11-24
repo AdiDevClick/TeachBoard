@@ -3,14 +3,16 @@ import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { DEV_MODE } from "@/configs/app.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
+import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
 import { useSignupValidation } from "@/hooks/database/signup/email-validation/useSignupValidation.ts";
+import { useAuthMemoryStore } from "@/hooks/store/AuthMemoryStore";
 import type { EmailValidationProps } from "@/pages/Signup/types/signup.types.ts";
 import {
   GENERIC_CONTAINER_STYLE,
   GENERIC_CONTENT_STYLE,
 } from "@/utils/styles/generic-styles.ts";
 import { cn, wait } from "@/utils/utils.ts";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 /**
@@ -33,11 +35,18 @@ export function EmailValidation({
   const { data, error, isLoading, onSubmit } = useSignupValidation({
     urlParams,
   });
+  const {
+    data: sessionData,
+    error: sessionError,
+    onSubmit: onSessionCheck,
+  } = useSessionChecker();
 
-  const startValidation = async () => {
+  const setSignupToken = useAuthMemoryStore((state) => state.setSignupToken);
+
+  const startValidation = useCallback(async () => {
     closeAllDialogs();
     await onSubmit();
-  };
+  }, []);
 
   /**
    * Main
@@ -57,29 +66,38 @@ export function EmailValidation({
     };
 
     if (data) {
-      const token = data.token ?? "";
-      sessionStorage.setItem("signup_token", token);
-      triggerNavigation("/password-creation");
+      const token = (data as unknown as { token?: string })?.token ?? "";
+      if (!sessionData) {
+        onSessionCheck();
+      }
+
+      if (sessionData) {
+        // Session valid, we can pursue password creation
+        // & Store token in memory (not persisted)
+        setSignupToken(token);
+        triggerNavigation("/password-creation");
+        return;
+      }
+
       if (DEV_MODE) {
         console.debug("EmailValidation onSuccess:", data);
       }
     }
 
-    if (error) {
+    if (error || sessionError) {
+      triggerNavigation("/login");
       if (DEV_MODE) {
         console.debug("EmailValidation onError:", error);
       }
     }
-  }, [data, error, isLoading]);
+  }, [data, error, isLoading, sessionData]);
 
   const description =
     (data?.success || error?.message) ?? "Vérification en cours...";
 
-  const title = data?.success
-    ? "Succès !"
-    : error?.message
-    ? "Échec de la validation..."
-    : "Validation de votre inscription";
+  let title = "Validation de votre inscription";
+  if (data?.success) title = "Succès !";
+  else if (error?.message) title = "Échec de la validation...";
 
   return (
     <div className={GENERIC_CONTAINER_STYLE.className}>
