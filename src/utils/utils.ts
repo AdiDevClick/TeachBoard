@@ -1,6 +1,8 @@
-import { LANGUAGE } from "@/configs/app.config";
+import type { DialogContextType } from "@/api/contexts/types/context.types.ts";
+import { LANGUAGE, type AppModalNames } from "@/configs/app.config";
 import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
 import { clsx, type ClassValue } from "clsx";
+import type { MouseEvent } from "react";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -64,4 +66,24 @@ export function preventDefaultAndStopPropagation(
   if (!e) return;
   e.preventDefault();
   e.stopPropagation();
+}
+
+/** Handle the opening of a modal dialog.
+ *
+ * @param e - The mouse event that triggered the action.
+ * @param dialogFns - An object containing functions to manage dialog state.
+ * @param modalName - The name of the modal to open (default is "signup").
+ */
+export function handleModaleOpening({
+  e,
+  dialogFns,
+  modalName = "signup",
+}: {
+  e: MouseEvent<HTMLAnchorElement>;
+  dialogFns: Pick<DialogContextType, "closeAllDialogs" | "openDialog">;
+  modalName?: AppModalNames;
+}) {
+  preventDefaultAndStopPropagation(e);
+  dialogFns.closeAllDialogs();
+  dialogFns.openDialog(e, modalName);
 }
