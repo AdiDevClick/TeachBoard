@@ -92,11 +92,7 @@ export function PasswordCreation({
     if (data || error) {
       toast.dismiss(toastLoaderId);
 
-      triggerNavigation();
-    }
-
-    if (data && !isLoading) {
-      triggerNavigation();
+      if (!isLoading) triggerNavigation();
     }
 
     if (DEV_MODE) {
