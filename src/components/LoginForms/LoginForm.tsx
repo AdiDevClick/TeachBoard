@@ -3,8 +3,8 @@ import { AppFieldDescriptionWithLink } from "@/components/Fields/AppFieldDescrip
 import { Inputs } from "@/components/Inputs/Inputs.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import type {
-  LoginFormProps,
   LoginFormSchema,
+  LoginInputItem,
   RecoveryFormSchema,
 } from "@/components/LoginForms/types/login-forms.types";
 import {
@@ -21,14 +21,16 @@ import { passwordRecoveryInputControllers } from "@/data/inputs-controllers.data
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useLogin } from "@/hooks/database/login/useLogin.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
+import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import { formSchema } from "@/models/login.models.ts";
 import { pwRecoverySchema } from "@/models/pw-recovery.model.ts";
+import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import {
   handleModaleOpening,
   preventDefaultAndStopPropagation,
 } from "@/utils/utils.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -52,7 +54,7 @@ export function LoginForm({
   inputControllers,
   modaleMode = false,
   ...props
-}: Readonly<LoginFormProps>) {
+}: Readonly<PageWithControllers<LoginInputItem>>) {
   const navigate = useNavigate();
   const { open, setOpen } = useSidebar();
   const { closeDialog, openDialog, closeAllDialogs } = useDialog();
@@ -71,7 +73,13 @@ export function LoginForm({
     },
   });
 
-  const inputFieldRef = useRef<HTMLDivElement>(null!);
+  const { setRef, observedRef } = useMutationObserver({});
+
+  useEffect(() => {
+    if (observedRef) {
+      form.setFocus("identifier");
+    }
+  }, [observedRef]);
 
   /** Log user data on change (for development purposes) */
   useEffect(() => {
@@ -114,7 +122,7 @@ export function LoginForm({
     if (data) {
       resetFormAndTriggerNavigation();
 
-      if (isPwForgotten && inputFieldRef.current) {
+      if (isPwForgotten && observedRef) {
         openDialog(null, "pw-recovery-email-sent");
       } else {
         toast.success("Connexion réussie !");
@@ -160,6 +168,7 @@ export function LoginForm({
       <Title />
       <CardContent>
         <form
+          ref={setRef}
           id="login-form"
           onSubmit={form.handleSubmit(onSubmit)}
           className="grid gap-4"
@@ -178,11 +187,7 @@ export function LoginForm({
             <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
               Ou continuez avec
             </FieldSeparator>
-            <Inputs
-              ref={inputFieldRef}
-              items={inputControllersToUse}
-              form={form}
-            />
+            <Inputs items={inputControllersToUse} form={form} />
             <AppFieldDescriptionWithLink
               className="text-left"
               onClick={handleRecoverPasswordClick}
