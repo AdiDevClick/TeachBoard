@@ -8,7 +8,6 @@ import type {
   ComponentLike,
   ContentPropsFor,
   EnsureContentList,
-  RemainingProps,
 } from "@/utils/types/types.utils.ts";
 import type { ComponentType } from "react";
 
