@@ -15,6 +15,7 @@ export type InputItem<T> = {
   title: string;
   type: string;
   placeholder: string;
+  autoComplete?: string;
 };
 
 /** Props for the Inputs component */
