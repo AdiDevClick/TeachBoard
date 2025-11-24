@@ -20,7 +20,7 @@ export function StepOne({
 }) {
   const [selected, setSelected] = useState(false);
 
-  const { data, queryFn, isLoading, isLoaded, error } = useClasses();
+  const { data, onSubmit, isLoading, isLoaded, error } = useClasses();
 
   /**
    * Handles the addition of a new class.
@@ -46,7 +46,7 @@ export function StepOne({
     if (data || error) {
       toast.dismiss(loadingName);
       if (import.meta.env.DEV) {
-        console.debug("useQueryOnSubmit data", data);
+        console.debug("useQueryOnSubmit data", data ?? error);
       }
       // You can handle additional side effects here if needed
     }
@@ -67,7 +67,7 @@ export function StepOne({
           }}
           label={title}
           onOpenChange={(value) => {
-            if (value && !isLoaded) queryFn();
+            if (value && !isLoaded) onSubmit();
           }}
         >
           <SelectItem
@@ -89,7 +89,7 @@ export function StepOne({
           </SelectItem>
           <SelectSeparator />
           {data && (
-            <ListMapper items={data.data}>
+            <ListMapper items={data.data.classes}>
               <LabelledGroup ischild>
                 <NonLabelledGroupItem />
               </LabelledGroup>

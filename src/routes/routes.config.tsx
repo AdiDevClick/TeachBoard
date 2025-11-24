@@ -2,6 +2,7 @@ import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas.tsx";
 import {
   inputLoginControllers,
   inputSignupControllers,
+  passwordCreationInputControllers,
 } from "@/data/inputs-controllers.data.ts";
 import { completeDatas } from "@/main.tsx";
 import { About } from "@/pages/About/About.tsx";
@@ -11,6 +12,8 @@ import { StepOne } from "@/pages/Evaluations/create/steps/StepOne.tsx";
 import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
 import { Login } from "@/pages/Login/Login.tsx";
+import { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
+import { EmailValidation } from "@/pages/Signup/email-validation/EmailValidation.tsx";
 import { Signup } from "@/pages/Signup/Signup";
 import { Navigate, type RouteObject } from "react-router-dom";
 type NavMenu = (typeof completeDatas.navMain.menus)[number];
@@ -63,9 +66,32 @@ export const routeChildren = [
   },
   {
     path: "signup",
-    element: <Signup inputControllers={inputSignupControllers} />,
+    children: [
+      {
+        index: true,
+        element: <Signup inputControllers={inputSignupControllers} />,
+        loader: async () => {
+          setDocumentTitle("S'enregistrer");
+          return { pageTitle: "hidden" };
+        },
+      },
+      {
+        path: "verify/:referral/:referralCode",
+        element: <EmailValidation />,
+        loader: async () => {
+          setDocumentTitle("Vérification de l'inscription");
+          return { pageTitle: "hidden" };
+        },
+      },
+    ],
+  },
+  {
+    path: "password-creation",
+    element: (
+      <PasswordCreation inputControllers={passwordCreationInputControllers} />
+    ),
     loader: async () => {
-      setDocumentTitle("S'enregistrer");
+      setDocumentTitle("Création du mot de passe");
       return { pageTitle: "hidden" };
     },
   },
@@ -75,16 +101,19 @@ export const routeChildren = [
   },
   {
     path: "evaluations",
-    element: <Evaluations />,
-    loader: async () => {
-      setDocumentTitle(completeDatas.navMain.menus[2].title);
-
-      return {
-        pageTitle: completeDatas.navMain.menus[2].title,
-        loaderData: completeDatas.navMain.menus[2],
-      };
-    },
     children: [
+      {
+        index: true,
+        element: <Evaluations />,
+        loader: async () => {
+          setDocumentTitle(completeDatas.navMain.menus[2].title);
+
+          return {
+            pageTitle: completeDatas.navMain.menus[2].title,
+            loaderData: completeDatas.navMain.menus[2],
+          };
+        },
+      },
       {
         path: "create",
         element: <CreateEvaluations />,
@@ -109,7 +138,6 @@ export const routeChildren = [
             ),
             loader: async () => {
               const date = new Date().toLocaleDateString();
-              // setDocumentTitle(EvaluationPageTabsDatas.step1.name);
               return {
                 pageTitle: "Evaluation - " + date,
               };
@@ -120,7 +148,6 @@ export const routeChildren = [
             element: <StepOne title="bots" placeholder="bots" />,
             loader: async () => {
               const date = new Date().toLocaleDateString();
-              // setDocumentTitle(EvaluationPageTabsDatas.step2.name);
               return {
                 pageTitle: "Evaluation - " + date,
               };
@@ -131,7 +158,6 @@ export const routeChildren = [
             element: <StepOne title="dsq" placeholder="dsq" />,
             loader: async () => {
               const date = new Date().toLocaleDateString();
-              // setDocumentTitle(EvaluationPageTabsDatas.step3.name);
               return {
                 pageTitle: "Evaluation - " + date,
               };
@@ -142,7 +168,6 @@ export const routeChildren = [
             element: <StepOne title="gfgg" placeholder="gfgg" />,
             loader: async () => {
               const date = new Date().toLocaleDateString();
-              // setDocumentTitle(EvaluationPageTabsDatas.step4.name);
               return {
                 pageTitle: "Evaluation - " + date,
               };

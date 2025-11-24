@@ -19,13 +19,18 @@ export const API_ENDPOINTS = Object.freeze({
     COURSES: `${BASE_API_URL}/courses`,
     USERS: `${BASE_API_URL}/users`,
     POSTS: `${BASE_API_URL}/posts`,
+    AUTH: {
+      SIGNUP_VALIDATION: `${AUTH}/verify/`,
+    },
   },
   POST: {
     METHOD: "POST",
     CREATE_CLASS: `${BASE_API_URL}/classes/create`,
     AUTH: {
       LOGIN: `${AUTH}/login`,
-      REGISTER: `${AUTH}/register`,
+      SIGNUP: `${AUTH}/signup`,
+      PASSWORD_CREATION: `${AUTH}/password-creation`,
+      PASSWORD_RECOVERY: `${AUTH}/password-recovery`,
       SESSION_CHECK: `${AUTH}/session`,
       LOGOUT: `${AUTH}/logout`,
     },

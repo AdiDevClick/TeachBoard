@@ -1,11 +1,11 @@
 import { Outlet, useOutlet } from "react-router-dom";
 
 export function Evaluations() {
-  const outlet = useOutlet();
+  // const outlet = useOutlet();
 
-  if (outlet) {
-    return <Outlet />;
-  }
+  // if (outlet) {
+  //   return <Outlet />;
+  // }
 
   return (
     <div>

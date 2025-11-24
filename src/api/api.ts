@@ -35,6 +35,7 @@ export async function fetchJSON<
     } else {
       options.body = JSON.stringify(options.json);
     }
+    delete options.json;
     headers["Content-Type"] = "application/json; charset=UTF-8";
   }
 
@@ -54,7 +55,6 @@ export async function fetchJSON<
 
     if (!response.ok) {
       const filteredObject = await filterErrorResponse<TErrorBody>(response);
-
       throw new Error(
         `HTTP Error ! Status : ${response.status} - ${response.statusText}`,
         {

@@ -38,6 +38,24 @@ export const useAppStore = create(
                 state.user = null;
               });
             },
+            signup() {
+              set((state) => {
+                state.lastUserActivity = USER_ACTIVITIES.signup;
+                state.isLoggedIn = false;
+              });
+            },
+            signupValidation() {
+              set((state) => {
+                state.lastUserActivity = USER_ACTIVITIES.signupValidation;
+                state.isLoggedIn = false;
+              });
+            },
+            passwordCreation() {
+              set((state) => {
+                state.lastUserActivity = USER_ACTIVITIES.passwordCreation;
+                state.isLoggedIn = false;
+              });
+            },
             login(user: User) {
               set((state) => {
                 state.lastUserActivity = USER_ACTIVITIES.login;

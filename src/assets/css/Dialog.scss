@@ -19,7 +19,8 @@
   background: transparent;
 
   &--login,
-  &--signup {
+  &--signup,
+  &--pw-recovery-email-sent {
     max-width: 400px;
   }
 

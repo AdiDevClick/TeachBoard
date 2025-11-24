@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/Header/PageHeader";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { Toaster } from "@/components/ui/sonner";
-import { DEV_MODE } from "@/configs/app.config.ts";
+import { DEV_MODE, NO_SESSIONS_CHECK_PAGES } from "@/configs/app.config.ts";
 import { calendarEvents } from "@/data/CalendarData.ts";
 import { sidebarDatas } from "@/data/SidebarData.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
@@ -20,7 +20,12 @@ import "@css/Toaster.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode, useEffect, type CSSProperties } from "react";
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Outlet,
+  RouterProvider,
+  useLocation,
+} from "react-router-dom";
 
 const queryClient = new QueryClient();
 
@@ -80,21 +85,36 @@ export function Root({ contentType }: Readonly<RootProps>) {
   const lastUserActivity = useAppStore((state) => state.lastUserActivity);
   const sessionSynced = useAppStore((state) => state.sessionSynced);
   const { openDialog } = useDialog();
-
-  const { data, isLoading, queryFn, isLoaded, error } = useSessionChecker();
+  const location = useLocation();
+  const { data, isLoading, onSubmit, isLoaded, error } = useSessionChecker();
 
   /**
    * Automatically check session on app load unless the last user activity was a logout
    */
   useEffect(() => {
     // const userExists = user !== null;
+    const path = location.pathname;
+    const doesContainNoSessionPage = NO_SESSIONS_CHECK_PAGES.some((page) =>
+      path.startsWith(page)
+    );
+
     const lastActivityWasLogout = lastUserActivity === "logout";
     const doNotCheckSession =
-      isLoaded || lastActivityWasLogout || sessionSynced;
+      isLoaded ||
+      lastActivityWasLogout ||
+      sessionSynced ||
+      doesContainNoSessionPage;
     // const shouldCheckSession = userExists && !doNotCheckSession;
 
+    // const doNotCheckSession =
+    //   isLoaded ||
+    //   lastActivityWasLogout ||
+    //   sessionSynced ||
+    //   path === "/login" ||
+    //   path.startsWith("/signup");
+
     if (doNotCheckSession) return;
-    queryFn();
+    onSubmit();
   }, [isLoaded, lastUserActivity, sessionSynced]);
 
   useEffect(() => {

@@ -11,28 +11,32 @@ import { toast } from "sonner";
 /**
  * Hook for logging in the user.
  */
-export function useLogin() {
+export function useLogin({ isPwForgotten = false }) {
   const login = useAppStore((state) => state.login);
 
-  const { data, queryFn, isLoading, error } = useQueryOnSubmit<
-    AuthLoginSuccess,
-    AuthLoginError
-  >([
+  const url = isPwForgotten
+    ? API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY
+    : API_ENDPOINTS.POST.AUTH.LOGIN;
+
+  return useQueryOnSubmit<AuthLoginSuccess, AuthLoginError>([
     USER_ACTIVITIES.login,
     {
-      url: API_ENDPOINTS.POST.AUTH.LOGIN,
+      url,
       method: API_ENDPOINTS.POST.METHOD,
       successDescription: "Vous êtes maintenant connecté(e).",
       onSuccess(data) {
-        login({
-          userId: "data.userId",
-          name: "Adi",
-          email: "Adi@test.com",
-          role: "Student",
-          token: "data.token",
-          refreshToken: "data.refreshToken",
-          avatar: "https://i.pravatar.cc/150?img=3",
-        });
+        if (!isPwForgotten) {
+          login({
+            userId: "data.userId",
+            name: "Adi",
+            email: "Adi@test.com",
+            role: "Student",
+            token: "data.token",
+            refreshToken: "data.refreshToken",
+            avatar: "https://i.pravatar.cc/150?img=3",
+          });
+        }
+
         if (import.meta.env.DEV) {
           console.debug("Login onSuccess:", data);
         }
@@ -47,6 +51,4 @@ export function useLogin() {
       },
     },
   ]);
-
-  return { data, queryFn, error, isLoading };
 }

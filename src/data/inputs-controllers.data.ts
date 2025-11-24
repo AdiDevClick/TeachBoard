@@ -1,4 +1,5 @@
 import type { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
+import type { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
 import type { Signup } from "@/pages/Signup/Signup.tsx";
 
 /**
@@ -14,12 +15,14 @@ export const inputLoginControllers = [
     title: "Identifiant",
     type: "text",
     placeholder: "m@example.com",
+    autoComplete: "username",
   },
   {
     name: "password",
     title: "Mot de passe",
     type: "password",
     placeholder: "********",
+    autoComplete: "current-password",
   },
 ] satisfies Parameters<typeof LoginForm>[0]["inputControllers"];
 
@@ -30,11 +33,40 @@ export const inputSignupControllers = [
     title: "Votre adresse e-mail",
     type: "email",
     placeholder: "m@example.com",
+    autoComplete: "email",
   },
   {
     name: "username",
     title: "Votre nom d'utilisateur",
     type: "text",
     placeholder: "John Doe",
+    autoComplete: "username",
   },
 ] satisfies Parameters<typeof Signup>[0]["inputControllers"];
+
+/** Password creation page controllers  */
+export const passwordCreationInputControllers = [
+  {
+    name: "password",
+    title: "Nouveau mot de passe",
+    type: "password",
+    placeholder: "********",
+  },
+  {
+    name: "passwordConfirmation",
+    title: "Confirmer le mot de passe",
+    type: "password",
+    placeholder: "********",
+  },
+] satisfies Parameters<typeof PasswordCreation>[0]["inputControllers"];
+
+/** Password recovery page controllers  */
+export const passwordRecoveryInputControllers = [
+  {
+    name: "identifier",
+    title: "Votre adresse e-mail",
+    type: "email",
+    placeholder: "m@example.com",
+    autoComplete: "email",
+  },
+] satisfies Parameters<typeof PasswordCreation>[0]["inputControllers"];

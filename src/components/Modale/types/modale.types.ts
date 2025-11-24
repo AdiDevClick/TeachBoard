@@ -1,17 +1,16 @@
 import type { AppModalNames } from "@/configs/app.config.ts";
-import { type ReactNode } from "react";
+import { type PropsWithChildren, type ReactNode, type Ref } from "react";
 
 /**
  * Types for Modale component props
  */
 export type ModaleProps = {
-  children?: ReactNode;
   modaleContent: ReactNode;
   modaleName: AppModalNames;
   onOpenChange?: (id: string) => void;
   onOpen?: (id: string) => boolean;
   onNodeReady?: HTMLElement;
-};
+} & PropsWithChildren;
 
 export type ModalState = {
   forward: boolean | null;
@@ -26,3 +25,12 @@ export type ModalState = {
   isHandledByUserEvent: boolean;
   userInput: string | number | null;
 };
+
+type SimpleAlertExtraProps = {
+  headerTitle: string;
+  headerDescription: string;
+  ref?: Ref<HTMLDivElement>;
+};
+
+export type WithSimpleAlertProps = Omit<ModaleProps, "modaleContent"> &
+  SimpleAlertExtraProps;

@@ -2,23 +2,19 @@ import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
 import { FieldDescription } from "@/components/ui/field.tsx";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
 import { inputLoginControllers } from "@/data/inputs-controllers.data";
+import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import type { LoginPageProps } from "@/pages/Login/types/login-page.types.ts";
-import "@css/LoginPage.scss";
+import {
+  GENERIC_CONTAINER_STYLE,
+  GENERIC_CONTENT_STYLE,
+  GENERIC_LOGO_BACKGROUND_STYLE,
+  GENERIC_LOGO_ICON_STYLE,
+  GENERIC_LOGO_STYLE,
+} from "@/utils/styles/generic-styles.ts";
+import "@css/GenericPage.scss";
 import { GalleryVerticalEnd } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-
-/** Use it once or insert it into the component
- * if you need to add dynamic styles based on props or state
- * in the future.
- */
-const {
-  containerStyle,
-  contentStyle,
-  logoStyle,
-  logoBackgroundStyle,
-  logoIconStyle,
-} = loginStyle();
 
 /**
  * Login page component
@@ -29,6 +25,7 @@ export function Login({
   inputControllers = inputLoginControllers,
 }: LoginPageProps) {
   const { open, setOpen, openMobile, setOpenMobile } = useSidebar();
+  const { closeAllDialogs } = useDialog();
 
   /** Close sidebar on login page */
   useEffect(() => {
@@ -36,14 +33,15 @@ export function Login({
       setOpen(false);
       setOpenMobile(false);
     }
+    closeAllDialogs();
   }, []);
 
   return (
-    <div {...containerStyle}>
-      <div {...contentStyle}>
-        <Link to="/" {...logoStyle}>
-          <div {...logoBackgroundStyle}>
-            <GalleryVerticalEnd {...logoIconStyle} />
+    <div {...GENERIC_CONTAINER_STYLE}>
+      <div {...GENERIC_CONTENT_STYLE}>
+        <Link to="/" {...GENERIC_LOGO_STYLE}>
+          <div {...GENERIC_LOGO_BACKGROUND_STYLE}>
+            <GalleryVerticalEnd {...GENERIC_LOGO_ICON_STYLE} />
           </div>
           Acme Inc.
         </Link>
@@ -56,21 +54,4 @@ export function Login({
       </div>
     </div>
   );
-}
-
-/**
- * Styles for the login page
- *
- * @returns An object containing class names for the login page elements.
- */
-function loginStyle() {
-  const loginPage = "login-page";
-
-  return {
-    containerStyle: { className: `${loginPage}-container` },
-    contentStyle: { className: `${loginPage}__content` },
-    logoStyle: { className: `${loginPage}__logo` },
-    logoBackgroundStyle: { className: `${loginPage}__logo--background` },
-    logoIconStyle: { className: `${loginPage}__logo--icon` },
-  };
 }

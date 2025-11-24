@@ -17,6 +17,7 @@
 
 
   &--menu {
+    transition: transform 0.5s ease;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -41,11 +42,11 @@
     }
 
     &:hover {
+      transition: transform 0.2s ease-in-out;
       cursor: pointer;
+      transform: scale(1.05);
     }
   }
-
-
 
   &--quickbutton {
     width: calc(var(--spacing) * 8);
@@ -77,4 +78,10 @@
     background-color: var(--primary-hover);
     color: var(--primary-foreground-hover);
   }
+
+  &:active,
+  &--effect:active {
+    transform: scale(0.95);
+  }
+
 }
