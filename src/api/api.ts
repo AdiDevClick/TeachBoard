@@ -20,37 +20,38 @@ export async function fetchJSON<
   url = "",
   options: fetchJSONOptions = {}
 ): Promise<FetchJSONResult<TData, TErrorBody>> {
+  const { json, signal, ...rest } = options;
+
   const headers = {
     Accept: "application/json",
-    ...options.headers,
+    ...rest.headers,
   } as Record<string, string>;
 
   if (options.img) {
     headers["Content-Type"] = "multipart/form-data";
   }
 
-  if (options.json && !options.img) {
-    if (Array.isArray(options.json)) {
-      options.body = JSON.stringify(Object.fromEntries(options.json));
+  if (json && !options.img) {
+    if (Array.isArray(json)) {
+      options.body = JSON.stringify(Object.fromEntries(json));
     } else {
-      options.body = JSON.stringify(options.json);
+      options.body = JSON.stringify(json);
     }
-    delete options.json;
     headers["Content-Type"] = "application/json; charset=UTF-8";
   }
 
-  let signal = options.signal;
+  let newSignal = signal;
 
-  if (!signal) {
+  if (!newSignal) {
     const controller = new AbortController();
-    signal = controller.signal;
+    newSignal = controller.signal;
   }
 
   try {
     const response = await fetch(url, {
       ...options,
       headers,
-      signal,
+      signal: newSignal,
     });
 
     if (!response.ok) {
