@@ -24,7 +24,6 @@ export function useLogin({ isPwForgotten = false }) {
       url,
       method: API_ENDPOINTS.POST.METHOD,
       successDescription: "Vous êtes maintenant connecté(e).",
-      silent: true,
       onSuccess(data) {
         if (!isPwForgotten) {
           login({
