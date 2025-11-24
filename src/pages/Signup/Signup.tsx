@@ -1,8 +1,4 @@
 import { Inputs } from "@/components/Inputs/Inputs.tsx";
-import type {
-  SignupFormProps,
-  SignupFormSchema,
-} from "@/components/SignupForm/types/signup.types.ts";
 import {
   DialogHeaderTitle,
   HeaderTitle,
@@ -13,6 +9,11 @@ import { Field, FieldGroup } from "@/components/ui/field.tsx";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSignup } from "@/hooks/database/signup/useSignup.ts";
 import { signupSchema } from "@/models/signup.models.ts";
+import type {
+  SignupInputItem,
+  SignupFormSchema,
+} from "@/pages/Signup/types/signup.types.ts";
+import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { cn } from "@/utils/utils.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
@@ -32,7 +33,7 @@ export function Signup({
   className,
   inputControllers,
   ...props
-}: SignupFormProps) {
+}: Readonly<PageWithControllers<SignupInputItem>>) {
   const { data, isLoaded, isLoading, onSubmit, error } = useSignup();
   const { closeAllDialogs } = useDialog();
 
