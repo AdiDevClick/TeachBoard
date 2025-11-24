@@ -4,6 +4,8 @@ import {
   type FetchJSONError,
   type FetchJSONSuccess,
 } from "@/api/types/api.types";
+import { DEV_MODE } from "@/configs/app.config.ts";
+import type { DEV_MODE } from "@/configs/app.config.ts";
 import type {
   HttpMethod,
   MutationVariables,
@@ -101,7 +103,7 @@ export function useQueryOnSubmit<
   const onSubmit = useCallback(
     async (variables: MutationVariables = undefined) => {
       try {
-        if (import.meta.env.DEV) {
+        if (DEV_MODE) {
           console.debug("useQueryOnSubmit executing mutation");
         }
         return await mutateAsync(variables);
@@ -112,7 +114,7 @@ export function useQueryOnSubmit<
         }
         return await error;
         // Errors are handled via the mutation onError callback.
-        if (import.meta.env.DEV) {
+        if (DEV_MODE) {
           console.debug("useQueryOnSubmit mutation rejected", error);
         }
       }
