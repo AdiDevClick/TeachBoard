@@ -18,6 +18,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
+/**
+ * Signup form component
+ *
+ * @param modaleMode - Flag to indicate if the form is in modal mode (default: false)
+ * @param className - Additional class names for the component
+ * @param inputControllers - Array of input controller objects.
+ * This needs to be stricly typed to match the SignupFormSchema
+ * @param props - Optional props for the component of div type for the Card
+ */
 export function Signup({
   modaleMode = false,
   className,
@@ -40,7 +49,6 @@ export function Signup({
     if (data && isLoaded) {
       form.reset();
       closeAllDialogs();
-      // closeDialog(null, "signup");
     }
     if (import.meta.env.DEV) {
       console.debug("Signup Component:", { data, isLoaded, isLoading, error });
