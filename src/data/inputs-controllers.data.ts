@@ -1,4 +1,6 @@
+import type { InputItem } from "@/components/Inputs/types/InputsTypes.ts";
 import type { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
+import type { RecoveryFormSchema } from "@/components/LoginForms/types/login-forms.types.ts";
 import type { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
 import type { Signup } from "@/pages/Signup/Signup.tsx";
 
@@ -69,4 +71,4 @@ export const passwordRecoveryInputControllers = [
     placeholder: "m@example.com",
     autoComplete: "email",
   },
-] satisfies Parameters<typeof PasswordCreation>[0]["inputControllers"];
+] satisfies InputItem<RecoveryFormSchema>[];
