@@ -22,7 +22,7 @@ import { Activity, type MouseEvent } from "react";
  */
 export function AppSidebar({ ...props }: SidebarProps) {
   const { state } = useSidebar();
-  const { data, onSubmit } = useUserLogout();
+  const onSubmit = useUserLogout().onSubmit;
 
   const handleOnFooterButtonsClick = (e: MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLDivElement;
