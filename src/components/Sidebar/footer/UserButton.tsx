@@ -37,7 +37,7 @@ export function UserButton({
 
   return (
     <SidebarMenu>
-      <SidebarMenuItem>
+      <SidebarMenuItem className="sidebarButton--effect">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton size="lg" className="sidebarButton--menu">
