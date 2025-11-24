@@ -5,7 +5,6 @@ import {
   type FetchJSONSuccess,
 } from "@/api/types/api.types";
 import { DEV_MODE } from "@/configs/app.config.ts";
-import type { DEV_MODE } from "@/configs/app.config.ts";
 import type {
   HttpMethod,
   MutationVariables,
