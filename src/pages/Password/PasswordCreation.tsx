@@ -32,12 +32,12 @@ let description =
  * Password Creation Form Schema
  *
  * @param props - All props forwarded to the Card component
- * @param modaleMode - Flag to indicate if the form is in modal mode (default: false)
+ * @param modalMode - Flag to indicate if the form is in modal mode (default: false)
  * @param inputControllers - Array of input controller objects
  * @returns
  */
 export function PasswordCreation({
-  modaleMode = false,
+  modalMode = false,
   className,
   inputControllers,
   ...props

@@ -1,8 +1,8 @@
 import type {
-  ModaleProps,
+  ModalProps,
   ModalState,
   WithSimpleAlertProps,
-} from "@/components/Modale/types/modale.types.ts";
+} from "@/components/Modal/types/modal.types.ts";
 import { DialogHeaderTitle } from "@/components/Titles/ModalTitle.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Card } from "@/components/ui/card.tsx";
@@ -16,45 +16,45 @@ import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useUserEventListener } from "@/hooks/events/useUserEventListener";
 import { wait } from "@/utils/utils.ts";
 import "@css/Dialog.scss";
-import { useEffect, useState, type ComponentType, type Ref } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import { useLocation } from "react-router-dom";
 
 /**
- * Modale component
- * In order to trigger the modale, simply call the `useDialog` hook and use its `openDialog` method with the corresponding modale name.
+ * Modal component
+ * In order to trigger the modal, simply call the `useDialog` hook and use its `openDialog` method with the corresponding modal name.
  *
- * @description Choose a name for your modale instance.
- * Note that a name can correspond to only one modale instance and can have its own styles.
+ * @description Choose a name for your modal instance.
+ * Note that a name can correspond to only one modal instance and can have its own styles.
  *
- * @param children - Content the modale will observe (e.g., trigger button)
- * @param modaleContent - Content to be displayed inside the modal content area
- * @param modaleName - Name for your modale instance.
+ * @param children - Content the modal will observe (e.g., trigger button)
+ * @param modalContent - Content to be displayed inside the modal content area
+ * @param modalName - Name for your modal instance.
  * !! IMPORTANT !! NAME IS MANDATORY AND SHOULD BE UNIQUE ACROSS YOUR APPLICATION.
  * @param onOpenChange - Function to handle changes in the open state if needed
- * @param onOpen - Boolean to control the open state of the modale externally
- * @param onNodeReady - Function that receives the modale content ref when it's ready (this helps avoid issues with forms inside modales)
+ * @param onOpen - Boolean to control the open state of the modal externally
+ * @param onNodeReady - Function that receives the modal content ref when it's ready (this helps avoid issues with forms inside modals)
  *
  * @example
  * ```tsx
  * const { setRef, observedRef } = useMutationObserver({});
- * return (<Modale
- *   modaleName="myUniqueModaleName"
- *   modaleContent={<div ref={setRef}>My Triggered Modale Content</div>}
+ * return (<Modal
+ *   modalName="myUniqueModalName"
+ *   modalContent={<div ref={setRef}>My Triggered Modal Content</div>}
  *   onNodeReady={observedRef}
  *   onOpen={myOptionalOverrideFunctionThatReturnsBoolean}
  *   onOpenChange={myOptionalOverrideFunctionThatHandlesOpenChange}
  * />)
- * <Button onClick={openDialog("myUniqueModaleName")}>Open Modale</Button>
+ * <Button onClick={openDialog("myUniqueModalName")}>Open Modal</Button>
  * ```
  */
-export function Modale({
+export function Modal({
   children,
-  modaleContent,
-  modaleName,
+  modalContent,
+  modalName,
   onNodeReady,
   onOpen,
   onOpenChange,
-}: Readonly<ModaleProps>) {
+}: Readonly<ModalProps>) {
   const { myEvent: popStateEvent } = useUserEventListener("popstate");
   const { myEvent: userMouseEvent } = useUserEventListener("pointerdown");
   const location = useLocation();
@@ -68,7 +68,7 @@ export function Modale({
     forward: null,
     isReady: false,
     previousUrl: "",
-    modaleName: "",
+    modalName: "",
     isOpen: false,
     locationState: "",
     url: "",
@@ -78,10 +78,10 @@ export function Modale({
     userInput: null,
   });
 
-  const className = `dialog__content dialog__content--${modaleName}`;
+  const className = `dialog__content dialog__content--${modalName}`;
   const onOpenChangeHandler = onOpenChange ?? contextOnOpenChange;
-  const isOpen = onOpen ?? isDialogOpen(modaleName);
-  const modalURL = `/${modaleName}`;
+  const isOpen = onOpen ?? isDialogOpen(modalName);
+  const modalURL = `/${modalName}`;
   // User clicked a mouse button
   const mouseButton = userMouseEvent?.button;
   // Router believes current path
@@ -90,7 +90,7 @@ export function Modale({
   const currentLocation = globalThis.location.pathname;
 
   /**
-   * @todo modale ouverte : forwardstate => ne fait rien
+   * @todo modal ouverte : forwardstate => ne fait rien
    */
 
   /**
@@ -108,9 +108,9 @@ export function Modale({
     /**
      * Case 1 : Normal Back -
      *
-     * @description Modale is closed via back navigation-
+     * @description Modal is closed via back navigation-
      * Browser should handle the history change itself
-     * and modale URL can still be in history for forward navigation.
+     * and modal URL can still be in history for forward navigation.
      */
     if (!isOpen && modalState.isOpen && currentLocation !== modalURL) {
       popState = true;
@@ -185,8 +185,8 @@ export function Modale({
       ...history.state,
       forwardURL: modalURL,
     };
-    // Force close the modale if opened
-    if (isDialogOpen(modaleName)) closeDialog(popStateEvent, modaleName);
+    // Force close the modal if opened
+    if (isDialogOpen(modalName)) closeDialog(popStateEvent, modalName);
 
     const userIsOnModalURL = currentLocation === modalURL;
     const userIsOnPreviousURL = currentLocation === modalState.previousUrl;
@@ -195,7 +195,7 @@ export function Modale({
     const shouldGoBack =
       userIsOnModalURL && browserUrlIsDifferentThanRouter && targetUrl;
 
-    // Case 1 : user closes modale with a click on close cross or outside the modale
+    // Case 1 : user closes modal with a click on close cross or outside the modal
     if (shouldGoBack) {
       history.back();
       waitAndReplace(stateObj, modalState.previousUrl);
@@ -237,7 +237,7 @@ export function Modale({
       waitAndPush(
         {
           ...history.state,
-          modaleName,
+          modalName,
           backgroundURL: currentPathLocation,
           actualURL: modalURL,
           ...popStateEvent?.state,
@@ -280,10 +280,10 @@ export function Modale({
   return (
     <Dialog
       open={isOpen as boolean}
-      onOpenChange={() => onOpenChangeHandler(modaleName)}
+      onOpenChange={() => onOpenChangeHandler(modalName)}
     >
       {children}
-      <DialogContent className={className}>{modaleContent}</DialogContent>
+      <DialogContent className={className}>{modalContent}</DialogContent>
     </Dialog>
   );
 }
@@ -310,11 +310,11 @@ async function waitAndReplace(state: object, url: string, timer = 70) {
 /**
  * Higher-order component to create a simple alert modal
  *
- * @description This contains a title, description and an Ok button to close the modale.
+ * @description This contains a title, description and an Ok button to close the modal.
  */
-export const WithSimpleAlert = withSimpleAlert(Modale);
+export const WithSimpleAlert = withSimpleAlert(Modal);
 
-function withSimpleAlert(WrappedComponent: ComponentType<ModaleProps>) {
+function withSimpleAlert(WrappedComponent: ComponentType<ModalProps>) {
   return ({
     headerTitle,
     headerDescription,
@@ -323,7 +323,7 @@ function withSimpleAlert(WrappedComponent: ComponentType<ModaleProps>) {
   }: WithSimpleAlertProps) => (
     <WrappedComponent
       {...rest}
-      modaleContent={
+      modalContent={
         <Card ref={ref}>
           <DialogHeaderTitle
             title={headerTitle}

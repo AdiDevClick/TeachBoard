@@ -10,8 +10,8 @@ import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSignup } from "@/hooks/database/signup/useSignup.ts";
 import { signupSchema } from "@/models/signup.models.ts";
 import type {
-  SignupInputItem,
   SignupFormSchema,
+  SignupInputItem,
 } from "@/pages/Signup/types/signup.types.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { cn } from "@/utils/utils.ts";
@@ -22,14 +22,14 @@ import { useForm } from "react-hook-form";
 /**
  * Signup form component
  *
- * @param modaleMode - Flag to indicate if the form is in modal mode (default: false)
+ * @param modalMode - Flag to indicate if the form is in modal mode (default: false)
  * @param className - Additional class names for the component
  * @param inputControllers - Array of input controller objects.
  * This needs to be stricly typed to match the SignupFormSchema
  * @param props - Optional props for the component of div type for the Card
  */
 export function Signup({
-  modaleMode = false,
+  modalMode = false,
   className,
   inputControllers,
   ...props
@@ -60,7 +60,7 @@ export function Signup({
    * Determine the title component based on modal mode
    * @description Uses HeaderTitle directly in modal mode, otherwise wraps it with the dialog header HOC
    */
-  const Title = modaleMode ? DialogHeaderTitle : HeaderTitle;
+  const Title = modalMode ? DialogHeaderTitle : HeaderTitle;
 
   return (
     <Card className={cn("flex flex-col gap-6", className)} {...props}>

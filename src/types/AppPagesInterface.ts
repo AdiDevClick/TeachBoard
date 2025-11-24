@@ -9,5 +9,5 @@ export interface PageWithControllers<T = unknown>
   extends ComponentProps<"div"> {
   inputControllers: T[];
   className?: string;
-  modaleMode?: boolean;
+  modalMode?: boolean;
 }

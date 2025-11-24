@@ -26,7 +26,7 @@ import { formSchema } from "@/models/login.models.ts";
 import { pwRecoverySchema } from "@/models/pw-recovery.model.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import {
-  handleModaleOpening,
+  handleModalOpening,
   preventDefaultAndStopPropagation,
   wait,
 } from "@/utils/utils.ts";
@@ -53,7 +53,7 @@ export function LoginForm({
   ref,
   className,
   inputControllers,
-  modaleMode = false,
+  modalMode = false,
   ...props
 }: Readonly<PageWithControllers<LoginInputItem>>) {
   const navigate = useNavigate();
@@ -130,7 +130,7 @@ export function LoginForm({
         console.debug("Mutation resolved", data);
       }
     }
-  }, [isLoading, error, data, open, modaleMode]);
+  }, [isLoading, error, data, open, modalMode]);
 
   const handleRecoverPasswordClick = (e: MouseEvent<HTMLAnchorElement>) => {
     preventDefaultAndStopPropagation(e);
@@ -147,7 +147,7 @@ export function LoginForm({
    * Determine the title component based on modal mode
    * @description Uses HeaderTitle directly in modal mode, otherwise wraps it with the dialog header HOC
    */
-  const Title = modaleMode ? DialogHeaderTitle : HeaderTitle;
+  const Title = modalMode ? DialogHeaderTitle : HeaderTitle;
 
   let inputControllersToUse = inputControllers;
   let pwForgottenLinkText = "Mot de passe oublié ?";
@@ -204,7 +204,7 @@ export function LoginForm({
                 linkText="Inscrivez-vous ici"
                 linkTo="/signup"
                 onClick={(e) =>
-                  handleModaleOpening({
+                  handleModalOpening({
                     e,
                     dialogFns: { closeAllDialogs, openDialog },
                     modalName: "signup",

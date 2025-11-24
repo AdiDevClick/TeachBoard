@@ -107,7 +107,7 @@ export type ComponentLike<P = unknown> =
  * Replace the given prop S with inferred content props based on the provided component.
  */
 export type EnsureContentProps<T, S extends string> = T extends {
-  modaleContent: infer C;
+  modalContent: infer C;
 }
   ? C extends AnyComponentLike
     ? Omit<T, S> & { contentProps: ContentPropsFor<C> }

@@ -74,7 +74,7 @@ export function preventDefaultAndStopPropagation(
  * @param dialogFns - An object containing functions to manage dialog state.
  * @param modalName - The name of the modal to open (default is "signup").
  */
-export function handleModaleOpening({
+export function handleModalOpening({
   e,
   dialogFns,
   modalName = "signup",
