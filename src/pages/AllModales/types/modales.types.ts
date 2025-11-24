@@ -26,11 +26,8 @@ type SimpleAlertModaleProps = SimpleAlertRequiredProps &
     >
   >;
 
-export type StandardModaleConfig<
-  Name extends AppModalNames,
-  TComponent extends ComponentLike<unknown>
-> = {
-  modaleName: Name;
+export type StandardModaleConfig<TComponent extends ComponentLike<unknown>> = {
+  modaleName: AppModalNames;
   type: ComponentType<ModaleProps>;
   modaleContent: TComponent;
   modaleProps?: StandardModaleProps;
@@ -40,8 +37,8 @@ export type StandardModaleConfig<
 /**
  * WithSimpleAlert wrapper config (returns a prewired modal without a modaleContent prop)
  */
-export type SimpleAlertConfig<Name extends AppModalNames> = {
-  modaleName: Name;
+export type SimpleAlertConfig = {
+  modaleName: AppModalNames;
   type: ComponentType<WithSimpleAlertProps>;
   modaleProps: SimpleAlertModaleProps;
   contentProps?: never;
@@ -49,8 +46,8 @@ export type SimpleAlertConfig<Name extends AppModalNames> = {
 };
 
 export type AppModale =
-  | StandardModaleConfig<AppModalNames, AnyComponentLike>
-  | SimpleAlertConfig<AppModalNames>;
+  | StandardModaleConfig<AnyComponentLike>
+  | SimpleAlertConfig;
 
 type StrictModalesList<T extends readonly AppModale[]> = EnsureContentList<
   T,

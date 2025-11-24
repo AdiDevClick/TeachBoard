@@ -54,6 +54,11 @@ const modales = defineStrictModalesList([
 
 /**
  * AppModales component to render all modals used in the application.
+ *
+ * @param modalesList - List of modal configurations to render.
+ *
+ * @description The list have to be created with defineStrictModalesList to ensure proper typing.
+ * {@link modales}
  */
 export function AppModales({
   modalesList = modales,
