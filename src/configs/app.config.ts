@@ -49,7 +49,8 @@ export type AppModalNames =
   | "none"
   | "signup"
   | "pw-recovery"
-  | "pw-recovery-email-sent";
+  | "pw-recovery-email-sent"
+  | "class-creation";
 
 /**
  * Pages that do not require session checks
