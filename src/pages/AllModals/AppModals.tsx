@@ -1,3 +1,4 @@
+import { ClassCreation } from "@/components/ClassCreation/ClassCreation.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
 import { Modal, WithSimpleAlert } from "@/components/Modal/Modal.tsx";
@@ -48,6 +49,15 @@ const modals = defineStrictModalsList([
       headerTitle: "Demande envoyée",
       headerDescription:
         "Vérifiez votre boîte mail pour réinitialiser votre mot de passe.",
+    },
+  },
+  {
+    modalName: "class-creation",
+    type: Modal,
+    modalContent: ClassCreation,
+    contentProps: {
+      // inputControllers: inputSignupControllers,
+      modalMode: true,
     },
   },
 ]) satisfies Parameters<typeof AppModals>[0]["modalsList"];
