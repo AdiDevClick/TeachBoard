@@ -35,7 +35,8 @@
       "@icons/*": ["assets/icons/*"],
       "@data/*": ["data/*"],
       "@utils/*": ["utils/*"],
-      "@hooks/*": ["hooks/*"]
+      "@hooks/*": ["hooks/*"],
+      "@components/*": ["components/*"]
     }
   },
   "include": ["src"]
