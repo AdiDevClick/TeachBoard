@@ -45,7 +45,7 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
     mutationKey: queryKeysArr,
     mutationFn: (variables) => {
       const fetchArgs = {
-        variables,
+        bodyVariables: variables,
         method,
         url,
         abortController: abortController,
@@ -165,7 +165,7 @@ async function onFetch<
   retry = 3,
   ...fetchArgs
 }: FetchArgs): Promise<FetchJSONSuccess<TSuccess>> {
-  const { variables, method, url, abortController, headers } = fetchArgs;
+  const { bodyVariables, method, url, abortController, headers } = fetchArgs;
 
   if (abortController?.signal.aborted) {
     const reason = abortController.signal.reason;
@@ -180,7 +180,7 @@ async function onFetch<
   try {
     const response = await fetchJSON<TSuccess, TError>(getUrl(url), {
       method: method,
-      json: variables,
+      json: bodyVariables,
       signal: abortController?.signal,
       headers: headers,
     });

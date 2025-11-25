@@ -42,6 +42,19 @@ export type QueryOnSubmitMutationState = {
 
 export type HttpMethod = (typeof HTTP_METHODS)[number];
 
+/**
+ * Arguments for fetch function used in queries and mutations.
+ */
+export type FetchArgs = {
+  bodyVariables: MutationVariables;
+  method: HttpMethod;
+  headers?: Headers;
+  url?: string;
+  abortController?: AbortController;
+  retry?: number;
+  timeout?: number;
+};
+
 export type GenericQueryResults<S, E> = {
   [K in keyof S]: S[K];
 } & {
@@ -53,6 +66,8 @@ export type QueryKeyDescriptor<S, E> = [
   descriptor: {
     url: string;
     method?: HttpMethod;
+    headers?: Headers;
+    abortController?: AbortController;
     successDescription?: string;
     silent?: boolean;
     onSuccess?: (data: FetchJSONSuccess<S>) => void;
