@@ -1,3 +1,4 @@
+import type { VerticalSelectProps } from "@/components/Selects/types/select.types.ts";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -6,17 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/utils/utils";
-import { type ComponentProps, ReactNode, useId } from "react";
-
-type VerticalSelectProps = ComponentProps<typeof Select> & {
-  label?: ReactNode;
-  placeholder?: string;
-  fullWidth?: boolean;
-  className?: string;
-  /** id to apply on the Trigger element for label association */
-  triggerId?: string;
-  children?: ReactNode;
-};
+import { useId } from "react";
 
 /**
  * A card-like select field with vertical layout on selection options.
@@ -33,7 +24,7 @@ export function VerticalFieldSelect({
   placeholder,
   fullWidth = true,
   className,
-  children,
+  side = "bottom",
   ...props
 }: VerticalSelectProps) {
   const id = useId();
@@ -55,7 +46,7 @@ export function VerticalFieldSelect({
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
 
-        <SelectContent>{children}</SelectContent>
+        <SelectContent side={side}>{props.children}</SelectContent>
       </Select>
     </div>
   );

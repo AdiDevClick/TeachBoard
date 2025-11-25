@@ -15,6 +15,7 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
+    "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
 
@@ -25,6 +26,7 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+
     /* Base Config */
     "baseUrl": "./src",
     "paths": {
@@ -35,7 +37,8 @@
       "@icons/*": ["assets/icons/*"],
       "@data/*": ["data/*"],
       "@utils/*": ["utils/*"],
-      "@hooks/*": ["hooks/*"]
+      "@hooks/*": ["hooks/*"],
+      "@components/*": ["components/*"]
     }
   },
   "include": ["src"]
