@@ -4,6 +4,7 @@ import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/Non
 import VerticalFieldSelect from "@/components/Selects/VerticalFieldSelect.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { SelectItem, SelectSeparator } from "@/components/ui/select.tsx";
+import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useClasses } from "@/hooks/database/classes/useClasses.ts";
 import { wait } from "@/utils/utils";
 import { SelectIcon } from "@radix-ui/react-select";
@@ -18,6 +19,7 @@ export function StepOne({
   readonly title: string;
   readonly placeholder?: string;
 }) {
+  const { openDialog } = useDialog();
   const [selected, setSelected] = useState(false);
 
   const { data, onSubmit, isLoading, isLoaded, error } = useClasses();
@@ -32,7 +34,7 @@ export function StepOne({
    * @param e - The pointer event triggered on adding a class.
    */
   const onClassAdd = async (e: PointerEvent<HTMLDivElement>) => {
-    e.preventDefault();
+    openDialog(e, "class-creation");
     setSelected(true);
     await wait(150);
     setSelected(false);
@@ -87,13 +89,15 @@ export function StepOne({
               +
             </SelectIcon>
           </SelectItem>
-          <SelectSeparator />
-          {data && (
-            <ListMapper items={data.data.classes}>
-              <LabelledGroup ischild>
-                <NonLabelledGroupItem />
-              </LabelledGroup>
-            </ListMapper>
+          {data?.data?.classes.length > 0 && (
+            <>
+              <SelectSeparator />
+              <ListMapper items={data.data.classes}>
+                <LabelledGroup ischild>
+                  <NonLabelledGroupItem />
+                </LabelledGroup>
+              </ListMapper>
+            </>
           )}
         </VerticalFieldSelect>
       </CardContent>
