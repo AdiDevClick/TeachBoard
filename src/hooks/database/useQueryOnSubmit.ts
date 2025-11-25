@@ -6,7 +6,7 @@ import {
 } from "@/api/types/api.types";
 import { DEV_MODE } from "@/configs/app.config.ts";
 import type {
-  HttpMethod,
+  FetchArgs,
   MutationVariables,
   QueryKeyDescriptor,
 } from "@/hooks/database/types/QueriesTypes.ts";
@@ -23,7 +23,7 @@ import { toast } from "sonner";
  * @description Centralizing mutation functions
  */
 const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
-  queryKeys: QueryKeyDescriptor<S, E>
+  queryKeysArr: QueryKeyDescriptor<S, E>
 ): UseMutationOptions<
   FetchJSONSuccess<S>,
   FetchJSONError<E>,
@@ -39,21 +39,20 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
     onError,
     reset,
     abortController,
-  } = queryKeys[1];
-  // } = queryKeys[1] ?? {};
+  } = queryKeysArr[1];
 
   return {
-    mutationKey: queryKeys,
-    mutationFn: (variables) =>
-      onFetch<S, E>(
+    mutationKey: queryKeysArr,
+    mutationFn: (variables) => {
+      const fetchArgs = {
         variables,
         method,
         url,
-        3,
-        1000,
-        abortController as AbortController,
-        headers
-      ),
+        abortController: abortController,
+        headers,
+      };
+      return onFetch<S, E>(fetchArgs);
+    },
     onSuccess: (response) => {
       abortController?.abort(
         new Error("Request completed", { cause: response })
@@ -76,20 +75,40 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
  *
  * @description When a success occurs, an error reset is performed to clear any previous errors.
  *
- * @param queryKeys The query key descriptor containing task and descriptor.
+ * @param queryKeysArr The query key descriptor containing task and descriptor.
+ *
+ * @example
+ * ```tsx
+ * const { data, isLoading, isLoaded, error, onSubmit } = useQueryOnSubmit([
+ *   USER_ACTIVITIES.signup,
+ *   {
+ *    url: API_ENDPOINTS.POST.SIGNUP,
+ *   method: "POST",
+ *  successDescription: "Signup successful.",
+ * onSuccess(data) {
+ *   console.log("Signup successful:", data);
+ * },
+ * onError(error) {
+ *   console.error("Signup error:", error);
+ * }
+ * ]);
+ * ```
  */
 export function useQueryOnSubmit<
   S extends ResponseInterface,
   E extends ApiError
->(queryKeys: QueryKeyDescriptor<S, E>) {
+>(queryKeysArr: QueryKeyDescriptor<S, E>) {
   const { reset } = useQueryErrorResetBoundary();
   const abortControllerRef = useRef(new AbortController());
 
-  queryKeys[1].abortController = abortControllerRef.current;
-  queryKeys[1].reset = reset;
+  queryKeysArr[1].abortController ??= abortControllerRef.current;
+  queryKeysArr[1].reset = reset;
 
   // Memoize mutation options to prevent observer recreation on every render
-  const options = useMemo(() => mutationOptions<S, E>(queryKeys), [queryKeys]);
+  const options = useMemo(
+    () => mutationOptions<S, E>(queryKeysArr),
+    [queryKeysArr]
+  );
 
   const { mutateAsync, data, isPending, error } = useMutation(options);
 
@@ -141,24 +160,29 @@ export function useQueryOnSubmit<
 async function onFetch<
   TSuccess extends ResponseInterface,
   TError extends ApiError
->(
-  variables: MutationVariables,
-  queryMethod: HttpMethod,
-  queryUrl?: string,
-  retry = 3,
+>({
   timeout = 1000,
-  abortController?: AbortController,
-  queryHeaders?: Record<string, string>
-): Promise<FetchJSONSuccess<TSuccess>> {
+  retry = 3,
+  ...fetchArgs
+}: FetchArgs): Promise<FetchJSONSuccess<TSuccess>> {
+  const { variables, method, url, abortController, headers } = fetchArgs;
+
   if (abortController?.signal.aborted) {
-    return;
+    const reason = abortController.signal.reason;
+
+    if (reason) {
+      throw reason;
+    }
+
+    throw new Error("Request aborted");
   }
+
   try {
-    const response = await fetchJSON<TSuccess, TError>(getUrl(queryUrl), {
-      method: queryMethod,
+    const response = await fetchJSON<TSuccess, TError>(getUrl(url), {
+      method: method,
       json: variables,
       signal: abortController?.signal,
-      headers: queryHeaders,
+      headers: headers,
     });
 
     if (!response.ok || response === undefined) {
@@ -174,7 +198,6 @@ async function onFetch<
       });
     }
 
-    // At this point response.ok is true, so cast to the success variant
     return response;
   } catch (error) {
     const err = error as Error;
@@ -185,15 +208,11 @@ async function onFetch<
 
     if (shouldRetry(errorCause.status, retry)) {
       await wait(timeout);
-      return onFetch(
-        variables,
-        queryMethod,
-        queryUrl,
-        retry - 1,
-        timeout,
-        abortController,
-        queryHeaders
-      );
+      return onFetch({
+        ...fetchArgs,
+        retry: retry - 1,
+        timeout: timeout * 2,
+      });
     }
 
     throw errorCause;
