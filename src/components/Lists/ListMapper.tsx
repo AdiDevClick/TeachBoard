@@ -66,15 +66,20 @@ export function ListMapper<
       return null;
     }
 
-    const itemId =
-      typeof item === "object" && "id" in item
-        ? item.id
-        : index * Math.random();
+    // !!IMPORTANT!! For consistency, ListMapper MUST return an object containing the id and its item.
+    // Generate a stable key for each item -
+    // If the item does not have an id (e.g., a primitive), construct one.
+    if (typeof item !== "object") {
+      item = { item };
+    }
+
+    const itemId = "id" in item ? item.id : index * Math.random();
 
     // Case A: component prop provided (act as a Component but you provide the child to display as a prop)
 
     if (component) {
       const Component = component;
+
       return (
         <Fragment key={String(itemId)}>
           <Component {...item} {...optional} {...props} />
@@ -89,6 +94,7 @@ export function ListMapper<
         index: number,
         optional?: TOptional
       ) => ReactNode;
+
       return renderFn(item, index, optional);
     }
 
