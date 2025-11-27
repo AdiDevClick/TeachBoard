@@ -1,7 +1,8 @@
 import { ClassCreation } from "@/components/ClassCreation/ClassCreation.tsx";
+import { DiplomaCreation } from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
-import { Modal, WithSimpleAlert } from "@/components/Modal/Modal.tsx";
+import { Modal, ModalWithSimpleAlert } from "@/components/Modal/Modal.tsx";
 import {
   inputLoginControllers,
   inputSignupControllers,
@@ -44,8 +45,9 @@ const modals = defineStrictModalsList([
   },
   {
     modalName: "pw-recovery-email-sent",
-    type: WithSimpleAlert,
+    type: ModalWithSimpleAlert,
     modalProps: {
+      isNavigationModal: false,
       headerTitle: "Demande envoyée",
       headerDescription:
         "Vérifiez votre boîte mail pour réinitialiser votre mot de passe.",
@@ -55,8 +57,23 @@ const modals = defineStrictModalsList([
     modalName: "class-creation",
     type: Modal,
     modalContent: ClassCreation,
+    modalProps: {
+      isNavigationModal: false,
+    },
     contentProps: {
       // inputControllers: inputSignupControllers,
+      modalMode: true,
+    },
+  },
+  {
+    modalName: "create-diploma",
+    type: Modal,
+    modalContent: DiplomaCreation,
+    modalProps: {
+      className: "max-w-2",
+      isNavigationModal: false,
+    },
+    contentProps: {
       modalMode: true,
     },
   },

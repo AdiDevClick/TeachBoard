@@ -33,6 +33,7 @@ export const USER_ACTIVITIES = Object.freeze({
   none: "none",
   sessionCheck: "session-check",
   classes: "classes",
+  classCreation: "class-creation",
   signup: "signup",
   signupValidation: "signup-validation",
   passwordCreation: "password-creation",
@@ -50,7 +51,8 @@ export type AppModalNames =
   | "signup"
   | "pw-recovery"
   | "pw-recovery-email-sent"
-  | "class-creation";
+  | "class-creation"
+  | "create-diploma";
 
 /**
  * Pages that do not require session checks

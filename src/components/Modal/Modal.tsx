@@ -54,6 +54,7 @@ export function Modal({
   onNodeReady,
   onOpen,
   onOpenChange,
+  isNavigationModal = true,
 }: Readonly<ModalProps>) {
   const { myEvent: popStateEvent } = useUserEventListener("popstate");
   const { myEvent: userMouseEvent } = useUserEventListener("pointerdown");
@@ -269,13 +270,14 @@ export function Modal({
    * @description This is the init
    */
   useEffect(() => {
+    if (!isNavigationModal) return;
     if (onNodeReady && modalState.isReady !== onNodeReady) {
       setModalState((prev) => ({
         ...prev,
         isReady: onNodeReady ?? false,
       }));
     }
-  }, [onNodeReady, modalState.isReady]);
+  }, [onNodeReady, modalState.isReady, isNavigationModal]);
 
   return (
     <Dialog
@@ -307,13 +309,6 @@ async function waitAndReplace(state: object, url: string, timer = 70) {
   history.replaceState(state, "", url);
 }
 
-/**
- * Higher-order component to create a simple alert modal
- *
- * @description This contains a title, description and an Ok button to close the modal.
- */
-export const WithSimpleAlert = withSimpleAlert(Modal);
-
 function withSimpleAlert(WrappedComponent: ComponentType<ModalProps>) {
   return ({
     headerTitle,
@@ -339,3 +334,10 @@ function withSimpleAlert(WrappedComponent: ComponentType<ModalProps>) {
     />
   );
 }
+
+/**
+ * Higher-order component to create a simple alert modal
+ *
+ * @description This contains a title, description and an Ok button to close the modal.
+ */
+export const ModalWithSimpleAlert = withSimpleAlert(Modal);

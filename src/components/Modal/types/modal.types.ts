@@ -10,6 +10,7 @@ export type ModalProps = {
   onOpenChange?: (id: string) => void;
   onOpen?: (id: string) => boolean;
   onNodeReady?: HTMLElement;
+  isNavigationModal?: boolean;
 } & PropsWithChildren;
 
 export type ModalState = {

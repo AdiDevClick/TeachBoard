@@ -1,6 +1,6 @@
 import type {
-  ModalProps,
   WithSimpleAlertProps,
+  ModalProps,
 } from "@/components/Modal/types/modal.types.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type {
