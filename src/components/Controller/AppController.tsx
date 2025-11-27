@@ -49,7 +49,8 @@ function withController<C extends AnyComponentLike>(Wrapped: C) {
           <Field ref={ref} data-invalid={fieldState.invalid}>
             <Wrapped
               {...(restProps as ComponentPropsOf<AnyComponentLike>)}
-              {...field}
+              field={field}
+              fieldState={fieldState}
             />
             <FieldError errors={[fieldState.error]} />
           </Field>
