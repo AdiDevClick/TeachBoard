@@ -32,7 +32,8 @@ export const formSchema = z.object({
         }
       }
     })
-    .transform((v) => v.trim().toLowerCase()),
+    .toLowerCase(),
+  // .transform((v) => v.trim().toLowerCase()),
   password: z
     .string()
     .min(1, "Votre mot de passe doit contenir au moins 1 caractère.")
