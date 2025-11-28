@@ -19,6 +19,20 @@ import "@css/Dialog.scss";
 import { useEffect, useState, type ComponentType } from "react";
 import { useLocation } from "react-router-dom";
 
+const defaultModalState: ModalState = {
+  forward: null,
+  isReady: false,
+  previousUrl: "",
+  modalName: "",
+  isOpen: false,
+  locationState: "",
+  url: "",
+  historyIdx: null!,
+  isHandledByPopState: false,
+  isHandledByUserEvent: false,
+  userInput: null,
+};
+
 /**
  * Modal component
  * In order to trigger the modal, simply call the `useDialog` hook and use its `openDialog` method with the corresponding modal name.
@@ -32,15 +46,13 @@ import { useLocation } from "react-router-dom";
  * !! IMPORTANT !! NAME IS MANDATORY AND SHOULD BE UNIQUE ACROSS YOUR APPLICATION.
  * @param onOpenChange - Function to handle changes in the open state if needed
  * @param onOpen - Boolean to control the open state of the modal externally
- * @param onNodeReady - Function that receives the modal content ref when it's ready (this helps avoid issues with forms inside modals)
  *
  * @example
  * ```tsx
- * const { setRef, observedRef } = useMutationObserver({});
+ * const { setRef, observedRefs } = useMutationObserver({});
  * return (<Modal
  *   modalName="myUniqueModalName"
  *   modalContent={<div ref={setRef}>My Triggered Modal Content</div>}
- *   onNodeReady={observedRef}
  *   onOpen={myOptionalOverrideFunctionThatReturnsBoolean}
  *   onOpenChange={myOptionalOverrideFunctionThatHandlesOpenChange}
  * />)
@@ -51,7 +63,6 @@ export function Modal({
   children,
   modalContent,
   modalName,
-  onNodeReady,
   onOpen,
   onOpenChange,
   isNavigationModal = true,
@@ -63,21 +74,11 @@ export function Modal({
     isDialogOpen,
     onOpenChange: contextOnOpenChange,
     closeDialog,
+    setRef,
+    observedRefs,
   } = useDialog();
 
-  const [modalState, setModalState] = useState<ModalState>({
-    forward: null,
-    isReady: false,
-    previousUrl: "",
-    modalName: "",
-    isOpen: false,
-    locationState: "",
-    url: "",
-    historyIdx: null!,
-    isHandledByPopState: false,
-    isHandledByUserEvent: false,
-    userInput: null,
-  });
+  const [modalState, setModalState] = useState(defaultModalState);
 
   const className = `dialog__content dialog__content--${modalName}`;
   const onOpenChangeHandler = onOpenChange ?? contextOnOpenChange;
@@ -190,7 +191,7 @@ export function Modal({
     if (isDialogOpen(modalName)) closeDialog(popStateEvent, modalName);
 
     const userIsOnModalURL = currentLocation === modalURL;
-    const userIsOnPreviousURL = currentLocation === modalState.previousUrl;
+    // const userIsOnPreviousURL = currentLocation === modalState.previousUrl;
     const browserUrlIsDifferentThanRouter = currentLocation !== routerPath;
     const targetUrl = routerPath === modalState.previousUrl;
     const shouldGoBack =
@@ -265,19 +266,25 @@ export function Modal({
   }, [isOpen, modalState.isReady]);
 
   /**
-   * Verify and set the onNodeReady element
+   * Verify and set the observedRef element
    *
    * @description This is the init
    */
   useEffect(() => {
-    if (!isNavigationModal) return;
-    if (onNodeReady && modalState.isReady !== onNodeReady) {
-      setModalState((prev) => ({
-        ...prev,
-        isReady: onNodeReady ?? false,
-      }));
+    if (!isNavigationModal || !observedRefs || !modalName) return;
+
+    if (observedRefs.size > 0) {
+      const observedEntry = observedRefs.get(modalName);
+      const observedElement = observedEntry?.element ?? false;
+
+      if (modalState.isReady !== observedElement) {
+        setModalState((prev) => ({
+          ...prev,
+          isReady: observedElement,
+        }));
+      }
     }
-  }, [onNodeReady, modalState.isReady, isNavigationModal]);
+  }, [observedRefs, modalState.isReady, isNavigationModal, modalName]);
 
   return (
     <Dialog
@@ -285,7 +292,9 @@ export function Modal({
       onOpenChange={() => onOpenChangeHandler(modalName)}
     >
       {children}
-      <DialogContent className={className}>{modalContent}</DialogContent>
+      <DialogContent ref={setRef} id={modalName} className={className}>
+        {modalContent}
+      </DialogContent>
     </Dialog>
   );
 }
@@ -319,7 +328,10 @@ function withSimpleAlert(WrappedComponent: ComponentType<ModalProps>) {
     <WrappedComponent
       {...rest}
       modalContent={
-        <Card ref={ref}>
+        <Card
+          id={rest.modalName ? `${rest.modalName}-card` : undefined}
+          ref={ref}
+        >
           <DialogHeaderTitle
             title={headerTitle}
             description={headerDescription}
