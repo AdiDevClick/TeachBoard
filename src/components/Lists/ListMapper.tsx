@@ -1,8 +1,15 @@
 import type { ListMapperProps } from "@/components/Lists/types/ListsTypes.ts";
+import type {
+  AnyComponentLike,
+  ComponentPropsOf,
+  ExtractItemType,
+  MissingRequiredProps,
+} from "@/utils/types/types.utils.ts";
 import {
-  cloneElement,
   Fragment,
   isValidElement,
+  useId,
+  type ComponentType,
   type ElementType,
   type ReactNode,
 } from "react";
@@ -58,6 +65,7 @@ export function ListMapper<
   component,
   ...props
 }: Readonly<ListMapperProps<TItems, C, TOptional>>) {
+  const id = useId();
   const isArrayInput = Array.isArray(items);
   const itemsArray = isArrayInput ? items : Object.entries(items);
 
@@ -73,7 +81,11 @@ export function ListMapper<
       item = { item };
     }
 
-    const itemId = "id" in item ? item.id : index * Math.random();
+    if ("id" in item) {
+      // item.id exists
+    } else {
+      item.id = `${id}-${index * Math.random()}`;
+    }
 
     // Case A: component prop provided (act as a Component but you provide the child to display as a prop)
 
@@ -81,7 +93,7 @@ export function ListMapper<
       const Component = component;
 
       return (
-        <Fragment key={String(itemId)}>
+        <Fragment key={String(item.id)}>
           <Component {...item} {...optional} {...props} />
         </Fragment>
       );
@@ -106,9 +118,20 @@ export function ListMapper<
         ...optional,
       };
 
+      //   <Fragment key={String(item.id)}>
+      //     {cloneElement(children, injectedProps)}
+      //   </Fragment>
+      // );
+
+      const Component = children.type as ElementType;
+      const originalChildProps = (children.props ?? {}) as Record<
+        string,
+        unknown
+      >;
+
       return (
-        <Fragment key={String(itemId)}>
-          {cloneElement(children, injectedProps)}
+        <Fragment key={String(item.id)}>
+          <Component {...originalChildProps} {...injectedProps} />
         </Fragment>
       );
     }
@@ -116,3 +139,43 @@ export function ListMapper<
     return null;
   });
 }
+
+function withListMapper<C extends AnyComponentLike>(Wrapped: C) {
+  return function Component<
+    Items extends readonly unknown[] | Record<string, unknown>,
+    TOptional extends Record<string, unknown> | undefined,
+    P extends ComponentPropsOf<C> = ComponentPropsOf<C>
+  >(
+    props: Readonly<
+      Pick<
+        ListMapperProps<Items, ComponentType<P>, TOptional>,
+        "items" | "optional"
+      > &
+        Omit<P, keyof ExtractItemType<Items> | "children"> &
+        Partial<Pick<P, Extract<keyof ExtractItemType<Items>, keyof P>>> &
+        MissingRequiredProps<P, ExtractItemType<Items>>
+    >
+  ) {
+    const { items, optional, ...rest } = props;
+
+    return (
+      <ListMapper items={items} optional={optional}>
+        <Wrapped {...(rest as P)} />
+      </ListMapper>
+    );
+  };
+}
+
+/**
+ * HOC to wrap a component with ListMapper functionality.
+ *
+ * @example
+ *
+ * ```tsx
+ * const MyListItemWithListMapper = WithListMapper(MyComponentThatNeedsListMapping);
+ *
+ * How to use:
+ * <MyListItemWithListMapper items={myItems} optional={myOptionalProps} otherProp1={} />
+ * ```
+ */
+export const WithListMapper = withListMapper;
