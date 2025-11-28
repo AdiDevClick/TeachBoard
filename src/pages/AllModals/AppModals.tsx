@@ -7,7 +7,6 @@ import {
   inputLoginControllers,
   inputSignupControllers,
 } from "@/data/inputs-controllers.data.ts";
-import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import {
   defineStrictModalsList,
   isStandardModal,
@@ -88,8 +87,6 @@ const modals = defineStrictModalsList([
  * {@link modals}
  */
 export function AppModals({ modalsList = modals }: Readonly<AppModalsProps>) {
-  const { setRef, observedRef } = useMutationObserver({});
-
   return (
     <ListMapper items={modalsList}>
       {(modal) => {
@@ -101,14 +98,12 @@ export function AppModals({ modalsList = modals }: Readonly<AppModalsProps>) {
           const StandardModalComponent = modal.type;
           const ContentComponent = modal.modalContent;
 
-          const renderedContent = (
-            <ContentComponent ref={setRef} {...modal.contentProps} />
-          );
+          const renderedContent = <ContentComponent {...modal.contentProps} />;
 
           return (
             <StandardModalComponent
-              key={modalName}
-              onNodeReady={observedRef}
+              id={"modal-" + modalName + "-" + modal.id}
+              key={"modal-" + modalName + "-" + modal.id}
               modalName={modalName}
               modalContent={renderedContent}
               {...(modal.modalProps ?? {})}
@@ -120,10 +115,9 @@ export function AppModals({ modalsList = modals }: Readonly<AppModalsProps>) {
 
         return (
           <SimpleAlertComponent
-            key={modalName}
-            onNodeReady={observedRef}
+            id={"simple-modal-" + modalName + "-" + modal.id}
+            key={"simple-modal-" + modalName + "-" + modal.id}
             modalName={modalName}
-            ref={setRef}
             {...modal.modalProps}
           />
         );
