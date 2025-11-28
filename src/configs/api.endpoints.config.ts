@@ -4,6 +4,7 @@ const API_VERSION = "v1";
 //
 
 const AUTH = `${BASE_API_URL}/auth`;
+const DEGREES = `${BASE_API_URL}/degrees`;
 
 /**
  * API Endpoints Configuration
@@ -15,6 +16,7 @@ export const API_ENDPOINTS = Object.freeze({
       ALL: `${BASE_API_URL}/classes/`,
       BY_ID: (id: number | string) => `${BASE_API_URL}/classes/${id}`,
     },
+    DIPLOMAS: `${DEGREES}/config`,
     STUDENTS: `${BASE_API_URL}/students`,
     COURSES: `${BASE_API_URL}/courses`,
     USERS: `${BASE_API_URL}/users`,
@@ -25,7 +27,7 @@ export const API_ENDPOINTS = Object.freeze({
   },
   POST: {
     METHOD: "POST",
-    CREATE_CLASS: `${BASE_API_URL}/classes/create`,
+    CREATE_CLASS: `${BASE_API_URL}/classes`,
     AUTH: {
       LOGIN: `${AUTH}/login`,
       SIGNUP: `${AUTH}/signup`,
