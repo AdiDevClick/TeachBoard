@@ -1,5 +1,6 @@
 import { DialogContext } from "@/api/contexts/DialogContext.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
+import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
@@ -15,8 +16,8 @@ import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
  * @returns The DialogProvider component that wraps its children with Dialog context.
  */
 export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
-  // Use a Set to track all open dialog IDs (supports multiple dialogs)
   const [openDialogs, setOpenDialogs] = useState<Set<AppModalNames>>(new Set());
+  const { setRef, observedRefs, deleteRef } = useMutationObserver({});
 
   const openDialog = useCallback(
     (e: PreventDefaultAndStopPropagation, id: AppModalNames) => {
@@ -30,8 +31,6 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
     []
   );
 
-  const openedDialogs = useMemo(() => Array.from(openDialogs), [openDialogs]);
-
   const closeDialog = useCallback(
     (e: PreventDefaultAndStopPropagation, id?: AppModalNames) => {
       preventDefaultAndStopPropagation(e);
@@ -39,10 +38,14 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
         const next = new Set(prev);
         if (id) {
           next.delete(id);
+          deleteRef(id);
         } else {
           // If no ID provided, close the most recent dialog
           const lastId = Array.from(next).pop();
-          if (lastId) next.delete(lastId);
+          if (lastId) {
+            next.delete(lastId);
+            deleteRef(lastId);
+          }
         }
         return next;
       });
@@ -72,14 +75,17 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
 
   const value = useMemo(
     () => ({
-      openedDialogs,
+      openedDialogs: Array.from(openDialogs),
       isDialogOpen,
       openDialog,
       closeDialog,
       onOpenChange,
       closeAllDialogs,
+      setRef,
+      deleteRef,
+      observedRefs,
     }),
-    [openDialogs]
+    [openDialogs, observedRefs]
   );
 
   return (
