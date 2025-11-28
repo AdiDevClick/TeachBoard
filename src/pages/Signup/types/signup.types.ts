@@ -1,4 +1,4 @@
-import type { InputItem } from "@/components/Inputs/types/InputsTypes.ts";
+import type { InputItem } from "@/components/Inputs/types/inputs.types";
 import type { signupSchema } from "@/models/signup.models.ts";
 import type { HTMLAttributes } from "react";
 import type z from "zod";
