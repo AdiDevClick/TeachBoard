@@ -2,12 +2,14 @@ import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import { LabelledGroup } from "@/components/Selects/labelled-group/LabelledGroup.tsx";
 import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem";
 import VerticalFieldSelect from "@/components/Selects/VerticalFieldSelect.tsx";
+import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { SelectItem, SelectSeparator } from "@/components/ui/select.tsx";
+import { DEV_MODE } from "@/configs/app.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
-import { useClasses } from "@/hooks/database/classes/useClasses.ts";
+import { useClasses } from "@/hooks/database/classes/useClasses";
 import { wait } from "@/utils/utils";
-import { SelectIcon } from "@radix-ui/react-select";
+import { PlusIcon } from "lucide-react";
 import { useEffect, useState, type PointerEvent } from "react";
 import { toast } from "sonner";
 
@@ -47,7 +49,10 @@ export function StepOne({
 
     if (data || error) {
       toast.dismiss(loadingName);
-      if (import.meta.env.DEV) {
+      if (DEV_MODE) {
+        console.log(
+          (data?.data.classes !== null) | (data?.data.classes !== undefined)
+        );
         console.debug("useQueryOnSubmit data", data ?? error);
       }
       // You can handle additional side effects here if needed
@@ -77,28 +82,28 @@ export function StepOne({
             value="add-class"
             onPointerDown={onClassAdd}
           >
-            Ajouter une classe
             {/* <SelectItemIndicator>...</SelectItemIndicator> */}
-            <SelectIcon
-              style={{
-                flexDirection: "row-reverse",
-                flexGrow: 1,
-                justifyContent: "space-between",
-              }}
+            <span className="loneText">Ajouter une classe</span>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="rounded-full max-h-2"
             >
-              +
-            </SelectIcon>
+              <PlusIcon />
+            </Button>
           </SelectItem>
-          {data?.data?.classes.length > 0 && (
-            <>
-              <SelectSeparator />
-              <ListMapper items={data.data.classes}>
-                <LabelledGroup ischild>
-                  <NonLabelledGroupItem />
-                </LabelledGroup>
-              </ListMapper>
-            </>
-          )}
+          {data?.data.classes !== null &&
+            data?.data.classes !== undefined &&
+            data?.data.classes.length > 0 && (
+              <>
+                <SelectSeparator />
+                <ListMapper items={data?.data.classes}>
+                  <LabelledGroup ischild>
+                    <NonLabelledGroupItem />
+                  </LabelledGroup>
+                </ListMapper>
+              </>
+            )}
         </VerticalFieldSelect>
       </CardContent>
     </Card>
