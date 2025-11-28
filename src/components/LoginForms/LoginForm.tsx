@@ -1,6 +1,6 @@
 import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
 import { AppFieldDescriptionWithLink } from "@/components/Fields/AppFieldDescriptionWithLink.tsx";
-import { Inputs } from "@/components/Inputs/Inputs.tsx";
+import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import type {
   LoginFormSchema,
@@ -31,7 +31,7 @@ import {
   wait,
 } from "@/utils/utils.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent, type Ref } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -51,6 +51,7 @@ const loginLinkTo = "/login";
  */
 export function LoginForm({
   ref,
+  pageId = "login-form-page-card",
   className,
   inputControllers,
   modalMode = false,
@@ -74,13 +75,19 @@ export function LoginForm({
     },
   });
 
-  const { setRef, observedRef } = useMutationObserver({});
+  const { setRef, observedRefs } = useMutationObserver({});
 
-  useEffect(() => {
-    if (observedRef) {
-      form.setFocus("identifier");
-    }
-  }, [observedRef]);
+  // useEffect(() => {
+  //   if (!pageId || !observedRefs) return;
+  //   const key = `${pageId}-form`;
+  //   const element = observedRefs.get(key)?.element;
+  //   if (element) form.setFocus("identifier");
+  // }, [observedRefs, pageId]);
+  // useEffect(() => {
+  //   if (observedRefs.size > 0) {
+  //     form.setFocus("identifier");
+  //   }
+  // }, [observedRefs]);
 
   /** Log user data on change (for development purposes) */
   useEffect(() => {
@@ -120,7 +127,8 @@ export function LoginForm({
     if (data) {
       resetFormAndTriggerNavigation();
 
-      if (isPwForgotten && observedRef) {
+      if (isPwForgotten && observedRefs.get("pw-recovery-email-sent")) {
+        // if (isPwForgotten && observedRefs) {
         openDialog(null, "pw-recovery-email-sent");
       } else {
         toast.success("Connexion réussie !");
@@ -160,14 +168,15 @@ export function LoginForm({
     buttonText = resetPasswordButtonText;
     inputControllersToUse = passwordRecoveryInputControllers;
   }
+  const formId = pageId + "-form";
 
   return (
-    <Card ref={ref} className={className} {...props}>
+    <Card id={pageId} ref={ref} className={className} {...props}>
       <Title />
       <CardContent>
         <form
-          ref={setRef}
-          id="login-form"
+          ref={setRef as Ref<HTMLFormElement>}
+          id={formId}
           onSubmit={form.handleSubmit(onSubmit)}
           className="grid gap-4"
         >
@@ -185,7 +194,7 @@ export function LoginForm({
             <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
               Ou continuez avec
             </FieldSeparator>
-            <Inputs items={inputControllersToUse} form={form} />
+            <ControlledInputList items={inputControllersToUse} form={form} />
             <AppFieldDescriptionWithLink
               className="text-left"
               onClick={handleRecoverPasswordClick}
@@ -196,7 +205,7 @@ export function LoginForm({
               <Button
                 type="submit"
                 disabled={!form.formState.isValid}
-                form="login-form"
+                form={formId}
               >
                 {buttonText}
               </Button>
