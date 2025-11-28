@@ -1,7 +1,7 @@
 import type { WrapperProps } from "@/components/Controller/types/controller.types.ts";
 import { Field, FieldError } from "@/components/ui/field.tsx";
 import type { AnyComponentLike } from "@/utils/types/types.utils.ts";
-import type { ComponentProps, JSX } from "react";
+import type { ComponentProps } from "react";
 import { Controller, type FieldValues } from "react-hook-form";
 
 /**
