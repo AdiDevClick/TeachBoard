@@ -127,7 +127,8 @@ export function LoginForm({
     if (data) {
       resetFormAndTriggerNavigation();
 
-      if (isPwForgotten && observedRefs.get("pw-recovery-email-sent")) {
+      if (isPwForgotten) {
+        // if (isPwForgotten && observedRefs.get("pw-recovery-email-sent")) {
         // if (isPwForgotten && observedRefs) {
         openDialog(null, "pw-recovery-email-sent");
       } else {
