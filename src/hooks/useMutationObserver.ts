@@ -45,7 +45,7 @@ export function useMutationObserver({
    * @param node - The target element to observe
    */
   const setRef = useCallback(
-    (node?: Element) => {
+    (node?: HTMLElement) => {
       if (!node) {
         const disconnectedElement = Array.from(
           state.observedRefs.entries()

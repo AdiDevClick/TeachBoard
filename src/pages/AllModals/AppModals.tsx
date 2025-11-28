@@ -102,7 +102,6 @@ export function AppModals({ modalsList = modals }: Readonly<AppModalsProps>) {
 
           return (
             <StandardModalComponent
-              id={"modal-" + modalName + "-" + modal.id}
               key={"modal-" + modalName + "-" + modal.id}
               modalName={modalName}
               modalContent={renderedContent}
@@ -115,7 +114,6 @@ export function AppModals({ modalsList = modals }: Readonly<AppModalsProps>) {
 
         return (
           <SimpleAlertComponent
-            id={"simple-modal-" + modalName + "-" + modal.id}
             key={"simple-modal-" + modalName + "-" + modal.id}
             modalName={modalName}
             {...modal.modalProps}
