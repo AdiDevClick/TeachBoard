@@ -1,4 +1,4 @@
-import { Inputs } from "@/components/Inputs/Inputs.tsx";
+import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import {
   DialogHeaderTitle,
   HeaderTitle,
@@ -14,7 +14,6 @@ import type {
   SignupInputItem,
 } from "@/pages/Signup/types/signup.types.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
-import { cn } from "@/utils/utils.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -29,6 +28,7 @@ import { useForm } from "react-hook-form";
  * @param props - Optional props for the component of div type for the Card
  */
 export function Signup({
+  pageId = "signup-page-card",
   modalMode = false,
   className,
   inputControllers,
@@ -61,26 +61,27 @@ export function Signup({
    * @description Uses HeaderTitle directly in modal mode, otherwise wraps it with the dialog header HOC
    */
   const Title = modalMode ? DialogHeaderTitle : HeaderTitle;
+  const formId = `${pageId}-form`;
 
   return (
-    <Card className={cn("flex flex-col gap-6", className)} {...props}>
+    <Card id={pageId} className={className} {...props}>
       <Title
         title="S'enregistrer"
         description="Rejoignez-nous pour faciliter votre quotidien !"
       />
       <CardContent>
         <form
-          id="signup-form"
+          id={formId}
           onSubmit={isLoading ? undefined : form.handleSubmit(onSubmit)}
           className="grid gap-4"
         >
           <FieldGroup>
-            <Inputs items={inputControllers} form={form} />
+            <ControlledInputList items={inputControllers} form={form} />
             <Field>
               <Button
                 type="submit"
                 disabled={!form.formState.isValid}
-                form="signup-form"
+                form={formId}
               >
                 S'enregistrer
               </Button>
