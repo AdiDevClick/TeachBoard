@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
  * @param url - The URL to navigate to on button click
  * @param buttonProps - Additional button HTML attributes
  */
-export function LoginButton({ ...props }: Readonly<LoginButtonProps>) {
+export function LoginButton(props: Readonly<LoginButtonProps>) {
   const { name, path, url, ...buttonProps } = props;
 
   if (!path || !name) {
