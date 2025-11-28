@@ -75,7 +75,7 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
  *
  * @description When a success occurs, an error reset is performed to clear any previous errors.
  *
- * @param queryKeysArr The query key descriptor containing task and descriptor.
+ * @param queryKeysArr An array where the first element is the task identifier string and the second element is the query descriptor object. {@link QueryKeyDescriptor}
  *
  * @example
  * ```tsx
