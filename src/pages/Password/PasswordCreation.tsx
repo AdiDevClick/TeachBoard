@@ -1,4 +1,4 @@
-import { Inputs } from "@/components/Inputs/Inputs.tsx";
+import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { HeaderTitle } from "@/components/Titles/ModalTitle.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
@@ -37,6 +37,7 @@ let description =
  * @returns
  */
 export function PasswordCreation({
+  pageId = "password-creation-page-card",
   modalMode = false,
   className,
   inputControllers,
@@ -105,23 +106,32 @@ export function PasswordCreation({
     description =
       "Veuillez patienter pendant que nous créons votre mot de passe sécurisé.";
   }
+  const formId = `${pageId}-form`;
 
   return (
     <div {...GENERIC_CONTAINER_STYLE}>
       <div {...GENERIC_CONTENT_STYLE}>
-        <Card className={cn("flex flex-col gap-6", className)} {...props}>
+        <Card
+          id={pageId}
+          className={cn("flex flex-col gap-6", className)}
+          {...props}
+        >
           <HeaderTitle title={title} description={description} />
           <CardContent>
             {!data && (
               <form
-                id="password-creation-form"
+                id={formId}
                 onSubmit={isLoading ? undefined : form.handleSubmit(onSubmit)}
                 className="grid gap-4"
               >
                 <FieldGroup>
-                  <Inputs items={inputControllers} form={form} />
+                  <ControlledInputList items={inputControllers} form={form} />
                   <Field>
-                    <Button type="submit" disabled={isLoading}>
+                    <Button
+                      form={formId}
+                      type="submit"
+                      disabled={!form.formState.isValid}
+                    >
                       Créer
                     </Button>
                   </Field>
