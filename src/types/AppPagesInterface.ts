@@ -7,6 +7,7 @@ import type { ComponentProps } from "react";
  */
 export interface PageWithControllers<T = unknown>
   extends ComponentProps<"div"> {
+  pageId?: string;
   inputControllers: T[];
   className?: string;
   modalMode?: boolean;
