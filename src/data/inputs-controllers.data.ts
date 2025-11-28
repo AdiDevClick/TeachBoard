@@ -1,4 +1,5 @@
-import type { InputItem } from "@/components/Inputs/types/InputsTypes.ts";
+import type { ClassCreationFormSchema } from "@/components/ClassCreation/types/class-creation.types.ts";
+import type { InputItem } from "@/components/Inputs/types/inputs.types";
 import type { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
 import type { RecoveryFormSchema } from "@/components/LoginForms/types/login-forms.types.ts";
 import type { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
@@ -72,3 +73,25 @@ export const passwordRecoveryInputControllers = [
     autoComplete: "email",
   },
 ] satisfies InputItem<RecoveryFormSchema>[];
+
+export const classCreationInputControllers = [
+  {
+    name: "name",
+    title: "Nom",
+    type: "text",
+    placeholder: "Unique nom (ex: 1A, 2B, ...)",
+  },
+  {
+    name: "description",
+    title: "Description (optionnelle)",
+    type: "text",
+    placeholder: "Description de la classe",
+  },
+  // {
+  //   name: "schoolYear",
+  //   title: "Année scolaire",
+  //   type: "button",
+  //   placeholder: "Sélectionnez l'année scolaire",
+  //   autoComplete: "off",
+  // },
+] satisfies InputItem<ClassCreationFormSchema>[];
