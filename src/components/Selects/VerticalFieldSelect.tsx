@@ -48,7 +48,7 @@ export function VerticalFieldSelect({
   return (
     <div
       id={containerId}
-      ref={setRef as Ref<HTMLDivElement>}
+      ref={setRef}
       data-inputcontrollername={rest.field?.name}
       className={cn("flex flex-col items-start gap-2", className)}
     >
