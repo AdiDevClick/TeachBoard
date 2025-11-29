@@ -1,11 +1,10 @@
 <!--
-  README for TeachBoard frontend
-  Created by GitHub Copilot (Raptor mini)
+  README for TeachBoard
 -->
 
 # TeachBoard — Frontend (React + TypeScript + Vite)
 
-Bienvenue ! Cette application représente le frontend de TeachBoard, une interface pédagogique développée en React, TypeScript et Vite.
+Bienvenue ! Cette application représente le frontend de TeachBoard, une interface pédagogique développée en React et TypeScript.
 
 ## Aperçu
 
@@ -23,14 +22,15 @@ Quand une démo sera publiée, elle sera référencée ici :
 
 Si vous souhaitez exécuter localement une instance « preview », suivez les étapes ci-dessous.
 
----
+<!-- --- -->
 
 ## Prérequis
 
-- Node 18+ (LTS recommandé) ou Node 20
+- Node 20
 - npm 8+ ou yarn
+- Vite 6+
 
----
+<!-- --- -->
 
 ## Installation
 
@@ -47,7 +47,7 @@ npm ci
 
 Remarque : si vous préférez `npm install` pour récupérer les packages sans fichier lock, vous pouvez remplacer `npm ci` par `npm install`.
 
----
+<!-- --- -->
 
 ## Configuration & variables d'environnement
 
@@ -71,7 +71,7 @@ Ou configurez la variable d'environnement dans PowerShell :
 $env:VITE_BACKEND_URL = "https://localhost:8443"
 ```
 
----
+<!-- --- -->
 
 ## Commandes utiles
 
@@ -107,7 +107,7 @@ npm run lint
 npm run generate:launch
 ```
 
----
+<!-- --- -->
 
 ## Proxy API et backend
 
@@ -121,17 +121,7 @@ const backendUrl = process.env.VITE_BACKEND_URL || 'https://localhost:8443';
 
 Si l'API backend est indisponible et que vous voulez développer côté frontend, vérifiez si des mocks sont présents dans `/src/data` ou dans certains hooks.
 
----
-
-## Icônes / Rendu sobre
-
-Le projet a été configuré pour un rendu visuel sobre :
-
-- Toutes les icônes (SVG/`<img class="icon"/>`) sont masquées globalement via la classe CSS `no-icons` appliquée au conteneur principal (voir `src/main.tsx`).
-- Pour réactiver les icônes, retirez la classe `no-icons` dans `src/main.tsx` (sur le `SidebarProvider`) ou supprimez la règle CSS correspondante dans `src/assets/css/index-tailwind.css`.
-
-Cette approche masque les icônes sans modifier les composants (pas d'imports supprimés), permettant un revert rapide si nécessaire.
-
+<!-- --- -->
 
 ## Structure du projet (aperçu rapide)
 
@@ -143,13 +133,13 @@ Cette approche masque les icônes sans modifier les composants (pas d'imports su
   - `hooks/` — hooks personnalisés
   - `routes/` — configuration des routes
 
----
+<!-- --- -->
 
 ## Tests
 
 Actuellement, il n'y a pas de script de test (`jest`, `vitest`) attaché au projet frontend. Si vous souhaitez ajouter des tests, nous recommandons `vitest` + `@testing-library/react`.
 
----
+<!-- --- -->
 
 ## Modales (Dialog)
 
