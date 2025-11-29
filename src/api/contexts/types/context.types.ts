@@ -15,7 +15,7 @@ export type DialogContextType = {
   onOpenChange: (id: AppModalNames) => void;
   closeAllDialogs: () => void;
   deleteRef: (id: AppModalNames) => void;
-  setRef: (ref: HTMLElement | null) => void;
-  observedRefs: UniqueSet<string, { element: HTMLElement | null }>;
+  setRef: (ref: Element | null) => void;
+  observedRefs: UniqueSet<string, { element: Element | null }>;
   openedDialogs: AppModalNames[];
 };
