@@ -23,5 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 
-# Optional npm cache directory
+# Optional 
 package-lock.json

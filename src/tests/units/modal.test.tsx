@@ -4,6 +4,7 @@ import { AppModals } from "@/pages/AllModals/AppModals";
 import { AppTestWrapper } from "@/tests/test-utils/AppTestWrapper";
 import getHookResults from "@/tests/test-utils/getHookResults.ts";
 import { handleModalOpening, wait } from "@/utils/utils";
+
 import { type ReactNode } from "react";
 import { beforeEach, expect, test } from "vitest";
 import type { RenderHookResult } from "vitest-browser-react";
@@ -26,8 +27,7 @@ beforeEach(async () => {
 });
 
 test("openDialog updates isDialogOpen", async () => {
-  const { act, result } = hook!;
-  const { isDialogOpen, openDialog, closeDialog } = getHookResults(result);
+  const { act, isDialogOpen, openDialog, closeDialog } = getHookResults(hook!);
 
   expect(isDialogOpen("login")).toBe(false);
 
@@ -48,8 +48,7 @@ test("openDialog updates isDialogOpen", async () => {
 });
 
 test("opening a navigation modal sets the URL and allows back/forward navigation", async () => {
-  const { act, result } = hook!;
-  const { isDialogOpen, openDialog, closeDialog } = getHookResults(result);
+  const { act, isDialogOpen, openDialog, closeDialog } = getHookResults(hook!);
 
   expect(isDialogOpen("login")).toBe(false);
 
@@ -75,8 +74,9 @@ test("opening a navigation modal sets the URL and allows back/forward navigation
 });
 
 test("standard modal replaces another standard modal while alert can stack", async () => {
-  const { act, result } = hook!;
-  const { isDialogOpen, openDialog, closeAllDialogs } = getHookResults(result);
+  const { act, isDialogOpen, openDialog, closeAllDialogs } = getHookResults(
+    hook!
+  );
 
   // Open login (standard)
   await wait(50);

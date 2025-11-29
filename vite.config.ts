@@ -1,5 +1,7 @@
+/// <reference types="vitest/config" />
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
+import { playwright } from "@vitest/browser-playwright";
 import path from "node:path";
 import { defineConfig } from "vite";
 import svgr from "vite-plugin-svgr";
@@ -38,6 +40,15 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+    },
+  },
+  test: {
+    setupFiles: ["./test.setup-file.ts"],
+    browser: {
+      provider: playwright(),
+      enabled: true,
+      // at least one instance is required
+      instances: [{ browser: "chromium" }],
     },
   },
 });
