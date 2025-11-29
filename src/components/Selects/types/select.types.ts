@@ -27,7 +27,7 @@ export type VerticalSelectProps = Omit<
   fullWidth?: boolean;
   className?: string;
   side?: ComponentProps<typeof SelectContent>["side"];
-  setRef?: (node?: HTMLElement) => void;
+  setRef?: (node?: Element | null) => void;
   id: string;
 } & PropsWithChildren;
 
