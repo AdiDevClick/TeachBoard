@@ -15,5 +15,5 @@ export type MutationObserverOptions = {
 export interface MutationObserverHook {
   callback?: MutationCallback;
   options?: MutationObserverOptions;
-  onNodeReady?: (node: Element) => void;
+  onNodeReady?: (node: Element, meta?: Record<string, unknown>) => void;
 }
