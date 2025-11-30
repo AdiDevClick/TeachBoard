@@ -30,9 +30,13 @@ export function useMutationObserver({
   const idCounterRef = useRef(0);
   const nodeRef = useRef<Element>(null);
   const generatedNodeId = useId();
+  const hookId = useId();
 
   const [state, setState] = useState<{
-    observedRefs: UniqueSet<string, { element: Element }>;
+    observedRefs: UniqueSet<
+      string,
+      { element: Element; meta?: Record<string, unknown> }
+    >;
     observer: MutationObserver;
   }>({
     observedRefs: new UniqueSet(),
@@ -45,7 +49,7 @@ export function useMutationObserver({
    * @param node - The target element to observe
    */
   const setRef = useCallback(
-    (node?: Element | null) => {
+    (node?: Element | null, meta?: Record<string, unknown>) => {
       if (!node) {
         const disconnectedElement = Array.from(
           state.observedRefs.entries()
@@ -90,7 +94,43 @@ export function useMutationObserver({
       if (!node.id) node.id = nodeKey;
 
       const existingObs = state.observedRefs.has(nodeKey);
-      if (existingObs) return;
+      if (existingObs) {
+        const prevMeta = state.observedRefs.get(nodeKey)?.meta ?? null;
+        const newMeta = meta ?? null;
+        if (prevMeta === newMeta) return;
+
+        setState((prev) => {
+          try {
+            const prevStr = JSON.stringify(prevMeta);
+            const newStr = JSON.stringify(newMeta);
+            if (prevStr !== newStr) {
+              return {
+                ...prev,
+                observedRefs: prev.observedRefs
+                  .clone()
+                  .set(nodeKey, { element: node, meta }),
+              };
+            }
+          } catch {
+            // If stringifying fails, fall back to always updating the meta reference
+            return {
+              ...prev,
+              observedRefs: prev.observedRefs
+                .clone()
+                .set(nodeKey, { element: node, meta }),
+            };
+          }
+          // if (DEV_MODE) {
+          //   console.debug(
+          //     `useMutationObserver[${hookId}]: node already present -> ${
+          //       nodeKey + "\n" + JSON.stringify(meta)
+          //     }`
+          //   );
+          // }
+          return prev;
+        });
+        return;
+      }
 
       nodeRef.current = node;
 
@@ -101,17 +141,21 @@ export function useMutationObserver({
 
       setState((prev) => ({
         ...prev,
-        observedRefs: prev.observedRefs.clone().set(nodeKey, { element: node }),
+        observedRefs: prev.observedRefs
+          .clone()
+          .set(nodeKey, { element: node, meta }),
         observer: obs,
       }));
 
       if (DEV_MODE) {
-        console.debug(`useMutationObserver: observed node added -> ${nodeKey}`);
+        console.debug(
+          `useMutationObserver[${hookId}]: observed node added -> ${nodeKey}`
+        );
       }
 
-      onNodeReady?.(node);
+      onNodeReady?.(node, meta);
     },
-    [callback, options, onNodeReady, generatedNodeId]
+    [callback, options, onNodeReady, generatedNodeId, hookId]
   );
 
   const deleteRef = useCallback((key: string) => {
