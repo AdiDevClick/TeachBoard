@@ -6,7 +6,6 @@ import type {
   MissingRequiredProps,
 } from "@/utils/types/types.utils.ts";
 import {
-  Fragment,
   isValidElement,
   useId,
   type ComponentType,
@@ -93,9 +92,7 @@ export function ListMapper<
       const Component = component;
 
       return (
-        <Fragment key={String(item.id)}>
-          <Component {...item} {...optional} {...props} />
-        </Fragment>
+        <Component key={String(item.id)} {...item} {...optional} {...props} />
       );
     }
 
@@ -130,9 +127,11 @@ export function ListMapper<
       >;
 
       return (
-        <Fragment key={String(item.id)}>
-          <Component {...originalChildProps} {...injectedProps} />
-        </Fragment>
+        <Component
+          key={String(item.id)}
+          {...originalChildProps}
+          {...injectedProps}
+        />
       );
     }
 
@@ -149,7 +148,7 @@ function withListMapper<C extends AnyComponentLike>(Wrapped: C) {
     props: Readonly<
       Pick<
         ListMapperProps<Items, ComponentType<P>, TOptional>,
-        "items" | "optional"
+        "items" | "optional" | "children"
       > &
         Omit<P, keyof ExtractItemType<Items> | "children"> &
         Partial<Pick<P, Extract<keyof ExtractItemType<Items>, keyof P>>> &
