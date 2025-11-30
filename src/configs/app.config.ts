@@ -37,6 +37,7 @@ export const USER_ACTIVITIES = Object.freeze({
   signup: "signup",
   signupValidation: "signup-validation",
   passwordCreation: "password-creation",
+  fetchDiplomas: "fetch-diplomas",
 });
 
 /**
