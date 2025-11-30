@@ -5,14 +5,25 @@ import type {
 } from "@/components/ui/select.tsx";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
+import type { UniqueSet } from "@/utils/UniqueSet";
 import type {
   ComponentProps,
   Dispatch,
   PointerEvent,
   PropsWithChildren,
   ReactNode,
+  Ref,
   SetStateAction,
 } from "react";
+
+export type VerticalRefSetters = {
+  /** Underlying props for the select */
+  props: ComponentProps<typeof Select>;
+  /** Metadatas from the component and wrapped HOCs (eg: task, apiEndpoint, name, id, etc.) */
+  getMeta: () => Record<string, unknown> | undefined;
+  /** Last selected item value (may be undefined) */
+  getLastSelectedItemValue: () => unknown;
+};
 
 /**
  * Props for the VerticalFieldSelect component
@@ -22,12 +33,20 @@ export type VerticalSelectProps = Omit<
   ComponentProps<typeof Select>,
   "form"
 > & {
+  ref?: Ref<VerticalRefSetters>;
+  controllerRef?: Ref<VerticalRefSetters>;
+  observedRefs?: UniqueSet<
+    string,
+    { element: Element; meta?: Record<string, unknown> }
+  >;
+  task?: string;
+  apiEndpoint?: string;
   label?: ReactNode;
   placeholder?: string;
   fullWidth?: boolean;
   className?: string;
   side?: ComponentProps<typeof SelectContent>["side"];
-  setRef?: (node?: Element | null) => void;
+  setRef?: (node?: Element | null, meta?: Record<string, unknown>) => void;
   id: string;
 } & PropsWithChildren;
 
