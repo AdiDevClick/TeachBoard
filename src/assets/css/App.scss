@@ -10,6 +10,55 @@ Button {
     opacity: 0.8;
   }
 
+
+  &:is([data-is-editing="true"], :focus, :focus-within) {
+    z-index: 60;
+  }
+}
+
+/* Only highlight the group when it's focused or has an open trigger, but NOT when a descendant is explicitly in editing mode */
+:is([role="group"], [data-slot="field"], [data-slot="field-group"], [data-slot="item-group"], [data-slot="select-group"]):not(:has([data-is-editing="true"])):is(:focus-within, :has([aria-expanded="true"]), :has([data-state="open"])) {
+  z-index: 40;
+  isolation: isolate;
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  transition: padding 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+
+
+// [role="group"]:not(:has([data-is-editing])):is(:focus-within, :has([aria-expanded="true"]), :has([data-state="open"])),
+// [data-slot="field"]:not(:has([data-is-editing])):is(:focus-within, :has([aria-expanded="true"]), :has([data-state="open"])),
+// [data-slot="field-group"]:not(:has([data-is-editing])):is(:focus-within, :has([aria-expanded="true"]), :has([data-state="open"])),
+// [data-slot="item-group"]:not(:has([data-is-editing="true"])):is(:focus-within, :has([aria-expanded="true"]), :has([data-state="open"])),
+// [data-slot="select-group"]:not(:has([data-is-editing])):is(:focus-within, :has([aria-expanded="true"]), :has([data-state="open"])) {
+//   z-index: 40;
+//   isolation: isolate;
+//   background: white;
+//   border-radius: 10px;
+//   padding: 10px;
+//   transition: padding 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+// }
+
+form,
+[role="group"] {
+  transition: padding 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+form:has([data-is-editing="true"], :focus-within, [aria-expanded="true"], [data-state="open"])::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+  z-index: 1;
+
+  @starting-style {
+    opacity: 0;
+  }
+
 }
 
 /**
