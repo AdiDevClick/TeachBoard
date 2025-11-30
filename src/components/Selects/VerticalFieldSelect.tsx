@@ -1,7 +1,11 @@
+import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
 import { WithController } from "@/components/Controller/AppController.tsx";
 import { WithListMapper } from "@/components/Lists/ListMapper.tsx";
 import { SelectItemWithIcon } from "@/components/Selects/select-item-with-icon/SelectItemWithIcon.tsx";
-import type { VerticalSelectProps } from "@/components/Selects/types/select.types.ts";
+import type {
+  VerticalRefSetters,
+  VerticalSelectProps,
+} from "@/components/Selects/types/select.types.ts";
 import {
   Command,
   CommandEmpty,
@@ -17,12 +21,27 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { AnyComponentLike } from "@/utils/types/types.utils.ts";
-import { cn, preventDefaultAndStopPropagation } from "@/utils/utils";
-import { useId, type PointerEvent, type ReactNode, type Ref } from "react";
+import { cn } from "@/utils/utils";
+import {
+  useCallback,
+  useId,
+  useImperativeHandle,
+  useRef,
+  useState,
+  type ComponentProps,
+  type ReactNode,
+} from "react";
+
+const emptyHandle: VerticalRefSetters = {
+  props: {} as ComponentProps<typeof Select>,
+  getMeta: () => undefined,
+  getLastSelectedItemValue: () => null,
+};
 
 /**
  * A card-like select field with vertical layout on selection options.
  *
+ * @param ref - Ref object to access the select component's props
  * @param label - Label for the select field
  * @param placeholder - Placeholder text for the select field
  * @param fullWidth - Whether the select field should take full width
@@ -31,25 +50,88 @@ import { useId, type PointerEvent, type ReactNode, type Ref } from "react";
  * @param props - Additional props for the Select component
  */
 export function VerticalFieldSelect({
+  ref,
+  controllerRef,
   label,
   placeholder,
   fullWidth = true,
   className,
   side = "bottom",
   setRef,
+  observedRefs,
   id: containerId,
   ...props
 }: VerticalSelectProps) {
   const id = useId();
+  const [, setState] = useState<{ containerId?: string; open?: boolean }>({});
 
-  const { onOpenChange, onValueChange, children, defaultValue, ...rest } =
-    props;
+  const lastSelectedValueRef = useRef<string>(null);
+
+  const {
+    onOpenChange,
+    onOpenChangeWithItem,
+    onValueChange,
+    children,
+    defaultValue,
+    ...rest
+  } = props;
+
+  const fieldName = (rest as unknown as { field?: { name?: string } })?.field
+    ?.name;
+
+  const handleObjectRef = useRef<VerticalRefSetters>(emptyHandle);
+
+  useImperativeHandle(controllerRef ?? ref, () => handleObjectRef.current, [
+    onOpenChange,
+  ]);
+
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (open) {
+        setState({ containerId, open });
+        handleObjectRef.current = {
+          props,
+          getMeta: () => observedRefs?.get(containerId)?.meta ?? undefined,
+          getLastSelectedItemValue: () => lastSelectedValueRef.current,
+        };
+
+        if (controllerRef) controllerRef.current = handleObjectRef.current;
+      } else {
+        setState({});
+        handleObjectRef.current = emptyHandle;
+        if (controllerRef?.current === handleObjectRef.current)
+          controllerRef.current = null;
+      }
+
+      onOpenChange?.(open);
+    },
+    [
+      containerId,
+      props,
+      observedRefs,
+      fieldName,
+      onOpenChange,
+      onOpenChangeWithItem,
+    ]
+  );
+
+  // wrap onValueChange to keep track of last clicked/selected item and expose it via the imperative handle
+  const handleValueChange = (value?: string) => {
+    lastSelectedValueRef.current = value ?? null;
+    if (typeof value === "string") onValueChange?.(value);
+  };
 
   return (
     <div
       id={containerId}
-      ref={setRef}
-      data-inputcontrollername={rest.field?.name}
+      ref={(el) => {
+        setRef?.(el, {
+          task: props?.task,
+          apiEndpoint: props?.apiEndpoint,
+          name: fieldName,
+          id: containerId,
+        });
+      }}
       className={cn("flex flex-col items-start gap-2", className)}
     >
       {label && (
@@ -60,8 +142,8 @@ export function VerticalFieldSelect({
 
       <Select
         defaultValue={defaultValue}
-        onOpenChange={onOpenChange}
-        onValueChange={onValueChange}
+        onOpenChange={handleOpenChange}
+        onValueChange={handleValueChange}
       >
         <SelectTrigger
           id={id}
@@ -78,16 +160,16 @@ export function VerticalFieldSelect({
   );
 }
 
-function withCommands(Wrapped: AnyComponentLike) {
-  type CommandsProps = {
-    useCommands?: boolean;
-    creationButtonText?: ReactNode;
-    task: string;
-    apiEndpoint?: string;
-    useButtonAddNew?: boolean;
-    onAddNewItem?: (e: PointerEvent<HTMLDivElement>) => void;
-  };
+type CommandsProps = {
+  useCommands?: boolean;
+  creationButtonText?: ReactNode;
+  task: string;
+  apiEndpoint: string;
+  useButtonAddNew?: boolean;
+  onAddNewItem?: (payload: HandleAddNewItemParams) => void;
+};
 
+function withCommands(Wrapped: AnyComponentLike) {
   return function Component<T extends CommandsProps>(
     props: T & VerticalSelectProps
   ) {
@@ -95,22 +177,13 @@ function withCommands(Wrapped: AnyComponentLike) {
       useCommands,
       children,
       creationButtonText,
-      task,
-      apiEndpoint,
       useButtonAddNew,
       onAddNewItem,
       ...rest
     } = props;
 
-    const handleAddNew = async (
-      e: PointerEvent<HTMLDivElement>,
-      task: string | undefined,
-      apiEndpoint: string | undefined
-    ) => {
-      preventDefaultAndStopPropagation(e);
-      if (!task || !apiEndpoint) return;
-      console.log(e.target, task, apiEndpoint);
-    };
+    const apiEndpoint = props.apiEndpoint;
+    const task = props.task;
 
     return (
       <Wrapped {...rest}>
@@ -127,7 +200,7 @@ function withCommands(Wrapped: AnyComponentLike) {
           <SelectItemWithIcon
             value={task}
             selectText={creationButtonText}
-            onPointerDown={onAddNewItem}
+            onPointerDown={(e) => onAddNewItem?.({ e, apiEndpoint, task })}
           />
         )}
         {children}
@@ -138,15 +211,16 @@ function withCommands(Wrapped: AnyComponentLike) {
 
 export default VerticalFieldSelect;
 
-export const VerticalFieldSelectWithController =
-  WithController(VerticalFieldSelect);
+export const VerticalFieldSelectWithController: ReturnType<
+  typeof WithController<typeof VerticalFieldSelect>
+> = WithController(VerticalFieldSelect);
 
 export const VerticalFieldSelectWithCommands =
   withCommands(VerticalFieldSelect);
 
-export const VerticalFieldSelectWithControlledCommands = WithController(
-  VerticalFieldSelectWithCommands
-);
+export const VerticalFieldSelectWithControlledCommands: ReturnType<
+  typeof WithController<typeof VerticalFieldSelectWithCommands>
+> = WithController(VerticalFieldSelectWithCommands);
 
 export const VerticalFieldSelectWithControllerAndCommandsList: ReturnType<
   typeof WithListMapper<typeof VerticalFieldSelectWithControlledCommands>

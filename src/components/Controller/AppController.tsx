@@ -1,7 +1,7 @@
 import type { WrapperProps } from "@/components/Controller/types/controller.types.ts";
 import { Field, FieldError } from "@/components/ui/field.tsx";
 import type { AnyComponentLike } from "@/utils/types/types.utils.ts";
-import type { ComponentProps } from "react";
+import { type ComponentProps } from "react";
 import { Controller, type FieldValues } from "react-hook-form";
 
 /**
@@ -11,25 +11,39 @@ import { Controller, type FieldValues } from "react-hook-form";
  */
 function withController<C extends AnyComponentLike>(Wrapped: C) {
   return function Component<T extends FieldValues>({
-    ref,
     ...props
   }: WrapperProps<T, C>) {
     const typedProps = props as WrapperProps<T, C>;
+
     if (!typedProps?.form || !typedProps?.name) {
       return null;
     }
+
     const { name, form, ...restProps } = typedProps;
+
     return (
       <Controller
         name={name}
         control={form.control}
         render={({ field, fieldState }) => (
-          <Field ref={ref} data-invalid={fieldState.invalid}>
+          <Field
+            ref={(el) => {
+              props.setRef?.(el, {
+                type: "controller",
+                name: name,
+                id: `${name}`,
+              });
+            }}
+            data-invalid={fieldState.invalid}
+          >
             <Wrapped
               {...({
                 ...restProps,
                 field,
                 fieldState,
+                controllerMeta: {
+                  controllerName: name,
+                },
               } as ComponentProps<C>)}
             />
             <FieldError errors={[fieldState.error]} />
