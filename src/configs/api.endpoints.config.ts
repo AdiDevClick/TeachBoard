@@ -16,6 +16,7 @@ export const API_ENDPOINTS = Object.freeze({
       ALL: `${BASE_API_URL}/classes/`,
       BY_ID: (id: number | string) => `${BASE_API_URL}/classes/${id}`,
     },
+    DEGREES: DEGREES,
     DIPLOMAS: `${DEGREES}/config`,
     STUDENTS: `${BASE_API_URL}/students`,
     COURSES: `${BASE_API_URL}/courses`,
