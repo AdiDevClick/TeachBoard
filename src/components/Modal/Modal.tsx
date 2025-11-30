@@ -292,7 +292,11 @@ export function Modal({
       onOpenChange={() => onOpenChangeHandler(modalName)}
     >
       {children}
-      <DialogContent ref={setRef} id={modalName} className={className}>
+      <DialogContent
+        ref={(el) => setRef(el, { modalName })}
+        id={modalName}
+        className={className}
+      >
         {modalContent}
       </DialogContent>
     </Dialog>

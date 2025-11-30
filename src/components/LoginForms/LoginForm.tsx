@@ -176,7 +176,7 @@ export function LoginForm({
       <Title />
       <CardContent>
         <form
-          ref={setRef}
+          ref={(el) => setRef(el, { name: pageId, id: formId })}
           id={formId}
           onSubmit={form.handleSubmit(onSubmit)}
           className="grid gap-4"
