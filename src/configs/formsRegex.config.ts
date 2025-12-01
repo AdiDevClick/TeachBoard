@@ -2,7 +2,12 @@ export const formsRegex = {
   // Server-side patterns (kept as source of truth)
   serverEmail: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, // matches provided EMAIL_REGEX
   serverUsername: /^[a-zA-Z0-9._-]{3,}$/, // matches provided USERNAME_REGEX
-
+  noSpecialCharsWithTwoCharMin: /^[a-zA-Z0-9 ]{2,}$/,
+  // Name fields (e.g. diploma names) should support Unicode letters and
+  // common separators like spaces, hyphens and apostrophes. These patterns
+  // are used server-side and for client-side immediate sanitization.
+  serverName: /^[\p{L}0-9 ._'-]{1,255}$/u,
+  allowedCharsNameRemove: /[^\p{L}0-9 ._'-]/gu,
   // Sanitizers / character classes used on the client for immediate feedback
   // Remove anything that is not ASCII letter/digit or the small set of allowed
   // punctuation for usernames
@@ -12,5 +17,8 @@ export const formsRegex = {
 
   // Single-character allowed tests (used for onBeforeInput checks)
   allowedCharUsernameTest: /^[a-zA-Z0-9._-]$/,
+  // Single-character test for name fields to be used on input events
+  // (allows accented letters through Unicode \p{L} property).
+  allowedCharNameTest: /^[\p{L}0-9 ._'-]$/u,
   allowedCharEmailTest: /^[a-zA-Z0-9@._-]$/,
 };
