@@ -10,7 +10,6 @@ Button {
     opacity: 0.8;
   }
 
-
   &:is([data-is-editing="true"], :focus, :focus-visible, :focus-within) {
     z-index: 60;
     isolation: isolate;
@@ -25,8 +24,8 @@ Button {
   isolation: isolate;
   background: white;
   border-radius: 10px;
-  padding: 10px;
-  transition: padding 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  padding: 5px;
+  transition: padding 0.4s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 form,
@@ -40,7 +39,7 @@ form,
     inset: 0;
     background-color: rgba(0, 0, 0, 0.55);
     opacity: 1;
-    transition: opacity 0.3s ease-in-out;
+    transition: transform 0.3s ease, opacity 0.3s ease-in-out;
     z-index: 1;
 
     @starting-style {
@@ -49,6 +48,7 @@ form,
 
   }
 }
+
 
 /**
  * Use .loneText on an element (usually a text or span) when you have a button or an icon next to a text and you want the text
