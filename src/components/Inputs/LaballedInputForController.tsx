@@ -24,11 +24,11 @@ export function LaballedInputForController<T extends FieldValues>(
     <>
       <Label htmlFor={name ?? field.name}>{title}</Label>
       <Input
+        required
         {...rest}
         {...field}
         id={name ?? field.name ?? "intput-is-not-named"}
         aria-invalid={fieldState.invalid ?? false}
-        required
       />
     </>
   );
