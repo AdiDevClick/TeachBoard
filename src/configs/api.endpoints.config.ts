@@ -37,5 +37,10 @@ export const API_ENDPOINTS = Object.freeze({
       SESSION_CHECK: `${AUTH}/session`,
       LOGOUT: `${AUTH}/logout`,
     },
+    CREATE_DEGREE: {
+      LEVEL: `${DEGREES}/level`,
+      YEAR: `${DEGREES}/year`,
+      FIELD: `${DEGREES}/field`,
+    },
   },
 } as const);
