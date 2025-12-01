@@ -1,0 +1,26 @@
+import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
+import type { Command } from "@/components/ui/command.tsx";
+import type { ComponentProps, ReactNode } from "react";
+
+/** A heading with a title and corresponding values */
+export type HeadingType = {
+  groupTitle: string;
+  items: CommandItemType[];
+};
+
+export type CommandItemType = {
+  id: string | number;
+  value: string;
+};
+
+/**
+ * Props for command-based components
+ */
+export type CommandsProps = {
+  useCommands?: boolean;
+  creationButtonText?: ReactNode;
+  useButtonAddNew?: boolean;
+  onAddNewItem?: (payload: HandleAddNewItemParams) => void;
+  commandHeadings?: HeadingType[];
+  queryRecordsKey?: string[];
+} & ComponentProps<typeof Command>;
