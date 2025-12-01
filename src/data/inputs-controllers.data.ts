@@ -1,4 +1,5 @@
-import type { ClassCreationFormSchema } from "@/components/ClassCreation/types/class-creation.types.ts";
+import type { ClassCreation } from "@/components/ClassCreation/ClassCreation.tsx";
+import type { NewDegreeItem } from "@/components/ClassCreation/diploma/degree-item/NewDegreeItem.tsx";
 import type { InputItem } from "@/components/Inputs/types/inputs.types";
 import type { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
 import type { RecoveryFormSchema } from "@/components/LoginForms/types/login-forms.types.ts";
@@ -94,4 +95,26 @@ export const classCreationInputControllers = [
   //   placeholder: "Sélectionnez l'année scolaire",
   //   autoComplete: "off",
   // },
-] satisfies InputItem<ClassCreationFormSchema>[];
+] satisfies Parameters<typeof ClassCreation>[0]["inputControllers"];
+
+export const degreeCreationInputControllers = [
+  {
+    name: "name",
+    title: "Nom du diplôme",
+    type: "text",
+    placeholder: "Ex: Brevet des collèges, Bac Pro, ...",
+  },
+  {
+    name: "code",
+    title: "Code du diplôme",
+    type: "text",
+    placeholder: "Ex: BTS, BACPRO, ...",
+  },
+  {
+    name: "description",
+    title: "Description (optionnelle)",
+    type: "text",
+    placeholder: "Description du diplôme. Ex: Niveau 4, RNCP5, ...",
+    required: false,
+  },
+] satisfies Parameters<typeof NewDegreeItem>[0]["inputControllers"];
