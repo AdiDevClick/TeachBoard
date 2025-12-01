@@ -38,6 +38,7 @@ export const USER_ACTIVITIES = Object.freeze({
   signupValidation: "signup-validation",
   passwordCreation: "password-creation",
   fetchDiplomas: "fetch-diplomas",
+  degreeCreation: "degree-creation",
 });
 
 /**
@@ -53,7 +54,8 @@ export type AppModalNames =
   | "pw-recovery"
   | "pw-recovery-email-sent"
   | "class-creation"
-  | "create-diploma";
+  | "create-diploma"
+  | "new-degree-item-dialog";
 
 /**
  * Pages that do not require session checks
