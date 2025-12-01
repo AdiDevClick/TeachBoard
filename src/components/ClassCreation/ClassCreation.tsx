@@ -1,7 +1,3 @@
-import type {
-  ClassCreationFormSchema,
-  ClassCreationInputItem,
-} from "@/components/ClassCreation/types/class-creation.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem.tsx";
@@ -30,6 +26,10 @@ import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useClassCreation } from "@/hooks/database/classes/useClassCreation.ts";
 import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
+import type {
+  ClassCreationFormSchema,
+  ClassCreationInputItem,
+} from "@/models/class-creation.models.ts";
 import { classCreationSchema } from "@/models/class-creation.models.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 
@@ -218,14 +218,16 @@ export function ClassCreation({
     editable.dataset.isEditing = "true";
     editable.style.setProperty("user-select", "text");
     editable.style.setProperty("-webkit-user-modify", "read-write");
-    const selection = window.getSelection();
-    selection?.focusNode;
     const newRange = new Range();
+    const selection = globalThis.getSelection();
     newRange.selectNodeContents(editable);
+
+    selection?.focusNode;
     selection?.removeAllRanges();
     selection?.addRange(newRange);
 
     console.log("Edit role:", roleId);
+
     setState((prev) => ({
       ...prev,
       isEditing: true,
@@ -297,16 +299,6 @@ export function ClassCreation({
     // buttonEl.removeAttribute("contenteditable");
     // buttonEl.removeAttribute("data-is-editing");
   };
-
-  // const handleOnTextEdit = (e: PointerEvent<HTMLButtonElement>) => {
-  //   const roleId = e.currentTarget.id;
-  //   const selection = window.getSelection();
-  //   if (!selection) return;
-  //   const range = document.createRange();
-  //   range.selectNodeContents(roleId);
-  //   selection.removeAllRanges();
-  //   selection.addRange(range);
-  // };
 
   const roles = [
     "serveur",
