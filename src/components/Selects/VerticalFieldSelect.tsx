@@ -1,4 +1,5 @@
-import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
+import { CommandItems } from "@/components/Command/CommandItems.tsx";
+import type { CommandsProps } from "@/components/Command/types/command.types.ts";
 import { WithController } from "@/components/Controller/AppController.tsx";
 import { WithListMapper } from "@/components/Lists/ListMapper.tsx";
 import { SelectItemWithIcon } from "@/components/Selects/select-item-with-icon/SelectItemWithIcon.tsx";
@@ -6,13 +7,6 @@ import type {
   VerticalRefSetters,
   VerticalSelectProps,
 } from "@/components/Selects/types/select.types.ts";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandList,
-} from "@/components/ui/command.tsx";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -29,7 +23,6 @@ import {
   useRef,
   useState,
   type ComponentProps,
-  type ReactNode,
 } from "react";
 
 const emptyHandle: VerticalRefSetters = {
@@ -67,14 +60,8 @@ export function VerticalFieldSelect({
 
   const lastSelectedValueRef = useRef<string>(null);
 
-  const {
-    onOpenChange,
-    onOpenChangeWithItem,
-    onValueChange,
-    children,
-    defaultValue,
-    ...rest
-  } = props;
+  const { onOpenChange, onValueChange, children, defaultValue, ...rest } =
+    props;
 
   const fieldName = (rest as unknown as { field?: { name?: string } })?.field
     ?.name;
@@ -105,14 +92,7 @@ export function VerticalFieldSelect({
 
       onOpenChange?.(open);
     },
-    [
-      containerId,
-      props,
-      observedRefs,
-      fieldName,
-      onOpenChange,
-      onOpenChangeWithItem,
-    ]
+    [containerId, props, observedRefs, fieldName, onOpenChange]
   );
 
   // wrap onValueChange to keep track of last clicked/selected item and expose it via the imperative handle
@@ -160,15 +140,6 @@ export function VerticalFieldSelect({
   );
 }
 
-type CommandsProps = {
-  useCommands?: boolean;
-  creationButtonText?: ReactNode;
-  task: string;
-  apiEndpoint: string;
-  useButtonAddNew?: boolean;
-  onAddNewItem?: (payload: HandleAddNewItemParams) => void;
-};
-
 function withCommands(Wrapped: AnyComponentLike) {
   return function Component<T extends CommandsProps>(
     props: T & VerticalSelectProps
@@ -179,6 +150,7 @@ function withCommands(Wrapped: AnyComponentLike) {
       creationButtonText,
       useButtonAddNew,
       onAddNewItem,
+      commandHeadings,
       ...rest
     } = props;
 
@@ -188,13 +160,7 @@ function withCommands(Wrapped: AnyComponentLike) {
     return (
       <Wrapped {...rest}>
         {useCommands && (
-          <Command>
-            <CommandInput placeholder="Search..." />
-            <CommandList>
-              <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
-              <CommandGroup></CommandGroup>
-            </CommandList>
-          </Command>
+          <CommandItems commandHeadings={commandHeadings ?? []} {...rest} />
         )}
         {useButtonAddNew && (
           <SelectItemWithIcon
