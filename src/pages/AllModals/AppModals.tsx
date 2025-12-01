@@ -1,9 +1,11 @@
 import { ClassCreation } from "@/components/ClassCreation/ClassCreation.tsx";
+import { NewDegreeItem } from "@/components/ClassCreation/diploma/degree-item/NewDegreeItem.tsx";
 import { DiplomaCreation } from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
 import { Modal, ModalWithSimpleAlert } from "@/components/Modal/Modal.tsx";
 import {
+  degreeCreationInputControllers,
   inputLoginControllers,
   inputSignupControllers,
 } from "@/data/inputs-controllers.data.ts";
@@ -70,6 +72,18 @@ const modals = defineStrictModalsList([
     modalContent: DiplomaCreation,
     modalProps: {
       className: "max-w-2",
+      isNavigationModal: false,
+    },
+    contentProps: {
+      inputControllers: degreeCreationInputControllers,
+      modalMode: true,
+    },
+  },
+  {
+    modalName: "new-degree-item-dialog",
+    type: Modal,
+    modalContent: NewDegreeItem,
+    modalProps: {
       isNavigationModal: false,
     },
     contentProps: {
