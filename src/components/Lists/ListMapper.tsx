@@ -6,6 +6,7 @@ import type {
   MissingRequiredProps,
 } from "@/utils/types/types.utils.ts";
 import {
+  Fragment,
   isValidElement,
   useId,
   type ComponentType,
@@ -65,8 +66,12 @@ export function ListMapper<
   ...props
 }: Readonly<ListMapperProps<TItems, C, TOptional>>) {
   const id = useId();
+  if (!items || items === undefined) return null;
+
   const isArrayInput = Array.isArray(items);
-  const itemsArray = isArrayInput ? items : Object.entries(items);
+  const itemsArray = isArrayInput
+    ? items
+    : Object.entries(items as Record<string, unknown>);
 
   return itemsArray.map((item, index) => {
     if (!item) {
@@ -104,7 +109,11 @@ export function ListMapper<
         optional?: TOptional
       ) => ReactNode;
 
-      return renderFn(item, index, optional);
+      return (
+        <Fragment key={item.id ?? `${id}-${index}`}>
+          {renderFn(item, index, optional)}
+        </Fragment>
+      );
     }
 
     // Case C: ReactElement - render its type with injected props
@@ -127,11 +136,13 @@ export function ListMapper<
       >;
 
       return (
+        // <Fragment key={String(item.id)}>
         <Component
           key={String(item.id)}
           {...originalChildProps}
           {...injectedProps}
         />
+        // </Fragment>
       );
     }
 
