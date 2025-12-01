@@ -19,6 +19,8 @@ import {
   ItemTitle,
 } from "@/components/ui/item.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import { DEV_MODE } from "@/configs/app.config.ts";
+import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import { diplomaCreationSchema } from "@/models/diploma-creation.models.ts";
@@ -33,6 +35,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@radix-ui/react-popover";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   CheckIcon,
   Pencil,
@@ -41,19 +44,14 @@ import {
   Trash2,
   XIcon,
 } from "lucide-react";
-import { useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent,
+} from "react";
 import { useForm } from "react-hook-form";
-
-// type DiplomaCreationInputs = {
-//   task: string;
-//   name: string;
-//   label: string;
-//   placeholder: string;
-//   creationButtonText: string;
-//   useCommands: boolean;
-//   useButtonAddNew: boolean;
-//   apiEndpoint: string;
-// };
 
 const inputs = [
   {
@@ -121,7 +119,21 @@ export function DiplomaCreation({
     isLoaded,
     setFetchParams,
   } = useFetch();
+  const { openDialog } = useDialog();
+  const queryClient = useQueryClient();
   const [state, setState] = useState(defaultState);
+  const { setRef, observedRefs } = useMutationObserver({});
+
+  const resultsCallback = useCallback((keys: any) => {
+    const cachedData = queryClient.getQueryData(keys ?? []);
+    if (DEV_MODE) {
+      console.log("Cached data for ", keys, " is ", cachedData);
+    }
+    if (cachedData === undefined) {
+      return data;
+    }
+    return cachedData;
+  }, []);
 
   const form = useForm<{
     diploma: string;
@@ -138,31 +150,7 @@ export function DiplomaCreation({
       mainSkills: [],
     },
   });
-  const { setRef, observedRefs } = useMutationObserver({});
   const VerticalFieldSelectRef = useRef<VerticalRefSetters>(null!);
-  const handleChange = (
-    open: boolean,
-    meta?: { task?: string; apiEndpoint?: string; name?: string; id?: string }
-  ) => {
-    console.log("onchange dans le diploma creation", open);
-    if (!open) return;
-    const task = meta?.task;
-    const apiEndpoint = meta?.apiEndpoint;
-    // Ensure apiEndpoint is present and correspond to a known input
-    const found = inputs.find((input) => {
-      return input.task === task && input.apiEndpoint === apiEndpoint;
-    });
-    if (!found) return;
-    setFetchParams((prev) => ({
-      ...prev,
-      url: API_ENDPOINTS.GET.DEGREES + apiEndpoint,
-      contentId: "fetch-diplomas",
-    }));
-    onSubmit();
-    // if (open && !selected) {
-    //   // setSelected(true);
-    // }
-  };
 
   const handleOnDelete = (e: PointerEvent<HTMLButtonElement>) => {
     preventDefaultAndStopPropagation(e);
@@ -179,14 +167,15 @@ export function DiplomaCreation({
     editable.dataset.isEditing = "true";
     editable.style.setProperty("user-select", "text");
     editable.style.setProperty("-webkit-user-modify", "read-write");
-    const selection = window.getSelection();
-    selection?.focusNode;
     const newRange = new Range();
+
+    const selection = window.getSelection();
     newRange.selectNodeContents(editable);
+
+    selection?.focusNode;
     selection?.removeAllRanges();
     selection?.addRange(newRange);
 
-    console.log("Edit role:", roleId);
     setState((prev) => ({
       ...prev,
       isEditing: true,
@@ -245,32 +234,63 @@ export function DiplomaCreation({
     apiEndpoint,
     task,
   }: HandleAddNewItemParams) => {
-    preventDefaultAndStopPropagation(e);
-    console.log("Add new item triggered", apiEndpoint, task);
+    if (DEV_MODE) {
+      console.log("Add new item triggered", {
+        apiEndpoint,
+        task,
+      });
+    }
+    openDialog(e, "new-degree-item-dialog");
   };
 
-  const handleOpening = (
-    open: boolean,
-    meta?: { task?: string; apiEndpoint?: string; name?: string; id?: string }
-  ) => {
+  useEffect(() => {
+    const keys = [fetchParams.contentId, fetchParams.url];
+
+    if (keys[1] === "" && keys[0] === "none") return;
+    const cachedData = queryClient.getQueryData(keys ?? []);
+
+    if (cachedData === undefined) {
+      onSubmit();
+    }
+  }, [fetchParams]);
+
+  /**
+   * Handle opening of the VerticalFieldSelect component
+   *
+   * @param open - Whether the select is opening
+   * @returns
+   */
+  const handleOpening = (open: boolean) => {
     if (!open) return;
     const metaData = VerticalFieldSelectRef.current.getMeta();
-    console.log("DiplomaCreation onOpenChange:", open, metaData);
 
-    const task = meta?.task;
-    const apiEndpoint = meta?.apiEndpoint;
+    const task = metaData?.task;
+    const apiEndpoint = metaData?.apiEndpoint;
+
     // Ensure apiEndpoint is present and correspond to a known input
-    const found = inputs.find((input) => {
-      return input.task === task && input.apiEndpoint === apiEndpoint;
-    });
+    const found = inputs.find(
+      (input) => input.task === task && input.apiEndpoint === apiEndpoint
+    );
     if (!found) return;
+
+    if (DEV_MODE) {
+      console.log("handleOpening diploma creation & Fetching ", metaData);
+    }
+
     setFetchParams((prev) => ({
       ...prev,
       url: API_ENDPOINTS.GET.DEGREES + apiEndpoint,
       contentId: "fetch-diplomas",
     }));
-    onSubmit();
   };
+
+  useEffect(() => {
+    if (isLoaded && !error && data) {
+      if (DEV_MODE) {
+        console.log("Diploma creation fetched data:", data, fetchParams);
+      }
+    }
+  }, [isLoaded, error, data]);
 
   /**
    * Determine the title component based on modal mode
@@ -304,6 +324,10 @@ export function DiplomaCreation({
           <VerticalFieldSelectWithControllerAndCommandsList
             items={inputs}
             form={form}
+            commandHeadings={resultsCallback(
+              [fetchParams.contentId, fetchParams.url] ?? []
+            )}
+            // queryRecordsKey={memoizedQueryRecordsKeys.cachedKeys}
             onOpenChange={handleOpening}
             onValueChange={() =>
               console.log(
@@ -317,7 +341,7 @@ export function DiplomaCreation({
             onAddNewItem={handleAddNewItem}
           />
           <ItemGroup id={`${pageId}-roles`} className="grid gap-2">
-            <ItemTitle>Ajouter des rôles</ItemTitle>
+            <ItemTitle>Compétences principales</ItemTitle>
             <Item variant={"default"} className="p-0">
               <ItemContent className="flex-row flex-wrap gap-2">
                 <ListMapper items={skills}>
