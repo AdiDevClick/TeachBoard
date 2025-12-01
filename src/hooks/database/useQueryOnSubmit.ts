@@ -54,9 +54,9 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
       return onFetch<S, E>(fetchArgs);
     },
     onSuccess: (response) => {
-      abortController?.abort(
-        new Error("Request completed", { cause: response })
-      );
+      // abortController?.abort(
+      //   new Error("Request completed", { cause: response })
+      // );
       reset?.();
       onSuccess?.(response);
       if (silent) return;
