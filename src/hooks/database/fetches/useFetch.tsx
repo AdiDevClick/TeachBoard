@@ -1,6 +1,7 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { USER_ACTIVITIES } from "@/configs/app.config.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
+import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 type FetchParams = {
@@ -34,27 +35,14 @@ export function useFetch() {
       url: fetchParams.url,
       headers: fetchParams.headers,
       // silent: true,
-      onSuccess: (response) => {
-        let cachingDatas;
-        const responseData = structuredClone(response.data);
-
-        // Single array response
-        if (Array.isArray(responseData)) {
-          const items: Array<{ id: string; value: string }> = responseData.map(
-            (item) => ({ id: item.id, value: item.name })
-          );
-          cachingDatas = [{ groupTitle: "Tous", items }];
-        }
-
-        // If the server returns an object where each key is a group
-        if (typeof responseData === "object" && !Array.isArray(responseData)) {
-          cachingDatas = Object.entries(responseData).map(([key, value]) => ({
-            title: key,
-            values: Array.isArray(value)
-              ? value.map((item: any) => ({ id: item.id, value: item.name }))
-              : [{ id: value.id, value: value.name }],
-          }));
-        }
+      onSuccess: (response: any) => {
+        // Reshape data for caching
+        const reshaper = new ObjectReshape(response.data);
+        const cachingDatas = reshaper
+          .assignSourceTo("items")
+          .add({ groupTitle: "Tous" })
+          .assign([["name", "value"]])
+          .newShape();
 
         // Caching under [contentId, url] keys
         queryClient.setQueryData(
