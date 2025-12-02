@@ -34,15 +34,18 @@ export function useDegreeCreationForm(id: "LEVEL" | "YEAR" | "FIELD") {
 
         const queryKey = [USER_ACTIVITIES.fetchDiplomas, apiUrl];
 
-        // 2) Merge la nouvelle donnée dans le cache (shape dépend de ton API)
+        // 2) Merge la nouvelle donnée dans le cache existant
         queryClient.setQueryData(queryKey, (old: any) => {
           if (!old) return data;
-          // suppose old = { ok: true, data: [ ... ] }
-          const oldData = Array.isArray(old.data) ? old.data : [];
-          return {
-            ...old,
-            data: [...oldData, data.data], // append le nouvel item
-          };
+          // Suppose old is an array of groups [{ groupTitle, items: [] }]
+          if (!Array.isArray(old)) return data;
+          const mappedNewItem = { id: data.data.id, value: data.data.name };
+          // Append the item to the first group if present
+          const newGroups = old.map((g: any, idx: number) => {
+            if (idx !== 0) return g;
+            return { ...(g ?? {}), items: [...(g?.items ?? []), mappedNewItem] };
+          });
+          return newGroups;
         });
       },
       onError(error) {
