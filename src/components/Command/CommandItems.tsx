@@ -8,6 +8,8 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command.tsx";
+import { usePopoverFieldContextSafe } from "@/hooks/contexts/usePopover.ts";
+import { useCallback } from "react";
 
 /**
  * A command items component that displays headings and their corresponding values.
@@ -18,19 +20,42 @@ import {
  * @returns A CommandItems component
  */
 export function CommandItems(props: Readonly<CommandsProps>) {
-  const { commandHeadings, filter, ...rest } = props;
+  const {
+    commandHeadings,
+    filter,
+    onSelect: externalOnSelect,
+    ...rest
+  } = props;
+
+  // !! IMPORTANT !! This context can be null
+  const context = usePopoverFieldContextSafe();
+  const contextOnSelect = context?.onSelect;
+
+  const handleSelect = useCallback(
+    (value: string) => {
+      contextOnSelect?.(value);
+      externalOnSelect?.(value);
+    },
+    [contextOnSelect, externalOnSelect]
+  );
 
   return (
-    <Command filter={filter}>
+    <Command filter={filter} onChange={(e) => console.log("change", e)}>
       <CommandInput placeholder="Search..." />
       <CommandList>
         <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
-        <ListMapper items={commandHeadings}>
+        <ListMapper items={commandHeadings ?? []}>
           {({ groupTitle, items }) => (
             <CommandGroup key={groupTitle} heading={groupTitle}>
               <ListMapper items={items}>
                 {({ id, value }) => (
-                  <CommandItem id={id} value={value} key={id}>
+                  <CommandItem
+                    key={id}
+                    id={String(id)}
+                    value={value}
+                    onSelect={handleSelect}
+                    {...rest}
+                  >
                     {value ?? ""}
                   </CommandItem>
                 )}
