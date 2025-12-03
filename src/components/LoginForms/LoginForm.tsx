@@ -31,7 +31,7 @@ import {
   wait,
 } from "@/utils/utils.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState, type MouseEvent, type Ref } from "react";
+import { startTransition, useEffect, useState, type MouseEvent } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -106,10 +106,16 @@ export function LoginForm({
   useEffect(() => {
     const resetFormAndTriggerNavigation = async () => {
       await wait(500);
-      if (!open) setOpen(true);
-      form.reset();
 
-      closeDialog(null, "login");
+      // !! IMPORTANT !! - Use startTransition to avoid blocking UI updates
+      startTransition(() => {
+        if (!open) setOpen(true);
+        form.reset();
+        closeDialog(null, "login");
+      });
+
+      // Navigate ONLY after transitions are scheduled
+      // avoids UI jank and an React render warning
       navigate("/", { replace: true });
     };
 
