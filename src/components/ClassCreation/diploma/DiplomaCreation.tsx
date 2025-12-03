@@ -110,15 +110,8 @@ export function DiplomaCreation({
   inputControllers,
   ...props
 }: Readonly<PageWithControllers<SignupInputItem>>) {
-  const {
-    onSubmit,
-    fetchParams,
-    data,
-    error,
-    isLoading,
-    isLoaded,
-    setFetchParams,
-  } = useFetch();
+  const { onSubmit, fetchParams, data, error, isLoaded, setFetchParams } =
+    useFetch();
   const { openDialog } = useDialog();
   const queryClient = useQueryClient();
   const [state, setState] = useState(defaultState);
@@ -240,9 +233,19 @@ export function DiplomaCreation({
         task,
       });
     }
-    openDialog(e, "new-degree-item-dialog");
+    // console.log(openedDialogs);
+    openDialog(e, "new-degree-item-dialog", {
+      task: "get-degrees",
+      apiEndpoint,
+      queryKey: [fetchParams.contentId, fetchParams.url],
+    });
   };
 
+  /**
+   * Effect to fetch data when fetchParams change
+   *
+   * @description Triggers when fetchParams are updated with {@link handleOpening}
+   */
   useEffect(() => {
     const keys = [fetchParams.contentId, fetchParams.url];
 
@@ -257,8 +260,9 @@ export function DiplomaCreation({
   /**
    * Handle opening of the VerticalFieldSelect component
    *
+   * @description When opening, fetch data based on the select's meta information
+   *
    * @param open - Whether the select is opening
-   * @returns
    */
   const handleOpening = (open: boolean) => {
     if (!open) return;
