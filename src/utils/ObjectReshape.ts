@@ -1,4 +1,4 @@
-import { DEV_MODE } from "@/configs/app.config.ts";
+import { DEV_MODE, NO_PROXY_LOGS } from "@/configs/app.config.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 
 export class ObjectReshape<T extends Record<string, unknown>> {
@@ -430,8 +430,8 @@ export class ObjectReshape<T extends Record<string, unknown>> {
           if (sourceKeys) {
             const resolved = this.#resolveValue(target, sourceKeys);
             if (resolved) {
-              if (DEV_MODE) {
-                console.log(
+              if (DEV_MODE && !NO_PROXY_LOGS) {
+                console.debug(
                   "GET trap called for mapped prop:",
                   prop,
                   "resolved to source key:",
