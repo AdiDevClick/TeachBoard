@@ -2,6 +2,7 @@ import { DialogContext } from "@/api/contexts/DialogContext.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
+import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
@@ -16,15 +17,17 @@ import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
  * @returns The DialogProvider component that wraps its children with Dialog context.
  */
 export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
-  const [openDialogs, setOpenDialogs] = useState<Set<AppModalNames>>(new Set());
+  const [openDialogs, setOpenDialogs] = useState<UniqueSet<AppModalNames, any>>(
+    new UniqueSet()
+  );
   const { setRef, observedRefs, deleteRef } = useMutationObserver({});
 
   const openDialog = useCallback(
-    (e: PreventDefaultAndStopPropagation, id: AppModalNames) => {
+    (e: PreventDefaultAndStopPropagation, id: AppModalNames, options?: any) => {
       preventDefaultAndStopPropagation(e);
       setOpenDialogs((prev) => {
-        const next = new Set(prev);
-        next.add(id);
+        const next = prev.clone();
+        next.set(id, options ?? {});
         return next;
       });
     },
@@ -35,13 +38,13 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
     (e: PreventDefaultAndStopPropagation, id?: AppModalNames) => {
       preventDefaultAndStopPropagation(e);
       setOpenDialogs((prev) => {
-        const next = new Set(prev);
+        const next = prev.clone();
         if (id) {
           next.delete(id);
           deleteRef(id);
         } else {
           // If no ID provided, close the most recent dialog
-          const lastId = Array.from(next).pop();
+          const lastId = Array.from(next.entries()).pop();
           if (lastId) {
             next.delete(lastId);
             deleteRef(lastId);
@@ -55,7 +58,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
 
   const closeAllDialogs = useCallback(() => {
     if (openDialogs.size === 0) return;
-    setOpenDialogs(new Set());
+    setOpenDialogs(new UniqueSet());
   }, [openDialogs]);
 
   const isDialogOpen = useCallback(
@@ -67,15 +70,28 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
 
   const onOpenChange = useCallback((id: AppModalNames) => {
     setOpenDialogs((prev) => {
-      const next = new Set(prev);
+      const next = prev.clone();
       next.delete(id);
       return next;
     });
   }, []);
 
+  const dialogsOptions = useMemo(() => {
+    return new Map(openDialogs.entries());
+  }, [openDialogs]);
+
+  const dialogOptions = useCallback(
+    (dialog) => {
+      return openDialogs.get(dialog);
+    },
+    [openDialogs]
+  );
+
   const value = useMemo(
     () => ({
-      openedDialogs: Array.from(openDialogs),
+      openedDialogs: Array.from(openDialogs.entries()),
+      dialogsOptions,
+      dialogOptions,
       isDialogOpen,
       openDialog,
       closeDialog,
