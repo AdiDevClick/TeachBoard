@@ -1,9 +1,7 @@
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/PopoverField.tsx";
 import type { VerticalRefSetters } from "@/components/Selects/types/select.types.ts";
-import {
-  VerticalFieldSelectWithCommands,
-  VerticalFieldSelectWithControllerAndCommandsList,
-} from "@/components/Selects/VerticalFieldSelect.tsx";
+import { VerticalFieldSelectWithCommands } from "@/components/Selects/VerticalFieldSelect.tsx";
 import {
   DialogHeaderTitle,
   HeaderTitle,
@@ -18,8 +16,13 @@ import {
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item.tsx";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { DEV_MODE } from "@/configs/app.config.ts";
+import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
@@ -28,13 +31,7 @@ import type { SignupInputItem } from "@/pages/Signup/types/signup.types.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Popover,
-  PopoverArrow,
-  PopoverClose,
-  PopoverContent,
-  PopoverTrigger,
-} from "@radix-ui/react-popover";
+import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   CheckIcon,
@@ -95,10 +92,11 @@ const defaultState = {
   isEditing: false,
   prevText: "",
   newText: "",
+  selectedText: "",
 };
 
 export type HandleAddNewItemParams = {
-  e: PointerEvent<HTMLElement>;
+  e?: PointerEvent<HTMLElement>;
   apiEndpoint?: (typeof inputs)[number]["apiEndpoint"];
   task: (typeof inputs)[number]["task"];
 };
@@ -119,7 +117,7 @@ export function DiplomaCreation({
 
   const resultsCallback = useCallback((keys: any) => {
     const cachedData = queryClient.getQueryData(keys ?? []);
-    if (DEV_MODE) {
+    if (DEV_MODE && !NO_CACHE_LOGS) {
       console.log("Cached data for ", keys, " is ", cachedData);
     }
     if (cachedData === undefined) {
@@ -263,10 +261,10 @@ export function DiplomaCreation({
    * @description When opening, fetch data based on the select's meta information
    *
    * @param open - Whether the select is opening
+   * @param metaData - The meta data from the popover field that was opened
    */
-  const handleOpening = (open: boolean) => {
+  const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
     if (!open) return;
-    const metaData = VerticalFieldSelectRef.current.getMeta();
 
     const task = metaData?.task;
     const apiEndpoint = metaData?.apiEndpoint;
@@ -278,7 +276,7 @@ export function DiplomaCreation({
     if (!found) return;
 
     if (DEV_MODE) {
-      console.log("handleOpening diploma creation & Fetching ", metaData);
+      console.debug("handleOpening diploma creation & Fetching ", metaData);
     }
 
     setFetchParams((prev) => ({
@@ -325,23 +323,29 @@ export function DiplomaCreation({
           className="grid gap-4"
           // onSubmit={form.handleSubmit(onSubmit)}
         >
-          <VerticalFieldSelectWithControllerAndCommandsList
+          <PopoverFieldWithControllerAndCommandsList
             items={inputs}
             form={form}
-            commandHeadings={resultsCallback(
-              [fetchParams.contentId, fetchParams.url] ?? []
-            )}
-            // queryRecordsKey={memoizedQueryRecordsKeys.cachedKeys}
-            onOpenChange={handleOpening}
-            onValueChange={() =>
+            commandHeadings={resultsCallback([
+              fetchParams.contentId,
+              fetchParams.url,
+            ])}
+            role="combobox"
+            // Command search box value changed
+            onValueChange={(value) =>
               console.log(
                 "value changed ->",
-                VerticalFieldSelectRef.current?.getLastSelectedItemValue()
+                VerticalFieldSelectRef.current?.getLastSelectedItemValue(),
+                VerticalFieldSelectRef.current?.getLastCommandValue(),
+                value
               )
             }
+            // Selection on command item triggered
+            // onSelect={(select) => {}}
+            // Vertical field just triggered opening
+            onOpenChange={handleOpening}
             setRef={setRef}
             observedRefs={observedRefs}
-            controllerRef={VerticalFieldSelectRef}
             onAddNewItem={handleAddNewItem}
           />
           <ItemGroup id={`${pageId}-roles`} className="grid gap-2">
