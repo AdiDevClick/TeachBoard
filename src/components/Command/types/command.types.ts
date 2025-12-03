@@ -23,4 +23,6 @@ export type CommandsProps = {
   onAddNewItem?: (payload: HandleAddNewItemParams) => void;
   commandHeadings?: HeadingType[];
   queryRecordsKey?: string[];
-} & ComponentProps<typeof Command>;
+  /** Callback appelé quand un item de commande est sélectionné */
+  onSelect?: (value: string) => void;
+} & Omit<ComponentProps<typeof Command>, 'onSelect'>;
