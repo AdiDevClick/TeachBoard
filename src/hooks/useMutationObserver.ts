@@ -1,4 +1,4 @@
-import { DEV_MODE } from "@/configs/app.config.ts";
+import { DEV_MODE, NO_MUTATION_OBSERVER_LOGS } from "@/configs/app.config.ts";
 import type { MutationObserverHook } from "@/hooks/types/use-mutation-observer.types.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useCallback, useId, useRef, useState } from "react";
@@ -120,13 +120,6 @@ export function useMutationObserver({
                 .set(nodeKey, { element: node, meta }),
             };
           }
-          // if (DEV_MODE) {
-          //   console.debug(
-          //     `useMutationObserver[${hookId}]: node already present -> ${
-          //       nodeKey + "\n" + JSON.stringify(meta)
-          //     }`
-          //   );
-          // }
           return prev;
         });
         return;
@@ -147,7 +140,7 @@ export function useMutationObserver({
         observer: obs,
       }));
 
-      if (DEV_MODE) {
+      if (DEV_MODE && !NO_MUTATION_OBSERVER_LOGS) {
         console.debug(
           `useMutationObserver[${hookId}]: observed node added -> ${nodeKey}`
         );
