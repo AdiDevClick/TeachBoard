@@ -62,19 +62,6 @@ function withCommands(Wrapped: AnyComponentLike) {
  */
 function restaureScrollBehavior(e: WheelEvent | TouchEvent) {
   preventDefaultAndStopPropagation(e);
-  const event = e as WheelEvent;
-  const eventTarget = event.target as HTMLElement;
-
-  const isScrollingDown = event.deltaY > 0;
-  // Simulate arrow down key press
-  if (isScrollingDown) {
-    eventTarget.dispatchEvent(
-      new KeyboardEvent("keydown", { key: "ArrowDown" })
-    );
-  } else {
-    // Simulate arrow up key press
-    eventTarget.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp" }));
-  }
 }
 
 export default withCommands;
