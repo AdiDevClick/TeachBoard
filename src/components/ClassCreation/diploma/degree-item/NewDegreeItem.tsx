@@ -35,9 +35,9 @@ export function NewDegreeItem({
   className,
   ...props
 }: Readonly<PageWithControllers<DegreeCreationInputItem>>) {
-  const { closeDialog } = useDialog();
+  const { closeDialog, dialogOptions } = useDialog();
   const { setRef, observedRefs } = useMutationObserver({});
-  const { onSubmit, data, error, isLoading, isLoaded } =
+  const { setQueryParams, onSubmit, data, error, isLoading, isLoaded } =
     useDegreeCreationForm("LEVEL");
   const form = useForm<DegreeCreationFormSchema>({
     resolver: zodResolver(diplomaFieldData),
@@ -56,6 +56,10 @@ export function NewDegreeItem({
    */
   const handleSubmit = (variables: MutationVariables) => {
     if (isLoading) return;
+    const options = dialogOptions("new-degree-item-dialog");
+    const endPoint =
+      options?.apiEndpoint.split("/")[1]?.toUpperCase() || "LEVEL";
+    setQueryParams({ endPoint, cachedFetchKey: options.queryKey });
     onSubmit(variables);
   };
 
