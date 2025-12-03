@@ -1,4 +1,4 @@
-import { DialogContext } from "@/api/contexts/DialogContext.ts";
+import { DialogContext } from "@/api/contexts/Dialog.context";
 import { use } from "react";
 
 /**
