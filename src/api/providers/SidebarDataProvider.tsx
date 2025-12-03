@@ -1,4 +1,4 @@
-import { SidebarDataContext } from "@/api/contexts/SidebarDataContext.ts";
+import { SidebarDataContext } from "@/api/contexts/SidebarData.context";
 import type { SidebarDataProviderProps } from "@/api/providers/types/SidebarDataProviderTypes.ts";
 
 /**
