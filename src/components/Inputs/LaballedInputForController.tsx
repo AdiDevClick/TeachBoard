@@ -1,6 +1,6 @@
-import { WithController } from "@/components/Controller/AppController.tsx";
+import withController from "@/components/HOCs/withController.tsx";
+import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import type { LaballedInputForControllerProps } from "@/components/Inputs/types/inputs.types";
-import { WithListMapper } from "@/components/Lists/ListMapper.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import type { FieldValues } from "react-hook-form";
@@ -34,8 +34,8 @@ export function LaballedInputForController<T extends FieldValues>(
   );
 }
 
-export const ControlledLabelledInput = WithController(
+export const ControlledLabelledInput = withController(
   LaballedInputForController
 );
 
-export const ControlledInputList = WithListMapper(ControlledLabelledInput);
+export const ControlledInputList = withListMapper(ControlledLabelledInput);
