@@ -3,7 +3,7 @@ import { USER_ACTIVITIES } from "@/configs/app.config.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -31,43 +31,27 @@ export function useDegreeCreationForm(endpoint: "LEVEL" | "YEAR" | "FIELD") {
       method: API_ENDPOINTS.POST.METHOD,
       successDescription: "Degree created successfully.",
       // silent: true,
-      onSuccess(data) {
+      onSuccess(response) {
         setLastUserActivity(USER_ACTIVITIES.degreeCreation);
-        // if (data?.data.length === 0) {
-        //   toast.dismiss();
-        //   toast.info("Aucune classe disponible. \nCréez-en une nouvelle !", {
-        //     style: { whiteSpace: "pre-wrap", zIndex: 10001 },
-        //   });
-        // }
-        // 1) Compose la même clé que celle utilisée pour GET (exemple) :
-        //  const queryKey = cachedFetchKeyRef.current;
-        //         console.log("my keys => ", queryKey);
+        if (!response.data.degree) throw new Error("No data returned from API");
+        toast.success("Nouveau diplôme créé avec succès.");
 
-        //         if (queryKey.length === 0) {
-        //           console.warn("No cache key set, skipping cache update");
-        //           return;
-        //         }
-        // cachedFetchKey est déjà un tableau, ne pas l'envelopper à nouveau
+        // Merge the new data into the existing cache
         const queryKey = queryParams.cachedFetchKey;
 
-        // 2) Merge the new data into the existing cache
         queryClient.setQueryData(queryKey, (old: any) => {
-          if (!old) return data.data.degree;
-          // Suppose old is an array of groups [{ groupTitle, items: [] }]
-          if (!Array.isArray(old)) return data;
+          if (!old) return response.data.degree;
 
-          // La structure de la réponse est : data.data.degree = { id, name, code, description, type }
-          const newItem = data.data.degree;
+          if (!Array.isArray(old)) return response;
+
+          // La structure de la réponse est : response.data.degree = { id, name, code, description, type }
+          const newItem = response.data.degree;
           const mappedNewItem = {
             id: newItem?.id,
             value: newItem?.name,
           };
 
-          // Vérifier que le mapping a fonctionné
-          if (
-            mappedNewItem.id === undefined ||
-            mappedNewItem.value === undefined
-          ) {
+          if (!mappedNewItem.id || !mappedNewItem.value) {
             console.error("Failed to map new item, data structure:", newItem);
             return old;
           }
