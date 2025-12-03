@@ -3,6 +3,7 @@ import type { CommandsProps } from "@/components/Command/types/command.types.ts"
 import type { PopoverFieldProps } from "@/components/Popovers/PopoverField.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import type { AnyComponentLike } from "@/utils/types/types.utils.ts";
+import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { PlusIcon } from "lucide-react";
 
 /**
@@ -29,7 +30,12 @@ function withCommands(Wrapped: AnyComponentLike) {
     return (
       <Wrapped {...rest}>
         {useCommands && (
-          <CommandItems commandHeadings={commandHeadings ?? []} {...rest} />
+          <CommandItems
+            commandHeadings={commandHeadings ?? []}
+            onTouchMove={restaureScrollBehavior}
+            onWheel={restaureScrollBehavior}
+            {...rest}
+          />
         )}
         {useButtonAddNew && task && (
           <Button
@@ -45,6 +51,30 @@ function withCommands(Wrapped: AnyComponentLike) {
       </Wrapped>
     );
   };
+}
+
+/**
+ * Restores scroll behavior inside Command by simulating arrow key presses.
+ *
+ * !! IMPORTANT !! This is a workaround to allow scrolling within Command
+ *
+ * @param e - Scroll or Touch event
+ */
+function restaureScrollBehavior(e: WheelEvent | TouchEvent) {
+  preventDefaultAndStopPropagation(e);
+  const event = e as WheelEvent;
+  const eventTarget = event.target as HTMLElement;
+
+  const isScrollingDown = event.deltaY > 0;
+  // Simulate arrow down key press
+  if (isScrollingDown) {
+    eventTarget.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "ArrowDown" })
+    );
+  } else {
+    // Simulate arrow up key press
+    eventTarget.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp" }));
+  }
 }
 
 export default withCommands;

@@ -40,8 +40,12 @@ export function CommandItems(props: Readonly<CommandsProps>) {
   );
 
   return (
-    <Command filter={filter} onChange={(e) => console.log("change", e)}>
+    <Command
+      filter={filter}
+      // onChange={(e) => preventDefaultAndStopPropagation(e)}
+    >
       <CommandInput placeholder="Search..." />
+
       <CommandList>
         <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
         <ListMapper items={commandHeadings ?? []}>
