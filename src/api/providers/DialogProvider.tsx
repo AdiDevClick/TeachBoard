@@ -1,4 +1,4 @@
-import { DialogContext } from "@/api/contexts/DialogContext.ts";
+import { DialogContext } from "@/api/contexts/Dialog.context";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
