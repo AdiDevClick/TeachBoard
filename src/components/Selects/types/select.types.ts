@@ -3,7 +3,6 @@ import type {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select.tsx";
-import type { AppModalNames } from "@/configs/app.config.ts";
 import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
 import type { UniqueSet } from "@/utils/UniqueSet";
 import type {
@@ -16,6 +15,13 @@ import type {
   SetStateAction,
 } from "react";
 
+/** State type for VerticalFieldSelect */
+export type VerticalFieldState = {
+  containerId?: string;
+  open?: boolean;
+  command?: boolean;
+};
+
 export type VerticalRefSetters = {
   /** Underlying props for the select */
   props: ComponentProps<typeof Select>;
@@ -23,6 +29,18 @@ export type VerticalRefSetters = {
   getMeta: () => Record<string, unknown> | undefined;
   /** Last selected item value (may be undefined) */
   getLastSelectedItemValue: () => unknown;
+  /** Set the last selected item value */
+  setLastSelectedItemValue: (value: string) => void;
+  /** Last command value from CommandItems (may be null) */
+  getLastCommandValue: () => string | null;
+  /** Set the last command value */
+  setLastCommandValue: (value: string) => void;
+  /** Set the open state of the vertical field select */
+  setVerticalFieldOpen?: Dispatch<SetStateAction<VerticalFieldState>>;
+  /** Set the selected value */
+  setSelectedValue?: (value: string) => void;
+  /** Set the vertical field state */
+  setVerticalState?: Dispatch<SetStateAction<VerticalFieldState>>;
 };
 
 /**
@@ -77,13 +95,20 @@ export type NonLabelledGroupItemProps = {
 /**
  * Props for the SelectItemWithIcon component
  */
-export type SelectItemWithIconProps = ComponentProps<typeof SelectItem> & {
-  value: string;
-  selectText: ReactNode | string;
-  modalName?: AppModalNames;
-};
+export type ButtonItemWithIconProps = {
+  // value: string;
+  inertIconText: ReactNode | string;
+  // modalName?: AppModalNames;
+} & PropsWithChildren;
+// export type SelectItemWithIconProps = ComponentProps<typeof SelectItem> & {
+//   value: string;
+//   selectText: ReactNode | string;
+//   modalName?: AppModalNames;
+// };
 
 export type HandleAddNewParams = {
   e: PointerEvent<HTMLDivElement>;
   setSelected: Dispatch<SetStateAction<boolean>>;
 };
+
+export type InertSelectItemProps = ComponentProps<typeof SelectItem>;
