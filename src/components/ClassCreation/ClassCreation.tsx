@@ -56,32 +56,9 @@ const year = new Date().getFullYear();
 const years = yearsListRange(year, 5);
 const defaultSchoolYear = year + " - " + (year + 1);
 
-/**
- * Generates a list of school years within a specified range.
- *
- * @param year - The central year to base the range on.
- * @param range - The number of years to include before and after the central year.
- * @returns An array of objects containing the school year names and IDs.
- */
-function yearsListRange(
-  year: number,
-  range: number
-): { name: string; id: string }[] {
-  const startYear = year - range;
-  const endYear = year + range;
-  const length = endYear - startYear + 1;
-  return Array.from({ length }, (_v, i) => {
-    const yearLabel = `${startYear + i} - ${startYear + i + 1}`;
-    return {
-      name: yearLabel,
-      id: yearLabel,
-    };
-  });
-}
-
 const inputs = [
   {
-    // Required for WithController to be able to process the field
+    // Required for withController to be able to process the field
     name: "degreeConfigId",
     label: "Année et niveau du diplôme",
     placeholder: "Sélectionnez...",
@@ -92,7 +69,7 @@ const inputs = [
     useButtonAddNew: true,
   },
   {
-    // Required for WithController to be able to process the field
+    // Required for withController to be able to process the field
     // The "students" field can hold an array of selected student ids (or similar)
     name: "students",
     label: "Elèves",
@@ -524,7 +501,7 @@ export function ClassCreation({
             name="schoolYear"
             form={form}
             fullWidth={false}
-            placeholder={defaultSchoolYear}
+            placeholder={"defaultSchoolYear"}
             defaultValue={defaultSchoolYear}
             label="Année scolaire"
             id={`${pageId}-schoolYear`}
@@ -567,4 +544,27 @@ export function ClassCreation({
       </DialogFooter>
     </Card>
   );
+}
+
+/**
+ * Generates a list of school years within a specified range.
+ *
+ * @param year - The central year to base the range on.
+ * @param range - The number of years to include before and after the central year.
+ * @returns An array of objects containing the school year names and IDs.
+ */
+function yearsListRange(
+  year: number,
+  range: number
+): { name: string; id: string }[] {
+  const startYear = year - range;
+  const endYear = year + range;
+  const length = endYear - startYear + 1;
+  return Array.from({ length }, (_v, i) => {
+    const yearLabel = `${startYear + i} - ${startYear + i + 1}`;
+    return {
+      name: yearLabel,
+      id: yearLabel,
+    };
+  });
 }
