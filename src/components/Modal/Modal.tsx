@@ -295,6 +295,7 @@ export function Modal({
       <DialogContent
         ref={(el) => setRef(el, { modalName })}
         id={modalName}
+        data-dialog={modalName}
         className={className}
       >
         {modalContent}
@@ -337,6 +338,7 @@ function withSimpleAlert(WrappedComponent: ComponentType<ModalProps>) {
           ref={ref}
         >
           <DialogHeaderTitle
+            className="text-center!"
             title={headerTitle}
             description={headerDescription}
           />
