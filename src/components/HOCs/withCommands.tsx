@@ -2,16 +2,16 @@ import { CommandItems } from "@/components/Command/CommandItems.tsx";
 import type { CommandsProps } from "@/components/Command/types/command.types.ts";
 import type { PopoverFieldProps } from "@/components/Popovers/PopoverField.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import type { AnyComponentLike } from "@/utils/types/types.utils.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { PlusIcon } from "lucide-react";
+import type { ComponentType } from "react";
 
 /**
  * HOC to add CommandItems and an optional "Add New" button to a component.
  *
  * @param Wrapped - The component to be wrapped with command functionalities.
  */
-function withCommands(Wrapped: AnyComponentLike) {
+function withCommands(Wrapped: ComponentType) {
   return function Component<T extends CommandsProps>(
     props: T & PopoverFieldProps
   ) {
