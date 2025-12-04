@@ -1,7 +1,10 @@
+import type { CommandsProps } from "@/components/Command/types/command.types.ts";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/PopoverField.tsx";
+import {
+  PopoverFieldWithControllerAndCommandsList,
+  type PopoverFieldProps,
+} from "@/components/Popovers/PopoverField.tsx";
 import type { VerticalRefSetters } from "@/components/Selects/types/select.types.ts";
-import { VerticalFieldSelectWithCommands } from "@/components/Selects/VerticalFieldSelect.tsx";
 import {
   DialogHeaderTitle,
   HeaderTitle,
@@ -84,7 +87,8 @@ const inputs = [
     apiEndpoint: "/level",
     id: "school-level-input",
   },
-] satisfies Parameters<typeof VerticalFieldSelectWithCommands>[];
+] satisfies (PopoverFieldProps & CommandsProps)[];
+// ] satisfies Parameters<typeof VerticalFieldSelectWithCommands>[];
 
 const defaultState = {
   selected: false,
@@ -232,7 +236,7 @@ export function DiplomaCreation({
       });
     }
     // console.log(openedDialogs);
-    openDialog(e, "new-degree-item-dialog", {
+    openDialog(e, "new-degree-item", {
       task: "get-degrees",
       apiEndpoint,
       queryKey: [fetchParams.contentId, fetchParams.url],
@@ -455,6 +459,7 @@ export function DiplomaCreation({
                 variant="ghost"
                 size="icon"
                 className="rounded-full max-h-5"
+                onClick={(e) => openDialog(e, "new-degree-skill-dialog")}
               >
                 <PlusIcon />
               </Button>
