@@ -59,8 +59,8 @@ export type AppModalNames =
   | "pw-recovery-email-sent"
   | "class-creation"
   | "create-diploma"
-  | "new-degree-item-dialog"
-  | "new-degree-skill-dialog";
+  | "new-degree-item"
+  | "new-degree-skill";
 
 /**
  * Pages that do not require session checks

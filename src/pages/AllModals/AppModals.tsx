@@ -81,7 +81,7 @@ const modals = defineStrictModalsList([
     },
   },
   {
-    modalName: "new-degree-item-dialog",
+    modalName: "new-degree-item",
     type: Modal,
     modalContent: DegreeItem,
     modalProps: {
@@ -92,7 +92,7 @@ const modals = defineStrictModalsList([
     },
   },
   {
-    modalName: "new-degree-skill-dialog",
+    modalName: "new-degree-skill",
     type: Modal,
     modalContent: DegreeSkill,
     modalProps: { isNavigationModal: false },
