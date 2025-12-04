@@ -1,5 +1,5 @@
 import type { ClassCreation } from "@/components/ClassCreation/ClassCreation.tsx";
-import type DegreeItem from "@/components/ClassCreation/diploma/degree-item/DegreeItem";
+import type { DegreeItemController } from "@/components/ClassCreation/diploma/degree-item/controller/DegreeItemController.tsx";
 import type { InputItem } from "@/components/Inputs/types/inputs.types";
 import type LoginForm from "@/components/LoginForms/LoginForm.tsx";
 import type { RecoveryFormSchema } from "@/components/LoginForms/types/login-forms.types.ts";
@@ -117,4 +117,4 @@ export const degreeCreationInputControllers = [
     placeholder: "Description du diplôme. Ex: Niveau 4, RNCP5, ...",
     required: false,
   },
-] satisfies Parameters<typeof DegreeItem>[0]["inputControllers"];
+] satisfies Parameters<typeof DegreeItemController>[0]["inputControllers"];
