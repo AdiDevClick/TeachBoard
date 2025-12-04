@@ -113,12 +113,6 @@ export function useQueryOnSubmit<
   queryKeysArr[1].reset = reset;
 
   queryKeysArr[1].localState = setLocalState;
-  // Wrapper du onError original pour mettre à jour l'état local
-  // const originalOnError = queryKeysArr[1].onError;
-  // queryKeysArr[1].onError = (error) => {
-  //   setLocalError(error);
-  //   originalOnError?.(error);
-  // };
 
   // Memoize mutation options to prevent observer recreation on every render
   const options = useMemo(
