@@ -1,5 +1,6 @@
 import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
 import { AppFieldDescriptionWithLink } from "@/components/Fields/AppFieldDescriptionWithLink.tsx";
+import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import type {
@@ -7,17 +8,16 @@ import type {
   LoginInputItem,
   RecoveryFormSchema,
 } from "@/components/LoginForms/types/login-forms.types";
-import {
-  DialogHeaderTitle,
-  HeaderTitle,
-} from "@/components/Titles/ModalTitle.tsx";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Field, FieldGroup, FieldSeparator } from "@/components/ui/field";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
 import { DEV_MODE } from "@/configs/app.config.ts";
 import { loginButtonsSvgs } from "@/configs/social.config.ts";
-import { passwordRecoveryInputControllers } from "@/data/inputs-controllers.data.ts";
+import {
+  inputLoginControllers,
+  passwordRecoveryInputControllers,
+} from "@/data/inputs-controllers.data.ts";
+
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useLogin } from "@/hooks/database/login/useLogin.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
@@ -31,7 +31,15 @@ import {
   wait,
 } from "@/utils/utils.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { startTransition, useEffect, useState, type MouseEvent } from "react";
+import {
+  startTransition,
+  useEffect,
+  useMemo,
+  useState,
+  type Dispatch,
+  type MouseEvent,
+  type SetStateAction,
+} from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -41,6 +49,22 @@ const resetPasswordButtonText = "Réinitialiser le mot de passe";
 const backToLoginLinkText = "Retour à la connexion";
 const loginLinkTo = "/login";
 
+type LoginFormProps = {
+  pageId?: string;
+  className?: string;
+  inputControllers?: LoginInputItem[];
+  modalMode?: boolean;
+  formId?: string;
+  form: ReturnType<typeof useForm<LoginFormSchema | RecoveryFormSchema>>;
+  setIsPwForgotten: Dispatch<SetStateAction<boolean>>;
+  isPwForgotten: boolean;
+  textToDisplay: {
+    pwForgottenLinkText: string;
+    pwForgottenLinkTo: string;
+    buttonText: string;
+  };
+};
+
 /**
  * Login form component
  *
@@ -49,45 +73,24 @@ const loginLinkTo = "/login";
  * @param modalMode - Flag to indicate if the form is in modal mode (default: false)
  * @param props - Additional props for the component
  */
-export function LoginForm({
-  ref,
+function LoginFormController({
   pageId = "login-form-page-card",
-  className,
-  inputControllers,
+  className = "grid gap-4",
+  form,
+  setIsPwForgotten,
+  isPwForgotten,
+  inputControllers = inputLoginControllers,
   modalMode = false,
-  ...props
-}: Readonly<PageWithControllers<LoginInputItem>>) {
+  formId: formIdProp,
+  textToDisplay,
+}: Readonly<LoginFormProps>) {
   const navigate = useNavigate();
   const { open, setOpen } = useSidebar();
   const { closeDialog, openDialog, closeAllDialogs } = useDialog();
   const user = useAppStore((state) => state.user);
-  const [isPwForgotten, setIsPwForgotten] = useState(false);
   const { data, onSubmit, isLoading, error } = useLogin({ isPwForgotten });
 
-  const schemaToUse = isPwForgotten ? pwRecoverySchema : formSchema;
-
-  const form = useForm<LoginFormSchema | RecoveryFormSchema>({
-    resolver: zodResolver(schemaToUse),
-    mode: "onTouched",
-    defaultValues: {
-      identifier: "",
-      password: "",
-    },
-  });
-
-  const { setRef, observedRefs } = useMutationObserver({});
-
-  // useEffect(() => {
-  //   if (!pageId || !observedRefs) return;
-  //   const key = `${pageId}-form`;
-  //   const element = observedRefs.get(key)?.element;
-  //   if (element) form.setFocus("identifier");
-  // }, [observedRefs, pageId]);
-  // useEffect(() => {
-  //   if (observedRefs.size > 0) {
-  //     form.setFocus("identifier");
-  //   }
-  // }, [observedRefs]);
+  const { setRef } = useMutationObserver({});
 
   /** Log user data on change (for development purposes) */
   useEffect(() => {
@@ -134,8 +137,6 @@ export function LoginForm({
       resetFormAndTriggerNavigation();
 
       if (isPwForgotten) {
-        // if (isPwForgotten && observedRefs.get("pw-recovery-email-sent")) {
-        // if (isPwForgotten && observedRefs) {
         openDialog(null, "pw-recovery-email-sent");
       } else {
         toast.success("Connexion réussie !");
@@ -158,11 +159,87 @@ export function LoginForm({
     }
   };
 
-  /**
-   * Determine the title component based on modal mode
-   * @description Uses HeaderTitle directly in modal mode, otherwise wraps it with the dialog header HOC
-   */
-  const Title = modalMode ? DialogHeaderTitle : HeaderTitle;
+  const formId = formIdProp ?? pageId + "-form";
+
+  return (
+    <form
+      ref={(el) => setRef(el, { name: pageId, id: formId })}
+      id={formId}
+      onSubmit={form.handleSubmit(onSubmit)}
+      className={className}
+    >
+      <FieldGroup>
+        <Field>
+          <ListMapper items={loginButtonsSvgs}>
+            <LoginButton
+              ischild
+              onClick={(e) => {
+                openDialog(e, "apple-login");
+              }}
+            />
+          </ListMapper>
+        </Field>
+        <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
+          Ou continuez avec
+        </FieldSeparator>
+        <ControlledInputList items={inputControllers} form={form} />
+        <AppFieldDescriptionWithLink
+          className="text-left"
+          onClick={handleRecoverPasswordClick}
+          linkText={textToDisplay.pwForgottenLinkText}
+          linkTo={textToDisplay.pwForgottenLinkTo}
+        />
+        <Field>
+          <Button
+            type="submit"
+            disabled={!form.formState.isValid}
+            form={formId}
+          >
+            {textToDisplay.buttonText}
+          </Button>
+          <AppFieldDescriptionWithLink
+            linkText="Inscrivez-vous ici"
+            linkTo="/signup"
+            onClick={(e) =>
+              handleModalOpening({
+                e,
+                dialogFns: { closeAllDialogs, openDialog },
+                modalName: "signup",
+              })
+            }
+          >
+            Vous n'avez pas de compte ?{" "}
+          </AppFieldDescriptionWithLink>
+        </Field>
+      </FieldGroup>
+    </form>
+  );
+}
+
+const titleProps = {
+  title: "Welcome Back !",
+  description: "Connectez-vous à votre compte TeachBoard.",
+  className: "text-center",
+};
+
+function LoginForm({
+  pageId = "login-form-page-card",
+  modalMode = false,
+  inputControllers = inputLoginControllers,
+  ...props
+}: Readonly<PageWithControllers<LoginInputItem>>) {
+  const [isPwForgotten, setIsPwForgotten] = useState(false);
+
+  const schemaToUse = isPwForgotten ? pwRecoverySchema : formSchema;
+
+  const form = useForm<LoginFormSchema | RecoveryFormSchema>({
+    resolver: zodResolver(schemaToUse),
+    mode: "all",
+    defaultValues: {
+      identifier: "",
+      password: "",
+    },
+  });
 
   let inputControllersToUse = inputControllers;
   let pwForgottenLinkText = "Mot de passe oublié ?";
@@ -175,64 +252,33 @@ export function LoginForm({
     buttonText = resetPasswordButtonText;
     inputControllersToUse = passwordRecoveryInputControllers;
   }
+
   const formId = pageId + "-form";
 
-  return (
-    <Card id={pageId} ref={ref} className={className} {...props}>
-      <Title />
-      <CardContent>
-        <form
-          ref={(el) => setRef(el, { name: pageId, id: formId })}
-          id={formId}
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid gap-4"
-        >
-          <FieldGroup>
-            <Field>
-              <ListMapper items={loginButtonsSvgs}>
-                <LoginButton
-                  ischild
-                  onClick={(e) => {
-                    openDialog(e, "apple-login");
-                  }}
-                />
-              </ListMapper>
-            </Field>
-            <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-              Ou continuez avec
-            </FieldSeparator>
-            <ControlledInputList items={inputControllersToUse} form={form} />
-            <AppFieldDescriptionWithLink
-              className="text-left"
-              onClick={handleRecoverPasswordClick}
-              linkText={pwForgottenLinkText}
-              linkTo={pwForgottenLinkTo}
-            />
-            <Field>
-              <Button
-                type="submit"
-                disabled={!form.formState.isValid}
-                form={formId}
-              >
-                {buttonText}
-              </Button>
-              <AppFieldDescriptionWithLink
-                linkText="Inscrivez-vous ici"
-                linkTo="/signup"
-                onClick={(e) =>
-                  handleModalOpening({
-                    e,
-                    dialogFns: { closeAllDialogs, openDialog },
-                    modalName: "signup",
-                  })
-                }
-              >
-                Vous n'avez pas de compte ?{" "}
-              </AppFieldDescriptionWithLink>
-            </Field>
-          </FieldGroup>
-        </form>
-      </CardContent>
-    </Card>
+  const Component = withTitledCard(LoginFormController);
+
+  const commonProps = useMemo(
+    () => ({
+      pageId,
+      formId,
+      form,
+      setIsPwForgotten,
+      isPwForgotten,
+      modalMode,
+      titleProps,
+      displayFooter: false as const,
+      inputControllers: inputControllersToUse,
+      textToDisplay: {
+        pwForgottenLinkText,
+        pwForgottenLinkTo,
+        buttonText,
+      },
+      ...props,
+    }),
+    [form.formState, setIsPwForgotten, isPwForgotten, props]
   );
+
+  return <Component {...commonProps} />;
 }
+
+export default LoginForm;
