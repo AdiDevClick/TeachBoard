@@ -9,6 +9,7 @@ import {
   CommandList,
 } from "@/components/ui/command.tsx";
 import { usePopoverFieldContextSafe } from "@/hooks/contexts/usePopover.ts";
+import { CheckIcon } from "lucide-react";
 import { useCallback } from "react";
 
 /**
@@ -30,14 +31,12 @@ export function CommandItems(props: Readonly<CommandsProps>) {
   // !! IMPORTANT !! This context can be null
   const context = usePopoverFieldContextSafe();
   const contextOnSelect = context?.onSelect;
+  const selectedValue = context?.selectedValue ?? "";
 
-  const handleSelect = useCallback(
-    (value: string) => {
-      contextOnSelect?.(value);
-      externalOnSelect?.(value);
-    },
-    [contextOnSelect, externalOnSelect]
-  );
+  const handleSelect = useCallback((value: string) => {
+    contextOnSelect?.(value);
+    externalOnSelect?.(value);
+  }, []);
 
   return (
     <Command
@@ -60,7 +59,10 @@ export function CommandItems(props: Readonly<CommandsProps>) {
                     onSelect={handleSelect}
                     {...rest}
                   >
-                    {value ?? ""}
+                    {value ?? "Valeur inconnue"}
+                    {selectedValue === value && (
+                      <CheckIcon className={"ml-auto"} />
+                    )}
                   </CommandItem>
                 )}
               </ListMapper>

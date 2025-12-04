@@ -107,14 +107,23 @@ export function PopoverField({
             id={id}
             variant="outline"
             role={role}
-            className={cn("justify-between", fullWidth ? "w-full" : "w-fit")}
+            className={cn(
+              "justify-between",
+              fullWidth ? "w-full" : "w-fit",
+              selectedValue
+                ? "font-normal"
+                : "text-muted-foreground font-normal"
+            )}
           >
             {selectedValue || placeholder}
             <LucideChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent side={side} className="p-0">
-          <PopoverFieldProvider onSelect={setSelectedValueCallback}>
+          <PopoverFieldProvider
+            onSelect={setSelectedValueCallback}
+            selectedValue={selectedValue}
+          >
             {children}
           </PopoverFieldProvider>
         </PopoverContent>
