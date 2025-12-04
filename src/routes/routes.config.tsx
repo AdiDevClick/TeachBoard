@@ -13,7 +13,7 @@ import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
 import { Login } from "@/pages/Login/Login.tsx";
 import { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
-import { EmailValidation } from "@/pages/Signup/email-validation/EmailValidation.tsx";
+import EmailValidation from "@/pages/Email/EmailValidation";
 import { Signup } from "@/pages/Signup/Signup";
 import { Navigate, type RouteObject } from "react-router-dom";
 type NavMenu = (typeof completeDatas.navMain.menus)[number];

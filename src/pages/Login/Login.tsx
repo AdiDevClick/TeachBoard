@@ -1,4 +1,4 @@
-import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
+import LoginForm from "@/components/LoginForms/LoginForm.tsx";
 import { FieldDescription } from "@/components/ui/field.tsx";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
 import { inputLoginControllers } from "@/data/inputs-controllers.data";
