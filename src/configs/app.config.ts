@@ -12,6 +12,7 @@ export const DEV_MODE = import.meta.env.DEV;
 export const NO_PROXY_LOGS = true;
 export const NO_MUTATION_OBSERVER_LOGS = true;
 export const NO_CACHE_LOGS = true;
+export const NO_QUERY_LOGS = true;
 
 /** Supported HTTP methods for API requests */
 export const HTTP_METHODS = [
@@ -58,7 +59,8 @@ export type AppModalNames =
   | "pw-recovery-email-sent"
   | "class-creation"
   | "create-diploma"
-  | "new-degree-item-dialog";
+  | "new-degree-item-dialog"
+  | "new-degree-skill-dialog";
 
 /**
  * Pages that do not require session checks
@@ -73,3 +75,5 @@ export const NO_SESSIONS_CHECK_PAGES = [
   "/forgot-password",
 ];
 // export const NO_SESSIONS_PAGES = ["/login", "/signup", "/signup/validate"];
+
+export const APP_REDIRECT_TIMEOUT = 1500;
