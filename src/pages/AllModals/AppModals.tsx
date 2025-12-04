@@ -1,8 +1,9 @@
 import { ClassCreation } from "@/components/ClassCreation/ClassCreation.tsx";
-import { NewDegreeItem } from "@/components/ClassCreation/diploma/degree-item/NewDegreeItem.tsx";
+import DegreeItem from "@/components/ClassCreation/diploma/degree-item/DegreeItem";
+import DegreeSkill from "@/components/ClassCreation/diploma/degree-skill/NewDegreeSkill.tsx";
 import { DiplomaCreation } from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
+import LoginForm from "@/components/LoginForms/LoginForm.tsx";
 import { Modal, ModalWithSimpleAlert } from "@/components/Modal/Modal.tsx";
 import {
   degreeCreationInputControllers,
@@ -82,13 +83,20 @@ const modals = defineStrictModalsList([
   {
     modalName: "new-degree-item-dialog",
     type: Modal,
-    modalContent: NewDegreeItem,
+    modalContent: DegreeItem,
     modalProps: {
       isNavigationModal: false,
     },
     contentProps: {
       modalMode: true,
     },
+  },
+  {
+    modalName: "new-degree-skill-dialog",
+    type: Modal,
+    modalContent: DegreeSkill,
+    modalProps: { isNavigationModal: false },
+    contentProps: { modalMode: true },
   },
 ]) satisfies Parameters<typeof AppModals>[0]["modalsList"];
 
