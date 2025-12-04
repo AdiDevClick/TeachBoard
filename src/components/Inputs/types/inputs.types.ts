@@ -22,6 +22,7 @@ export type InputItem<T> = {
   type: HTMLInputTypeAttribute;
   placeholder: string;
   autoComplete?: string;
+  required?: boolean;
 };
 
 /** Props for the Inputs component */
