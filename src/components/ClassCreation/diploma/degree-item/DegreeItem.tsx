@@ -17,7 +17,7 @@ const titleProps = {
   description: "Ajoutez un nouveau domaine / métier pour les diplômes.",
 };
 
-const footerProps = { submitText: "Sauvegarder", cancelText: "Annuler" };
+const footerProps = { submitText: "Créer", cancelText: "Annuler" };
 
 /**
  * View component for creating a new degree item.
