@@ -1,0 +1,422 @@
+import type { CommandsProps } from "@/components/Command/types/command.types.ts";
+import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import {
+  PopoverFieldWithControllerAndCommandsList,
+  type PopoverFieldProps,
+} from "@/components/Popovers/PopoverField.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemGroup,
+  ItemTitle,
+} from "@/components/ui/item.tsx";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover.tsx";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import {
+  DEV_MODE,
+  NO_CACHE_LOGS,
+  NO_QUERY_LOGS,
+} from "@/configs/app.config.ts";
+import { useDialog } from "@/hooks/contexts/useDialog.ts";
+import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
+import type { SignupInputItem } from "@/pages/Signup/types/signup.types.ts";
+import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
+import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
+import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  CheckIcon,
+  Pencil,
+  PlusIcon,
+  RotateCcw,
+  Trash2,
+  XIcon,
+} from "lucide-react";
+import { useCallback, useEffect, useState, type PointerEvent } from "react";
+
+const inputs = [
+  {
+    task: "add-diploma-field",
+    name: "diplomaField",
+    label: "Métier / Domaine du diplôme",
+    placeholder: "Sélectionnez...",
+    creationButtonText: "Ajouter un métier ou domaine",
+    useButtonAddNew: true,
+    useCommands: true,
+    apiEndpoint: "/field",
+    id: "diploma-field-input",
+  },
+  {
+    task: "add-school-year",
+    name: "schoolYear",
+    label: "Année scolaire",
+    placeholder: "Sélectionnez...",
+    creationButtonText: "Ajouter une année scolaire",
+    useButtonAddNew: true,
+    useCommands: true,
+    apiEndpoint: "/year",
+    id: "school-year-input",
+  },
+  {
+    task: "add-school-level",
+    name: "schoolLevel",
+    label: "Diplôme / Niveau scolaire",
+    placeholder: "Sélectionnez...",
+    creationButtonText: "Ajouter un niveau scolaire",
+    useButtonAddNew: true,
+    useCommands: true,
+    apiEndpoint: "/level",
+    id: "school-level-input",
+  },
+] satisfies (PopoverFieldProps & CommandsProps)[];
+// ] satisfies Parameters<typeof VerticalFieldSelectWithCommands>[];
+
+const defaultState = {
+  selected: false,
+  role: "",
+  isEditing: false,
+  prevText: "",
+  newText: "",
+  selectedText: "",
+};
+
+export type HandleAddNewItemParams = {
+  e?: PointerEvent<HTMLElement>;
+  apiEndpoint?: (typeof inputs)[number]["apiEndpoint"];
+  task: (typeof inputs)[number]["task"];
+};
+
+export function DiplomaCreationController({
+  pageId = "diploma-creation-page-card",
+  modalMode = true,
+  className,
+  inputControllers,
+  fetchHooks,
+  form,
+  formId,
+  ...props
+}: Readonly<PageWithControllers<SignupInputItem>>) {
+  const { onSubmit, fetchParams, data, error, isLoaded, setFetchParams } =
+    fetchHooks;
+  const { openDialog } = useDialog();
+  const queryClient = useQueryClient();
+  const [state, setState] = useState(defaultState);
+  const { setRef, observedRefs } = useMutationObserver({});
+
+  const resultsCallback = useCallback((keys: any) => {
+    const cachedData = queryClient.getQueryData(keys ?? []);
+    if (DEV_MODE && !NO_CACHE_LOGS) {
+      console.log("Cached data for ", keys, " is ", cachedData);
+    }
+    if (cachedData === undefined) {
+      return data;
+    }
+    return cachedData;
+  }, []);
+
+  const handleOnDelete = (e: PointerEvent<HTMLButtonElement>) => {
+    preventDefaultAndStopPropagation(e);
+    console.log("Delete role:", state.role);
+    setState(defaultState);
+  };
+
+  const handleOnEdit = (e: PointerEvent<HTMLButtonElement>) => {
+    preventDefaultAndStopPropagation(e);
+    const roleId = e.currentTarget.id.split("-")[0];
+    const editable = document.getElementById(roleId);
+    if (!editable) return;
+    editable.focus();
+    editable.dataset.isEditing = "true";
+    editable.style.setProperty("user-select", "text");
+    editable.style.setProperty("-webkit-user-modify", "read-write");
+    const newRange = new Range();
+
+    const selection = window.getSelection();
+    newRange.selectNodeContents(editable);
+
+    selection?.focusNode;
+    selection?.removeAllRanges();
+    selection?.addRange(newRange);
+
+    setState((prev) => ({
+      ...prev,
+      isEditing: true,
+      prevText: roleId,
+      selected: true,
+      role: roleId,
+    }));
+  };
+
+  const handleOnValidate = (e: PointerEvent<HTMLButtonElement>) => {
+    preventDefaultAndStopPropagation(e);
+    const role = e.currentTarget.id.split("-")[0];
+    console.log("Validate role edit:", state.role);
+    if (role === state.role) {
+      // cleanup editable state on validate
+      const editable = document.getElementById(role);
+      if (editable) {
+        // editable.removeAttribute("contenteditable");
+        // editable.removeAttribute("data-is-editing");
+        editable.removeAttribute("style");
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+      }
+      setState(defaultState);
+    }
+  };
+
+  const onRoleOpenChange = (open: boolean, role: string) => {
+    if (state.isEditing) return;
+    console.log("openChange");
+    setState(
+      open
+        ? {
+            selected: true,
+            role,
+            isEditing: false,
+            prevText: "",
+            newText: "",
+          }
+        : defaultState
+    );
+  };
+
+  const handleOnCancel = (e: PointerEvent<HTMLButtonElement>) => {
+    preventDefaultAndStopPropagation(e);
+    setState((prev) => ({
+      ...prev,
+      isEditing: false,
+      newText: "",
+      prevText: "",
+    }));
+  };
+
+  const handleAddNewItem = ({
+    e,
+    apiEndpoint,
+    task,
+  }: HandleAddNewItemParams) => {
+    if (DEV_MODE && !NO_CACHE_LOGS) {
+      console.log("Add new item triggered", {
+        apiEndpoint,
+        task,
+      });
+    }
+    // console.log(openedDialogs);
+    openDialog(e, "new-degree-item", {
+      task: "get-degrees",
+      apiEndpoint,
+      queryKey: [fetchParams.contentId, fetchParams.url],
+    });
+  };
+
+  /**
+   * Effect to fetch data when fetchParams change
+   *
+   * @description Triggers when fetchParams are updated with {@link handleOpening}
+   */
+  useEffect(() => {
+    const keys = [fetchParams.contentId, fetchParams.url];
+
+    if (keys[1] === "" && keys[0] === "none") return;
+    const cachedData = queryClient.getQueryData(keys ?? []);
+
+    if (cachedData === undefined) {
+      onSubmit();
+    }
+  }, [fetchParams]);
+
+  /**
+   * Handle opening of the VerticalFieldSelect component
+   *
+   * @description When opening, fetch data based on the select's meta information
+   *
+   * @param open - Whether the select is opening
+   * @param metaData - The meta data from the popover field that was opened
+   */
+  const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
+    if (!open) return;
+
+    const task = metaData?.task;
+    const apiEndpoint = metaData?.apiEndpoint;
+
+    // Ensure apiEndpoint is present and correspond to a known input
+    const found = inputs.find(
+      (input) => input.task === task && input.apiEndpoint === apiEndpoint
+    );
+    if (!found) return;
+
+    if (DEV_MODE && !NO_CACHE_LOGS) {
+      console.debug("handleOpening diploma creation & Fetching ", metaData);
+    }
+
+    setFetchParams((prev) => ({
+      ...prev,
+      url: API_ENDPOINTS.GET.DEGREES + apiEndpoint,
+      contentId: "fetch-diplomas",
+    }));
+  };
+
+  useEffect(() => {
+    if (isLoaded && !error && data) {
+      if (DEV_MODE && !NO_QUERY_LOGS) {
+        console.log("Diploma creation fetched data:", data, fetchParams);
+      }
+    }
+  }, [isLoaded, error, data]);
+
+  const skills = ["P1", "P2", "P3", "P4", "P5", "P6"];
+  const id = formId ?? pageId + "-form";
+  return (
+    <form
+      id={id}
+      className="grid gap-4"
+      // onSubmit={form.handleSubmit(onSubmit)}
+    >
+      <PopoverFieldWithControllerAndCommandsList
+        items={inputs}
+        form={form}
+        commandHeadings={resultsCallback([
+          fetchParams.contentId,
+          fetchParams.url,
+        ])}
+        role="combobox"
+        // Command search box value changed
+        onValueChange={(value) =>
+          console.log(
+            "value changed ->",
+            VerticalFieldSelectRef.current?.getLastSelectedItemValue(),
+            VerticalFieldSelectRef.current?.getLastCommandValue(),
+            value
+          )
+        }
+        // Selection on command item triggered
+        // onSelect={(select) => {}}
+        // Vertical field just triggered opening
+        onOpenChange={handleOpening}
+        setRef={setRef}
+        observedRefs={observedRefs}
+        onAddNewItem={handleAddNewItem}
+      />
+      <ItemGroup id={`${pageId}-roles`} className="grid gap-2">
+        <ItemTitle>Compétences principales</ItemTitle>
+        <Item variant={"default"} className="p-0">
+          <ItemContent className="flex-row flex-wrap gap-2">
+            <ListMapper items={skills}>
+              {(rawItem: string | { item: string; id?: string }) => {
+                const item =
+                  typeof rawItem === "string" ? rawItem : rawItem.item;
+                return (
+                  <ItemActions key={item} className="relative">
+                    <Popover
+                      open={state.selected && state.role === item}
+                      onOpenChange={(open) => onRoleOpenChange(open, item)}
+                    >
+                      <PopoverTrigger asChild>
+                        <Button
+                          // onBlur={handleOnTextEdited}
+                          // onFocus={handleOnTextEdit}
+                          // onClick={handleFocus}
+                          data-is-editing={
+                            state.isEditing && state.role === item
+                          }
+                          id={item}
+                          size="sm"
+                          variant="outline"
+                          contentEditable={
+                            state.isEditing && state.role === item
+                          }
+                        >
+                          {item}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        side="top"
+                        align="center"
+                        sideOffset={8}
+                        className="p-0.5 w-auto max-h-min-content"
+                      >
+                        {state.isEditing && state.role === item ? (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              id={item + "-validate"}
+                              onClick={handleOnValidate}
+                              aria-label={`Valider ${item}`}
+                            >
+                              <CheckIcon className="size-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              id={item + "-cancel"}
+                              onClick={handleOnCancel}
+                              aria-label={`Annuler ${item}`}
+                            >
+                              <RotateCcw className="size-4" />
+                            </Button>
+                          </>
+                        ) : (
+                          state.role === item && (
+                            <>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={handleOnEdit}
+                                id={item + "-edit"}
+                                aria-label={`Modifier ${item}`}
+                              >
+                                <Pencil className="size-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={handleOnDelete}
+                                id={item + "-delete"}
+                                aria-label={`Supprimer ${item}`}
+                              >
+                                <Trash2 className="size-4" />
+                              </Button>
+                              <PopoverClose asChild>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  id={item + "-close"}
+                                  aria-label={`Fermer ${item}`}
+                                >
+                                  <XIcon className="size-4" />
+                                </Button>
+                              </PopoverClose>
+                            </>
+                          )
+                        )}
+                        <PopoverArrow className="fill-popover" />
+                      </PopoverContent>
+                    </Popover>
+                  </ItemActions>
+                );
+              }}
+            </ListMapper>
+          </ItemContent>
+        </Item>
+        <ItemActions className="p-0">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full max-h-5"
+            onClick={(e) => openDialog(e, "new-degree-skill")}
+          >
+            <PlusIcon />
+          </Button>
+        </ItemActions>
+      </ItemGroup>
+    </form>
+  );
+}

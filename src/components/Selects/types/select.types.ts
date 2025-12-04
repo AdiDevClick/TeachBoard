@@ -65,7 +65,7 @@ export type VerticalSelectProps = Omit<
   className?: string;
   side?: ComponentProps<typeof SelectContent>["side"];
   setRef?: (node?: Element | null, meta?: Record<string, unknown>) => void;
-  id: string;
+  id?: string;
 } & PropsWithChildren;
 
 type LabelledGroupBaseProps<T> = {
