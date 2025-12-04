@@ -2,17 +2,16 @@ import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import type { ListMapperProps } from "@/components/Lists/types/ListsTypes.ts";
 import type {
   AnyComponentLike,
-  ComponentPropsOf,
   ExtractItemType,
   MissingRequiredProps,
 } from "@/utils/types/types.utils.ts";
-import type { ComponentType } from "react";
+import type { ComponentProps, ComponentType } from "react";
 
 function withListMapper<C extends AnyComponentLike>(Wrapped: C) {
   return function Component<
     Items extends readonly unknown[] | Record<string, unknown>,
     TOptional extends Record<string, unknown> | undefined,
-    P extends ComponentPropsOf<C> = ComponentPropsOf<C>
+    P extends ComponentProps<C> = ComponentProps<C>
   >(
     props: Readonly<
       Pick<
