@@ -87,7 +87,7 @@ import type { ComponentProps, ComponentType } from "react";
  */
 function withTitledCard<C extends object, F extends object = object>(
   WrappedContent: ComponentType<C>,
-  WrappedFooter?: ComponentType<F & { modalMode?: boolean }>
+  WrappedFooter?: ComponentType<F>
 ) {
   return function Component(props: WithTitledCardProps<C, F>) {
     const {
@@ -125,12 +125,12 @@ function withTitledCard<C extends object, F extends object = object>(
         <CardContent>
           <WrappedContent {...(rest as C)} />
         </CardContent>
-        {displayFooter && WrappedFooter && footerProps ? (
+        {displayFooter ? (
           <FooterContent
             {...(footerProps as AppDialFooterProps &
               ComponentProps<typeof CardFooter>)}
           >
-            <WrappedFooter {...(rest as F)} modalMode={modalMode} />
+            {WrappedFooter ? <WrappedFooter {...(rest as F)} /> : null}
           </FooterContent>
         ) : null}
       </Card>
