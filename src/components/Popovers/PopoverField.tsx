@@ -27,6 +27,12 @@ export type PopoverFieldProps = Omit<
   onOpenChange?: (open: boolean, meta?: Record<string, unknown>) => void;
 };
 
+type PopoverFieldState = {
+  open: boolean;
+  selectedValue?: string;
+  fieldName?: string;
+};
+
 /**
  * A popover-based field with Command support for searchable selections.
  * Similar to VerticalFieldSelect but uses Popover + Command instead of Select.
@@ -41,37 +47,33 @@ export function PopoverField({
   id: containerId,
   ...props
 }: PopoverFieldProps) {
-  const id = useId();
-  const [open, setOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState<string | undefined>(
-    undefined
-  );
   const { onOpenChange, children, role, ...rest } = props;
 
-  const fieldName = rest?.name;
+  const id = useId();
+
+  const [state, setState] = useState<PopoverFieldState>({
+    open: false,
+    fieldName: rest?.name,
+  });
 
   // Meta data for this field instance
   const memoizedMeta = useMemo(
     () => ({
       task: rest?.task,
       apiEndpoint: rest?.apiEndpoint,
-      name: fieldName,
+      name: state.fieldName,
       id: containerId,
     }),
-    [rest?.task, rest?.apiEndpoint, fieldName, containerId]
+    [rest?.task, rest?.apiEndpoint, state.fieldName, containerId]
   );
 
   /**
    * Callback to handle selection of a value
    *
    * !! IMPORTANT !! This function is passed to the PopoverFieldProvider to be used in CommandItems.
-   *
-   * @description This function updates the selected value state and triggers the onSelect callback.
-   * @param value - The selected value
    */
   const setSelectedValueCallback = useCallback((value: string) => {
-    setSelectedValue(value);
-    setOpen(false);
+    setState({ selectedValue: value, open: false });
   }, []);
 
   /**
@@ -83,7 +85,7 @@ export function PopoverField({
    */
   const handleOpenChange = useCallback(
     (isOpen: boolean) => {
-      setOpen(isOpen);
+      setState((prev) => ({ ...prev, open: isOpen }));
       onOpenChange?.(isOpen, memoizedMeta);
     },
     [onOpenChange, memoizedMeta]
@@ -101,7 +103,7 @@ export function PopoverField({
         </Label>
       )}
 
-      <Popover open={open} onOpenChange={handleOpenChange}>
+      <Popover open={state.open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <Button
             id={id}
@@ -110,19 +112,19 @@ export function PopoverField({
             className={cn(
               "justify-between",
               fullWidth ? "w-full" : "w-fit",
-              selectedValue
+              state.selectedValue
                 ? "font-normal"
                 : "text-muted-foreground font-normal"
             )}
           >
-            {selectedValue || placeholder}
+            {state.selectedValue || placeholder}
             <LucideChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent side={side} className="p-0">
           <PopoverFieldProvider
             onSelect={setSelectedValueCallback}
-            selectedValue={selectedValue}
+            selectedValue={state.selectedValue}
           >
             {children}
           </PopoverFieldProvider>
