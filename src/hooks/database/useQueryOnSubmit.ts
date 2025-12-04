@@ -15,7 +15,7 @@ import type { ResponseInterface } from "@/types/AppResponseInterface";
 import { wait } from "@/utils/utils";
 import type { UseMutationOptions } from "@tanstack/react-query";
 import { useMutation, useQueryErrorResetBoundary } from "@tanstack/react-query";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 /**
@@ -38,6 +38,7 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
     onSuccess,
     onError,
     reset,
+    localState,
     abortController,
   } = queryKeysArr[1];
 
@@ -57,6 +58,7 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
       // abortController?.abort(
       //   new Error("Request completed", { cause: response })
       // );
+      localState?.({ success: response, error: null });
       reset?.();
       onSuccess?.(response);
       if (silent) return;
@@ -64,6 +66,7 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
     },
     onError: (error) => {
       onError?.(error);
+      localState?.({ success: null, error: error });
       if (silent) return;
       onQueryError<E>(error);
     },
@@ -100,9 +103,22 @@ export function useQueryOnSubmit<
 >(queryKeysArr: QueryKeyDescriptor<S, E>) {
   const { reset } = useQueryErrorResetBoundary();
   const abortControllerRef = useRef(new AbortController());
+  // État local pour capturer l'erreur via le callback onError
+  const [localState, setLocalState] = useState({
+    error: null,
+    success: null,
+  });
 
   queryKeysArr[1].abortController ??= abortControllerRef.current;
   queryKeysArr[1].reset = reset;
+
+  queryKeysArr[1].localState = setLocalState;
+  // Wrapper du onError original pour mettre à jour l'état local
+  // const originalOnError = queryKeysArr[1].onError;
+  // queryKeysArr[1].onError = (error) => {
+  //   setLocalError(error);
+  //   originalOnError?.(error);
+  // };
 
   // Memoize mutation options to prevent observer recreation on every render
   const options = useMemo(
@@ -120,7 +136,11 @@ export function useQueryOnSubmit<
    */
   const onSubmit = useCallback(
     async (variables: MutationVariables = undefined) => {
+      // !! IMPORTANT !! Reset local error
+
       try {
+        if (localState?.error !== null)
+          setLocalState({ success: null, error: null });
         if (DEV_MODE) {
           console.debug("useQueryOnSubmit executing mutation");
         }
@@ -141,10 +161,10 @@ export function useQueryOnSubmit<
   );
 
   return {
-    data,
+    data: localState.success ?? data,
     isLoading: isPending,
     isLoaded: !!data,
-    error,
+    error: localState.error ?? error,
     onSubmit,
   };
 }

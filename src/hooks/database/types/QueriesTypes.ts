@@ -79,7 +79,13 @@ export type QueryKeyDescriptor<S, E> = [
     onSuccess?: (data: FetchJSONSuccess<S>) => void;
     onError?: (error: FetchJSONError<E>) => void;
     reset?: () => void;
-  } & Record<string, unknown>
+    localState?: (
+      state: {
+        error: FetchJSONError<E> | null;
+        success: FetchJSONSuccess<S> | null;
+      } & Record<string, unknown>
+    ) => void;
+  }
 ];
 
 // export interface QueryHookInterface<
