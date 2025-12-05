@@ -7,7 +7,11 @@ import type { LoginFormControllerProps } from "@/components/LoginForms/types/log
 import { Button } from "@/components/ui/button.tsx";
 import { Field, FieldGroup, FieldSeparator } from "@/components/ui/field.tsx";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
-import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
+import {
+  APP_REDIRECT_TIMEOUT_SUCCESS,
+  DEV_MODE,
+  NO_QUERY_LOGS,
+} from "@/configs/app.config.ts";
 import { loginButtonsSvgs } from "@/configs/social.config.ts";
 import { inputLoginControllers } from "@/data/inputs-controllers.data.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
@@ -63,7 +67,7 @@ export function LoginFormController({
    */
   useEffect(() => {
     const resetFormAndTriggerNavigation = async () => {
-      await wait(500);
+      await wait(APP_REDIRECT_TIMEOUT_SUCCESS);
 
       // !! IMPORTANT !! - Use startTransition to avoid blocking UI updates
       startTransition(() => {
@@ -72,12 +76,13 @@ export function LoginFormController({
         closeDialog(null, "login");
       });
 
-      // Navigate ONLY after transitions are scheduled
-      // avoids UI jank and an React render warning
+      // Navigate ONLY after transitions
+      // Avoids UI jank and a React render warning
       navigate("/", { replace: true });
     };
 
-    if (isLoading) {
+    if (isLoading && !toast.getToasts().some((t) => t.id === toastId)) {
+      toast.dismiss();
       toast.loading("Connexion en cours...", {
         id: toastId,
       });
@@ -94,7 +99,10 @@ export function LoginFormController({
       if (isPwForgotten) {
         openDialog(null, "pw-recovery-email-sent");
       } else {
-        toast.success("Connexion réussie !");
+        toast.dismiss(toastId);
+        toast.success("Connexion réussie !", {
+          id: "login-success-toast",
+        });
       }
 
       if (DEV_MODE && !NO_QUERY_LOGS) {

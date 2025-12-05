@@ -77,3 +77,4 @@ export const NO_SESSIONS_CHECK_PAGES = [
 // export const NO_SESSIONS_PAGES = ["/login", "/signup", "/signup/validate"];
 
 export const APP_REDIRECT_TIMEOUT = 1500;
+export const APP_REDIRECT_TIMEOUT_SUCCESS = 500;

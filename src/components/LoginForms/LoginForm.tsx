@@ -1,17 +1,17 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { LoginFormController } from "@/components/LoginForms/controller/LoginFormController.tsx";
-import type {
-  LoginFormSchema,
-  LoginInputItem,
-  RecoveryFormSchema,
-} from "@/components/LoginForms/types/login-forms.types";
 import {
   inputLoginControllers,
   passwordRecoveryInputControllers,
 } from "@/data/inputs-controllers.data.ts";
 
 import { useLogin } from "@/hooks/database/login/useLogin.ts";
-import { formSchema } from "@/models/login.models.ts";
+import {
+  formSchema,
+  type LoginFormSchema,
+  type LoginInputItem,
+  type RecoveryFormSchema,
+} from "@/models/login.models.ts";
 import { pwRecoverySchema } from "@/models/pw-recovery.model.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
