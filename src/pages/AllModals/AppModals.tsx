@@ -1,6 +1,6 @@
 import { ClassCreation } from "@/components/ClassCreation/ClassCreation.tsx";
 import DegreeItem from "@/components/ClassCreation/diploma/degree-item/DegreeItem";
-import DegreeSkill from "@/components/ClassCreation/diploma/degree-skill/NewDegreeSkill.tsx";
+import DegreeSkill from "@/components/ClassCreation/diploma/degree-skill/DegreeSkill";
 import DiplomaCreation from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import LoginForm from "@/components/LoginForms/LoginForm.tsx";
