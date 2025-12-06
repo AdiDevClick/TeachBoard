@@ -31,10 +31,7 @@ export type ControlledInputsProps<T extends FieldValues> = {
   form: UseFormReturn<T>;
 } & ComponentPropsWithRef<"div">;
 
-type LaballedInputStandAloneProps<T extends FieldValues> = {
-  field: ControllerRenderProps<T, Path<T>>;
-  fieldState: ControllerFieldState;
-} & InputItem<T>;
+type LaballedInputStandAloneProps<T extends FieldValues> = InputItem<T>;
 
 type HOCLaballedInputProps<T extends FieldValues> = InputItem<T> & {
   form: UseFormReturn<T>;
@@ -57,6 +54,7 @@ export type LaballedInputForControllerProps<T extends FieldValues> = (
   | HOCLaballedInputWithMapperProps<T>
   | HOCLaballedInputProps<T>
   | LaballedInputStandAloneProps<T>
-) &
-  // ComponentPropsWithRef<"input">;
-  Omit<ComponentPropsWithRef<"input">, "form">;
+) & {
+  field: ControllerRenderProps<T, Path<T>>;
+  fieldState: ControllerFieldState;
+} & Omit<ComponentPropsWithRef<"input">, "form">; // ComponentPropsWithRef<"input">;
