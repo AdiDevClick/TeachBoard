@@ -29,6 +29,7 @@ function withCommands(Wrapped: ComponentType) {
 
     return (
       <Wrapped {...rest}>
+        {children}
         {useCommands && (
           <CommandItems
             commandHeadings={commandHeadings ?? []}
@@ -47,7 +48,6 @@ function withCommands(Wrapped: ComponentType) {
             <PlusIcon className="h-4 w-4" />
           </Button>
         )}
-        {children}
       </Wrapped>
     );
   };
