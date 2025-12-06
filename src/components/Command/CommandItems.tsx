@@ -8,6 +8,11 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command.tsx";
+import {
+  commandGroupContainsInvalid,
+  commandItemContainsInvalid,
+  debugLogs,
+} from "@/configs/app-components.config.ts";
 import { usePopoverFieldContextSafe } from "@/hooks/contexts/usePopover.ts";
 import { CheckIcon } from "lucide-react";
 import { useCallback } from "react";
@@ -48,26 +53,36 @@ export function CommandItems(props: Readonly<CommandsProps>) {
       <CommandList>
         <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
         <ListMapper items={commandHeadings ?? []}>
-          {({ groupTitle, items }) => (
-            <CommandGroup key={groupTitle} heading={groupTitle}>
-              <ListMapper items={items}>
-                {({ id, value }) => (
-                  <CommandItem
-                    key={id}
-                    id={String(id)}
-                    value={value}
-                    onSelect={handleSelect}
-                    {...rest}
-                  >
-                    {value ?? "Valeur inconnue"}
-                    {selectedValue === value && (
-                      <CheckIcon className={"ml-auto"} />
-                    )}
-                  </CommandItem>
-                )}
-              </ListMapper>
-            </CommandGroup>
-          )}
+          {({ groupTitle, items }) => {
+            if (commandGroupContainsInvalid(props)) {
+              debugLogs("Rendering CommandGroup");
+            }
+            return (
+              <CommandGroup key={groupTitle} heading={groupTitle}>
+                <ListMapper items={items}>
+                  {({ id, value }) => {
+                    if (commandItemContainsInvalid(props)) {
+                      debugLogs("Rendering CommandItem");
+                    }
+                    return (
+                      <CommandItem
+                        key={id}
+                        id={String(id)}
+                        value={value}
+                        onSelect={handleSelect}
+                        {...rest}
+                      >
+                        {value ?? "Valeur inconnue"}
+                        {selectedValue === value && (
+                          <CheckIcon className={"ml-auto"} />
+                        )}
+                      </CommandItem>
+                    );
+                  }}
+                </ListMapper>
+              </CommandGroup>
+            );
+          }}
         </ListMapper>
       </CommandList>
     </Command>
