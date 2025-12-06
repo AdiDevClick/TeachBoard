@@ -2,35 +2,54 @@ import { DEV_MODE, NO_PROXY_LOGS } from "@/configs/app.config.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 
 export class ObjectReshape<T extends Record<string, unknown>> {
-  #dataSource: T[] = [];
+  #dataSource: T[] | T = [];
   readonly #shapeToBuild: Partial<Record<keyof T, unknown>> = {} as Partial<
     Record<keyof T, unknown>
   >;
+  /** Indicates whether the data source is an array */
   readonly #isArray: boolean = false;
+  /** Indicates whether the data source is a plain object */
   readonly #isPlainObject: boolean = false;
+  /** The first saved element of the data source if it is an array.
+   * Used for introspection during initialization.
+   */
   #firstSourceElement: Record<string, unknown> | undefined;
+  /** Stores keys from the shape to build */
   readonly #shapeKeysStore = new UniqueSet<string, Record<string, unknown>>();
+  /** Stores keys from the source object */
   readonly #sourceObjectStore = new UniqueSet<
     string,
     Record<string, unknown>
   >();
+  /** Stores the newly shaped item during transformation
+   * @description You can build it and retrieve it via `build()` or `newShape()`
+   */
   #newShapedItem: Record<string, unknown> = {};
+  /** Stores the current selection during transformation */
   #currentSelection: unknown = undefined;
   /** Maps targetKey -> sourceKeys[] for property aliasing with fallback support */
   readonly #mappingProxies = new Map<string, string[]>();
   #assignedSourceKey?: string;
   readonly #perItemAdditions: Record<string, unknown> = {};
 
+  /**
+   * Creates an instance of ObjectReshape.
+   *
+   * @param dataSource - Datas that need to be reshaped
+   * @param shapeToBuild
+   */
   constructor(
-    dataSource: T[],
-    shapeToBuild: Partial<Record<keyof T, unknown>> = null
+    dataSource: T[] | T,
+    shapeToBuild: Partial<Record<keyof T, unknown>> = {} as Partial<
+      Record<keyof T, unknown>
+    >
   ) {
     this.#dataSource = structuredClone(dataSource);
     this.#shapeToBuild = shapeToBuild;
 
     this.#isArray = this.#isValidArray(this.#dataSource);
     this.#isPlainObject = this.#isValidObject(this.#dataSource);
-    this.#firstSourceElement = this.#dataSource[0];
+    this.#firstSourceElement = (this.#dataSource as T[])[0];
     this.#init();
   }
 
@@ -38,7 +57,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     if (!this.#isArray && !this.#isPlainObject) {
       throw new TypeError("Data source must be an Array");
     }
-    this.#firstSourceElement = this.#dataSource[0];
+    this.#firstSourceElement = (this.#dataSource as T[])[0];
 
     for (const key in this.#shapeToBuild) {
       this.#shapeKeysStore.set(
@@ -53,10 +72,6 @@ export class ObjectReshape<T extends Record<string, unknown>> {
         this.#firstSourceElement[key] as Record<string, unknown>
       );
     }
-
-    // NOTE: We intentionally do NOT auto-detect mappings from `shapeToBuild`.
-    // Mapping is intentionally performed via `.assign([[source, target]])` only
-    // to avoid accidental renames when the developer hasn't explicitly requested.
   }
 
   // static from<T extends Record<string, unknown>>(
@@ -468,44 +483,37 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     };
   }
 
+  /**
+   * Renames a key in the data source items.
+   * This modifies each item in `#dataSource` by renaming `oldKey` to `newName`.
+   *
+   * @param oldKey - The current key name to rename
+   * @param newName - The new key name
+   */
+  rename(oldKey: string, newName: string) {
+    if (!this.#isPlainObject) {
+      throw new TypeError(
+        "rename() can only be used if #dataSource is a plain object"
+      );
+    }
+    if (Object.hasOwn(this.#dataSource, oldKey)) {
+      const { [oldKey]: removed, ...rest } = this.#dataSource as Record<
+        string,
+        unknown
+      >;
+      this.#newShapedItem = { ...rest, [newName]: removed };
+      // keep the first element reference in sync
+      this.#firstSourceElement = this.#newShapedItem;
+    }
+    return this;
+  }
+
+  /**
+   * Builds and returns a new shape object using proxies to handle property access.
+   *
+   * @description All nested objects/arrays are also proxied to ensure mappings work at all levels.
+   */
   newShape() {
-    // Capture `this` in arrow handlers via lexical scoping — do not alias to `self` to satisfy linters
-    // const handler = {
-    //   get: (
-    //     target: Record<string, unknown>,
-    //     prop: string | symbol,
-    //     receiver: unknown
-    //   ) => {
-    //     // When reading the assigned source (e.g. `items`) we want to return an
-    //     // array of proxied items so mapping and hiding work as expected.
-    //     if (
-    //       target === this.#newShapedItem &&
-    //       typeof prop === "string" &&
-    //       this.#assignedSourceKey &&
-    //       prop === this.#assignedSourceKey
-    //     ) {
-    //       const arr = Reflect.get(target, prop, receiver) as Array<
-    //         Record<string, unknown>
-    //       >;
-    //       this.#deepProxy(arr, this.#handler());
-    //     }
-
-    //     // Default: forward to native behaviour
-    //     // Use Reflect.get to preserve standard JS semantics (methods, prototype, etc.)
-    //     return Reflect.get(target, prop, receiver);
-    //   },
-    //   ownKeys: (target: Record<string, unknown>) => {
-    //     if (target === this.#newShapedItem["items"]) {
-    //       console.log("target => ", Reflect.ownKeys(target));
-    //       return Reflect.ownKeys(target);
-    //     }
-    //     return Reflect.ownKeys(target);
-    //   },
-    //   // No apply handler: this proxy targets an object, not a callable function
-    // };
-
-    // We want to proxy the new shape object (so we intercept property access of the shape)
-    // not the original data source (which is usually an Array and triggers prototype checks like 'map').
     return this.deepProxy([this.#newShapedItem], this.#handler());
   }
 }
