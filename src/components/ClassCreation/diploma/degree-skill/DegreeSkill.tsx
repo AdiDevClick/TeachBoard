@@ -1,12 +1,13 @@
 import { DegreeSkillController } from "@/components/ClassCreation/diploma/degree-skill/controller/DegreeSkillController.tsx";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
-import { degreeCreationInputControllers } from "@/data/inputs-controllers.data.ts";
+import { degreeMainSkillsCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useDegreeCreationForm } from "@/hooks/database/classes/useDegreeCreationForm.ts";
+import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import {
-  diplomaFieldData,
-  type DegreeCreationFormSchema,
-  type DegreeCreationInputItem,
-} from "@/models/degree-creation.models.ts";
+  diplomaSkillData,
+  type DegreeSkillFormSchema,
+  type DegreeSkillInputItem,
+} from "@/models/degree-skill.models.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
@@ -31,22 +32,21 @@ const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
  * @param props - Additional props.
  */
 function DegreeSkill({
-  pageId = "new-degree-item",
+  pageId = "new-degree-skill",
   modalMode = true,
-  inputControllers = degreeCreationInputControllers,
+  inputControllers = degreeMainSkillsCreationInputControllers,
   ...props
-}: Readonly<PageWithControllers<DegreeCreationInputItem>>) {
+}: Readonly<PageWithControllers<DegreeSkillInputItem>>) {
   const formId = pageId + "-form";
-
   const queryHooks = useDegreeCreationForm("LEVEL");
-
-  const form = useForm<DegreeCreationFormSchema>({
-    resolver: zodResolver(diplomaFieldData),
+  const fetchHooks = useFetch();
+  const form = useForm<DegreeSkillFormSchema>({
+    resolver: zodResolver(diplomaSkillData),
     mode: "onTouched",
     defaultValues: {
       name: "",
       code: "",
-      description: "",
+      skills: [],
     },
   });
 
@@ -60,10 +60,11 @@ function DegreeSkill({
       footerProps: {
         ...footerProps,
         formState: form.formState,
-        formId: formId,
+        formId,
       },
       titleProps,
       queryHooks,
+      fetchHooks,
       ...props,
     }),
     [form.formState, props]

@@ -258,7 +258,8 @@ export function DiplomaCreationController({
 
     setFetchParams((prev) => ({
       ...prev,
-      url: API_ENDPOINTS.GET.DEGREES + apiEndpoint,
+      dataReshape: API_ENDPOINTS.GET.DEGREES.dataReshape,
+      url: API_ENDPOINTS.GET.DEGREES.endPoint + apiEndpoint,
       contentId: "fetch-diplomas",
     }));
   };
@@ -286,7 +287,7 @@ export function DiplomaCreationController({
           fetchParams.contentId,
           fetchParams.url,
         ])}
-        role="combobox"
+        // role="combobox"
         // Command search box value changed
         onValueChange={(value) =>
           console.log(
@@ -305,7 +306,7 @@ export function DiplomaCreationController({
         onAddNewItem={handleAddNewItem}
       />
       <ItemGroup id={`${pageId}-roles`} className="grid gap-2">
-        <ItemTitle>Compétences principales</ItemTitle>
+        <ItemTitle>Modules</ItemTitle>
         <Item variant={"default"} className="p-0">
           <ItemContent className="flex-row flex-wrap gap-2">
             <ListMapper items={skills}>
