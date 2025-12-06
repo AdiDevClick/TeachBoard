@@ -3,6 +3,7 @@ import withController from "@/components/HOCs/withController.tsx";
 import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import { LaballedInputForController } from "@/components/Inputs/LaballedInputForController.tsx";
 import { PrimaryMenuButton } from "@/components/Sidebar/nav/elements/menu_button/PrimaryMenuButton.tsx";
+import { CommandItems } from "@/components/Command/CommandItems.tsx";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
 import { checkPropsValidity } from "@/utils/utils.ts";
 
@@ -69,6 +70,21 @@ const MENU_BUTTON_REQUIRES = ["item"];
 
 export const menuButtonContainsInvalid = (props: Record<string, unknown>) =>
   checkPropsValidity(props, MENU_BUTTON_REQUIRES, []);
+
+/**                    ------------                            */
+
+/** Validation requirements for MenuButton component.
+ *
+ * {@link CommandItems}
+ */
+const COMMAND_GROUP_REQUIRES = ["items", "groupTitle"];
+const COMMAND_ITEM_REQUIRES = ["id", "value"];
+
+export const commandGroupContainsInvalid = (props: Record<string, unknown>) =>
+  checkPropsValidity(props, COMMAND_GROUP_REQUIRES, []);
+
+export const commandItemContainsInvalid = (props: Record<string, unknown>) =>
+  checkPropsValidity(props, COMMAND_ITEM_REQUIRES, []);
 
 /**                    ------------                            */
 
