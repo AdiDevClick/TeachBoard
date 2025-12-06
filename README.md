@@ -147,6 +147,25 @@ Les mocks peuvent se trouver dans `/src/data` ou être intégrés dans certains 
 
 <!-- --- -->
 
+## Validation des props des composants
+
+Pour éviter les usages invalides en développement, certains composants se protègent et retournent `null` si des props indispensables sont manquantes ou si des props interdites sont passées.
+
+- Les helpers vivent dans [Components Config](src/configs/app-components.config.ts) : `labelledInputContainsInvalid`, `controllerPropsInvalid`, `listMapperContainsInvalid`, `loginButtonContainsInvalid`, `menuButtonContainsInvalid` et `debugLogs`.
+- Pattern à placer en début de composant :
+
+```ts
+if (labelledInputContainsInvalid(props)) {
+  debugLogs("LaballedInputForController");
+  return null;
+}
+```
+
+- Composants déjà protégés : `LaballedInputForController`, `withController`, `ListMapper`, `LoginButton`, `PrimaryMenuButton`, `SidebarCalendar` (absence d'events en contexte).
+- Pour un nouveau composant, ajoutez un validateur dédié dans [Components Config](src/configs/app-components.config.ts), importez-le avec `debugLogs` et appliquez le garde en entrée pour garder le comportement homogène.
+
+<!-- --- -->
+
 ## Tests
 
 Le projet utilise Vitest pour les tests unitaires et d'intégration côté frontend.
