@@ -1,5 +1,6 @@
 import type { ClassCreation } from "@/components/ClassCreation/ClassCreation.tsx";
 import type { DegreeItemController } from "@/components/ClassCreation/diploma/degree-item/controller/DegreeItemController.tsx";
+import type { DegreeSkillController } from "@/components/ClassCreation/diploma/degree-skill/controller/DegreeSkillController.tsx";
 import type { InputItem } from "@/components/Inputs/types/inputs.types";
 import type LoginForm from "@/components/LoginForms/LoginForm.tsx";
 import type { RecoveryFormSchema } from "@/components/LoginForms/types/login-forms.types.ts";
@@ -118,3 +119,30 @@ export const degreeCreationInputControllers = [
     required: false,
   },
 ] satisfies Parameters<typeof DegreeItemController>[0]["inputControllers"];
+
+export const degreeMainSkillsCreationInputControllers = [
+  {
+    name: "name",
+    title: "Nom du module",
+    type: "text",
+    placeholder: "Ex: Mettre en place une infrastructure réseau...",
+  },
+  {
+    name: "code",
+    title: "Code",
+    type: "text",
+    placeholder: "Ex: C7, G90...",
+  },
+  {
+    id: "fetch-input-skills",
+    apiEndpoint: "/sub",
+    task: "add-skill-to-main-skills-module",
+    name: "skills",
+    title: "",
+    type: "text",
+    useButtonAddNew: true,
+    creationButtonText: "Ajouter une compétence",
+    useCommands: true,
+    placeholder: "Votre liste de compétences...",
+  },
+] satisfies Parameters<typeof DegreeSkillController>[0]["inputControllers"];
