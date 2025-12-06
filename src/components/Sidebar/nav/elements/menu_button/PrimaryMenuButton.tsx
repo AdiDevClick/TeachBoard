@@ -1,5 +1,9 @@
 import type { MenuContentProps } from "@/components/Sidebar/nav/types/NavTypes.ts";
 import { SidebarMenuButton } from "@/components/ui/sidebar.tsx";
+import {
+  debugLogs,
+  menuButtonContainsInvalid,
+} from "@/configs/app-components.config.ts";
 import "@css/SidebarButtons.scss";
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -13,22 +17,24 @@ import { Link } from "react-router-dom";
  * @param item Menu item to display
  * @param setStyle Function to set style&
  */
-export default function PrimaryMenuButton({
-  item,
-  setStyle = () => "",
-  ...props
-}: MenuContentProps) {
-  if (!item) return null;
+export default function PrimaryMenuButton(props: MenuContentProps) {
+  if (menuButtonContainsInvalid(props as unknown as Record<string, unknown>)) {
+    debugLogs("PrimaryMenuButton");
+    return null;
+  }
+
+  const { item, setStyle = () => "", ...rest } = props;
+
   const isQuickButtonEnabled = item.quickButton?.enabled;
 
   return (
     <Link to={item.url ?? "#"} className="w-full">
       <SidebarMenuButton
-        {...props}
+        {...rest}
         className={`sidebarButton--menu ${setStyle({
           isQuickButtonEnabled,
           isMenu: false,
-        })} ${props.className ?? ""}`}
+        })} ${rest.className ?? ""}`}
         title={item.tooltip}
       >
         {item.icon && <item.icon className="sidebarButton--menu-icon" />}
