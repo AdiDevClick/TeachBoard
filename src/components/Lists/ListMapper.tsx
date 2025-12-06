@@ -1,15 +1,12 @@
 import type { ListMapperProps } from "@/components/Lists/types/ListsTypes.ts";
-import type {
-  AnyComponentLike,
-  ComponentPropsOf,
-  ExtractItemType,
-  MissingRequiredProps,
-} from "@/utils/types/types.utils.ts";
+import {
+  debugLogs,
+  listMapperContainsInvalid,
+} from "@/configs/app-components.config.ts";
 import {
   Fragment,
   isValidElement,
   useId,
-  type ComponentType,
   type ElementType,
   type ReactNode,
 } from "react";
@@ -58,15 +55,15 @@ export function ListMapper<
   TItems extends readonly unknown[] | Record<string, unknown>,
   C extends ElementType = ElementType,
   TOptional extends Record<string, unknown> | undefined = undefined
->({
-  items,
-  optional,
-  children,
-  component,
-  ...props
-}: Readonly<ListMapperProps<TItems, C, TOptional>>) {
+>(props: Readonly<ListMapperProps<TItems, C, TOptional>>) {
+  const { items, optional, children, component, ...rest } = props;
+
   const id = useId();
-  if (!items || items === undefined) return null;
+
+  if (listMapperContainsInvalid(props)) {
+    debugLogs("ListMapper");
+    return null;
+  }
 
   const isArrayInput = Array.isArray(items);
   const itemsArray = isArrayInput
@@ -97,7 +94,7 @@ export function ListMapper<
       const Component = component;
 
       return (
-        <Component key={String(item.id)} {...item} {...optional} {...props} />
+        <Component key={String(item.id)} {...item} {...optional} {...rest} />
       );
     }
 
@@ -149,4 +146,3 @@ export function ListMapper<
     return null;
   });
 }
-

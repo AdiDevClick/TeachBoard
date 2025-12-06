@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { SidebarGroup } from "@/components/ui/sidebar.tsx";
+import { debugLogs } from "@/configs/app-components.config.ts";
 import { useSidebarDataContext } from "@/hooks/contexts/useSidebarDataContext.ts";
 import { formatDate, formatRangeCompat } from "@/utils/utils";
 import "@css/Calendar.scss";
@@ -19,7 +20,10 @@ export default function SidebarCalendar({ ...props }) {
   const events = useSidebarDataContext();
   const [date, setDate] = useState<Date>(new Date(2025, 5, 12));
 
-  if (!events) return null;
+  if (!events) {
+    debugLogs("SidebarCalendar");
+    return null;
+  }
 
   const calendarEvents = events.calendarEvents || [];
 

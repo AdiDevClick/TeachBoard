@@ -12,7 +12,8 @@ export const DEV_MODE = import.meta.env.DEV;
 export const NO_PROXY_LOGS = true;
 export const NO_MUTATION_OBSERVER_LOGS = true;
 export const NO_CACHE_LOGS = true;
-export const NO_QUERY_LOGS = true;
+export const NO_QUERY_LOGS = false;
+export const NO_COMPONENT_WARNING_LOGS = true;
 
 /** Supported HTTP methods for API requests */
 export const HTTP_METHODS = [

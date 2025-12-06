@@ -3,6 +3,10 @@ import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import type { LaballedInputForControllerProps } from "@/components/Inputs/types/inputs.types";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
+import {
+  debugLogs,
+  labelledInputContainsInvalid,
+} from "@/configs/app-components.config.ts";
 import type { FieldValues } from "react-hook-form";
 
 /**
@@ -14,11 +18,12 @@ import type { FieldValues } from "react-hook-form";
 export function LaballedInputForController<T extends FieldValues>(
   props: LaballedInputForControllerProps<T>
 ) {
-  if (!("field" in props) || !("fieldState" in props)) {
+  if (labelledInputContainsInvalid(props)) {
+    debugLogs("LaballedInputForController");
     return null;
   }
 
-  const { name, title, field, fieldState, ...rest } = props;
+  const { name, title, field, fieldState, form, ...rest } = props;
 
   return (
     <>

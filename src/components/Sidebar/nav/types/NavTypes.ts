@@ -35,7 +35,7 @@ type QuickButton = NonNullable<NavMainMenuItem["quickButton"]>;
 type SubMenus = NonNullable<NavMainMenuItem["subMenus"]>;
 
 type GenericMenuItemProps<T> = {
-  item?: T;
+  item: T;
   setStyle: (props: SetStyleMenuProps) => string;
 };
 

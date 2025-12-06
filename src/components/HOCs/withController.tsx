@@ -1,5 +1,9 @@
 import type { WrapperProps } from "@/components/Controller/types/controller.types.ts";
 import { Field, FieldError } from "@/components/ui/field.tsx";
+import {
+  controllerPropsInvalid,
+  debugLogs,
+} from "@/configs/app-components.config.ts";
 import type { AnyComponentLike } from "@/utils/types/types.utils.ts";
 import { type ComponentProps } from "react";
 import { Controller, type FieldValues } from "react-hook-form";
@@ -24,10 +28,9 @@ import { Controller, type FieldValues } from "react-hook-form";
  * ```
  */
 function withController<C extends AnyComponentLike>(Wrapped: C) {
-  return function Component<T extends FieldValues>({
-    ...props
-  }: WrapperProps<T, C>) {
-    if (!props?.form || !props?.name) {
+  return function Component<T extends FieldValues>(props: WrapperProps<T, C>) {
+    if (controllerPropsInvalid(props)) {
+      debugLogs("withController");
       return null;
     }
 
