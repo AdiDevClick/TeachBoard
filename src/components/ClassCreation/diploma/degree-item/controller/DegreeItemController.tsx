@@ -17,7 +17,7 @@ import { useDegreeCreation } from "@/hooks/useDegreeCreation.ts";
  * @param queryHooks - The query hooks for handling form submission and state.
  */
 export function DegreeItemController({
-  pageId = "new-degree-item" as AppModalNames,
+  pageId = "new-degree-item",
   inputControllers = degreeCreationInputControllers,
   className = "grid gap-4",
   formId,
