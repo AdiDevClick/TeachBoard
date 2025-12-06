@@ -1,7 +1,6 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { USER_ACTIVITIES } from "@/configs/app.config.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
-import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 type FetchParams = {
@@ -37,12 +36,9 @@ export function useFetch() {
       // silent: true,
       onSuccess: (response: any) => {
         // Reshape data for caching
-        const reshaper = new ObjectReshape(response.data);
-        const cachingDatas = reshaper
-          .assignSourceTo("items")
-          .add({ groupTitle: "Tous" })
-          .assign([["name", "value"]])
-          .newShape();
+        const cachingDatas = fetchParams.dataReshape
+          ? fetchParams.dataReshape(response.data)
+          : response.data;
 
         // Caching under [contentId, url] keys
         queryClient.setQueryData(
