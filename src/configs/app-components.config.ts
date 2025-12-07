@@ -1,9 +1,9 @@
 import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
+import { CommandItems } from "@/components/Command/CommandItems.tsx";
 import withController from "@/components/HOCs/withController.tsx";
 import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import { LaballedInputForController } from "@/components/Inputs/LaballedInputForController.tsx";
-import { PrimaryMenuButton } from "@/components/Sidebar/nav/elements/menu_button/PrimaryMenuButton.tsx";
-import { CommandItems } from "@/components/Command/CommandItems.tsx";
+import PrimaryMenuButton from "@/components/Sidebar/nav/elements/menu_button/PrimaryMenuButton.tsx";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
 import { checkPropsValidity } from "@/utils/utils.ts";
 
