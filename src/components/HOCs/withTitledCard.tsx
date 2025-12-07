@@ -123,7 +123,7 @@ function withTitledCard<C extends object, F extends object = object>(
           {...titleProps}
         />
         <CardContent>
-          <WrappedContent {...(rest as C)} />
+          <WrappedContent pageId={pageId} {...(rest as C)} />
         </CardContent>
         {displayFooter ? (
           <FooterContent
