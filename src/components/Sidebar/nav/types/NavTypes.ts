@@ -1,4 +1,4 @@
-import type { dataContext } from "@/api/providers/types/SidebarDataProviderTypes.ts";
+import type { dataContext } from "@/api/providers/types/sidebar-data.provider.types";
 import type {
   SidebarGroup,
   SidebarHeader,
