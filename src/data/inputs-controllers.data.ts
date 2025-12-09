@@ -138,9 +138,10 @@ export const degreeModuleCreationInputControllers = [
   {
     id: "fetch-input-skills",
     apiEndpoint: API_ENDPOINTS.GET.SKILLS.endPoints.SUBSKILLS,
+    dataReshapeFn: API_ENDPOINTS.GET.SKILLS.dataReshape,
     task: "new-degree-module-skill",
     name: "skillList",
-    title: "",
+    title: "Compétences",
     type: "text",
     useButtonAddNew: true,
     creationButtonText: "Ajouter une compétence",
