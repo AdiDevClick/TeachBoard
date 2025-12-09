@@ -38,8 +38,7 @@ export function useDegreeCreation({
     if (isLoading || hasStartedCreation.current) return;
     hasStartedCreation.current = true;
     const options = dialogOptions(hookOptions.pageId);
-    const endPoint =
-      options?.apiEndpoint.split("/")[1]?.toUpperCase() || "LEVEL";
+    const endPoint = options?.apiEndpoint;
     setQueryParams({ endPoint, cachedFetchKey: options.queryKey });
     onSubmit(variables);
   };
