@@ -1,5 +1,5 @@
 import { TriggeredSettingsPopup } from "@/components/Sidebar/footer/settings_popup/TriggeredSettingsPopup.tsx";
-import type { UserButtonProps } from "@/components/Sidebar/footer/types/FooterTypes.ts";
+import type { UserButtonProps } from "@/components/Sidebar/footer/types/footer.types";
 import { UserDisplay } from "@/components/Sidebar/footer/UserDisplay.tsx";
 import {
   DropdownMenu,

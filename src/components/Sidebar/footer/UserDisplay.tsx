@@ -1,4 +1,4 @@
-import type { UserDisplayProps } from "@/components/Sidebar/footer/types/FooterTypes.ts";
+import type { UserDisplayProps } from "@/components/Sidebar/footer/types/footer.types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import "@css/UserDisplay.scss";
 

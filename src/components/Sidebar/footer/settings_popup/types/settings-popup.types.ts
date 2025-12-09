@@ -1,8 +1,8 @@
 import type {
   dataContext,
   dataContextUser,
-} from "@/api/providers/types/SidebarDataProviderTypes.ts";
-import type { UserButtonProps } from "@/components/Sidebar/footer/types/FooterTypes.ts";
+} from "@/api/providers/types/sidebar-data.provider.types";
+import type { UserButtonProps } from "@/components/Sidebar/footer/types/footer.types";
 import type { AppStore } from "@/hooks/store/types/store.types.ts";
 
 /**
