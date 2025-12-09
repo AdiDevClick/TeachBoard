@@ -1,6 +1,7 @@
 import { ClassCreation } from "@/components/ClassCreation/ClassCreation.tsx";
 import DegreeItem from "@/components/ClassCreation/diploma/degree-item/DegreeItem";
-import DegreeSkill from "@/components/ClassCreation/diploma/degree-skill/DegreeSkill";
+import DegreeModuleSkill from "@/components/ClassCreation/diploma/degree-module-skill/DegreeModuleSkill.tsx";
+import DegreeModule from "@/components/ClassCreation/diploma/degree-module/DegreeModule.tsx";
 import DiplomaCreation from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import LoginForm from "@/components/LoginForms/LoginForm.tsx";
@@ -92,9 +93,16 @@ const modals = defineStrictModalsList([
     },
   },
   {
-    modalName: "new-degree-skill",
+    modalName: "new-degree-module",
     type: Modal,
-    modalContent: DegreeSkill,
+    modalContent: DegreeModule,
+    modalProps: { isNavigationModal: false },
+    contentProps: { modalMode: true },
+  },
+  {
+    modalName: "new-degree-module-skill",
+    type: Modal,
+    modalContent: DegreeModuleSkill,
     modalProps: { isNavigationModal: false },
     contentProps: { modalMode: true },
   },
