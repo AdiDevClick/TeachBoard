@@ -40,9 +40,9 @@ export function useDegreeCreationForm(endpoint: "LEVEL" | "YEAR" | "FIELD") {
         const queryKey = queryParams.cachedFetchKey;
 
         queryClient.setQueryData(queryKey, (old: any) => {
-          if (!old) return response.data.degree;
+          // if (!old) return response.data.degree;
 
-          if (!Array.isArray(old)) return response;
+          // if (!Array.isArray(old)) return response;
 
           // La structure de la réponse est : response.data.degree = { id, name, code, description, type }
           const newItem = response.data.degree;
@@ -51,17 +51,20 @@ export function useDegreeCreationForm(endpoint: "LEVEL" | "YEAR" | "FIELD") {
             value: newItem?.name,
           };
 
-          if (!mappedNewItem.id || !mappedNewItem.value) {
-            console.error("Failed to map new item, data structure:", newItem);
-            return old;
-          }
+          return mergeDatas(old, mappedNewItem, response, newItem);
 
-          // Append the item to the first group if present
-          const newGroups = [
-            { ...old[0], items: [...old[0].items, mappedNewItem] },
-          ];
+          //   if (!mappedNewItem.id || !mappedNewItem.value) {
+          //     console.error("Failed to map new item, data structure:", newItem);
+          //     return old;
+          //   }
 
-          return newGroups;
+          //   // Append the item to the first group if present
+          //   const newGroups = [
+          //     { ...old[0], items: [...old[0].items, mappedNewItem] },
+          //   ];
+
+          //   return newGroups;
+          // });
         });
       },
       onError(error) {
@@ -79,4 +82,26 @@ export function useDegreeCreationForm(endpoint: "LEVEL" | "YEAR" | "FIELD") {
     },
   ]);
   return { ...queryOnSubmit, setQueryParams };
+}
+
+function mergeDatas(
+  oldArray: any[],
+  newMappedItem,
+  response: any,
+  originData: any
+) {
+  if (!oldArray) return originData;
+
+  if (!Array.isArray(oldArray)) return response;
+
+  if (!newMappedItem.id || !newMappedItem.value) {
+    console.error("Failed to map new item, data structure:", originData);
+    return oldArray;
+  }
+
+  // Append the item to the first group if present
+  const newGroups = [
+    { ...oldArray[0], items: [...oldArray[0].items, newMappedItem] },
+  ];
+  return newGroups;
 }
