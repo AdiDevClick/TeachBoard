@@ -165,11 +165,19 @@ export function useMutationObserver({
     }));
   }, []);
 
+  const findMetadata = useCallback(
+    (key: string) => {
+      return state.observedRefs.get(key)?.meta;
+    },
+    [state.observedRefs]
+  );
+
   return {
     setRef,
     deleteRef,
     clearRefs,
     observedRefs: state.observedRefs,
     observer: state.observer,
+    findMetadata,
   };
 }
