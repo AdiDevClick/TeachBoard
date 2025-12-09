@@ -2,8 +2,8 @@ import { CommandItems } from "@/components/Command/CommandItems.tsx";
 import type { CommandsProps } from "@/components/Command/types/command.types.ts";
 import withController from "@/components/HOCs/withController.tsx";
 
-import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import { InertSelectItemWithIcon } from "@/components/HOCs/withIconItem";
+import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import type {
   VerticalFieldState,
   VerticalRefSetters,
@@ -151,6 +151,7 @@ export function VerticalFieldSelect({
         setRef?.(el, {
           task: props?.task,
           apiEndpoint: props?.apiEndpoint,
+          dataReshapeFn: props?.dataReshapeFn,
           name: fieldName,
           id: containerId,
         });
@@ -201,6 +202,7 @@ function withCommands(Wrapped: AnyComponentLike) {
 
     const apiEndpoint = props.apiEndpoint;
     const task = props.task;
+    const dataReshapeFn = props.dataReshapeFn;
 
     return (
       <Wrapped {...rest}>
@@ -211,7 +213,9 @@ function withCommands(Wrapped: AnyComponentLike) {
           <InertSelectItemWithIcon
             value={task}
             inertIconText={creationButtonText}
-            onPointerDown={(e) => onAddNewItem?.({ e, apiEndpoint, task })}
+            onPointerDown={(e) =>
+              onAddNewItem?.({ e, apiEndpoint, task, dataReshapeFn })
+            }
           />
         )}
         {children}
