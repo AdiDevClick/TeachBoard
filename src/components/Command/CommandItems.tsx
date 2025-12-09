@@ -36,7 +36,7 @@ export function CommandItems(props: Readonly<CommandsProps>) {
   // !! IMPORTANT !! This context can be null
   const context = usePopoverFieldContextSafe();
   const contextOnSelect = context?.onSelect;
-  const selectedValue = context?.selectedValue ?? "";
+  const selectedValue = context?.selectedValue;
 
   const handleSelect = useCallback((value: string) => {
     contextOnSelect?.(value);
@@ -73,9 +73,11 @@ export function CommandItems(props: Readonly<CommandsProps>) {
                         {...rest}
                       >
                         {value ?? "Valeur inconnue"}
-                        {selectedValue === value && (
-                          <CheckIcon className={"ml-auto"} />
-                        )}
+                        {defineSelection(
+                          value,
+                          selectedValue,
+                          rest.multiSelection
+                        ) && <CheckIcon className={"ml-auto"} />}
                       </CommandItem>
                     );
                   }}
@@ -87,4 +89,22 @@ export function CommandItems(props: Readonly<CommandsProps>) {
       </CommandList>
     </Command>
   );
+}
+
+/**
+ * Define if the item is selected based on selection mode
+ *
+ * @param value - The value of the item
+ * @param selectedValue - The currently selected value(s)
+ * @param multiSelection - Whether multi-selection is enabled
+ * @returns True if the item is selected, false otherwise
+ */
+function defineSelection(
+  value: string,
+  selectedValue: string | Set<string>,
+  multiSelection?: boolean
+) {
+  return multiSelection
+    ? (selectedValue as Set<string>).has(value)
+    : selectedValue === value;
 }

@@ -18,6 +18,7 @@ export type CommandItemType = {
  */
 export type CommandsProps = {
   useCommands?: boolean;
+  multiSelection?: boolean;
   creationButtonText?: ReactNode;
   useButtonAddNew?: boolean;
   onAddNewItem?: (payload: HandleAddNewItemParams) => void;
@@ -25,4 +26,4 @@ export type CommandsProps = {
   queryRecordsKey?: string[];
   /** Callback appelé quand un item de commande est sélectionné */
   onSelect?: (value: string) => void;
-} & Omit<ComponentProps<typeof Command>, 'onSelect'>;
+} & Omit<ComponentProps<typeof Command>, "onSelect">;
