@@ -1,8 +1,9 @@
 import type { DegreeItemProps } from "@/components/ClassCreation/diploma/degree-item/types/degree-item.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
-import type { AppModalNames } from "@/configs/app.config.ts";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { degreeCreationInputControllers } from "@/data/inputs-controllers.data.ts";
-import { useDegreeCreation } from "@/hooks/useDegreeCreation.ts";
+import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
+import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 
 /**
  * Controller component for creating a new degree item.
@@ -22,16 +23,26 @@ export function DegreeItemController({
   className = "grid gap-4",
   formId,
   form,
-  queryHooks,
+  fetchHooks,
 }: Readonly<DegreeItemProps>) {
-  const { handleSubmit, setRef, observedRefs } = useDegreeCreation({
-    queryHooks,
+  const { setRef, observedRefs, submitCallback } = useCommandHandler({
+    fetchHooks,
     form,
-    hookOptions: {
-      pageId: pageId as AppModalNames,
-      inputControllers: inputControllers,
-    },
+    pageId,
   });
+
+  /**
+   * Handle form submission
+   *
+   * @param variables - form variables
+   */
+  const handleSubmit = (variables: MutationVariables) => {
+    submitCallback(
+      variables,
+      null,
+      API_ENDPOINTS.POST.CREATE_DEGREE.dataReshape
+    );
+  };
 
   const id = formId ?? pageId + "-form";
 

@@ -1,7 +1,7 @@
 import { DegreeItemController } from "@/components/ClassCreation/diploma/degree-item/controller/DegreeItemController.tsx";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { degreeCreationInputControllers } from "@/data/inputs-controllers.data.ts";
-import { useDegreeCreationForm } from "@/hooks/database/classes/useDegreeCreationForm.ts";
+import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import {
   diplomaFieldData,
   type DegreeCreationFormSchema,
@@ -37,8 +37,7 @@ function DegreeItem({
   ...props
 }: Readonly<PageWithControllers<DegreeCreationInputItem>>) {
   const formId = pageId + "-form";
-  const queryHooks = useDegreeCreationForm("LEVEL");
-
+  const fetchHooks = useFetch();
   const form = useForm<DegreeCreationFormSchema>({
     resolver: zodResolver(diplomaFieldData),
     mode: "onTouched",
@@ -62,7 +61,8 @@ function DegreeItem({
       },
       modalMode,
       titleProps,
-      queryHooks,
+      fetchHooks,
+      // queryHooks,
       ...props,
     }),
     [form.formState, props]
