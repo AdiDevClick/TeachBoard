@@ -2,7 +2,10 @@ import { PopoverFieldProvider } from "@/api/providers/Popover.provider.tsx";
 import withCommands from "@/components/HOCs/withCommands.tsx";
 import withController from "@/components/HOCs/withController.tsx";
 import withListMapper from "@/components/HOCs/withListMapper.tsx";
-import type { VerticalSelectProps } from "@/components/Selects/types/select.types.ts";
+import type {
+  PopoverFieldProps,
+  PopoverFieldState,
+} from "@/components/Popovers/types/popover.types.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import {
@@ -13,29 +16,20 @@ import {
 import { cn } from "@/utils/utils.ts";
 import { LucideChevronDown } from "lucide-react";
 import { useCallback, useId, useMemo, useState } from "react";
-import type { ButtonProps } from "react-day-picker";
-
-/** Props spécifiques au PopoverField */
-export type PopoverFieldProps = Omit<
-  VerticalSelectProps,
-  "side" | "onOpenChange"
-> & {
-  side?: "top" | "bottom" | "left" | "right";
-  onSelect?: (value: string) => void;
-  role?: ButtonProps["role"];
-  /** Called when the popover opens or closes. Receives the open state and the meta data. */
-  onOpenChange?: (open: boolean, meta?: Record<string, unknown>) => void;
-};
-
-type PopoverFieldState = {
-  open: boolean;
-  selectedValue?: string;
-  fieldName?: string;
-};
 
 /**
- * A popover-based field with Command support for searchable selections.
- * Similar to VerticalFieldSelect but uses Popover + Command instead of Select.
+ * Popover Field component
+ *
+ * @description A field that opens a popover with selectable options.
+ *
+ * @param label - The label for the field.
+ * @param placeholder - The placeholder text when no option is selected.
+ * @param fullWidth - Whether the field should take the full width of its container.
+ * @param className - Additional class names for the container.
+ * @param side - The side where the popover should appear.
+ * @param setRef - A callback to set the ref of the container.
+ * @param containerId - The id for the container element.
+ * @param props - Additional props for the PopoverField.
  */
 export function PopoverField({
   label,
@@ -54,6 +48,7 @@ export function PopoverField({
   const [state, setState] = useState<PopoverFieldState>({
     open: false,
     fieldName: rest?.name,
+    selectedValue: props.multiSelection ? new Set<string>() : undefined,
   });
 
   // Meta data for this field instance
@@ -73,7 +68,19 @@ export function PopoverField({
    * !! IMPORTANT !! This function is passed to the PopoverFieldProvider to be used in CommandItems.
    */
   const setSelectedValueCallback = useCallback((value: string) => {
-    setState({ selectedValue: value, open: false });
+    if (props.multiSelection) {
+      setState((prev) => {
+        const newSet = new Set(prev.selectedValue);
+        if (newSet.has(value)) {
+          newSet.delete(value);
+        } else {
+          newSet.add(value);
+        }
+        return { ...prev, selectedValue: newSet };
+      });
+    } else {
+      setState((prev) => ({ ...prev, selectedValue: value }));
+    }
   }, []);
 
   /**
@@ -90,6 +97,10 @@ export function PopoverField({
     },
     [onOpenChange, memoizedMeta]
   );
+
+  const selectValue = props.multiSelection
+    ? placeholder
+    : state.selectedValue ?? placeholder;
 
   return (
     <div
@@ -117,7 +128,7 @@ export function PopoverField({
                 : "text-muted-foreground font-normal"
             )}
           >
-            {state.selectedValue || placeholder}
+            {selectValue}
             <LucideChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
