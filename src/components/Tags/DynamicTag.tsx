@@ -30,7 +30,8 @@ const defaultState = {
 export function DynamicTag(props: Readonly<DynamicTagProps>) {
   const [state, setState] = useState(defaultState);
 
-  const { id, name, label, pageId, value, onRemove, itemList, ...rest } = props;
+  const { id, name, label, pageId, value, onRemove, itemList, title, ...rest } =
+    props;
 
   const handleOnDelete = (e: PointerEvent<HTMLButtonElement>) => {
     preventDefaultAndStopPropagation(e);
@@ -188,7 +189,7 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
 
   return (
     <ItemGroup id={`${pageId}-roles`} className="grid gap-2">
-      <ItemTitle>Compétences</ItemTitle>
+      <ItemTitle>{title}</ItemTitle>
       <Item variant={"default"} className="p-0">
         <ItemContent className="flex-row flex-wrap gap-2">
           <ListMapper items={itemList}>
