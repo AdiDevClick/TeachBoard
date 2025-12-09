@@ -58,6 +58,7 @@ export type VerticalSelectProps = Omit<
     { element: Element; meta?: Record<string, unknown> }
   >;
   task?: string;
+  dataReshapeFn?: (data: unknown) => unknown;
   apiEndpoint?: string;
   label?: ReactNode;
   placeholder?: string;
