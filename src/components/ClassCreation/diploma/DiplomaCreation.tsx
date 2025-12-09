@@ -1,7 +1,10 @@
 import { DiplomaCreationController } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
-import { diplomaCreationSchema } from "@/models/diploma-creation.models.ts";
+import {
+  diplomaCreationSchema,
+  type DiplomaCreationFormSchema,
+} from "@/models/diploma-creation.models.ts";
 import type { SignupInputItem } from "@/pages/Signup/types/signup.types.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,7 +22,7 @@ const footerProps = {
 };
 
 function DiplomaCreation({
-  pageId = "new-diploma-creation-page-card",
+  pageId = "create-diploma",
   modalMode = true,
   className,
   inputControllers,
@@ -27,19 +30,14 @@ function DiplomaCreation({
 }: Readonly<PageWithControllers<SignupInputItem>>) {
   const formId = pageId + "-form";
   const fetchHooks = useFetch();
-  const form = useForm<{
-    diploma: string;
-    schoolYear: string;
-    schoolLevel: string;
-    mainSkills: string[];
-  }>({
+  const form = useForm<DiplomaCreationFormSchema>({
     resolver: zodResolver(diplomaCreationSchema),
     mode: "onTouched",
     defaultValues: {
       diploma: "",
       schoolYear: "",
       schoolLevel: "",
-      mainSkills: [],
+      mainSkillsList: [],
     },
   });
 
