@@ -43,7 +43,10 @@ export const USER_ACTIVITIES = Object.freeze({
   signupValidation: "signup-validation",
   passwordCreation: "password-creation",
   fetchDiplomas: "fetch-diplomas",
+  fetchModulesSkills: "fetch-modules-skills",
   degreeCreation: "degree-creation",
+  degreeModuleCreation: "degree-module-creation",
+  degreeModuleSkillCreation: "new-degree-module-skill",
 });
 
 /**
@@ -61,7 +64,8 @@ export type AppModalNames =
   | "class-creation"
   | "create-diploma"
   | "new-degree-item"
-  | "new-degree-skill";
+  | "new-degree-module"
+  | "new-degree-module-skill";
 
 /**
  * Pages that do not require session checks
