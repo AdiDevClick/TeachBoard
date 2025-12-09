@@ -10,5 +10,5 @@ export type FetchParams = {
   filters: Record<string, unknown>;
   sortBy: string;
   sortOrder: "asc" | "desc";
-  dataReshape?: (data, cachedDatas: unknown) => unknown;
+  dataReshapeFn?: (data, cachedDatas: unknown) => unknown;
 } & QueryKeyDescriptor<unknown, unknown>["1"];

@@ -18,7 +18,7 @@ const defaultStateParameters: FetchParams = {
   url: "",
   headers: undefined,
   method: API_ENDPOINTS.GET.METHOD,
-  dataReshape: undefined,
+  dataReshapeFn: undefined,
   onSuccess: undefined,
   onError: undefined,
   silent: false,
@@ -51,8 +51,8 @@ export function useFetch() {
         const cachedKey = cachedFetchKey ?? [contentId, params.url];
 
         // Reshape data for caching
-        const cachingDatas = fetchParams.dataReshape
-          ? fetchParams.dataReshape(
+        const cachingDatas = fetchParams.dataReshapeFn
+          ? fetchParams.dataReshapeFn(
               response.data,
               queryClient.getQueriesData(cachedKey)
             )
