@@ -57,6 +57,7 @@ const moduleCreationSchema = (data: typeof fieldData) => {
             data.arrayItemRegexMessage
           )
           .trim()
+          .toUpperCase()
       )
       .min(data.minArrayLength, data.minArrayLengthMessage)
       .max(data.maxArrayLength, data.maxArrayLengthExceededMessage)
