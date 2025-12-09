@@ -1,78 +1,68 @@
 import type { CommandsProps } from "@/components/Command/types/command.types.ts";
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import {
+  PopoverFieldWithCommands,
   PopoverFieldWithControllerAndCommandsList,
   type PopoverFieldProps,
 } from "@/components/Popovers/PopoverField.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemGroup,
-  ItemTitle,
-} from "@/components/ui/item.tsx";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover.tsx";
+import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import {
-  DEV_MODE,
-  NO_CACHE_LOGS,
-  NO_QUERY_LOGS,
-} from "@/configs/app.config.ts";
-import { useDialog } from "@/hooks/contexts/useDialog.ts";
-import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
+import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
+import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
+import type { DiplomaCreationFormSchema } from "@/models/diploma-creation.models.ts";
 import type { SignupInputItem } from "@/pages/Signup/types/signup.types.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
-import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
-import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  CheckIcon,
-  Pencil,
-  PlusIcon,
-  RotateCcw,
-  Trash2,
-  XIcon,
-} from "lucide-react";
-import { useCallback, useEffect, useState, type PointerEvent } from "react";
+import { useCallback, type PointerEvent } from "react";
 
 const inputs = [
   {
-    task: "add-diploma-field",
+    task: "new-degree-item",
     name: "diplomaField",
     label: "Métier / Domaine du diplôme",
     placeholder: "Sélectionnez...",
     creationButtonText: "Ajouter un métier ou domaine",
     useButtonAddNew: true,
     useCommands: true,
-    apiEndpoint: "/field",
+    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.FIELD,
+    dataReshapeFn: API_ENDPOINTS.GET.DEGREES.dataReshape,
     id: "diploma-field-input",
   },
   {
-    task: "add-school-year",
+    task: "new-degree-item",
     name: "schoolYear",
     label: "Année scolaire",
     placeholder: "Sélectionnez...",
     creationButtonText: "Ajouter une année scolaire",
     useButtonAddNew: true,
     useCommands: true,
-    apiEndpoint: "/year",
+    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.YEAR,
+    dataReshapeFn: API_ENDPOINTS.GET.DEGREES.dataReshape,
     id: "school-year-input",
   },
   {
-    task: "add-school-level",
+    task: "new-degree-item",
     name: "schoolLevel",
     label: "Diplôme / Niveau scolaire",
     placeholder: "Sélectionnez...",
     creationButtonText: "Ajouter un niveau scolaire",
     useButtonAddNew: true,
     useCommands: true,
-    apiEndpoint: "/level",
+    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.LEVEL,
+    dataReshapeFn: API_ENDPOINTS.GET.DEGREES.dataReshape,
     id: "school-level-input",
+  },
+  {
+    id: "add-module-skills",
+    apiEndpoint: API_ENDPOINTS.GET.SKILLS.endPoints.MODULES,
+    dataReshapeFn: API_ENDPOINTS.GET.SKILLS.dataReshape,
+    task: "new-degree-module",
+    name: "mainSkillsList",
+    title: "Modules",
+    type: "text",
+    useButtonAddNew: true,
+    creationButtonText: "Ajouter un module",
+    useCommands: true,
+    placeholder: "Recherchez des modules...",
   },
 ] satisfies (PopoverFieldProps & CommandsProps)[];
 // ] satisfies Parameters<typeof VerticalFieldSelectWithCommands>[];
@@ -90,10 +80,11 @@ export type HandleAddNewItemParams = {
   e?: PointerEvent<HTMLElement>;
   apiEndpoint?: (typeof inputs)[number]["apiEndpoint"];
   task: (typeof inputs)[number]["task"];
+  dataReshapeFn?: (typeof inputs)[number]["dataReshapeFn"];
 };
 
 export function DiplomaCreationController({
-  pageId = "diploma-creation-page-card",
+  pageId,
   modalMode = true,
   className,
   inputControllers,
@@ -102,12 +93,20 @@ export function DiplomaCreationController({
   formId,
   ...props
 }: Readonly<PageWithControllers<SignupInputItem>>) {
-  const { onSubmit, fetchParams, data, error, isLoaded, setFetchParams } =
-    fetchHooks;
-  const { openDialog } = useDialog();
+  const {
+    setRef,
+    observedRefs,
+    submitCallback,
+    fetchParams,
+    data,
+    newItemCallback,
+    openingCallback,
+  } = useCommandHandler({
+    fetchHooks,
+    form,
+    pageId,
+  });
   const queryClient = useQueryClient();
-  const [state, setState] = useState(defaultState);
-  const { setRef, observedRefs } = useMutationObserver({});
 
   const resultsCallback = useCallback((keys: any) => {
     const cachedData = queryClient.getQueryData(keys ?? []);
@@ -120,117 +119,117 @@ export function DiplomaCreationController({
     return cachedData;
   }, []);
 
-  const handleOnDelete = (e: PointerEvent<HTMLButtonElement>) => {
-    preventDefaultAndStopPropagation(e);
-    console.log("Delete role:", state.role);
-    setState(defaultState);
-  };
+  // const handleOnDelete = (e: PointerEvent<HTMLButtonElement>) => {
+  //   preventDefaultAndStopPropagation(e);
+  //   console.log("Delete role:", state.role);
+  //   setState(defaultState);
+  // };
 
-  const handleOnEdit = (e: PointerEvent<HTMLButtonElement>) => {
-    preventDefaultAndStopPropagation(e);
-    const roleId = e.currentTarget.id.split("-")[0];
-    const editable = document.getElementById(roleId);
-    if (!editable) return;
-    editable.focus();
-    editable.dataset.isEditing = "true";
-    editable.style.setProperty("user-select", "text");
-    editable.style.setProperty("-webkit-user-modify", "read-write");
-    const newRange = new Range();
+  // const handleOnEdit = (e: PointerEvent<HTMLButtonElement>) => {
+  //   preventDefaultAndStopPropagation(e);
+  //   const roleId = e.currentTarget.id.split("-")[0];
+  //   const editable = document.getElementById(roleId);
+  //   if (!editable) return;
+  //   editable.focus();
+  //   editable.dataset.isEditing = "true";
+  //   editable.style.setProperty("user-select", "text");
+  //   editable.style.setProperty("-webkit-user-modify", "read-write");
+  //   const newRange = new Range();
 
-    const selection = window.getSelection();
-    newRange.selectNodeContents(editable);
+  //   const selection = window.getSelection();
+  //   newRange.selectNodeContents(editable);
 
-    selection?.focusNode;
-    selection?.removeAllRanges();
-    selection?.addRange(newRange);
+  //   selection?.focusNode;
+  //   selection?.removeAllRanges();
+  //   selection?.addRange(newRange);
 
-    setState((prev) => ({
-      ...prev,
-      isEditing: true,
-      prevText: roleId,
-      selected: true,
-      role: roleId,
-    }));
-  };
+  //   setState((prev) => ({
+  //     ...prev,
+  //     isEditing: true,
+  //     prevText: roleId,
+  //     selected: true,
+  //     role: roleId,
+  //   }));
+  // };
 
-  const handleOnValidate = (e: PointerEvent<HTMLButtonElement>) => {
-    preventDefaultAndStopPropagation(e);
-    const role = e.currentTarget.id.split("-")[0];
-    console.log("Validate role edit:", state.role);
-    if (role === state.role) {
-      // cleanup editable state on validate
-      const editable = document.getElementById(role);
-      if (editable) {
-        // editable.removeAttribute("contenteditable");
-        // editable.removeAttribute("data-is-editing");
-        editable.removeAttribute("style");
-        const selection = window.getSelection();
-        selection?.removeAllRanges();
-      }
-      setState(defaultState);
-    }
-  };
+  // const handleOnValidate = (e: PointerEvent<HTMLButtonElement>) => {
+  //   preventDefaultAndStopPropagation(e);
+  //   const role = e.currentTarget.id.split("-")[0];
+  //   console.log("Validate role edit:", state.role);
+  //   if (role === state.role) {
+  //     // cleanup editable state on validate
+  //     const editable = document.getElementById(role);
+  //     if (editable) {
+  //       // editable.removeAttribute("contenteditable");
+  //       // editable.removeAttribute("data-is-editing");
+  //       editable.removeAttribute("style");
+  //       const selection = window.getSelection();
+  //       selection?.removeAllRanges();
+  //     }
+  //     setState(defaultState);
+  //   }
+  // };
 
-  const onRoleOpenChange = (open: boolean, role: string) => {
-    if (state.isEditing) return;
-    console.log("openChange");
-    setState(
-      open
-        ? {
-            selected: true,
-            role,
-            isEditing: false,
-            prevText: "",
-            newText: "",
-          }
-        : defaultState
-    );
-  };
+  // const onRoleOpenChange = (open: boolean, role: string) => {
+  //   if (state.isEditing) return;
+  //   console.log("openChange");
+  //   setState(
+  //     open
+  //       ? {
+  //           selected: true,
+  //           role,
+  //           isEditing: false,
+  //           prevText: "",
+  //           newText: "",
+  //         }
+  //       : defaultState
+  //   );
+  // };
 
-  const handleOnCancel = (e: PointerEvent<HTMLButtonElement>) => {
-    preventDefaultAndStopPropagation(e);
-    setState((prev) => ({
-      ...prev,
-      isEditing: false,
-      newText: "",
-      prevText: "",
-    }));
-  };
+  // const handleOnCancel = (e: PointerEvent<HTMLButtonElement>) => {
+  //   preventDefaultAndStopPropagation(e);
+  //   setState((prev) => ({
+  //     ...prev,
+  //     isEditing: false,
+  //     newText: "",
+  //     prevText: "",
+  //   }));
+  // };
 
-  const handleAddNewItem = ({
-    e,
-    apiEndpoint,
-    task,
-  }: HandleAddNewItemParams) => {
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Add new item triggered", {
-        apiEndpoint,
-        task,
-      });
-    }
-    // console.log(openedDialogs);
-    openDialog(e, "new-degree-item", {
-      task: "get-degrees",
-      apiEndpoint,
-      queryKey: [fetchParams.contentId, fetchParams.url],
-    });
-  };
+  // const handleAddNewItem = ({
+  //   e,
+  //   apiEndpoint,
+  //   task,
+  // }: HandleAddNewItemParams) => {
+  //   if (DEV_MODE && !NO_CACHE_LOGS) {
+  //     console.log("Add new item triggered", {
+  //       apiEndpoint,
+  //       task,
+  //     });
+  //   }
+  //   // console.log(openedDialogs);
+  //   openDialog(e, task, {
+  //     task,
+  //     apiEndpoint,
+  //     queryKey: [fetchParams.contentId, fetchParams.url],
+  //   });
+  // };
 
   /**
    * Effect to fetch data when fetchParams change
    *
    * @description Triggers when fetchParams are updated with {@link handleOpening}
    */
-  useEffect(() => {
-    const keys = [fetchParams.contentId, fetchParams.url];
+  // useEffect(() => {
+  //   const keys = [fetchParams.contentId, fetchParams.url];
 
-    if (keys[1] === "" && keys[0] === "none") return;
-    const cachedData = queryClient.getQueryData(keys ?? []);
+  //   if (keys[1] === "" && keys[0] === "none") return;
+  //   const cachedData = queryClient.getQueryData(keys ?? []);
 
-    if (cachedData === undefined) {
-      onSubmit();
-    }
-  }, [fetchParams]);
+  //   if (cachedData === undefined) {
+  //     onSubmit();
+  //   }
+  // }, [fetchParams]);
 
   /**
    * Handle opening of the VerticalFieldSelect component
@@ -241,71 +240,112 @@ export function DiplomaCreationController({
    * @param metaData - The meta data from the popover field that was opened
    */
   const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
-    if (!open) return;
+    openingCallback(open, metaData, inputs);
 
-    const task = metaData?.task;
-    const apiEndpoint = metaData?.apiEndpoint;
+    // if (!open) return;
 
-    // Ensure apiEndpoint is present and correspond to a known input
-    const found = inputs.find(
-      (input) => input.task === task && input.apiEndpoint === apiEndpoint
-    );
-    if (!found) return;
+    // const task = metaData?.task;
+    // const apiEndpoint = metaData?.apiEndpoint;
 
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.debug("handleOpening diploma creation & Fetching ", metaData);
-    }
+    // // Ensure apiEndpoint is present and correspond to a known input
+    // const found = inputs.find(
+    //   (input) => input.task === task && input.apiEndpoint === apiEndpoint
+    // );
+    // if (!found) return;
 
-    setFetchParams((prev) => ({
-      ...prev,
-      dataReshape: API_ENDPOINTS.GET.DEGREES.dataReshape,
-      url: API_ENDPOINTS.GET.DEGREES.endPoint + apiEndpoint,
-      contentId: "fetch-diplomas",
-    }));
+    // if (DEV_MODE && !NO_CACHE_LOGS) {
+    //   console.debug("handleOpening diploma creation & Fetching ", metaData);
+    // }
+
+    // setFetchParams((prev) => ({
+    //   ...prev,
+    //   dataReshape: endPointReshapeFunction,
+    //   url: apiEndpoint,
+    //   method: API_ENDPOINTS.GET.METHOD,
+    //   contentId: task,
+    //   // contentId: "fetch-diplomas",
+    // }));
   };
 
-  useEffect(() => {
-    if (isLoaded && !error && data) {
-      if (DEV_MODE && !NO_QUERY_LOGS) {
-        console.log("Diploma creation fetched data:", data, fetchParams);
-      }
-    }
-  }, [isLoaded, error, data]);
+  const handleSubmit = (variables: DiplomaCreationFormSchema) => {
+    submitCallback(
+      variables,
+      API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint,
+      API_ENDPOINTS.POST.CREATE_DIPLOMA.dataReshape
+    );
+  };
 
-  const skills = ["P1", "P2", "P3", "P4", "P5", "P6"];
+  const handleCommandSelection = (value: string) => {
+    if (currentSkills.has(value)) {
+      currentSkills.delete(value);
+    } else {
+      currentSkills.add(value);
+    }
+    form.setValue("mainSkillsList", Array.from(currentSkills), {
+      shouldValidate: true,
+    });
+  };
+
+  const onSelectHandler = (value: string) => {
+    const cachedData = queryClient.getQueryData([
+      fetchParams.contentId,
+      fetchParams.url,
+    ]);
+    const array = cachedData?.[0];
+    const data = array?.items;
+    const matchingItems = data?.filter((item: any) => item.value === value);
+    const firstItem = matchingItems ? matchingItems[0] : null;
+    const id = firstItem?.id ?? value;
+
+    form.setValue(switchFields(firstItem.type), id, {
+      shouldValidate: true,
+    });
+  };
+
+  // Get the current skills from the form
+  const currentSkills = new Set(form.watch("mainSkillsList") || []);
+
   const id = formId ?? pageId + "-form";
   return (
     <form
       id={id}
       className="grid gap-4"
-      // onSubmit={form.handleSubmit(onSubmit)}
+      onSubmit={form.handleSubmit(handleSubmit)}
     >
       <PopoverFieldWithControllerAndCommandsList
-        items={inputs}
+        items={inputs.slice(0, 3)}
         form={form}
         commandHeadings={resultsCallback([
           fetchParams.contentId,
           fetchParams.url,
         ])}
+        onSelect={onSelectHandler}
         // role="combobox"
         // Command search box value changed
-        onValueChange={(value) =>
-          console.log(
-            "value changed ->",
-            VerticalFieldSelectRef.current?.getLastSelectedItemValue(),
-            VerticalFieldSelectRef.current?.getLastCommandValue(),
-            value
-          )
-        }
+        // onValueChange={(value) =>
+        //   console.log(
+        //     "value changed ->",
+        //     VerticalFieldSelectRef.current?.getLastSelectedItemValue(),
+        //     VerticalFieldSelectRef.current?.getLastCommandValue(),
+        //     value
+        //   )
+        // }
         // Selection on command item triggered
         // onSelect={(select) => {}}
         // Vertical field just triggered opening
         onOpenChange={handleOpening}
         setRef={setRef}
         observedRefs={observedRefs}
-        onAddNewItem={handleAddNewItem}
+        onAddNewItem={newItemCallback}
       />
-      <ItemGroup id={`${pageId}-roles`} className="grid gap-2">
+      <ControlledDynamicTagList
+        form={form}
+        setRef={setRef}
+        {...inputs[3]}
+        observedRefs={observedRefs}
+        itemList={Array.from(currentSkills)}
+      />
+      {/* <ItemGroup id={`${pageId}-roles`} className="grid gap-2">
         <ItemTitle>Modules</ItemTitle>
         <Item variant={"default"} className="p-0">
           <ItemContent className="flex-row flex-wrap gap-2">
@@ -412,12 +452,48 @@ export function DiplomaCreationController({
             variant="ghost"
             size="icon"
             className="rounded-full max-h-5"
-            onClick={(e) => openDialog(e, "new-degree-skill")}
+            onClick={(e) => openDialog(e, "new-degree-module")}
           >
             <PlusIcon />
           </Button>
         </ItemActions>
-      </ItemGroup>
+      </ItemGroup> */}
+      <PopoverFieldWithCommands
+        multiSelection
+        setRef={setRef}
+        onSelect={handleCommandSelection}
+        onOpenChange={handleOpening}
+        observedRefs={observedRefs}
+        onAddNewItem={newItemCallback}
+        commandHeadings={resultsCallback([
+          fetchParams.contentId,
+          fetchParams.url,
+        ])}
+        {...inputs[3]}
+      />
     </form>
   );
+}
+
+/**
+ * Verify the input type and return the corresponding field name
+ *
+ * @param fieldName
+ */
+function switchFields(fieldName: string) {
+  let field = "";
+  switch (fieldName) {
+    case "FIELD":
+      field = "diploma";
+      break;
+    case "YEAR":
+      field = "schoolYear";
+      break;
+    case "LEVEL":
+      field = "schoolLevel";
+      break;
+    default:
+      break;
+  }
+  return field;
 }
