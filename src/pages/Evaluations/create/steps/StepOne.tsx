@@ -5,9 +5,10 @@ import VerticalFieldSelect from "@/components/Selects/VerticalFieldSelect.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { SelectItem, SelectSeparator } from "@/components/ui/select.tsx";
-import { DEV_MODE } from "@/configs/app.config.ts";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import { DEV_MODE, USER_ACTIVITIES } from "@/configs/app.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
-import { useClasses } from "@/hooks/database/classes/useClasses";
+import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import { wait } from "@/utils/utils";
 import { PlusIcon } from "lucide-react";
 import { useEffect, useState, type PointerEvent } from "react";
@@ -24,7 +25,8 @@ export function StepOne({
   const { openDialog } = useDialog();
   const [selected, setSelected] = useState(false);
 
-  const { data, onSubmit, isLoading, isLoaded, error } = useClasses();
+  const { onSubmit, isLoading, isLoaded, data, error, setFetchParams } =
+    useFetch();
 
   /**
    * Handles the addition of a new class.
@@ -63,6 +65,20 @@ export function StepOne({
     }
   }, [data, error, isLoading]);
 
+  const handleTriggerOpening = (isOpen: boolean) => {
+    if (isOpen && !isLoaded && !isLoading) {
+      setFetchParams((prev) => ({
+        ...prev,
+        silent: true,
+        method: API_ENDPOINTS.GET.METHOD,
+        url: API_ENDPOINTS.GET.CLASSES.endPoints.ALL,
+        contentId: USER_ACTIVITIES.classes,
+        dataReshape: API_ENDPOINTS.GET.CLASSES.dataReshape,
+      }));
+      onSubmit();
+    }
+  };
+
   return (
     <Card className="content__right">
       <CardContent className="right__content-container">
@@ -73,9 +89,7 @@ export function StepOne({
             console.log("value => ", value);
           }}
           label={title}
-          onOpenChange={(value) => {
-            if (value && !isLoaded) onSubmit();
-          }}
+          onOpenChange={handleTriggerOpening}
         >
           <SelectItem
             inert={selected}
@@ -92,12 +106,12 @@ export function StepOne({
               <PlusIcon />
             </Button>
           </SelectItem>
-          {data?.data.classes !== null &&
-            data?.data.classes !== undefined &&
-            data?.data.classes.length > 0 && (
+          {data?.items !== null &&
+            data?.items !== undefined &&
+            data?.items.length > 0 && (
               <>
                 <SelectSeparator />
-                <ListMapper items={data?.data.classes}>
+                <ListMapper items={data?.items}>
                   <LabelledGroup ischild>
                     <NonLabelledGroupItem />
                   </LabelledGroup>
