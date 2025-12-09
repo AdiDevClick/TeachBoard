@@ -98,18 +98,30 @@ export const API_ENDPOINTS = Object.freeze({
       dataReshape: (data: any, cachedDatas) => {
         const existingData = getCachedDatas(cachedDatas);
 
+        // Extract the actual skill data from the response
+        const skillData = data?.skill || data;
+
         // Mapping code -> value
         const newItem = {
-          ...data,
-          value: data.code,
+          ...skillData,
+          value: skillData.code,
         };
 
-        return [
+        const result = [
           {
             ...existingData,
-            items: [...existingData.items, newItem],
+            items: [...(existingData.items || []), newItem],
           },
         ];
+
+        return result;
+      },
+    },
+    CREATE_DIPLOMA: {
+      endpoint: `${DEGREES}/config`,
+      dataReshape: (data: any, cachedDatas: unknown) => {
+        // const existingData = getCachedDatas(cachedDatas);
+        return data;
       },
     },
   },
