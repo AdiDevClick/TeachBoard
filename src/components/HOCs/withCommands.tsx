@@ -42,7 +42,9 @@ function withCommands(Wrapped: ComponentType) {
           <Button
             variant="ghost"
             className="flex w-full items-center justify-between px-2 py-1.5 text-sm cursor-pointer"
-            onClick={() => onAddNewItem?.({ apiEndpoint: apiEndpoint!, task })}
+            onClick={(e) =>
+              onAddNewItem?.({ e, apiEndpoint: apiEndpoint!, task })
+            }
           >
             <span>{creationButtonText}</span>
             <PlusIcon className="h-4 w-4" />
