@@ -56,10 +56,17 @@ export function PopoverField({
     () => ({
       task: rest?.task,
       apiEndpoint: rest?.apiEndpoint,
+      dataReshapeFn: rest?.dataReshapeFn,
       name: state.fieldName,
       id: containerId,
     }),
-    [rest?.task, rest?.apiEndpoint, state.fieldName, containerId]
+    [
+      rest?.task,
+      rest?.apiEndpoint,
+      rest?.dataReshapeFn,
+      state.fieldName,
+      containerId,
+    ]
   );
 
   /**
@@ -79,7 +86,7 @@ export function PopoverField({
         return { ...prev, selectedValue: newSet };
       });
     } else {
-      setState((prev) => ({ ...prev, selectedValue: value }));
+      setState((prev) => ({ ...prev, selectedValue: value, open: false }));
     }
   }, []);
 
