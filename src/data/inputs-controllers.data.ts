@@ -1,9 +1,11 @@
 import type { ClassCreation } from "@/components/ClassCreation/ClassCreation.tsx";
 import type { DegreeItemController } from "@/components/ClassCreation/diploma/degree-item/controller/DegreeItemController.tsx";
-import type { DegreeSkillController } from "@/components/ClassCreation/diploma/degree-skill/controller/DegreeSkillController.tsx";
+import type { DegreeModuleSkillController } from "@/components/ClassCreation/diploma/degree-module-skill/controller/DegreeModuleSkillController.tsx";
+import type DegreeModule from "@/components/ClassCreation/diploma/degree-module/DegreeModule.tsx";
 import type { InputItem } from "@/components/Inputs/types/inputs.types";
 import type LoginForm from "@/components/LoginForms/LoginForm.tsx";
-import type { RecoveryFormSchema } from "@/components/LoginForms/types/login-forms.types.ts";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import type { RecoveryFormSchema } from "@/models/login.models.ts";
 import type { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
 import type { Signup } from "@/pages/Signup/Signup.tsx";
 
@@ -120,7 +122,7 @@ export const degreeCreationInputControllers = [
   },
 ] satisfies Parameters<typeof DegreeItemController>[0]["inputControllers"];
 
-export const degreeMainSkillsCreationInputControllers = [
+export const degreeModuleCreationInputControllers = [
   {
     name: "name",
     title: "Nom du module",
@@ -135,14 +137,31 @@ export const degreeMainSkillsCreationInputControllers = [
   },
   {
     id: "fetch-input-skills",
-    apiEndpoint: "/sub",
-    task: "add-skill-to-main-skills-module",
-    name: "skills",
+    apiEndpoint: API_ENDPOINTS.GET.SKILLS.endPoints.SUBSKILLS,
+    task: "new-degree-module-skill",
+    name: "skillList",
     title: "",
     type: "text",
     useButtonAddNew: true,
     creationButtonText: "Ajouter une compétence",
     useCommands: true,
-    placeholder: "Votre liste de compétences...",
+    placeholder: "Recherchez une compétence...",
   },
-] satisfies Parameters<typeof DegreeSkillController>[0]["inputControllers"];
+] satisfies Parameters<typeof DegreeModule>[0]["inputControllers"];
+
+export const degreeSubSkillsCreationInputControllers = [
+  {
+    name: "name",
+    title: "Nom de la compétence",
+    type: "text",
+    placeholder: "Ex: Installer un switch manageable...",
+  },
+  {
+    name: "code",
+    title: "Code",
+    type: "text",
+    placeholder: "Ex: S1, A23...",
+  },
+] satisfies Parameters<
+  typeof DegreeModuleSkillController
+>[0]["inputControllers"];

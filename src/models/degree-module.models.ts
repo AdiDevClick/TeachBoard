@@ -16,6 +16,8 @@ const fieldData = {
     "Le nom de la compétence ne doit pas contenir de caractères spéciaux.",
   codeRegexMessage:
     "Le code de la compétence ne doit pas contenir de caractères spéciaux.",
+  minArrayLength: 1,
+  minArrayLengthMessage: "Au moins une compétence doit être ajoutée.",
   maxArrayLength: 1000,
   maxArrayLengthExceededMessage:
     "La description du diplôme ne peut pas dépasser 1000 caractères.",
@@ -28,7 +30,7 @@ const fieldData = {
  *
  * @param data - Object containing validation messages and constraints
  */
-const skillCreationSchema = (data: typeof fieldData) => {
+const moduleCreationSchema = (data: typeof fieldData) => {
   return z.object({
     name: z
       .string()
@@ -46,7 +48,7 @@ const skillCreationSchema = (data: typeof fieldData) => {
       .toUpperCase()
       .trim()
       .nonoptional(),
-    skills: z
+    skillList: z
       .array(
         z
           .string()
@@ -56,15 +58,14 @@ const skillCreationSchema = (data: typeof fieldData) => {
           )
           .trim()
       )
+      .min(data.minArrayLength, data.minArrayLengthMessage)
       .max(data.maxArrayLength, data.maxArrayLengthExceededMessage)
       .nonoptional(),
   });
 };
 
-const diplomaSkillData = skillCreationSchema(fieldData);
+export type DegreeModuleFormSchema = z.infer<typeof degreeModuleData>;
 
-export type DegreeSkillFormSchema = z.infer<typeof diplomaSkillData>;
+export type DegreeModuleInputItem = InputItem<DegreeModuleFormSchema>;
 
-export type DegreeSkillInputItem = InputItem<DegreeSkillFormSchema>;
-
-export { diplomaSkillData };
+export const degreeModuleData = moduleCreationSchema(fieldData);
