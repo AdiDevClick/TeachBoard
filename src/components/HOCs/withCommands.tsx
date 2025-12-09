@@ -1,6 +1,6 @@
 import { CommandItems } from "@/components/Command/CommandItems.tsx";
 import type { CommandsProps } from "@/components/Command/types/command.types.ts";
-import type { PopoverFieldProps } from "@/components/Popovers/PopoverField.tsx";
+import type { PopoverFieldProps } from "@/components/Popovers/types/popover.types.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { PlusIcon } from "lucide-react";
@@ -25,7 +25,7 @@ function withCommands(Wrapped: ComponentType) {
       ...rest
     } = props;
 
-    const { apiEndpoint, task } = props;
+    const { apiEndpoint, task, dataReshape } = props;
 
     return (
       <Wrapped {...rest}>
@@ -43,7 +43,12 @@ function withCommands(Wrapped: ComponentType) {
             variant="ghost"
             className="flex w-full items-center justify-between px-2 py-1.5 text-sm cursor-pointer"
             onClick={(e) =>
-              onAddNewItem?.({ e, apiEndpoint: apiEndpoint!, task })
+              onAddNewItem?.({
+                e,
+                apiEndpoint: apiEndpoint!,
+                task,
+                dataReshape,
+              })
             }
           >
             <span>{creationButtonText}</span>
