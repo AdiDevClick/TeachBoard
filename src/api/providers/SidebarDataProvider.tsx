@@ -1,5 +1,5 @@
 import { SidebarDataContext } from "@/api/contexts/SidebarData.context";
-import type { SidebarDataProviderProps } from "@/api/providers/types/SidebarDataProviderTypes.ts";
+import type { SidebarDataProviderProps } from "@/api/providers/types/sidebar-data.provider.types";
 
 /**
  * Sidebar Data Provider component

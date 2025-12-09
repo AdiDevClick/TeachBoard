@@ -1,9 +1,9 @@
+import type { PopoverFieldContextType } from "@/api/providers/types/popover.provider.types.ts";
 import { createContext } from "react";
 
-type PopoverFieldContextType = {
-  onSelect: (value: string) => void;
-  selectedValue?: string;
-};
-
-export const PopoverFieldContext =
-  createContext<PopoverFieldContextType | null>(null);
+/**
+ * Context for Popover Field
+ */
+export const PopoverFieldContext = createContext<PopoverFieldContextType>(
+  null!
+);

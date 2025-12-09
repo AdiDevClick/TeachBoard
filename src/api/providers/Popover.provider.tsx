@@ -1,5 +1,6 @@
 import { PopoverFieldContext } from "@/api/contexts/Popover.context.ts";
-import { type PropsWithChildren, useMemo } from "react";
+import type { PopoverFieldContextType } from "@/api/providers/types/popover.provider.types.ts";
+import { useMemo } from "react";
 
 /**
  * Provider component with memoized value
@@ -10,18 +11,15 @@ import { type PropsWithChildren, useMemo } from "react";
  * @param selectedValue - Currently selected value
  * @param children - Child components that will have access to the context
  */
-export function PopoverFieldProvider({
-  onSelect,
-  selectedValue,
-  children,
-}: {
-  onSelect: (value: string) => void;
-  selectedValue?: string;
-} & PropsWithChildren) {
-  const value = useMemo(() => ({ onSelect, selectedValue }), [onSelect, selectedValue]);
+export function PopoverFieldProvider(props: PopoverFieldContextType) {
+  const { onSelect, selectedValue } = props;
+  const value = useMemo(
+    () => ({ onSelect, selectedValue }),
+    [onSelect, selectedValue]
+  );
   return (
     <PopoverFieldContext.Provider value={value}>
-      {children}
+      {props.children}
     </PopoverFieldContext.Provider>
   );
 }
