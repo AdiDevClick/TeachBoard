@@ -1,6 +1,6 @@
 import { Dropdown } from "@/components/Dropdowns/Dropdown.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import type { SettingsPopupProps } from "@/components/Sidebar/footer/settings_popup/types/SettingsPopupTypes.ts";
+import type { SettingsPopupProps } from "@/components/Sidebar/footer/settings_popup/types/settings-popup.types";
 import { UserDisplay } from "@/components/Sidebar/footer/UserDisplay.tsx";
 import {
   DropdownMenuContent,
