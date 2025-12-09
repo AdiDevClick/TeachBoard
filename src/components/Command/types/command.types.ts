@@ -1,4 +1,4 @@
-import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
+import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
 import type { Command } from "@/components/ui/command.tsx";
 import type { ComponentProps, ReactNode } from "react";
 
