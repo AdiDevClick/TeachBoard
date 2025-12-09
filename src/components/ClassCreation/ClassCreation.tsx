@@ -1,10 +1,7 @@
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem.tsx";
-import {
-  VerticalFieldSelectWithController,
-  VerticalFieldSelectWithControllerAndCommandsList,
-} from "@/components/Selects/VerticalFieldSelect.tsx";
+import { VerticalFieldSelectWithController } from "@/components/Selects/VerticalFieldSelect.tsx";
 import {
   DialogHeaderTitle,
   HeaderTitle,
@@ -20,12 +17,11 @@ import {
   ItemTitle,
 } from "@/components/ui/item.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { DEV_MODE } from "@/configs/app.config.ts";
+import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { classCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useClassCreation } from "@/hooks/database/classes/useClassCreation.ts";
 import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
-import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import type {
   ClassCreationFormSchema,
   ClassCreationInputItem,
@@ -33,14 +29,17 @@ import type {
 import { classCreationSchema } from "@/models/class-creation.models.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 
+import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/PopoverField.tsx";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   CheckIcon,
   Pencil,
@@ -49,8 +48,9 @@ import {
   Trash2,
   XIcon,
 } from "lucide-react";
-import { useEffect, useState, type PointerEvent } from "react";
+import { useCallback, useEffect, useState, type PointerEvent } from "react";
 import { useForm } from "react-hook-form";
+import type { DiplomaCreationFormSchema } from "@/models/diploma-creation.models.ts";
 
 const year = new Date().getFullYear();
 const years = yearsListRange(year, 5);
@@ -59,14 +59,16 @@ const defaultSchoolYear = year + " - " + (year + 1);
 const inputs = [
   {
     // Required for withController to be able to process the field
+    id: "add-new-diploma",
     name: "degreeConfigId",
     label: "Année et niveau du diplôme",
     placeholder: "Sélectionnez...",
     creationButtonText: "Ajouter un diplôme",
-    task: "add-diploma",
+    task: "create-diploma",
     useCommands: true,
     fullWidth: true,
     useButtonAddNew: true,
+    apiEndpoint: API_ENDPOINTS.GET.DIPLOMAS,
   },
   {
     // Required for withController to be able to process the field
@@ -106,7 +108,7 @@ export function ClassCreation({
   modalMode = false,
   inputControllers = classCreationInputControllers,
   ref,
-  pageId = "class-creation-page-card",
+  pageId = "class-creation",
   className,
   ...props
 }: Readonly<PageWithControllers<ClassCreationInputItem>>) {
@@ -121,7 +123,7 @@ export function ClassCreation({
     setFetchParams,
   } = useFetch();
 
-  const { setRef, observedRefs } = useMutationObserver({});
+  // const { setRef, observedRefs } = useMutationObserver({});
   const [state, setState] = useState(defaultState);
   const [isYearOpened, setIsYearOpened] = useState(false);
 
@@ -135,12 +137,65 @@ export function ClassCreation({
     },
   });
 
+  const {
+    setRef,
+    observedRefs,
+    submitCallback,
+    fetchParams,
+    data,
+    newItemCallback,
+    openingCallback,
+  } = useCommandHandler({
+    fetchHooks: useFetch(),
+    form,
+    pageId,
+  });
+
+  const queryClient = useQueryClient();
+  const resultsCallback = useCallback((keys: any) => {
+    const cachedData = queryClient.getQueryData(keys ?? []);
+    if (DEV_MODE && !NO_CACHE_LOGS) {
+      console.log("Cached data for ", keys, " is ", cachedData);
+    }
+    if (cachedData === undefined) {
+      return data;
+    }
+    return cachedData;
+  }, []);
+
+  /**
+   * Handle opening of the VerticalFieldSelect component
+   *
+   * @description When opening, fetch data based on the select's meta information
+   *
+   * @param open - Whether the select is opening
+   * @param metaData - The meta data from the popover field that was opened
+   */
+  const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
+    openingCallback(open, metaData, inputs);
+  };
+
+  const handleSubmit = (variables: DiplomaCreationFormSchema) => {
+    submitCallback(
+      variables,
+      API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint,
+      API_ENDPOINTS.POST.CREATE_DIPLOMA.dataReshape
+    );
+  };
+
   const handleNewDiploma = async ({
     e,
   }: {
     e: PointerEvent<HTMLDivElement>;
   }) => {
-    openDialog(e, "create-diploma");
+    openDialog(e, "create-diploma", {
+      apiEndpoint: API_ENDPOINTS.POST.CREATE_DIPLOMA,
+      dataReshapeFn: API_ENDPOINTS.POST.CREATE_DIPLOMA.dataReshape,
+      queryKey: [
+        "create-diploma",
+        API_ENDPOINTS.POST.CREATE_DIPLOMA.endPoints.DIPLOMA,
+      ],
+    });
     console.log("Je create un diploma");
     // setSelected(true);
     // await wait(150);
@@ -347,42 +402,47 @@ export function ClassCreation({
         <form
           ref={(el) => setRef(el, { name: pageId, id: `${pageId}-form` })}
           id={`${pageId}-form`}
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit(handleSubmit)}
           className="grid gap-4"
         >
           <ControlledInputList
-            items={inputControllers}
+            items={inputControllers.slice(0, 2)}
             form={form}
             setRef={setRef}
           />
-          <VerticalFieldSelectWithControllerAndCommandsList
+          <PopoverFieldWithControllerAndCommandsList
             items={inputs}
             form={form}
-            id={`${pageId}-year`}
+            // id={`${pageId}-year`}
             setRef={setRef}
+            commandHeadings={resultsCallback([
+              fetchParams.contentId,
+              fetchParams.url,
+            ])}
             observedRefs={observedRefs}
             onLoad={(e) => {
               console.log(e);
               setIsYearOpened(true);
             }}
-            onOpenChange={(value) => {
-              if (value && !isDiplomasLoaded) {
-                setFetchParams((prev) => ({
-                  ...prev,
-                  url: API_ENDPOINTS.GET.DIPLOMAS,
-                  contentId: "fetch-diplomas",
-                }));
-                getDiplomas();
-              }
-            }}
-            onAddNewItem={handleNewDiploma}
+            onOpenChange={handleOpening}
+            // onOpenChange={(value) => {
+            //   if (value && !isDiplomasLoaded) {
+            //     setFetchParams((prev) => ({
+            //       ...prev,
+            //       url: API_ENDPOINTS.GET.DIPLOMAS,
+            //       contentId: "fetch-diplomas",
+            //     }));
+            //     getDiplomas();
+            //   }
+            // }}
+            onAddNewItem={newItemCallback}
           >
             {isYearOpened && (
               <ListMapper items={years}>
                 <NonLabelledGroupItem />
               </ListMapper>
             )}
-          </VerticalFieldSelectWithControllerAndCommandsList>
+          </PopoverFieldWithControllerAndCommandsList>
           <ItemGroup id={`${pageId}-roles`} className="grid gap-2">
             <ItemTitle>Ajouter des rôles</ItemTitle>
             <Item variant={"default"} className="p-0">
