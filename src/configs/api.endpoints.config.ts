@@ -57,10 +57,14 @@ export const API_ENDPOINTS = Object.freeze({
     DIPLOMAS: {
       endpoint: `${DEGREES}/config`,
       dataReshape: (data: any) =>
+        // Tuple key for all entries will be : { groupTitle: "Bachelor", items: [...] }
+        // Instead of : { "Bachelor" : [...] }
+        // A new output will be create under "description" in each "items"
+        // "description" will be transformed to "value" for selects
         dataReshaper(data)
-          .rename("Degree configuration", "items")
-          .add({ groupTitle: "Tous" })
-          .assign([["id", "value"]])
+          .transformTuplesToGroups("groupTitle", "items")
+          .createOutput(["degreeLevel", "degreeYear"], "description", " ")
+          .assign([["description", "value"]])
           .newShape(),
     },
     STUDENTS: `${BASE_API_URL}/students`,
