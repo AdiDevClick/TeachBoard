@@ -84,12 +84,14 @@ export function useCommandHandler({
    * Handle form submission
    *
    * @param variables - form variables
+   * @param endpointUrl - The API endpoint URL
+   * @param dataReshapeFn - Function to reshape the response data
    */
   const handleSubmit = useCallback(
     (
       variables: MutationVariables,
       endpointUrl: string,
-      dataReshapeFn: string
+      dataReshapeFn?: (data: any, cachedDatas?: unknown) => unknown
     ) => {
       if (DEV_MODE && !NO_CACHE_LOGS) {
         console.debug("useModuleCreation handleSubmit called", variables);
@@ -103,11 +105,11 @@ export function useCommandHandler({
       // Update fetchParams - this will trigger the useEffect above
       setFetchParams((prev) => ({
         ...prev,
-        url: endpointUrl ?? options.apiEndpoint,
-        cachedFetchKey: options.queryKey ?? [],
+        url: endpointUrl ?? options?.apiEndpoint,
+        cachedFetchKey: options?.queryKey ?? [],
         method: API_ENDPOINTS.POST.METHOD,
-        contentId: options.task,
-        dataReshapeFn: dataReshapeFn,
+        contentId: options?.task ?? pageId,
+        dataReshapeFn: dataReshapeFn ?? options?.dataReshapeFn,
       }));
     },
     []
