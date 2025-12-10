@@ -330,10 +330,6 @@ export function ClassCreationController({
           fetchParams.url,
         ])}
         observedRefs={observedRefs}
-        onLoad={(e) => {
-          console.log(e);
-          setIsYearOpened(true);
-        }}
         onOpenChange={handleOpening}
         onAddNewItem={newItemCallback}
       />
