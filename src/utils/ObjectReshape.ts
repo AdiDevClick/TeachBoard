@@ -24,13 +24,18 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   /** Stores the newly shaped item during transformation
    * @description You can build it and retrieve it via `build()` or `newShape()`
    */
-  #newShapedItem: Record<string, unknown> = {};
+  #newShapedItem: Record<string, unknown> = null!;
   /** Stores the current selection during transformation */
   #currentSelection: unknown = undefined;
   /** Maps targetKey -> sourceKeys[] for property aliasing with fallback support */
   readonly #mappingProxies = new Map<string, string[]>();
   #assignedSourceKey?: string;
   readonly #perItemAdditions: Record<string, unknown> = {};
+  /** Maps targetKey -> compute function for dynamic property creation */
+  readonly #computedProperties = new Map<
+    string,
+    (item: Record<string, unknown>) => unknown
+  >();
 
   /**
    * Creates an instance of ObjectReshape.
@@ -105,26 +110,62 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     );
   }
 
-  transform(value: unknown) {
-    return value;
+  /**
+   * Transforms an object with dynamic keys containing arrays into an array of groups.
+   * Each entry becomes an object with specified keys for the group name and items.
+   *
+   * @example
+   * Input: { "Bac Pro": [{...}], "BTS": [{...}] }
+   * .transformTuplesToGroups("groupTitle", "items")
+   * Output: [{ groupTitle: "Bac Pro", items: [{...}] }, { groupTitle: "BTS", items: [{...}] }]
+   *
+   * @param groupKeyName - The key name for the group identifier (e.g., "groupTitle")
+   * @param itemsKeyName - The key name for the array of items (e.g., "items")
+   */
+  transformTuplesToGroups(groupKeyName: string, itemsKeyName: string) {
+    if (this.#isPlainObject) {
+      const result: Array<Record<string, unknown>> = [];
+
+      for (const [key, value] of Object.entries(this.#dataSource)) {
+        const clonedItems = Array.isArray(value)
+          ? value.map((item) =>
+              typeof item === "object" && item !== null ? { ...item } : item
+            )
+          : value;
+
+        result.push({
+          [groupKeyName]: key,
+          [itemsKeyName]: clonedItems,
+        });
+      }
+
+      this.#newShapedItem = result;
+    }
+    return this;
   }
 
   /**
-   * Assigns a shaped value to a key in the resulting shape.
-   * If `selection` argument is provided, it is used; otherwise the previously
-   * stored `currentSelection` or the full `dataSource` is used.
+   * Creates a computed property that joins multiple source keys with a separator.
+   * The value is computed dynamically for each item when accessed via proxy.
+   *
+   * @example
+   * ```ts
+   * .createOutput(["degreeLevel", "degreeYear"], "description")
+   * // For item { degreeLevel: "Bac", degreeYear: "2024" }
+   * // Accessing "description" returns "Bac 2024"
+   * ```
+   *
+   * @param keys - Source keys to join
+   * @param output - Target property name
+   * @param separator - Separator between values (default: " ")
    */
-  to(key: string) {
-    // if selection is source : migrate all source data
-    const handler = {
-      get: (target: Record<string, unknown>, prop: string) => {
-        if (prop === this.#currentSelection) {
-          return key in target;
-        }
-      },
-    };
-
-    this.#newShapedItem = new Proxy(this.#newShapedItem, handler);
+  createOutput(keys: string[], outputKey: string, separator = " ") {
+    this.#computedProperties.set(outputKey, (item) => {
+      return keys
+        .map((key) => item[key])
+        .filter((v) => v !== undefined && v !== null && v !== "")
+        .join(separator);
+    });
     return this;
   }
 
@@ -132,6 +173,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    * Sets the current selection to the data source for further shaping.
    */
   assignSourceTo(key: string) {
+    this.#initShapedItem();
     // Clone the provided data source for shaping as we don't want to mutate the
     // original input passed by the caller.
     const clonedSource = structuredClone(this.#dataSource) as unknown[];
@@ -313,6 +355,22 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   }
 
   /**
+   * Applies computed properties to the target object.
+   * Each computed property is evaluated using the source item's data.
+   *
+   * @param source - The source item to compute values from
+   * @param target - The target object to add computed properties to
+   */
+  #applyComputedProperties(
+    source: Record<string, unknown>,
+    target: Record<string, unknown>
+  ): void {
+    for (const [key, computeFn] of this.#computedProperties.entries()) {
+      target[key] = computeFn(source);
+    }
+  }
+
+  /**
    * Builds a single item with all mappings and additions applied.
    *
    * @param item - The source item to transform
@@ -321,6 +379,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   #buildItem(item: Record<string, unknown>): Record<string, unknown> {
     const newItem: Record<string, unknown> = { ...item };
     this.#applyMappings(item, newItem);
+    this.#applyComputedProperties(item, newItem);
     this.#applyPerItemAdditions(newItem);
     return newItem;
   }
@@ -345,6 +404,38 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    * @returns A new object with all mappings applied as real properties
    */
   build(): Record<string, unknown>[] {
+    // If dataSource is an array (e.g., after transformTuplesToGroups), process each group
+    if (Array.isArray(this.#dataSource) && this.#dataSource.length > 0) {
+      // Check if this looks like a transformed groups array
+      const firstItem = this.#dataSource[0];
+      if (
+        firstItem &&
+        typeof firstItem === "object" &&
+        !this.#assignedSourceKey
+      ) {
+        // Apply mappings to each group and their items
+        return this.#dataSource.map((group) => {
+          const transformedGroup = { ...group };
+          this.#applyMappings(
+            group as Record<string, unknown>,
+            transformedGroup
+          );
+
+          // If the group has an items array, apply mappings to each item
+          for (const key in transformedGroup) {
+            if (Array.isArray(transformedGroup[key])) {
+              transformedGroup[key] = this.#buildItemsArray(
+                transformedGroup[key] as Array<Record<string, unknown>>
+              );
+            }
+          }
+
+          return transformedGroup;
+        }) as Record<string, unknown>[];
+      }
+    }
+
+    // Original behavior for assignSourceTo() pattern
     const result = this.#copyObjectExcluding(
       this.#newShapedItem,
       this.#assignedSourceKey
@@ -403,19 +494,31 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   #handler(): ProxyHandler<Record<string, unknown>> {
     return {
       ownKeys: (target: Record<string, unknown>) => {
-        // Include both the actual properties and mapped target keys so that
-        // enumerations (Object.keys/JSON.stringify) show the mapped keys.
-        const keys = new Set<string | symbol>(Reflect.ownKeys(target));
-        // Add mapped target keys (e.g. "value" when mapping "name" -> "value")
-        for (const targetKey of this.#mappingProxies.keys()) {
-          keys.add(targetKey);
+        const keys = new Set(Reflect.ownKeys(target));
+
+        // Add mapped keys
+        for (const key of this.#mappingProxies.keys()) {
+          keys.add(key);
         }
+
+        // Add computed property keys
+        for (const key of this.#computedProperties.keys()) {
+          keys.add(key);
+        }
+
         return Array.from(keys);
       },
       getOwnPropertyDescriptor: (
         target: Record<string, unknown>,
         prop: string | symbol
       ) => {
+        // !! IMPORTANT !! Check if the property exists directly on the target first
+        const directDescendant = Reflect.getOwnPropertyDescriptor(target, prop);
+        if (directDescendant) {
+          return directDescendant;
+        }
+
+        // Then check for mapped properties
         if (typeof prop === "string") {
           const sourceKeys = this.#mappingProxies.get(prop);
           if (sourceKeys) {
@@ -438,11 +541,16 @@ export class ObjectReshape<T extends Record<string, unknown>> {
         receiver: unknown
       ): unknown => {
         if (typeof prop === "string") {
+          // !! IMPORTANT !! Check if the property exists directly on the target first
+          if (Object.hasOwn(target, prop)) {
+            return Reflect.get(target, prop, receiver);
+          }
+
           // mappingProxies stores targetKey -> sourceKeys[]
-          // e.g. "value" -> ["name", "label", "text"]
           const sourceKeys = this.#mappingProxies.get(prop);
 
           if (sourceKeys) {
+            // First try to resolve from actual properties on target
             const resolved = this.#resolveValue(target, sourceKeys);
             if (resolved) {
               if (DEV_MODE && !NO_PROXY_LOGS) {
@@ -458,6 +566,25 @@ export class ObjectReshape<T extends Record<string, unknown>> {
                 );
               }
               return resolved.value;
+            }
+
+            // If not found on target, check if any source key is a computed property
+            for (const sourceKey of sourceKeys) {
+              const sourceComputeFn = this.#computedProperties.get(sourceKey);
+              if (sourceComputeFn) {
+                const computedValue = sourceComputeFn(target);
+                if (DEV_MODE && !NO_PROXY_LOGS) {
+                  console.debug(
+                    "GET trap called for mapped prop:",
+                    prop,
+                    "resolved to computed source:",
+                    sourceKey,
+                    "with value:",
+                    computedValue
+                  );
+                }
+                return computedValue;
+              }
             }
           }
         }
@@ -514,6 +641,16 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    * @description All nested objects/arrays are also proxied to ensure mappings work at all levels.
    */
   newShape() {
-    return this.deepProxy([this.#newShapedItem], this.#handler());
+    if (!Array.isArray(this.#newShapedItem)) {
+      this.#newShapedItem = [this.#newShapedItem];
+    }
+
+    return this.deepProxy(this.#newShapedItem, this.#handler());
+  }
+
+  #initShapedItem() {
+    if (this.#newShapedItem === null) {
+      this.#newShapedItem = {};
+    }
   }
 }
