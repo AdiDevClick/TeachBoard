@@ -54,7 +54,15 @@ export const API_ENDPOINTS = Object.freeze({
           .assign([["name", "value"]])
           .newShape(),
     },
-    DIPLOMAS: `${DEGREES}/config`,
+    DIPLOMAS: {
+      endpoint: `${DEGREES}/config`,
+      dataReshape: (data: any) =>
+        dataReshaper(data)
+          .rename("Degree configuration", "items")
+          .add({ groupTitle: "Tous" })
+          .assign([["id", "value"]])
+          .newShape(),
+    },
     STUDENTS: `${BASE_API_URL}/students`,
     COURSES: `${BASE_API_URL}/courses`,
     USERS: `${BASE_API_URL}/users`,

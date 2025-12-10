@@ -1,6 +1,6 @@
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/PopoverField.tsx";
+import { PopoverFieldWithControlledCommands } from "@/components/Popovers/PopoverField.tsx";
 import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem.tsx";
 import { VerticalFieldSelectWithController } from "@/components/Selects/VerticalFieldSelect.tsx";
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
@@ -30,7 +30,8 @@ const inputs = [
     useCommands: true,
     fullWidth: true,
     useButtonAddNew: true,
-    apiEndpoint: API_ENDPOINTS.GET.DIPLOMAS,
+    apiEndpoint: API_ENDPOINTS.GET.DIPLOMAS.endpoint,
+    dataReshapeFn: API_ENDPOINTS.GET.DIPLOMAS.dataReshape,
   },
   {
     // Required for withController to be able to process the field
@@ -319,8 +320,8 @@ export function ClassCreationController({
         form={form}
         setRef={setRef}
       />
-      <PopoverFieldWithControllerAndCommandsList
-        items={inputs}
+      <PopoverFieldWithControlledCommands
+        {...inputs[0]}
         form={form}
         // id={`${pageId}-year`}
         setRef={setRef}
@@ -335,13 +336,29 @@ export function ClassCreationController({
         }}
         onOpenChange={handleOpening}
         onAddNewItem={newItemCallback}
+      />
+      <PopoverFieldWithControlledCommands
+        setRef={setRef}
+        commandHeadings={resultsCallback([
+          fetchParams.contentId,
+          fetchParams.url,
+        ])}
+        observedRefs={observedRefs}
+        onLoad={(e) => {
+          console.log(e);
+          setIsYearOpened(true);
+        }}
+        onOpenChange={handleOpening}
+        onAddNewItem={newItemCallback}
+        form={form}
+        {...inputs[1]}
       >
         {isYearOpened && (
           <ListMapper items={years}>
             <NonLabelledGroupItem />
           </ListMapper>
         )}
-      </PopoverFieldWithControllerAndCommandsList>
+      </PopoverFieldWithControlledCommands>
       <ControlledDynamicTagList
         form={form}
         setRef={setRef}
