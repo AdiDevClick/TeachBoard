@@ -1,4 +1,4 @@
-import { ClassCreation } from "@/components/ClassCreation/ClassCreation.tsx";
+import ClassCreation from "@/components/ClassCreation/ClassCreation.tsx";
 import DegreeItem from "@/components/ClassCreation/diploma/degree-item/DegreeItem";
 import DegreeModuleSkill from "@/components/ClassCreation/diploma/degree-module-skill/DegreeModuleSkill.tsx";
 import DegreeModule from "@/components/ClassCreation/diploma/degree-module/DegreeModule.tsx";
