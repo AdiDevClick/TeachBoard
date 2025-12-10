@@ -2,8 +2,8 @@ import type { CommandsProps } from "@/components/Command/types/command.types.ts"
 import {
   PopoverFieldWithCommands,
   PopoverFieldWithControllerAndCommandsList,
-  type PopoverFieldProps,
 } from "@/components/Popovers/PopoverField.tsx";
+import type { PopoverFieldProps } from "@/components/Popovers/types/popover.types.ts";
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
@@ -88,7 +88,6 @@ export function DiplomaCreationController({
   modalMode = true,
   className,
   inputControllers,
-  fetchHooks,
   form,
   formId,
   ...props
@@ -102,7 +101,6 @@ export function DiplomaCreationController({
     newItemCallback,
     openingCallback,
   } = useCommandHandler({
-    fetchHooks,
     form,
     pageId,
   });
@@ -216,22 +214,6 @@ export function DiplomaCreationController({
   // };
 
   /**
-   * Effect to fetch data when fetchParams change
-   *
-   * @description Triggers when fetchParams are updated with {@link handleOpening}
-   */
-  // useEffect(() => {
-  //   const keys = [fetchParams.contentId, fetchParams.url];
-
-  //   if (keys[1] === "" && keys[0] === "none") return;
-  //   const cachedData = queryClient.getQueryData(keys ?? []);
-
-  //   if (cachedData === undefined) {
-  //     onSubmit();
-  //   }
-  // }, [fetchParams]);
-
-  /**
    * Handle opening of the VerticalFieldSelect component
    *
    * @description When opening, fetch data based on the select's meta information
@@ -241,30 +223,6 @@ export function DiplomaCreationController({
    */
   const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
     openingCallback(open, metaData, inputs);
-
-    // if (!open) return;
-
-    // const task = metaData?.task;
-    // const apiEndpoint = metaData?.apiEndpoint;
-
-    // // Ensure apiEndpoint is present and correspond to a known input
-    // const found = inputs.find(
-    //   (input) => input.task === task && input.apiEndpoint === apiEndpoint
-    // );
-    // if (!found) return;
-
-    // if (DEV_MODE && !NO_CACHE_LOGS) {
-    //   console.debug("handleOpening diploma creation & Fetching ", metaData);
-    // }
-
-    // setFetchParams((prev) => ({
-    //   ...prev,
-    //   dataReshape: endPointReshapeFunction,
-    //   url: apiEndpoint,
-    //   method: API_ENDPOINTS.GET.METHOD,
-    //   contentId: task,
-    //   // contentId: "fetch-diplomas",
-    // }));
   };
 
   const handleSubmit = (variables: DiplomaCreationFormSchema) => {
@@ -447,16 +405,6 @@ export function DiplomaCreationController({
             </ListMapper>
           </ItemContent>
         </Item>
-        <ItemActions className="p-0">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full max-h-5"
-            onClick={(e) => openDialog(e, "new-degree-module")}
-          >
-            <PlusIcon />
-          </Button>
-        </ItemActions>
       </ItemGroup> */}
       <PopoverFieldWithCommands
         multiSelection
@@ -484,13 +432,13 @@ function switchFields(fieldName: string) {
   let field = "";
   switch (fieldName) {
     case "FIELD":
-      field = "diploma";
+      field = "diplomaFieldId";
       break;
     case "YEAR":
-      field = "schoolYear";
+      field = "yearId";
       break;
     case "LEVEL":
-      field = "schoolLevel";
+      field = "levelId";
       break;
     default:
       break;
