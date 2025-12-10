@@ -6,23 +6,19 @@ import {
   NO_QUERY_LOGS,
 } from "@/configs/app.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
+import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { startTransition, useCallback, useEffect, useRef } from "react";
 
 export function useCommandHandler({
-  fetchHooks,
   form,
   pageId,
 }: {
-  fetchHooks: any;
   form: any;
   pageId: string;
 }) {
-  const { openDialog, closeDialog, dialogOptions } = useDialog();
-  const queryClient = useQueryClient();
-  const mutationObs = useMutationObserver({});
   const {
     fetchParams,
     onSubmit,
@@ -31,7 +27,11 @@ export function useCommandHandler({
     error,
     data,
     isLoading,
-  } = fetchHooks;
+  } = useFetch();
+  const { openDialog, closeDialog, dialogOptions } = useDialog();
+  const queryClient = useQueryClient();
+  const mutationObs = useMutationObserver({});
+
   const hasStartedCreation = useRef(false);
   const postVariables = useRef<MutationVariables>(null!);
 
@@ -50,7 +50,6 @@ export function useCommandHandler({
         apiEndpoint,
         dataReshapeFn,
         queryKey: [task, apiEndpoint],
-        // queryKey: [fetchParams.contentId, fetchParams.url],
       });
     },
     []
@@ -177,7 +176,12 @@ export function useCommandHandler({
 
   return {
     ...mutationObs,
-    ...fetchHooks,
+    data,
+    isLoading,
+    error,
+    isLoaded,
+    fetchParams,
+    setFetchParams,
     openDialog,
     closeDialog,
     dialogOptions,
