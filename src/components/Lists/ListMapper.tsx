@@ -82,20 +82,15 @@ export function ListMapper<
       item = { item };
     }
 
-    if ("id" in item) {
-      // item.id exists
-    } else {
-      item.id = `${id}-${index * Math.random()}`;
-    }
+    // Use existing id or create a stable one based on index only
+    const itemId = "id" in item ? item.id : `${id}-${index}`;
 
     // Case A: component prop provided (act as a Component but you provide the child to display as a prop)
 
     if (component) {
       const Component = component;
 
-      return (
-        <Component key={String(item.id)} {...item} {...optional} {...rest} />
-      );
+      return <Component key={itemId} {...item} {...optional} {...rest} />;
     }
 
     // Case B: Render function - best type safety (act as a function with params)
@@ -107,9 +102,7 @@ export function ListMapper<
       ) => ReactNode;
 
       return (
-        <Fragment key={item.id ?? `${id}-${index}`}>
-          {renderFn(item, index, optional)}
-        </Fragment>
+        <Fragment key={itemId}>{renderFn(item, index, optional)}</Fragment>
       );
     }
 
@@ -121,11 +114,6 @@ export function ListMapper<
         ...optional,
       };
 
-      //   <Fragment key={String(item.id)}>
-      //     {cloneElement(children, injectedProps)}
-      //   </Fragment>
-      // );
-
       const Component = children.type as ElementType;
       const originalChildProps = (children.props ?? {}) as Record<
         string,
@@ -133,13 +121,7 @@ export function ListMapper<
       >;
 
       return (
-        // <Fragment key={String(item.id)}>
-        <Component
-          key={String(item.id)}
-          {...originalChildProps}
-          {...injectedProps}
-        />
-        // </Fragment>
+        <Component key={itemId} {...originalChildProps} {...injectedProps} />
       );
     }
 
