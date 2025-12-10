@@ -11,10 +11,8 @@ export function DegreeModuleSkillController({
   inputControllers = degreeSubSkillsCreationInputControllers,
   form,
   className = "grid gap-4",
-  fetchHooks,
 }: Readonly<DegreeModuleSkillProps>) {
   const { setRef, observedRefs, submitCallback } = useCommandHandler({
-    fetchHooks,
     form,
     pageId,
   });

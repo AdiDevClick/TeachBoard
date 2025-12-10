@@ -27,7 +27,6 @@ export function DegreeModuleController({
   className = "grid gap-4",
   formId,
   form,
-  fetchHooks,
 }: Readonly<DegreeModuleProps>) {
   const {
     setRef,
@@ -38,7 +37,6 @@ export function DegreeModuleController({
     openingCallback,
     submitCallback,
   } = useCommandHandler({
-    fetchHooks,
     form,
     pageId,
   });

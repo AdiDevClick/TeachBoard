@@ -37,7 +37,6 @@ function DegreeItem({
   ...props
 }: Readonly<PageWithControllers<DegreeCreationInputItem>>) {
   const formId = pageId + "-form";
-  const fetchHooks = useFetch();
   const form = useForm<DegreeCreationFormSchema>({
     resolver: zodResolver(diplomaFieldData),
     mode: "onTouched",
@@ -61,8 +60,6 @@ function DegreeItem({
       },
       modalMode,
       titleProps,
-      fetchHooks,
-      // queryHooks,
       ...props,
     }),
     [form.formState, props]

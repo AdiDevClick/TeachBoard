@@ -38,8 +38,6 @@ function DegreeModule({
   ...props
 }: Readonly<PageWithControllers<DegreeModuleInputItem>>) {
   const formId = pageId + "-form";
-  const queryHooks = useDegreeCreationForm("LEVEL");
-  const fetchHooks = useFetch();
   const form = useForm<DegreeModuleFormSchema>({
     resolver: zodResolver(degreeModuleData),
     mode: "onTouched",
@@ -63,8 +61,6 @@ function DegreeModule({
         formId,
       },
       titleProps,
-      queryHooks,
-      fetchHooks,
       ...props,
     }),
     [form.formState, props]

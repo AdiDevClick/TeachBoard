@@ -23,10 +23,8 @@ export function DegreeItemController({
   className = "grid gap-4",
   formId,
   form,
-  fetchHooks,
 }: Readonly<DegreeItemProps>) {
   const { setRef, observedRefs, submitCallback } = useCommandHandler({
-    fetchHooks,
     form,
     pageId,
   });

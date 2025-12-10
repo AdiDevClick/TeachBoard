@@ -1,7 +1,6 @@
 import { DegreeModuleSkillController } from "@/components/ClassCreation/diploma/degree-module-skill/controller/DegreeModuleSkillController.tsx";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { degreeSubSkillsCreationInputControllers } from "@/data/inputs-controllers.data.ts";
-import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import type {
   DegreeModuleSkillFormSchema,
   DegreeModuleSkillInputItem,
@@ -37,7 +36,6 @@ export function DegreeModuleSkill({
   ...props
 }: Readonly<PageWithControllers<DegreeModuleSkillInputItem>>) {
   const formId = pageId + "-form";
-  const fetchHooks = useFetch();
   const form = useForm<DegreeModuleSkillFormSchema>({
     resolver: zodResolver(moduleSkillSchema),
     mode: "onTouched",
@@ -59,7 +57,6 @@ export function DegreeModuleSkill({
         formId,
       },
       titleProps,
-      fetchHooks,
       ...props,
     }),
     [form.formState, props]
