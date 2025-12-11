@@ -18,35 +18,39 @@ const fieldData = {
     "Les modules ne doivent pas contenir de caractères spéciaux.",
 };
 
-export const diplomaCreationSchema = z.object({
-  diplomaFieldId: z
-    .uuid(fieldData.diplomaValidUuidMessage)
-    .trim()
-    .nonempty(fieldData.diplomaRequiredMessage),
-  yearId: z
-    .uuid(fieldData.schoolYearValidUuidMessage)
-    .trim()
-    .nonempty(fieldData.schoolYearRequiredMessage),
-  levelId: z
-    .uuid(fieldData.schoolLevelValidUuidMessage)
-    .trim()
-    .nonempty(fieldData.schoolLevelRequiredMessage),
-  mainSkillsList: z
-    .array(
-      z
-        .string()
-        .regex(
-          formsRegex.noSpecialCharsWithTwoCharMin,
-          fieldData.arrayItemRegexMessage
-        )
-        .trim()
-        .toUpperCase()
-    )
-    .min(fieldData.minArrayLength, fieldData.minArrayLengthMessage)
-    .max(fieldData.maxArrayLength, fieldData.maxArrayLengthExceededMessage)
-    .nonoptional(),
-});
+const diplomaSchema = (data: typeof fieldData) => {
+  return z.object({
+    diplomaFieldId: z
+      .uuid(data.diplomaValidUuidMessage)
+      .trim()
+      .nonempty(data.diplomaRequiredMessage),
+    yearId: z
+      .uuid(data.schoolYearValidUuidMessage)
+      .trim()
+      .nonempty(data.schoolYearRequiredMessage),
+    levelId: z
+      .uuid(data.schoolLevelValidUuidMessage)
+      .trim()
+      .nonempty(data.schoolLevelRequiredMessage),
+    mainSkillsList: z
+      .array(
+        z
+          .string()
+          .regex(
+            formsRegex.noSpecialCharsWithTwoCharMin,
+            data.arrayItemRegexMessage
+          )
+          .trim()
+          .toUpperCase()
+      )
+      .min(data.minArrayLength, data.minArrayLengthMessage)
+      .max(data.maxArrayLength, data.maxArrayLengthExceededMessage)
+      .nonoptional(),
+  });
+};
 
 export type DiplomaCreationFormSchema = z.infer<typeof diplomaCreationSchema>;
 
 export type DiplomaInputItem = InputItem<DiplomaCreationFormSchema>;
+
+export const diplomaCreationSchema = diplomaSchema(fieldData);
