@@ -244,6 +244,11 @@ export function DiplomaCreationController({
     });
   };
 
+  /**
+   * Set ids based on selected command value
+   *
+   * @param value
+   */
   const onSelectHandler = (value: string) => {
     const cachedData = queryClient.getQueryData([
       fetchParams.contentId,
