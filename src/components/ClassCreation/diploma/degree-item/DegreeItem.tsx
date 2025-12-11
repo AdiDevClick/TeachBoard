@@ -1,7 +1,6 @@
 import { DegreeItemController } from "@/components/ClassCreation/diploma/degree-item/controller/DegreeItemController.tsx";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { degreeCreationInputControllers } from "@/data/inputs-controllers.data.ts";
-import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import {
   diplomaFieldData,
   type DegreeCreationFormSchema,
