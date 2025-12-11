@@ -22,7 +22,7 @@ const defaultStateParameters: FetchParams = {
   onSuccess: undefined,
   onError: undefined,
   silent: false,
-  cachedFetchKey: null,
+  cachedFetchKey: undefined,
 };
 
 export function useFetch() {
@@ -54,7 +54,7 @@ export function useFetch() {
         const cachingDatas = fetchParams.dataReshapeFn
           ? fetchParams.dataReshapeFn(
               response.data,
-              queryClient.getQueriesData(cachedKey)
+              queryClient.getQueriesData({ queryKey: cachedKey })
             )
           : response.data;
 
