@@ -20,6 +20,13 @@ const footerProps = {
   submitText: "Créer le diplôme",
 };
 
+/**
+ *
+ * @param pageId - The ID of the page.
+ * @param modalMode - Whether the creation is in a modal or a full page.
+ * @param className - Additional CSS classes for styling.
+ * @param inputControllers - The input controllers for the form (this needs to be already validated by Zod Schema).
+ */
 function DiplomaCreation({
   pageId = "create-diploma",
   modalMode = true,
