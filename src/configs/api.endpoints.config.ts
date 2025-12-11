@@ -32,11 +32,11 @@ export const API_ENDPOINTS = Object.freeze({
     SKILLS: {
       endPoints: { MODULES: `${SKILLS}/main`, SUBSKILLS: `${SKILLS}/sub` },
       dataReshape: (data: any) =>
-        // use "code" and transform to "value" for selects
-        // data.Skills is the actual array of skills from the server response
         dataReshaper(data)
+          // data.Skills is the actual array of skills from the server response
           .rename("Skills", "items")
           .add({ groupTitle: "Tous" })
+          // use "code" and transform to "value" for selects
           .assign([["code", "value"]])
           .newShape(),
     },
@@ -47,23 +47,23 @@ export const API_ENDPOINTS = Object.freeze({
         FIELD: `${DEGREES}/field`,
       },
       dataReshape: (data: any) =>
-        // use "name" and transform to "value" for selects
         dataReshaper(data)
           .assignSourceTo("items")
           .add({ groupTitle: "Tous" })
+          // use "name" and transform to "value" for selects
           .assign([["name", "value"]])
           .newShape(),
     },
     DIPLOMAS: {
       endpoint: `${DEGREES}/config`,
       dataReshape: (data: any) =>
-        // Tuple key for all entries will be : { groupTitle: "Bachelor", items: [...] }
-        // Instead of : { "Bachelor" : [...] }
-        // A new output will be create under "description" in each "items"
-        // "description" will be transformed to "value" for selects
         dataReshaper(data)
+          // Tuple key for all entries will be : { groupTitle: "Bachelor", items: [...] }
+          // Instead of : { "Bachelor" : [...] }
           .transformTuplesToGroups("groupTitle", "items")
+          // A new output will be create under "description" in each "items"
           .createOutput(["degreeLevel", "degreeYear"], "description", " ")
+          // "description" will be transformed to "value" for selects
           .assign([["description", "value"]])
           .newShape(),
     },
@@ -96,20 +96,16 @@ export const API_ENDPOINTS = Object.freeze({
         const degree = data?.degree;
         // grab id and name from data.degree only
         const newItem = {
-          id: degree?.id,
+          ...degree,
           value: degree?.name,
         };
 
-        const existingData = getCachedDatas(cachedDatas);
-
-        return [{ ...existingData, items: [...existingData.items, newItem] }];
+        return reshapeItemToCachedData(newItem, cachedDatas, "Tous");
       },
     },
     CREATE_SKILL: {
       endPoints: { MODULE: `${SKILLS}/main`, SUBSKILL: `${SKILLS}/sub` },
       dataReshape: (data: any, cachedDatas) => {
-        const existingData = getCachedDatas(cachedDatas);
-
         // Extract the actual skill data from the response
         const skillData = data?.skill || data;
 
@@ -119,21 +115,18 @@ export const API_ENDPOINTS = Object.freeze({
           value: skillData.code,
         };
 
-        const result = [
-          {
-            ...existingData,
-            items: [...(existingData.items || []), newItem],
-          },
-        ];
-
-        return result;
+        return reshapeItemToCachedData(newItem, cachedDatas, "Tous");
       },
     },
     CREATE_DIPLOMA: {
       endpoint: `${DEGREES}/config`,
       dataReshape: (data: any, cachedDatas: unknown) => {
-        // const existingData = getCachedDatas(cachedDatas);
-        return data;
+        const newItem = {
+          ...data,
+          value: data?.degreeLevel + " " + data?.degreeYear,
+        };
+
+        return reshapeItemToCachedData(newItem, cachedDatas, data.degreeField);
       },
     },
   },
@@ -148,6 +141,27 @@ function dataReshaper(data: any) {
 function getCachedDatas(cachedDatas: unknown) {
   const array = cachedDatas?.[0];
   const data = array?.[1];
-  const firstItem = data?.[0];
-  return firstItem || { items: [] };
+  if (data?.length > 0) return data;
+  return data?.[0];
+}
+
+/**
+ * Reshape a new item into the cached data structure
+ *
+ * @description structure : { groupTitle: string, items: Array }
+ *
+ * @param newItem The new item to be reshaped and added
+ * @param cachedDatas The existing cached data structure
+ * @param groupConditionValue The group condition value for grouping items
+ * @returns The reshaped data structure with the new item added
+ */
+function reshapeItemToCachedData(
+  newItem: any,
+  cachedDatas: unknown,
+  groupConditionValue: string
+) {
+  const existingData = getCachedDatas(cachedDatas);
+  return dataReshaper(existingData)
+    .addTo(newItem, "items", "groupTitle", groupConditionValue)
+    .newShape();
 }
