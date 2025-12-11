@@ -30,7 +30,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   /** Maps targetKey -> sourceKeys[] for property aliasing with fallback support */
   readonly #mappingProxies = new Map<string, string[]>();
   #assignedSourceKey?: string;
-  readonly #perItemAdditions: Record<string, unknown> = {};
+  #perItemAdditions: Record<string, unknown> = {};
   /** Maps targetKey -> compute function for dynamic property creation */
   readonly #computedProperties = new Map<
     string,
@@ -49,13 +49,32 @@ export class ObjectReshape<T extends Record<string, unknown>> {
       Record<keyof T, unknown>
     >
   ) {
-    this.#dataSource = structuredClone(dataSource);
+    this.#dataSource = this.#deepClone(dataSource);
     this.#shapeToBuild = shapeToBuild;
 
     this.#isArray = this.#isValidArray(this.#dataSource);
     this.#isPlainObject = this.#isValidObject(this.#dataSource);
     this.#firstSourceElement = (this.#dataSource as T[])[0];
     this.#init();
+  }
+
+  /**
+   * Deep clone that handles proxied objects
+   * Falls back to JSON serialization if structuredClone fails
+   */
+  #deepClone<T>(data: T): T {
+    try {
+      return structuredClone(data);
+    } catch (error) {
+      // If structuredClone fails (e.g., with Proxy objects), use JSON serialization
+      if (DEV_MODE && !NO_PROXY_LOGS) {
+        console.warn(
+          "[ObjectReshape] structuredClone failed, using JSON serialization fallback:",
+          error
+        );
+      }
+      return JSON.parse(JSON.stringify(data));
+    }
   }
 
   #init() {
@@ -277,9 +296,30 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     return this;
   }
 
-  addToItems(pairs: Record<string, unknown>) {
-    for (const key in pairs) {
-      this.#perItemAdditions[key] = pairs[key];
+  addTo(
+    newItem: Record<string, unknown>,
+    itemsKey = "items",
+    groupConditionKey?: string,
+    groupConditionValue?: string
+  ) {
+    let jobDone = false;
+
+    this.#newShapedItem = this.#dataSource.reduce((acc, curr) => {
+      if (curr[groupConditionKey] === groupConditionValue) {
+        curr[itemsKey] = [...curr[itemsKey], newItem];
+        jobDone = true;
+      }
+
+      return acc;
+    }, this.#dataSource);
+
+    if (!jobDone) {
+      const item = {
+        [groupConditionKey]: groupConditionValue,
+        [itemsKey]: [newItem],
+      };
+
+      this.#newShapedItem.push(item);
     }
     return this;
   }
@@ -376,7 +416,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    * @param item - The source item to transform
    * @returns A new object with mappings and additions applied
    */
-  #buildItem(item: Record<string, unknown>): Record<string, unknown> {
+  buildItem(item: Record<string, unknown>): Record<string, unknown> {
     const newItem: Record<string, unknown> = { ...item };
     this.#applyMappings(item, newItem);
     this.#applyComputedProperties(item, newItem);
@@ -393,7 +433,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   #buildItemsArray(
     sourceArray: Array<Record<string, unknown>>
   ): Array<Record<string, unknown>> {
-    return sourceArray.map((item) => this.#buildItem(item));
+    return sourceArray.map((item) => this.buildItem(item));
   }
 
   /**
