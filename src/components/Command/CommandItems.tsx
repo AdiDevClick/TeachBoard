@@ -1,4 +1,7 @@
-import type { CommandsProps } from "@/components/Command/types/command.types.ts";
+import type {
+  CommandItemType,
+  CommandsProps,
+} from "@/components/Command/types/command.types.ts";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import {
   Command,
@@ -38,10 +41,13 @@ export function CommandItems(props: Readonly<CommandsProps>) {
   const contextOnSelect = context?.onSelect;
   const selectedValue = context?.selectedValue;
 
-  const handleSelect = useCallback((value: string) => {
-    contextOnSelect?.(value);
-    externalOnSelect?.(value);
-  }, []);
+  const handleSelect = useCallback(
+    (value: string, commandItem: CommandItemType) => {
+      contextOnSelect?.(value);
+      externalOnSelect?.(value, commandItem);
+    },
+    []
+  );
 
   return (
     <Command
@@ -53,28 +59,28 @@ export function CommandItems(props: Readonly<CommandsProps>) {
       <CommandList>
         <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
         <ListMapper items={commandHeadings ?? []}>
-          {({ groupTitle, items }) => {
-            if (commandGroupContainsInvalid(props)) {
+          {(item) => {
+            if (commandGroupContainsInvalid(item)) {
               debugLogs("Rendering CommandGroup");
             }
             return (
-              <CommandGroup key={groupTitle} heading={groupTitle}>
-                <ListMapper items={items}>
-                  {({ id, value }) => {
-                    if (commandItemContainsInvalid(props)) {
+              <CommandGroup key={item.groupTitle} heading={item.groupTitle}>
+                <ListMapper items={item.items}>
+                  {(command) => {
+                    if (commandItemContainsInvalid(command)) {
                       debugLogs("Rendering CommandItem");
                     }
                     return (
                       <CommandItem
-                        key={id}
-                        id={String(id)}
-                        value={value}
-                        onSelect={handleSelect}
+                        key={command.id}
+                        id={String(command.id)}
+                        value={command.value}
+                        onSelect={(e) => handleSelect(e, command)}
                         {...rest}
                       >
-                        {value ?? "Valeur inconnue"}
+                        {command.value ?? "Valeur inconnue"}
                         {defineSelection(
-                          value,
+                          command.value,
                           selectedValue,
                           rest.multiSelection
                         ) && <CheckIcon className={"ml-auto"} />}
