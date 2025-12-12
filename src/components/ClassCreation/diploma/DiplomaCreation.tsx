@@ -30,7 +30,6 @@ const footerProps = {
 function DiplomaCreation({
   pageId = "create-diploma",
   modalMode = true,
-  className,
   inputControllers,
   ...props
 }: Readonly<PageWithControllers<SignupInputItem>>) {
@@ -50,7 +49,6 @@ function DiplomaCreation({
     () => ({
       pageId,
       modalMode,
-      className,
       form,
       formId,
       titleProps,
