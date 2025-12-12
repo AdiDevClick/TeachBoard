@@ -11,6 +11,18 @@ const SKILLS = `${BASE_API_URL}/skills`;
 
 /**
  * API Endpoints Configuration
+ * This file is used as a buffer between frontend and backend.
+ *
+ * @description <CommandList/> await structure :
+ * { groupTitle: string, items: Array }
+ * @description Each <CommandItem/> await structure :
+ * { id: number | string, value: string, ... }
+ *
+ * @remarks Endpoints are grouped by HTTP method (GET, POST).
+ *
+ * @remarks Data reshaping is handled using ObjectReshape utility for consistency.
+ * ObjectReshape allows transformations to adapt server responses to frontend needs.
+ * It uses proxy pattern
  */
 export const API_ENDPOINTS = Object.freeze({
   GET: {
@@ -65,6 +77,24 @@ export const API_ENDPOINTS = Object.freeze({
           .createOutput(["degreeLevel", "degreeYear"], "description", " ")
           // "description" will be transformed to "value" for selects
           .assign([["description", "value"]])
+          .newShape(),
+    },
+    TASKSTEMPLATES: {
+      endpoints: {
+        ALL: `${BASE_API_URL}/task-templates`,
+        BY_DIPLOMA_ID: (id: number | string) =>
+          `${BASE_API_URL}/task-templates/by-degree-config/${id}`,
+      },
+      dataReshape: (data: any) =>
+        dataReshaper(data).rename("tasks", "items").newShape(),
+    },
+    TASKS: {
+      endpoint: `${BASE_API_URL}/tasks`,
+      dataReshape: (data: any) =>
+        dataReshaper(data)
+          .assignSourceTo("items")
+          .add({ groupTitle: "Tous" })
+          .assign([["name", "value"]])
           .newShape(),
     },
     STUDENTS: `${BASE_API_URL}/students`,
