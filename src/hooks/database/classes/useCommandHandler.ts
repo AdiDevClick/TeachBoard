@@ -36,20 +36,18 @@ export function useCommandHandler({
   const postVariables = useRef<MutationVariables>(null!);
 
   const handleAddNewItem = useCallback(
-    ({ e, apiEndpoint, task, dataReshapeFn }: HandleAddNewItemParams) => {
+    ({ e, ...rest }: HandleAddNewItemParams) => {
       if (DEV_MODE && !NO_CACHE_LOGS) {
         console.log("Add new item triggered", {
-          apiEndpoint,
-          task,
+          apiEndpoint: rest.apiEndpoint,
+          task: rest.task,
         });
       }
       console.log("opening new degree item");
 
-      openDialog(e, task, {
-        task,
-        apiEndpoint,
-        dataReshapeFn,
-        queryKey: [task, apiEndpoint],
+      openDialog(e, rest.task, {
+        ...rest,
+        queryKey: [rest.task, rest.apiEndpoint],
       });
     },
     []
@@ -130,11 +128,11 @@ export function useCommandHandler({
     const dataReshapeFn = metaData?.dataReshapeFn;
 
     // Ensure apiEndpoint is present and correspond to a known input
-    const found = inputControllers.find(
-      (input: (typeof inputControllers)[number]) =>
-        input.task === task && input.apiEndpoint === apiEndpoint
-    );
-    if (!found) return;
+    // const found = inputControllers.find(
+    //   (input: (typeof inputControllers)[number]) =>
+    //     input.task === task && input.apiEndpoint === apiEndpoint
+    // );
+    // if (!found) return;
 
     if (DEV_MODE && !NO_CACHE_LOGS) {
       console.debug("handleOpening callback in CommandHandler", metaData);
@@ -145,7 +143,7 @@ export function useCommandHandler({
       dataReshapeFn: dataReshapeFn,
       url: apiEndpoint,
       contentId: task,
-      method: "GET",
+      // method: "GET",
     }));
   }, []);
 
