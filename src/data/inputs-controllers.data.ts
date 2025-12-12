@@ -1,7 +1,8 @@
-import type { ClassCreation } from "@/components/ClassCreation/ClassCreation.tsx";
+import type ClassCreation from "@/components/ClassCreation/ClassCreation.tsx";
 import type { DegreeItemController } from "@/components/ClassCreation/diploma/degree-item/controller/DegreeItemController.tsx";
 import type { DegreeModuleSkillController } from "@/components/ClassCreation/diploma/degree-module-skill/controller/DegreeModuleSkillController.tsx";
 import type DegreeModule from "@/components/ClassCreation/diploma/degree-module/DegreeModule.tsx";
+import type TaskTemplateCreation from "@/components/ClassCreation/task/TaskTemplateCreation.tsx";
 import type { InputItem } from "@/components/Inputs/types/inputs.types";
 import type LoginForm from "@/components/LoginForms/LoginForm.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
@@ -78,6 +79,8 @@ export const passwordRecoveryInputControllers = [
   },
 ] satisfies InputItem<RecoveryFormSchema>[];
 
+const year = new Date().getFullYear();
+const defaultSchoolYear = year + " - " + (year + 1);
 export const classCreationInputControllers = [
   {
     name: "name",
@@ -91,6 +94,19 @@ export const classCreationInputControllers = [
     type: "text",
     placeholder: "Description de la classe",
   },
+  {
+    id: "fetch-input-tasks-templates",
+    apiEndpoint: API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID,
+    dataReshapeFn: API_ENDPOINTS.GET.TASKSTEMPLATES.dataReshape,
+    name: "taskId",
+    task: "new-task-template",
+    title: "Tâches à évaluer",
+    type: "text",
+    placeholder: "Sélectionnez un template de tâche...",
+    useButtonAddNew: true,
+    useCommands: true,
+    creationButtonText: "Ajouter une tâche",
+  },
   // {
   //   name: "schoolYear",
   //   title: "Année scolaire",
@@ -98,6 +114,43 @@ export const classCreationInputControllers = [
   //   placeholder: "Sélectionnez l'année scolaire",
   //   autoComplete: "off",
   // },
+  {
+    // Required for withController to be able to process the field
+    id: "add-new-diploma",
+    name: "degreeConfigId",
+    label: "Année et niveau du diplôme",
+    placeholder: "Sélectionnez...",
+    creationButtonText: "Ajouter un diplôme",
+    task: "create-diploma",
+    useCommands: true,
+    fullWidth: true,
+    useButtonAddNew: true,
+    apiEndpoint: API_ENDPOINTS.GET.DIPLOMAS.endpoint,
+    dataReshapeFn: API_ENDPOINTS.GET.DIPLOMAS.dataReshape,
+  },
+  {
+    // Required for withController to be able to process the field
+    // The "students" field can hold an array of selected student ids (or similar)
+    name: "students",
+    label: "Elèves",
+    task: "add-students",
+    placeholder: "Sélectionnez...",
+    creationButtonText: "Ajouter des élèves",
+    useCommands: false,
+    fullWidth: true,
+    useButtonAddNew: true,
+  },
+  {
+    name: "schoolYear",
+    label: "Année scolaire",
+    task: "add-school-year",
+    placeholder: defaultSchoolYear,
+    defaultValue: defaultSchoolYear,
+    creationButtonText: false,
+    useCommands: false,
+    fullWidth: false,
+    useButtonAddNew: false,
+  },
 ] satisfies Parameters<typeof ClassCreation>[0]["inputControllers"];
 
 export const degreeCreationInputControllers = [
@@ -166,3 +219,53 @@ export const degreeSubSkillsCreationInputControllers = [
 ] satisfies Parameters<
   typeof DegreeModuleSkillController
 >[0]["inputControllers"];
+
+export const taskTemplateCreationInputControllers = [
+  {
+    name: "name",
+    title: "Nom de la configuration",
+    type: "text",
+    placeholder: "Ex: BTS Cuisine - Serveur...",
+  },
+  {
+    name: "description",
+    title: "Description",
+    type: "text",
+    placeholder: "Ex: La tâche consiste à ...",
+  },
+  {
+    id: "fetch-input-tasks",
+    // apiEndpoint: API_ENDPOINTS.GET.DIPLOMAS.endpoint,
+    // dataReshapeFn: API_ENDPOINTS.GET.DIPLOMAS.dataReshape,
+    name: "degreeConfigId",
+    title: "Diplôme associé",
+    type: "text",
+    placeholder: "Sélectionnez le diplôme associé...",
+  },
+  {
+    id: "fetch-input-tasks",
+    apiEndpoint: API_ENDPOINTS.GET.TASKS.endpoint,
+    dataReshapeFn: API_ENDPOINTS.GET.TASKS.dataReshape,
+    name: "taskId",
+    task: "new-task",
+    label: "Tâche",
+    type: "text",
+    placeholder: "Sélectionnez un nom...",
+    useButtonAddNew: true,
+    creationButtonText: "Ajouter une tâche",
+    useCommands: true,
+  },
+  {
+    id: "fetch-input-skills-for-tasks",
+    // apiEndpoint: API_ENDPOINTS.GET.SKILLS.endPoints.SUBSKILLS,
+    // dataReshapeFn: API_ENDPOINTS.GET.SKILLS.dataReshape,
+    task: "new-task-skill",
+    name: "skills",
+    label: "Compétences associées",
+    type: "text",
+    useButtonAddNew: true,
+    creationButtonText: "Ajouter une compétence",
+    useCommands: true,
+    placeholder: "Recherchez une compétence...",
+  },
+] satisfies Parameters<typeof TaskTemplateCreation>[0]["inputControllers"];
