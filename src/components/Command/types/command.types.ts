@@ -25,5 +25,5 @@ export type CommandsProps = {
   commandHeadings?: HeadingType[];
   queryRecordsKey?: string[];
   /** Callback appelé quand un item de commande est sélectionné */
-  onSelect?: (value: string) => void;
+  onSelect?: (value: string, commandItem: CommandItemType) => void;
 } & Omit<ComponentProps<typeof Command>, "onSelect">;
