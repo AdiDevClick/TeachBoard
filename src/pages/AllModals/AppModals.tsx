@@ -3,6 +3,7 @@ import DegreeItem from "@/components/ClassCreation/diploma/degree-item/DegreeIte
 import DegreeModuleSkill from "@/components/ClassCreation/diploma/degree-module-skill/DegreeModuleSkill.tsx";
 import DegreeModule from "@/components/ClassCreation/diploma/degree-module/DegreeModule.tsx";
 import DiplomaCreation from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
+import TaskTemplateCreation from "@/components/ClassCreation/task/TaskTemplateCreation.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import LoginForm from "@/components/LoginForms/LoginForm.tsx";
 import { Modal, ModalWithSimpleAlert } from "@/components/Modal/Modal.tsx";
@@ -106,6 +107,20 @@ const modals = defineStrictModalsList([
     modalProps: { isNavigationModal: false },
     contentProps: { modalMode: true },
   },
+  {
+    modalName: "new-task-template",
+    type: Modal,
+    modalContent: TaskTemplateCreation,
+    modalProps: { isNavigationModal: false },
+    contentProps: { modalMode: true },
+  },
+  // {
+  //   modalName: "new-task",
+  //   type: Modal,
+  //   modalContent: TaskCreation,
+  //   modalProps: { isNavigationModal: false },
+  //   contentProps: { modalMode: true },
+  // },
 ]) satisfies Parameters<typeof AppModals>[0]["modalsList"];
 
 /**
