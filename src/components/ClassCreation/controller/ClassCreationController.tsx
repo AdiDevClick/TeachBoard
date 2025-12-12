@@ -1,6 +1,11 @@
+import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
+import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import { PopoverFieldWithControlledCommands } from "@/components/Popovers/PopoverField.tsx";
+import {
+  PopoverFieldWithCommands,
+  PopoverFieldWithControllerAndCommandsList,
+} from "@/components/Popovers/PopoverField.tsx";
 import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem.tsx";
 import { VerticalFieldSelectWithController } from "@/components/Selects/VerticalFieldSelect.tsx";
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
@@ -12,51 +17,51 @@ import type { ClassCreationInputItem } from "@/models/class-creation.models.ts";
 import type { DiplomaCreationFormSchema } from "@/models/diploma-creation.models.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const year = new Date().getFullYear();
 const years = yearsListRange(year, 5);
 const defaultSchoolYear = year + " - " + (year + 1);
 
-const inputs = [
-  {
-    // Required for withController to be able to process the field
-    id: "add-new-diploma",
-    name: "degreeConfigId",
-    label: "Année et niveau du diplôme",
-    placeholder: "Sélectionnez...",
-    creationButtonText: "Ajouter un diplôme",
-    task: "create-diploma",
-    useCommands: true,
-    fullWidth: true,
-    useButtonAddNew: true,
-    apiEndpoint: API_ENDPOINTS.GET.DIPLOMAS.endpoint,
-    dataReshapeFn: API_ENDPOINTS.GET.DIPLOMAS.dataReshape,
-  },
-  {
-    // Required for withController to be able to process the field
-    // The "students" field can hold an array of selected student ids (or similar)
-    name: "students",
-    label: "Elèves",
-    task: "add-students",
-    placeholder: "Sélectionnez...",
-    creationButtonText: "Ajouter des élèves",
-    useCommands: false,
-    fullWidth: true,
-    useButtonAddNew: true,
-  },
-  {
-    name: "schoolYear",
-    label: "Année scolaire",
-    task: "add-school-year",
-    placeholder: defaultSchoolYear,
-    defaultValue: defaultSchoolYear,
-    creationButtonText: false,
-    useCommands: false,
-    fullWidth: false,
-    useButtonAddNew: false,
-  },
-];
+// const inputs = [
+//   {
+//     // Required for withController to be able to process the field
+//     id: "add-new-diploma",
+//     name: "degreeConfigId",
+//     label: "Année et niveau du diplôme",
+//     placeholder: "Sélectionnez...",
+//     creationButtonText: "Ajouter un diplôme",
+//     task: "create-diploma",
+//     useCommands: true,
+//     fullWidth: true,
+//     useButtonAddNew: true,
+//     apiEndpoint: API_ENDPOINTS.GET.DIPLOMAS.endpoint,
+//     dataReshapeFn: API_ENDPOINTS.GET.DIPLOMAS.dataReshape,
+//   },
+//   {
+//     // Required for withController to be able to process the field
+//     // The "students" field can hold an array of selected student ids (or similar)
+//     name: "students",
+//     label: "Elèves",
+//     task: "add-students",
+//     placeholder: "Sélectionnez...",
+//     creationButtonText: "Ajouter des élèves",
+//     useCommands: false,
+//     fullWidth: true,
+//     useButtonAddNew: true,
+//   },
+//   {
+//     name: "schoolYear",
+//     label: "Année scolaire",
+//     task: "add-school-year",
+//     placeholder: defaultSchoolYear,
+//     defaultValue: defaultSchoolYear,
+//     creationButtonText: false,
+//     useCommands: false,
+//     fullWidth: false,
+//     useButtonAddNew: false,
+//   },
+// ];
 
 const defaultState = {
   selected: false,
@@ -96,15 +101,22 @@ export function ClassCreationController({
     pageId,
   });
 
+  const cachedKeysRef = useRef<unknown[]>([]);
+  const selectedDiplomaRef = useRef<CommandItemType | null>(null);
+
   const queryClient = useQueryClient();
   const resultsCallback = useCallback((keys: any) => {
+    saveKeys(keys, cachedKeysRef);
     const cachedData = queryClient.getQueryData(keys ?? []);
+
     if (DEV_MODE && !NO_CACHE_LOGS) {
       console.log("Cached data for ", keys, " is ", cachedData);
     }
+
     if (cachedData === undefined) {
       return data;
     }
+
     return cachedData;
   }, []);
 
@@ -117,7 +129,15 @@ export function ClassCreationController({
    * @param metaData - The meta data from the popover field that was opened
    */
   const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
-    openingCallback(open, metaData, inputs);
+    const linkedDiploma = selectedDiplomaRef.current;
+    if (linkedDiploma && metaData) {
+      metaData.apiEndpoint =
+        API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
+          linkedDiploma.id
+        );
+      metaData["degreeConfig"] = linkedDiploma;
+    }
+    openingCallback(open, metaData, inputControllers);
   };
 
   const handleSubmit = (variables: DiplomaCreationFormSchema) => {
@@ -150,6 +170,40 @@ export function ClassCreationController({
       }
     }
   }, [observedRefs, form, pageId]);
+
+  const handleCommandSelection = (value: string) => {
+    if (currentSkills.has(value)) {
+      currentSkills.delete(value);
+    } else {
+      currentSkills.add(value);
+    }
+    console.log(value);
+    form.setValue("skillList", Array.from(currentSkills), {
+      shouldValidate: true,
+    });
+  };
+
+  const handleOnSelect = (value: string, commandItem: CommandItemType) => {
+    console.log(commandItem);
+    selectedDiplomaRef.current = commandItem;
+    // const diplomaKey = cachedKeysRef.current?.["create-diploma"];
+    // const cachedData = queryClient.getQueryData({ queryKey: diplomaKey });
+  };
+
+  const handleNewItemCallback = ({ e, ...rest }: HandleAddNewItemParams) => {
+    if (DEV_MODE && !NO_CACHE_LOGS) {
+      console.log("Add new item triggered", {
+        apiEndpoint: rest.apiEndpoint,
+        task: rest.task,
+      });
+    }
+    console.log("opening new degree item");
+    newItemCallback({
+      e,
+      ...rest,
+      selectedDiploma: selectedDiplomaRef.current,
+    });
+  };
 
   // handleRoleClick removed (popovers handle toggle via onOpenChange)
 
@@ -307,11 +361,12 @@ export function ClassCreationController({
   // };
   // Get the current skills from the form
   const currentSkills = new Set(form.watch("mainSkillsList") || []);
+  const id = formId ?? pageId + "-form";
 
   return (
     <form
-      ref={(el) => setRef(el, { name: pageId, id: `${pageId}-form` })}
-      id={`${pageId}-form`}
+      ref={(el) => setRef(el, { name: pageId, id })}
+      id={id}
       onSubmit={form.handleSubmit(handleSubmit)}
       className="grid gap-4"
     >
@@ -320,8 +375,8 @@ export function ClassCreationController({
         form={form}
         setRef={setRef}
       />
-      <PopoverFieldWithControlledCommands
-        {...inputs[0]}
+      <PopoverFieldWithControllerAndCommandsList
+        items={inputControllers.slice(3, 5)}
         form={form}
         // id={`${pageId}-year`}
         setRef={setRef}
@@ -331,9 +386,46 @@ export function ClassCreationController({
         ])}
         observedRefs={observedRefs}
         onOpenChange={handleOpening}
+        onSelect={handleOnSelect}
         onAddNewItem={newItemCallback}
       />
-      <PopoverFieldWithControlledCommands
+      <ControlledDynamicTagList
+        form={form}
+        setRef={setRef}
+        {...classCreationInputControllers[2]}
+        observedRefs={observedRefs}
+        itemList={Array.from(currentSkills)}
+      />
+      <PopoverFieldWithCommands
+        multiSelection
+        setRef={setRef}
+        onSelect={handleCommandSelection}
+        onOpenChange={handleOpening}
+        observedRefs={observedRefs}
+        onAddNewItem={handleNewItemCallback}
+        commandHeadings={resultsCallback([
+          fetchParams.contentId,
+          fetchParams.url,
+        ])}
+        {...classCreationInputControllers[2]}
+      />
+      <VerticalFieldSelectWithController
+        setRef={setRef}
+        observedRefs={observedRefs}
+        name="schoolYear"
+        form={form}
+        fullWidth={false}
+        placeholder={"defaultSchoolYear"}
+        defaultValue={defaultSchoolYear}
+        label="Année scolaire"
+        id={`${pageId}-schoolYear`}
+      >
+        <ListMapper items={years}>
+          <NonLabelledGroupItem />
+        </ListMapper>
+      </VerticalFieldSelectWithController>
+
+      {/* <PopoverFieldWithControlledCommands
         setRef={setRef}
         commandHeadings={resultsCallback([
           fetchParams.contentId,
@@ -347,21 +439,14 @@ export function ClassCreationController({
         onOpenChange={handleOpening}
         onAddNewItem={newItemCallback}
         form={form}
-        {...inputs[1]}
+        {...inputControllers[4]}
       >
         {isYearOpened && (
           <ListMapper items={years}>
             <NonLabelledGroupItem />
           </ListMapper>
         )}
-      </PopoverFieldWithControlledCommands>
-      <ControlledDynamicTagList
-        form={form}
-        setRef={setRef}
-        {...inputs[3]}
-        observedRefs={observedRefs}
-        itemList={Array.from(currentSkills)}
-      />
+      </PopoverFieldWithControlledCommands> */}
       {/* <ItemGroup id={`${pageId}-roles`} className="grid gap-2">
         <ItemTitle>Ajouter des rôles</ItemTitle>
         <Item variant={"default"} className="p-0">
@@ -470,21 +555,6 @@ export function ClassCreationController({
           </Button>
         </ItemActions>
       </ItemGroup> */}
-      <VerticalFieldSelectWithController
-        setRef={setRef}
-        observedRefs={observedRefs}
-        name="schoolYear"
-        form={form}
-        fullWidth={false}
-        placeholder={"defaultSchoolYear"}
-        defaultValue={defaultSchoolYear}
-        label="Année scolaire"
-        id={`${pageId}-schoolYear`}
-      >
-        <ListMapper items={years}>
-          <NonLabelledGroupItem />
-        </ListMapper>
-      </VerticalFieldSelectWithController>
       {/* {data?.data?.classes.length > 0 && (
             <>
               <SelectSeparator />
@@ -500,6 +570,18 @@ export function ClassCreationController({
       {/* School Year Select */}
     </form>
   );
+}
+
+/**
+ * Save the provided keys into the given ref object.
+ *
+ * @description You can then call any query with these keys to get cached data.
+ *
+ * @param keys - The keys to be saved.
+ * @param ref - The ref object where the keys will be stored.
+ */
+function saveKeys(keys: unknown[], ref: object) {
+  ref.current = { ...ref.current, [keys[0]]: keys };
 }
 
 /**
