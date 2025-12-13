@@ -2,7 +2,8 @@ import type ClassCreation from "@/components/ClassCreation/ClassCreation.tsx";
 import type { DegreeItemController } from "@/components/ClassCreation/diploma/degree-item/controller/DegreeItemController.tsx";
 import type { DegreeModuleSkillController } from "@/components/ClassCreation/diploma/degree-module-skill/controller/DegreeModuleSkillController.tsx";
 import type DegreeModule from "@/components/ClassCreation/diploma/degree-module/DegreeModule.tsx";
-import type TaskTemplateCreation from "@/components/ClassCreation/task/TaskTemplateCreation.tsx";
+import type TaskItem from "@/components/ClassCreation/task/task-item/TaskItem";
+import type TaskTemplateCreation from "@/components/ClassCreation/task/task-template/TaskTemplateCreation";
 import type { InputItem } from "@/components/Inputs/types/inputs.types";
 import type LoginForm from "@/components/LoginForms/LoginForm.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
@@ -247,7 +248,7 @@ export const taskTemplateCreationInputControllers = [
     apiEndpoint: API_ENDPOINTS.GET.TASKS.endpoint,
     dataReshapeFn: API_ENDPOINTS.GET.TASKS.dataReshape,
     name: "taskId",
-    task: "new-task",
+    task: "new-task-item",
     label: "Tâche",
     type: "text",
     placeholder: "Sélectionnez un nom...",
@@ -257,6 +258,7 @@ export const taskTemplateCreationInputControllers = [
   },
   {
     id: "fetch-input-skills-for-tasks",
+    multiSelection: true,
     // apiEndpoint: API_ENDPOINTS.GET.SKILLS.endPoints.SUBSKILLS,
     // dataReshapeFn: API_ENDPOINTS.GET.SKILLS.dataReshape,
     task: "new-task-skill",
@@ -269,3 +271,18 @@ export const taskTemplateCreationInputControllers = [
     placeholder: "Recherchez une compétence...",
   },
 ] satisfies Parameters<typeof TaskTemplateCreation>[0]["inputControllers"];
+
+export const taskItemInputControllers = [
+  {
+    name: "name",
+    title: "Nom de la tâche",
+    type: "text",
+    placeholder: "Ex: Installer un système d'exploitation...",
+  },
+  {
+    name: "description",
+    title: "Description",
+    type: "text",
+    placeholder: "Ex: La tâche consiste à ...",
+  },
+] satisfies Parameters<typeof TaskItem>[0]["inputControllers"];

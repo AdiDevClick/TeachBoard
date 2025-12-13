@@ -67,7 +67,7 @@ export type AppModalNames =
   | "new-degree-module"
   | "new-degree-module-skill"
   | "new-task-template"
-  | "new-task";
+  | "new-task-item";
 
 /**
  * Pages that do not require session checks

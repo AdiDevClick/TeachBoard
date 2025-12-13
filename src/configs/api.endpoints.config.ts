@@ -159,6 +159,26 @@ export const API_ENDPOINTS = Object.freeze({
         return reshapeItemToCachedData(newItem, cachedDatas, data.degreeField);
       },
     },
+    CREATE_TASK_TEMPLATE: {
+      endpoint: `${BASE_API_URL}/task-templates`,
+      dataReshape: (data: any, cachedDatas: unknown) => {
+        const newItem = {
+          ...data.taskTemplate,
+          value: data.taskTemplate.name,
+        };
+        return reshapeItemToCachedData(newItem, cachedDatas, "Tous");
+      },
+    },
+    CREATE_TASK: {
+      endpoint: `${BASE_API_URL}/tasks`,
+      dataReshape: (data: any, cachedDatas: unknown) => {
+        const newItem = {
+          ...data.task,
+          value: data.task.name,
+        };
+        return reshapeItemToCachedData(newItem, cachedDatas, "Tous");
+      },
+    },
   },
 } as const);
 
