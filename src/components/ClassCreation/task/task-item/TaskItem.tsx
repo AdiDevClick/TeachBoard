@@ -2,6 +2,7 @@ import { TaskItemController } from "@/components/ClassCreation/task/task-item/co
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { taskItemInputControllers } from "@/data/inputs-controllers.data.ts";
 import {
+  type TaskItemCreationInputItem,
   type TaskItemFormSchema,
   taskItemCreationSchema,
 } from "@/models/task-item.models.ts";
@@ -33,7 +34,7 @@ export function TaskItem({
   inputControllers = taskItemInputControllers,
   modalMode = true,
   ...props
-}: Readonly<PageWithControllers<TaskItemProps>>) {
+}: Readonly<PageWithControllers<TaskItemCreationInputItem>>) {
   const formId = pageId + "-form";
 
   const form = useForm<TaskItemFormSchema>({

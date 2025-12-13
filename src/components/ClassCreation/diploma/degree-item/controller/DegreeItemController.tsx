@@ -1,4 +1,4 @@
-import type { DegreeItemProps } from "@/components/ClassCreation/diploma/degree-item/types/degree-item.types.ts";
+import type { DegreeItemControllerProps } from "@/components/ClassCreation/diploma/degree-item/types/degree-item.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { degreeCreationInputControllers } from "@/data/inputs-controllers.data.ts";
@@ -23,7 +23,7 @@ export function DegreeItemController({
   className = "grid gap-4",
   formId,
   form,
-}: Readonly<DegreeItemProps>) {
+}: Readonly<DegreeItemControllerProps>) {
   const { setRef, observedRefs, submitCallback } = useCommandHandler({
     form,
     pageId,
