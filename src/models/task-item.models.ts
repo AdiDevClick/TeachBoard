@@ -21,13 +21,16 @@ const data = {
     "La description de la tâche ne doit pas contenir de caractères spéciaux.",
 };
 
+/**
+ * Zod schema for task item creation form validation.
+ */
 export const taskItemCreationSchema = z.object({
   name: z
     .string()
     .nonempty(data.nameMinLengthMessage)
     .max(data.nameMaxLength, data.nameMaxLengthMessage)
     .min(data.nameMinLength, data.nameMinLengthMessage)
-    .regex(formsRegex.noSpecialCharsWithTwoCharMin, {
+    .regex(formsRegex.serverName, {
       message: data.regexNameMessage,
     })
     .trim()
@@ -38,7 +41,7 @@ export const taskItemCreationSchema = z.object({
     .nonempty(data.descriptionMinLengthMessage)
     .max(data.descriptionMaxLength, data.descriptionMaxLengthMessage)
     .min(data.descriptionMinLength, data.descriptionMinLengthMessage)
-    .regex(formsRegex.noSpecialCharsWithTwoCharMin, {
+    .regex(formsRegex.serverName, {
       message: data.regexDescriptionMessage,
     })
     .trim()
