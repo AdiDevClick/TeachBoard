@@ -308,6 +308,19 @@ export function DiplomaCreationController({
         observedRefs={observedRefs}
         itemList={Array.from(currentSkills)}
       />
+      <PopoverFieldWithCommands
+        multiSelection
+        setRef={setRef}
+        onSelect={handleCommandSelection}
+        onOpenChange={handleOpening}
+        observedRefs={observedRefs}
+        onAddNewItem={newItemCallback}
+        commandHeadings={resultsCallback([
+          fetchParams.contentId,
+          fetchParams.url,
+        ])}
+        {...inputs[3]}
+      />
       {/* <ItemGroup id={`${pageId}-roles`} className="grid gap-2">
         <ItemTitle>Modules</ItemTitle>
         <Item variant={"default"} className="p-0">
@@ -411,19 +424,6 @@ export function DiplomaCreationController({
           </ItemContent>
         </Item>
       </ItemGroup> */}
-      <PopoverFieldWithCommands
-        multiSelection
-        setRef={setRef}
-        onSelect={handleCommandSelection}
-        onOpenChange={handleOpening}
-        observedRefs={observedRefs}
-        onAddNewItem={newItemCallback}
-        commandHeadings={resultsCallback([
-          fetchParams.contentId,
-          fetchParams.url,
-        ])}
-        {...inputs[3]}
-      />
     </form>
   );
 }
