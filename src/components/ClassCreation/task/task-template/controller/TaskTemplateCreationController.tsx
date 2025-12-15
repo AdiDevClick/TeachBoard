@@ -38,8 +38,21 @@ export function TaskTemplateCreationController({
     if (DEV_MODE && !NO_CACHE_LOGS) {
       console.log("Cached data for ", keys, " is ", cachedData);
     }
-    if (cachedData === undefined) {
+
+    const isRetrievedSkills = keys[0] === "new-task-skill";
+
+    if (cachedData === undefined && !isRetrievedSkills) {
       return data;
+    }
+
+    if (isRetrievedSkills && diplomaDatas) {
+      return diplomaDatas.skills.map((skill: string) => ({
+        groupTitle: skill.mainSkillCode,
+        items: skill.subSkills.map((subSkill: string) => ({
+          value: subSkill.code,
+          label: subSkill.name,
+        })),
+      }));
     }
     return cachedData;
   }, []);
@@ -84,6 +97,7 @@ export function TaskTemplateCreationController({
   const currentSkills = new Set(form.watch("skillList") || []);
 
   const id = formId ?? pageId + "-form";
+  console.log(diplomaDatas);
 
   return (
     <form
