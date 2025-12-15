@@ -1,5 +1,5 @@
 import type ClassCreation from "@/components/ClassCreation/ClassCreation.tsx";
-import type { DegreeItemController } from "@/components/ClassCreation/diploma/degree-item/controller/DegreeItemController.tsx";
+import type DegreeItem from "@/components/ClassCreation/diploma/degree-item/DegreeItem.tsx";
 import type { DegreeModuleSkillController } from "@/components/ClassCreation/diploma/degree-module-skill/controller/DegreeModuleSkillController.tsx";
 import type DegreeModule from "@/components/ClassCreation/diploma/degree-module/DegreeModule.tsx";
 import type TaskItem from "@/components/ClassCreation/task/task-item/TaskItem";
@@ -154,7 +154,7 @@ export const classCreationInputControllers = [
   },
 ] satisfies Parameters<typeof ClassCreation>[0]["inputControllers"];
 
-export const degreeCreationInputControllers = [
+export const degreeCreationInputControllersDegree = [
   {
     name: "name",
     title: "Nom du diplôme",
@@ -174,7 +174,51 @@ export const degreeCreationInputControllers = [
     placeholder: "Description du diplôme. Ex: Niveau 4, RNCP5, ...",
     required: false,
   },
-] satisfies Parameters<typeof DegreeItemController>[0]["inputControllers"];
+] satisfies Parameters<typeof DegreeItem>[0]["inputControllers"];
+export const degreeCreationInputControllersField = [
+  {
+    name: "name",
+    title: "Nom du métier / domaine",
+    type: "text",
+    placeholder: "Ex: Cuisine, Prothésiste Dentaire...",
+  },
+  {
+    name: "code",
+    title: "Code du métier / domaine",
+    type: "text",
+    placeholder: "Ex: CUISINE, PROTHDENT...",
+  },
+  {
+    name: "description",
+    title: "Description (optionnelle)",
+    type: "text",
+    placeholder:
+      "Description du métier / domaine. Ex: Métiers de la cuisine...",
+    required: false,
+  },
+] satisfies Parameters<typeof DegreeItem>[0]["inputControllers"];
+export const degreeCreationInputControllersYear = [
+  {
+    name: "name",
+    title: "Année scolaire du diplôme",
+    type: "text",
+    placeholder: "Ex: Première année, Deuxième année...",
+  },
+  {
+    name: "code",
+    title: "Code de l'année",
+    type: "text",
+    placeholder: "Ex: 1A, 2A...",
+  },
+  {
+    name: "description",
+    title: "Description (optionnelle)",
+    type: "text",
+    placeholder:
+      "Description de l'année scolaire. Ex: Représente la première année du diplôme...",
+    required: false,
+  },
+] satisfies Parameters<typeof DegreeItem>[0]["inputControllers"];
 
 export const degreeModuleCreationInputControllers = [
   {

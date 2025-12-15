@@ -1,6 +1,6 @@
 import { DegreeItemController } from "@/components/ClassCreation/diploma/degree-item/controller/DegreeItemController.tsx";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
-import { degreeCreationInputControllers } from "@/data/inputs-controllers.data.ts";
+import { degreeCreationInputControllersField } from "@/data/inputs-controllers.data.ts";
 import {
   diplomaFieldData,
   type DegreeCreationFormSchema,
@@ -32,10 +32,9 @@ const footerProps = { submitText: "Créer", cancelText: "Annuler" };
 function DegreeItem({
   pageId = "new-degree-item",
   modalMode = true,
-  inputControllers = degreeCreationInputControllers,
+  inputControllers = degreeCreationInputControllersField,
   ...props
 }: Readonly<PageWithControllers<DegreeCreationInputItem>>) {
-  const formId = pageId + "-form";
   const form = useForm<DegreeCreationFormSchema>({
     resolver: zodResolver(diplomaFieldData),
     mode: "onTouched",
@@ -46,6 +45,8 @@ function DegreeItem({
     },
   });
 
+  const formId = pageId + "-form";
+
   const commonProps = useMemo(
     () => ({
       pageId,
@@ -55,7 +56,7 @@ function DegreeItem({
       footerProps: {
         ...footerProps,
         formState: form.formState,
-        formId: formId,
+        formId,
       },
       modalMode,
       titleProps,

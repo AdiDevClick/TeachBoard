@@ -9,7 +9,10 @@ import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import LoginForm from "@/components/LoginForms/LoginForm.tsx";
 import { Modal, ModalWithSimpleAlert } from "@/components/Modal/Modal.tsx";
 import {
-  degreeCreationInputControllers,
+  degreeCreationInputControllersDegree,
+  degreeCreationInputControllersField,
+  degreeCreationInputControllersYear,
+  degreeModuleCreationInputControllers,
   inputLoginControllers,
   inputSignupControllers,
 } from "@/data/inputs-controllers.data.ts";
@@ -19,6 +22,16 @@ import {
   type AppModalsProps,
 } from "@/pages/AllModals/types/modals.types.ts";
 import { Signup } from "@/pages/Signup/Signup.tsx";
+
+const baseNonNavigationalProps = {
+  type: Modal,
+  modalProps: {
+    isNavigationModal: false,
+  },
+  contentProps: {
+    modalMode: true,
+  },
+};
 
 const modals = defineStrictModalsList([
   {
@@ -72,55 +85,58 @@ const modals = defineStrictModalsList([
   },
   {
     modalName: "create-diploma",
-    type: Modal,
     modalContent: DiplomaCreation,
+    ...baseNonNavigationalProps,
     modalProps: {
       className: "max-w-2",
-      isNavigationModal: false,
     },
     contentProps: {
-      inputControllers: degreeCreationInputControllers,
-      modalMode: true,
+      inputControllers: degreeModuleCreationInputControllers,
     },
   },
   {
-    modalName: "new-degree-item",
-    type: Modal,
+    modalName: "new-degree-item-degree",
     modalContent: DegreeItem,
-    modalProps: {
-      isNavigationModal: false,
-    },
+    ...baseNonNavigationalProps,
     contentProps: {
-      modalMode: true,
+      inputControllers: degreeCreationInputControllersDegree,
+    },
+  },
+  {
+    modalName: "new-degree-item-year",
+    modalContent: DegreeItem,
+    ...baseNonNavigationalProps,
+    contentProps: {
+      inputControllers: degreeCreationInputControllersYear,
+    },
+  },
+  {
+    modalName: "new-degree-item-field",
+    modalContent: DegreeItem,
+    ...baseNonNavigationalProps,
+    contentProps: {
+      inputControllers: degreeCreationInputControllersField,
     },
   },
   {
     modalName: "new-degree-module",
-    type: Modal,
     modalContent: DegreeModule,
-    modalProps: { isNavigationModal: false },
-    contentProps: { modalMode: true },
+    ...baseNonNavigationalProps,
   },
   {
     modalName: "new-degree-module-skill",
-    type: Modal,
     modalContent: DegreeModuleSkill,
-    modalProps: { isNavigationModal: false },
-    contentProps: { modalMode: true },
+    ...baseNonNavigationalProps,
   },
   {
     modalName: "new-task-template",
-    type: Modal,
     modalContent: TaskTemplateCreation,
-    modalProps: { isNavigationModal: false },
-    contentProps: { modalMode: true },
+    ...baseNonNavigationalProps,
   },
   {
     modalName: "new-task-item",
-    type: Modal,
     modalContent: TaskItem,
-    modalProps: { isNavigationModal: false },
-    contentProps: { modalMode: true },
+    ...baseNonNavigationalProps,
   },
   // {
   //   modalName: "new-task",

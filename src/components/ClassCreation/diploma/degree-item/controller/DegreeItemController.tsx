@@ -1,7 +1,7 @@
 import type { DegreeItemControllerProps } from "@/components/ClassCreation/diploma/degree-item/types/degree-item.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { degreeCreationInputControllers } from "@/data/inputs-controllers.data.ts";
+import { degreeCreationInputControllersField } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 
@@ -19,7 +19,7 @@ import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
  */
 export function DegreeItemController({
   pageId = "new-degree-item",
-  inputControllers = degreeCreationInputControllers,
+  inputControllers = degreeCreationInputControllersField,
   className = "grid gap-4",
   formId,
   form,

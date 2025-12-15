@@ -16,7 +16,7 @@ import { useCallback, type PointerEvent } from "react";
 
 const inputs = [
   {
-    task: "new-degree-item",
+    task: "new-degree-item-field",
     name: "diplomaField",
     label: "Métier / Domaine du diplôme",
     placeholder: "Sélectionnez...",
@@ -28,7 +28,7 @@ const inputs = [
     id: "diploma-field-input",
   },
   {
-    task: "new-degree-item",
+    task: "new-degree-item-year",
     name: "schoolYear",
     label: "Année scolaire",
     placeholder: "Sélectionnez...",
@@ -40,7 +40,7 @@ const inputs = [
     id: "school-year-input",
   },
   {
-    task: "new-degree-item",
+    task: "new-degree-item-degree",
     name: "schoolLevel",
     label: "Diplôme / Niveau scolaire",
     placeholder: "Sélectionnez...",
