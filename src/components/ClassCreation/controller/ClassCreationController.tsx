@@ -17,7 +17,7 @@ import type { ClassCreationInputItem } from "@/models/class-creation.models.ts";
 import type { DiplomaCreationFormSchema } from "@/models/diploma-creation.models.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Activity, useCallback, useEffect, useRef, useState } from "react";
 
 const year = new Date().getFullYear();
 const years = yearsListRange(year, 5);
@@ -83,6 +83,7 @@ export function ClassCreationController({
 }: Readonly<PageWithControllers<ClassCreationInputItem>>) {
   const [state, setState] = useState(defaultState);
   const [isYearOpened, setIsYearOpened] = useState(false);
+  const [isSelectedDiploma, setIsSelectedDiploma] = useState(false);
 
   const {
     data: diplomasData,
@@ -184,8 +185,8 @@ export function ClassCreationController({
   };
 
   const handleOnSelect = (value: string, commandItem: CommandItemType) => {
-    console.log(commandItem);
     selectedDiplomaRef.current = commandItem;
+    setIsSelectedDiploma(!!commandItem);
     // const diplomaKey = cachedKeysRef.current?.["create-diploma"];
     // const cachedData = queryClient.getQueryData({ queryKey: diplomaKey });
   };
@@ -389,26 +390,28 @@ export function ClassCreationController({
         onSelect={handleOnSelect}
         onAddNewItem={newItemCallback}
       />
-      <ControlledDynamicTagList
-        form={form}
-        setRef={setRef}
-        {...classCreationInputControllers[2]}
-        observedRefs={observedRefs}
-        itemList={Array.from(currentSkills)}
-      />
-      <PopoverFieldWithCommands
-        multiSelection
-        setRef={setRef}
-        onSelect={handleCommandSelection}
-        onOpenChange={handleOpening}
-        observedRefs={observedRefs}
-        onAddNewItem={handleNewItemCallback}
-        commandHeadings={resultsCallback([
-          fetchParams.contentId,
-          fetchParams.url,
-        ])}
-        {...classCreationInputControllers[2]}
-      />
+      <Activity mode={isSelectedDiploma ? "visible" : "hidden"}>
+        <ControlledDynamicTagList
+          form={form}
+          setRef={setRef}
+          {...classCreationInputControllers[2]}
+          observedRefs={observedRefs}
+          itemList={Array.from(currentSkills)}
+        />
+        <PopoverFieldWithCommands
+          multiSelection
+          setRef={setRef}
+          onSelect={handleCommandSelection}
+          onOpenChange={handleOpening}
+          observedRefs={observedRefs}
+          onAddNewItem={handleNewItemCallback}
+          commandHeadings={resultsCallback([
+            fetchParams.contentId,
+            fetchParams.url,
+          ])}
+          {...classCreationInputControllers[2]}
+        />
+      </Activity>
       <VerticalFieldSelectWithController
         setRef={setRef}
         observedRefs={observedRefs}
