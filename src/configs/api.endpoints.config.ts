@@ -173,8 +173,8 @@ export const API_ENDPOINTS = Object.freeze({
       endpoint: `${BASE_API_URL}/tasks`,
       dataReshape: (data: any, cachedDatas: unknown) => {
         const newItem = {
-          ...data.task,
-          value: data.task.name,
+          ...data,
+          value: data.name,
         };
         return reshapeItemToCachedData(newItem, cachedDatas, "Tous");
       },
