@@ -280,8 +280,6 @@ export const taskTemplateCreationInputControllers = [
   },
   {
     id: "fetch-input-tasks",
-    // apiEndpoint: API_ENDPOINTS.GET.DIPLOMAS.endpoint,
-    // dataReshapeFn: API_ENDPOINTS.GET.DIPLOMAS.dataReshape,
     name: "degreeConfigId",
     title: "Diplôme associé",
     type: "text",
