@@ -357,35 +357,58 @@ export class ObjectReshape<T extends Record<string, unknown>> {
 
   /**
    * Selects elements from the data source based on a key and assigns them to a new key.
+   * Iterates through keys in order to build each item, with later keys overwriting earlier ones.
    *
-   * @param key - The key to select elements from
+   * @param keys - Array of keys to select elements from (in order of priority)
    * @param to - The key to assign the selected elements to
    *
    * @example
    * ```ts
-   * const previousData =
-   * {
-   *  task: [ { id: 1 }, { id: 2 } ]
-   * }
-   * // Selects all "task" elements and assigns them to "items"
-   * .selectElementsTo("task", "items")
+   * const previousData = [
+   *   {
+   *     id: "root-id",
+   *     task: { id: "task-id", name: "Task Name", description: "Task Description" }
+   *   }
+   * ]
+   * // First spreads "task" content, then overwrites with root-level "id"
+   * .selectElementsTo(["task", "id"], "items")
    * ```
    * @output
    * ```ts
    * {
-   *   items: [ { id: 1 }, { id: 2 } ]
+   *   items: [
+   *     { id: "root-id", name: "Task Name", description: "Task Description" }
+   *   ]
    * }
    * ```
    */
-  selectElementsTo(key: string, to: string) {
-    for (const item of this.#dataSource as T[]) {
-      if (Object.hasOwn(item, key)) {
-        this.#currentSelection.push(item[key]);
+  selectElementsTo(keys: string[], to: string) {
+    const resultItems: Record<string, unknown>[] = [];
+
+    for (const sourceItem of this.#dataSource as T[]) {
+      let builtItem: Record<string, unknown> = {};
+
+      // !! IMPORTANT !! Order of keys matters here - each key can add or overwrite properties
+      for (const key of keys) {
+        if (Object.hasOwn(sourceItem, key)) {
+          const value = sourceItem[key];
+
+          // If the value is an object (not array), spread its properties into builtItem
+          if (value && typeof value === "object" && !Array.isArray(value)) {
+            builtItem = { ...builtItem, ...value };
+          } else {
+            // For primitive values, add them directly with the key name
+            builtItem[key] = value;
+          }
+        }
       }
+
+      resultItems.push(builtItem);
     }
+
     this.#newShapedItem = {
       ...this.#newShapedItem,
-      [to]: this.#currentSelection,
+      [to]: resultItems,
     };
     return this;
   }
