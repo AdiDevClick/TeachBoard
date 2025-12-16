@@ -1,12 +1,12 @@
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/PopoverField.tsx";
-import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
+import { DynamicTag } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 export function TaskTemplateCreationController({
   pageId = "task-controller",
@@ -33,6 +33,8 @@ export function TaskTemplateCreationController({
 
   const queryClient = useQueryClient();
 
+  const savedSkills = useRef(null!);
+
   const resultsCallback = useCallback((keys: unknown[]) => {
     const cachedData = queryClient.getQueryData(keys ?? []);
     if (DEV_MODE && !NO_CACHE_LOGS) {
@@ -46,13 +48,28 @@ export function TaskTemplateCreationController({
     }
 
     if (isRetrievedSkills && diplomaDatas) {
-      return diplomaDatas.skills.map((skill: string) => ({
-        groupTitle: skill.mainSkillCode,
-        items: skill.subSkills.map((subSkill: string) => ({
-          value: subSkill.code,
-          label: subSkill.name,
-        })),
-      }));
+      if (!savedSkills.current) {
+        const displayedSkills = diplomaDatas.skills.map((skill: string) => {
+          const mainSkillCode = skill.mainSkillCode || "Unknown Skill";
+          const mainSkillId = skill.mainSkillId || "unknown-id";
+
+          return {
+            groupTitle: mainSkillCode,
+            id: mainSkillId,
+            items: skill.subSkills.map((subSkill: string) => ({
+              value: subSkill.code,
+              label: subSkill.name,
+              id: subSkill.id,
+            })),
+          };
+        });
+
+        savedSkills.current = displayedSkills;
+
+        return displayedSkills;
+      }
+
+      return savedSkills.current;
     }
     return cachedData;
   }, []);
@@ -65,8 +82,8 @@ export function TaskTemplateCreationController({
   const handleSubmit = (variables: MutationVariables) => {
     submitCallback(
       variables,
-      API_ENDPOINTS.POST.CREATE_SKILL.endPoints.MODULE,
-      API_ENDPOINTS.POST.CREATE_SKILL.dataReshape
+      API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.endpoint,
+      API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.dataReshape
     );
   };
 
@@ -82,22 +99,58 @@ export function TaskTemplateCreationController({
     openingCallback(open, metaData, inputControllers);
   };
 
-  const handleCommandSelection = (value: string) => {
-    if (currentSkills.has(value)) {
-      currentSkills.delete(value);
-    } else {
-      currentSkills.add(value);
+  const handleCommandSelection = (value: string, commandItemDetails) => {
+    const isTask = Object.hasOwn(commandItemDetails, "description");
+    if (isTask) {
+      form.setValue("taskId", commandItemDetails.id, { shouldValidate: true });
+      return;
     }
-    form.setValue("skillList", Array.from(currentSkills), {
+
+    const current = new Map(form.getValues("skillsDuplicate"));
+
+    const main = commandItemDetails.groupId;
+    const sub = commandItemDetails.id;
+    let subSkillsSet = new Set();
+
+    if (!current.has(main)) {
+      subSkillsSet.add(sub);
+    } else {
+      subSkillsSet = new Set(current.get(main).subSkillId);
+
+      if (subSkillsSet.has(sub)) {
+        subSkillsSet.delete(sub);
+      } else {
+        subSkillsSet.add(sub);
+      }
+
+      if (subSkillsSet.size === 0) {
+        current.delete(main);
+      }
+    }
+
+    if (subSkillsSet.size > 0) {
+      current.set(main, {
+        mainSkill: main,
+        subSkillId: Array.from(subSkillsSet.values()),
+      });
+    }
+
+    form.setValue("skillsDuplicate", Array.from(current), {
+      shouldValidate: true,
+    });
+
+    form.setValue("skills", Array.from(current.values()), {
       shouldValidate: true,
     });
   };
 
-  // Get the current skills from the form
-  const currentSkills = new Set(form.watch("skillList") || []);
-
   const id = formId ?? pageId + "-form";
-  console.log(diplomaDatas);
+
+  if (form.getValues("degreeConfigId") !== diplomaDatas.id) {
+    form.setValue("degreeConfigId", diplomaDatas.id, {
+      shouldValidate: true,
+    });
+  }
 
   return (
     <form
@@ -112,11 +165,8 @@ export function TaskTemplateCreationController({
         observedRefs={observedRefs}
         onOpenChange={handleOpening}
       />
-      <ControlledDynamicTagList
-        form={form}
-        setRef={setRef}
+      <DynamicTag
         {...inputControllers[2]}
-        observedRefs={observedRefs}
         itemList={[
           `${diplomaDatas?.degreeField} - ${diplomaDatas?.degreeLevel} ${diplomaDatas?.degreeYear}`,
         ]}
