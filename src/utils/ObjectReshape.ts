@@ -26,7 +26,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    */
   #newShapedItem: Record<string, unknown> = null!;
   /** Stores the current selection during transformation */
-  #currentSelection: unknown = undefined;
+  #currentSelection = [];
   /** Maps targetKey -> sourceKeys[] for property aliasing with fallback support */
   readonly #mappingProxies = new Map<string, string[]>();
   #assignedSourceKey?: string;
@@ -55,6 +55,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     this.#isArray = this.#isValidArray(this.#dataSource);
     this.#isPlainObject = this.#isValidObject(this.#dataSource);
     this.#firstSourceElement = (this.#dataSource as T[])[0];
+    this.#initShapedItem();
     this.#init();
   }
 
@@ -288,6 +289,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   }
 
   add(pairs: Record<string, unknown>) {
+    this.#initShapedItem();
     // Always add at the top-level of the newly built shape. To add to the
     // items of an assigned source, use `addToItems()`.
     for (const key in pairs) {
@@ -296,6 +298,15 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     return this;
   }
 
+  /**
+   * Adds a new item to a specified group in the data source.
+   * If the group does not exist, it creates a new group corresponding to the condition.
+   *
+   * @param newItem - The new item to add
+   * @param itemsKey - The key for the items array (default: "items")
+   * @param groupConditionKey - The key to identify the group (e.g., "groupTitle")
+   * @param groupConditionValue - The value to match for the group
+   */
   addTo(
     newItem: Record<string, unknown>,
     itemsKey = "items",
@@ -342,6 +353,41 @@ export class ObjectReshape<T extends Record<string, unknown>> {
       }
     }
     return result;
+  }
+
+  /**
+   * Selects elements from the data source based on a key and assigns them to a new key.
+   *
+   * @param key - The key to select elements from
+   * @param to - The key to assign the selected elements to
+   *
+   * @example
+   * ```ts
+   * const previousData =
+   * {
+   *  task: [ { id: 1 }, { id: 2 } ]
+   * }
+   * // Selects all "task" elements and assigns them to "items"
+   * .selectElementsTo("task", "items")
+   * ```
+   * @output
+   * ```ts
+   * {
+   *   items: [ { id: 1 }, { id: 2 } ]
+   * }
+   * ```
+   */
+  selectElementsTo(key: string, to: string) {
+    for (const item of this.#dataSource as T[]) {
+      if (Object.hasOwn(item, key)) {
+        this.#currentSelection.push(item[key]);
+      }
+    }
+    this.#newShapedItem = {
+      ...this.#newShapedItem,
+      [to]: this.#currentSelection,
+    };
+    return this;
   }
 
   /**
