@@ -1,3 +1,4 @@
+import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import type { VerticalSelectProps } from "@/components/Selects/types/select.types.ts";
 import type { ButtonProps } from "react-day-picker";
 
@@ -7,7 +8,7 @@ export type PopoverFieldProps = Omit<
   "side" | "onOpenChange"
 > & {
   side?: "top" | "bottom" | "left" | "right";
-  onSelect?: (value: string) => void;
+  onSelect?: (value: string, commandItem?: CommandItemType) => void;
   role?: ButtonProps["role"];
   /** Allows multiple selections inside the popover list items if set to true */
   multiSelection?: boolean;
