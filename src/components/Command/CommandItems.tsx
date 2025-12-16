@@ -43,7 +43,7 @@ export function CommandItems(props: Readonly<CommandsProps>) {
 
   const handleSelect = useCallback(
     (value: string, commandItem: CommandItemType) => {
-      contextOnSelect?.(value);
+      contextOnSelect?.(value, commandItem);
       externalOnSelect?.(value, commandItem);
     },
     []
@@ -70,12 +70,18 @@ export function CommandItems(props: Readonly<CommandsProps>) {
                     if (commandItemContainsInvalid(command)) {
                       debugLogs("Rendering CommandItem");
                     }
+                    const itemDetails = {
+                      groupId: item.id,
+                      groupName: item.groupTitle,
+                      ...command,
+                    };
+
                     return (
                       <CommandItem
                         key={command.id}
                         id={String(command.id)}
                         value={command.value}
-                        onSelect={(e) => handleSelect(e, command)}
+                        onSelect={(e) => handleSelect(e, itemDetails)}
                         {...rest}
                       >
                         {command.value ?? "Valeur inconnue"}
@@ -107,9 +113,10 @@ export function CommandItems(props: Readonly<CommandsProps>) {
  */
 function defineSelection(
   value: string,
-  selectedValue: string | Set<string>,
+  selectedValue?: string | Set<string>,
   multiSelection?: boolean
 ) {
+  if (!selectedValue) return false;
   return multiSelection
     ? (selectedValue as Set<string>).has(value)
     : selectedValue === value;
