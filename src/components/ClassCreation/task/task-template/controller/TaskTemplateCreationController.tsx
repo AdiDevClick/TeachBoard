@@ -2,6 +2,7 @@ import {
   createTaskTemplateView,
   updateValues,
 } from "@/components/ClassCreation/task/task-template/functions/task-template.functions.ts";
+import type { TaskTemplateCreationControllerProps } from "@/components/ClassCreation/task/task-template/types/task-template-creation.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/PopoverField.tsx";
 import { DynamicTag } from "@/components/Tags/DynamicTag.tsx";
@@ -23,13 +24,13 @@ import { useCallback, useRef } from "react";
  * @param diplomaDatas - Data related to the diploma associated with the task template
  */
 export function TaskTemplateCreationController({
-  pageId = "task-controller",
+  pageId,
   formId,
   inputControllers,
   className = "grid gap-4",
   form,
   diplomaDatas,
-}) {
+}: Readonly<TaskTemplateCreationControllerProps>) {
   const {
     setRef,
     observedRefs,
