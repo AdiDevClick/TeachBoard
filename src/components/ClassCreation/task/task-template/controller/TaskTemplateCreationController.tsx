@@ -1,4 +1,7 @@
-import { updateValues } from "@/components/ClassCreation/task/task-template/functions/task-template.functions.ts";
+import {
+  createTaskTemplateView,
+  updateValues,
+} from "@/components/ClassCreation/task/task-template/functions/task-template.functions.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/PopoverField.tsx";
 import { DynamicTag } from "@/components/Tags/DynamicTag.tsx";
@@ -9,6 +12,16 @@ import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useRef } from "react";
 
+/**
+ * Controller component for creating task templates.
+ *
+ * @param pageId - The unique identifier for the page or component instance
+ * @param formId - The unique identifier for the form
+ * @param inputControllers - An array of input controller configurations
+ * @param className - Additional CSS classes for styling the form
+ * @param form - The react-hook-form instance managing the form state
+ * @param diplomaDatas - Data related to the diploma associated with the task template
+ */
 export function TaskTemplateCreationController({
   pageId = "task-controller",
   formId,
@@ -16,8 +29,6 @@ export function TaskTemplateCreationController({
   className = "grid gap-4",
   form,
   diplomaDatas,
-}: {
-  pageId?: string;
 }) {
   const {
     setRef,
@@ -33,9 +44,14 @@ export function TaskTemplateCreationController({
   });
 
   const queryClient = useQueryClient();
-
   const savedSkills = useRef(null!);
 
+  /**
+   * Callback to reshape and retrieve cached data based on query keys.
+   *
+   * @param keys - The query keys used to retrieve cached data
+   * @returns The reshaped cached data or the original data if not found
+   */
   const resultsCallback = useCallback((keys: unknown[]) => {
     const cachedData = queryClient.getQueryData(keys ?? []);
     if (DEV_MODE && !NO_CACHE_LOGS) {
@@ -50,20 +66,7 @@ export function TaskTemplateCreationController({
 
     if (isRetrievedSkills && diplomaDatas) {
       if (!savedSkills.current) {
-        const displayedSkills = diplomaDatas.skills.map((skill: string) => {
-          const mainSkillCode = skill.mainSkillCode || "Unknown Skill";
-          const mainSkillId = skill.mainSkillId || "unknown-id";
-
-          return {
-            groupTitle: mainSkillCode,
-            id: mainSkillId,
-            items: skill.subSkills.map((subSkill: string) => ({
-              value: subSkill.code,
-              label: subSkill.name,
-              id: subSkill.id,
-            })),
-          };
-        });
+        const displayedSkills = createTaskTemplateView(diplomaDatas.skills);
 
         savedSkills.current = displayedSkills;
 

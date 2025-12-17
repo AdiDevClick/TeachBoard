@@ -43,3 +43,26 @@ export function updateValues(
 
   return current;
 }
+
+/**
+ * Create a view structure for task templates based on diploma data
+ *
+ * @param diplomaDatas - The diploma data containing skills information
+ * @returns An array of heading structures for command items
+ */
+export function createTaskTemplateView(diplomaDatas: any) {
+  diplomaDatas.map((skill: string) => {
+    const mainSkillCode = skill.mainSkillCode || "Unknown Skill";
+    const mainSkillId = skill.mainSkillId || "unknown-id";
+
+    return {
+      groupTitle: mainSkillCode,
+      id: mainSkillId,
+      items: skill.subSkills.map((subSkill: string) => ({
+        value: subSkill.code,
+        label: subSkill.name,
+        id: subSkill.id,
+      })),
+    };
+  });
+}
