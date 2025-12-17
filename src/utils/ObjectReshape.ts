@@ -1,5 +1,4 @@
 import { DEV_MODE, NO_PROXY_LOGS } from "@/configs/app.config.ts";
-import { UniqueSet } from "@/utils/UniqueSet.ts";
 
 export class ObjectReshape<T extends Record<string, unknown>> {
   #dataSource: T[] | T = [];
@@ -7,20 +6,13 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     Record<keyof T, unknown>
   >;
   /** Indicates whether the data source is an array */
-  readonly #isArray: boolean = false;
+  #isArray: boolean = false;
   /** Indicates whether the data source is a plain object */
-  readonly #isPlainObject: boolean = false;
+  #isPlainObject: boolean = false;
   /** The first saved element of the data source if it is an array.
    * Used for introspection during initialization.
    */
   #firstSourceElement: Record<string, unknown> | undefined;
-  /** Stores keys from the shape to build */
-  readonly #shapeKeysStore = new UniqueSet<string, Record<string, unknown>>();
-  /** Stores keys from the source object */
-  readonly #sourceObjectStore = new UniqueSet<
-    string,
-    Record<string, unknown>
-  >();
   /** Stores the newly shaped item during transformation
    * @description You can build it and retrieve it via `build()` or `newShape()`
    */
@@ -52,10 +44,6 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     this.#dataSource = this.#deepClone(dataSource);
     this.#shapeToBuild = shapeToBuild;
 
-    this.#isArray = this.#isValidArray(this.#dataSource);
-    this.#isPlainObject = this.#isValidObject(this.#dataSource);
-    this.#firstSourceElement = (this.#dataSource as T[])[0];
-    this.#initShapedItem();
     this.#init();
   }
 
@@ -79,24 +67,10 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   }
 
   #init() {
-    if (!this.#isArray && !this.#isPlainObject) {
-      throw new TypeError("Data source must be an Array");
-    }
+    this.#isArray = this.#isValidArray(this.#dataSource);
+    this.#isPlainObject = this.#isValidObject(this.#dataSource);
     this.#firstSourceElement = (this.#dataSource as T[])[0];
-
-    for (const key in this.#shapeToBuild) {
-      this.#shapeKeysStore.set(
-        key,
-        this.#shapeToBuild[key] as Record<string, unknown>
-      );
-    }
-
-    for (const key in this.#firstSourceElement) {
-      this.#sourceObjectStore.set(
-        key,
-        this.#firstSourceElement[key] as Record<string, unknown>
-      );
-    }
+    this.#initShapedItem();
   }
 
   // static from<T extends Record<string, unknown>>(
