@@ -99,7 +99,7 @@ export const classCreationInputControllers = [
     id: "fetch-input-tasks-templates",
     apiEndpoint: API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID,
     dataReshapeFn: API_ENDPOINTS.GET.TASKSTEMPLATES.dataReshape,
-    name: "taskId",
+    name: "tasks",
     task: "new-task-template",
     title: "Tâches à évaluer",
     placeholder: "Sélectionnez un template de tâche...",
