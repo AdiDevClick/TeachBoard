@@ -183,7 +183,7 @@ export function ClassCreationController({
       currentSkills.add(value);
     }
     console.log(value);
-    form.setValue("skillList", Array.from(currentSkills), {
+    form.setValue("tasks", Array.from(currentSkills), {
       shouldValidate: true,
     });
   };
@@ -375,13 +375,12 @@ export function ClassCreationController({
   //   // editable.style.setProperty("-webkit-user-modify", "read-only");
   // };
   // Get the current skills from the form
-  const currentSkills = new Set(form.watch("mainSkillsList") || []);
-  const id = formId ?? pageId + "-form";
+  const currentSkills = new Set(form.watch("tasks") || []);
 
   return (
     <form
-      ref={(el) => setRef(el, { name: pageId, id })}
-      id={id}
+      ref={(el) => setRef(el, { name: pageId, formId })}
+      id={formId}
       onSubmit={form.handleSubmit(handleSubmit)}
       className="grid gap-4"
     >
