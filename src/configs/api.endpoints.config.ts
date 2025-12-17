@@ -198,7 +198,7 @@ function getCachedDatas(cachedDatas: unknown) {
   const array = cachedDatas?.[0];
   const data = array?.[1];
   if (data?.length > 0) return data;
-  return data?.[0];
+  return data?.[0] ?? [];
 }
 
 /**
