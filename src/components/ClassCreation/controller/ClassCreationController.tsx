@@ -131,13 +131,17 @@ export function ClassCreationController({
    */
   const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
     const linkedDiploma = selectedDiplomaRef.current;
-    if (linkedDiploma && metaData) {
+    const isNewTaskTemplate =
+      metaData?.task === "new-task-template" && linkedDiploma;
+
+    if (isNewTaskTemplate) {
       metaData.apiEndpoint =
         API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
           linkedDiploma.id
         );
       metaData["degreeConfig"] = linkedDiploma;
     }
+
     openingCallback(open, metaData, inputControllers);
   };
 
