@@ -167,9 +167,9 @@ export const API_ENDPOINTS = Object.freeze({
       endpoint: `${BASE_API_URL}/task-templates`,
       dataReshape: (data: any, cachedDatas: unknown) => {
         const newItem = {
-          ...data,
+          id: data.id,
+          description: data.task.description,
           value: data.task.name,
-          // value: data.name,
         };
         return reshapeItemToCachedData(newItem, cachedDatas, "Tous");
       },
@@ -194,6 +194,7 @@ function dataReshaper(data: any) {
 }
 
 function getCachedDatas(cachedDatas: unknown) {
+  if (!cachedDatas) return [];
   const array = cachedDatas?.[0];
   const data = array?.[1];
   if (data?.length > 0) return data;
@@ -220,75 +221,3 @@ function reshapeItemToCachedData(
     .addTo(newItem, "items", "groupTitle", groupConditionValue)
     .newShape();
 }
-
-const dataCreationTaskTemplateSaved = {
-  id: "1f0da0a0-364c-6bfd-9bea-b538946f0c8f",
-  name: "testsdfdsfdsfdszz",
-  task: {
-    id: "1f0d7fda-7fe4-6d11-9092-4b33a18e1890",
-    name: "Test dune nouvelle tâche",
-    description: "test dune nouvelle tâche",
-  },
-  degreeConfiguration: {
-    id: "1f0d6706-a60d-626c-ad95-fd4a3110da63",
-    degreeLevel: "MASTER",
-    degreeYear: "2A",
-    degreeField: "ADD",
-    skills: [
-      {
-        mainSkillCode: "MAINPO",
-        mainSkillId: "1f0d51fa-817a-6969-8d63-d98eece0b59b",
-        mainSkillName: "mainpo",
-        subSkills: [
-          {
-            id: "1f0d51fa-3026-6468-8d63-d98eece0b59b",
-            code: "SUBPO",
-            name: "subpo",
-          },
-        ],
-      },
-      {
-        mainSkillCode: "MAINSI",
-        mainSkillId: "1f0d5153-f7f6-6e63-8d63-d98eece0b59b",
-        mainSkillName: "mainsi",
-        subSkills: [
-          {
-            id: "1f0d5152-81f8-6b62-8d63-d98eece0b59b",
-            code: "SUBSI",
-            name: "subsi",
-          },
-        ],
-      },
-    ],
-  },
-  skills: [
-    {
-      mainSkill: {
-        name: "mainpo",
-        code: "MAINPO",
-        id: "1f0d51fa-817a-6969-8d63-d98eece0b59b",
-      },
-      subskills: [
-        {
-          name: "subpo",
-          code: "SUBPO",
-          id: "1f0d51fa-3026-6468-8d63-d98eece0b59b",
-        },
-      ],
-    },
-    {
-      mainSkill: {
-        name: "mainsi",
-        code: "MAINSI",
-        id: "1f0d5153-f7f6-6e63-8d63-d98eece0b59b",
-      },
-      subskills: [
-        {
-          name: "subsi",
-          code: "SUBSI",
-          id: "1f0d5152-81f8-6b62-8d63-d98eece0b59b",
-        },
-      ],
-    },
-  ],
-};
