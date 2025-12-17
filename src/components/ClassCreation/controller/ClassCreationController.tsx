@@ -176,16 +176,25 @@ export function ClassCreationController({
     }
   }, [observedRefs, form, pageId]);
 
-  const handleCommandSelection = (value: string) => {
+  const handleCommandSelection = (
+    value: string,
+    commandItemDetails: CommandItemType
+  ) => {
+    const taskTemplateId = commandItemDetails.id;
+    const tasks = new Set(form.watch("tasks") || []);
+
     if (currentSkills.has(value)) {
+      tasks.delete(taskTemplateId);
       currentSkills.delete(value);
     } else {
       currentSkills.add(value);
+      tasks.add(taskTemplateId);
     }
-    console.log(value);
-    form.setValue("tasks", Array.from(currentSkills), {
+    form.setValue("tasksValues", Array.from(currentSkills), {
       shouldValidate: true,
     });
+
+    form.setValue("tasks", Array.from(tasks), { shouldValidate: true });
   };
 
   const handleOnSelect = (value: string, commandItem: CommandItemType) => {
@@ -375,7 +384,7 @@ export function ClassCreationController({
   //   // editable.style.setProperty("-webkit-user-modify", "read-only");
   // };
   // Get the current skills from the form
-  const currentSkills = new Set(form.watch("tasks") || []);
+  const currentSkills = new Set(form.watch("tasksValues") || []);
 
   return (
     <form
