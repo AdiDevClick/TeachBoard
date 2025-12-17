@@ -78,6 +78,7 @@ export function CommandItems(props: Readonly<CommandsProps>) {
 
                     return (
                       <CommandItem
+                        disabled={command.disabled}
                         key={command.id}
                         id={String(command.id)}
                         value={command.value}
