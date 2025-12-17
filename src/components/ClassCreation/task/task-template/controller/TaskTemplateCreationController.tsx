@@ -1,3 +1,4 @@
+import { updateValues } from "@/components/ClassCreation/task/task-template/functions/task-template.functions.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/PopoverField.tsx";
 import { DynamicTag } from "@/components/Tags/DynamicTag.tsx";
@@ -99,6 +100,12 @@ export function TaskTemplateCreationController({
     openingCallback(open, metaData, inputControllers);
   };
 
+  /**
+   * Handle selection from command list
+   *
+   * @param value - Selected value
+   * @param commandItemDetails - Details of the selected command item from the callback
+   */
   const handleCommandSelection = (value: string, commandItemDetails) => {
     const isTask = Object.hasOwn(commandItemDetails, "description");
     if (isTask) {
@@ -106,39 +113,17 @@ export function TaskTemplateCreationController({
       return;
     }
 
-    const current = new Map(form.getValues("skillsDuplicate"));
+    const current = updateValues(
+      commandItemDetails,
+      form.getValues("skillsDuplicate")
+    );
 
-    const main = commandItemDetails.groupId;
-    const sub = commandItemDetails.id;
-    let subSkillsSet = new Set();
-
-    if (!current.has(main)) {
-      subSkillsSet.add(sub);
-    } else {
-      subSkillsSet = new Set(current.get(main).subSkillId);
-
-      if (subSkillsSet.has(sub)) {
-        subSkillsSet.delete(sub);
-      } else {
-        subSkillsSet.add(sub);
-      }
-
-      if (subSkillsSet.size === 0) {
-        current.delete(main);
-      }
-    }
-
-    if (subSkillsSet.size > 0) {
-      current.set(main, {
-        mainSkill: main,
-        subSkillId: Array.from(subSkillsSet.values()),
-      });
-    }
-
+    // Convenient copy - This is used to avoid rebuilding the original Map reference in the form values
     form.setValue("skillsDuplicate", Array.from(current), {
       shouldValidate: true,
     });
 
+    // Update the actual skills field used for submission & validation
     form.setValue("skills", Array.from(current.values()), {
       shouldValidate: true,
     });
