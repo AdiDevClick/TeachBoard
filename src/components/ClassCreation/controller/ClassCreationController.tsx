@@ -202,11 +202,21 @@ export function ClassCreationController({
         task: rest.task,
       });
     }
+    const isTaskTemplate = rest.task === "new-task-template";
+    const selectedDiploma = selectedDiplomaRef.current;
+
+    if (isTaskTemplate && selectedDiploma) {
+      rest.apiEndpoint =
+        API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
+          selectedDiploma.id
+        );
+    }
+
     console.log("opening new degree item");
     newItemCallback({
       e,
       ...rest,
-      selectedDiploma: selectedDiplomaRef.current,
+      selectedDiploma: selectedDiploma,
     });
   };
 
