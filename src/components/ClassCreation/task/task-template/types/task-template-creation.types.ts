@@ -8,7 +8,7 @@ import type { FieldValues, useForm } from "react-hook-form";
 export type TaskTemplateCreationControllerProps<
   T extends FieldValues = TaskTemplateCreationFormSchema
 > = {
-  formId?: string;
+  formId: string;
   className?: string;
   form: ReturnType<typeof useForm<T>>;
   diplomaDatas: unknown;

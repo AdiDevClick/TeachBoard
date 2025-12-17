@@ -133,7 +133,6 @@ export function TaskTemplateCreationController({
     });
   };
 
-  const id = formId ?? pageId + "-form";
 
   if (form.getValues("degreeConfigId") !== diplomaDatas.id) {
     form.setValue("degreeConfigId", diplomaDatas.id, {
@@ -143,7 +142,7 @@ export function TaskTemplateCreationController({
 
   return (
     <form
-      id={id}
+      id={formId}
       className={className}
       onSubmit={form.handleSubmit(handleSubmit)}
     >
