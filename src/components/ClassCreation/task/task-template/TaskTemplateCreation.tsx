@@ -1,7 +1,6 @@
 import { TaskTemplateCreationController } from "@/components/ClassCreation/task/task-template/controller/TaskTemplateCreationController";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { taskTemplateCreationInputControllers } from "@/data/inputs-controllers.data.ts";
-import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import {
   type TaskTemplateCreationFormSchema,
   taskTemplateSchema,
@@ -23,8 +22,6 @@ function TaskTemplateCreation({
   inputControllers = taskTemplateCreationInputControllers,
   ...props
 }) {
-  const formId = pageId + "-form";
-  const { dialogOptions } = useDialog();
   const form = useForm<TaskTemplateCreationFormSchema>({
     resolver: zodResolver(taskTemplateSchema),
     mode: "onTouched",
@@ -36,6 +33,7 @@ function TaskTemplateCreation({
       skills: [],
     },
   });
+  const formId = pageId + "-form";
 
   const commonProps = useMemo(
     () => ({
@@ -44,7 +42,6 @@ function TaskTemplateCreation({
       formId,
       form,
       modalMode,
-      diplomaDatas: dialogOptions(pageId).selectedDiploma,
       footerProps: {
         ...footerProps,
         formState: form.formState,

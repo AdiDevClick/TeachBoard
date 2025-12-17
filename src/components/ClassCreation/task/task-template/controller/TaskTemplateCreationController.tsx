@@ -11,7 +11,7 @@ import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 /**
  * Controller component for creating task templates.
@@ -21,7 +21,6 @@ import { useCallback, useRef } from "react";
  * @param inputControllers - An array of input controller configurations
  * @param className - Additional CSS classes for styling the form
  * @param form - The react-hook-form instance managing the form state
- * @param diplomaDatas - Data related to the diploma associated with the task template
  */
 export function TaskTemplateCreationController({
   pageId,
@@ -29,7 +28,6 @@ export function TaskTemplateCreationController({
   inputControllers,
   className = "grid gap-4",
   form,
-  diplomaDatas,
 }: Readonly<TaskTemplateCreationControllerProps>) {
   const {
     setRef,
@@ -39,13 +37,17 @@ export function TaskTemplateCreationController({
     newItemCallback,
     openingCallback,
     submitCallback,
+    dialogOptions,
   } = useCommandHandler({
     form,
     pageId,
   });
-
   const queryClient = useQueryClient();
   const savedSkills = useRef(null!);
+  const diplomaDatas = useMemo(
+    () => dialogOptions(pageId)?.selectedDiploma ?? null,
+    [dialogOptions, pageId]
+  );
 
   /**
    * Callback to reshape and retrieve cached data based on query keys.
@@ -76,6 +78,7 @@ export function TaskTemplateCreationController({
 
       return savedSkills.current;
     }
+
     return cachedData;
   }, []);
 
@@ -133,8 +136,10 @@ export function TaskTemplateCreationController({
     });
   };
 
-
-  if (form.getValues("degreeConfigId") !== diplomaDatas.id) {
+  if (
+    diplomaDatas?.id &&
+    form.getValues("degreeConfigId") !== diplomaDatas.id
+  ) {
     form.setValue("degreeConfigId", diplomaDatas.id, {
       shouldValidate: true,
     });
@@ -156,7 +161,9 @@ export function TaskTemplateCreationController({
       <DynamicTag
         {...inputControllers[2]}
         itemList={[
-          `${diplomaDatas?.degreeField} - ${diplomaDatas?.degreeLevel} ${diplomaDatas?.degreeYear}`,
+          diplomaDatas
+            ? `${diplomaDatas.degreeField} - ${diplomaDatas.degreeLevel} ${diplomaDatas.degreeYear}`
+            : "Aucun diplôme sélectionné",
         ]}
       />
       <PopoverFieldWithControllerAndCommandsList

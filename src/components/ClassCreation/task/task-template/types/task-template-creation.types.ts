@@ -11,5 +11,4 @@ export type TaskTemplateCreationControllerProps<
   formId: string;
   className?: string;
   form: ReturnType<typeof useForm<T>>;
-  diplomaDatas: unknown;
 } & Omit<Parameters<typeof TaskTemplateCreation>[0], "modalMode">;
