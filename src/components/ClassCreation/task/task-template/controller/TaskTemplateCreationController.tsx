@@ -44,10 +44,13 @@ export function TaskTemplateCreationController({
   });
   const queryClient = useQueryClient();
   const savedSkills = useRef(null!);
-  const diplomaDatas = useMemo(
-    () => dialogOptions(pageId)?.selectedDiploma ?? null,
-    [dialogOptions, pageId]
-  );
+  const diplomaDatas = useMemo(() => {
+    const dialogData = dialogOptions(pageId);
+    return {
+      diploma: dialogData?.selectedDiploma ?? null,
+      shortTemplatesList: dialogData?.shortTemplatesList ?? [],
+    };
+  }, [dialogOptions, pageId]);
 
   /**
    * Callback to reshape and retrieve cached data based on query keys.
@@ -67,9 +70,11 @@ export function TaskTemplateCreationController({
       return data;
     }
 
-    if (isRetrievedSkills && diplomaDatas) {
+    if (isRetrievedSkills && diplomaDatas.diploma) {
       if (!savedSkills.current) {
-        const displayedSkills = createTaskTemplateView(diplomaDatas.skills);
+        const displayedSkills = createTaskTemplateView(
+          diplomaDatas.diploma.skills
+        );
 
         savedSkills.current = displayedSkills;
 
@@ -78,7 +83,27 @@ export function TaskTemplateCreationController({
 
       return savedSkills.current;
     }
+    if (keys[0] === "new-task-item" && Array.isArray(cachedData)) {
+      const disabledItems = {
+        groupTitle: "Déjà utilisés",
+        items: [],
+      };
 
+      // Move already-used templates into a disabled group without using delete
+      const filteredItems = cachedData[0].items.filter((item) => {
+        if (diplomaDatas.shortTemplatesList.includes(item.name)) {
+          disabledItems.items.push({ ...item, disabled: true });
+          return false;
+        }
+        return true;
+      });
+
+      cachedData[0].items = filteredItems;
+
+      if (disabledItems.items.length) {
+        cachedData.push(disabledItems);
+      }
+    }
     return cachedData;
   }, []);
 
@@ -137,10 +162,10 @@ export function TaskTemplateCreationController({
   };
 
   if (
-    diplomaDatas?.id &&
-    form.getValues("degreeConfigId") !== diplomaDatas.id
+    diplomaDatas.diploma?.id &&
+    form.getValues("degreeConfigId") !== diplomaDatas.diploma.id
   ) {
-    form.setValue("degreeConfigId", diplomaDatas.id, {
+    form.setValue("degreeConfigId", diplomaDatas.diploma.id, {
       shouldValidate: true,
     });
   }
@@ -161,8 +186,8 @@ export function TaskTemplateCreationController({
       <DynamicTag
         {...inputControllers[2]}
         itemList={[
-          diplomaDatas
-            ? `${diplomaDatas.degreeField} - ${diplomaDatas.degreeLevel} ${diplomaDatas.degreeYear}`
+          diplomaDatas.diploma
+            ? `${diplomaDatas.diploma.degreeField} - ${diplomaDatas.diploma.degreeLevel} ${diplomaDatas.diploma.degreeYear}`
             : "Aucun diplôme sélectionné",
         ]}
       />
