@@ -25,6 +25,28 @@ const defaultStateParameters: FetchParams = {
   cachedFetchKey: undefined,
 };
 
+/**
+ * A hook to fetch data from an API endpoint with various parameters.
+ *
+ * @description Cached data is stored using React Query under the keys `[contentId, url]`.
+ * Data reshaping can be applied using a provided function before caching.
+ *
+ * @see {@link api.endpoints.config.ts} for predefined API endpoints and their configurations and how to use the reshaper.
+ * @see {@link FetchParams} for the structure of fetch parameters.
+ * @see {@link useQueryOnSubmit} for query handling on fetch submission.
+ * @see {@link useAppStore} for accessing global app state like user activity and navigation.
+ *
+ * @remarks This hook handles user activity tracking and redirects to login on 403 errors.
+ *
+ * @param fetchParams - The parameters for the fetch operation
+ * @param setFetchParams - A function to set the fetch parameters
+ * @param isLoaded - A boolean indicating if the data has been loaded
+ * @param error - An error object if the fetch operation failed
+ * @param data - The fetched data
+ * @param isLoading - A boolean indicating if the fetch operation is in progress
+ *
+ * @returns An object containing fetch parameters, a function to set them, and query status.
+ */
 export function useFetch() {
   const [fetchParams, setFetchParams] = useState(defaultStateParameters);
   const clearUser = useAppStore((state) => state.clearUser);
@@ -98,25 +120,4 @@ export function useFetch() {
     setFetchParams,
     ...queryParams,
   };
-}
-function mergeDatas(
-  oldArray: any[],
-  newMappedItem,
-  response: any,
-  originData: any
-) {
-  if (!oldArray) return originData;
-
-  if (!Array.isArray(oldArray)) return response;
-
-  if (!newMappedItem.id || !newMappedItem.value) {
-    console.error("Failed to map new item, data structure:", originData);
-    return oldArray;
-  }
-
-  // Append the item to the first group if present
-  const newGroups = [
-    { ...oldArray[0], items: [...oldArray[0].items, newMappedItem] },
-  ];
-  return newGroups;
 }
