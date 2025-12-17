@@ -86,7 +86,7 @@ export const API_ENDPOINTS = Object.freeze({
           `${BASE_API_URL}/task-templates/by-degree-config/${id}`,
       },
       dataReshape: (data: any) =>
-        dataReshaper(data)
+        dataReshaper(data.taskTemplates)
           .selectElementsTo(["task", "id"], "items")
           .add({ groupTitle: "Tous" })
           .assign([["name", "value"]])
