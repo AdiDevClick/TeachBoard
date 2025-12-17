@@ -268,10 +268,9 @@ export function DiplomaCreationController({
   // Get the current skills from the form
   const currentSkills = new Set(form.watch("mainSkillsList") || []);
 
-  const id = formId ?? pageId + "-form";
   return (
     <form
-      id={id}
+      id={formId}
       className="grid gap-4"
       onSubmit={form.handleSubmit(handleSubmit)}
     >
