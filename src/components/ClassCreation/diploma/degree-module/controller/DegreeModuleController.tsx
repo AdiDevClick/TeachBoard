@@ -93,11 +93,9 @@ export function DegreeModuleController({
   // Get the current skills from the form
   const currentSkills = new Set(form.watch("skillList") || []);
 
-  const id = formId ?? pageId + "-form";
-
   return (
     <form
-      id={id}
+      id={formId}
       className={className}
       onSubmit={form.handleSubmit(handleSubmit)}
     >
