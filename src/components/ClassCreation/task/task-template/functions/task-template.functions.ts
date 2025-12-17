@@ -51,7 +51,7 @@ export function updateValues(
  * @returns An array of heading structures for command items
  */
 export function createTaskTemplateView(diplomaDatas: any) {
-  diplomaDatas.map((skill: string) => {
+  return diplomaDatas.map((skill: string) => {
     const mainSkillCode = skill.mainSkillCode || "Unknown Skill";
     const mainSkillId = skill.mainSkillId || "unknown-id";
 
