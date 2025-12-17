@@ -102,7 +102,6 @@ export const classCreationInputControllers = [
     name: "taskId",
     task: "new-task-template",
     title: "Tâches à évaluer",
-    type: "text",
     placeholder: "Sélectionnez un template de tâche...",
     useButtonAddNew: true,
     useCommands: true,
