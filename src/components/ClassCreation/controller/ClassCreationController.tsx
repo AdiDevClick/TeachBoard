@@ -86,10 +86,9 @@ export function ClassCreationController({
   const [isSelectedDiploma, setIsSelectedDiploma] = useState(false);
 
   const {
-    data: diplomasData,
-    error: diplomasError,
-    isLoading: isDiplomasLoading,
-    isLoaded: isDiplomasLoaded,
+    error,
+    isLoading,
+    isLoaded,
     setRef,
     observedRefs,
     submitCallback,
@@ -154,13 +153,13 @@ export function ClassCreationController({
   };
 
   useEffect(() => {
-    if (diplomasData || diplomasError) {
+    if (data || data) {
       if (DEV_MODE) {
-        console.debug("useFetch diplomasData", diplomasData ?? diplomasError);
+        console.debug("useFetch diplomasData", data ?? error);
       }
       // You can handle additional side effects here if needed
     }
-  }, [diplomasData, diplomasError, isDiplomasLoading]);
+  }, [data, error, isLoading]);
 
   useEffect(() => {
     if (!pageId || observedRefs.size === 0) return;
@@ -226,6 +225,7 @@ export function ClassCreationController({
       e,
       ...rest,
       selectedDiploma: selectedDiploma,
+      shortTemplatesList: data.data.shortTemplatesList
     });
   };
 
