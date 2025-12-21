@@ -144,7 +144,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    *
    * @example
    * ```ts
-   * .createOutput(["degreeLevel", "degreeYear"], "description")
+   * .createPropertyWithContentFromKeys(["degreeLevel", "degreeYear"], "description")
    * // For item { degreeLevel: "Bac", degreeYear: "2024" }
    * // Accessing "description" returns "Bac 2024"
    * ```
@@ -153,13 +153,32 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    * @param output - Target property name
    * @param separator - Separator between values (default: " ")
    */
-  createOutput(keys: string[], outputKey: string, separator = " ") {
+  createPropertyWithContentFromKeys(
+    keys: string[],
+    outputKey: string,
+    separator = " "
+  ) {
     this.#computedProperties.set(outputKey, (item) => {
       return keys
         .map((key) => item[key])
         .filter((v) => v !== undefined && v !== null && v !== "")
         .join(separator);
     });
+    return this;
+  }
+
+  /**
+   * Creates a computed property with a fixed content value.
+   * @example
+   * ```ts
+   * .createPropertyWithContent("role", "Student")
+   * // Accessing "role" returns "Student"
+   * ```
+   * @param key - Target property name
+   * @param content - Fixed content value
+   */
+  createPropertyWithContent(key: string, content: string) {
+    this.#computedProperties.set(key, () => content);
     return this;
   }
 
