@@ -136,8 +136,9 @@ export const classCreationInputControllers = [
     task: "add-students",
     placeholder: "Sélectionnez...",
     creationButtonText: "Ajouter des élèves",
-    useCommands: false,
+    // useCommands: false,
     fullWidth: true,
+    task: "search-students",
     useButtonAddNew: true,
   },
   {
