@@ -3,6 +3,7 @@ import DegreeItem from "@/components/ClassCreation/diploma/degree-item/DegreeIte
 import DegreeModuleSkill from "@/components/ClassCreation/diploma/degree-module-skill/DegreeModuleSkill.tsx";
 import DegreeModule from "@/components/ClassCreation/diploma/degree-module/DegreeModule.tsx";
 import DiplomaCreation from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
+import SearchStudents from "@/components/ClassCreation/students/SearchStudents.tsx";
 import TaskItem from "@/components/ClassCreation/task/task-item/TaskItem";
 import TaskTemplateCreation from "@/components/ClassCreation/task/task-template/TaskTemplateCreation";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
@@ -99,6 +100,7 @@ const modals = defineStrictModalsList([
     modalContent: DegreeItem,
     ...baseNonNavigationalProps,
     contentProps: {
+      pageId: "new-degree-item-degree",
       inputControllers: degreeCreationInputControllersDegree,
     },
   },
@@ -107,6 +109,7 @@ const modals = defineStrictModalsList([
     modalContent: DegreeItem,
     ...baseNonNavigationalProps,
     contentProps: {
+      pageId: "new-degree-item-year",
       inputControllers: degreeCreationInputControllersYear,
     },
   },
@@ -115,6 +118,7 @@ const modals = defineStrictModalsList([
     modalContent: DegreeItem,
     ...baseNonNavigationalProps,
     contentProps: {
+      pageId: "new-degree-item-field",
       inputControllers: degreeCreationInputControllersField,
     },
   },
@@ -136,6 +140,11 @@ const modals = defineStrictModalsList([
   {
     modalName: "new-task-item",
     modalContent: TaskItem,
+    ...baseNonNavigationalProps,
+  },
+  {
+    modalName: "search-students",
+    modalContent: SearchStudents,
     ...baseNonNavigationalProps,
   },
   // {
