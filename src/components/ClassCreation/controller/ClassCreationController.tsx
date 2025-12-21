@@ -1,4 +1,5 @@
 import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
+import { CommandItemsForDialog } from "@/components/Command/CommandItems.tsx";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
@@ -105,6 +106,7 @@ export function ClassCreationController({
   const selectedDiplomaRef = useRef<CommandItemType | null>(null);
 
   const queryClient = useQueryClient();
+
   const resultsCallback = useCallback((keys: any) => {
     saveKeys(keys, cachedKeysRef);
     const cachedData = queryClient.getQueryData(keys ?? []);
@@ -225,7 +227,7 @@ export function ClassCreationController({
       e,
       ...rest,
       selectedDiploma: selectedDiploma,
-      shortTemplatesList: data.data.shortTemplatesList
+      shortTemplatesList: data.data.shortTemplatesList,
     });
   };
 
@@ -412,11 +414,19 @@ export function ClassCreationController({
         onSelect={handleOnSelect}
         onAddNewItem={newItemCallback}
       />
+      <ControlledDynamicTagList
+        form={form}
+        setRef={setRef}
+        {...inputControllers[3]}
+        observedRefs={observedRefs}
+        itemList={Array.from(currentSkills)}
+      />
+      <CommandItemsForDialog />
       <Activity mode={isSelectedDiploma ? "visible" : "hidden"}>
         <ControlledDynamicTagList
           form={form}
           setRef={setRef}
-          {...classCreationInputControllers[2]}
+          {...inputControllers[2]}
           observedRefs={observedRefs}
           itemList={Array.from(currentSkills)}
         />
@@ -431,7 +441,7 @@ export function ClassCreationController({
             fetchParams.contentId,
             fetchParams.url,
           ])}
-          {...classCreationInputControllers[2]}
+          {...inputControllers[2]}
         />
       </Activity>
       <VerticalFieldSelectWithController
