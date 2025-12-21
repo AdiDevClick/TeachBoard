@@ -1,11 +1,14 @@
 .user-display-container {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: var(--app-overall-gap);
   padding-inline: calc(var(--spacing) * 1);
+  // padding-block: 0;
   padding-block: calc(var(--spacing) * 1.5);
   text-align: left;
   font-size: var(--font-size-sm, 0.875rem);
+  width: 100%;
 
   & .user-display__avatar {
     width: calc(var(--spacing) * 8);
@@ -26,7 +29,7 @@
 
   & .user-display__info {
     display: grid;
-    // flex: 1 1 0%;
+    gap: 0;
     font-size: var(--font-size-sm, 0.875rem);
     line-height: var(--leading-tight, 1.25);
 
