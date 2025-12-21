@@ -1,10 +1,10 @@
 import type { dataContextUser } from "@/api/providers/types/sidebar-data.provider.types";
-import type { MouseEventHandler } from "react";
+import type { MouseEventHandler, PropsWithChildren } from "react";
 
-/** Props for the UserDisplay component */
-export type UserDisplayProps = {
+/** Props for the AvatarDisplay component */
+export type AvatarDisplayProps = {
   props: Omit<dataContextUser, "settings">;
-};
+} & PropsWithChildren;
 
 /** Props for the UserButton component */
 export type UserButtonProps = {
