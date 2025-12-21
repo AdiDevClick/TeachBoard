@@ -8,6 +8,7 @@ const API_VERSION = "v1";
 const AUTH = `${BASE_API_URL}/auth`;
 const DEGREES = `${BASE_API_URL}/degrees`;
 const SKILLS = `${BASE_API_URL}/skills`;
+const STUDENTS = `${BASE_API_URL}/students`;
 
 /**
  * API Endpoints Configuration
@@ -74,7 +75,11 @@ export const API_ENDPOINTS = Object.freeze({
           // Instead of : { "Bachelor" : [...] }
           .transformTuplesToGroups("groupTitle", "items")
           // A new output will be create under "description" in each "items"
-          .createOutput(["degreeLevel", "degreeYear"], "description", " ")
+          .createPropertyWithContentFromKeys(
+            ["degreeLevel", "degreeYear"],
+            "description",
+            " "
+          )
           // "description" will be transformed to "value" for selects
           .assign([["description", "value"]])
           .newShape(),
@@ -101,7 +106,25 @@ export const API_ENDPOINTS = Object.freeze({
           .assign([["name", "value"]])
           .newShape(),
     },
-    STUDENTS: `${BASE_API_URL}/students`,
+    STUDENTS: {
+      endpoint: `${STUDENTS}/not-assigned`,
+      dataReshape: (data: any) =>
+        dataReshaper(data)
+          .assignSourceTo("items")
+          .add({ groupTitle: "Tous" })
+          .createPropertyWithContentFromKeys(
+            ["firstName", "lastName"],
+            "fullName",
+            " "
+          )
+          .createPropertyWithContent("newRole", "Etudiant")
+          .assign([
+            ["fullName", "name"],
+            ["newRole", "email"],
+            ["img", "avatar"],
+          ])
+          .newShape(),
+    },
     COURSES: `${BASE_API_URL}/courses`,
     USERS: `${BASE_API_URL}/users`,
     POSTS: `${BASE_API_URL}/posts`,
