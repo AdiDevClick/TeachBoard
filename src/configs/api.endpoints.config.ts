@@ -38,7 +38,7 @@ export const API_ENDPOINTS = Object.freeze({
         // data.classes is the actual array of classes from the server response
         dataReshaper(data)
           .rename("classes", "items")
-          .add({ groupTitle: "Tous" })
+          .addToRoot({ groupTitle: "Tous" })
           // .assign([["code", "value"]])
           .newShape(),
     },
@@ -48,7 +48,7 @@ export const API_ENDPOINTS = Object.freeze({
         dataReshaper(data)
           // data.Skills is the actual array of skills from the server response
           .rename("Skills", "items")
-          .add({ groupTitle: "Tous" })
+          .addToRoot({ groupTitle: "Tous" })
           // use "code" and transform to "value" for selects
           .assign([["code", "value"]])
           .newShape(),
@@ -62,7 +62,7 @@ export const API_ENDPOINTS = Object.freeze({
       dataReshape: (data: any) =>
         dataReshaper(data)
           .assignSourceTo("items")
-          .add({ groupTitle: "Tous" })
+          .addToRoot({ groupTitle: "Tous" })
           // use "name" and transform to "value" for selects
           .assign([["name", "value"]])
           .newShape(),
@@ -93,7 +93,7 @@ export const API_ENDPOINTS = Object.freeze({
       dataReshape: (data: any) =>
         dataReshaper(data.taskTemplates)
           .selectElementsTo(["task", "id"], "items")
-          .add({ groupTitle: "Tous" })
+          .addToRoot({ groupTitle: "Tous" })
           .assign([["name", "value"]])
           .newShape(),
     },
@@ -102,7 +102,7 @@ export const API_ENDPOINTS = Object.freeze({
       dataReshape: (data: any) =>
         dataReshaper(data)
           .assignSourceTo("items")
-          .add({ groupTitle: "Tous" })
+          .addToRoot({ groupTitle: "Tous" })
           .assign([["name", "value"]])
           .newShape(),
     },
@@ -111,13 +111,13 @@ export const API_ENDPOINTS = Object.freeze({
       dataReshape: (data: any) =>
         dataReshaper(data)
           .assignSourceTo("items")
-          .add({ groupTitle: "Tous" })
+          .addToRoot({ groupTitle: "Tous" })
           .createPropertyWithContentFromKeys(
             ["firstName", "lastName"],
             "fullName",
             " "
           )
-          .createPropertyWithContent("newRole", "Etudiant")
+          .setProxyPropertyWithContent("newRole", "Etudiant")
           .assign([
             ["fullName", "name"],
             ["newRole", "email"],
