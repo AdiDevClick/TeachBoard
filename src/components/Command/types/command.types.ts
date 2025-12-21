@@ -17,6 +17,7 @@ export type CommandItemType = {
  * Props for command-based components
  */
 export type CommandsProps = {
+  avatarDisplay?: boolean;
   useCommands?: boolean;
   multiSelection?: boolean;
   creationButtonText?: ReactNode;
