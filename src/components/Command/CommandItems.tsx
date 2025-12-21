@@ -3,6 +3,8 @@ import type {
   CommandsProps,
 } from "@/components/Command/types/command.types.ts";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { AvatarDisplay } from "@/components/Sidebar/footer/AvatarDisplay.tsx";
+import { Button } from "@/components/ui/button.tsx";
 import {
   Command,
   CommandEmpty,
@@ -17,8 +19,14 @@ import {
   debugLogs,
 } from "@/configs/app-components.config.ts";
 import { usePopoverFieldContextSafe } from "@/hooks/contexts/usePopover.ts";
-import { CheckIcon } from "lucide-react";
-import { useCallback } from "react";
+import { CommandDialog } from "cmdk";
+import { CheckIcon, Plus } from "lucide-react";
+import {
+  Activity,
+  useCallback,
+  type ComponentProps,
+  type ComponentType,
+} from "react";
 
 /**
  * A command items component that displays headings and their corresponding values.
@@ -31,8 +39,8 @@ import { useCallback } from "react";
 export function CommandItems(props: Readonly<CommandsProps>) {
   const {
     commandHeadings,
-    filter,
     onSelect: externalOnSelect,
+    avatarDisplay,
     ...rest
   } = props;
 
@@ -50,10 +58,7 @@ export function CommandItems(props: Readonly<CommandsProps>) {
   );
 
   return (
-    <Command
-      filter={filter}
-      // onChange={(e) => preventDefaultAndStopPropagation(e)}
-    >
+    <>
       <CommandInput placeholder="Search..." />
 
       <CommandList>
@@ -85,12 +90,26 @@ export function CommandItems(props: Readonly<CommandsProps>) {
                         onSelect={(e) => handleSelect(e, itemDetails)}
                         {...rest}
                       >
-                        {command.value ?? "Valeur inconnue"}
-                        {defineSelection(
-                          command.value,
-                          selectedValue,
-                          rest.multiSelection
-                        ) && <CheckIcon className={"ml-auto"} />}
+                        <Activity mode={avatarDisplay ? "visible" : "hidden"}>
+                          <AvatarDisplay props={command}>
+                            <Button
+                              size="icon-sm"
+                              variant="outline"
+                              className="rounded-full"
+                              aria-label="Invite"
+                            >
+                              <Plus />
+                            </Button>
+                          </AvatarDisplay>
+                        </Activity>
+                        <Activity mode={avatarDisplay ? "hidden" : "visible"}>
+                          {command.value}
+                          {defineSelection(
+                            command.value,
+                            selectedValue,
+                            rest.multiSelection
+                          ) && <CheckIcon className={"ml-auto"} />}
+                        </Activity>
                       </CommandItem>
                     );
                   }}
@@ -100,8 +119,30 @@ export function CommandItems(props: Readonly<CommandsProps>) {
           }}
         </ListMapper>
       </CommandList>
-    </Command>
+    </>
   );
+}
+
+function withDialog(WrappedComponent: ComponentType) {
+  return function DialogComponent(
+    props: ComponentProps<typeof WrappedComponent>
+  ) {
+    return (
+      <CommandDialog>
+        <WrappedComponent {...props} />
+      </CommandDialog>
+    );
+  };
+}
+
+function withComboBox(WrappedComponent: ComponentType) {
+  return function ComboBoxComponent(props: CommandsProps) {
+    return (
+      <Command filter={props.filter}>
+        <WrappedComponent {...props} />
+      </Command>
+    );
+  };
 }
 
 /**
@@ -122,3 +163,6 @@ function defineSelection(
     ? (selectedValue as Set<string>).has(value)
     : selectedValue === value;
 }
+
+export const CommandItemsForDialog = withDialog(CommandItems);
+export const CommandItemsForComboBox = withComboBox(CommandItems);
