@@ -1,9 +1,5 @@
-import { CommandItems } from "@/components/Command/CommandItems.tsx";
-import type { CommandsProps } from "@/components/Command/types/command.types.ts";
 import withController from "@/components/HOCs/withController.tsx";
 
-import { InertSelectItemWithIcon } from "@/components/HOCs/withIconItem";
-import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import type {
   VerticalFieldState,
   VerticalRefSetters,
@@ -16,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { AnyComponentLike } from "@/utils/types/types.utils.ts";
 import { cn } from "@/utils/utils";
 import {
   useCallback,
@@ -186,43 +181,46 @@ export function VerticalFieldSelect({
   );
 }
 
-function withCommands(Wrapped: AnyComponentLike) {
-  return function Component<T extends CommandsProps>(
-    props: T & VerticalSelectProps
-  ) {
-    const {
-      useCommands,
-      children,
-      creationButtonText,
-      useButtonAddNew,
-      onAddNewItem,
-      commandHeadings,
-      ...rest
-    } = props;
+// function withCommands(Wrapped: AnyComponentLike) {
+//   return function Component<T extends CommandsProps>(
+//     props: T & VerticalSelectProps
+//   ) {
+//     const {
+//       useCommands,
+//       children,
+//       creationButtonText,
+//       useButtonAddNew,
+//       onAddNewItem,
+//       commandHeadings,
+//       ...rest
+//     } = props;
 
-    const apiEndpoint = props.apiEndpoint;
-    const task = props.task;
-    const dataReshapeFn = props.dataReshapeFn;
+//     const apiEndpoint = props.apiEndpoint;
+//     const task = props.task;
+//     const dataReshapeFn = props.dataReshapeFn;
 
-    return (
-      <Wrapped {...rest}>
-        {useCommands && (
-          <CommandItems commandHeadings={commandHeadings ?? []} {...rest} />
-        )}
-        {useButtonAddNew && (
-          <InertSelectItemWithIcon
-            value={task}
-            inertIconText={creationButtonText}
-            onPointerDown={(e) =>
-              onAddNewItem?.({ e, apiEndpoint, task, dataReshapeFn })
-            }
-          />
-        )}
-        {children}
-      </Wrapped>
-    );
-  };
-}
+//     return (
+//       <Wrapped {...rest}>
+//         {useCommands && (
+//           <CommandItemsForComboBox
+//             commandHeadings={commandHeadings ?? []}
+//             {...rest}
+//           />
+//         )}
+//         {useButtonAddNew && (
+//           <InertSelectItemWithIcon
+//             value={task}
+//             inertIconText={creationButtonText}
+//             onPointerDown={(e) =>
+//               onAddNewItem?.({ e, apiEndpoint, task, dataReshapeFn })
+//             }
+//           />
+//         )}
+//         {children}
+//       </Wrapped>
+//     );
+//   };
+// }
 
 export default VerticalFieldSelect;
 
@@ -230,13 +228,13 @@ export const VerticalFieldSelectWithController: ReturnType<
   typeof withController<typeof VerticalFieldSelect>
 > = withController(VerticalFieldSelect);
 
-export const VerticalFieldSelectWithCommands =
-  withCommands(VerticalFieldSelect);
+// export const VerticalFieldSelectWithCommands =
+//   withCommands(VerticalFieldSelect);
 
-export const VerticalFieldSelectWithControlledCommands: ReturnType<
-  typeof withController<typeof VerticalFieldSelectWithCommands>
-> = withController(VerticalFieldSelectWithCommands);
+// export const VerticalFieldSelectWithControlledCommands: ReturnType<
+//   typeof withController<typeof VerticalFieldSelectWithCommands>
+// > = withController(VerticalFieldSelectWithCommands);
 
-export const VerticalFieldSelectWithControllerAndCommandsList: ReturnType<
-  typeof withListMapper<typeof VerticalFieldSelectWithControlledCommands>
-> = withListMapper(VerticalFieldSelectWithControlledCommands);
+// export const VerticalFieldSelectWithControllerAndCommandsList: ReturnType<
+//   typeof withListMapper<typeof VerticalFieldSelectWithControlledCommands>
+// > = withListMapper(VerticalFieldSelectWithControlledCommands);
