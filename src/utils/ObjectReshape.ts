@@ -171,13 +171,13 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    * Creates a computed property with a fixed content value.
    * @example
    * ```ts
-   * .createPropertyWithContent("role", "Student")
+   * .setProxyPropertyWithContent("role", "Student")
    * // Accessing "role" returns "Student"
    * ```
    * @param key - Target property name
    * @param content - Fixed content value
    */
-  createPropertyWithContent(key: string, content: string) {
+  setProxyPropertyWithContent(key: string, content: string) {
     this.#computedProperties.set(key, () => content);
     return this;
   }
@@ -281,7 +281,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     return this;
   }
 
-  add(pairs: Record<string, unknown>) {
+  addToRoot(pairs: Record<string, unknown>) {
     this.#initShapedItem();
     // Always add at the top-level of the newly built shape. To add to the
     // items of an assigned source, use `addToItems()`.
