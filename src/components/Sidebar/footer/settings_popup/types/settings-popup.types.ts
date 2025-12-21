@@ -20,6 +20,6 @@ type UserData = Omit<dataContextUser, UserDisplay> &
 /** Props for the SettingsPopup component */
 export type SettingsPopupProps = {
   userData: UserData;
-  userDisplay: Pick<dataContext["user"], UserDisplay>;
+  avatarDisplay: Pick<dataContext["user"], UserDisplay>;
   handleOnFooterButtonsClick: UserButtonProps["handleOnFooterButtonsClick"];
 };

@@ -1,6 +1,6 @@
+import { AvatarDisplay } from "@/components/Sidebar/footer/AvatarDisplay.tsx";
 import { TriggeredSettingsPopup } from "@/components/Sidebar/footer/settings_popup/TriggeredSettingsPopup.tsx";
 import type { UserButtonProps } from "@/components/Sidebar/footer/types/footer.types";
-import { UserDisplay } from "@/components/Sidebar/footer/UserDisplay.tsx";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -27,7 +27,7 @@ export function UserButton({
   const isLoggedIn = useAppStore((state) => state.isLoggedIn);
   const user = useAppStore((state) => state.user);
 
-  const userDisplay = {
+  const avatarDisplay = {
     name: user?.name ?? name,
     email: user?.email ?? email,
     avatar: user?.avatar ?? avatar,
@@ -41,13 +41,14 @@ export function UserButton({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton size="lg" className="sidebarButton--menu">
-              <UserDisplay props={userDisplay} />
-              <IconDotsVertical className="sidebarButton--menu-dots" />
+              <AvatarDisplay props={avatarDisplay}>
+                <IconDotsVertical className="sidebarButton--menu-dots" />
+              </AvatarDisplay>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <TriggeredSettingsPopup
             userData={userData}
-            userDisplay={userDisplay}
+            avatarDisplay={avatarDisplay}
             handleOnFooterButtonsClick={handleOnFooterButtonsClick}
           />
         </DropdownMenu>
