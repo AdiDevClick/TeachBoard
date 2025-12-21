@@ -1,5 +1,5 @@
 import { PopoverFieldProvider } from "@/api/providers/Popover.provider.tsx";
-import withCommands from "@/components/HOCs/withCommands.tsx";
+import withComboBoxCommands from "@/components/HOCs/withComboBoxCommands";
 import withController from "@/components/HOCs/withController.tsx";
 import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import type {
@@ -156,7 +156,7 @@ export default PopoverField;
 
 export const PopoverFieldWithController = withController(PopoverField);
 
-export const PopoverFieldWithCommands = withCommands(PopoverField);
+export const PopoverFieldWithCommands = withComboBoxCommands(PopoverField);
 
 export const PopoverFieldWithControlledCommands = withController(
   PopoverFieldWithCommands
