@@ -143,7 +143,6 @@ export function useCommandHandler({
       dataReshapeFn: dataReshapeFn,
       url: apiEndpoint,
       contentId: task,
-      // method: "GET",
     }));
   }, []);
 
