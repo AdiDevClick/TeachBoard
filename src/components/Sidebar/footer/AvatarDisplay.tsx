@@ -39,16 +39,4 @@ export function AvatarDisplay({
       <ItemActions>{children}</ItemActions>
     </Item>
   );
-  // return (
-  //   <div className="user-display-container">
-  //     <Avatar className="user-display__avatar grayscale">
-  //       <AvatarImage className="avatar__img" src={avatar} alt={name} />
-  //       <AvatarFallback className="avatar__img-fallback">TB</AvatarFallback>
-  //     </Avatar>
-  //     <div className="user-display__info">
-  //       <p className="info__name">{name}</p>
-  //       <p className="info__email">{email}</p>
-  //     </div>
-  //   </div>
-  // );
 }
