@@ -44,8 +44,9 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
           deleteRef(id);
         } else {
           // If no ID provided, close the most recent dialog
-          const lastId = Array.from(next.entries()).pop();
-          if (lastId) {
+          const lastEntries = Array.from(next.entries()).pop();
+          if (lastEntries) {
+            const lastId = lastEntries[0];
             next.delete(lastId);
             deleteRef(lastId);
           }
@@ -94,7 +95,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
   }, [openDialogs]);
 
   const dialogOptions = useCallback(
-    (dialog) => {
+    (dialog: AppModalNames) => {
       return openDialogs.get(dialog);
     },
     [openDialogs]
