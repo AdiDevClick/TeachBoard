@@ -1,4 +1,4 @@
-import { AvatarDisplay } from "@/components/Sidebar/footer/AvatarDisplay.tsx";
+import { AvatarDisplay } from "@/components/Avatar/AvatarDisplay";
 import { TriggeredSettingsPopup } from "@/components/Sidebar/footer/settings_popup/TriggeredSettingsPopup.tsx";
 import type { UserButtonProps } from "@/components/Sidebar/footer/types/footer.types";
 import {

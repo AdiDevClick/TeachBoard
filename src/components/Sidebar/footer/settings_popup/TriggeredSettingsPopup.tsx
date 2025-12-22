@@ -1,7 +1,7 @@
+import { AvatarDisplay } from "@/components/Avatar/AvatarDisplay";
 import { Dropdown } from "@/components/Dropdowns/Dropdown.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import type { SettingsPopupProps } from "@/components/Sidebar/footer/settings_popup/types/settings-popup.types";
-import { AvatarDisplay } from "@/components/Sidebar/footer/AvatarDisplay.tsx";
 import {
   DropdownMenuContent,
   DropdownMenuGroup,
