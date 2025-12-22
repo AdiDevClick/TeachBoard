@@ -3,8 +3,7 @@ import { CommandItemsForComboBox } from "@/components/Command/CommandItems.tsx";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
-import { useDialog } from "@/hooks/contexts/useDialog.ts";
-import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
+import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 
@@ -17,17 +16,20 @@ import { useCallback, useEffect } from "react";
 export function SearchStudentsController({
   pageId,
   form,
+  formId,
 }: Readonly<SearchStudentsControllerProps>) {
   const {
-    setFetchParams,
-    data,
     fetchParams,
-    error,
-    isLoaded,
-    isLoading,
-    onSubmit,
-  } = useFetch();
-  const { dialogOptions, setDialogOptions } = useDialog();
+    data,
+    closeDialog,
+    dialogOptions,
+    setDialogOptions,
+    openingCallback,
+  } = useCommandHandler({
+    form,
+    pageId,
+  });
+
   const queryClient = useQueryClient();
 
   /**
@@ -95,31 +97,42 @@ export function SearchStudentsController({
     []
   );
 
+  const handleSubmit = () => {
+    closeDialog(null, pageId);
+  };
+
   /**
    * Initial fetch setup
    *
    * @description Sets up the fetch parameters for retrieving students and triggers the fetch on component mount.
    */
   useEffect(() => {
-    setFetchParams((prev) => ({
-      ...prev,
-      dataReshapeFn: API_ENDPOINTS.GET.STUDENTS.dataReshape,
-      url: API_ENDPOINTS.GET.STUDENTS.endpoint,
-      contentId: pageId,
-    }));
+    const metaData = dialogOptions(pageId)?.metaData || {};
+    metaData.dataReshapeFn = API_ENDPOINTS.GET.STUDENTS.dataReshape;
+    metaData.apiEndpoint = API_ENDPOINTS.GET.STUDENTS.endpoint;
+    metaData.task = pageId;
 
-    onSubmit();
+    openingCallback(open, metaData, null);
   }, []);
 
   return (
-    <CommandItemsForComboBox
-      avatarDisplay
-      multiSelection
-      onSelect={handleOnSelect}
-      commandHeadings={resultsCallback([
-        fetchParams.contentId,
-        fetchParams.url,
-      ])}
-    />
+    <>
+      <CommandItemsForComboBox
+        avatarDisplay
+        multiSelection
+        onSelect={handleOnSelect}
+        commandHeadings={resultsCallback([
+          fetchParams.contentId,
+          fetchParams.url,
+        ])}
+      />
+
+      {/* Fix to avoid a focus effect */}
+      <form
+        id={formId}
+        className="display-none"
+        onSubmit={form.handleSubmit(handleSubmit)}
+      />
+    </>
   );
 }
