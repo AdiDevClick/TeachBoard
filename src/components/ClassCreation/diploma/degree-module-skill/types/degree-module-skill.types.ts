@@ -7,6 +7,4 @@ export type DegreeModuleSkillProps<
 > = {
   formId?: string;
   form: ReturnType<typeof useForm<T>>;
-  queryHooks: ReturnType<typeof DegreeModuleSkill>["queryHooks"];
-  fetchHooks: ReturnType<typeof DegreeModuleSkill>["fetchHooks"];
 } & Omit<Parameters<typeof DegreeModuleSkill>[0], "modalMode">;
