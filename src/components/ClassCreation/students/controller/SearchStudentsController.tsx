@@ -63,6 +63,7 @@ export function SearchStudentsController({
   return (
     <CommandItemsForComboBox
       avatarDisplay
+      multiSelection
       commandHeadings={resultsCallback([
         fetchParams.contentId,
         fetchParams.url,
