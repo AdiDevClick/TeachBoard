@@ -1,10 +1,9 @@
 import { SearchStudentsController } from "@/components/ClassCreation/students/controller/SearchStudentsController.tsx";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
-import { taskTemplateCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import {
-  type TaskTemplateCreationFormSchema,
-  taskTemplateSchema,
-} from "@/models/class-task-template.models.ts";
+  searchStudentsSchema,
+  type SearchStudentsFormSchema,
+} from "@/models/search-students.models.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -17,21 +16,22 @@ const titleProps = {
 
 const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
 
+/**
+ * SearchStudents Component
+ *
+ * @param pageId - The unique identifier for the page/component using this controller
+ * @param modalMode - Whether the component is used in a modal dialog or not
+ */
 function SearchStudents({
   pageId = "search-students",
   modalMode = true,
-  inputControllers = taskTemplateCreationInputControllers,
   ...props
 }) {
-  const form = useForm<TaskTemplateCreationFormSchema>({
-    resolver: zodResolver(taskTemplateSchema),
+  const form = useForm<SearchStudentsFormSchema>({
+    resolver: zodResolver(searchStudentsSchema),
     mode: "onTouched",
     defaultValues: {
-      name: "",
-      description: "",
-      taskId: "",
-      degreeConfigId: "",
-      skills: [],
+      students: [],
     },
   });
   const formId = pageId + "-form";
@@ -39,8 +39,6 @@ function SearchStudents({
   const commonProps = useMemo(
     () => ({
       pageId,
-      inputControllers,
-      formId,
       form,
       modalMode,
       footerProps: {
@@ -51,7 +49,7 @@ function SearchStudents({
       titleProps,
       ...props,
     }),
-    [form.formState, props]
+    [props]
   );
 
   return <SearchStudentsWithCard {...commonProps} />;
