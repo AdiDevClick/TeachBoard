@@ -28,7 +28,13 @@ export function useCommandHandler({
     data,
     isLoading,
   } = useFetch();
-  const { openDialog, closeDialog, dialogOptions } = useDialog();
+  const {
+    openDialog,
+    closeDialog,
+    dialogOptions,
+    openedDialogs,
+    setDialogOptions,
+  } = useDialog();
   const queryClient = useQueryClient();
   const mutationObs = useMutationObserver({});
 
@@ -188,5 +194,7 @@ export function useCommandHandler({
     newItemCallback: handleAddNewItem,
     submitCallback: handleSubmit,
     openingCallback: handleOpening,
+    openedDialogs,
+    setDialogOptions,
   };
 }
