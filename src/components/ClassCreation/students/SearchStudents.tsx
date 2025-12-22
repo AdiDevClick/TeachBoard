@@ -40,6 +40,7 @@ function SearchStudents({
     () => ({
       pageId,
       form,
+      formId,
       modalMode,
       footerProps: {
         ...footerProps,
