@@ -76,6 +76,19 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
     });
   }, []);
 
+  const setDialogOptions = useCallback((id: AppModalNames, options: any) => {
+    setOpenDialogs((prev) => {
+      const next = prev.clone();
+      if (next.has(id)) {
+        next.set(id, {
+          ...next.get(id),
+          ...options,
+        });
+      }
+      return next;
+    });
+  }, []);
+
   const dialogsOptions = useMemo(() => {
     return new Map(openDialogs.entries());
   }, [openDialogs]);
@@ -92,6 +105,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
       openedDialogs: Array.from(openDialogs.entries()),
       dialogsOptions,
       dialogOptions,
+      setDialogOptions,
       isDialogOpen,
       openDialog,
       closeDialog,
