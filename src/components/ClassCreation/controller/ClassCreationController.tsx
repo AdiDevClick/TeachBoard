@@ -1,5 +1,4 @@
 import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
-import { CommandItemsForDialog } from "@/components/Command/CommandItems.tsx";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
@@ -23,46 +22,6 @@ import { Activity, useCallback, useEffect, useRef, useState } from "react";
 const year = new Date().getFullYear();
 const years = yearsListRange(year, 5);
 const defaultSchoolYear = year + " - " + (year + 1);
-
-// const inputs = [
-//   {
-//     // Required for withController to be able to process the field
-//     id: "add-new-diploma",
-//     name: "degreeConfigId",
-//     label: "Année et niveau du diplôme",
-//     placeholder: "Sélectionnez...",
-//     creationButtonText: "Ajouter un diplôme",
-//     task: "create-diploma",
-//     useCommands: true,
-//     fullWidth: true,
-//     useButtonAddNew: true,
-//     apiEndpoint: API_ENDPOINTS.GET.DIPLOMAS.endpoint,
-//     dataReshapeFn: API_ENDPOINTS.GET.DIPLOMAS.dataReshape,
-//   },
-//   {
-//     // Required for withController to be able to process the field
-//     // The "students" field can hold an array of selected student ids (or similar)
-//     name: "students",
-//     label: "Elèves",
-//     task: "add-students",
-//     placeholder: "Sélectionnez...",
-//     creationButtonText: "Ajouter des élèves",
-//     useCommands: false,
-//     fullWidth: true,
-//     useButtonAddNew: true,
-//   },
-//   {
-//     name: "schoolYear",
-//     label: "Année scolaire",
-//     task: "add-school-year",
-//     placeholder: defaultSchoolYear,
-//     defaultValue: defaultSchoolYear,
-//     creationButtonText: false,
-//     useCommands: false,
-//     fullWidth: false,
-//     useButtonAddNew: false,
-//   },
-// ];
 
 const defaultState = {
   selected: false,
@@ -97,6 +56,8 @@ export function ClassCreationController({
     data,
     newItemCallback,
     openingCallback,
+    dialogOptions,
+    openedDialogs,
   } = useCommandHandler({
     form,
     pageId,
@@ -155,6 +116,11 @@ export function ClassCreationController({
   };
 
   useEffect(() => {
+    console.log("Dialog options changed", dialogOptions("search-students"));
+    console.log(openedDialogs);
+  }, [dialogOptions]);
+
+  useEffect(() => {
     if (data || data) {
       if (DEV_MODE) {
         console.debug("useFetch diplomasData", data ?? error);
@@ -184,14 +150,14 @@ export function ClassCreationController({
     const taskTemplateId = commandItemDetails.id;
     const tasks = new Set(form.watch("tasks") || []);
 
-    if (currentSkills.has(value)) {
+    if (currentTasks.has(value)) {
       tasks.delete(taskTemplateId);
-      currentSkills.delete(value);
+      currentTasks.delete(value);
     } else {
-      currentSkills.add(value);
+      currentTasks.add(value);
       tasks.add(taskTemplateId);
     }
-    form.setValue("tasksValues", Array.from(currentSkills), {
+    form.setValue("tasksValues", Array.from(currentTasks), {
       shouldValidate: true,
     });
 
@@ -386,7 +352,8 @@ export function ClassCreationController({
   //   // editable.style.setProperty("-webkit-user-modify", "read-only");
   // };
   // Get the current skills from the form
-  const currentSkills = new Set(form.watch("tasksValues") || []);
+  const currentTasks = new Set(form.watch("tasksValues") || []);
+  const currentStudents = new Set(form.watch("studentsValues") || []);
 
   return (
     <form
@@ -419,16 +386,16 @@ export function ClassCreationController({
         setRef={setRef}
         {...inputControllers[3]}
         observedRefs={observedRefs}
-        itemList={Array.from(currentSkills)}
+        itemList={Array.from(currentStudents)}
       />
-      <CommandItemsForDialog />
+      {/* <CommandItemsForDialog /> */}
       <Activity mode={isSelectedDiploma ? "visible" : "hidden"}>
         <ControlledDynamicTagList
           form={form}
           setRef={setRef}
           {...inputControllers[2]}
           observedRefs={observedRefs}
-          itemList={Array.from(currentSkills)}
+          itemList={Array.from(currentTasks)}
         />
         <PopoverFieldWithCommands
           multiSelection
