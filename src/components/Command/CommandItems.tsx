@@ -24,6 +24,7 @@ import { CheckIcon, Plus } from "lucide-react";
 import {
   Activity,
   useCallback,
+  useState,
   type ComponentProps,
   type ComponentType,
 } from "react";
@@ -46,16 +47,36 @@ export function CommandItems(props: Readonly<CommandsProps>) {
 
   // !! IMPORTANT !! This context can be null
   const context = usePopoverFieldContextSafe();
+  const [selectedValue, setSelectedValue] = useState(
+    context?.selectedValue || new Set()
+  );
   const contextOnSelect = context?.onSelect;
-  const selectedValue = context?.selectedValue;
 
   const handleSelect = useCallback(
     (value: string, commandItem: CommandItemType) => {
       contextOnSelect?.(value, commandItem);
       externalOnSelect?.(value, commandItem);
+
+      if (props.multiSelection && avatarDisplay) {
+        setSelectedValueCallback(value);
+      }
     },
     []
   );
+
+  /**
+   * Callback to handle selection of a value
+   */
+  const setSelectedValueCallback = (value: string) =>
+    setSelectedValue((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(value)) {
+        newSet.delete(value);
+      } else {
+        newSet.add(value);
+      }
+      return newSet;
+    });
 
   return (
     <>
@@ -98,7 +119,15 @@ export function CommandItems(props: Readonly<CommandsProps>) {
                               className="rounded-full"
                               aria-label="Invite"
                             >
-                              <Plus />
+                              {defineSelection(
+                                command.value,
+                                selectedValue,
+                                rest.multiSelection
+                              ) ? (
+                                <CheckIcon />
+                              ) : (
+                                <Plus />
+                              )}
                             </Button>
                           </AvatarDisplay>
                         </Activity>
