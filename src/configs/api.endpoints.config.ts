@@ -119,6 +119,7 @@ export const API_ENDPOINTS = Object.freeze({
           )
           .setProxyPropertyWithContent("newRole", "Etudiant")
           .assign([
+            ["fullName", "value"],
             ["fullName", "name"],
             ["newRole", "email"],
             ["img", "avatar"],
