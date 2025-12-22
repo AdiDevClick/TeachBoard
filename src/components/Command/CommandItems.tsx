@@ -114,6 +114,7 @@ export function CommandItems(props: Readonly<CommandsProps>) {
                         <Activity mode={avatarDisplay ? "visible" : "hidden"}>
                           <AvatarDisplay props={command}>
                             <Button
+                              type="button"
                               size="icon-sm"
                               variant="outline"
                               className="rounded-full"
