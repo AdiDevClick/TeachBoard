@@ -28,5 +28,5 @@ export type DialogContextType = {
    * Ordered list of opened dialogs with their associated options.
    * Entries come from the underlying UniqueSet, preserving insertion order.
    */
-  openedDialogs: Array<[AppModalNames, any]>;
+  openedDialogs: Array<[AppModalNames]>;
 };
