@@ -17,6 +17,7 @@ import {
   inputLoginControllers,
   inputSignupControllers,
 } from "@/data/inputs-controllers.data.ts";
+import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import {
   defineStrictModalsList,
   isStandardModal,
@@ -163,20 +164,26 @@ const modals = defineStrictModalsList([
  *
  * @description The list have to be created with defineStrictModalsList to ensure proper typing.
  * {@link modals}
+ *
+ * @remark If you pass through any dialogOptions, they will be spread out into the modal content component.
  */
 export function AppModals({ modalsList = modals }: Readonly<AppModalsProps>) {
+  const { dialogOptions } = useDialog();
   return (
     <ListMapper items={modalsList}>
       {(modal) => {
         if (!modal.type) return null;
 
         const modalName = modal.modalName;
+        const dialogOpts = dialogOptions(modalName) ?? {};
 
         if (isStandardModal(modal)) {
           const StandardModalComponent = modal.type;
           const ContentComponent = modal.modalContent;
 
-          const renderedContent = <ContentComponent {...modal.contentProps} />;
+          const renderedContent = (
+            <ContentComponent {...modal.contentProps} {...dialogOpts} />
+          );
 
           return (
             <StandardModalComponent
