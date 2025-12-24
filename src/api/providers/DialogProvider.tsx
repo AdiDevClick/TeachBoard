@@ -103,7 +103,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
 
   const value = useMemo(
     () => ({
-      openedDialogs: Array.from(openDialogs.entries()),
+      openedDialogs: Array.from(openDialogs.keys()),
       dialogsOptions,
       dialogOptions,
       setDialogOptions,
