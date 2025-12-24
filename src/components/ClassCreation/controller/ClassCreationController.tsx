@@ -9,6 +9,11 @@ import {
 import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem.tsx";
 import { VerticalFieldSelectWithController } from "@/components/Selects/VerticalFieldSelect.tsx";
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { classCreationInputControllers } from "@/data/inputs-controllers.data.ts";
@@ -44,7 +49,10 @@ export function ClassCreationController({
   const [state, setState] = useState(defaultState);
   const [isYearOpened, setIsYearOpened] = useState(false);
   const [isSelectedDiploma, setIsSelectedDiploma] = useState(false);
+  // const currentStudents = Array.from(form.watch("studentsValues") || []);
+  const currentTasks = new Set(form.watch("tasksValues") || []);
 
+  const studentsRef = useRef(null!);
   const {
     error,
     isLoading,
@@ -62,6 +70,17 @@ export function ClassCreationController({
     form,
     pageId,
   });
+
+  /**
+   * Sync studentsRef with form's studentsValues
+   *
+   * @description Updates the studentsRef whenever the form's studentsValues change.
+   *
+   * @remark This is necessary to keep the ref in sync with the form state, as refs do not trigger re-renders.
+   */
+  useEffect(() => {
+    studentsRef.current = Object.values(form.watch("studentsValues") || []);
+  }, [form]);
 
   const cachedKeysRef = useRef<unknown[]>([]);
   const selectedDiplomaRef = useRef<CommandItemType | null>(null);
@@ -116,20 +135,6 @@ export function ClassCreationController({
   };
 
   useEffect(() => {
-    console.log("Dialog options changed", dialogOptions("search-students"));
-    console.log(openedDialogs);
-  }, [dialogOptions]);
-
-  useEffect(() => {
-    if (data || data) {
-      if (DEV_MODE) {
-        console.debug("useFetch diplomasData", data ?? error);
-      }
-      // You can handle additional side effects here if needed
-    }
-  }, [data, error, isLoading]);
-
-  useEffect(() => {
     if (!pageId || observedRefs.size === 0) return;
     const observed = observedRefs.get(pageId + "-schoolYear");
     console.log("Observed for schoolYear:", observed);
@@ -167,33 +172,38 @@ export function ClassCreationController({
   const handleOnSelect = (value: string, commandItem: CommandItemType) => {
     selectedDiplomaRef.current = commandItem;
     setIsSelectedDiploma(!!commandItem);
-    // const diplomaKey = cachedKeysRef.current?.["create-diploma"];
-    // const cachedData = queryClient.getQueryData({ queryKey: diplomaKey });
   };
 
-  const handleNewItemCallback = ({ e, ...rest }: HandleAddNewItemParams) => {
+  const handleNewItem = ({ e, ...rest }: HandleAddNewItemParams) => {
     if (DEV_MODE && !NO_CACHE_LOGS) {
       console.log("Add new item triggered", {
         apiEndpoint: rest.apiEndpoint,
         task: rest.task,
       });
     }
-    const isTaskTemplate = rest.task === "new-task-template";
-    const selectedDiploma = selectedDiplomaRef.current;
+    const task = rest.task;
 
-    if (isTaskTemplate && selectedDiploma) {
-      rest.apiEndpoint =
-        API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
-          selectedDiploma.id
-        );
+    console.log("opening new students item");
+
+    if (task === "search-students") {
+      rest.apiEndpoint = API_ENDPOINTS.GET.STUDENTS.endpoint;
+      rest.dataReshapeFn = API_ENDPOINTS.GET.STUDENTS.dataReshape;
+      rest.form = form;
+      rest.selectedStudents = studentsRef.current;
     }
 
-    console.log("opening new degree item");
+    if (task === "new-task-template" && selectedDiplomaRef.current) {
+      rest.apiEndpoint =
+        API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
+          selectedDiplomaRef.current.id
+        );
+      rest.selectedDiploma = selectedDiplomaRef.current;
+      rest.shortTemplatesList = data.data.shortTemplatesList;
+    }
+
     newItemCallback({
       e,
       ...rest,
-      selectedDiploma: selectedDiploma,
-      shortTemplatesList: data.data.shortTemplatesList,
     });
   };
 
@@ -352,8 +362,9 @@ export function ClassCreationController({
   //   // editable.style.setProperty("-webkit-user-modify", "read-only");
   // };
   // Get the current skills from the form
-  const currentTasks = new Set(form.watch("tasksValues") || []);
-  const currentStudents = new Set(form.watch("studentsValues") || []);
+
+  // console.log("Current Students => ", currentStudents);
+  console.log("Current Students in REF => ", studentsRef.current);
 
   return (
     <form
@@ -379,16 +390,27 @@ export function ClassCreationController({
         observedRefs={observedRefs}
         onOpenChange={handleOpening}
         onSelect={handleOnSelect}
-        onAddNewItem={newItemCallback}
+        onAddNewItem={handleNewItem}
       />
-      <ControlledDynamicTagList
-        form={form}
-        setRef={setRef}
-        {...inputControllers[3]}
-        observedRefs={observedRefs}
-        itemList={Array.from(currentStudents)}
-      />
-      {/* <CommandItemsForDialog /> */}
+      <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+        {Object.entries(studentsRef.current ?? []).map(
+          ([fullName, studentDetails]) => {
+            // const fullName = `${studentDetails.firstName} ${studentDetails.lastName}`;
+            return (
+              <Avatar key={studentDetails.id}>
+                <AvatarImage
+                  src={`https://github.com/${studentDetails.firstName}.png`}
+                  alt={`@${fullName}`}
+                />
+                <AvatarFallback>
+                  {studentDetails.firstName.slice(0, 1).toUpperCase()}
+                  {studentDetails.lastName.slice(0, 1).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            );
+          }
+        )}
+      </div>
       <Activity mode={isSelectedDiploma ? "visible" : "hidden"}>
         <ControlledDynamicTagList
           form={form}
@@ -403,7 +425,7 @@ export function ClassCreationController({
           onSelect={handleCommandSelection}
           onOpenChange={handleOpening}
           observedRefs={observedRefs}
-          onAddNewItem={handleNewItemCallback}
+          onAddNewItem={handleNewItem}
           commandHeadings={resultsCallback([
             fetchParams.contentId,
             fetchParams.url,
