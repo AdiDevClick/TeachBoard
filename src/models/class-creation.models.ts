@@ -45,6 +45,10 @@ export const classCreationSchema = z.object({
     .array(uuid("L'identifiant de la tâche doit être un UUID valide."))
     .nonempty("Au moins une tâche est requise."),
   students: z
-    .array(uuid("L'identifiant de l'élève doit être un UUID valide."))
-    .optional(),
+    .array(z.uuid("L'identifiant de l'élève doit être un UUID valide."))
+    .nonempty("La liste des étudiants ne peut pas être vide.")
+    .min(1, "La liste des étudiants ne peut pas être vide.")
+    .max(50, "La liste des étudiants ne peut pas dépasser 50 éléments.")
+    .nonoptional()
+    .describe("Identifiant unique pour l'étudiant"),
 });
