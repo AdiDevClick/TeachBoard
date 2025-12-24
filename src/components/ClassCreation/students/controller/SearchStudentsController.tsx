@@ -11,11 +11,15 @@ import { useCallback, useEffect } from "react";
  * Controller for searching and selecting students.
  * @param pageId - The unique identifier for the page/component using this controller
  * @param form - The form object managing the state of selected students
+ * @param selectedStudents - An object containing currently selected students
+ * @param formId - The unique identifier for the form
  * @returns A SearchStudentsController component
  */
 export function SearchStudentsController({
   pageId,
   form,
+  localForm,
+  selectedStudents,
   formId,
 }: Readonly<SearchStudentsControllerProps>) {
   const {
@@ -26,7 +30,7 @@ export function SearchStudentsController({
     setDialogOptions,
     openingCallback,
   } = useCommandHandler({
-    form,
+    form: localForm,
     pageId,
   });
 
@@ -49,6 +53,20 @@ export function SearchStudentsController({
       return data;
     }
 
+    if (selectedStudents.length > 0) {
+      cachedData[0].items.forEach((element) => {
+        if (element.id === undefined) return;
+        const itemIndex = selectedStudents.some(
+          ([_, details]) => details.id === element.id
+        );
+        if (itemIndex) {
+          element.isSelected = true;
+        } else {
+          element.isSelected = false;
+        }
+      });
+    }
+
     return cachedData;
   }, []);
 
@@ -65,25 +83,39 @@ export function SearchStudentsController({
    */
   const handleOnSelect = useCallback(
     (value: string, commandItemDetails: CommandItemType) => {
-      console.log(value, commandItemDetails);
-
       const studentId = commandItemDetails.id;
       const studentName =
         commandItemDetails.firstName + " " + commandItemDetails.lastName;
+      const isSelected = commandItemDetails.isSelected;
 
-      const localFormStudents = new Set(form.watch("students") || []);
-      const savedStudents = dialogOptions(pageId)?.selectedStudents || {};
+      if (studentId === undefined) return;
 
-      if (localFormStudents.has(studentId)) {
-        localFormStudents.delete(studentId);
+      const savedStudents = selectedStudents || {};
+      const studentsFormIds = new Set(form.watch("students") || []);
+
+      // if (!isSelected) {
+      if (studentsFormIds.has(studentId) || !isSelected) {
+        studentsFormIds.delete(studentId);
         delete savedStudents[studentName];
       } else {
-        localFormStudents.add(studentId);
+        studentsFormIds.add(studentId);
         savedStudents[studentName] = commandItemDetails;
       }
-
-      form.setValue("students", Array.from(localFormStudents), {
+      // Modify local form to trigger reactivity
+      localForm.setValue("students", Array.from(studentsFormIds), {
         shouldValidate: true,
+        shouldDirty: true,
+      });
+
+      // Modify main form to store final values and allow details retrieval for the display in the class creation component
+      form.setValue("students", Array.from(studentsFormIds), {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+
+      form.setValue("studentsValues", Array.from(savedStudents).entries(), {
+        shouldValidate: true,
+        shouldDirty: true,
       });
 
       setDialogOptions(pageId, {
@@ -91,7 +123,7 @@ export function SearchStudentsController({
         // Full details for further use
         selectedStudents: savedStudents,
         // Convenient for further filtering without touching the form values
-        searchState: localFormStudents,
+        searchState: studentsFormIds,
       });
     },
     []
@@ -111,8 +143,9 @@ export function SearchStudentsController({
     metaData.dataReshapeFn = API_ENDPOINTS.GET.STUDENTS.dataReshape;
     metaData.apiEndpoint = API_ENDPOINTS.GET.STUDENTS.endpoint;
     metaData.task = pageId;
+    metaData.form = form;
 
-    openingCallback(open, metaData, null);
+    openingCallback(true, metaData, null);
   }, []);
 
   return (
@@ -131,7 +164,7 @@ export function SearchStudentsController({
       <form
         id={formId}
         className="display-none"
-        onSubmit={form.handleSubmit(handleSubmit)}
+        onSubmit={localForm.handleSubmit(handleSubmit)}
       />
     </>
   );
