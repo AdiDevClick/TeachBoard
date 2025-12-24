@@ -1,8 +1,8 @@
 import { SearchStudentsController } from "@/components/ClassCreation/students/controller/SearchStudentsController.tsx";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import {
-  searchStudentsSchema,
   type SearchStudentsFormSchema,
+  searchStudentsSchema,
 } from "@/models/search-students.models.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
@@ -27,24 +27,25 @@ function SearchStudents({
   modalMode = true,
   ...props
 }) {
-  const form = useForm<SearchStudentsFormSchema>({
+  const localForm = useForm<SearchStudentsFormSchema>({
     resolver: zodResolver(searchStudentsSchema),
     mode: "onTouched",
     defaultValues: {
-      students: [],
+      students: props.form?.watch("students") ?? [],
     },
   });
+
   const formId = pageId + "-form";
 
   const commonProps = useMemo(
     () => ({
       pageId,
-      form,
       formId,
+      localForm,
       modalMode,
       footerProps: {
         ...footerProps,
-        formState: form.formState,
+        formState: localForm.formState,
         formId,
       },
       titleProps,
