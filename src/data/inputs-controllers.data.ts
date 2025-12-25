@@ -133,12 +133,18 @@ export const classCreationInputControllers = [
     // The "students" field can hold an array of selected student ids (or similar)
     name: "students",
     label: "Elèves",
-    task: "add-students",
     placeholder: "Sélectionnez...",
     creationButtonText: "Ajouter des élèves",
-    // useCommands: false,
     fullWidth: true,
     task: "search-students",
+    useButtonAddNew: true,
+  },
+  {
+    name: "principalTeacher",
+    label: "Professeur principal",
+    task: "search-teacher",
+    placeholder: "Sélectionnez...",
+    creationButtonText: "Ajoutez un professeur principal",
     useButtonAddNew: true,
   },
   {
