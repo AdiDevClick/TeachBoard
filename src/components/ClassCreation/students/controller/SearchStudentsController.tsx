@@ -22,17 +22,12 @@ export function SearchStudentsController({
   selectedStudents,
   formId,
 }: Readonly<SearchStudentsControllerProps>) {
-  const {
-    fetchParams,
-    data,
-    closeDialog,
-    dialogOptions,
-    setDialogOptions,
-    openingCallback,
-  } = useCommandHandler({
-    form: localForm,
-    pageId,
-  });
+  const { fetchParams, data, closeDialog, openingCallback } = useCommandHandler(
+    {
+      form: localForm,
+      pageId,
+    }
+  );
 
   const queryClient = useQueryClient();
 
@@ -42,7 +37,6 @@ export function SearchStudentsController({
    * @description Checks React Query cache for existing data before falling back to fetched data.
    */
   const resultsCallback = useCallback((keys: any) => {
-    // saveKeys(keys, cachedKeysRef);
     const cachedData = queryClient.getQueryData(keys ?? []);
 
     if (DEV_MODE && !NO_CACHE_LOGS) {
