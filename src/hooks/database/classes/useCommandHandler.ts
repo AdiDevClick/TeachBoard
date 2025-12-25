@@ -32,6 +32,7 @@ export function useCommandHandler({
     openDialog,
     closeDialog,
     dialogOptions,
+    onOpenChange,
     openedDialogs,
     setDialogOptions,
   } = useDialog();
@@ -41,19 +42,27 @@ export function useCommandHandler({
   const hasStartedCreation = useRef(false);
   const postVariables = useRef<MutationVariables>(null!);
 
+  /**
+   * Handle adding a new item/feature
+   *
+   * @description Opens the dialog for creating a new item with appropriate parameters
+   *
+   * @param e - The event that triggered the addition
+   * @param rest - Additional parameters for the new item to pass to the dialog as options
+   */
   const handleAddNewItem = useCallback(
     ({ e, ...rest }: HandleAddNewItemParams) => {
       if (DEV_MODE && !NO_CACHE_LOGS) {
         console.log("Add new item triggered", {
-          apiEndpoint: rest.apiEndpoint,
-          task: rest.task,
+          ...rest,
         });
       }
-      console.log("opening new degree item");
 
-      openDialog(e, rest.task, {
+      const task = rest.task ?? pageId;
+
+      openDialog(e, task, {
         ...rest,
-        queryKey: [rest.task, rest.apiEndpoint],
+        queryKey: [task, rest.apiEndpoint],
       });
     },
     []
@@ -190,6 +199,7 @@ export function useCommandHandler({
     openDialog,
     closeDialog,
     dialogOptions,
+    onOpenChange,
     postVariables,
     newItemCallback: handleAddNewItem,
     submitCallback: handleSubmit,
