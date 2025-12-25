@@ -1,4 +1,5 @@
 import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
+import { resetSelectedItemsFromCache } from "@/components/ClassCreation/functions/class-creation.functions.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
@@ -52,6 +53,7 @@ export function ClassCreationController({
   // const currentStudents = Array.from(form.watch("studentsValues") || []);
   const currentTasks = new Set(form.watch("tasksValues") || []);
   const studentsRef = useRef(null!);
+  const primaryTeacherRef = useRef(null!);
   const queryClient = useQueryClient();
 
   const {
@@ -85,6 +87,7 @@ export function ClassCreationController({
    */
   useEffect(() => {
     studentsRef.current = Object.values(form.watch("studentsValues") || []);
+    primaryTeacherRef.current = form.watch("primaryTeacherValue") || [];
   }, [form]);
 
   /**
@@ -143,6 +146,20 @@ export function ClassCreationController({
   }, []);
 
   /**
+   * Reset students selection in cache when modal closes
+   *
+   * @description Resets the isSelected flag for all students in the cache data
+   * when the class-creation modal is closed.
+   */
+  const resetPrimaryTeacherSelection = useCallback(() => {
+    resetSelectedItemsFromCache(
+      cachedKeysRef.current["search-primaryteacher"],
+      primaryTeacherRef.current,
+      queryClient
+    );
+  }, []);
+
+  /**
    * Handle modal close
    *
    * @description Detects when the modal closes and resets the students selection in cache
@@ -156,8 +173,20 @@ export function ClassCreationController({
     if (Object.entries(studentsRef.current ?? {}).length > 0) {
       resetStudentsSelection();
     }
+
+    // If modal was just closed, reset primary teacher selection
+    if (Object.entries(primaryTeacherRef.current ?? {}).length > 0) {
+      resetPrimaryTeacherSelection();
+    }
   }, [openedDialogs]);
 
+  /**
+   * Retrieve results from cache or fetched data
+   * @description Checks React Query cache for existing data before falling back to fetched data.
+   *
+   * @param keys - The query keys to retrieve cached data for
+   * @return The cached data if available, otherwise the fetched data
+   */
   const resultsCallback = useCallback((keys: any) => {
     const cachedData = queryClient.getQueryData(keys ?? []);
 
@@ -196,6 +225,14 @@ export function ClassCreationController({
     openingCallback(open, metaData, inputControllers);
   };
 
+  /**
+   * Handle Class Creation form submission
+   *
+   * @description Provided API endpoint and data reshaping function
+   * in order to call the submit callback correctly.
+   *
+   * @param variables - The form data to submit
+   */
   const handleSubmit = (variables: DiplomaCreationFormSchema) => {
     submitCallback(
       variables,
@@ -218,6 +255,13 @@ export function ClassCreationController({
     }
   }, [observedRefs, form, pageId]);
 
+  /**
+   * Handle command selection from PopoverFieldWithCommands
+   * @description Updates the form values based on selected command items.
+   *
+   * @param value - The value of the selected command item
+   * @param commandItemDetails - The details of the selected command item
+   */
   const handleCommandSelection = (
     value: string,
     commandItemDetails: CommandItemType
@@ -239,11 +283,24 @@ export function ClassCreationController({
     form.setValue("tasks", Array.from(tasks), { shouldValidate: true });
   };
 
+  /**
+   * Handle command selection from PopoverFieldWithControllerAndCommandsList
+   * @description Updates the selected diploma reference and selection state.
+   *
+   * @param value - The value of the selected command item
+   * @param commandItem - The details of the selected command item
+   */
   const handleOnSelect = (value: string, commandItem: CommandItemType) => {
     selectedDiplomaRef.current = commandItem;
     setIsSelectedDiploma(!!commandItem);
   };
 
+  /**
+   * Handle adding a new item
+   *
+   * @param e - The event triggering the new item addition
+   * @param rest - Additional parameters related to the new item
+   */
   const handleNewItem = ({ e, ...rest }: HandleAddNewItemParams) => {
     if (DEV_MODE && !NO_CACHE_LOGS) {
       console.log("Add new item triggered", {
@@ -260,6 +317,14 @@ export function ClassCreationController({
       rest.dataReshapeFn = API_ENDPOINTS.GET.STUDENTS.dataReshape;
       rest.form = form;
       rest.selectedStudents = studentsRef.current;
+      saveKeys([task, rest.apiEndpoint], cachedKeysRef);
+    }
+
+    if (task === "search-primaryteacher") {
+      rest.apiEndpoint = API_ENDPOINTS.GET.TEACHERS.endpoint;
+      rest.dataReshapeFn = API_ENDPOINTS.GET.TEACHERS.dataReshape;
+      rest.form = form;
+      rest.selectedPrimaryTeacher = primaryTeacherRef.current;
       saveKeys([task, rest.apiEndpoint], cachedKeysRef);
     }
 
@@ -465,27 +530,23 @@ export function ClassCreationController({
       />
       <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
         {Object.entries(studentsRef.current ?? []).map(
-          ([fullName, studentDetails]) => {
-            // const fullName = `${studentDetails.firstName} ${studentDetails.lastName}`;
-            return (
-              <Avatar key={studentDetails.id}>
-                <AvatarImage
-                  src={`https://github.com/${studentDetails.firstName}.png`}
-                  alt={`@${fullName}`}
-                />
-                <AvatarFallback>
-                  {studentDetails.firstName.slice(0, 1).toUpperCase()}
-                  {studentDetails.lastName.slice(0, 1).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-            );
-          }
+          ([fullName, studentDetails]) => (
+            <Avatar key={studentDetails.id}>
+              <AvatarImage
+                src={`https://github.com/${studentDetails.firstName}.png`}
+                alt={`@${fullName}`}
+              />
+              <AvatarFallback>
+                {studentDetails.firstName.slice(0, 1).toUpperCase()}
+                {studentDetails.lastName.slice(0, 1).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          )
         )}
       </div>
       <PopoverFieldWithControllerAndCommandsList
         items={inputControllers.slice(5, 6)}
         form={form}
-        // id={`${pageId}-year`}
         setRef={setRef}
         commandHeadings={resultsCallback([
           fetchParams.contentId,
@@ -496,6 +557,22 @@ export function ClassCreationController({
         onSelect={handleOnSelect}
         onAddNewItem={handleNewItem}
       />
+      <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+        {Object.entries(primaryTeacherRef.current ?? []).map(
+          ([fullName, teacherDetails]) => (
+            <Avatar key={teacherDetails.id}>
+              <AvatarImage
+                src={`https://github.com/${teacherDetails.firstName}.png`}
+                alt={`@${fullName}`}
+              />
+              <AvatarFallback>
+                {teacherDetails.firstName.slice(0, 1).toUpperCase()}
+                {teacherDetails.lastName.slice(0, 1).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          )
+        )}
+      </div>
       <Activity mode={isSelectedDiploma ? "visible" : "hidden"}>
         <ControlledDynamicTagList
           form={form}
