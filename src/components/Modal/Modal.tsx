@@ -118,6 +118,13 @@ export function Modal({
       popState = true;
     }
 
+    /**
+     * Case 2 : Normal Forward +
+     *
+     * @description Modal is opened via forward navigation +
+     * Browser should handle the history change itself
+     * and modal URL is now the current URL.
+     */
     if (!modalState.isOpen && location.pathname === modalURL) {
       popState = false;
     }
