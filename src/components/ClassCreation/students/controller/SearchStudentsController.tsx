@@ -53,20 +53,6 @@ export function SearchStudentsController({
       return data;
     }
 
-    if (selectedStudents.length > 0) {
-      cachedData[0].items.forEach((element) => {
-        if (element.id === undefined) return;
-        const itemIndex = selectedStudents.some(
-          ([_, details]) => details.id === element.id
-        );
-        if (itemIndex) {
-          element.isSelected = true;
-        } else {
-          element.isSelected = false;
-        }
-      });
-    }
-
     return cachedData;
   }, []);
 
@@ -90,16 +76,15 @@ export function SearchStudentsController({
 
       if (studentId === undefined) return;
 
-      const savedStudents = selectedStudents || {};
       const studentsFormIds = new Set(form.watch("students") || []);
 
       // if (!isSelected) {
       if (studentsFormIds.has(studentId) || !isSelected) {
         studentsFormIds.delete(studentId);
-        delete savedStudents[studentName];
+        delete selectedStudents[studentName];
       } else {
         studentsFormIds.add(studentId);
-        savedStudents[studentName] = commandItemDetails;
+        selectedStudents[studentName] = commandItemDetails;
       }
       // Modify local form to trigger reactivity
       localForm.setValue("students", Array.from(studentsFormIds), {
@@ -107,23 +92,15 @@ export function SearchStudentsController({
         shouldDirty: true,
       });
 
-      // Modify main form to store final values and allow details retrieval for the display in the class creation component
+      // Modify main form to store final values and allow details retrieval to allow avatar display in the class creation component
       form.setValue("students", Array.from(studentsFormIds), {
         shouldValidate: true,
         shouldDirty: true,
       });
 
-      form.setValue("studentsValues", Array.from(savedStudents).entries(), {
+      form.setValue("studentsValues", Array.from(selectedStudents).entries(), {
         shouldValidate: true,
         shouldDirty: true,
-      });
-
-      setDialogOptions(pageId, {
-        ...dialogOptions(pageId),
-        // Full details for further use
-        selectedStudents: savedStudents,
-        // Convenient for further filtering without touching the form values
-        searchState: studentsFormIds,
       });
     },
     []
@@ -139,7 +116,7 @@ export function SearchStudentsController({
    * @description Sets up the fetch parameters for retrieving students and triggers the fetch on component mount.
    */
   useEffect(() => {
-    const metaData = dialogOptions(pageId)?.metaData || {};
+    const metaData = {};
     metaData.dataReshapeFn = API_ENDPOINTS.GET.STUDENTS.dataReshape;
     metaData.apiEndpoint = API_ENDPOINTS.GET.STUDENTS.endpoint;
     metaData.task = pageId;
