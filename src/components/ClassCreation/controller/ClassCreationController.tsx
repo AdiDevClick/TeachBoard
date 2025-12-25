@@ -51,8 +51,9 @@ export function ClassCreationController({
   const [isSelectedDiploma, setIsSelectedDiploma] = useState(false);
   // const currentStudents = Array.from(form.watch("studentsValues") || []);
   const currentTasks = new Set(form.watch("tasksValues") || []);
-
   const studentsRef = useRef(null!);
+  const queryClient = useQueryClient();
+
   const {
     error,
     isLoading,
@@ -66,10 +67,14 @@ export function ClassCreationController({
     openingCallback,
     dialogOptions,
     openedDialogs,
+    onOpenChange,
   } = useCommandHandler({
     form,
     pageId,
   });
+
+  const cachedKeysRef = useRef<unknown[]>([]);
+  const selectedDiplomaRef = useRef<CommandItemType | null>(null);
 
   /**
    * Sync studentsRef with form's studentsValues
@@ -82,13 +87,78 @@ export function ClassCreationController({
     studentsRef.current = Object.values(form.watch("studentsValues") || []);
   }, [form]);
 
-  const cachedKeysRef = useRef<unknown[]>([]);
-  const selectedDiplomaRef = useRef<CommandItemType | null>(null);
+  /**
+   * Reset students selection in cache when modal closes
+   *
+   * @description Resets the isSelected flag for all students in the cache data
+   * when the class-creation modal is closed.
+   */
+  const resetStudentsSelection = useCallback(() => {
+    const queryKey = cachedKeysRef.current["search-students"];
+    if (!queryKey) return;
 
-  const queryClient = useQueryClient();
+    const cachedData = queryClient.getQueryData(queryKey);
+    if (!cachedData || !Array.isArray(cachedData) || !cachedData[0]?.items)
+      return;
+
+    if (DEV_MODE && !NO_CACHE_LOGS) {
+      console.log("[Reset Students] Cached data structure:", cachedData);
+      console.log(
+        "[Reset Students] Items type:",
+        cachedData[0].items.constructor.name
+      );
+      console.log("[Reset Students] Students to reset:", studentsRef.current);
+    }
+
+    Object.values(studentsRef.current ?? []).forEach((studentDetails: any) => {
+      const items = cachedData[0].items;
+
+      if (DEV_MODE && !NO_CACHE_LOGS) {
+        console.log("[Reset Students] Looking for ID:", studentDetails.id);
+        console.log("[Reset Students] Items is Map:", items instanceof Map);
+        if (items instanceof Map) {
+          console.log("[Reset Students] Map keys:", Array.from(items.keys()));
+        } else if (Array.isArray(items)) {
+          console.log("[Reset Students] Array length:", items.length);
+        } else {
+          console.log("[Reset Students] Object keys:", Object.keys(items));
+        }
+      }
+
+      // Handle different data structures
+      let cachedItem;
+
+      if (Array.isArray(items)) {
+        cachedItem = items.find((item: any) => item.id === studentDetails.id);
+      }
+
+      if (DEV_MODE && !NO_CACHE_LOGS) {
+        console.log("[Reset Students] Found cached item:", cachedItem);
+      }
+
+      if (cachedItem) {
+        cachedItem.isSelected = false;
+      }
+    });
+  }, []);
+
+  /**
+   * Handle modal close
+   *
+   * @description Detects when the modal closes and resets the students selection in cache
+   */
+  useEffect(() => {
+    const isModalOpen = openedDialogs.includes(pageId);
+
+    if (isModalOpen) return;
+
+    // If modal was just closed, reset students selection
+    if (Object.entries(studentsRef.current ?? {}).length > 0) {
+      resetStudentsSelection();
+    }
+  }, [openedDialogs]);
 
   const resultsCallback = useCallback((keys: any) => {
-    saveKeys(keys, cachedKeysRef);
     const cachedData = queryClient.getQueryData(keys ?? []);
 
     if (DEV_MODE && !NO_CACHE_LOGS) {
@@ -190,6 +260,7 @@ export function ClassCreationController({
       rest.dataReshapeFn = API_ENDPOINTS.GET.STUDENTS.dataReshape;
       rest.form = form;
       rest.selectedStudents = studentsRef.current;
+      saveKeys([task, rest.apiEndpoint], cachedKeysRef);
     }
 
     if (task === "new-task-template" && selectedDiplomaRef.current) {
@@ -411,6 +482,20 @@ export function ClassCreationController({
           }
         )}
       </div>
+      <PopoverFieldWithControllerAndCommandsList
+        items={inputControllers.slice(5, 6)}
+        form={form}
+        // id={`${pageId}-year`}
+        setRef={setRef}
+        commandHeadings={resultsCallback([
+          fetchParams.contentId,
+          fetchParams.url,
+        ])}
+        observedRefs={observedRefs}
+        onOpenChange={handleOpening}
+        onSelect={handleOnSelect}
+        onAddNewItem={handleNewItem}
+      />
       <Activity mode={isSelectedDiploma ? "visible" : "hidden"}>
         <ControlledDynamicTagList
           form={form}
