@@ -1,26 +1,24 @@
 import z from "zod";
 
 const dataField = {
-  teacherValidUuidMessage:
-    "L'identifiant du professeur doit être un UUID valide.",
-  teachersNotEmptyMessage: "La liste des professeurs ne peut pas être vide.",
-  teachersMaxMessage:
-    "La liste des professeurs ne peut pas dépasser 2 éléments.",
-  teachersMinLength: 1,
-  teachersMaxLength: 2,
+  primaryTeacherValidUuidMessage:
+    "L'identifiant du professeur principal doit être un UUID valide.",
+  primaryTeachersNotEmptyMessage:
+    "L'identifiant du professeur principal ne peut pas être vide.",
 };
 
-const searchTeachersModel = (data: typeof dataField) =>
+const searchPrimaryTeacherModel = (data: typeof dataField) =>
   z.object({
-    teacher: z
-      .array(z.uuid(data.teacherValidUuidMessage))
-      .nonempty(data.teachersNotEmptyMessage)
-      .min(data.teachersMinLength, data.teachersNotEmptyMessage)
-      .max(data.teachersMaxLength, data.teachersMaxMessage)
+    primaryTeacherId: z
+      .uuid(data.primaryTeacherValidUuidMessage)
+      .nonempty(data.primaryTeachersNotEmptyMessage)
       .nonoptional()
       .describe("Identifiant unique pour le professeur"),
   });
 
-export type SearchTeachersFormSchema = z.infer<typeof searchTeachersSchema>;
+export type SearchPrimaryTeacherFormSchema = z.infer<
+  typeof SearchPrimaryTeacherSchema
+>;
 
-export const searchTeachersSchema = searchTeachersModel(dataField);
+export const SearchPrimaryTeacherSchema =
+  searchPrimaryTeacherModel(dataField);

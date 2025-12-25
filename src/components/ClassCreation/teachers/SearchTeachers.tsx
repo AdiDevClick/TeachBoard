@@ -1,8 +1,8 @@
-import { SearchTeachersController } from "@/components/ClassCreation/teachers/controller/SearchTeachersController.tsx";
+import { SearchPrimaryTeacherController } from "@/components/ClassCreation/teachers/controller/SearchTeachersController.tsx";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import {
-  type SearchTeachersFormSchema,
-  searchTeachersSchema,
+  type SearchPrimaryTeacherFormSchema,
+  SearchPrimaryTeacherSchema,
 } from "@/models/search-teachers.models.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
@@ -22,16 +22,16 @@ const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
  * @param pageId - The unique identifier for the page/component using this controller
  * @param modalMode - Whether the component is used in a modal dialog or not
  */
-export function SearchTeachers({
-  pageId = "search-teachers",
+export function SearchPrimaryTeacher({
+  pageId = "search-primaryteacher",
   modalMode = true,
   ...props
 }) {
-  const localForm = useForm<SearchTeachersFormSchema>({
-    resolver: zodResolver(searchTeachersSchema),
+  const localForm = useForm<SearchPrimaryTeacherFormSchema>({
+    resolver: zodResolver(SearchPrimaryTeacherSchema),
     mode: "onTouched",
     defaultValues: {
-      teacher: props.form?.watch("teacher") ?? [],
+      primaryTeacherId: props.form?.watch("primaryTeacherId"),
     },
   });
   const formId = pageId + "-form";
@@ -53,7 +53,9 @@ export function SearchTeachers({
     [props]
   );
 
-  return <SearchTeachersWithCard {...commonProps} />;
+  return <SearchPrimaryTeacherWithCard {...commonProps} />;
 }
 
-const SearchTeachersWithCard = withTitledCard(SearchTeachersController);
+const SearchPrimaryTeacherWithCard = withTitledCard(
+  SearchPrimaryTeacherController
+);

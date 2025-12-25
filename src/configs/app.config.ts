@@ -71,7 +71,7 @@ export type AppModalNames =
   | "new-task-template"
   | "new-task-item"
   | "search-students"
-  | "search-teacher";
+  | "search-primaryteacher";
 
 /**
  * Pages that do not require session checks

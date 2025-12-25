@@ -6,7 +6,7 @@ import DiplomaCreation from "@/components/ClassCreation/diploma/DiplomaCreation.
 import SearchStudents from "@/components/ClassCreation/students/SearchStudents.tsx";
 import TaskItem from "@/components/ClassCreation/task/task-item/TaskItem";
 import TaskTemplateCreation from "@/components/ClassCreation/task/task-template/TaskTemplateCreation";
-import { SearchTeachers } from "@/components/ClassCreation/teachers/SearchTeachers.tsx";
+import { SearchPrimaryTeacher } from "@/components/ClassCreation/teachers/SearchTeachers.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import LoginForm from "@/components/LoginForms/LoginForm.tsx";
 import { Modal, ModalWithSimpleAlert } from "@/components/Modal/Modal.tsx";
@@ -149,8 +149,8 @@ const modals = defineStrictModalsList([
     ...baseNonNavigationalProps,
   },
   {
-    modalName: "search-teacher",
-    modalContent: SearchTeachers,
+    modalName: "search-primaryteacher",
+    modalContent: SearchPrimaryTeacher,
     ...baseNonNavigationalProps,
   },
   // {

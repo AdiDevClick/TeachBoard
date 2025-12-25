@@ -1,12 +1,12 @@
-import type { SearchTeachers } from "@/components/ClassCreation/teachers/SearchTeachers.tsx";
-import type { SearchTeachersFormSchema } from "@/models/search-teachers.models.ts";
+import type { SearchPrimaryTeacher } from "@/components/ClassCreation/teachers/SearchTeachers.tsx";
+import type { SearchPrimaryTeacherFormSchema } from "@/models/search-teachers.models.ts";
 import type { FieldValues, useForm } from "react-hook-form";
 
-export type SearchTeachersControllerProps<
-  T extends FieldValues = SearchTeachersFormSchema
+export type SearchPrimaryTeacherControllerProps<
+  T extends FieldValues = SearchPrimaryTeacherFormSchema
 > = {
   form: ReturnType<typeof useForm<T>>;
   localForm: ReturnType<typeof useForm<T>>;
   formId: string;
   selectedTeacher?: Array<string>;
-} & Omit<Parameters<typeof SearchTeachers>[0], "modalMode">;
+} & Omit<Parameters<typeof SearchPrimaryTeacher>[0], "modalMode">;

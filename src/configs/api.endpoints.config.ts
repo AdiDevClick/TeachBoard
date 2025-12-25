@@ -9,6 +9,7 @@ const AUTH = `${BASE_API_URL}/auth`;
 const DEGREES = `${BASE_API_URL}/degrees`;
 const SKILLS = `${BASE_API_URL}/skills`;
 const STUDENTS = `${BASE_API_URL}/students`;
+const TEACHERS = `${BASE_API_URL}/teachers`;
 
 /**
  * API Endpoints Configuration
@@ -118,6 +119,26 @@ export const API_ENDPOINTS = Object.freeze({
             " "
           )
           .setProxyPropertyWithContent("newRole", "Etudiant")
+          .assign([
+            ["fullName", "value"],
+            ["fullName", "name"],
+            ["newRole", "email"],
+            ["img", "avatar"],
+          ])
+          .newShape(),
+    },
+    TEACHERS: {
+      endpoint: `${TEACHERS}/`,
+      dataReshape: (data: any) =>
+        dataReshaper(data)
+          .assignSourceTo("items")
+          .addToRoot({ groupTitle: "Tous" })
+          .createPropertyWithContentFromKeys(
+            ["firstName", "lastName"],
+            "fullName",
+            " "
+          )
+          .setProxyPropertyWithContent("newRole", "Enseignant")
           .assign([
             ["fullName", "value"],
             ["fullName", "name"],
