@@ -522,6 +522,7 @@ function ClassCreation({
       description: "",
       schoolYear: defaultSchoolYear,
       students: [],
+      primaryTeacherId: "",
     },
   });
   const commonProps = useMemo(
