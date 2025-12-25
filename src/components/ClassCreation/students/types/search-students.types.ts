@@ -6,5 +6,7 @@ export type SearchStudentsControllerProps<
   T extends FieldValues = SearchStudentsFormSchema
 > = {
   form: ReturnType<typeof useForm<T>>;
+  localForm: ReturnType<typeof useForm<T>>;
   formId: string;
+  selectedStudents?: Array<string>;
 } & Omit<Parameters<typeof SearchStudents>[0], "modalMode">;
