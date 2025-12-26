@@ -81,7 +81,7 @@ export function useCommandHandler({
 
     if (data) {
       if (DEV_MODE && !NO_QUERY_LOGS) {
-        console.debug("NewDegreeItem created:", data);
+        console.debug(pageId, " created:", data);
       }
       if (isSubmition) {
         postVariables.current = null;
@@ -104,7 +104,12 @@ export function useCommandHandler({
     (
       variables: MutationVariables,
       endpointUrl: string,
-      dataReshapeFn?: (data: any, cachedDatas?: unknown) => unknown
+      dataReshapeFn?: (
+        data: any,
+        cachedDatas?: unknown,
+        options?: any
+      ) => unknown,
+      reshapeOptions?: any
     ) => {
       if (DEV_MODE && !NO_CACHE_LOGS) {
         console.debug("useModuleCreation handleSubmit called", variables);
@@ -123,6 +128,7 @@ export function useCommandHandler({
         method: API_ENDPOINTS.POST.METHOD,
         contentId: options?.task ?? pageId,
         dataReshapeFn: dataReshapeFn ?? options?.dataReshapeFn,
+        reshapeOptions: reshapeOptions,
       }));
     },
     []
