@@ -143,6 +143,8 @@ export function StepOne({
       });
     }
 
+    rest.userId = user?.userId;
+
     newItemCallback({
       e,
       ...rest,
