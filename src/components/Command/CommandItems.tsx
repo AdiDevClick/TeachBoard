@@ -10,6 +10,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command.tsx";
 import {
   commandGroupContainsInvalid,
@@ -60,32 +61,35 @@ export function CommandItems(props: Readonly<CommandsProps>) {
               debugLogs("Rendering CommandGroup");
             }
             return (
-              <CommandGroup key={item.groupTitle} heading={item.groupTitle}>
-                <ListMapper items={item.items}>
-                  {(command) => {
-                    if (commandItemContainsInvalid(command)) {
-                      debugLogs("Rendering CommandItem");
-                    }
+              <>
+                <CommandGroup key={item.groupTitle} heading={item.groupTitle}>
+                  <ListMapper items={item.items}>
+                    {(command) => {
+                      if (commandItemContainsInvalid(command)) {
+                        debugLogs("Rendering CommandItem");
+                      }
 
-                    const itemDetails = {
-                      groupId: item.id,
-                      groupName: item.groupTitle,
-                    };
+                      const itemDetails = {
+                        groupId: item.id,
+                        groupName: item.groupTitle,
+                      };
 
-                    return (
-                      <CommandSelectionItem
-                        command={command}
-                        details={itemDetails}
-                        multiSelection={rest.multiSelection}
-                        selectedValue={selectedValue}
-                        avatarDisplay={avatarDisplay}
-                        onSelect={handleSelect}
-                        {...rest}
-                      />
-                    );
-                  }}
-                </ListMapper>
-              </CommandGroup>
+                      return (
+                        <CommandSelectionItem
+                          command={command}
+                          details={itemDetails}
+                          multiSelection={rest.multiSelection}
+                          selectedValue={selectedValue}
+                          avatarDisplay={avatarDisplay}
+                          onSelect={handleSelect}
+                          {...rest}
+                        />
+                      );
+                    }}
+                  </ListMapper>
+                </CommandGroup>
+                <CommandSeparator />
+              </>
             );
           }}
         </ListMapper>
