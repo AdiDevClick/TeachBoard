@@ -158,10 +158,33 @@ export const API_ENDPOINTS = Object.freeze({
     METHOD: "POST",
     CREATE_CLASS: `${BASE_API_URL}/classes`,
     AUTH: {
-      LOGIN: `${AUTH}/login`,
+      LOGIN: {
+        endpoint: `${AUTH}/login`,
+        dataReshape: (data: any, cachedDatas, options) => {
+          const user = data.user;
+          const session = data.session;
+          options.login({
+            userId: user.id,
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            name: user.firstName + " " + user.lastName,
+            email: user.email,
+            role: user.role,
+            token: session,
+            refreshToken: data.refreshToken,
+            avatar: user.avatar,
+            schoolName: user.schoolName,
+          });
+          return data;
+        },
+      },
       SIGNUP: `${AUTH}/signup`,
       PASSWORD_CREATION: `${AUTH}/password-creation`,
-      PASSWORD_RECOVERY: `${AUTH}/password-recovery`,
+      PASSWORD_RECOVERY: {
+        endpoint: `${AUTH}/password-recovery`,
+        dataReshape: (data: any, cachedDatas) => data,
+      },
       SESSION_CHECK: `${AUTH}/session`,
       LOGOUT: `${AUTH}/logout`,
     },
