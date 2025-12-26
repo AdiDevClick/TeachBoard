@@ -2,7 +2,7 @@ import { CommandItemsForComboBox } from "@/components/Command/CommandItems.tsx";
 import type { CommandsProps } from "@/components/Command/types/command.types.ts";
 import type { PopoverFieldProps } from "@/components/Popovers/types/popover.types.ts";
 import { Button } from "@/components/ui/button.tsx";
-import { SelectSeparator } from "@/components/ui/select.tsx";
+import { Separator } from "@/components/ui/separator.tsx";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { PlusIcon } from "lucide-react";
 import type { ComponentType } from "react";
@@ -42,7 +42,7 @@ function withComboBoxCommands(Wrapped: ComponentType) {
 
         {useButtonAddNew && task && (
           <>
-            <SelectSeparator />
+            <Separator />
             <Button
               variant="ghost"
               className="flex w-full items-center justify-between px-2 py-1.5 text-sm cursor-pointer"
