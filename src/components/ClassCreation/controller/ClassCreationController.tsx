@@ -95,92 +95,29 @@ export function ClassCreationController({
   }, [form]);
 
   /**
-   * Reset students selection in cache when modal closes
+   * Handle modal close behavior
    *
-   * @description Resets the isSelected flag for all students in the cache data
-   * when the class-creation modal is closed.
-   */
-  const resetStudentsSelection = useCallback(() => {
-    const queryKey = cachedKeysRef.current["search-students"];
-    if (!queryKey) return;
-
-    const cachedData = queryClient.getQueryData(queryKey);
-    if (!cachedData || !Array.isArray(cachedData) || !cachedData[0]?.items)
-      return;
-
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("[Reset Students] Cached data structure:", cachedData);
-      console.log(
-        "[Reset Students] Items type:",
-        cachedData[0].items.constructor.name
-      );
-      console.log("[Reset Students] Students to reset:", studentsRef.current);
-    }
-
-    Object.values(studentsRef.current ?? []).forEach((studentDetails: any) => {
-      const items = cachedData[0].items;
-
-      if (DEV_MODE && !NO_CACHE_LOGS) {
-        console.log("[Reset Students] Looking for ID:", studentDetails.id);
-        console.log("[Reset Students] Items is Map:", items instanceof Map);
-        if (items instanceof Map) {
-          console.log("[Reset Students] Map keys:", Array.from(items.keys()));
-        } else if (Array.isArray(items)) {
-          console.log("[Reset Students] Array length:", items.length);
-        } else {
-          console.log("[Reset Students] Object keys:", Object.keys(items));
-        }
-      }
-
-      // Handle different data structures
-      let cachedItem;
-
-      if (Array.isArray(items)) {
-        cachedItem = items.find((item: any) => item.id === studentDetails.id);
-      }
-
-      if (DEV_MODE && !NO_CACHE_LOGS) {
-        console.log("[Reset Students] Found cached item:", cachedItem);
-      }
-
-      if (cachedItem) {
-        cachedItem.isSelected = false;
-      }
-    });
-  }, []);
-
-  /**
-   * Reset students selection in cache when modal closes
-   *
-   * @description Resets the isSelected flag for all students in the cache data
-   * when the class-creation modal is closed.
-   */
-  const resetPrimaryTeacherSelection = useCallback(() => {
-    resetSelectedItemsFromCache(
-      cachedKeysRef.current["search-primaryteacher"],
-      primaryTeacherRef.current,
-      queryClient
-    );
-  }, []);
-
-  /**
-   * Handle modal close
-   *
-   * @description Detects when the modal closes and resets the students selection in cache
+   * @description Detects when the modal closes and resets the students & primary teacher selections  from the cache
    */
   useEffect(() => {
     const isModalOpen = openedDialogs.includes(pageId);
 
     if (isModalOpen) return;
 
-    // If modal was just closed, reset students selection
     if (Object.entries(studentsRef.current ?? {}).length > 0) {
-      resetStudentsSelection();
+      resetSelectedItemsFromCache(
+        cachedKeysRef.current["search-students"],
+        studentsRef.current,
+        queryClient
+      );
     }
 
-    // If modal was just closed, reset primary teacher selection
     if (Object.entries(primaryTeacherRef.current ?? {}).length > 0) {
-      resetPrimaryTeacherSelection();
+      resetSelectedItemsFromCache(
+        cachedKeysRef.current["search-primaryteacher"],
+        primaryTeacherRef.current,
+        queryClient
+      );
     }
   }, [openedDialogs]);
 
@@ -238,10 +175,15 @@ export function ClassCreationController({
    * @param variables - The form data to submit
    */
   const handleSubmit = (variables: ClassCreationFormSchema) => {
+    const yearVariable = variables.schoolYear
+      .split(" - ")
+      .map((s) => s.trim())
+      .join("-");
+    variables.schoolYear = yearVariable;
     submitCallback(
       variables,
-      API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint,
-      API_ENDPOINTS.POST.CREATE_DIPLOMA.dataReshape
+      API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
+      API_ENDPOINTS.POST.CREATE_CLASS.dataReshape
     );
   };
 
@@ -289,14 +231,18 @@ export function ClassCreationController({
 
   /**
    * Handle command selection from PopoverFieldWithControllerAndCommandsList
+   *
    * @description Updates the selected diploma reference and selection state.
    *
    * @param value - The value of the selected command item
    * @param commandItem - The details of the selected command item
    */
   const handleOnSelect = (value: string, commandItem: CommandItemType) => {
-    selectedDiplomaRef.current = commandItem;
-    setIsSelectedDiploma(!!commandItem);
+    if (form.watch("degreeConfigId") !== commandItem.id) {
+      selectedDiplomaRef.current = commandItem;
+      setIsSelectedDiploma(!!commandItem);
+      form.setValue("degreeConfigId", commandItem.id, { shouldValidate: true });
+    }
   };
 
   /**
@@ -345,6 +291,12 @@ export function ClassCreationController({
       e,
       ...rest,
     });
+  };
+
+  const handleOnYearSelect = (value: string, commandItem: CommandItemType) => {
+    if (form.watch("schoolYear") !== value) {
+      form.setValue("schoolYear", value, { shouldValidate: true });
+    }
   };
 
   // handleRoleClick removed (popovers handle toggle via onOpenChange)
@@ -609,6 +561,7 @@ export function ClassCreationController({
         defaultValue={defaultSchoolYear}
         label="Année scolaire"
         id={`${pageId}-schoolYear`}
+        onValueChange={handleOnYearSelect}
       >
         <ListMapper items={years}>
           <NonLabelledGroupItem />
