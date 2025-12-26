@@ -19,6 +19,7 @@ const defaultStateParameters: FetchParams = {
   headers: undefined,
   method: API_ENDPOINTS.GET.METHOD,
   dataReshapeFn: undefined,
+  reshapeOptions: undefined,
   onSuccess: undefined,
   onError: undefined,
   silent: false,
@@ -76,7 +77,8 @@ export function useFetch() {
         const cachingDatas = fetchParams.dataReshapeFn
           ? fetchParams.dataReshapeFn(
               response.data,
-              queryClient.getQueriesData({ queryKey: cachedKey })
+              queryClient.getQueriesData({ queryKey: cachedKey }),
+              fetchParams.reshapeOptions
             )
           : response.data;
 
