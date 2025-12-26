@@ -140,7 +140,7 @@ export const classCreationInputControllers = [
     useButtonAddNew: true,
   },
   {
-    name: "principalTeacher",
+    name: "primaryTeacherId",
     label: "Professeur principal",
     task: "search-primaryteacher",
     placeholder: "Sélectionnez...",
