@@ -522,7 +522,10 @@ function ClassCreation({
       description: "",
       schoolYear: defaultSchoolYear,
       students: [],
+      degreeConfigId: "",
+      userId: props.userId ?? "",
       primaryTeacherId: "",
+      tasks: [],
     },
   });
   const commonProps = useMemo(
