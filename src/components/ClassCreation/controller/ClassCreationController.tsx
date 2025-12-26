@@ -55,7 +55,7 @@ export function ClassCreationController({
   const [isYearOpened, setIsYearOpened] = useState(false);
   const [isSelectedDiploma, setIsSelectedDiploma] = useState(false);
   // const currentStudents = Array.from(form.watch("studentsValues") || []);
-  const currentTasks = new Set(form.watch("tasksValues") || []);
+  const tasksRef = useRef<Set<unknown>>(null!);
   const studentsRef = useRef(null!);
   const primaryTeacherRef = useRef(null!);
   const queryClient = useQueryClient();
@@ -92,6 +92,7 @@ export function ClassCreationController({
   useEffect(() => {
     studentsRef.current = Object.values(form.watch("studentsValues") || []);
     primaryTeacherRef.current = form.watch("primaryTeacherValue") || [];
+    tasksRef.current = new Set(form.watch("tasksValues") || []);
   }, [form]);
 
   /**
@@ -215,14 +216,14 @@ export function ClassCreationController({
     const taskTemplateId = commandItemDetails.id;
     const tasks = new Set(form.watch("tasks") || []);
 
-    if (currentTasks.has(value)) {
+    if (tasksRef.current?.has(value)) {
       tasks.delete(taskTemplateId);
-      currentTasks.delete(value);
+      tasksRef.current.delete(value);
     } else {
-      currentTasks.add(value);
+      tasksRef.current.add(value);
       tasks.add(taskTemplateId);
     }
-    form.setValue("tasksValues", Array.from(currentTasks), {
+    form.setValue("tasksValues", Array.from(tasksRef.current), {
       shouldValidate: true,
     });
 
@@ -242,6 +243,8 @@ export function ClassCreationController({
       selectedDiplomaRef.current = commandItem;
       setIsSelectedDiploma(!!commandItem);
       form.setValue("degreeConfigId", commandItem.id, { shouldValidate: true });
+      form.setValue("tasks", [], { shouldValidate: true });
+      tasksRef.current = new Set();
     }
   };
 
@@ -535,7 +538,7 @@ export function ClassCreationController({
           setRef={setRef}
           {...inputControllers[2]}
           observedRefs={observedRefs}
-          itemList={Array.from(currentTasks)}
+          itemList={Array.from(tasksRef.current || [])}
         />
         <PopoverFieldWithCommands
           multiSelection
