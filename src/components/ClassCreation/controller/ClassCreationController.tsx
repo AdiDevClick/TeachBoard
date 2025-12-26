@@ -19,8 +19,11 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { classCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
-import type { ClassCreationInputItem } from "@/models/class-creation.models.ts";
-import type { DiplomaCreationFormSchema } from "@/models/diploma-creation.models.ts";
+import { useAppStore } from "@/hooks/store/AppStore.ts";
+import type {
+  ClassCreationFormSchema,
+  ClassCreationInputItem,
+} from "@/models/class-creation.models.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { Activity, useCallback, useEffect, useRef, useState } from "react";
@@ -47,6 +50,7 @@ export function ClassCreationController({
   formId,
   ...props
 }: Readonly<PageWithControllers<ClassCreationInputItem>>) {
+  const user = useAppStore((state) => state.user);
   const [state, setState] = useState(defaultState);
   const [isYearOpened, setIsYearOpened] = useState(false);
   const [isSelectedDiploma, setIsSelectedDiploma] = useState(false);
@@ -233,7 +237,7 @@ export function ClassCreationController({
    *
    * @param variables - The form data to submit
    */
-  const handleSubmit = (variables: DiplomaCreationFormSchema) => {
+  const handleSubmit = (variables: ClassCreationFormSchema) => {
     submitCallback(
       variables,
       API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint,
