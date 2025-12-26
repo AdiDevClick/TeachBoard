@@ -132,7 +132,7 @@ export function VerticalFieldSelect({
       getLastSelectedItemValue: () => value,
       getLastCommandValue: () => lastCommandValueRef.current,
     };
-    if (typeof value === "string") onValueChange?.(value);
+    onValueChange?.(value);
   };
 
   // console.log(props?.onSelect(), "PROPS ON SELECT");
