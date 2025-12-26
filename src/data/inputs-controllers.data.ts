@@ -334,3 +334,18 @@ export const taskItemInputControllers = [
     placeholder: "Ex: La tâche consiste à ...",
   },
 ] satisfies Parameters<typeof TaskItem>[0]["inputControllers"];
+
+export const stepOneInputControllers = [
+  {
+    name: "classe",
+    label: "Classes disponibles",
+    type: "text",
+    placeholder: "Choisir...",
+    apiEndpoint: API_ENDPOINTS.GET.CLASSES.endPoints.ALL,
+    dataReshapeFn: API_ENDPOINTS.GET.CLASSES.dataReshape,
+    task: "class-creation",
+    useCommands: true,
+    creationButtonText: "Créer une classe",
+    useButtonAddNew: true,
+  },
+];
