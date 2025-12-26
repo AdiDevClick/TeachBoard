@@ -4,10 +4,14 @@ export interface User {
   userId: string;
   name: string;
   email: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
   role: string;
   token: string;
   avatar: string;
   refreshToken: string;
+  schoolName: string;
 }
 
 // export interface UserDisplayData {
