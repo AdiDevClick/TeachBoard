@@ -10,6 +10,7 @@ const DEGREES = `${BASE_API_URL}/degrees`;
 const SKILLS = `${BASE_API_URL}/skills`;
 const STUDENTS = `${BASE_API_URL}/students`;
 const TEACHERS = `${BASE_API_URL}/teachers`;
+const CLASSES = `${BASE_API_URL}/classes`;
 
 /**
  * API Endpoints Configuration
@@ -31,16 +32,18 @@ export const API_ENDPOINTS = Object.freeze({
     METHOD: "GET",
     CLASSES: {
       endPoints: {
-        ALL: `${BASE_API_URL}/classes/`,
+        ALL: `${CLASSES}/`,
         BY_ID: (id: number | string) => `${BASE_API_URL}/classes/${id}`,
       },
       dataReshape: (data: any) =>
         // use "code" and transform to "value" for selects
         // data.classes is the actual array of classes from the server response
         dataReshaper(data)
-          .rename("classes", "items")
-          .addToRoot({ groupTitle: "Tous" })
-          // .assign([["code", "value"]])
+          // .rename("classes", "items")
+          .transformTuplesToGroups("groupTitle", "items")
+          // .assignSourceTo("items")
+          // .addToRoot({ groupTitle: "Tous" })
+          .assign([["name", "value"]])
           .newShape(),
     },
     SKILLS: {
@@ -156,7 +159,16 @@ export const API_ENDPOINTS = Object.freeze({
   },
   POST: {
     METHOD: "POST",
-    CREATE_CLASS: `${BASE_API_URL}/classes`,
+    CREATE_CLASS: {
+      endpoint: `${CLASSES}`,
+      dataReshape: (data: any, cachedDatas: unknown) => {
+        const newItem = {
+          ...data,
+          value: data?.name,
+        };
+        return reshapeItemToCachedData(newItem, cachedDatas, "Tous");
+      },
+    },
     AUTH: {
       LOGIN: {
         endpoint: `${AUTH}/login`,
