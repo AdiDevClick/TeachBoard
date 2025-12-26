@@ -5,7 +5,6 @@ import {
   passwordRecoveryInputControllers,
 } from "@/data/inputs-controllers.data.ts";
 
-import { useLogin } from "@/hooks/database/login/useLogin.ts";
 import {
   formSchema,
   type LoginFormSchema,
@@ -26,9 +25,10 @@ const titleProps = {
 
 const resetPasswordButtonText = "Réinitialiser le mot de passe";
 const backToLoginLinkText = "Retour à la connexion";
+const forgotPasswordLinkText = "Mot de passe oublié ?";
 const loginLinkTo = "/login";
 
-let pwForgottenLinkText = "Mot de passe oublié ?";
+let defaultText = forgotPasswordLinkText;
 let pwForgottenLinkTo = "/forgot-password";
 let buttonText = "Se connecter";
 
@@ -45,13 +45,12 @@ let buttonText = "Se connecter";
  * @returns
  */
 function LoginForm({
-  pageId = "login-form-page-card",
+  pageId = "login",
   modalMode = false,
   inputControllers = inputLoginControllers,
   ...props
 }: Readonly<PageWithControllers<LoginInputItem>>) {
   const [isPwForgotten, setIsPwForgotten] = useState(false);
-  const loginHooks = useLogin({ isPwForgotten });
 
   const schemaToUse = isPwForgotten ? pwRecoverySchema : formSchema;
 
@@ -65,9 +64,10 @@ function LoginForm({
   });
 
   let inputControllersToUse = inputControllers;
+  defaultText = forgotPasswordLinkText;
 
   if (isPwForgotten) {
-    pwForgottenLinkText = backToLoginLinkText;
+    defaultText = backToLoginLinkText;
     pwForgottenLinkTo = loginLinkTo;
     buttonText = resetPasswordButtonText;
     inputControllersToUse = passwordRecoveryInputControllers;
@@ -87,14 +87,13 @@ function LoginForm({
       displayFooter: false as const,
       inputControllers: inputControllersToUse,
       textToDisplay: {
-        pwForgottenLinkText,
+        defaultText,
         pwForgottenLinkTo,
         buttonText,
       },
-      loginHooks,
       ...props,
     }),
-    [form.formState, isPwForgotten]
+    [form.formState, isPwForgotten, props]
   );
 
   return <LoginFormWithCard {...commonProps} />;
