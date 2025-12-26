@@ -166,7 +166,7 @@ export const API_ENDPOINTS = Object.freeze({
           ...data,
           value: data?.name,
         };
-        return reshapeItemToCachedData(newItem, cachedDatas, "Tous");
+        return reshapeItemToCachedData(newItem, cachedDatas, data.degreeLevel);
       },
     },
     AUTH: {
