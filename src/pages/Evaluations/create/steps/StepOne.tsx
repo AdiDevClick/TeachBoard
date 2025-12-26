@@ -9,6 +9,7 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, USER_ACTIVITIES } from "@/configs/app.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
+import { useAppStore } from "@/hooks/store/AppStore.ts";
 import { wait } from "@/utils/utils";
 import { PlusIcon } from "lucide-react";
 import { useEffect, useState, type PointerEvent } from "react";
@@ -23,6 +24,7 @@ export function StepOne({
   readonly placeholder?: string;
 }) {
   const { openDialog } = useDialog();
+  const user = useAppStore((state) => state.user);
   const [selected, setSelected] = useState(false);
 
   const { onSubmit, isLoading, isLoaded, data, error, setFetchParams } =
@@ -38,7 +40,7 @@ export function StepOne({
    * @param e - The pointer event triggered on adding a class.
    */
   const onClassAdd = async (e: PointerEvent<HTMLDivElement>) => {
-    openDialog(e, "class-creation");
+    openDialog(e, "class-creation", { userId: user?.userId ?? "" });
     setSelected(true);
     await wait(150);
     setSelected(false);
