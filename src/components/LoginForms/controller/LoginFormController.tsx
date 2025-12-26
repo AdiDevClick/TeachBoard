@@ -1,4 +1,5 @@
 import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
+import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
 import { AppFieldDescriptionWithLink } from "@/components/Fields/AppFieldDescriptionWithLink.tsx";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
@@ -7,17 +8,16 @@ import type { LoginFormControllerProps } from "@/components/LoginForms/types/log
 import { Button } from "@/components/ui/button.tsx";
 import { Field, FieldGroup, FieldSeparator } from "@/components/ui/field.tsx";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
-import {
-  APP_REDIRECT_TIMEOUT_SUCCESS,
-  DEV_MODE,
-  NO_QUERY_LOGS,
-} from "@/configs/app.config.ts";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
 import { loginButtonsSvgs } from "@/configs/social.config.ts";
 import { inputLoginControllers } from "@/data/inputs-controllers.data.ts";
-import { useDialog } from "@/hooks/contexts/useDialog.ts";
+import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
-import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
-import { handleModalOpening, wait } from "@/utils/utils.ts";
+import type {
+  LoginFormSchema,
+  RecoveryFormSchema,
+} from "@/models/login.models.ts";
 import { startTransition, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -28,28 +28,28 @@ const toastId = "login-loading";
  *
  * @param className - Additional class names for the component
  * @param inputControllers - Array of input controller objects
- * @param modalMode - Flag to indicate if the form is in modal mode (default: false)
  * @param props - Additional props for the component
  */
 export function LoginFormController({
-  pageId = "login-form-page-card",
+  pageId,
   className = "grid gap-4",
   form,
   setIsPwForgotten,
   isPwForgotten,
   inputControllers = inputLoginControllers,
-  modalMode = false,
-  formId: formIdProp,
+  formId,
   textToDisplay,
-  loginHooks,
 }: Readonly<LoginFormControllerProps>) {
   const navigate = useNavigate();
   const { open, setOpen } = useSidebar();
-  const { closeDialog, openDialog, closeAllDialogs } = useDialog();
+  const login = useAppStore((state) => state.login);
   const user = useAppStore((state) => state.user);
-  const { data, onSubmit, isLoading, error } = loginHooks;
 
-  const { setRef } = useMutationObserver({});
+  const { error, isLoading, setRef, submitCallback, data, newItemCallback } =
+    useCommandHandler({
+      form,
+      pageId,
+    });
 
   /** Log user data on change (for development purposes) */
   useEffect(() => {
@@ -66,21 +66,6 @@ export function LoginFormController({
    * @description It will open the sidebar upon successful login and navigate to the home page.
    */
   useEffect(() => {
-    const resetFormAndTriggerNavigation = async () => {
-      await wait(APP_REDIRECT_TIMEOUT_SUCCESS);
-
-      // !! IMPORTANT !! - Use startTransition to avoid blocking UI updates
-      startTransition(() => {
-        if (!open) setOpen(true);
-        form.reset();
-        closeDialog(null, "login");
-      });
-
-      // Navigate ONLY after transitions
-      // Avoids UI jank and a React render warning
-      navigate("/", { replace: true });
-    };
-
     if (isLoading && !toast.getToasts().some((t) => t.id === toastId)) {
       toast.dismiss();
       toast.loading("Connexion en cours...", {
@@ -91,13 +76,24 @@ export function LoginFormController({
     if (error || data) {
       toast.dismiss(toastId);
       // If there's an error, show an error toast
+      if (error?.status === 400 || error?.status === 401) {
+        toast.error(
+          "Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations et réessayer."
+        );
+      }
     }
 
     if (data) {
-      resetFormAndTriggerNavigation();
+      // Navigate ONLY after transitions
+      // Avoids UI jank and a React render warning
+      startTransition(() => {
+        // await wait(APP_REDIRECT_TIMEOUT_SUCCESS);
+        if (!open) setOpen(true);
+        navigate("/", { replace: true });
+      });
 
       if (isPwForgotten) {
-        openDialog(null, "pw-recovery-email-sent");
+        newItemCallback({ e: null, task: "pw-recovery-email-sent" });
       } else {
         toast.dismiss(toastId);
         toast.success("Connexion réussie !", {
@@ -109,15 +105,38 @@ export function LoginFormController({
         console.debug("Query success in LoginForm", data);
       }
     }
-  }, [isLoading, error, data, open, modalMode]);
+  }, [isLoading, error, data, open]);
 
-  const formId = formIdProp ?? pageId + "-form";
+  const handleOnOpen = ({ e, ...rest }: HandleAddNewItemParams) => {
+    newItemCallback({ e, ...rest });
+  };
+
+  /**
+   * Handle Class Creation form submission
+   *
+   * @description Provided API endpoint and data reshaping function
+   * in order to call the submit callback correctly.
+   *
+   * @param variables - The form data to submit
+   */
+  const handleSubmit = (variables: LoginFormSchema | RecoveryFormSchema) => {
+    submitCallback(
+      variables,
+      isPwForgotten
+        ? API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.endpoint
+        : API_ENDPOINTS.POST.AUTH.LOGIN.endpoint,
+      isPwForgotten
+        ? API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.dataReshape
+        : API_ENDPOINTS.POST.AUTH.LOGIN.dataReshape,
+      { login }
+    );
+  };
 
   return (
     <form
       ref={(el) => setRef(el, { name: pageId, id: formId })}
       id={formId}
-      onSubmit={form.handleSubmit(onSubmit)}
+      onSubmit={form.handleSubmit(handleSubmit)}
       className={className}
     >
       <FieldGroup>
@@ -126,7 +145,7 @@ export function LoginFormController({
             <LoginButton
               ischild
               onClick={(e) => {
-                openDialog(e, "apple-login");
+                handleOnOpen({ e, task: "apple-login" });
               }}
             />
           </ListMapper>
@@ -145,7 +164,7 @@ export function LoginFormController({
               form,
             })
           }
-          linkText={textToDisplay.pwForgottenLinkText}
+          linkText={textToDisplay.defaultText}
           linkTo={textToDisplay.pwForgottenLinkTo}
         />
         <Field>
@@ -160,10 +179,9 @@ export function LoginFormController({
             linkText="Inscrivez-vous ici"
             linkTo="/signup"
             onClick={(e) =>
-              handleModalOpening({
+              handleOnOpen({
                 e,
-                dialogFns: { closeAllDialogs, openDialog },
-                modalName: "signup",
+                task: "signup",
               })
             }
           >
