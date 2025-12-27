@@ -1,3 +1,5 @@
+import { SimpleAvatarList } from "@/components/Avatar/SimpleAvatar.tsx";
+import { SimpleAddButtonWithToolTip } from "@/components/Buttons/SimpleAddButton.tsx";
 import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
 import { resetSelectedItemsFromCache } from "@/components/ClassCreation/functions/class-creation.functions.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
@@ -25,8 +27,16 @@ import type {
   ClassCreationInputItem,
 } from "@/models/class-creation.models.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
+import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { Activity, useCallback, useEffect, useRef, useState } from "react";
+import {
+  Activity,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+} from "react";
 
 const year = new Date().getFullYear();
 const years = yearsListRange(year, 5);
@@ -84,8 +94,10 @@ export function ClassCreationController({
 
   /**
    * Sync studentsRef with form's studentsValues
+   * Sync primaryTeacherRef with form's primaryTeacherValue
+   * Sync tasksRef with form's tasksValues
    *
-   * @description Updates the studentsRef whenever the form's studentsValues change.
+   * @description Updates the studentsRef, primaryTeacherRef, and tasksRef whenever the values change in the form.
    *
    * @remark This is necessary to keep the ref in sync with the form state, as refs do not trigger re-renders.
    */
@@ -296,6 +308,14 @@ export function ClassCreationController({
     });
   };
 
+  const handleAttendanceClick = (e: MouseEvent<HTMLButtonElement>, rest) => {
+    preventDefaultAndStopPropagation(e);
+
+    newItemCallback({
+      ...rest,
+    });
+  };
+
   const handleOnYearSelect = (value: string, commandItem: CommandItemType) => {
     if (form.watch("schoolYear") !== value) {
       form.setValue("schoolYear", value, { shouldValidate: true });
@@ -487,7 +507,22 @@ export function ClassCreationController({
         onSelect={handleOnSelect}
         onAddNewItem={handleNewItem}
       />
-      <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+      <SimpleAddButtonWithToolTip
+        toolTipText="Ajouter des étudiants"
+        onClick={handleAttendanceClick}
+      />
+      <SimpleAvatarList
+        items={Object.entries(studentsRef.current ?? []).map(
+          ([fullName, studentDetails]: any) => ({
+            src: `https://github.com/${studentDetails.firstName}.png`,
+            alt: `@${fullName}`,
+            fallback:
+              (studentDetails.firstName?.slice(0, 1).toUpperCase() || "") +
+              (studentDetails.lastName?.slice(0, 1).toUpperCase() || ""),
+          })
+        )}
+      />
+      {/* <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
         {Object.entries(studentsRef.current ?? []).map(
           ([fullName, studentDetails]) => (
             <Avatar key={studentDetails.id}>
@@ -502,7 +537,7 @@ export function ClassCreationController({
             </Avatar>
           )
         )}
-      </div>
+      </div> */}
       <PopoverFieldWithControllerAndCommandsList
         items={inputControllers.slice(5, 6)}
         form={form}
