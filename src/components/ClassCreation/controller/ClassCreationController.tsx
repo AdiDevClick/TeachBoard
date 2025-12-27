@@ -51,6 +51,20 @@ const defaultState = {
   // isEdited: false,  // removed - we handle edit state via isEditing and newText
 };
 
+/**
+ * ClassCreationController Component
+ *  
+ * @description This component handles the class creation form, including input management,
+ * command handling, and form submission.
+ * 
+ * @param modalMode - Indicates if the component is in modal mode
+ * @param inputControllers - The input controllers for the form
+ * @param pageId - The unique identifier for the page
+ * @param className - Additional class names for styling
+ * @param form - The form object for managing form state
+ * @param formId - The unique identifier for the form
+ * @param props - Additional props
+ */
 export function ClassCreationController({
   modalMode = true,
   inputControllers = classCreationInputControllers,
@@ -311,6 +325,12 @@ export function ClassCreationController({
   const handleAttendanceClick = (e: MouseEvent<HTMLButtonElement>, rest) => {
     preventDefaultAndStopPropagation(e);
 
+    const task = rest.task;
+    rest.form = form;
+
+    rest.selectedStudents = studentsRef.current;
+    saveKeys([task, rest.apiEndpoint], cachedKeysRef);
+
     newItemCallback({
       ...rest,
     });
@@ -509,7 +529,8 @@ export function ClassCreationController({
       />
       <SimpleAddButtonWithToolTip
         toolTipText="Ajouter des étudiants"
-        onClick={handleAttendanceClick}
+        onClick={(e) => handleAttendanceClick(e, { ...inputControllers[4] })}
+      
       />
       <SimpleAvatarList
         items={Object.entries(studentsRef.current ?? []).map(
