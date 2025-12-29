@@ -86,7 +86,11 @@ export function useCommandHandler({ form, pageId }: UseCommandHandlerParams) {
       }
       if (isSubmition) {
         postVariables.current = null;
-        form.reset();
+        // NOTE: form.reset() is intentionally NOT called here.
+        // The setRef callback in useMutationObserver calls setState during render,
+        // which causes "Cannot update a component while rendering" warnings.
+        // For navigation flows (like login), the form will be unmounted anyway.
+        // For dialog flows, the dialog closing will handle the form state.
         startTransition(() => {
           closeDialog(null, pageId);
         });
