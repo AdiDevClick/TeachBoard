@@ -133,14 +133,12 @@ export const classCreationInputControllers = [
     // The "students" field can hold an array of selected student ids (or similar)
     name: "students",
     label: "Elèves",
+    type: "button",
     apiEndpoint: API_ENDPOINTS.GET.STUDENTS.endpoint,
     dataReshapeFn: API_ENDPOINTS.GET.STUDENTS.dataReshape,
-    // placeholder: "Sélectionnez...",
     creationButtonText: "Ajouter des élèves",
-    tooltipText: "Ajouter des élèves à la classe",
-    // fullWidth: true,
+    toolTipText: "Ajouter des élèves",
     task: "search-students",
-    // useButtonAddNew: true,
   },
   {
     name: "primaryTeacherId",
@@ -149,6 +147,8 @@ export const classCreationInputControllers = [
     placeholder: "Sélectionnez...",
     creationButtonText: "Ajoutez un professeur principal",
     useButtonAddNew: true,
+    dataReshapeFn: API_ENDPOINTS.GET.TEACHERS.dataReshape,
+    apiEndpoint: API_ENDPOINTS.GET.TEACHERS.endpoint,
   },
   {
     name: "schoolYear",
