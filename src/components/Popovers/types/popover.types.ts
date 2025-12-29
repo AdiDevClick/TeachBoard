@@ -14,6 +14,8 @@ export type PopoverFieldProps = Omit<
   multiSelection?: boolean;
   /** Called when the popover opens or closes. Receives the open state and the meta data. */
   onOpenChange?: (open: boolean, meta?: Record<string, unknown>) => void;
+  /** When this key changes, the selectedValue state will be reset */
+  resetKey?: string | number;
 };
 
 export type PopoverFieldState = {
