@@ -8,17 +8,18 @@ import {
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
+import type { UseCommandHandlerParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { startTransition, useCallback, useEffect, useRef } from "react";
 
-export function useCommandHandler({
-  form,
-  pageId,
-}: {
-  form: any;
-  pageId: string;
-}) {
+/**
+ * Custom hook to handle command operations including data fetching, dialog management, and form submissions.
+ *
+ * @param form - The form instance to manage form state and actions
+ * @param pageId - The identifier for the current page or module
+ */
+export function useCommandHandler({ form, pageId }: UseCommandHandlerParams) {
   const {
     fetchParams,
     onSubmit,
