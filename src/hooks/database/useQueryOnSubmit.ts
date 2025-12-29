@@ -15,7 +15,7 @@ import type { ResponseInterface } from "@/types/AppResponseInterface";
 import { wait } from "@/utils/utils";
 import type { UseMutationOptions } from "@tanstack/react-query";
 import { useMutation, useQueryErrorResetBoundary } from "@tanstack/react-query";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 /**
@@ -38,6 +38,7 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
     onSuccess,
     onError,
     reset,
+    localState,
     abortController,
   } = queryKeysArr[1];
 
@@ -54,9 +55,7 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
       return onFetch<S, E>(fetchArgs);
     },
     onSuccess: (response) => {
-      abortController?.abort(
-        new Error("Request completed", { cause: response })
-      );
+      localState?.({ success: response, error: null });
       reset?.();
       onSuccess?.(response);
       if (silent) return;
@@ -64,6 +63,7 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
     },
     onError: (error) => {
       onError?.(error);
+      localState?.({ success: null, error: error });
       if (silent) return;
       onQueryError<E>(error);
     },
@@ -75,7 +75,7 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
  *
  * @description When a success occurs, an error reset is performed to clear any previous errors.
  *
- * @param queryKeysArr The query key descriptor containing task and descriptor.
+ * @param queryKeysArr An array where the first element is the task identifier string and the second element is the query descriptor object. {@link QueryKeyDescriptor}
  *
  * @example
  * ```tsx
@@ -100,9 +100,17 @@ export function useQueryOnSubmit<
 >(queryKeysArr: QueryKeyDescriptor<S, E>) {
   const { reset } = useQueryErrorResetBoundary();
   const abortControllerRef = useRef(new AbortController());
+  const [localState, setLocalState] = useState<{
+    error: FetchJSONError<E> | null;
+    success: FetchJSONSuccess<S> | null;
+  }>({ error: null, success: null });
 
   queryKeysArr[1].abortController ??= abortControllerRef.current;
   queryKeysArr[1].reset = reset;
+
+  queryKeysArr[1].localState = (next) => {
+    setLocalState(next);
+  };
 
   // Memoize mutation options to prevent observer recreation on every render
   const options = useMemo(
@@ -120,31 +128,39 @@ export function useQueryOnSubmit<
    */
   const onSubmit = useCallback(
     async (variables: MutationVariables = undefined) => {
+      // !! IMPORTANT !! Reset local error
       try {
+        if (localState.error !== null)
+          setLocalState({ success: null, error: null });
         if (DEV_MODE) {
-          console.debug("useQueryOnSubmit executing mutation");
+          console.debug("useQueryOnSubmit executing mutation", {
+            key: queryKeysArr?.[0],
+            url: queryKeysArr?.[1]?.url,
+            method: queryKeysArr?.[1]?.method,
+          });
         }
         return await mutateAsync(variables);
-      } catch (error) {
+      } catch (err) {
         // throw new Error(error);
-        if ((error as Error).message === "Request completed") {
-          return error.cause.success;
+        if ((err as Error).message === "Request completed") {
+          return err.cause.success;
         }
-        return await error;
-        // Errors are handled via the mutation onError callback.
+
         if (DEV_MODE) {
-          console.debug("useQueryOnSubmit mutation rejected", error);
+          console.debug("useQueryOnSubmit mutation rejected", err);
         }
+
+        return await err;
       }
     },
-    [mutateAsync]
+    [mutateAsync, localState.error, queryKeysArr]
   );
 
   return {
-    data,
+    data: localState.success ?? data,
     isLoading: isPending,
     isLoaded: !!data,
-    error,
+    error: localState.error ?? error,
     onSubmit,
   };
 }
@@ -188,11 +204,6 @@ async function onFetch<
     if (!response.ok || response === undefined) {
       const status = response.status;
       const message = getErrorMessage(status, response, retry);
-      // throw abortController?.abort(
-      //   new Error(message, {
-      //     cause: { ...response },
-      //   })
-      // );
       throw new Error(message, {
         cause: { ...response },
       });

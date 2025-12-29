@@ -1,22 +1,25 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { DEV_MODE, USER_ACTIVITIES } from "@/configs/app.config.ts";
+import {
+  DEV_MODE,
+  NO_QUERY_LOGS,
+  USER_ACTIVITIES,
+} from "@/configs/app.config.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
 import { toast } from "sonner";
 
-export function useSignupValidation({
-  urlParams,
-}: {
-  urlParams: Record<string, string | undefined>;
-}) {
+/**
+ * Hook for validating signup email.
+ *
+ * @param url - The API endpoint URL for signup validation
+ */
+export function useSignupValidation({ url }: { url: string }) {
   const signupValidation = useAppStore((state) => state.signupValidation);
 
   return useQueryOnSubmit([
     USER_ACTIVITIES.signupValidation,
     {
-      url:
-        API_ENDPOINTS.GET.AUTH.SIGNUP_VALIDATION +
-        `${urlParams.referral}/${urlParams.referralCode}`,
+      url,
       method: API_ENDPOINTS.GET.METHOD,
       silent: true,
       // successDescription:
@@ -27,7 +30,7 @@ export function useSignupValidation({
         toast.success(
           "Votre email a été vérifié avec succès. Vous pouvez maintenant créer un mot de passe."
         );
-        if (DEV_MODE) {
+        if (DEV_MODE && !NO_QUERY_LOGS) {
           console.debug("Signup onSuccess:", data);
         }
       },

@@ -19,6 +19,20 @@ import "@css/Dialog.scss";
 import { useEffect, useState, type ComponentType } from "react";
 import { useLocation } from "react-router-dom";
 
+const defaultModalState: ModalState = {
+  forward: null,
+  isReady: false,
+  previousUrl: "",
+  modalName: "",
+  isOpen: false,
+  locationState: "",
+  url: "",
+  historyIdx: null!,
+  isHandledByPopState: false,
+  isHandledByUserEvent: false,
+  userInput: null,
+};
+
 /**
  * Modal component
  * In order to trigger the modal, simply call the `useDialog` hook and use its `openDialog` method with the corresponding modal name.
@@ -32,15 +46,13 @@ import { useLocation } from "react-router-dom";
  * !! IMPORTANT !! NAME IS MANDATORY AND SHOULD BE UNIQUE ACROSS YOUR APPLICATION.
  * @param onOpenChange - Function to handle changes in the open state if needed
  * @param onOpen - Boolean to control the open state of the modal externally
- * @param onNodeReady - Function that receives the modal content ref when it's ready (this helps avoid issues with forms inside modals)
  *
  * @example
  * ```tsx
- * const { setRef, observedRef } = useMutationObserver({});
+ * const { setRef, observedRefs } = useMutationObserver({});
  * return (<Modal
  *   modalName="myUniqueModalName"
  *   modalContent={<div ref={setRef}>My Triggered Modal Content</div>}
- *   onNodeReady={observedRef}
  *   onOpen={myOptionalOverrideFunctionThatReturnsBoolean}
  *   onOpenChange={myOptionalOverrideFunctionThatHandlesOpenChange}
  * />)
@@ -51,9 +63,9 @@ export function Modal({
   children,
   modalContent,
   modalName,
-  onNodeReady,
   onOpen,
   onOpenChange,
+  isNavigationModal = true,
 }: Readonly<ModalProps>) {
   const { myEvent: popStateEvent } = useUserEventListener("popstate");
   const { myEvent: userMouseEvent } = useUserEventListener("pointerdown");
@@ -62,21 +74,11 @@ export function Modal({
     isDialogOpen,
     onOpenChange: contextOnOpenChange,
     closeDialog,
+    setRef,
+    observedRefs,
   } = useDialog();
 
-  const [modalState, setModalState] = useState<ModalState>({
-    forward: null,
-    isReady: false,
-    previousUrl: "",
-    modalName: "",
-    isOpen: false,
-    locationState: "",
-    url: "",
-    historyIdx: null!,
-    isHandledByPopState: false,
-    isHandledByUserEvent: false,
-    userInput: null,
-  });
+  const [modalState, setModalState] = useState(defaultModalState);
 
   const className = `dialog__content dialog__content--${modalName}`;
   const onOpenChangeHandler = onOpenChange ?? contextOnOpenChange;
@@ -116,6 +118,13 @@ export function Modal({
       popState = true;
     }
 
+    /**
+     * Case 2 : Normal Forward +
+     *
+     * @description Modal is opened via forward navigation +
+     * Browser should handle the history change itself
+     * and modal URL is now the current URL.
+     */
     if (!modalState.isOpen && location.pathname === modalURL) {
       popState = false;
     }
@@ -189,7 +198,7 @@ export function Modal({
     if (isDialogOpen(modalName)) closeDialog(popStateEvent, modalName);
 
     const userIsOnModalURL = currentLocation === modalURL;
-    const userIsOnPreviousURL = currentLocation === modalState.previousUrl;
+    // const userIsOnPreviousURL = currentLocation === modalState.previousUrl;
     const browserUrlIsDifferentThanRouter = currentLocation !== routerPath;
     const targetUrl = routerPath === modalState.previousUrl;
     const shouldGoBack =
@@ -264,18 +273,25 @@ export function Modal({
   }, [isOpen, modalState.isReady]);
 
   /**
-   * Verify and set the onNodeReady element
+   * Verify and set the observedRef element
    *
    * @description This is the init
    */
   useEffect(() => {
-    if (onNodeReady && modalState.isReady !== onNodeReady) {
-      setModalState((prev) => ({
-        ...prev,
-        isReady: onNodeReady ?? false,
-      }));
+    if (!isNavigationModal || !observedRefs || !modalName) return;
+
+    if (observedRefs.size > 0) {
+      const observedEntry = observedRefs.get(modalName);
+      const observedElement = observedEntry?.element ?? false;
+
+      if (modalState.isReady !== observedElement) {
+        setModalState((prev) => ({
+          ...prev,
+          isReady: observedElement,
+        }));
+      }
     }
-  }, [onNodeReady, modalState.isReady]);
+  }, [observedRefs, modalState.isReady, isNavigationModal, modalName]);
 
   return (
     <Dialog
@@ -283,7 +299,14 @@ export function Modal({
       onOpenChange={() => onOpenChangeHandler(modalName)}
     >
       {children}
-      <DialogContent className={className}>{modalContent}</DialogContent>
+      <DialogContent
+        ref={(el) => setRef(el, { modalName })}
+        id={modalName}
+        data-dialog={modalName}
+        className={className}
+      >
+        {modalContent}
+      </DialogContent>
     </Dialog>
   );
 }
@@ -307,13 +330,6 @@ async function waitAndReplace(state: object, url: string, timer = 70) {
   history.replaceState(state, "", url);
 }
 
-/**
- * Higher-order component to create a simple alert modal
- *
- * @description This contains a title, description and an Ok button to close the modal.
- */
-export const WithSimpleAlert = withSimpleAlert(Modal);
-
 function withSimpleAlert(WrappedComponent: ComponentType<ModalProps>) {
   return ({
     headerTitle,
@@ -324,8 +340,12 @@ function withSimpleAlert(WrappedComponent: ComponentType<ModalProps>) {
     <WrappedComponent
       {...rest}
       modalContent={
-        <Card ref={ref}>
+        <Card
+          id={rest.modalName ? `${rest.modalName}-card` : undefined}
+          ref={ref}
+        >
           <DialogHeaderTitle
+            className="text-center!"
             title={headerTitle}
             description={headerDescription}
           />
@@ -339,3 +359,10 @@ function withSimpleAlert(WrappedComponent: ComponentType<ModalProps>) {
     />
   );
 }
+
+/**
+ * Higher-order component to create a simple alert modal
+ *
+ * @description This contains a title, description and an Ok button to close the modal.
+ */
+export const ModalWithSimpleAlert = withSimpleAlert(Modal);

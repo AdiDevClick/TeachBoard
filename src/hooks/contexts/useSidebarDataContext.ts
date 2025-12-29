@@ -1,4 +1,4 @@
-import { SidebarDataContext } from "@/api/contexts/SidebarDataContext.ts";
+import { SidebarDataContext } from "@/api/contexts/SidebarData.context";
 import { use } from "react";
 
 /**

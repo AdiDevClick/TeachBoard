@@ -4,7 +4,7 @@ import GroupSeparator from "@/components/Sidebar/group_separator/GroupSeparator.
 import Header from "@/components/Sidebar/header/Header.tsx";
 import { MainNavigation } from "@/components/Sidebar/nav/MainNavigation";
 import { SecondaryNavigation } from "@/components/Sidebar/nav/SecondaryNavigation";
-import type { SidebarProps } from "@/components/Sidebar/types/SidebarTypes.ts";
+import type { SidebarProps } from "@/components/Sidebar/types/sidebar.types";
 import {
   Sidebar,
   SidebarContent,

@@ -61,6 +61,12 @@ export type GenericQueryResults<S, E> = {
   [K in keyof E]?: E[K];
 };
 
+/**
+ * Descriptor constructor for query keys used in data fetching and mutations.
+ *
+ * @template S - Success response type
+ * @template E - Error response type
+ */
 export type QueryKeyDescriptor<S, E> = [
   task: (typeof USER_ACTIVITIES)[keyof typeof USER_ACTIVITIES],
   descriptor: {
@@ -73,7 +79,13 @@ export type QueryKeyDescriptor<S, E> = [
     onSuccess?: (data: FetchJSONSuccess<S>) => void;
     onError?: (error: FetchJSONError<E>) => void;
     reset?: () => void;
-  } & Record<string, unknown>
+    localState?: (
+      state: {
+        error: FetchJSONError<E> | null;
+        success: FetchJSONSuccess<S> | null;
+      } & Record<string, unknown>
+    ) => void;
+  }
 ];
 
 // export interface QueryHookInterface<

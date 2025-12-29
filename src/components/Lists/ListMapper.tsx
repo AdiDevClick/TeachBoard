@@ -1,8 +1,12 @@
 import type { ListMapperProps } from "@/components/Lists/types/ListsTypes.ts";
 import {
-  cloneElement,
+  debugLogs,
+  listMapperContainsInvalid,
+} from "@/configs/app-components.config.ts";
+import {
   Fragment,
   isValidElement,
+  useId,
   type ElementType,
   type ReactNode,
 } from "react";
@@ -51,35 +55,42 @@ export function ListMapper<
   TItems extends readonly unknown[] | Record<string, unknown>,
   C extends ElementType = ElementType,
   TOptional extends Record<string, unknown> | undefined = undefined
->({
-  items,
-  optional,
-  children,
-  component,
-  ...props
-}: Readonly<ListMapperProps<TItems, C, TOptional>>) {
+>(props: Readonly<ListMapperProps<TItems, C, TOptional>>) {
+  const { items, optional, children, component, ...rest } = props;
+
+  const id = useId();
+
+  if (listMapperContainsInvalid(props)) {
+    debugLogs("ListMapper");
+    return null;
+  }
+
   const isArrayInput = Array.isArray(items);
-  const itemsArray = isArrayInput ? items : Object.entries(items);
+  const itemsArray = isArrayInput
+    ? items
+    : Object.entries(items as Record<string, unknown>);
 
   return itemsArray.map((item, index) => {
     if (!item) {
       return null;
     }
 
-    const itemId =
-      typeof item === "object" && "id" in item
-        ? item.id
-        : index * Math.random();
+    // !!IMPORTANT!! For consistency, ListMapper MUST return an object containing the id and its item.
+    // Generate a stable key for each item -
+    // If the item does not have an id (e.g., a primitive), construct one.
+    if (typeof item !== "object") {
+      item = { item };
+    }
+
+    // Use existing id or create a stable one based on index only
+    const itemId = "id" in item ? item.id : `${id}-${index}`;
 
     // Case A: component prop provided (act as a Component but you provide the child to display as a prop)
 
     if (component) {
       const Component = component;
-      return (
-        <Fragment key={String(itemId)}>
-          <Component {...item} {...optional} {...props} />
-        </Fragment>
-      );
+
+      return <Component key={itemId} {...item} {...optional} {...rest} />;
     }
 
     // Case B: Render function - best type safety (act as a function with params)
@@ -89,7 +100,10 @@ export function ListMapper<
         index: number,
         optional?: TOptional
       ) => ReactNode;
-      return renderFn(item, index, optional);
+
+      return (
+        <Fragment key={itemId}>{renderFn(item, index, optional)}</Fragment>
+      );
     }
 
     // Case C: ReactElement - render its type with injected props
@@ -100,10 +114,14 @@ export function ListMapper<
         ...optional,
       };
 
+      const Component = children.type as ElementType;
+      const originalChildProps = (children.props ?? {}) as Record<
+        string,
+        unknown
+      >;
+
       return (
-        <Fragment key={String(itemId)}>
-          {cloneElement(children, injectedProps)}
-        </Fragment>
+        <Component key={itemId} {...originalChildProps} {...injectedProps} />
       );
     }
 

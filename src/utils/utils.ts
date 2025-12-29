@@ -86,3 +86,31 @@ export function handleModalOpening({
   dialogFns.closeAllDialogs();
   dialogFns.openDialog(e, modalName);
 }
+
+/**
+ * Check the validity of props against required and forbidden keys.
+ *
+ * @param props - The props object to validate.
+ * @param required - An array of required prop keys.
+ * @param forbidden - An array of forbidden prop keys.
+ * @returns True if any forbidden keys are present or any required keys are missing; otherwise, false.
+ */
+export function checkPropsValidity(
+  props: unknown,
+  required: string[],
+  forbidden: string[]
+) {
+  if (typeof props !== "object" || props === null) return true;
+  const propsRecord = props as Record<string, unknown>;
+
+  const forbiddenPresent = forbidden.some(
+    (forbiddenKey) => forbiddenKey in propsRecord
+  );
+
+  const requiredPresent = required.some((requiredKey) => {
+    if (!(requiredKey in propsRecord)) return true;
+    const value = propsRecord[requiredKey];
+    return value === undefined || value === null || value === "";
+  });
+  return forbiddenPresent || requiredPresent;
+}

@@ -1,4 +1,4 @@
-import type { dataContext } from "@/api/providers/types/SidebarDataProviderTypes.ts";
+import type { dataContext } from "@/api/providers/types/sidebar-data.provider.types";
 import type {
   SidebarGroup,
   SidebarHeader,
@@ -35,7 +35,7 @@ type QuickButton = NonNullable<NavMainMenuItem["quickButton"]>;
 type SubMenus = NonNullable<NavMainMenuItem["subMenus"]>;
 
 type GenericMenuItemProps<T> = {
-  item?: T;
+  item: T;
   setStyle: (props: SetStyleMenuProps) => string;
 };
 

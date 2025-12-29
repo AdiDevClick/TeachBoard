@@ -31,6 +31,7 @@ export type StandardModalConfig<
   TComponent extends ComponentLike<unknown> = AnyComponentLike
 > = {
   modalName: Name;
+  id?: string;
   type: ComponentType<ModalProps>;
   modalContent: TComponent;
   modalProps?: StandardModalProps;
@@ -42,6 +43,7 @@ export type StandardModalConfig<
  */
 export type SimpleAlertConfig<Name = AppModalNames> = {
   modalName: Name;
+  id?: string;
   type: ComponentType<WithSimpleAlertProps>;
   modalProps: SimpleAlertModalProps;
   contentProps?: never;

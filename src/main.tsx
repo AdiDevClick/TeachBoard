@@ -130,7 +130,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
       }
     }
 
-    if (error) {
+    if (error && !isLoading) {
       openDialog(null, "login");
       if (DEV_MODE) {
         console.error("Session Check Error:", error);

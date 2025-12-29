@@ -74,7 +74,20 @@ export class UniqueSet<K, V extends { [key: string]: unknown }> {
    * Retourne le nombre d'éléments dans l'ensemble.
    * @returns number
    */
-  size() {
+  /**
+   * Legacy method previously used to get the size.
+   * It's recommended to use the property `instance.size` (Map-compatible getter)
+   * Added as a stable method only for backward compatibility under a different name.
+   */
+  getSize() {
+    return this.#map.size;
+  }
+
+  /**
+   * Getter compatible avec l'API Map.size => permet d'accéder à `instance.size` (sans appel de méthode)
+   * Utilisé dans le code existant qui attend `map.size` au lieu de `map.size()`.
+   */
+  get size() {
     return this.#map.size;
   }
 

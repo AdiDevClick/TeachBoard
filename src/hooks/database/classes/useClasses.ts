@@ -13,7 +13,7 @@ export function useClasses() {
   return useQueryOnSubmit([
     USER_ACTIVITIES.classes,
     {
-      url: API_ENDPOINTS.GET.CLASSES.ALL,
+      url: API_ENDPOINTS.GET.CLASSES.endPoints.ALL,
       method: "GET",
       successDescription: "All classes fetched successfully.",
       silent: true,

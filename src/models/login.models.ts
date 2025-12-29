@@ -1,4 +1,6 @@
+import type { InputItem } from "@/components/Inputs/types/inputs.types.ts";
 import { formsRegex } from "@/configs/formsRegex.config.ts";
+import type { pwRecoverySchema } from "@/models/pw-recovery.model.ts";
 import z from "zod";
 
 /** Validation schema for the login form */
@@ -32,10 +34,17 @@ export const formSchema = z.object({
         }
       }
     })
-    .transform((v) => v.trim().toLowerCase()),
+    .toLowerCase(),
+  // .transform((v) => v.trim().toLowerCase()),
   password: z
     .string()
     .min(1, "Votre mot de passe doit contenir au moins 1 caractère.")
     .max(100, "Votre mot de passe ne peut contenir plus de 100 caractères.")
     .nonempty("Le mot de passe est requis."),
 });
+
+export type LoginFormSchema = z.infer<typeof formSchema>;
+
+export type RecoveryFormSchema = z.infer<typeof pwRecoverySchema>;
+
+export type LoginInputItem = InputItem<LoginFormSchema>;

@@ -17,5 +17,6 @@ export const signupSchema = z.object({
       formsRegex.serverUsername,
       "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres et des underscores."
     )
-    .transform((v) => v.trim().toLowerCase()),
+    .toLowerCase(),
+  // .transform((v) => v.trim().toLowerCase()),
 });

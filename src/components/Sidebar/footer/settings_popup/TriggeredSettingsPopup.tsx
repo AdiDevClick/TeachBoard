@@ -1,7 +1,7 @@
+import { AvatarDisplay } from "@/components/Avatar/AvatarDisplay";
 import { Dropdown } from "@/components/Dropdowns/Dropdown.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import type { SettingsPopupProps } from "@/components/Sidebar/footer/settings_popup/types/SettingsPopupTypes.ts";
-import { UserDisplay } from "@/components/Sidebar/footer/UserDisplay.tsx";
+import type { SettingsPopupProps } from "@/components/Sidebar/footer/settings_popup/types/settings-popup.types";
 import {
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -19,7 +19,7 @@ import "@css/DropdownMenu.scss";
  */
 export function TriggeredSettingsPopup({
   userData,
-  userDisplay,
+  avatarDisplay,
   handleOnFooterButtonsClick,
 }: Readonly<SettingsPopupProps>) {
   const { isMobile } = useSidebar();
@@ -33,7 +33,7 @@ export function TriggeredSettingsPopup({
       sideOffset={4}
     >
       <DropdownMenuLabel className="menu__label">
-        <UserDisplay props={userDisplay} />
+        <AvatarDisplay props={avatarDisplay} />
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>

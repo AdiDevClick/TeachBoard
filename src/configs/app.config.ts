@@ -9,6 +9,11 @@ export const LANGUAGE = "fr-FR";
 
 /** Check if the app is running in development mode */
 export const DEV_MODE = import.meta.env.DEV;
+export const NO_PROXY_LOGS = true;
+export const NO_MUTATION_OBSERVER_LOGS = true;
+export const NO_CACHE_LOGS = true;
+export const NO_QUERY_LOGS = false;
+export const NO_COMPONENT_WARNING_LOGS = true;
 
 /** Supported HTTP methods for API requests */
 export const HTTP_METHODS = [
@@ -33,9 +38,15 @@ export const USER_ACTIVITIES = Object.freeze({
   none: "none",
   sessionCheck: "session-check",
   classes: "classes",
+  classCreation: "class-creation",
   signup: "signup",
   signupValidation: "signup-validation",
   passwordCreation: "password-creation",
+  fetchDiplomas: "fetch-diplomas",
+  fetchModulesSkills: "fetch-modules-skills",
+  degreeCreation: "degree-creation",
+  degreeModuleCreation: "degree-module-creation",
+  degreeModuleSkillCreation: "new-degree-module-skill",
 });
 
 /**
@@ -50,7 +61,17 @@ export type AppModalNames =
   | "signup"
   | "pw-recovery"
   | "pw-recovery-email-sent"
-  | "class-creation";
+  | "class-creation"
+  | "create-diploma"
+  | "new-degree-item-field"
+  | "new-degree-item-year"
+  | "new-degree-item-degree"
+  | "new-degree-module"
+  | "new-degree-module-skill"
+  | "new-task-template"
+  | "new-task-item"
+  | "search-students"
+  | "search-primaryteacher";
 
 /**
  * Pages that do not require session checks
@@ -64,4 +85,6 @@ export const NO_SESSIONS_CHECK_PAGES = [
   "/password-creation",
   "/forgot-password",
 ];
-// export const NO_SESSIONS_PAGES = ["/login", "/signup", "/signup/validate"];
+
+export const APP_REDIRECT_TIMEOUT = 1500;
+export const APP_REDIRECT_TIMEOUT_SUCCESS = 500;

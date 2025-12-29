@@ -7,5 +7,5 @@ export const pwRecoverySchema = z.object({
     .min(5, "L'adresse email doit contenir au moins 5 caractères.")
     .max(254, "L'adresse email ne peut contenir plus de 254 caractères.")
     .nonempty("L'adresse email est requise.")
-    .transform((v) => v.trim().toLowerCase()),
+    .toLowerCase(),
 });

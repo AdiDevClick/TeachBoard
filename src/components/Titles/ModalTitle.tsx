@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog.tsx";
 import { headerDescription, headerTitle } from "@/data/login-header.data.ts";
 import { cn } from "@/utils/utils";
+import { useId } from "react";
 
 /**
  * ModalTitle component for displaying a title and description in a modal dialog.
@@ -27,8 +28,13 @@ export function HeaderTitle({
   id = "login-header",
   ...props
 }: Readonly<HeaderTitleProps>) {
+  const ids = useId();
   return (
-    <CardHeader id={id} className={cn("text-center", className)} {...props}>
+    <CardHeader
+      id={id + ids}
+      className={cn("text-center", className)}
+      {...props}
+    >
       <CardTitle className="text-xl">{title}</CardTitle>
       <CardDescription>{description}</CardDescription>
     </CardHeader>
@@ -44,12 +50,14 @@ export function DialogHeaderTitle({
   title = headerTitle,
   description = headerDescription,
   className = "",
+  id = "login-header-dialog",
   ...rest
 }: Readonly<HeaderTitleProps>) {
+  const ids = useId();
   return (
     <DialogHeader
-      id={"login-header-dialog"}
-      className={cn("text-center!", className)}
+      id={id + ids}
+      className={cn("text-center", className)}
       {...rest}
     >
       <DialogTitle className="text-xl">{title}</DialogTitle>
@@ -57,6 +65,3 @@ export function DialogHeaderTitle({
     </DialogHeader>
   );
 }
-
-// export const LoginDialogHeader = withDialogHeader(HeaderTitle);
-// export const SignupDialogHeader = withDialogHeader(HeaderTitle);

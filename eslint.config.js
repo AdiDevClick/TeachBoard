@@ -32,6 +32,15 @@ export default defineConfig([
       //   { prefer: "no-type-imports" },
       //   // { prefer: "type-imports" },
       // ],
+      // Disallow importing the `console` module (e.g. `import console from 'console'`)
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: ["console"],
+        },
+      ],
+      // Warn when using `console.*` directly (allow warn/error by default if needed)
+      // "no-console": ["warn", { allow: ["warn", "error"] }],
     },
   },
 ]);

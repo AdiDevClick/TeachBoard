@@ -1,6 +1,8 @@
-import { DialogContext } from "@/api/contexts/DialogContext.ts";
+import { DialogContext } from "@/api/contexts/Dialog.context";
 import type { AppModalNames } from "@/configs/app.config.ts";
+import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
+import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
@@ -15,34 +17,39 @@ import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
  * @returns The DialogProvider component that wraps its children with Dialog context.
  */
 export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
-  // Use a Set to track all open dialog IDs (supports multiple dialogs)
-  const [openDialogs, setOpenDialogs] = useState<Set<AppModalNames>>(new Set());
+  const [openDialogs, setOpenDialogs] = useState<UniqueSet<AppModalNames, any>>(
+    new UniqueSet()
+  );
+  const { setRef, observedRefs, deleteRef } = useMutationObserver({});
 
   const openDialog = useCallback(
-    (e: PreventDefaultAndStopPropagation, id: AppModalNames) => {
+    (e: PreventDefaultAndStopPropagation, id: AppModalNames, options?: any) => {
       preventDefaultAndStopPropagation(e);
       setOpenDialogs((prev) => {
-        const next = new Set(prev);
-        next.add(id);
+        const next = prev.clone();
+        next.set(id, options ?? {});
         return next;
       });
     },
     []
   );
 
-  const openedDialogs = useMemo(() => Array.from(openDialogs), [openDialogs]);
-
   const closeDialog = useCallback(
     (e: PreventDefaultAndStopPropagation, id?: AppModalNames) => {
       preventDefaultAndStopPropagation(e);
       setOpenDialogs((prev) => {
-        const next = new Set(prev);
+        const next = prev.clone();
         if (id) {
           next.delete(id);
+          deleteRef(id);
         } else {
           // If no ID provided, close the most recent dialog
-          const lastId = Array.from(next).pop();
-          if (lastId) next.delete(lastId);
+          const lastEntries = Array.from(next.entries()).pop();
+          if (lastEntries) {
+            const lastId = lastEntries[0];
+            next.delete(lastId);
+            deleteRef(lastId);
+          }
         }
         return next;
       });
@@ -52,7 +59,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
 
   const closeAllDialogs = useCallback(() => {
     if (openDialogs.size === 0) return;
-    setOpenDialogs(new Set());
+    setOpenDialogs(new UniqueSet());
   }, [openDialogs]);
 
   const isDialogOpen = useCallback(
@@ -64,22 +71,52 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
 
   const onOpenChange = useCallback((id: AppModalNames) => {
     setOpenDialogs((prev) => {
-      const next = new Set(prev);
+      const next = prev.clone();
       next.delete(id);
       return next;
     });
   }, []);
 
+  const setDialogOptions = useCallback((id: AppModalNames, options: any) => {
+    setOpenDialogs((prev) => {
+      const next = prev.clone();
+      if (next.has(id)) {
+        next.set(id, {
+          ...next.get(id),
+          ...options,
+        });
+      }
+      return next;
+    });
+  }, []);
+
+  const dialogsOptions = useMemo(() => {
+    return new Map(openDialogs.entries());
+  }, [openDialogs]);
+
+  const dialogOptions = useCallback(
+    (dialog: AppModalNames) => {
+      return openDialogs.get(dialog);
+    },
+    [openDialogs]
+  );
+
   const value = useMemo(
     () => ({
-      openedDialogs,
+      openedDialogs: Array.from(openDialogs.keys()),
+      dialogsOptions,
+      dialogOptions,
+      setDialogOptions,
       isDialogOpen,
       openDialog,
       closeDialog,
       onOpenChange,
       closeAllDialogs,
+      setRef,
+      deleteRef,
+      observedRefs,
     }),
-    [openDialogs]
+    [openDialogs, observedRefs]
   );
 
   return (
