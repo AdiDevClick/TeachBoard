@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ObjectReshape } from "../ObjectReshape";
+import { ObjectReshape } from "../../utils/ObjectReshape";
 
 describe("ObjectReshape - transformTuplesToGroups", () => {
   it("should transform dynamic object keys into array of groups", () => {
