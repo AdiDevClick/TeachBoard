@@ -1,10 +1,13 @@
+import { SimpleAvatar } from "@/components/Avatar/SimpleAvatar.tsx";
+import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.ts";
 import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
+import { SimpleAddButtonWithToolTip } from "@/components/Buttons/SimpleAddButton.tsx";
+import type { SimpleAddButtonProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import { CommandItems } from "@/components/Command/CommandItems.tsx";
 import withController from "@/components/HOCs/withController.tsx";
 import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import { LaballedInputForController } from "@/components/Inputs/LaballedInputForController.tsx";
 import PrimaryMenuButton from "@/components/Sidebar/nav/elements/menu_button/PrimaryMenuButton.tsx";
-import { SimpleAvatar } from "@/components/Avatar/SimpleAvatar.tsx";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
 import { checkPropsValidity } from "@/utils/utils.ts";
 
@@ -96,8 +99,23 @@ export const commandItemContainsInvalid = (props: Record<string, unknown>) =>
  */
 const SIMPLE_AVATAR_REQUIRES = ["src", "alt", "fallback"];
 
-export function simpleAvatarPropsInvalid(props: Record<string, unknown>) {
+export function simpleAvatarPropsInvalid(props: SimpleAvatarProps) {
   return checkPropsValidity(props, SIMPLE_AVATAR_REQUIRES, []);
+}
+
+//                    ------------
+
+/**
+ * Validation requirements for SimpleAddButtonWithToolTip component.
+ *
+ * {@link SimpleAddButtonWithToolTip}
+ */
+const SIMPLE_ADD_BUTTON_REQUIRES = ["toolTipText"];
+
+export function simpleAddButtonWithToolTipPropsInvalid(
+  props: SimpleAddButtonProps
+) {
+  return checkPropsValidity(props, SIMPLE_ADD_BUTTON_REQUIRES, []);
 }
 
 //                    ------------
