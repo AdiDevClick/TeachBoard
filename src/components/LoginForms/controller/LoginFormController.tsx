@@ -76,6 +76,7 @@ export function LoginFormController({
       // !! IMPORTANT !! - Use startTransition to avoid blocking UI updates
       startTransition(() => {
         if (!open) setOpen(true);
+        // form.reset();
       });
 
       navigate("/", { replace: true });
