@@ -1,10 +1,17 @@
-import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.ts";
+import type {
+  SimpleAvatarListProps,
+  SimpleAvatarProps,
+} from "@/components/Avatar/types/avatar.types.ts";
 import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar.tsx";
+import {
+  debugLogs,
+  simpleAvatarPropsInvalid,
+} from "@/configs/app-components.config.ts";
 
 /**
  * Simple avatar component with image and fallback
@@ -14,6 +21,10 @@ import {
  * @param fallback - Fallback text when image is not available
  */
 export function SimpleAvatar(props: Readonly<SimpleAvatarProps>) {
+  if (simpleAvatarPropsInvalid(props)) {
+    debugLogs("Rendering SimpleAvatar");
+  }
+
   const { src, alt, fallback } = props;
   return (
     <Avatar>
@@ -34,7 +45,7 @@ export function SimpleAvatar(props: Readonly<SimpleAvatarProps>) {
  * ]} />
  * ```
  */
-export function SimpleAvatarList({ items }: { items: SimpleAvatarProps[] }) {
+export function SimpleAvatarList({ items }: Readonly<SimpleAvatarListProps>) {
   if (!items || items.length === 0) {
     return null;
   }
