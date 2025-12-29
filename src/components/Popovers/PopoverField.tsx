@@ -15,7 +15,9 @@ import {
 } from "@/components/ui/popover.tsx";
 import { cn } from "@/utils/utils.ts";
 import { LucideChevronDown } from "lucide-react";
-import { useCallback, useId, useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
+
+const defaultValue = new Set<string>();
 
 /**
  * Popover Field component
@@ -39,6 +41,7 @@ export function PopoverField({
   side = "bottom",
   setRef,
   id: containerId,
+  resetKey,
   ...props
 }: PopoverFieldProps) {
   const { onOpenChange, children, role, ...rest } = props;
@@ -48,8 +51,18 @@ export function PopoverField({
   const [state, setState] = useState<PopoverFieldState>({
     open: false,
     fieldName: rest?.name,
-    selectedValue: props.multiSelection ? new Set<string>() : undefined,
+    selectedValue: props.multiSelection ? defaultValue : undefined,
   });
+
+  // Reset selectedValue when resetKey changes
+  useEffect(() => {
+    if (resetKey !== undefined) {
+      setState((prev) => ({
+        ...prev,
+        selectedValue: props.multiSelection ? defaultValue : undefined,
+      }));
+    }
+  }, [resetKey, props.multiSelection]);
 
   // Meta data for this field instance
   const memoizedMeta = useMemo(
