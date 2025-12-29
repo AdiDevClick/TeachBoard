@@ -30,12 +30,7 @@ import { useCallback, type ComponentProps, type ComponentType } from "react";
  * @returns A CommandItems component
  */
 export function CommandItems(props: Readonly<CommandsProps>) {
-  const {
-    commandHeadings,
-    onSelect: externalOnSelect,
-    avatarDisplay,
-    ...rest
-  } = props;
+  const { commandHeadings, onSelect: externalOnSelect, ...rest } = props;
 
   // !! IMPORTANT !! This context can be null
   const context = usePopoverFieldContextSafe();
@@ -78,9 +73,7 @@ export function CommandItems(props: Readonly<CommandsProps>) {
                         <CommandSelectionItem
                           command={command}
                           details={itemDetails}
-                          multiSelection={rest.multiSelection}
                           selectedValue={selectedValue}
-                          avatarDisplay={avatarDisplay}
                           onSelect={handleSelect}
                           {...rest}
                         />
