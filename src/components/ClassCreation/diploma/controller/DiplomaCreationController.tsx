@@ -1,3 +1,4 @@
+import type DiplomaCreation from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
 import type { CommandsProps } from "@/components/Command/types/command.types.ts";
 import {
   PopoverFieldWithCommands,
@@ -9,15 +10,14 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { DiplomaCreationFormSchema } from "@/models/diploma-creation.models.ts";
-import type { SignupInputItem } from "@/pages/Signup/types/signup.types.ts";
-import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, type PointerEvent } from "react";
+import { useCallback, type MouseEvent, type PointerEvent } from "react";
+import { useWatch, type UseFormReturn } from "react-hook-form";
 
 const inputs = [
   {
     task: "new-degree-item-field",
-    name: "diplomaField",
+    name: "diplomaFieldId",
     label: "Métier / Domaine du diplôme",
     placeholder: "Sélectionnez...",
     creationButtonText: "Ajouter un métier ou domaine",
@@ -29,7 +29,7 @@ const inputs = [
   },
   {
     task: "new-degree-item-year",
-    name: "schoolYear",
+    name: "yearId",
     label: "Année scolaire",
     placeholder: "Sélectionnez...",
     creationButtonText: "Ajouter une année scolaire",
@@ -41,7 +41,7 @@ const inputs = [
   },
   {
     task: "new-degree-item-degree",
-    name: "schoolLevel",
+    name: "levelId",
     label: "Diplôme / Niveau scolaire",
     placeholder: "Sélectionnez...",
     creationButtonText: "Ajouter un niveau scolaire",
@@ -77,21 +77,36 @@ const defaultState = {
 };
 
 export type HandleAddNewItemParams = {
-  e?: PointerEvent<HTMLElement>;
+  e?: PointerEvent<HTMLElement> | MouseEvent<HTMLElement>;
   apiEndpoint?: (typeof inputs)[number]["apiEndpoint"];
   task: (typeof inputs)[number]["task"];
   dataReshapeFn?: (typeof inputs)[number]["dataReshapeFn"];
 };
 
+/**
+ * Props for DiplomaCreationController component
+ */
+export type DiplomaCreationControllerProps = {
+  form: UseFormReturn<DiplomaCreationFormSchema>;
+  formId: string;
+} & Omit<Parameters<typeof DiplomaCreation>[0], "modalMode">;
+
+/**
+ * Diploma creation controller component
+ *
+ * @param pageId - The ID of the page.
+ * @param form - The form instance to manage form state and actions.
+ * @param formId - The ID of the form element.
+ * @param props - Additional props for the DiplomaCreation component.
+ *
+ * @returns
+ */
 export function DiplomaCreationController({
   pageId,
-  modalMode = true,
-  className,
-  inputControllers,
   form,
   formId,
   ...props
-}: Readonly<PageWithControllers<SignupInputItem>>) {
+}: Readonly<DiplomaCreationControllerProps>) {
   const {
     setRef,
     observedRefs,
@@ -105,6 +120,11 @@ export function DiplomaCreationController({
     pageId,
   });
   const queryClient = useQueryClient();
+  const currentSkills =
+    useWatch({
+      control: form.control,
+      name: "mainSkillsList",
+    }) || [];
 
   const resultsCallback = useCallback((keys: any) => {
     const cachedData = queryClient.getQueryData(keys ?? []);
@@ -234,12 +254,13 @@ export function DiplomaCreationController({
   };
 
   const handleCommandSelection = (value: string) => {
-    if (currentSkills.has(value)) {
-      currentSkills.delete(value);
+    const skillsSet = new Set(form.getValues("mainSkillsList") || []);
+    if (skillsSet.has(value)) {
+      skillsSet.delete(value);
     } else {
-      currentSkills.add(value);
+      skillsSet.add(value);
     }
-    form.setValue("mainSkillsList", Array.from(currentSkills), {
+    form.setValue("mainSkillsList", Array.from(skillsSet), {
       shouldValidate: true,
     });
   };
@@ -265,9 +286,6 @@ export function DiplomaCreationController({
     });
   };
 
-  // Get the current skills from the form
-  const currentSkills = new Set(form.watch("mainSkillsList") || []);
-
   return (
     <form
       id={formId}
@@ -282,19 +300,6 @@ export function DiplomaCreationController({
           fetchParams.url,
         ])}
         onSelect={onSelectHandler}
-        // role="combobox"
-        // Command search box value changed
-        // onValueChange={(value) =>
-        //   console.log(
-        //     "value changed ->",
-        //     VerticalFieldSelectRef.current?.getLastSelectedItemValue(),
-        //     VerticalFieldSelectRef.current?.getLastCommandValue(),
-        //     value
-        //   )
-        // }
-        // Selection on command item triggered
-        // onSelect={(select) => {}}
-        // Vertical field just triggered opening
         onOpenChange={handleOpening}
         setRef={setRef}
         observedRefs={observedRefs}
@@ -305,7 +310,7 @@ export function DiplomaCreationController({
         setRef={setRef}
         {...inputs[3]}
         observedRefs={observedRefs}
-        itemList={Array.from(currentSkills)}
+        itemList={currentSkills}
       />
       <PopoverFieldWithCommands
         multiSelection
