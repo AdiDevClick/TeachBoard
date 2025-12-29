@@ -2,7 +2,7 @@ import { SimpleAvatar } from "@/components/Avatar/SimpleAvatar.tsx";
 import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.ts";
 import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
 import { SimpleAddButtonWithToolTip } from "@/components/Buttons/SimpleAddButton.tsx";
-import type { SimpleAddButtonProps } from "@/components/Buttons/types/ButtonTypes.ts";
+import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import { CommandItems } from "@/components/Command/CommandItems.tsx";
 import withController from "@/components/HOCs/withController.tsx";
 import withListMapper from "@/components/HOCs/withListMapper.tsx";
@@ -113,7 +113,7 @@ export function simpleAvatarPropsInvalid(props: SimpleAvatarProps) {
 const SIMPLE_ADD_BUTTON_REQUIRES = ["toolTipText"];
 
 export function simpleAddButtonWithToolTipPropsInvalid(
-  props: SimpleAddButtonProps
+  props: SimpleAddButtonWithToolTipProps
 ) {
   return checkPropsValidity(props, SIMPLE_ADD_BUTTON_REQUIRES, []);
 }
