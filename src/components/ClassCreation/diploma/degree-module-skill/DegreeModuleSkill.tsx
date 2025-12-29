@@ -49,7 +49,6 @@ export function DegreeModuleSkill({
       pageId,
       inputControllers,
       formId,
-      form,
       modalMode,
       footerProps: {
         ...footerProps,
@@ -58,6 +57,7 @@ export function DegreeModuleSkill({
       },
       titleProps,
       ...props,
+      form,
     }),
     [form.formState, props]
   );
