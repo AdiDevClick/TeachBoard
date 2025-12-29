@@ -15,11 +15,11 @@ import type { FieldValues } from "react-hook-form";
  * @param props - Props for the labelled input component
  * @returns
  */
-export function LaballedInputForController<T extends FieldValues>(
+export function LabelledInputForController<T extends FieldValues>(
   props: LaballedInputForControllerProps<T>
 ) {
   if (labelledInputContainsInvalid(props)) {
-    debugLogs("LaballedInputForController");
+    debugLogs("LabelledInputForController");
     return null;
   }
 
@@ -32,7 +32,7 @@ export function LaballedInputForController<T extends FieldValues>(
         required
         {...rest}
         {...field}
-        id={name ?? field.name ?? "intput-is-not-named"}
+        id={name ?? field.name ?? "input-is-not-named"}
         aria-invalid={fieldState.invalid ?? false}
       />
     </>
@@ -40,7 +40,7 @@ export function LaballedInputForController<T extends FieldValues>(
 }
 
 export const ControlledLabelledInput = withController(
-  LaballedInputForController
+  LabelledInputForController
 );
 
 export const ControlledInputList = withListMapper(ControlledLabelledInput);

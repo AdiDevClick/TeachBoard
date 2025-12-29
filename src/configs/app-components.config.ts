@@ -6,7 +6,7 @@ import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types
 import { CommandItems } from "@/components/Command/CommandItems.tsx";
 import withController from "@/components/HOCs/withController.tsx";
 import withListMapper from "@/components/HOCs/withListMapper.tsx";
-import { LaballedInputForController } from "@/components/Inputs/LaballedInputForController.tsx";
+import { LabelledInputForController } from "@/components/Inputs/LaballedInputForController.tsx";
 import PrimaryMenuButton from "@/components/Sidebar/nav/elements/menu_button/PrimaryMenuButton.tsx";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
 import { checkPropsValidity } from "@/utils/utils.ts";
@@ -16,7 +16,7 @@ import { checkPropsValidity } from "@/utils/utils.ts";
 /**
  * Validates props for LaballedInputForController component.
  *
- * {@link LaballedInputForController }
+ * {@link LabelledInputForController }
  */
 const LABELLED_INPUT_SHOULD_NOT_ACCEPT = ["useCommands", "creationButtonText"];
 const LABELLED_INPUT_REQUIRES = ["field", "fieldState"];

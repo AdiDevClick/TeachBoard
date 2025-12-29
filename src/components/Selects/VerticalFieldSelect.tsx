@@ -1,5 +1,4 @@
 import withController from "@/components/HOCs/withController.tsx";
-
 import type {
   VerticalFieldState,
   VerticalRefSetters,
@@ -78,7 +77,6 @@ export function VerticalFieldSelect({
   const handleOpenChange = useCallback(
     (open: boolean) => {
       if (open) {
-        console.log("oponChange in Vertical Select");
         handleObjectRef.current = {
           props,
           // setState: setVerticalStateCallback,
