@@ -53,10 +53,10 @@ const defaultState = {
 
 /**
  * ClassCreationController Component
- *  
+ *
  * @description This component handles the class creation form, including input management,
  * command handling, and form submission.
- * 
+ *
  * @param modalMode - Indicates if the component is in modal mode
  * @param inputControllers - The input controllers for the form
  * @param pageId - The unique identifier for the page
@@ -322,14 +322,23 @@ export function ClassCreationController({
     });
   };
 
+  /**
+   * Handle attendance button click
+   *
+   * @description This saves the keys related to the students task.
+   * Using the input controller props, it passes endpoint information & selected students for processing/retrieval.
+   *
+   * @param e - The mouse event triggered by clicking the button
+   * @param rest - Additional parameters related to the new item
+   */
+
   const handleAttendanceClick = (e: MouseEvent<HTMLButtonElement>, rest) => {
     preventDefaultAndStopPropagation(e);
 
-    const task = rest.task;
     rest.form = form;
-
     rest.selectedStudents = studentsRef.current;
-    saveKeys([task, rest.apiEndpoint], cachedKeysRef);
+
+    saveKeys([rest.task, rest.apiEndpoint], cachedKeysRef);
 
     newItemCallback({
       ...rest,
@@ -528,9 +537,9 @@ export function ClassCreationController({
         onAddNewItem={handleNewItem}
       />
       <SimpleAddButtonWithToolTip
+        {...inputControllers[4]}
         toolTipText="Ajouter des étudiants"
-        onClick={(e) => handleAttendanceClick(e, { ...inputControllers[4] })}
-      
+        onClick={handleAttendanceClick}
       />
       <SimpleAvatarList
         items={Object.entries(studentsRef.current ?? []).map(
