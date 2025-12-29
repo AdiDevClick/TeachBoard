@@ -50,8 +50,6 @@ export function SimpleAvatarList({ items }: Readonly<SimpleAvatarListProps>) {
     return null;
   }
 
-  console.log(items);
-
   return (
     <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
       <SimpleAvatarWithListMapper items={items} />
