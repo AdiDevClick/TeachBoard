@@ -96,17 +96,20 @@ export function handleModalOpening({
  * @returns True if any forbidden keys are present or any required keys are missing; otherwise, false.
  */
 export function checkPropsValidity(
-  props: Record<string, unknown>,
+  props: unknown,
   required: string[],
   forbidden: string[]
 ) {
+  if (typeof props !== "object" || props === null) return true;
+  const propsRecord = props as Record<string, unknown>;
+
   const forbiddenPresent = forbidden.some(
-    (forbiddenKey) => forbiddenKey in props
+    (forbiddenKey) => forbiddenKey in propsRecord
   );
 
   const requiredPresent = required.some((requiredKey) => {
-    if (!(requiredKey in props)) return true;
-    const value = props[requiredKey];
+    if (!(requiredKey in propsRecord)) return true;
+    const value = propsRecord[requiredKey];
     return value === undefined || value === null || value === "";
   });
   return forbiddenPresent || requiredPresent;
