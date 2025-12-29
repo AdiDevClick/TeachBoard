@@ -40,7 +40,6 @@ function TaskTemplateCreation({
       pageId,
       inputControllers,
       formId,
-      form,
       modalMode,
       footerProps: {
         ...footerProps,
@@ -49,6 +48,7 @@ function TaskTemplateCreation({
       },
       titleProps,
       ...props,
+      form,
     }),
     [form.formState, props]
   );
