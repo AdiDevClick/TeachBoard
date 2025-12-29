@@ -1,10 +1,17 @@
 import { AvatarDisplay } from "@/components/Avatar/AvatarDisplay.tsx";
-import type { CommandItemType } from "@/components/Command/types/command.types.ts";
+import type { CommandSelectionItemProps } from "@/components/Command/types/command.types.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { CommandItem } from "@/components/ui/command.tsx";
 import { CheckIcon, Plus } from "lucide-react";
 import { Activity, useCallback, useState } from "react";
 
+/**
+ * Props for CommandSelectionItem component.
+ *
+ * @param command - The command item data.
+ * @param details - Additional details for the command item.
+ * @param multiSelection - Flag indicating if multiple selections are allowed.
+ */
 export function CommandSelectionItem(props: CommandSelectionItemProps) {
   const {
     command,
@@ -19,6 +26,7 @@ export function CommandSelectionItem(props: CommandSelectionItemProps) {
   const [avatarSelection, setAvatarSelection] = useState(
     command.isSelected || false
   );
+
   const { id, disabled, value, ...otherCommands } = command;
   const isSelected = multiSelection
     ? selectedValue.has(value)
@@ -29,7 +37,7 @@ export function CommandSelectionItem(props: CommandSelectionItemProps) {
       command.isSelected = !command.isSelected;
       setAvatarSelection(command.isSelected);
     }
-    onSelect(value, { ...command, ...details });
+    onSelect?.(value, { ...command, ...details });
   }, []);
 
   return (
@@ -59,37 +67,4 @@ export function CommandSelectionItem(props: CommandSelectionItemProps) {
       </Activity>
     </CommandItem>
   );
-}
-
-/**
- * Define if the item is selected based on selection mode
- *
- * @param value - The value of the item
- * @param selectedValue - The currently selected value(s)
- * @param multiSelection - Whether multi-selection is enabled
- * @returns True if the item is selected, false otherwise
- */
-function defineSelection(
-  value: string,
-  selectedValue?: string | Set<string>,
-  multiSelection?: boolean,
-  avatarDisplay?: boolean,
-  command?: CommandItemType
-) {
-  if (!selectedValue) return false;
-
-  if (multiSelection) {
-    const isLocalSelection = (selectedValue as Set<string>).has(value);
-    const isSelectedCommandAvailable =
-      avatarDisplay && command?.isSelected !== undefined;
-    if (isSelectedCommandAvailable) {
-      if (command.isSelected && isLocalSelection) return false;
-      return command.isSelected;
-    }
-    return isLocalSelection;
-  }
-  return selectedValue === value;
-  // return multiSelection
-  //   ? (selectedValue as Set<string>).has(value)
-  //   : selectedValue === value;
 }
