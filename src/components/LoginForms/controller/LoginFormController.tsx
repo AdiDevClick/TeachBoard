@@ -18,7 +18,8 @@ import type {
   LoginFormSchema,
   RecoveryFormSchema,
 } from "@/models/login.models.ts";
-import { startTransition, useEffect } from "react";
+import { wait } from "@/utils/utils.ts";
+import { startTransition, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 const toastId = "login-loading";
@@ -51,6 +52,9 @@ export function LoginFormController({
       pageId,
     });
 
+  // Prevent effect from re-running when `open` changes after login success
+  const hasHandledLoginSuccess = useRef(false);
+
   /** Log user data on change (for development purposes) */
   useEffect(() => {
     if (user) {
@@ -66,6 +70,17 @@ export function LoginFormController({
    * @description It will open the sidebar upon successful login and navigate to the home page.
    */
   useEffect(() => {
+    const resetFormAndTriggerNavigation = async () => {
+      await wait(50);
+
+      // !! IMPORTANT !! - Use startTransition to avoid blocking UI updates
+      startTransition(() => {
+        if (!open) setOpen(true);
+      });
+
+      navigate("/", { replace: true });
+    };
+
     if (isLoading && !toast.getToasts().some((t) => t.id === toastId)) {
       toast.dismiss();
       toast.loading("Connexion en cours...", {
@@ -83,19 +98,13 @@ export function LoginFormController({
       }
     }
 
-    if (data) {
-      // Navigate ONLY after transitions
-      // Avoids UI jank and a React render warning
-      startTransition(() => {
-        // await wait(APP_REDIRECT_TIMEOUT_SUCCESS);
-        if (!open) setOpen(true);
-        navigate("/", { replace: true });
-      });
+    if (data && !hasHandledLoginSuccess.current) {
+      hasHandledLoginSuccess.current = true;
+      resetFormAndTriggerNavigation();
 
       if (isPwForgotten) {
         newItemCallback({ e: null, task: "pw-recovery-email-sent" });
       } else {
-        toast.dismiss(toastId);
         toast.success("Connexion réussie !", {
           id: "login-success-toast",
         });
@@ -105,7 +114,7 @@ export function LoginFormController({
         console.debug("Query success in LoginForm", data);
       }
     }
-  }, [isLoading, error, data, open]);
+  }, [isLoading, error, data]);
 
   const handleOnOpen = ({ e, ...rest }: HandleAddNewItemParams) => {
     newItemCallback({ e, ...rest });
@@ -131,7 +140,7 @@ export function LoginFormController({
       { login }
     );
   };
-
+  console.log("Je rerender le LoginForm");
   return (
     <form
       ref={(el) => setRef(el, { name: pageId, id: formId })}
