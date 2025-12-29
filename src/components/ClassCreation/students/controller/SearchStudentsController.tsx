@@ -92,7 +92,7 @@ export function SearchStudentsController({
         shouldDirty: true,
       });
 
-      form.setValue("studentsValues", Array.from(selectedStudents).entries(), {
+      form.setValue("studentsValues",selectedStudents, {
         shouldValidate: true,
         shouldDirty: true,
       });
