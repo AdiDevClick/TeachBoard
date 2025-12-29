@@ -45,8 +45,11 @@ function DiplomaCreation({
     },
   });
 
-  const commonProps = useMemo(
-    () => ({
+  const commonProps = useMemo(() => {
+    const props_without_form = { ...props };
+    delete props_without_form.form;
+
+    return {
       pageId,
       modalMode,
       form,
@@ -58,10 +61,9 @@ function DiplomaCreation({
         formId,
       },
       inputControllers,
-      ...props,
-    }),
-    [form.formState, props]
-  );
+      ...props_without_form,
+    };
+  }, [form.formState, props]);
   return <DiplomaWithCard {...commonProps} />;
 }
 

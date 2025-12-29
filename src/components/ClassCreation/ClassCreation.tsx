@@ -533,7 +533,6 @@ function ClassCreation({
       pageId,
       modalMode,
       className,
-      form,
       formId,
       titleProps,
       footerProps: {
@@ -543,6 +542,7 @@ function ClassCreation({
       },
       inputControllers,
       ...props,
+      form,
     }),
     [form.formState, props]
   );

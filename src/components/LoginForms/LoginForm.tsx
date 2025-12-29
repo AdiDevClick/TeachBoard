@@ -75,8 +75,10 @@ function LoginForm({
 
   const formId = pageId + "-form";
 
-  const commonProps = useMemo(
-    () => ({
+  const commonProps = useMemo(() => {
+    const props_without_form = { ...props };
+    delete props_without_form.form;
+    return {
       pageId,
       formId,
       form,
@@ -91,10 +93,9 @@ function LoginForm({
         pwForgottenLinkTo,
         buttonText,
       },
-      ...props,
-    }),
-    [form.formState, isPwForgotten, props]
-  );
+      ...props_without_form,
+    };
+  }, [form.formState, isPwForgotten, props]);
 
   return <LoginFormWithCard {...commonProps} />;
 }

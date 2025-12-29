@@ -51,7 +51,6 @@ export function TaskItem({
       pageId,
       inputControllers,
       formId,
-      form,
       footerProps: {
         ...footerProps,
         formState: form.formState,
@@ -60,6 +59,7 @@ export function TaskItem({
       modalMode,
       titleProps,
       ...props,
+      form,
     }),
     [form.formState, props]
   );

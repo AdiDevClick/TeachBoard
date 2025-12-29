@@ -52,7 +52,6 @@ function DegreeItem({
       pageId,
       inputControllers,
       formId,
-      form,
       footerProps: {
         ...footerProps,
         formState: form.formState,
@@ -61,6 +60,7 @@ function DegreeItem({
       modalMode,
       titleProps,
       ...props,
+      form,
     }),
     [form.formState, props]
   );
