@@ -14,4 +14,8 @@ export type LoginButtonProps = ComponentProps<"button"> &
 /** SimpleAddButton types */
 export type SimpleAddButtonProps = ComponentProps<typeof Button> & {
   toolTipText?: string;
+  onClick?: (
+    event: React.MouseEvent<HTMLButtonElement>,
+    rest: Omit<ComponentProps<typeof Button>, "onClick">
+  ) => void;
 };
