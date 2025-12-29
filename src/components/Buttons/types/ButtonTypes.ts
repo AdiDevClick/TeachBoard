@@ -1,7 +1,7 @@
 import type { Button } from "@/components/ui/button.tsx";
 import type { LoginButtonsSvgsType } from "@/configs/social.config";
 import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
-import type { ComponentProps } from "react";
+import type { ComponentProps, MouseEvent } from "react";
 
 /**
  * LOGIN BUTTON types
@@ -12,10 +12,10 @@ export type LoginButtonProps = ComponentProps<"button"> &
   (LoginButtonsSvgsType | SafeListMapperProp<LoginButtonsSvgsType>);
 
 /** SimpleAddButton types */
-export type SimpleAddButtonProps = ComponentProps<typeof Button> & {
+export type SimpleAddButtonWithToolTipProps = ComponentProps<typeof Button> & {
   toolTipText?: string;
   onClick?: (
-    event: React.MouseEvent<HTMLButtonElement>,
+    event: MouseEvent<HTMLButtonElement>,
     rest: Omit<ComponentProps<typeof Button>, "onClick">
   ) => void;
 };
