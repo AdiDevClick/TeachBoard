@@ -1,4 +1,4 @@
-import type { SimpleAddButtonProps } from "@/components/Buttons/types/ButtonTypes.ts";
+import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Tooltip,
@@ -11,6 +11,7 @@ import {
 } from "@/configs/app-components.config.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { PlusIcon } from "lucide-react";
+import type { MouseEvent, PointerEvent } from "react";
 
 /**
  * A simple button with a plus icon and a tooltip.
@@ -18,7 +19,9 @@ import { PlusIcon } from "lucide-react";
  * @param toolTipText The label to show in the tooltip
  * @param props Additional button props
  */
-export function SimpleAddButtonWithToolTip(props: SimpleAddButtonProps) {
+export function SimpleAddButtonWithToolTip(
+  props: SimpleAddButtonWithToolTipProps
+) {
   if (simpleAddButtonWithToolTipPropsInvalid(props)) {
     debugLogs("Rendering SimpleAddButtonWithToolTip");
   }
@@ -32,13 +35,16 @@ export function SimpleAddButtonWithToolTip(props: SimpleAddButtonProps) {
    *
    * @param event - The mouse event triggered by clicking the button
    */
-  const handleLocalClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    preventDefaultAndStopPropagation(event);
+  const handleLocalClick = (
+    e: PointerEvent<HTMLButtonElement> | MouseEvent<HTMLButtonElement>
+  ) => {
+    preventDefaultAndStopPropagation(e);
 
     if (externalOnClick) {
-      externalOnClick(event, rest);
+      externalOnClick({ e, ...rest });
     }
   };
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
