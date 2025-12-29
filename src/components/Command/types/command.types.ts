@@ -1,5 +1,5 @@
 import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
-import type { Command } from "@/components/ui/command.tsx";
+import type { Command, CommandItem } from "@/components/ui/command.tsx";
 import type { ComponentProps, ReactNode } from "react";
 
 /** A heading with a title and corresponding values */
@@ -28,3 +28,13 @@ export type CommandsProps = {
   /** Callback appelé quand un item de commande est sélectionné */
   onSelect?: (value: string, commandItem: CommandItemType) => void;
 } & Omit<ComponentProps<typeof Command>, "onSelect">;
+
+/**
+ * Props for CommandSelectionItem component.
+ */
+export type CommandSelectionItemProps = {
+  command: CommandItemType & { isSelected?: boolean };
+  details?: Record<string, any>;
+  selectedValue: string | Set<string>;
+} & Omit<ComponentProps<typeof CommandItem>, "onSelect"> &
+  Omit<CommandsProps, "commandHeadings">;
