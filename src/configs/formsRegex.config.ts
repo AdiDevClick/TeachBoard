@@ -3,6 +3,7 @@ export const formsRegex = {
   serverEmail: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, // matches provided EMAIL_REGEX
   serverUsername: /^[a-zA-Z0-9._-]{3,}$/, // matches provided USERNAME_REGEX
   noSpecialCharsWithTwoCharMin: /^[a-zA-Z0-9 ]{2,}$/,
+  skillId: /^[a-zA-Z0-9_-]{2,}$/, // For skill IDs like MAIN_2F90AB
   // Name fields (e.g. diploma names) should support Unicode letters and
   // common separators like spaces, hyphens and apostrophes. These patterns
   // are used server-side and for client-side immediate sanitization.
