@@ -1,8 +1,7 @@
-import { SimpleAvatarList } from "@/components/Avatar/SimpleAvatar.tsx";
-import { SimpleAddButtonWithToolTip } from "@/components/Buttons/SimpleAddButton.tsx";
 import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
 import { resetSelectedItemsFromCache } from "@/components/ClassCreation/functions/class-creation.functions.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
+import { AvatarsWithLabelAndAddButtonList } from "@/components/Form/AvatarListWithLabelAndAddButton.tsx";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import {
@@ -12,31 +11,20 @@ import {
 import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem.tsx";
 import { VerticalFieldSelectWithController } from "@/components/Selects/VerticalFieldSelect.tsx";
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { classCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
+import { useAvatarDataGenerator } from "@/hooks/useAvatarDataGenerator.ts";
 import type {
   ClassCreationFormSchema,
   ClassCreationInputItem,
 } from "@/models/class-creation.models.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
-import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  Activity,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type MouseEvent,
-} from "react";
+import { Activity, useCallback, useEffect, useRef, useState } from "react";
+import { useWatch } from "react-hook-form";
 
 const year = new Date().getFullYear();
 const years = yearsListRange(year, 5);
@@ -78,11 +66,17 @@ export function ClassCreationController({
   const [state, setState] = useState(defaultState);
   const [isYearOpened, setIsYearOpened] = useState(false);
   const [isSelectedDiploma, setIsSelectedDiploma] = useState(false);
-  // const currentStudents = Array.from(form.watch("studentsValues") || []);
-  const tasksRef = useRef<Set<unknown>>(null!);
-  const studentsRef = useRef(null!);
-  const primaryTeacherRef = useRef(null!);
+
   const queryClient = useQueryClient();
+  const studentsMemo = useAvatarDataGenerator(form, "studentsValues");
+  const primaryTeacherMemo = useAvatarDataGenerator(
+    form,
+    "primaryTeacherValue"
+  );
+  const tasksValues = useWatch({
+    control: form.control,
+    name: "tasksValues",
+  });
 
   const {
     error,
@@ -103,23 +97,8 @@ export function ClassCreationController({
     pageId,
   });
 
-  const cachedKeysRef = useRef<unknown[]>([]);
+  const cachedKeysRef = useRef<Record<string, unknown[]>>({});
   const selectedDiplomaRef = useRef<CommandItemType | null>(null);
-
-  /**
-   * Sync studentsRef with form's studentsValues
-   * Sync primaryTeacherRef with form's primaryTeacherValue
-   * Sync tasksRef with form's tasksValues
-   *
-   * @description Updates the studentsRef, primaryTeacherRef, and tasksRef whenever the values change in the form.
-   *
-   * @remark This is necessary to keep the ref in sync with the form state, as refs do not trigger re-renders.
-   */
-  useEffect(() => {
-    studentsRef.current = Object.values(form.watch("studentsValues") || []);
-    primaryTeacherRef.current = form.watch("primaryTeacherValue") || [];
-    tasksRef.current = new Set(form.watch("tasksValues") || []);
-  }, [form]);
 
   /**
    * Handle modal close behavior
@@ -131,18 +110,22 @@ export function ClassCreationController({
 
     if (isModalOpen) return;
 
-    if (Object.entries(studentsRef.current ?? {}).length > 0) {
+    const currentStudentsValues = form.getValues("studentsValues") ?? {};
+    const currentPrimaryTeacherValue =
+      form.getValues("primaryTeacherValue") ?? {};
+
+    if (Object.keys(currentStudentsValues).length > 0) {
       resetSelectedItemsFromCache(
         cachedKeysRef.current["search-students"],
-        studentsRef.current,
+        currentStudentsValues,
         queryClient
       );
     }
 
-    if (Object.entries(primaryTeacherRef.current ?? {}).length > 0) {
+    if (Object.keys(currentPrimaryTeacherValue).length > 0) {
       resetSelectedItemsFromCache(
         cachedKeysRef.current["search-primaryteacher"],
-        primaryTeacherRef.current,
+        currentPrimaryTeacherValue,
         queryClient
       );
     }
@@ -240,16 +223,19 @@ export function ClassCreationController({
     commandItemDetails: CommandItemType
   ) => {
     const taskTemplateId = commandItemDetails.id;
-    const tasks = new Set(form.watch("tasks") || []);
 
-    if (tasksRef.current?.has(value)) {
+    const tasks = new Set(form.watch("tasks") || []);
+    const values = new Set(tasksValues);
+
+    if (values?.has(value)) {
       tasks.delete(taskTemplateId);
-      tasksRef.current.delete(value);
+      values.delete(value);
     } else {
-      tasksRef.current.add(value);
+      values.add(value);
       tasks.add(taskTemplateId);
     }
-    form.setValue("tasksValues", Array.from(tasksRef.current), {
+
+    form.setValue("tasksValues", Array.from(values), {
       shouldValidate: true,
     });
 
@@ -270,7 +256,7 @@ export function ClassCreationController({
       setIsSelectedDiploma(!!commandItem);
       form.setValue("degreeConfigId", commandItem.id, { shouldValidate: true });
       form.setValue("tasks", [], { shouldValidate: true });
-      tasksRef.current = new Set();
+      form.setValue("tasksValues", [], { shouldValidate: true });
     }
   };
 
@@ -288,23 +274,15 @@ export function ClassCreationController({
       });
     }
     const task = rest.task;
-
+    rest.form = form;
     console.log("opening new students item");
 
     if (task === "search-students") {
-      rest.apiEndpoint = API_ENDPOINTS.GET.STUDENTS.endpoint;
-      rest.dataReshapeFn = API_ENDPOINTS.GET.STUDENTS.dataReshape;
-      rest.form = form;
-      rest.selectedStudents = studentsRef.current;
-      saveKeys([task, rest.apiEndpoint], cachedKeysRef);
+      rest.selectedStudents = form.getValues("studentsValues") ?? {};
     }
 
     if (task === "search-primaryteacher") {
-      rest.apiEndpoint = API_ENDPOINTS.GET.TEACHERS.endpoint;
-      rest.dataReshapeFn = API_ENDPOINTS.GET.TEACHERS.dataReshape;
-      rest.form = form;
-      rest.selectedPrimaryTeacher = primaryTeacherRef.current;
-      saveKeys([task, rest.apiEndpoint], cachedKeysRef);
+      rest.selectedPrimaryTeacher = form.getValues("primaryTeacherValue") ?? {};
     }
 
     if (task === "new-task-template" && selectedDiplomaRef.current) {
@@ -315,32 +293,10 @@ export function ClassCreationController({
       rest.selectedDiploma = selectedDiplomaRef.current;
       rest.shortTemplatesList = data.data.shortTemplatesList;
     }
+    saveKeys([task, rest.apiEndpoint], cachedKeysRef);
 
     newItemCallback({
       e,
-      ...rest,
-    });
-  };
-
-  /**
-   * Handle attendance button click
-   *
-   * @description This saves the keys related to the students task.
-   * Using the input controller props, it passes endpoint information & selected students for processing/retrieval.
-   *
-   * @param e - The mouse event triggered by clicking the button
-   * @param rest - Additional parameters related to the new item
-   */
-
-  const handleAttendanceClick = (e: MouseEvent<HTMLButtonElement>, rest) => {
-    preventDefaultAndStopPropagation(e);
-
-    rest.form = form;
-    rest.selectedStudents = studentsRef.current;
-
-    saveKeys([rest.task, rest.apiEndpoint], cachedKeysRef);
-
-    newItemCallback({
       ...rest,
     });
   };
@@ -508,8 +464,18 @@ export function ClassCreationController({
   // Get the current skills from the form
 
   // console.log("Current Students => ", currentStudents);
-  console.log("Current Students in REF => ", studentsRef.current);
+  // console.log("Current Students in REF => ", studentsRef.current);
 
+  const controllers = [
+    {
+      ...inputControllers[4],
+      items: studentsMemo,
+    },
+    {
+      ...inputControllers[5],
+      items: primaryTeacherMemo,
+    },
+  ];
   return (
     <form
       ref={(el) => setRef(el, { name: pageId, formId })}
@@ -523,7 +489,7 @@ export function ClassCreationController({
         setRef={setRef}
       />
       <PopoverFieldWithControllerAndCommandsList
-        items={inputControllers.slice(3, 5)}
+        items={inputControllers.slice(3, 4)}
         form={form}
         // id={`${pageId}-year`}
         setRef={setRef}
@@ -536,22 +502,17 @@ export function ClassCreationController({
         onSelect={handleOnSelect}
         onAddNewItem={handleNewItem}
       />
-      <SimpleAddButtonWithToolTip
+      <AvatarsWithLabelAndAddButtonList
+        items={controllers}
+        type="button"
+        onClick={handleNewItem}
+      />
+      {/* <AvatarListWithLabelAndAddButton
         {...inputControllers[4]}
-        toolTipText="Ajouter des étudiants"
-        onClick={handleAttendanceClick}
-      />
-      <SimpleAvatarList
-        items={Object.entries(studentsRef.current ?? []).map(
-          ([fullName, studentDetails]: any) => ({
-            src: `https://github.com/${studentDetails.firstName}.png`,
-            alt: `@${fullName}`,
-            fallback:
-              (studentDetails.firstName?.slice(0, 1).toUpperCase() || "") +
-              (studentDetails.lastName?.slice(0, 1).toUpperCase() || ""),
-          })
-        )}
-      />
+        type="button"
+        items={studentsMemo}
+        onClick={handleNewItem}
+      /> */}
       {/* <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
         {Object.entries(studentsRef.current ?? []).map(
           ([fullName, studentDetails]) => (
@@ -568,7 +529,7 @@ export function ClassCreationController({
           )
         )}
       </div> */}
-      <PopoverFieldWithControllerAndCommandsList
+      {/* <PopoverFieldWithControllerAndCommandsList
         items={inputControllers.slice(5, 6)}
         form={form}
         setRef={setRef}
@@ -582,7 +543,7 @@ export function ClassCreationController({
         onAddNewItem={handleNewItem}
       />
       <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
-        {Object.entries(primaryTeacherRef.current ?? []).map(
+        {Object.entries(primaryTeacherMemo).map(
           ([fullName, teacherDetails]) => (
             <Avatar key={teacherDetails.id}>
               <AvatarImage
@@ -596,14 +557,15 @@ export function ClassCreationController({
             </Avatar>
           )
         )}
-      </div>
+      </div> */}
       <Activity mode={isSelectedDiploma ? "visible" : "hidden"}>
         <ControlledDynamicTagList
           form={form}
           setRef={setRef}
           {...inputControllers[2]}
           observedRefs={observedRefs}
-          itemList={Array.from(tasksRef.current || [])}
+          itemList={tasksValues}
+          // itemList={Array.from(tasksRef.current || [])}
         />
         <PopoverFieldWithCommands
           multiSelection
@@ -612,6 +574,7 @@ export function ClassCreationController({
           onOpenChange={handleOpening}
           observedRefs={observedRefs}
           onAddNewItem={handleNewItem}
+          resetKey={form.watch("degreeConfigId")}
           commandHeadings={resultsCallback([
             fetchParams.contentId,
             fetchParams.url,
@@ -791,8 +754,12 @@ export function ClassCreationController({
  * @param keys - The keys to be saved.
  * @param ref - The ref object where the keys will be stored.
  */
-function saveKeys(keys: unknown[], ref: object) {
-  ref.current = { ...ref.current, [keys[0]]: keys };
+function saveKeys(
+  keys: unknown[],
+  ref: { current: Record<string, unknown[]> }
+) {
+  const key = String(keys[0]);
+  ref.current = { ...ref.current, [key]: keys };
 }
 
 /**
