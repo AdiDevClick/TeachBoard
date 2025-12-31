@@ -1,4 +1,8 @@
 import {
+  createDisabledGroup,
+  handleDiplomaChange,
+} from "@/components/ClassCreation/functions/class-creation.functions.ts";
+import {
   createTaskTemplateView,
   updateValues,
 } from "@/components/ClassCreation/task/task-template/functions/task-template.functions.ts";
@@ -38,19 +42,23 @@ export function TaskTemplateCreationController({
     openingCallback,
     submitCallback,
     dialogOptions,
+    openedDialogs,
   } = useCommandHandler({
     form,
     pageId,
   });
   const queryClient = useQueryClient();
   const savedSkills = useRef(null!);
+  const dialogData = dialogOptions(pageId);
   const diplomaDatas = useMemo(() => {
-    const dialogData = dialogOptions(pageId);
     return {
       diploma: dialogData?.selectedDiploma ?? null,
       shortTemplatesList: dialogData?.shortTemplatesList ?? [],
     };
-  }, [dialogOptions, pageId]);
+  }, [dialogData]);
+
+  const itemToDisplay = useRef(null!);
+  const activeDiplomaIdRef = useRef(null!);
 
   /**
    * Callback to reshape and retrieve cached data based on query keys.
@@ -58,54 +66,69 @@ export function TaskTemplateCreationController({
    * @param keys - The query keys used to retrieve cached data
    * @returns The reshaped cached data or the original data if not found
    */
-  const resultsCallback = useCallback((keys: unknown[]) => {
-    const cachedData = queryClient.getQueryData(keys ?? []);
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Cached data for ", keys, " is ", cachedData);
-    }
-
-    const isRetrievedSkills = keys[0] === "new-task-skill";
-
-    if (cachedData === undefined && !isRetrievedSkills) {
-      return data;
-    }
-
-    if (isRetrievedSkills && diplomaDatas.diploma) {
-      if (!savedSkills.current) {
-        const displayedSkills = createTaskTemplateView(
-          diplomaDatas.diploma.skills
-        );
-
-        savedSkills.current = displayedSkills;
-
-        return displayedSkills;
+  const resultsCallback = useCallback(
+    (keys: unknown[]) => {
+      const cachedData = queryClient.getQueryData(keys ?? []);
+      if (!data && cachedData === undefined && keys[0] === "none") return;
+      if (DEV_MODE && !NO_CACHE_LOGS) {
+        console.log("Cached data for ", keys, " is ", cachedData);
       }
 
-      return savedSkills.current;
-    }
-    if (keys[0] === "new-task-item" && Array.isArray(cachedData)) {
-      const disabledItems = {
-        groupTitle: "Déjà utilisés",
-        items: [],
-      };
+      if (!openedDialogs.includes(pageId)) {
+        return cachedData ?? data;
+      }
 
-      // Move already-used templates into a disabled group without using delete
-      const filteredItems = cachedData[0].items.filter((item) => {
-        if (diplomaDatas.shortTemplatesList.includes(item.name)) {
-          disabledItems.items.push({ ...item, disabled: true });
-          return false;
-        }
-        return true;
+      const isFetchedSkills = keys[0] === "new-task-skill";
+      const isFetchedTasks = keys[0] === "new-task-item";
+      const currentDiplomaId = diplomaDatas.diploma?.id;
+
+      const isDiplomaChanged = handleDiplomaChange({
+        currentId: currentDiplomaId,
+        activeDiplomaIdRef,
+        savedSkills,
+        itemToDisplay,
       });
 
-      cachedData[0].items = filteredItems;
-
-      if (disabledItems.items.length) {
-        cachedData.push(disabledItems);
+      if (cachedData === undefined && !isFetchedSkills) {
+        return data;
       }
-    }
-    return cachedData;
-  }, []);
+
+      if (isFetchedSkills) {
+        if (!diplomaDatas.diploma) return undefined;
+        if (!savedSkills.current) {
+          const displayedSkills = createTaskTemplateView(
+            diplomaDatas.diploma.skills
+          );
+          savedSkills.current = displayedSkills;
+          return displayedSkills;
+        }
+        return savedSkills.current;
+      }
+
+      if (isFetchedTasks) {
+        if (!Array.isArray(cachedData)) return undefined;
+        let dataCopy = itemToDisplay.current;
+
+        // Build (or rebuild) the display list when needed.
+        // - first open: itemToDisplay is null
+        // - diploma changed: needs a reset
+        if (dataCopy === null || isDiplomaChanged) {
+          dataCopy = createDisabledGroup({
+            dataCopy,
+            cachedData,
+            diplomaDatas,
+            currentDiplomaId,
+            activeDiplomaIdRef,
+          });
+          itemToDisplay.current = dataCopy;
+        }
+        return dataCopy;
+      }
+
+      return cachedData;
+    },
+    [data, diplomaDatas, openedDialogs, pageId, queryClient]
+  );
 
   /**
    * Handle form submission

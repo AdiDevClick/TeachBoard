@@ -163,7 +163,7 @@ export function ClassCreationController({
   const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
     const linkedDiploma = selectedDiplomaRef.current;
     const isNewTaskTemplate =
-      metaData?.task === "new-task-template" && linkedDiploma;
+      metaData?.task === "new-task-template" && linkedDiploma.id !== undefined;
 
     if (isNewTaskTemplate) {
       metaData.apiEndpoint =
@@ -224,10 +224,11 @@ export function ClassCreationController({
   ) => {
     const taskTemplateId = commandItemDetails.id;
 
-    const tasks = new Set(form.watch("tasks") || []);
-    const values = new Set(tasksValues);
+    const tasks = new Set(form.getValues("tasks") || []);
 
-    if (values?.has(value)) {
+    const values = new Set(form.getValues("tasksValues") || []);
+
+    if (values.has(value)) {
       tasks.delete(taskTemplateId);
       values.delete(value);
     } else {
@@ -291,7 +292,8 @@ export function ClassCreationController({
           selectedDiplomaRef.current.id
         );
       rest.selectedDiploma = selectedDiplomaRef.current;
-      rest.shortTemplatesList = data.data.shortTemplatesList;
+      const cached = queryClient.getQueryData([task, rest.apiEndpoint]);
+      rest.shortTemplatesList = cached?.[0]?.shortTemplatesList ?? [];
     }
     saveKeys([task, rest.apiEndpoint], cachedKeysRef);
 

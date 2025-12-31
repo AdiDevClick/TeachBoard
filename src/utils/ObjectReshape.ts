@@ -699,12 +699,14 @@ export class ObjectReshape<T extends Record<string, unknown>> {
         value: unknown,
         receiver: unknown
       ): boolean => {
-        console.log(
-          "SET EARLY trap called for prop:",
-          prop,
-          "with value:",
-          value
-        );
+        if (DEV_MODE && !NO_PROXY_LOGS) {
+          console.log(
+            "SET EARLY trap called for prop:",
+            prop,
+            "with value:",
+            value
+          );
+        }
 
         // Default behaviour: write directly to the target.
         return Reflect.set(target, prop, value, receiver);

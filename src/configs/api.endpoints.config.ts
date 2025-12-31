@@ -97,7 +97,10 @@ export const API_ENDPOINTS = Object.freeze({
       dataReshape: (data: any) =>
         dataReshaper(data.taskTemplates)
           .selectElementsTo(["task", "id"], "items")
-          .addToRoot({ groupTitle: "Tous" })
+          .addToRoot({
+            groupTitle: "Tous",
+            shortTemplatesList: data.shortTemplatesList ?? [],
+          })
           .assign([["name", "value"]])
           .newShape(),
     },
