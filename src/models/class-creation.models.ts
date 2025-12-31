@@ -1,9 +1,9 @@
-import type { InputItem } from "@/components/Inputs/types/inputs.types.ts";
+import type { FetchingInputItem } from "@/components/Inputs/types/inputs.types.ts";
 import z, { uuid } from "zod";
 
 export type ClassCreationFormSchema = z.infer<typeof classCreationSchema>;
 
-export type ClassCreationInputItem = InputItem<ClassCreationFormSchema>;
+export type ClassCreationInputItem = FetchingInputItem<ClassCreationFormSchema>;
 
 /**
  * Schema for class creation form validation

@@ -16,14 +16,54 @@ import type {
  * Un exemple of a component using this type is:
  * {@link LoginForm}
  */
-export type InputItem<T> = {
+type BaseInputItem<T> = {
   name: Path<T>;
-  title: string;
   type: HTMLInputTypeAttribute;
-  placeholder: string;
+  placeholder?: string;
   autoComplete?: string;
   required?: boolean;
 };
+
+/**
+ * Input item requires either a title or a label (for components that only render labels).
+ */
+export type InputItem<T> =
+  | (BaseInputItem<T> & { title: string; label?: string })
+  | (BaseInputItem<T> & { title?: string; label: string });
+
+type FetchingInputBase<T> = InputItem<T> & {
+  apiEndpoint?: string | ((id: number | string) => string);
+  dataReshapeFn?: (data: unknown) => Record<string, unknown>;
+  useButtonAddNew?: boolean;
+  fullWidth?: boolean;
+  creationButtonText?: string | boolean;
+  label?: string;
+  defaultValue?: string;
+  id?: string;
+  toolTipText?: string;
+  multiSelection?: boolean;
+};
+
+/**
+ * Variant used when a command palette / modal is available.
+ * Ensures `task` is set whenever `useCommands` is enabled.
+ */
+export type CommandInputItem<T> = FetchingInputBase<T> & {
+  useCommands: true;
+  task: string;
+};
+
+/**
+ * Fetching input that does not rely on commands (default case).
+ */
+type NonCommandFetchingInputItem<T> = FetchingInputBase<T> & {
+  useCommands?: false;
+  task?: string;
+};
+
+export type FetchingInputItem<T> =
+  | CommandInputItem<T>
+  | NonCommandFetchingInputItem<T>;
 
 /** Props for the Inputs component */
 export type ControlledInputsProps<T extends FieldValues> = {
