@@ -509,57 +509,6 @@ export function ClassCreationController({
         type="button"
         onClick={handleNewItem}
       />
-      {/* <AvatarListWithLabelAndAddButton
-        {...inputControllers[4]}
-        type="button"
-        items={studentsMemo}
-        onClick={handleNewItem}
-      /> */}
-      {/* <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
-        {Object.entries(studentsRef.current ?? []).map(
-          ([fullName, studentDetails]) => (
-            <Avatar key={studentDetails.id}>
-              <AvatarImage
-                src={`https://github.com/${studentDetails.firstName}.png`}
-                alt={`@${fullName}`}
-              />
-              <AvatarFallback>
-                {studentDetails.firstName.slice(0, 1).toUpperCase()}
-                {studentDetails.lastName.slice(0, 1).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          )
-        )}
-      </div> */}
-      {/* <PopoverFieldWithControllerAndCommandsList
-        items={inputControllers.slice(5, 6)}
-        form={form}
-        setRef={setRef}
-        commandHeadings={resultsCallback([
-          fetchParams.contentId,
-          fetchParams.url,
-        ])}
-        observedRefs={observedRefs}
-        onOpenChange={handleOpening}
-        onSelect={handleOnSelect}
-        onAddNewItem={handleNewItem}
-      />
-      <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
-        {Object.entries(primaryTeacherMemo).map(
-          ([fullName, teacherDetails]) => (
-            <Avatar key={teacherDetails.id}>
-              <AvatarImage
-                src={`https://github.com/${teacherDetails.firstName}.png`}
-                alt={`@${fullName}`}
-              />
-              <AvatarFallback>
-                {teacherDetails.firstName.slice(0, 1).toUpperCase()}
-                {teacherDetails.lastName.slice(0, 1).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-          )
-        )}
-      </div> */}
       <Activity mode={isSelectedDiploma ? "visible" : "hidden"}>
         <ControlledDynamicTagList
           form={form}
@@ -567,7 +516,6 @@ export function ClassCreationController({
           {...inputControllers[2]}
           observedRefs={observedRefs}
           itemList={tasksValues}
-          // itemList={Array.from(tasksRef.current || [])}
         />
         <PopoverFieldWithCommands
           multiSelection
