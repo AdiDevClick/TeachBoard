@@ -19,33 +19,31 @@ const fieldData = {
 };
 
 const diplomaSchema = (data: typeof fieldData) => {
-  return z
-    .object({
-      diplomaFieldId: z
-        .uuid(data.diplomaValidUuidMessage)
-        .trim()
-        .nonempty(data.diplomaRequiredMessage),
-      yearId: z
-        .uuid(data.schoolYearValidUuidMessage)
-        .trim()
-        .nonempty(data.schoolYearRequiredMessage),
-      levelId: z
-        .uuid(data.schoolLevelValidUuidMessage)
-        .trim()
-        .nonempty(data.schoolLevelRequiredMessage),
-      mainSkillsList: z
-        .array(
-          z
-            .string()
-            .regex(formsRegex.skillId, data.arrayItemRegexMessage)
-            .trim()
-            .toUpperCase()
-        )
-        .min(data.minArrayLength, data.minArrayLengthMessage)
-        .max(data.maxArrayLength, data.maxArrayLengthExceededMessage)
-        .nonoptional(),
-    })
-    .strict();
+  return z.object({
+    diplomaFieldId: z
+      .uuid(data.diplomaValidUuidMessage)
+      .trim()
+      .nonempty(data.diplomaRequiredMessage),
+    yearId: z
+      .uuid(data.schoolYearValidUuidMessage)
+      .trim()
+      .nonempty(data.schoolYearRequiredMessage),
+    levelId: z
+      .uuid(data.schoolLevelValidUuidMessage)
+      .trim()
+      .nonempty(data.schoolLevelRequiredMessage),
+    mainSkillsList: z
+      .array(
+        z
+          .string()
+          .regex(formsRegex.skillId, data.arrayItemRegexMessage)
+          .trim()
+          .toUpperCase()
+      )
+      .min(data.minArrayLength, data.minArrayLengthMessage)
+      .max(data.maxArrayLength, data.maxArrayLengthExceededMessage)
+      .nonoptional(),
+  });
 };
 
 export type DiplomaCreationFormSchema = z.infer<typeof diplomaCreationSchema>;
