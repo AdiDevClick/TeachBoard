@@ -25,6 +25,7 @@ const defaultState = {
   prevText: "",
   newText: "",
   selectedText: "",
+  itemDetails: undefined,
 };
 
 export function DynamicTag(props: Readonly<DynamicTagProps>) {
@@ -36,6 +37,9 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
   const handleOnDelete = (e: PointerEvent<HTMLButtonElement>) => {
     preventDefaultAndStopPropagation(e);
     console.log("Delete role:", state.role);
+    console.log("The rest : ", rest);
+    console.log("all the props : ", props);
+    onRemove?.(state.role, state.itemDetails);
     setState(defaultState);
   };
 
@@ -84,7 +88,11 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
     }
   };
 
-  const onRoleOpenChange = (open: boolean, role: string) => {
+  const onRoleOpenChange = (
+    open: boolean,
+    role: string,
+    details?: Record<string, unknown>
+  ) => {
     if (state.isEditing) return;
     console.log("openChange");
     setState(
@@ -95,6 +103,7 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
             isEditing: false,
             prevText: "",
             newText: "",
+            itemDetails: details,
           }
         : defaultState
     );
@@ -193,26 +202,31 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
       <Item variant={"default"} className="p-0">
         <ItemContent className="flex-row flex-wrap gap-2">
           <ListMapper items={itemList}>
-            {(rawItem: string | { item: string; id?: string }) => {
-              const item = typeof rawItem === "string" ? rawItem : rawItem.item;
+            {([value, itemDetails]) => {
               return (
-                <ItemActions key={id} className="relative">
+                <ItemActions key={value} className="relative">
                   <Popover
-                    open={state.selected && state.role === item}
-                    onOpenChange={(open) => onRoleOpenChange(open, item)}
+                    open={state.selected && state.role === value}
+                    onOpenChange={(open) =>
+                      onRoleOpenChange(open, value, itemDetails)
+                    }
                   >
                     <PopoverTrigger asChild>
                       <Button
                         // onBlur={handleOnTextEdited}
                         // onFocus={handleOnTextEdit}
                         // onClick={handleFocus}
-                        data-is-editing={state.isEditing && state.role === item}
-                        id={item}
+                        data-is-editing={
+                          state.isEditing && state.role === value
+                        }
+                        id={value}
                         size="sm"
                         variant="outline"
-                        contentEditable={state.isEditing && state.role === item}
+                        contentEditable={
+                          state.isEditing && state.role === value
+                        }
                       >
-                        {item}
+                        {value}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent
@@ -221,36 +235,36 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
                       sideOffset={8}
                       className="p-0.5 w-auto max-h-min-content"
                     >
-                      {state.isEditing && state.role === item ? (
+                      {state.isEditing && state.role === value ? (
                         <>
                           <Button
                             size="sm"
                             variant="outline"
-                            id={item + "-validate"}
+                            id={value + "-validate"}
                             onClick={handleOnValidate}
-                            aria-label={`Valider ${item}`}
+                            aria-label={`Valider ${value}`}
                           >
                             <CheckIcon className="size-4" />
                           </Button>
                           <Button
                             size="sm"
                             variant="ghost"
-                            id={item + "-cancel"}
+                            id={value + "-cancel"}
                             onClick={handleOnCancel}
-                            aria-label={`Annuler ${item}`}
+                            aria-label={`Annuler ${value}`}
                           >
                             <RotateCcw className="size-4" />
                           </Button>
                         </>
                       ) : (
-                        state.role === item && (
+                        state.role === value && (
                           <>
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={handleOnEdit}
-                              id={item + "-edit"}
-                              aria-label={`Modifier ${item}`}
+                              id={value + "-edit"}
+                              aria-label={`Modifier ${value}`}
                             >
                               <Pencil className="size-4" />
                             </Button>
@@ -258,8 +272,8 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
                               size="sm"
                               variant="ghost"
                               onClick={handleOnDelete}
-                              id={item + "-delete"}
-                              aria-label={`Supprimer ${item}`}
+                              id={value + "-delete"}
+                              aria-label={`Supprimer ${value}`}
                             >
                               <Trash2 className="size-4" />
                             </Button>
@@ -267,8 +281,8 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                id={item + "-close"}
-                                aria-label={`Fermer ${item}`}
+                                id={value + "-close"}
+                                aria-label={`Fermer ${value}`}
                               >
                                 <XIcon className="size-4" />
                               </Button>
