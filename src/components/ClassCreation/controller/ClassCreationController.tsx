@@ -22,6 +22,7 @@ import type {
   ClassCreationInputItem,
 } from "@/models/class-creation.models.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
+import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { Activity, useCallback, useEffect, useRef, useState } from "react";
 import { useWatch } from "react-hook-form";
@@ -73,10 +74,11 @@ export function ClassCreationController({
     form,
     "primaryTeacherValue"
   );
-  const tasksValues = useWatch({
-    control: form.control,
-    name: "tasksValues",
-  });
+  const tasksValues =
+    useWatch({
+      control: form.control,
+      name: "tasksValues",
+    }) ?? [];
 
   const {
     error,
@@ -225,19 +227,18 @@ export function ClassCreationController({
     const taskTemplateId = commandItemDetails.id;
 
     const tasks = new Set(form.getValues("tasks") || []);
-
-    const values = new Set(form.getValues("tasksValues") || []);
+    const values = new UniqueSet(null, form.getValues("tasksValues") || []);
 
     if (values.has(value)) {
       tasks.delete(taskTemplateId);
       values.delete(value);
     } else {
-      values.add(value);
+      values.set(value, commandItemDetails);
       tasks.add(taskTemplateId);
     }
 
-    form.setValue("tasksValues", Array.from(values), {
-      shouldValidate: true,
+    form.setValue("tasksValues", Array.from(values.entries()), {
+      shouldValidate: false,
     });
 
     form.setValue("tasks", Array.from(tasks), { shouldValidate: true });
@@ -307,6 +308,19 @@ export function ClassCreationController({
     if (form.watch("schoolYear") !== value) {
       form.setValue("schoolYear", value, { shouldValidate: true });
     }
+  };
+
+  const handleDeletingTask = (
+    taskValue: string,
+    taskDetails?: Record<string, unknown>
+  ) => {
+    const tasks = new Set(form.getValues("tasks") || []);
+    const tasksValues = new Set(form.getValues("tasksValues") || []);
+    tasksValues.delete(taskValue);
+    form.setValue("tasksValues", Array.from(tasksValues), {
+      shouldValidate: true,
+    });
+    form.setValue("tasks", Array.from(tasks), { shouldValidate: true });
   };
 
   // handleRoleClick removed (popovers handle toggle via onOpenChange)
@@ -516,6 +530,8 @@ export function ClassCreationController({
           {...inputControllers[2]}
           observedRefs={observedRefs}
           itemList={tasksValues}
+          // onRemove={handleCommandSelection}
+          onRemove={handleDeletingTask}
         />
         <PopoverFieldWithCommands
           multiSelection
