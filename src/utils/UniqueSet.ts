@@ -43,10 +43,22 @@ export class UniqueSet<K, V extends { [key: string]: unknown }> {
    * @param items Tableau d'objets à insérer dans l'ensemble.
    */
   constructor(cb?: ((item: V) => K) | null, items: V[] = []) {
-    if (cb) {
+    if (items.length > 0) {
       items.forEach((item) => {
-        const key = cb(item);
-        if (!this.#map.has(key)) this.#map.set(key, item);
+        let key: K;
+        let itemToMap: V = item;
+
+        if (typeof item[0] === "string") {
+          itemToMap = item[1] as V;
+          key = item[0] as K;
+        } else if (cb) {
+          key = cb(item);
+        } else {
+          key = item as unknown as K;
+          itemToMap = item;
+        }
+
+        if (!this.#map.has(key)) this.#map.set(key, itemToMap);
       });
     }
   }
