@@ -24,7 +24,6 @@ const footerProps = {
  *
  * @param pageId - The ID of the page.
  * @param modalMode - Whether the creation is in a modal or a full page.
- * @param className - Additional CSS classes for styling.
  * @param inputControllers - The input controllers for the form (this needs to be already validated by Zod Schema).
  */
 function DiplomaCreation({
@@ -46,13 +45,9 @@ function DiplomaCreation({
   });
 
   const commonProps = useMemo(() => {
-    const props_without_form = { ...props };
-    delete props_without_form.form;
-
     return {
       pageId,
       modalMode,
-      form,
       formId,
       titleProps,
       footerProps: {
@@ -61,7 +56,8 @@ function DiplomaCreation({
         formId,
       },
       inputControllers,
-      ...props_without_form,
+      ...props,
+      form,
     };
   }, [form.formState, props]);
   return <DiplomaWithCard {...commonProps} />;
