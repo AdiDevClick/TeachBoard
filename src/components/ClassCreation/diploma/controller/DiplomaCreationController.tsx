@@ -10,6 +10,7 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { DiplomaCreationFormSchema } from "@/models/diploma-creation.models.ts";
+import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, type MouseEvent, type PointerEvent } from "react";
 import { useWatch, type UseFormReturn } from "react-hook-form";
@@ -123,7 +124,7 @@ export function DiplomaCreationController({
   const currentSkills =
     useWatch({
       control: form.control,
-      name: "mainSkillsList",
+      name: "mainSkillsListDetails",
     }) || [];
 
   const resultsCallback = useCallback((keys: any) => {
@@ -245,7 +246,14 @@ export function DiplomaCreationController({
     openingCallback(open, metaData, inputs);
   };
 
+  /**
+   * Handle form submission
+   *
+   * @param variables - form variables
+   */
   const handleSubmit = (variables: DiplomaCreationFormSchema) => {
+    // const payload = { ...variables };
+    // delete payload.mainSkillsListDetails;
     submitCallback(
       variables,
       API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint,
@@ -253,15 +261,28 @@ export function DiplomaCreationController({
     );
   };
 
-  const handleCommandSelection = (value: string) => {
-    const skillsSet = new Set(form.getValues("mainSkillsList") || []);
+  const handleCommandSelection = (
+    value: string,
+    taskDetails?: Record<string, unknown>
+  ) => {
+    const skillsSet = new UniqueSet(
+      null,
+      form.getValues("mainSkillsListDetails") || []
+    );
     if (skillsSet.has(value)) {
       skillsSet.delete(value);
     } else {
-      skillsSet.add(value);
+      skillsSet.set(value, taskDetails);
     }
-    form.setValue("mainSkillsList", Array.from(skillsSet), {
+
+    form.setValue("mainSkillsList", Array.from(skillsSet.keys()), {
       shouldValidate: true,
+    });
+
+    form.setValue("mainSkillsListDetails", Array.from(skillsSet.entries()), {
+      shouldValidate: false,
+      shouldDirty: false,
+      shouldTouch: false,
     });
   };
 
