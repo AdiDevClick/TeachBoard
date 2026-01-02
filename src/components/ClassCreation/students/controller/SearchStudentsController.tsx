@@ -4,7 +4,6 @@ import type { CommandItemType } from "@/components/Command/types/command.types.t
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
-import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 
 /**
@@ -19,36 +18,13 @@ export function SearchStudentsController({
   pageId,
   form,
   localForm,
-  selectedStudents,
   formId,
 }: Readonly<SearchStudentsControllerProps>) {
-  const { fetchParams, data, closeDialog, openingCallback } = useCommandHandler(
-    {
-      form: localForm,
+  const { closeDialog, openingCallback, resultsCallback, selectionCallback } =
+    useCommandHandler({
+      form,
       pageId,
-    }
-  );
-
-  const queryClient = useQueryClient();
-
-  /**
-   * Retrieve results from cache or fetched data
-   *
-   * @description Checks React Query cache for existing data before falling back to fetched data.
-   */
-  const resultsCallback = useCallback((keys: any) => {
-    const cachedData = queryClient.getQueryData(keys ?? []);
-
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Cached data for ", keys, " is ", cachedData);
-    }
-
-    if (cachedData === undefined) {
-      return data;
-    }
-
-    return cachedData;
-  }, []);
+    });
 
   /**
    * Handle item selection in the command component
@@ -62,37 +38,29 @@ export function SearchStudentsController({
    * @param commandItemDetails - The details of the selected command item
    */
   const handleOnSelect = useCallback(
-    (value: string, commandItemDetails: CommandItemType) => {
-      const studentId = commandItemDetails.id;
-      const studentName =
-        commandItemDetails.firstName + " " + commandItemDetails.lastName;
-      const isSelected = commandItemDetails.isSelected;
-
-      if (studentId === undefined) return;
-
-      const studentsFormIds = new Set(form.watch("students") || []);
-
-      // if (!isSelected) {
-      if (studentsFormIds.has(studentId) || !isSelected) {
-        studentsFormIds.delete(studentId);
-        delete selectedStudents[studentName];
-      } else {
-        studentsFormIds.add(studentId);
-        selectedStudents[studentName] = commandItemDetails;
+    (_value: string, commandItemDetails: CommandItemType) => {
+      if (
+        commandItemDetails.id === undefined ||
+        commandItemDetails.id === null
+      ) {
+        if (DEV_MODE && !NO_CACHE_LOGS) {
+          console.warn(
+            "Selected command item has no ID, selection ignored:",
+            commandItemDetails
+          );
+        }
+        return;
       }
-      // Modify local form to trigger reactivity
-      localForm.setValue("students", Array.from(studentsFormIds), {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
 
-      // Modify main form to store final values and allow details retrieval to allow avatar display in the class creation component
-      form.setValue("students", Array.from(studentsFormIds), {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
+      const newValue = String(commandItemDetails.id);
+      const options = {
+        mainFormField: "students",
+        secondaryFormField: "studentsValues",
+        detailedCommandItem: commandItemDetails,
+      };
+      selectionCallback(newValue, options);
 
-      form.setValue("studentsValues",selectedStudents, {
+      localForm.setValue("students", form.getValues("students") || [], {
         shouldValidate: true,
         shouldDirty: true,
       });
@@ -110,11 +78,12 @@ export function SearchStudentsController({
    * @description Sets up the fetch parameters for retrieving students and triggers the fetch on component mount.
    */
   useEffect(() => {
-    const metaData = {};
-    metaData.dataReshapeFn = API_ENDPOINTS.GET.STUDENTS.dataReshape;
-    metaData.apiEndpoint = API_ENDPOINTS.GET.STUDENTS.endpoint;
-    metaData.task = pageId;
-    metaData.form = form;
+    const metaData: Record<string, unknown> = {
+      dataReshapeFn: API_ENDPOINTS.GET.STUDENTS.dataReshape,
+      apiEndpoint: API_ENDPOINTS.GET.STUDENTS.endpoint,
+      task: pageId,
+      form,
+    };
 
     openingCallback(true, metaData, null);
   }, []);
@@ -125,10 +94,7 @@ export function SearchStudentsController({
         avatarDisplay
         multiSelection
         onSelect={handleOnSelect}
-        commandHeadings={resultsCallback([
-          fetchParams.contentId,
-          fetchParams.url,
-        ])}
+        commandHeadings={resultsCallback()}
       />
 
       {/* Fix to avoid a focus effect */}
