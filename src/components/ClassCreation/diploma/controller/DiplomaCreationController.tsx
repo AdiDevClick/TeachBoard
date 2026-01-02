@@ -7,12 +7,10 @@ import {
 import type { PopoverFieldProps } from "@/components/Popovers/types/popover.types.ts";
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { DiplomaCreationFormSchema } from "@/models/diploma-creation.models.ts";
-import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, type MouseEvent, type PointerEvent } from "react";
+import { type MouseEvent, type PointerEvent } from "react";
 import { useWatch, type UseFormReturn } from "react-hook-form";
 
 const inputs = [
@@ -116,6 +114,8 @@ export function DiplomaCreationController({
     data,
     newItemCallback,
     openingCallback,
+    selectionCallback,
+    resultsCallback,
   } = useCommandHandler({
     form,
     pageId,
@@ -126,113 +126,6 @@ export function DiplomaCreationController({
       control: form.control,
       name: "mainSkillsListDetails",
     }) || [];
-
-  const resultsCallback = useCallback((keys: any) => {
-    const cachedData = queryClient.getQueryData(keys ?? []);
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Cached data for ", keys, " is ", cachedData);
-    }
-    if (cachedData === undefined) {
-      return data;
-    }
-    return cachedData;
-  }, []);
-
-  // const handleOnDelete = (e: PointerEvent<HTMLButtonElement>) => {
-  //   preventDefaultAndStopPropagation(e);
-  //   console.log("Delete role:", state.role);
-  //   setState(defaultState);
-  // };
-
-  // const handleOnEdit = (e: PointerEvent<HTMLButtonElement>) => {
-  //   preventDefaultAndStopPropagation(e);
-  //   const roleId = e.currentTarget.id.split("-")[0];
-  //   const editable = document.getElementById(roleId);
-  //   if (!editable) return;
-  //   editable.focus();
-  //   editable.dataset.isEditing = "true";
-  //   editable.style.setProperty("user-select", "text");
-  //   editable.style.setProperty("-webkit-user-modify", "read-write");
-  //   const newRange = new Range();
-
-  //   const selection = window.getSelection();
-  //   newRange.selectNodeContents(editable);
-
-  //   selection?.focusNode;
-  //   selection?.removeAllRanges();
-  //   selection?.addRange(newRange);
-
-  //   setState((prev) => ({
-  //     ...prev,
-  //     isEditing: true,
-  //     prevText: roleId,
-  //     selected: true,
-  //     role: roleId,
-  //   }));
-  // };
-
-  // const handleOnValidate = (e: PointerEvent<HTMLButtonElement>) => {
-  //   preventDefaultAndStopPropagation(e);
-  //   const role = e.currentTarget.id.split("-")[0];
-  //   console.log("Validate role edit:", state.role);
-  //   if (role === state.role) {
-  //     // cleanup editable state on validate
-  //     const editable = document.getElementById(role);
-  //     if (editable) {
-  //       // editable.removeAttribute("contenteditable");
-  //       // editable.removeAttribute("data-is-editing");
-  //       editable.removeAttribute("style");
-  //       const selection = window.getSelection();
-  //       selection?.removeAllRanges();
-  //     }
-  //     setState(defaultState);
-  //   }
-  // };
-
-  // const onRoleOpenChange = (open: boolean, role: string) => {
-  //   if (state.isEditing) return;
-  //   console.log("openChange");
-  //   setState(
-  //     open
-  //       ? {
-  //           selected: true,
-  //           role,
-  //           isEditing: false,
-  //           prevText: "",
-  //           newText: "",
-  //         }
-  //       : defaultState
-  //   );
-  // };
-
-  // const handleOnCancel = (e: PointerEvent<HTMLButtonElement>) => {
-  //   preventDefaultAndStopPropagation(e);
-  //   setState((prev) => ({
-  //     ...prev,
-  //     isEditing: false,
-  //     newText: "",
-  //     prevText: "",
-  //   }));
-  // };
-
-  // const handleAddNewItem = ({
-  //   e,
-  //   apiEndpoint,
-  //   task,
-  // }: HandleAddNewItemParams) => {
-  //   if (DEV_MODE && !NO_CACHE_LOGS) {
-  //     console.log("Add new item triggered", {
-  //       apiEndpoint,
-  //       task,
-  //     });
-  //   }
-  //   // console.log(openedDialogs);
-  //   openDialog(e, task, {
-  //     task,
-  //     apiEndpoint,
-  //     queryKey: [fetchParams.contentId, fetchParams.url],
-  //   });
-  // };
 
   /**
    * Handle opening of the VerticalFieldSelect component
@@ -261,29 +154,16 @@ export function DiplomaCreationController({
     );
   };
 
-  const handleCommandSelection = (
+  const handleSelection = (
     value: string,
     taskDetails?: Record<string, unknown>
   ) => {
-    const skillsSet = new UniqueSet(
-      null,
-      form.getValues("mainSkillsListDetails") || []
-    );
-    if (skillsSet.has(value)) {
-      skillsSet.delete(value);
-    } else {
-      skillsSet.set(value, taskDetails);
-    }
-
-    form.setValue("mainSkillsList", Array.from(skillsSet.keys()), {
-      shouldValidate: true,
-    });
-
-    form.setValue("mainSkillsListDetails", Array.from(skillsSet.entries()), {
-      shouldValidate: false,
-      shouldDirty: false,
-      shouldTouch: false,
-    });
+    const options = {
+      mainFormField: "mainSkillsList",
+      secondaryFormField: "mainSkillsListDetails",
+      detailedCommandItem: taskDetails,
+    };
+    selectionCallback(value, options);
   };
 
   /**
@@ -316,10 +196,7 @@ export function DiplomaCreationController({
       <PopoverFieldWithControllerAndCommandsList
         items={inputs.slice(0, 3)}
         form={form}
-        commandHeadings={resultsCallback([
-          fetchParams.contentId,
-          fetchParams.url,
-        ])}
+        commandHeadings={resultsCallback()}
         onSelect={onSelectHandler}
         onOpenChange={handleOpening}
         setRef={setRef}
@@ -336,119 +213,13 @@ export function DiplomaCreationController({
       <PopoverFieldWithCommands
         multiSelection
         setRef={setRef}
-        onSelect={handleCommandSelection}
+        onSelect={handleSelection}
         onOpenChange={handleOpening}
         observedRefs={observedRefs}
         onAddNewItem={newItemCallback}
-        commandHeadings={resultsCallback([
-          fetchParams.contentId,
-          fetchParams.url,
-        ])}
+        commandHeadings={resultsCallback()}
         {...inputs[3]}
       />
-      {/* <ItemGroup id={`${pageId}-roles`} className="grid gap-2">
-        <ItemTitle>Modules</ItemTitle>
-        <Item variant={"default"} className="p-0">
-          <ItemContent className="flex-row flex-wrap gap-2">
-            <ListMapper items={skills}>
-              {(rawItem: string | { item: string; id?: string }) => {
-                const item =
-                  typeof rawItem === "string" ? rawItem : rawItem.item;
-                return (
-                  <ItemActions key={item} className="relative">
-                    <Popover
-                      open={state.selected && state.role === item}
-                      onOpenChange={(open) => onRoleOpenChange(open, item)}
-                    >
-                      <PopoverTrigger asChild>
-                        <Button
-                          // onBlur={handleOnTextEdited}
-                          // onFocus={handleOnTextEdit}
-                          // onClick={handleFocus}
-                          data-is-editing={
-                            state.isEditing && state.role === item
-                          }
-                          id={item}
-                          size="sm"
-                          variant="outline"
-                          contentEditable={
-                            state.isEditing && state.role === item
-                          }
-                        >
-                          {item}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        side="top"
-                        align="center"
-                        sideOffset={8}
-                        className="p-0.5 w-auto max-h-min-content"
-                      >
-                        {state.isEditing && state.role === item ? (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              id={item + "-validate"}
-                              onClick={handleOnValidate}
-                              aria-label={`Valider ${item}`}
-                            >
-                              <CheckIcon className="size-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              id={item + "-cancel"}
-                              onClick={handleOnCancel}
-                              aria-label={`Annuler ${item}`}
-                            >
-                              <RotateCcw className="size-4" />
-                            </Button>
-                          </>
-                        ) : (
-                          state.role === item && (
-                            <>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={handleOnEdit}
-                                id={item + "-edit"}
-                                aria-label={`Modifier ${item}`}
-                              >
-                                <Pencil className="size-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={handleOnDelete}
-                                id={item + "-delete"}
-                                aria-label={`Supprimer ${item}`}
-                              >
-                                <Trash2 className="size-4" />
-                              </Button>
-                              <PopoverClose asChild>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  id={item + "-close"}
-                                  aria-label={`Fermer ${item}`}
-                                >
-                                  <XIcon className="size-4" />
-                                </Button>
-                              </PopoverClose>
-                            </>
-                          )
-                        )}
-                        <PopoverArrow className="fill-popover" />
-                      </PopoverContent>
-                    </Popover>
-                  </ItemActions>
-                );
-              }}
-            </ListMapper>
-          </ItemContent>
-        </Item>
-      </ItemGroup> */}
     </form>
   );
 }
