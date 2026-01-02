@@ -35,24 +35,25 @@
  * @template V Type de la valeur (objet)
  */
 export class UniqueSet<K, V extends { [key: string]: unknown }> {
-  #map = new Map<K, V>();
+  readonly #map = new Map<K, V>();
 
   /**
    * Crée un UniqueSet à partir d'une fonction de clé et d'un tableau d'objets.
    * @param cb Fonction qui retourne la clé unique pour chaque objet.
    * @param items Tableau d'objets à insérer dans l'ensemble.
    */
-  constructor(cb?: ((item: V) => K) | null, items: V[] = []) {
+  constructor(cb?: ((item: V) => K) | null, items: Array<V | [K, V]> = []) {
     if (items.length > 0) {
       items.forEach((item) => {
         let key: K;
-        let itemToMap: V = item;
+        let itemToMap: V;
 
-        if (typeof item[0] === "string") {
-          itemToMap = item[1] as V;
-          key = item[0] as K;
+        if (Array.isArray(item)) {
+          key = item[0];
+          itemToMap = item[1];
         } else if (cb) {
           key = cb(item);
+          itemToMap = item;
         } else {
           key = item as unknown as K;
           itemToMap = item;
