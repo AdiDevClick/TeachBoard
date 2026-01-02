@@ -16,6 +16,13 @@ const titleProps = {
 
 const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
 
+/**
+ * TaskTemplateCreation Component
+ *
+ * @param pageId - The unique identifier for the page/component using this controller
+ * @param modalMode - Whether the component is used in a modal dialog or not
+ * @param inputControllers - An array of input controller configurations
+ */
 function TaskTemplateCreation({
   pageId = "new-task-template",
   modalMode = true,
