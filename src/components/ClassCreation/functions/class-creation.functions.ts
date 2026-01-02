@@ -54,7 +54,7 @@ function logResetLookupDebug(items: unknown, id: string | number) {
  */
 export function resetSelectedItemsFromCache(
   queryKey: [string, string],
-  selectedItems: Record<string, unknown>,
+  selectedItems: Record<string, unknown> | Array<unknown>,
   queryClient: ReturnType<typeof useQueryClient>
 ) {
   if (!queryKey) return;
@@ -71,18 +71,28 @@ export function resetSelectedItemsFromCache(
     console.log("[Reset DATA] Items to reset:", selectedItems);
   }
 
-  Object.values(selectedItems ?? {}).forEach((itemDetails) => {
-    if (!isSelectedItemRef(itemDetails)) return;
+  const selectedValues: unknown[] = Array.isArray(selectedItems)
+    ? selectedItems
+    : Object.values(selectedItems ?? {});
+
+  selectedValues.forEach((itemDetails) => {
+    // Support entries form: [key, details]
+    const details =
+      Array.isArray(itemDetails) && itemDetails.length === 2
+        ? itemDetails[1]
+        : itemDetails;
+
+    if (!isSelectedItemRef(details)) return;
 
     const items = (cachedData as { 0?: { items?: unknown } })[0]?.items;
     let cachedItem: { isSelected?: boolean } | undefined;
 
-    logResetLookupDebug(items, itemDetails.id);
+    logResetLookupDebug(items, details.id);
     if (Array.isArray(items)) {
       cachedItem = items.find((item) => {
         if (typeof item !== "object" || item === null) return false;
         if (!("id" in item)) return false;
-        return (item as { id?: unknown }).id === itemDetails.id;
+        return (item as { id?: unknown }).id === details.id;
       }) as { isSelected?: boolean } | undefined;
     }
 
