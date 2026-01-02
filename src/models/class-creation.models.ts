@@ -39,7 +39,12 @@ export const classCreationSchema = z.object({
     .uuid("L'identifiant utilisateur doit être un UUID valide.")
     .nonempty("Un identifiant utilisateur est requis."),
   primaryTeacherId: z
-    .uuid("L'identifiant de l'enseignant principal doit être un UUID valide.")
+    .preprocess(
+      (value) => (value === "" ? undefined : value),
+      z.uuid(
+        "L'identifiant de l'enseignant principal doit être un UUID valide."
+      ).optional()
+    )
     .optional(),
   tasks: z
     .array(uuid("L'identifiant de la tâche doit être un UUID valide."))
