@@ -5,12 +5,15 @@ const dataField = {
     "L'identifiant du professeur principal doit être un UUID valide.",
   primaryTeachersNotEmptyMessage:
     "L'identifiant du professeur principal ne peut pas être vide.",
+  primaryTeacherMaxLengthMessage:
+    "Un seul professeur principal peut être sélectionné.",
 };
 
 const searchPrimaryTeacherModel = (data: typeof dataField) =>
   z.object({
     primaryTeacherId: z
-      .uuid(data.primaryTeacherValidUuidMessage)
+      .array(z.uuid(data.primaryTeacherValidUuidMessage))
+      .max(1, data.primaryTeacherMaxLengthMessage)
       .nonempty(data.primaryTeachersNotEmptyMessage)
       .nonoptional()
       .describe("Identifiant unique pour le professeur"),
@@ -20,5 +23,4 @@ export type SearchPrimaryTeacherFormSchema = z.infer<
   typeof SearchPrimaryTeacherSchema
 >;
 
-export const SearchPrimaryTeacherSchema =
-  searchPrimaryTeacherModel(dataField);
+export const SearchPrimaryTeacherSchema = searchPrimaryTeacherModel(dataField);
