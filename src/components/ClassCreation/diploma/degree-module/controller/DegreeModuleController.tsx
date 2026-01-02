@@ -4,13 +4,9 @@ import { ControlledInputList } from "@/components/Inputs/LaballedInputForControl
 import { PopoverFieldWithCommands } from "@/components/Popovers/PopoverField.tsx";
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { degreeModuleCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
-import { UniqueSet } from "@/utils/UniqueSet.ts";
-import { useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
 import { useWatch } from "react-hook-form";
 
 /**
@@ -34,33 +30,21 @@ export function DegreeModuleController({
   const {
     setRef,
     observedRefs,
-    fetchParams,
-    data,
     newItemCallback,
     openingCallback,
     submitCallback,
+    resultsCallback,
+    selectionCallback,
   } = useCommandHandler({
     form,
     pageId,
   });
 
-  const queryClient = useQueryClient();
   const currentSkills =
     useWatch({
       control: form.control,
       name: "skillListDetails",
     }) || [];
-
-  const resultsCallback = useCallback((keys: unknown[]) => {
-    const cachedData = queryClient.getQueryData(keys ?? []);
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Cached data for ", keys, " is ", cachedData);
-    }
-    if (cachedData === undefined) {
-      return data;
-    }
-    return cachedData;
-  }, []);
 
   /**
    * Handle form submission
@@ -87,26 +71,23 @@ export function DegreeModuleController({
     openingCallback(open, metaData, inputControllers);
   };
 
+  /**
+   * Handle command selection from PopoverFieldWithControllerAndCommandsList
+   *
+   * @description Updates the selected skill list and selection state.
+   * @param value - The value of the selected command item
+   * @param commandItem - The details of the selected command item
+   */
   const handleCommandSelection = (
     value: string,
     commandItem: CommandItemType
   ) => {
-    const currentSkills = new UniqueSet(
-      null,
-      form.getValues("skillListDetails") || []
-    );
-    if (currentSkills.has(value)) {
-      currentSkills.delete(value);
-    } else {
-      currentSkills.set(value, commandItem);
-    }
-    form.setValue("skillList", Array.from(currentSkills.keys()), {
-      shouldValidate: true,
-    });
-
-    form.setValue("skillListDetails", Array.from(currentSkills.entries()), {
-      shouldValidate: true,
-    });
+    const options = {
+      mainFormField: "skillList",
+      secondaryFormField: "skillListDetails",
+      detailedCommandItem: commandItem,
+    };
+    selectionCallback(value, options);
   };
 
   return (
@@ -135,10 +116,7 @@ export function DegreeModuleController({
         onOpenChange={handleOpening}
         observedRefs={observedRefs}
         onAddNewItem={newItemCallback}
-        commandHeadings={resultsCallback([
-          fetchParams.contentId,
-          fetchParams.url,
-        ])}
+        commandHeadings={resultsCallback()}
         {...inputControllers[2]}
       />
     </form>
