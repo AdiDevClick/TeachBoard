@@ -24,7 +24,7 @@ import type {
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { Activity, useCallback, useEffect, useRef, useState } from "react";
+import { Activity, useEffect, useRef, useState } from "react";
 import { useWatch } from "react-hook-form";
 
 const year = new Date().getFullYear();
@@ -94,6 +94,7 @@ export function ClassCreationController({
     dialogOptions,
     openedDialogs,
     onOpenChange,
+    resultsCallback,
   } = useCommandHandler({
     form,
     pageId,
@@ -133,26 +134,6 @@ export function ClassCreationController({
     }
   }, [openedDialogs]);
 
-  /**
-   * Retrieve results from cache or fetched data
-   * @description Checks React Query cache for existing data before falling back to fetched data.
-   *
-   * @param keys - The query keys to retrieve cached data for
-   * @return The cached data if available, otherwise the fetched data
-   */
-  const resultsCallback = useCallback((keys: any) => {
-    const cachedData = queryClient.getQueryData(keys ?? []);
-
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Cached data for ", keys, " is ", cachedData);
-    }
-
-    if (cachedData === undefined) {
-      return data;
-    }
-
-    return cachedData;
-  }, []);
 
   /**
    * Handle opening of the VerticalFieldSelect component
@@ -323,165 +304,6 @@ export function ClassCreationController({
     form.setValue("tasks", Array.from(tasks), { shouldValidate: true });
   };
 
-  // handleRoleClick removed (popovers handle toggle via onOpenChange)
-
-  // const handleOnDelete = (e: PointerEvent<HTMLButtonElement>) => {
-  //   preventDefaultAndStopPropagation(e);
-  //   console.log("Delete role:", state.role);
-  //   setState(defaultState);
-  // };
-
-  // const handleOnEdit = (e: PointerEvent<HTMLButtonElement>) => {
-  //   preventDefaultAndStopPropagation(e);
-  //   const roleId = e.currentTarget.id.split("-")[0];
-  //   const editable = document.getElementById(roleId);
-  //   if (!editable) return;
-  //   editable.focus();
-  //   editable.dataset.isEditing = "true";
-  //   editable.style.setProperty("user-select", "text");
-  //   editable.style.setProperty("-webkit-user-modify", "read-write");
-  //   const newRange = new Range();
-  //   const selection = globalThis.getSelection();
-  //   newRange.selectNodeContents(editable);
-
-  //   selection?.focusNode;
-  //   selection?.removeAllRanges();
-  //   selection?.addRange(newRange);
-
-  //   console.log("Edit role:", roleId);
-
-  //   setState((prev) => ({
-  //     ...prev,
-  //     isEditing: true,
-  //     prevText: roleId,
-  //     selected: true,
-  //     role: roleId,
-  //   }));
-  // };
-
-  // const handleOnValidate = (e: PointerEvent<HTMLButtonElement>) => {
-  //   preventDefaultAndStopPropagation(e);
-  //   const role = e.currentTarget.id.split("-")[0];
-  //   console.log("Validate role edit:", state.role);
-  //   if (role === state.role) {
-  //     // cleanup editable state on validate
-  //     const editable = document.getElementById(role);
-  //     if (editable) {
-  //       // editable.removeAttribute("contenteditable");
-  //       // editable.removeAttribute("data-is-editing");
-  //       editable.removeAttribute("style");
-  //       const selection = window.getSelection();
-  //       selection?.removeAllRanges();
-  //     }
-  //     setState(defaultState);
-  //   }
-  // };
-
-  // const handleOnCancel = (e: PointerEvent<HTMLButtonElement>) => {
-  //   preventDefaultAndStopPropagation(e);
-  //   console.log("Cancel role edit:", state.role);
-  //   // // remove contenteditable state
-  //   // const roleId = (e.currentTarget.id ?? "").split("-")[0];
-  //   // const editable = document.getElementById(roleId);
-  //   // if (editable) {
-  //   //   // editable.removeAttribute("contenteditable");
-  //   //   // editable.removeAttribute("data-is-editing");
-  //   //   editable.removeAttribute("style");
-  //   // }
-  //   setState((prev) => ({
-  //     ...prev,
-  //     isEditing: false,
-  //     newText: "",
-  //     prevText: "",
-  //   }));
-  // };
-
-  // const handleOnTextEdited = (e: PointerEvent<HTMLButtonElement>) => {
-  //   preventDefaultAndStopPropagation(e);
-  //   const buttonEl = e.currentTarget;
-  //   const newText = buttonEl.textContent ?? "";
-
-  //   console.log(
-  //     "Text edited for role:",
-  //     buttonEl.id,
-  //     "New text:",
-  //     newText,
-  //     state
-  //   );
-
-  //   setState((prev) => ({
-  //     ...prev,
-  //     newText,
-  //     isEdited: true,
-  //     isEditing: false,
-  //   }));
-
-  //   // cleanup contenteditable & attributes
-  //   buttonEl.removeAttribute("style");
-  //   // buttonEl.removeAttribute("contenteditable");
-  //   // buttonEl.removeAttribute("data-is-editing");
-  // };
-
-  // const roles = [
-  //   "serveur",
-  //   "cuisine",
-  //   "barman",
-  //   "caissier",
-  //   "invite",
-  //   "testeur",
-  // ];
-
-  // const onRoleOpenChange = (open: boolean, role: string) => {
-  //   if (state.isEditing) return;
-  //   console.log("openChange");
-  //   setState(
-  //     open
-  //       ? {
-  //           selected: true,
-  //           role,
-  //           isEditing: false,
-  //           prevText: "",
-  //           newText: "",
-  //         }
-  //       : defaultState
-  //   );
-  // };
-
-  // const handleFocus = (e: PointerEvent<HTMLButtonElement>) => {
-  //   // preventDefaultAndStopPropagation(e);
-  //   const editable = e.currentTarget;
-  //   const roleId = editable.id;
-  //   editable.focus();
-  //   editable.dispatchEvent(new KeyboardEvent("keyup", { key: "arrowRight" }));
-  //   editable.addEventListener(
-  //     "keyup",
-  //     (event) => {
-  //       console.log(event);
-  //       preventDefaultAndStopPropagation(event);
-  //       if (event.key === "arrowRight" || event.key === "arrowLeft") {
-  //         event.target.focus();
-  //         const selection = window.getSelection();
-  //         if (!selection) return;
-  //         const range = document.createRange();
-  //         range.selectNodeContents(editable);
-  //         selection.removeAllRanges();
-  //         selection.addRange(range);
-  //       }
-  //     },
-  //     { once: true }
-  //   );
-  //   // editable.style.setProperty("user-select", "text");
-  //   // editable.style.setProperty("-webkit-user-modify", "read-write");
-  //   // const editable = document.getElementById(roleId);
-  //   // if (!editable) return;
-  //   // editable.style.setProperty("user-select", "none");
-  //   // editable.style.setProperty("-webkit-user-modify", "read-only");
-  // };
-  // Get the current skills from the form
-
-  // console.log("Current Students => ", currentStudents);
-  // console.log("Current Students in REF => ", studentsRef.current);
-
   const controllers = [
     {
       ...inputControllers[4],
@@ -509,10 +331,7 @@ export function ClassCreationController({
         form={form}
         // id={`${pageId}-year`}
         setRef={setRef}
-        commandHeadings={resultsCallback([
-          fetchParams.contentId,
-          fetchParams.url,
-        ])}
+        commandHeadings={resultsCallback()}
         observedRefs={observedRefs}
         onOpenChange={handleOpening}
         onSelect={handleOnSelect}
@@ -541,10 +360,7 @@ export function ClassCreationController({
           observedRefs={observedRefs}
           onAddNewItem={handleNewItem}
           resetKey={form.watch("degreeConfigId")}
-          commandHeadings={resultsCallback([
-            fetchParams.contentId,
-            fetchParams.url,
-          ])}
+          commandHeadings={resultsCallback()}
           {...inputControllers[2]}
         />
       </Activity>
