@@ -144,8 +144,6 @@ export function DiplomaCreationController({
    * @param variables - form variables
    */
   const handleSubmit = (variables: DiplomaCreationFormSchema) => {
-    // const payload = { ...variables };
-    // delete payload.mainSkillsListDetails;
     submitCallback(
       variables,
       API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint,
@@ -171,17 +169,22 @@ export function DiplomaCreationController({
    * @param value
    */
   const onSelectHandler = (value: string) => {
-    const cachedData = queryClient.getQueryData([
+    type CachedItem = { value: string; id?: string; type?: string };
+    type CachedPage = { items?: CachedItem[] };
+
+    const cachedData = queryClient.getQueryData<unknown>([
       fetchParams.contentId,
       fetchParams.url,
     ]);
-    const array = cachedData?.[0];
-    const data = array?.items;
-    const matchingItems = data?.filter((item: any) => item.value === value);
-    const firstItem = matchingItems ? matchingItems[0] : null;
+
+    const firstPage = Array.isArray(cachedData)
+      ? (cachedData[0] as CachedPage | undefined)
+      : undefined;
+
+    const firstItem = firstPage?.items?.find((item) => item.value === value);
     const id = firstItem?.id ?? value;
 
-    form.setValue(switchFields(firstItem.type), id, {
+    form.setValue(switchFields(firstItem?.type ?? ""), id, {
       shouldValidate: true,
     });
   };
@@ -228,20 +231,17 @@ export function DiplomaCreationController({
  *
  * @param fieldName
  */
-function switchFields(fieldName: string) {
-  let field = "";
+function switchFields(
+  fieldName: string
+): "diplomaFieldId" | "yearId" | "levelId" {
   switch (fieldName) {
     case "FIELD":
-      field = "diplomaFieldId";
-      break;
+      return "diplomaFieldId";
     case "YEAR":
-      field = "yearId";
-      break;
+      return "yearId";
     case "LEVEL":
-      field = "levelId";
-      break;
+      return "levelId";
     default:
-      break;
+      return "diplomaFieldId";
   }
-  return field;
 }
