@@ -38,33 +38,11 @@ export function StepOne({
     dialogOptions,
     openedDialogs,
     onOpenChange,
+    resultsCallback,
   } = useCommandHandler({
     form: null,
     pageId: title,
   });
-
-  const queryClient = useQueryClient();
-
-  /**
-   * Retrieve results from cache or fetched data
-   * @description Checks React Query cache for existing data before falling back to fetched data.
-   *
-   * @param keys - The query keys to retrieve cached data for
-   * @return The cached data if available, otherwise the fetched data
-   */
-  const resultsCallback = useCallback((keys: any) => {
-    const cachedData = queryClient.getQueryData(keys ?? []);
-
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Cached data for ", keys, " is ", cachedData);
-    }
-
-    if (cachedData === undefined) {
-      return data;
-    }
-
-    return cachedData;
-  }, []);
 
   // /**
   //  * Handles the addition of a new class.
@@ -177,10 +155,7 @@ export function StepOne({
           // form={form}
           // id={`${pageId}-year`}
           setRef={setRef}
-          commandHeadings={resultsCallback([
-            fetchParams.contentId,
-            fetchParams.url,
-          ])}
+          commandHeadings={resultsCallback()}
           observedRefs={observedRefs}
           onOpenChange={handleOpening}
           onSelect={handleOnSelect}
