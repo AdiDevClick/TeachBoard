@@ -14,6 +14,7 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
+import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef } from "react";
 
@@ -51,9 +52,17 @@ export function TaskTemplateCreationController({
   const savedSkills = useRef(null!);
   const dialogData = dialogOptions(pageId);
   const diplomaDatas = useMemo(() => {
+    const selectedDiploma = dialogData?.selectedDiploma ?? null;
+    const newTagSet = new UniqueSet();
+    const diplomaTag = selectedDiploma
+      ? `${selectedDiploma?.degreeField} - ${selectedDiploma?.degreeLevel} ${selectedDiploma?.degreeYear}`
+      : "Aucun diplôme sélectionné";
+    newTagSet.set(diplomaTag, []);
+
     return {
-      diploma: dialogData?.selectedDiploma ?? null,
+      diploma: selectedDiploma,
       shortTemplatesList: dialogData?.shortTemplatesList ?? [],
+      tagData: Array.from(newTagSet.entries()),
     };
   }, [dialogData]);
 
@@ -206,14 +215,7 @@ export function TaskTemplateCreationController({
         observedRefs={observedRefs}
         onOpenChange={handleOpening}
       />
-      <DynamicTag
-        {...inputControllers[2]}
-        itemList={[
-          diplomaDatas.diploma
-            ? `${diplomaDatas.diploma.degreeField} - ${diplomaDatas.diploma.degreeLevel} ${diplomaDatas.diploma.degreeYear}`
-            : "Aucun diplôme sélectionné",
-        ]}
-      />
+      <DynamicTag {...inputControllers[2]} itemList={diplomaDatas.tagData} />
       <PopoverFieldWithControllerAndCommandsList
         items={inputControllers.slice(3, 5)}
         form={form}
