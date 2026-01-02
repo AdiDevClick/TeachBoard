@@ -111,7 +111,6 @@ export function DiplomaCreationController({
     observedRefs,
     submitCallback,
     fetchParams,
-    data,
     newItemCallback,
     openingCallback,
     selectionCallback,
