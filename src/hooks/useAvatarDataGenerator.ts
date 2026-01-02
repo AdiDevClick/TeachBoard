@@ -20,13 +20,18 @@ export function useAvatarDataGenerator(
 
   const dataMemo = useMemo(
     () =>
-      Object.entries(watchedData ?? {}).map(([fullName, details]: any) => ({
-        src: `https://github.com/${details.firstName}.png`,
-        alt: `@${fullName}`,
-        fallback:
-          (details.firstName?.slice(0, 1).toUpperCase() || "") +
-          (details.lastName?.slice(0, 1).toUpperCase() || ""),
-      })),
+      (watchedData ?? []).map(([_id, details]: any) => {
+        const fullName = `${details.firstName || ""} ${
+          details.lastName || ""
+        }`.trim();
+        return {
+          src: `https://github.com/${details.firstName}.png`,
+          alt: `@${fullName}`,
+          fallback:
+            (details.firstName?.slice(0, 1).toUpperCase() || "") +
+            (details.lastName?.slice(0, 1).toUpperCase() || ""),
+        };
+      }),
     [watchedData]
   );
 
