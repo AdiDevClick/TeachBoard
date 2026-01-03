@@ -1,7 +1,33 @@
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 
+import type {
+  ClassesFetch,
+  CreateClassResponseData,
+} from "@/api/types/routes/classes.types";
+import type {
+  CreateDegreeResponseData,
+  DegreesFetch,
+} from "@/api/types/routes/degrees.types";
+import type {
+  CreateDiplomaResponseData,
+  DiplomasFetch,
+} from "@/api/types/routes/diplomas.types";
+import type {
+  CreateSkillResponseData,
+  SkillsFetch,
+} from "@/api/types/routes/skills.types";
+import type { StudentsFetch } from "@/api/types/routes/students.types";
+import type {
+  CreateTaskTemplateResponseData,
+  TaskTemplatesFetch,
+} from "@/api/types/routes/task-templates.types";
+import type {
+  CreateTaskResponseData,
+  TasksFetch,
+} from "@/api/types/routes/tasks.types";
+import type { TeachersFetch } from "@/api/types/routes/teachers.types";
+
 const BASE_API_URL = "/api";
-const API_VERSION = "v1";
 
 //
 
@@ -35,7 +61,7 @@ export const API_ENDPOINTS = Object.freeze({
         ALL: `${CLASSES}/`,
         BY_ID: (id: number | string) => `${BASE_API_URL}/classes/${id}`,
       },
-      dataReshape: (data: any) =>
+      dataReshape: (data: ClassesFetch) =>
         // use "code" and transform to "value" for selects
         // data.classes is the actual array of classes from the server response
         dataReshaper(data)
@@ -48,7 +74,7 @@ export const API_ENDPOINTS = Object.freeze({
     },
     SKILLS: {
       endPoints: { MODULES: `${SKILLS}/main`, SUBSKILLS: `${SKILLS}/sub` },
-      dataReshape: (data: any) =>
+      dataReshape: (data: SkillsFetch) =>
         dataReshaper(data)
           // data.Skills is the actual array of skills from the server response
           .rename("Skills", "items")
@@ -63,7 +89,7 @@ export const API_ENDPOINTS = Object.freeze({
         YEAR: `${DEGREES}/year`,
         FIELD: `${DEGREES}/field`,
       },
-      dataReshape: (data: any) =>
+      dataReshape: (data: DegreesFetch) =>
         dataReshaper(data)
           .assignSourceTo("items")
           .addToRoot({ groupTitle: "Tous" })
@@ -73,7 +99,7 @@ export const API_ENDPOINTS = Object.freeze({
     },
     DIPLOMAS: {
       endpoint: `${DEGREES}/config`,
-      dataReshape: (data: any) =>
+      dataReshape: (data: DiplomasFetch) =>
         dataReshaper(data)
           // Tuple key for all entries will be : { groupTitle: "Bachelor", items: [...] }
           // Instead of : { "Bachelor" : [...] }
@@ -94,7 +120,7 @@ export const API_ENDPOINTS = Object.freeze({
         BY_DIPLOMA_ID: (id: number | string) =>
           `${BASE_API_URL}/task-templates/by-degree-config/${id}`,
       },
-      dataReshape: (data: any) =>
+      dataReshape: (data: TaskTemplatesFetch) =>
         dataReshaper(data.taskTemplates)
           .selectElementsTo(["task", "id"], "items")
           .addToRoot({
@@ -106,7 +132,7 @@ export const API_ENDPOINTS = Object.freeze({
     },
     TASKS: {
       endpoint: `${BASE_API_URL}/tasks`,
-      dataReshape: (data: any) =>
+      dataReshape: (data: TasksFetch) =>
         dataReshaper(data)
           .assignSourceTo("items")
           .addToRoot({ groupTitle: "Tous" })
@@ -115,7 +141,7 @@ export const API_ENDPOINTS = Object.freeze({
     },
     STUDENTS: {
       endpoint: `${STUDENTS}/not-assigned`,
-      dataReshape: (data: any) =>
+      dataReshape: (data: StudentsFetch) =>
         dataReshaper(data)
           .assignSourceTo("items")
           .addToRoot({ groupTitle: "Tous" })
@@ -135,7 +161,7 @@ export const API_ENDPOINTS = Object.freeze({
     },
     TEACHERS: {
       endpoint: `${TEACHERS}/`,
-      dataReshape: (data: any) =>
+      dataReshape: (data: TeachersFetch) =>
         dataReshaper(data)
           .assignSourceTo("items")
           .addToRoot({ groupTitle: "Tous" })
@@ -164,7 +190,10 @@ export const API_ENDPOINTS = Object.freeze({
     METHOD: "POST",
     CREATE_CLASS: {
       endpoint: `${CLASSES}`,
-      dataReshape: (data: any, cachedDatas: unknown) => {
+      dataReshape: (
+        data: CreateClassResponseData,
+        cachedDatas: CachedQueriesData | undefined
+      ) => {
         const newItem = {
           ...data,
           value: data?.name,
@@ -175,22 +204,47 @@ export const API_ENDPOINTS = Object.freeze({
     AUTH: {
       LOGIN: {
         endpoint: `${AUTH}/login`,
-        dataReshape: (data: any, cachedDatas, options) => {
-          const user = data.user;
-          const session = data.session;
+        dataReshape: (
+          data: unknown,
+          _cachedDatas: unknown,
+          options: {
+            login: (payload: {
+              userId?: unknown;
+              username?: unknown;
+              firstName?: unknown;
+              lastName?: unknown;
+              name?: string;
+              email?: unknown;
+              role?: unknown;
+              token?: unknown;
+              refreshToken?: unknown;
+              avatar?: unknown;
+              schoolName?: unknown;
+            }) => void;
+          }
+        ) => {
+          const payload = (data ?? {}) as Record<string, unknown>;
+          const user = (payload.user ?? {}) as Record<string, unknown>;
+          const firstName = user.firstName;
+          const lastName = user.lastName;
+
           options.login({
             userId: user.id,
             username: user.username,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            name: user.firstName + " " + user.lastName,
+            firstName,
+            lastName,
+            name:
+              typeof firstName === "string" && typeof lastName === "string"
+                ? firstName + " " + lastName
+                : "",
             email: user.email,
             role: user.role,
-            token: session,
-            refreshToken: data.refreshToken,
+            token: payload.session,
+            refreshToken: payload.refreshToken,
             avatar: user.avatar,
             schoolName: user.schoolName,
           });
+
           return data;
         },
       },
@@ -198,7 +252,7 @@ export const API_ENDPOINTS = Object.freeze({
       PASSWORD_CREATION: `${AUTH}/password-creation`,
       PASSWORD_RECOVERY: {
         endpoint: `${AUTH}/password-recovery`,
-        dataReshape: (data: any, cachedDatas) => data,
+        dataReshape: (data: unknown) => data,
       },
       SESSION_CHECK: `${AUTH}/session`,
       LOGOUT: `${AUTH}/logout`,
@@ -209,7 +263,10 @@ export const API_ENDPOINTS = Object.freeze({
         YEAR: `${DEGREES}/year`,
         FIELD: `${DEGREES}/field`,
       },
-      dataReshape: (data: any, cachedDatas) => {
+      dataReshape: (
+        data: CreateDegreeResponseData,
+        cachedDatas: CachedQueriesData | undefined
+      ) => {
         const degree = data?.degree;
         // grab id and name from data.degree only
         const newItem = {
@@ -222,7 +279,10 @@ export const API_ENDPOINTS = Object.freeze({
     },
     CREATE_SKILL: {
       endPoints: { MODULE: `${SKILLS}/main`, SUBSKILL: `${SKILLS}/sub` },
-      dataReshape: (data: any, cachedDatas) => {
+      dataReshape: (
+        data: CreateSkillResponseData,
+        cachedDatas: CachedQueriesData | undefined
+      ) => {
         // Extract the actual skill data from the response
         const skillData = data?.skill || data;
 
@@ -237,7 +297,10 @@ export const API_ENDPOINTS = Object.freeze({
     },
     CREATE_DIPLOMA: {
       endpoint: `${DEGREES}/config`,
-      dataReshape: (data: any, cachedDatas: unknown) => {
+      dataReshape: (
+        data: CreateDiplomaResponseData,
+        cachedDatas: CachedQueriesData | undefined
+      ) => {
         const newItem = {
           ...data,
           value: data?.degreeLevel + " " + data?.degreeYear,
@@ -248,7 +311,10 @@ export const API_ENDPOINTS = Object.freeze({
     },
     CREATE_TASK_TEMPLATE: {
       endpoint: `${BASE_API_URL}/task-templates`,
-      dataReshape: (data: any, cachedDatas: unknown) => {
+      dataReshape: (
+        data: CreateTaskTemplateResponseData,
+        cachedDatas: CachedQueriesData | undefined
+      ) => {
         const newItem = {
           id: data.id,
           description: data.task.description,
@@ -259,7 +325,10 @@ export const API_ENDPOINTS = Object.freeze({
     },
     CREATE_TASK: {
       endpoint: `${BASE_API_URL}/tasks`,
-      dataReshape: (data: any, cachedDatas: unknown) => {
+      dataReshape: (
+        data: CreateTaskResponseData,
+        cachedDatas: CachedQueriesData | undefined
+      ) => {
         const newItem = {
           ...data,
           value: data.name,
@@ -270,18 +339,33 @@ export const API_ENDPOINTS = Object.freeze({
   },
 } as const);
 
-function dataReshaper(data: any) {
+type CachedQueriesData = Array<[unknown, unknown]>;
+
+function dataReshaper(data: unknown) {
   // Reshape data for caching
-  const reshaper = new ObjectReshape(data);
+  const reshaper = new ObjectReshape(
+    data as Record<string, unknown> | Array<Record<string, unknown>>
+  );
   return reshaper;
 }
 
-function getCachedDatas(cachedDatas: unknown) {
+/**
+ * Get cached data from the cached queries data structure
+ *
+ * @param cachedDatas
+ * @returns  The extracted cached data array
+ */
+function getCachedDatas(cachedDatas: CachedQueriesData | undefined) {
   if (!cachedDatas) return [];
   const array = cachedDatas?.[0];
   const data = array?.[1];
-  if (data?.length > 0) return data;
-  return data?.[0] ?? [];
+
+  const isArray = Array.isArray(data);
+
+  if (isArray && data.length > 0) return data;
+
+  const maybeIndexed = data as { 0?: unknown } | undefined;
+  return maybeIndexed?.[0] ?? [];
 }
 
 /**
@@ -295,8 +379,8 @@ function getCachedDatas(cachedDatas: unknown) {
  * @returns The reshaped data structure with the new item added
  */
 function reshapeItemToCachedData(
-  newItem: any,
-  cachedDatas: unknown,
+  newItem: Record<string, unknown>,
+  cachedDatas: CachedQueriesData | undefined,
   groupConditionValue: string
 ) {
   const existingData = getCachedDatas(cachedDatas);
