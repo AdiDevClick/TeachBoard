@@ -33,7 +33,11 @@ export type InputItem<T> =
 
 type FetchingInputBase<T> = InputItem<T> & {
   apiEndpoint?: string | ((id: number | string) => string);
-  dataReshapeFn?: (data: unknown) => Record<string, unknown>;
+  dataReshapeFn?(
+    data: unknown,
+    cachedDatas?: unknown,
+    options?: unknown
+  ): Record<string, unknown>;
   useButtonAddNew?: boolean;
   fullWidth?: boolean;
   creationButtonText?: string | boolean;
@@ -97,4 +101,4 @@ export type LaballedInputForControllerProps<T extends FieldValues> = (
 ) & {
   field: ControllerRenderProps<T, Path<T>>;
   fieldState: ControllerFieldState;
-} & Omit<ComponentPropsWithRef<"input">, "form">; // ComponentPropsWithRef<"input">;
+} & Omit<ComponentPropsWithRef<"input">, "form">;
