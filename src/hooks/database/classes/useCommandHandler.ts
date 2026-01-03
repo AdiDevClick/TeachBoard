@@ -1,6 +1,10 @@
 import type { HeadingType } from "@/components/Command/types/command.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
+  debugLogs,
+  fetchParamsPropsInvalid,
+} from "@/configs/app-components.config.ts";
+import {
   APP_REDIRECT_TIMEOUT_SUCCESS,
   DEV_MODE,
   NO_CACHE_LOGS,
@@ -137,6 +141,16 @@ export function useCommandHandler<
       const task = metaData?.task as FetchParams["contentId"] | undefined;
       const apiEndpoint = metaData?.apiEndpoint;
       const dataReshapeFn = metaData?.dataReshapeFn;
+
+      // Fail fast when a command/modal expects an endpoint but none is provided.
+      // This catches regressions where inputControllers drift from API_ENDPOINTS.
+      if (!fetchParamsPropsInvalid(metaData || {})) {
+        const message = `[useCommandHandler] Missing fetchParams for task "${String(
+          task
+        )}". Ensure the related input controller is wired to API_ENDPOINTS.*.endPoint(s).`;
+        debugLogs(message);
+        throw new Error(message);
+      }
 
       // Ensure apiEndpoint is present and correspond to a known input
       // const found = inputControllers.find(
@@ -294,8 +308,8 @@ export function useCommandHandler<
         // For navigation flows (like login), the form will be unmounted anyway.
         // For dialog flows, the dialog closing will handle the form state.
         startTransition(async () => {
-          form.reset();
-          await wait(APP_REDIRECT_TIMEOUT_SUCCESS);
+          // form.reset();
+          // await wait(APP_REDIRECT_TIMEOUT_SUCCESS);
           closeDialog(null, pageId);
         });
       }
