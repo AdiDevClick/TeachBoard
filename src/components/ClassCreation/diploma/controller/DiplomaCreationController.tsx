@@ -1,4 +1,4 @@
-import type DiplomaCreation from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
+import type { DiplomaCreationControllerProps } from "@/components/ClassCreation/diploma/types/diploma-creation.types.ts";
 import type { CommandsProps } from "@/components/Command/types/command.types.ts";
 import {
   PopoverFieldWithCommands,
@@ -10,10 +10,9 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { DiplomaCreationFormSchema } from "@/models/diploma-creation.models.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { type MouseEvent, type PointerEvent } from "react";
-import { useWatch, type UseFormReturn } from "react-hook-form";
+import { useWatch } from "react-hook-form";
 
-const inputs = [
+export const inputs = [
   {
     task: "new-degree-item-field",
     name: "diplomaFieldId",
@@ -74,21 +73,6 @@ const defaultState = {
   newText: "",
   selectedText: "",
 };
-
-export type HandleAddNewItemParams = {
-  e?: PointerEvent<HTMLElement> | MouseEvent<HTMLElement>;
-  apiEndpoint?: (typeof inputs)[number]["apiEndpoint"];
-  task: (typeof inputs)[number]["task"];
-  dataReshapeFn?: (typeof inputs)[number]["dataReshapeFn"];
-};
-
-/**
- * Props for DiplomaCreationController component
- */
-export type DiplomaCreationControllerProps = {
-  form: UseFormReturn<DiplomaCreationFormSchema>;
-  formId: string;
-} & Omit<Parameters<typeof DiplomaCreation>[0], "modalMode">;
 
 /**
  * Diploma creation controller component

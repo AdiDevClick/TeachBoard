@@ -1,11 +1,65 @@
-import type { useForm } from "react-hook-form";
+import type { inputs } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
+import type { AppModalNames } from "@/configs/app.config.ts";
+import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
+import type { MouseEvent, PointerEvent } from "react";
+import type { FieldValues, UseFormReturn } from "react-hook-form";
 
 /**
  * Parameters for the useCommandHandler hook
  */
-export interface UseCommandHandlerParams {
+export interface UseCommandHandlerParams<
+  TFieldValues extends FieldValues = FieldValues
+> {
   /** Zod validated form instance */
-  form: ReturnType<typeof useForm>;
+  form: UseFormReturn<TFieldValues>;
   /** Identifier for the current page/module */
-  pageId: string;
+  pageId: AppModalNames;
 }
+
+/**
+ * Parameters for the handleAddNewItem function
+ */
+export type HandleAddNewItemParams = {
+  e?: PointerEvent<HTMLElement> | MouseEvent<HTMLElement>;
+  apiEndpoint?: (typeof inputs)[number]["apiEndpoint"];
+  task: AppModalNames;
+  dataReshapeFn?: (typeof inputs)[number]["dataReshapeFn"];
+};
+
+/**
+ * Parameters for the handleSelectionCallback function
+ */
+export type HandleSelectionCallbackParams = {
+  value: string;
+  options: {
+    mainFormField: string;
+    secondaryFormField: string;
+    detailedCommandItem?: {
+      isSelected?: boolean;
+    };
+    /** Defaults to "array" for backward compatibility with multi-selection fields. */
+    validationMode?: "array" | "single";
+  };
+};
+
+/**
+ * Parameters for the handleOpeningCallback function
+ */
+export type HandleOpeningCallbackParams = {
+  open: boolean;
+  metaData?: Omit<HandleAddNewItemParams, "e">;
+};
+
+/**
+ * Parameters for the handleSubmitCallback function
+ */
+export type HandleSubmitCallbackParams = {
+  variables: MutationVariables;
+  endpointUrl: string;
+  dataReshapeFn?: (
+    data: unknown,
+    cachedDatas?: unknown,
+    options?: any
+  ) => unknown;
+  reshapeOptions?: any;
+};

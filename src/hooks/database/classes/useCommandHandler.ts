@@ -1,4 +1,3 @@
-import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
 import type { HeadingType } from "@/components/Command/types/command.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
@@ -8,14 +7,22 @@ import {
   NO_QUERY_LOGS,
 } from "@/configs/app.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
+import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
-import type { UseCommandHandlerParams } from "@/hooks/database/types/use-command-handler.types.ts";
+import type {
+  HandleAddNewItemParams,
+  HandleOpeningCallbackParams,
+  HandleSelectionCallbackParams,
+  HandleSubmitCallbackParams,
+  UseCommandHandlerParams,
+} from "@/hooks/database/types/use-command-handler.types.ts";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { wait } from "@/utils/utils.ts";
 import { type QueryKey, useQueryClient } from "@tanstack/react-query";
 import { startTransition, useCallback, useEffect, useRef } from "react";
+import type { FieldValues, Path } from "react-hook-form";
 
 /**
  * Custom hook to handle command operations including data fetching, dialog management, and form submissions.
@@ -23,7 +30,9 @@ import { startTransition, useCallback, useEffect, useRef } from "react";
  * @param form - The form instance to manage form state and actions
  * @param pageId - The identifier for the current page or module
  */
-export function useCommandHandler({ form, pageId }: UseCommandHandlerParams) {
+export function useCommandHandler<
+  TFieldValues extends FieldValues = FieldValues
+>({ form, pageId }: UseCommandHandlerParams<TFieldValues>) {
   const {
     fetchParams,
     onSubmit,
@@ -41,11 +50,12 @@ export function useCommandHandler({ form, pageId }: UseCommandHandlerParams) {
     openedDialogs,
     setDialogOptions,
   } = useDialog();
+
   const queryClient = useQueryClient();
   const mutationObs = useMutationObserver({});
 
   const hasStartedCreation = useRef(false);
-  const postVariables = useRef<MutationVariables>(null!);
+  const postVariables = useRef<MutationVariables>(null);
 
   /**
    * Handle adding a new item/feature
@@ -82,14 +92,10 @@ export function useCommandHandler({ form, pageId }: UseCommandHandlerParams) {
    */
   const handleSubmit = useCallback(
     (
-      variables: MutationVariables,
-      endpointUrl: string,
-      dataReshapeFn?: (
-        data: any,
-        cachedDatas?: unknown,
-        options?: any
-      ) => unknown,
-      reshapeOptions?: any
+      variables: HandleSubmitCallbackParams["variables"],
+      endpointUrl: HandleSubmitCallbackParams["endpointUrl"],
+      dataReshapeFn: HandleSubmitCallbackParams["dataReshapeFn"],
+      reshapeOptions: HandleSubmitCallbackParams["reshapeOptions"] = null
     ) => {
       if (DEV_MODE && !NO_CACHE_LOGS) {
         console.debug("useModuleCreation handleSubmit called", variables);
@@ -121,31 +127,37 @@ export function useCommandHandler({ form, pageId }: UseCommandHandlerParams) {
    * @param open - Whether the select is opening
    * @param metaData - The meta data from the popover field that was opened
    */
-  const handleOpening = useCallback((open, metaData, inputControllers) => {
-    if (!open) return;
+  const handleOpening = useCallback(
+    (
+      open: HandleOpeningCallbackParams["open"],
+      metaData?: HandleOpeningCallbackParams["metaData"]
+    ) => {
+      if (!open) return;
 
-    const task = metaData?.task;
-    const apiEndpoint = metaData?.apiEndpoint;
-    const dataReshapeFn = metaData?.dataReshapeFn;
+      const task = metaData?.task as FetchParams["contentId"] | undefined;
+      const apiEndpoint = metaData?.apiEndpoint;
+      const dataReshapeFn = metaData?.dataReshapeFn;
 
-    // Ensure apiEndpoint is present and correspond to a known input
-    // const found = inputControllers.find(
-    //   (input: (typeof inputControllers)[number]) =>
-    //     input.task === task && input.apiEndpoint === apiEndpoint
-    // );
-    // if (!found) return;
+      // Ensure apiEndpoint is present and correspond to a known input
+      // const found = inputControllers.find(
+      //   (input: (typeof inputControllers)[number]) =>
+      //     input.task === task && input.apiEndpoint === apiEndpoint
+      // );
+      // if (!found) return;
 
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.debug("handleOpening callback in CommandHandler", metaData);
-    }
+      if (DEV_MODE && !NO_CACHE_LOGS) {
+        console.debug("handleOpening callback in CommandHandler", metaData);
+      }
 
-    setFetchParams((prev) => ({
-      ...prev,
-      dataReshapeFn: dataReshapeFn,
-      url: apiEndpoint,
-      contentId: task,
-    }));
-  }, []);
+      setFetchParams((prev) => ({
+        ...prev,
+        dataReshapeFn,
+        url: apiEndpoint ?? prev.url,
+        contentId: task ?? prev.contentId,
+      }));
+    },
+    []
+  );
 
   /**
    * Handle selection from command list
@@ -164,19 +176,14 @@ export function useCommandHandler({ form, pageId }: UseCommandHandlerParams) {
    */
   const handleSelection = useCallback(
     (
-      value: string,
-      options: {
-        mainFormField: string;
-        secondaryFormField: string;
-        detailedCommandItem: any;
-        /** Defaults to "array" for backward compatibility with multi-selection fields. */
-        validationMode?: "array" | "single";
-      }
+      value: HandleSelectionCallbackParams["value"],
+      options: HandleSelectionCallbackParams["options"]
     ) => {
-      const mainFormField = options.mainFormField;
-      const secondaryFormField = options.secondaryFormField;
+      const mainFormField = options.mainFormField as Path<TFieldValues>;
+      const secondaryFormField =
+        options.secondaryFormField as Path<TFieldValues>;
       const detailedCommandItem = options.detailedCommandItem;
-      const isSelected = detailedCommandItem.isSelected;
+      const isSelected = detailedCommandItem?.isSelected;
       const validationMode = options.validationMode ?? "array";
 
       if (DEV_MODE && !NO_CACHE_LOGS) {
@@ -188,10 +195,11 @@ export function useCommandHandler({ form, pageId }: UseCommandHandlerParams) {
         });
       }
 
-      const retrievedFormField = new UniqueSet(
+      const retrievedFormField = new UniqueSet<unknown, any>(
         null,
         form.getValues(secondaryFormField) || []
       );
+
       if (retrievedFormField.has(value) || isSelected === false) {
         retrievedFormField.delete(value);
       } else {
@@ -201,21 +209,22 @@ export function useCommandHandler({ form, pageId }: UseCommandHandlerParams) {
         retrievedFormField.set(value, detailedCommandItem);
       }
 
-      let values = Array.from(retrievedFormField.keys());
+      let values: unknown[] | unknown = Array.from(retrievedFormField.keys());
       if (validationMode === "single") {
-        if (values.length > 0) {
+        if (Array.isArray(values) && values.length > 0) {
           values = values[0];
         } else {
           values = "";
         }
       }
-      form.setValue(mainFormField, values, {
+
+      form.setValue(mainFormField, values as any, {
         shouldValidate: true,
       });
 
       form.setValue(
         secondaryFormField,
-        Array.from(retrievedFormField.entries()),
+        Array.from(retrievedFormField.entries()) as any,
         {
           shouldValidate: false,
           shouldDirty: false,
@@ -246,7 +255,7 @@ export function useCommandHandler({ form, pageId }: UseCommandHandlerParams) {
     * ```
    */
   const handleDataCacheUpdate = useCallback((): HeadingType[] | undefined => {
-    const queryKey = [fetchParams.contentId, fetchParams.url] ?? [];
+    const queryKey = [fetchParams.contentId, fetchParams.url];
     const cachedData = queryClient.getQueryData<HeadingType[]>(
       queryKey as QueryKey
     );
@@ -311,7 +320,7 @@ export function useCommandHandler({ form, pageId }: UseCommandHandlerParams) {
 
       // Avoid FetchParams initial state fetch
       if (keys[1] === "" && keys[0] === "none") return;
-      const cachedData = queryClient.getQueryData(keys ?? []);
+      const cachedData = queryClient.getQueryData(keys);
 
       if (cachedData === undefined) {
         hasStartedCreation.current = true;
