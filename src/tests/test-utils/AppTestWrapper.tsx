@@ -4,14 +4,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type PropsWithChildren } from "react";
 import { MemoryRouter } from "react-router-dom";
 
-const client = new QueryClient();
+export const testQueryClient = new QueryClient();
 
 export function AppTestWrapper({
   children,
 }: Readonly<PropsWithChildren<unknown>>) {
   return (
     <DialogProvider>
-      <QueryClientProvider client={client}>
+      <QueryClientProvider client={testQueryClient}>
         <MemoryRouter initialEntries={["/"]}>
           <SidebarProvider>{children}</SidebarProvider>
         </MemoryRouter>
