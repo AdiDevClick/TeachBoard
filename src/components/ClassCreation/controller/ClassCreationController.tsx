@@ -12,6 +12,10 @@ import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/Non
 import { VerticalFieldSelectWithController } from "@/components/Selects/VerticalFieldSelect.tsx";
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import {
+  debugLogs,
+  taskModalPropsInvalid,
+} from "@/configs/app-components.config.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { classCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
@@ -134,7 +138,6 @@ export function ClassCreationController({
     }
   }, [openedDialogs]);
 
-
   /**
    * Handle opening of the VerticalFieldSelect component
    *
@@ -145,10 +148,16 @@ export function ClassCreationController({
    */
   const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
     const linkedDiploma = selectedDiplomaRef.current;
-    const isNewTaskTemplate =
-      metaData?.task === "new-task-template" && linkedDiploma.id !== undefined;
+    const isNewTaskTemplate = metaData?.task === "new-task-template";
 
-    if (isNewTaskTemplate) {
+    if (isNewTaskTemplate && !taskModalPropsInvalid(linkedDiploma?.id)) {
+      debugLogs(
+        "ClassCreationController - Tried to open task templates without a selected diploma."
+      );
+      return;
+    }
+
+    if (isNewTaskTemplate && linkedDiploma) {
       metaData.apiEndpoint =
         API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
           linkedDiploma.id
@@ -168,6 +177,13 @@ export function ClassCreationController({
    * @param variables - The form data to submit
    */
   const handleSubmit = (variables: ClassCreationFormSchema) => {
+    if (DEV_MODE) {
+      (globalThis as any).__TB_CLASS_CREATION_LAST_SUBMIT__ = {
+        at: Date.now(),
+        variables,
+      };
+    }
+
     const yearVariable = variables.schoolYear
       .split(" - ")
       .map((s) => s.trim())
@@ -179,20 +195,6 @@ export function ClassCreationController({
       API_ENDPOINTS.POST.CREATE_CLASS.dataReshape
     );
   };
-
-  useEffect(() => {
-    if (!pageId || observedRefs.size === 0) return;
-    const observed = observedRefs.get(pageId + "-schoolYear");
-    console.log("Observed for schoolYear:", observed);
-    if (observed) {
-      const el = observed.element as HTMLElement | null;
-      const meta = observed.meta as { name?: string } | undefined;
-      if (el) {
-        console.log(meta?.name === "degreeConfigId");
-        form.setFocus("schoolYear");
-      }
-    }
-  }, [observedRefs, form, pageId]);
 
   /**
    * Handle command selection from PopoverFieldWithCommands
@@ -318,7 +320,29 @@ export function ClassCreationController({
     <form
       ref={(el) => setRef(el, { name: pageId, formId })}
       id={formId}
-      onSubmit={form.handleSubmit(handleSubmit)}
+      onSubmit={form.handleSubmit(handleSubmit, (errors) => {
+        if (DEV_MODE && !NO_CACHE_LOGS) {
+          console.debug("ClassCreation invalid submit", errors);
+        }
+
+        if (DEV_MODE) {
+          const v = form.getValues();
+          (globalThis as any).__TB_CLASS_CREATION_LAST_INVALID_SUBMIT__ = {
+            at: Date.now(),
+            keys: Object.keys(errors ?? {}),
+            values: {
+              name: v.name,
+              description: v.description,
+              schoolYear: v.schoolYear,
+              degreeConfigId: v.degreeConfigId,
+              userId: (v as any).userId,
+              primaryTeacherId: (v as any).primaryTeacherId,
+              tasks: (v as any).tasks,
+              students: (v as any).students,
+            },
+          };
+        }
+      })}
       className="grid gap-4"
     >
       <ControlledInputList
