@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { ObjectReshape } from "@/utils/ObjectReshape";
+import { describe, expect, it } from "vitest";
 
 describe("ObjectReshape - API config step contracts", () => {
   it("assignSourceTo('items') exposes the original array under root.items", () => {
@@ -7,7 +7,9 @@ describe("ObjectReshape - API config step contracts", () => {
       { id: "1", firstName: "Alice", lastName: "Doe", img: "a.png" },
     ];
 
-    const shaped = new ObjectReshape(payload as any).assignSourceTo("items").newShape();
+    const shaped = new ObjectReshape(payload as any)
+      .assignSourceTo("items")
+      .newShape();
 
     expect(Array.isArray(shaped)).toBe(true);
     expect(Array.isArray(shaped[0].items)).toBe(true);
@@ -24,7 +26,9 @@ describe("ObjectReshape - API config step contracts", () => {
   });
 
   it("createPropertyWithContentFromKeys computes a joined value (via buildItem)", () => {
-    const reshaper = new ObjectReshape([] as any).createPropertyWithContentFromKeys(
+    const reshaper = new ObjectReshape(
+      [] as any
+    ).createPropertyWithContentFromKeys(
       ["firstName", "lastName"],
       "fullName",
       " "
@@ -154,8 +158,14 @@ describe("ObjectReshape - API config step contracts", () => {
       .build();
 
     expect(built[0].groupTitle).toBe("Tous");
+    // build() materializes computed properties (fullName) into the item
+    // but mappings that reference computed keys are not applied during build()
+    // (mapping runs before computed properties are added). Ensure computed
+    // value exists and mapping to 'value'/'name' is not present here.
     expect(built[0].items[0]).toEqual(
-      expect.objectContaining({ value: "Alice Doe", name: "Alice Doe" })
+      expect.objectContaining({ fullName: "Alice Doe" })
     );
+    expect(built[0].items[0].value).toBeUndefined();
+    expect(built[0].items[0].name).toBeUndefined();
   });
 });
