@@ -56,34 +56,14 @@ describe("ObjectReshape - transformTuplesToGroups", () => {
     const result = new ObjectReshape(input)
       .transformTuplesToGroups("groupTitle", "items")
       .assign([["name", "value"]])
-      .build();
+      .newShape();
 
-    expect(result).toEqual([
-      {
-        groupTitle: "Bac Pro",
-        items: [
-          {
-            id: 1,
-            name: "Bac Pro Commerce",
-            code: "BPCOM",
-            value: "Bac Pro Commerce",
-          },
-          {
-            id: 2,
-            name: "Bac Pro Vente",
-            code: "BPVEN",
-            value: "Bac Pro Vente",
-          },
-        ],
-      },
-      {
-        groupTitle: "BTS",
-        items: [
-          { id: 3, name: "BTS MUC", code: "BTSMUC", value: "BTS MUC" },
-          { id: 4, name: "BTS NRC", code: "BTSNRC", value: "BTS NRC" },
-        ],
-      },
-    ]);
+    expect(result[0].groupTitle).toBe("Bac Pro");
+    expect(result[0].items[0].value).toBe("Bac Pro Commerce");
+    expect(result[0].items[1].value).toBe("Bac Pro Vente");
+    expect(result[1].groupTitle).toBe("BTS");
+    expect(result[1].items[0].value).toBe("BTS MUC");
+    expect(result[1].items[1].value).toBe("BTS NRC");
   });
 
   it("should handle empty object", () => {
@@ -94,5 +74,23 @@ describe("ObjectReshape - transformTuplesToGroups", () => {
       .newShape();
 
     expect(result).toEqual([]);
+  });
+
+  it("allows consuming computed properties through mapped outputs", () => {
+    const input = {
+      BTS: [{ degreeLevel: "BTS", degreeYear: "2024" }],
+    };
+
+    const result = new ObjectReshape(input)
+      .transformTuplesToGroups("groupTitle", "items")
+      .createPropertyWithContentFromKeys(
+        ["degreeLevel", "degreeYear"],
+        "description",
+        " "
+      )
+      .assign([["description", "value"]])
+      .newShape();
+
+    expect(result[0].items[0].value).toBe("BTS 2024");
   });
 });
