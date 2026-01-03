@@ -341,6 +341,11 @@ export const API_ENDPOINTS = Object.freeze({
 
 type CachedQueriesData = Array<[unknown, unknown]>;
 
+/**
+ * Reshape data using ObjectReshape utility
+ * @param data - The raw data to be reshaped
+ * @returns The reshaped data
+ */
 function dataReshaper(data: unknown) {
   // Reshape data for caching
   const reshaper = new ObjectReshape(
