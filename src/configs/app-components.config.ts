@@ -1,13 +1,5 @@
-import { SimpleAvatar } from "@/components/Avatar/SimpleAvatar.tsx";
 import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.ts";
-import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
-import { SimpleAddButtonWithToolTip } from "@/components/Buttons/SimpleAddButton.tsx";
 import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
-import { CommandItems } from "@/components/Command/CommandItems.tsx";
-import withController from "@/components/HOCs/withController.tsx";
-import withListMapper from "@/components/HOCs/withListMapper.tsx";
-import { LabelledInputForController } from "@/components/Inputs/LaballedInputForController.tsx";
-import PrimaryMenuButton from "@/components/Sidebar/nav/elements/menu_button/PrimaryMenuButton.tsx";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
 import { checkPropsValidity } from "@/utils/utils.ts";
 
@@ -16,7 +8,7 @@ import { checkPropsValidity } from "@/utils/utils.ts";
 /**
  * Validates props for LaballedInputForController component.
  *
- * {@link LabelledInputForController }
+ * {@link import("@/components/Inputs/LaballedInputForController.tsx").LabelledInputForController }
  */
 const LABELLED_INPUT_SHOULD_NOT_ACCEPT = ["useCommands", "creationButtonText"];
 const LABELLED_INPUT_REQUIRES = ["field", "fieldState"];
@@ -33,7 +25,7 @@ export const labelledInputContainsInvalid = (props: Record<string, unknown>) =>
 /**
  * Validation requirements for withController HOC.
  *
- * {@link withController}
+ * {@link import("@/components/HOCs/withController.tsx").default}
  */
 const CONTROLLER_REQUIRES = ["form", "name"];
 
@@ -45,7 +37,7 @@ export const controllerPropsInvalid = (props: Record<string, unknown>) =>
 /**
  * Validation requirements for withListMapper HOC.
  *
- * {@link withListMapper}
+ * {@link import("@/components/HOCs/withListMapper.tsx").default}
  */
 const LIST_MAPPER_REQUIRES = ["items"];
 
@@ -57,7 +49,7 @@ export const listMapperContainsInvalid = (props: Record<string, unknown>) =>
 /**
  * Validation requirements for LoginButton component.
  *
- * {@link LoginButton}
+ * {@link import("@/components/Buttons/LoginButton.tsx").LoginButton}
  */
 const LOGIN_BUTTON_REQUIRES = ["name", "path"];
 
@@ -68,7 +60,7 @@ export const loginButtonContainsInvalid = (props: Record<string, unknown>) =>
 
 /** Validation requirements for MenuButton component.
  *
- * {@link PrimaryMenuButton}
+ * {@link import("@/components/Sidebar/nav/elements/menu_button/PrimaryMenuButton.tsx").default}
  */
 const MENU_BUTTON_REQUIRES = ["item"];
 
@@ -79,7 +71,7 @@ export const menuButtonContainsInvalid = (props: Record<string, unknown>) =>
 
 /** Validation requirements for MenuButton component.
  *
- * {@link CommandItems}
+ * {@link import("@/components/Command/CommandItems.tsx").CommandItems}
  */
 const COMMAND_GROUP_REQUIRES = ["items", "groupTitle"];
 const COMMAND_ITEM_REQUIRES = ["id", "value"];
@@ -95,7 +87,7 @@ export const commandItemContainsInvalid = (props: Record<string, unknown>) =>
 /**
  * Validation requirements for SimpleAvatar component.
  *
- * {@link SimpleAvatar}
+ * {@link import("@/components/Avatar/SimpleAvatar.tsx").SimpleAvatar}
  */
 const SIMPLE_AVATAR_REQUIRES = ["src", "alt", "fallback"];
 
@@ -108,7 +100,7 @@ export function simpleAvatarPropsInvalid(props: SimpleAvatarProps) {
 /**
  * Validation requirements for SimpleAddButtonWithToolTip component.
  *
- * {@link SimpleAddButtonWithToolTip}
+ * {@link import("@/components/Buttons/SimpleAddButton.tsx").SimpleAddButtonWithToolTip}
  */
 const SIMPLE_ADD_BUTTON_REQUIRES = ["toolTipText"];
 
@@ -117,6 +109,29 @@ export function simpleAddButtonWithToolTipPropsInvalid(
 ) {
   return checkPropsValidity(props, SIMPLE_ADD_BUTTON_REQUIRES, []);
 }
+
+//                    ------------
+
+/**
+ * Validation requirements for useCommandHandler component handleOpening() callback.
+ *
+ * Used by {@link useCommandHandler}
+ */
+const FETCH_PARAMS_REQUIRES = ["contentId", "apiEndpoint", "dataReshapeFn"];
+export const fetchParamsPropsInvalid = (props: Record<string, unknown>) =>
+  checkPropsValidity(props, FETCH_PARAMS_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for Task Modal components.
+ *
+ * Used by {@link ClassCreationController} trying to open Task Modals.
+ */
+const TASK_MODAL_REQUIRES = ["id"];
+
+export const taskModalPropsInvalid = (props: Record<string, unknown>) =>
+  checkPropsValidity(props, TASK_MODAL_REQUIRES, []);
 
 //                    ------------
 
