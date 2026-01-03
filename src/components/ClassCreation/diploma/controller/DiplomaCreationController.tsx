@@ -8,6 +8,7 @@ import type { PopoverFieldProps } from "@/components/Popovers/types/popover.type
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
+import type { HandleOpeningCallbackParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { DiplomaCreationFormSchema } from "@/models/diploma-creation.models.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWatch } from "react-hook-form";
@@ -118,8 +119,11 @@ export function DiplomaCreationController({
    * @param open - Whether the select is opening
    * @param metaData - The meta data from the popover field that was opened
    */
-  const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
-    openingCallback(open, metaData, inputs);
+  const handleOpening = (
+    open: boolean,
+    metaData?: HandleOpeningCallbackParams["metaData"]
+  ) => {
+    openingCallback(open, metaData);
   };
 
   /**
