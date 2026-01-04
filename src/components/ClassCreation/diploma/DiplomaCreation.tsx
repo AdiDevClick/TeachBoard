@@ -30,6 +30,7 @@ const footerProps = {
 function DiplomaCreation({
   pageId = "create-diploma",
   modalMode = true,
+  className = "grid gap-4",
   inputControllers = diplomaCreationInputControllers,
   ...props
 }: Readonly<PageWithControllers<DiplomaInputItem>>) {
@@ -51,6 +52,7 @@ function DiplomaCreation({
       pageId,
       modalMode,
       formId,
+      className,
       titleProps,
       footerProps: {
         ...footerProps,
