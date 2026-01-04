@@ -35,7 +35,6 @@ export function DegreeModuleSkill({
   inputControllers = degreeSubSkillsCreationInputControllers,
   ...props
 }: Readonly<PageWithControllers<DegreeModuleSkillInputItem>>) {
-  const formId = pageId + "-form";
   const form = useForm<DegreeModuleSkillFormSchema>({
     resolver: zodResolver(moduleSkillSchema),
     mode: "onTouched",
@@ -44,6 +43,9 @@ export function DegreeModuleSkill({
       code: "",
     },
   });
+
+  const formId = pageId + "-form";
+
   const commonProps = useMemo(
     () => ({
       pageId,
