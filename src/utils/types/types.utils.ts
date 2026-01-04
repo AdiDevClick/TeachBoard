@@ -104,6 +104,16 @@ export type ComponentLike<P = unknown> =
   | ((props: P) => ReactNode);
 
 /**
+ * Make a function type bivariant in its parameters.
+ *
+ * Useful for React callback props where callers may pass subtypes
+ * (e.g. `DetailedCommandItem` where `CommandItemType` is expected).
+ */
+export type BivariantCallback<T extends (...args: any[]) => any> = {
+  bivarianceHack(...args: Parameters<T>): ReturnType<T>;
+}["bivarianceHack"];
+
+/**
  * Replace the given prop S with inferred content props based on the provided component.
  */
 export type EnsureContentProps<T, S extends string> = T extends {
