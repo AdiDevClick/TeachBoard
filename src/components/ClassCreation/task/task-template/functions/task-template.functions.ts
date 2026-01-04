@@ -1,4 +1,16 @@
+import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
+import {
+  createDisabledGroup,
+  handleDiplomaChange,
+} from "@/components/ClassCreation/functions/class-creation.functions.ts";
+import type { FetchSkillsDataParams } from "@/components/ClassCreation/task/task-template/types/task-template-creation.types.ts";
+import type {
+  DetailedCommandItem,
+  DiplomaTaskContext,
+  MutableRef,
+  TaskTemplatesCacheShape,
+} from "@/components/ClassCreation/types/class-creation.types.ts";
 
 /**
  * Create a new Map() of form values based on selected command item details
@@ -8,21 +20,19 @@ import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
  * @returns The updated form values Map()
  */
 export function updateValues(
-  details: Record<string, unknown>,
-  formValues: Map<unknown, unknown>
+  details: DetailedCommandItem,
+  formValues: Map<UUID, { mainSkill: UUID; subSkillId?: UUID[] }>
 ) {
   const current = new Map(formValues);
 
   const main = details.groupId;
   const sub = details.id;
-  let subSkillsSet = new Set();
+  let subSkillsSet = new Set<UUID>();
 
   if (!current.has(main)) {
     subSkillsSet.add(sub);
   } else {
-    const existing = current.get(main) as
-      | { subSkillId?: unknown[] }
-      | undefined;
+    const existing = current.get(main);
     subSkillsSet = new Set(existing?.subSkillId ?? []);
 
     if (subSkillsSet.has(sub)) {
@@ -67,4 +77,53 @@ export function createTaskTemplateView(skills?: SkillsViewDto[]) {
       })),
     };
   });
+}
+
+/**
+ * Fetch and reshape task data based on cached data and diploma information
+ *
+ * @param cachedData - The cached task template data
+ * @param diplomaDatasParam - The diploma data parameter
+ * @param currentDiplomaId - The current diploma ID
+ * @param isDiplomaChanged - Flag indicating if the diploma has changed
+ * @returns The reshaped task template data with disabled groups if applicable
+ */
+export function fetchTasksData(
+  cachedData: TaskTemplatesCacheShape,
+  diplomaDatas: DiplomaTaskContext,
+  currentDiplomaId: UUID,
+  isDiplomaChanged: ReturnType<typeof handleDiplomaChange>,
+  itemToDisplay: MutableRef<ReturnType<typeof createDisabledGroup>>,
+  activeDiplomaIdRef: MutableRef<UUID>
+) {
+  if (!Array.isArray(cachedData)) return undefined;
+  let dataCopy = itemToDisplay.current;
+
+  if (dataCopy === null || isDiplomaChanged) {
+    dataCopy = createDisabledGroup({
+      dataCopy,
+      cachedData,
+      diplomaDatas,
+      currentDiplomaId,
+      activeDiplomaIdRef,
+    });
+    itemToDisplay.current = dataCopy;
+  }
+  return dataCopy;
+}
+
+/**
+ * Fetch and reshape skills data based on diploma information
+ *
+ * @param diploma - The diploma data containing skills
+ * @param savedSkills - A ref object to store and retrieve cached skills view
+ * @returns The cached or newly created skills view
+ */
+export function fetchSkillsData(
+  diploma: FetchSkillsDataParams["diploma"],
+  savedSkills: FetchSkillsDataParams["savedSkills"]
+) {
+  if (!diploma) return undefined;
+  savedSkills.current ??= createTaskTemplateView(diploma.skills);
+  return savedSkills.current;
 }
