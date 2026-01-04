@@ -1,6 +1,13 @@
-import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
-import { resetSelectedItemsFromCache } from "@/components/ClassCreation/functions/class-creation.functions.ts";
-import type { CommandItemType } from "@/components/Command/types/command.types.ts";
+import {
+  resetSelectedItemsFromCache,
+  saveKeys,
+  yearsListRange,
+} from "@/components/ClassCreation/functions/class-creation.functions.ts";
+import type { ClassCreationControllerProps } from "@/components/ClassCreation/types/class-creation.types.ts";
+import type {
+  CommandItemType,
+  DetailedCommandItem,
+} from "@/components/Command/types/command.types.ts";
 import { AvatarsWithLabelAndAddButtonList } from "@/components/Form/AvatarListWithLabelAndAddButton.tsx";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
@@ -19,14 +26,9 @@ import {
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { classCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
-import { useAppStore } from "@/hooks/store/AppStore.ts";
+import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import { useAvatarDataGenerator } from "@/hooks/useAvatarDataGenerator.ts";
-import type {
-  ClassCreationFormSchema,
-  ClassCreationInputItem,
-} from "@/models/class-creation.models.ts";
-import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
-import { UniqueSet } from "@/utils/UniqueSet.ts";
+import type { ClassCreationFormSchema } from "@/models/class-creation.models.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { Activity, useEffect, useRef, useState } from "react";
 import { useWatch } from "react-hook-form";
@@ -35,22 +37,12 @@ const year = new Date().getFullYear();
 const years = yearsListRange(year, 5);
 const defaultSchoolYear = year + " - " + (year + 1);
 
-const defaultState = {
-  selected: false,
-  role: "",
-  isEditing: false,
-  prevText: "",
-  newText: "",
-  // isEdited: false,  // removed - we handle edit state via isEditing and newText
-};
-
 /**
  * ClassCreationController Component
  *
  * @description This component handles the class creation form, including input management,
  * command handling, and form submission.
  *
- * @param modalMode - Indicates if the component is in modal mode
  * @param inputControllers - The input controllers for the form
  * @param pageId - The unique identifier for the page
  * @param className - Additional class names for styling
@@ -59,17 +51,12 @@ const defaultState = {
  * @param props - Additional props
  */
 export function ClassCreationController({
-  modalMode = true,
   inputControllers = classCreationInputControllers,
   pageId,
-  className,
   form,
   formId,
-  ...props
-}: Readonly<PageWithControllers<ClassCreationInputItem>>) {
-  const user = useAppStore((state) => state.user);
-  const [state, setState] = useState(defaultState);
-  const [isYearOpened, setIsYearOpened] = useState(false);
+  className,
+}: ClassCreationControllerProps) {
   const [isSelectedDiploma, setIsSelectedDiploma] = useState(false);
 
   const queryClient = useQueryClient();
@@ -85,20 +72,14 @@ export function ClassCreationController({
     }) ?? [];
 
   const {
-    error,
-    isLoading,
-    isLoaded,
     setRef,
     observedRefs,
     submitCallback,
-    fetchParams,
-    data,
     newItemCallback,
     openingCallback,
-    dialogOptions,
     openedDialogs,
-    onOpenChange,
     resultsCallback,
+    selectionCallback,
   } = useCommandHandler({
     form,
     pageId,
@@ -165,7 +146,7 @@ export function ClassCreationController({
       metaData["degreeConfig"] = linkedDiploma;
     }
 
-    openingCallback(open, metaData, inputControllers);
+    openingCallback(open, metaData);
   };
 
   /**
@@ -205,26 +186,22 @@ export function ClassCreationController({
    */
   const handleCommandSelection = (
     value: string,
-    commandItemDetails: CommandItemType
+    commandItemDetails: DetailedCommandItem
   ) => {
-    const taskTemplateId = commandItemDetails.id;
+    const options = {
+      mainFormField: "tasks",
+      detailedCommandItem: commandItemDetails,
+    };
 
-    const tasks = new Set(form.getValues("tasks") || []);
-    const values = new UniqueSet(null, form.getValues("tasksValues") || []);
+    const newValue = commandItemDetails.id;
+    selectionCallback(newValue, options);
 
-    if (values.has(value)) {
-      tasks.delete(taskTemplateId);
-      values.delete(value);
-    } else {
-      values.set(value, commandItemDetails);
-      tasks.add(taskTemplateId);
-    }
+    const otherOptions = {
+      secondaryFormField: "tasksValues",
+      detailedCommandItem: commandItemDetails,
+    };
 
-    form.setValue("tasksValues", Array.from(values.entries()), {
-      shouldValidate: false,
-    });
-
-    form.setValue("tasks", Array.from(tasks), { shouldValidate: true });
+    selectionCallback(value, otherOptions);
   };
 
   /**
@@ -235,7 +212,7 @@ export function ClassCreationController({
    * @param value - The value of the selected command item
    * @param commandItem - The details of the selected command item
    */
-  const handleOnSelect = (value: string, commandItem: CommandItemType) => {
+  const handleOnSelect = (__value: string, commandItem: CommandItemType) => {
     if (form.watch("degreeConfigId") !== commandItem.id) {
       selectedDiplomaRef.current = commandItem;
       setIsSelectedDiploma(!!commandItem);
@@ -276,7 +253,9 @@ export function ClassCreationController({
           selectedDiplomaRef.current.id
         );
       rest.selectedDiploma = selectedDiplomaRef.current;
+
       const cached = queryClient.getQueryData([task, rest.apiEndpoint]);
+
       rest.shortTemplatesList = cached?.[0]?.shortTemplatesList ?? [];
     }
     saveKeys([task, rest.apiEndpoint], cachedKeysRef);
@@ -287,7 +266,7 @@ export function ClassCreationController({
     });
   };
 
-  const handleOnYearSelect = (value: string, commandItem: CommandItemType) => {
+  const handleOnYearSelect = (value: string) => {
     if (form.watch("schoolYear") !== value) {
       form.setValue("schoolYear", value, { shouldValidate: true });
     }
@@ -343,7 +322,7 @@ export function ClassCreationController({
           };
         }
       })}
-      className="grid gap-4"
+      className={className}
     >
       <ControlledInputList
         items={inputControllers.slice(0, 2)}
@@ -353,7 +332,6 @@ export function ClassCreationController({
       <PopoverFieldWithControllerAndCommandsList
         items={inputControllers.slice(3, 4)}
         form={form}
-        // id={`${pageId}-year`}
         setRef={setRef}
         commandHeadings={resultsCallback()}
         observedRefs={observedRefs}
@@ -404,189 +382,6 @@ export function ClassCreationController({
           <NonLabelledGroupItem />
         </ListMapper>
       </VerticalFieldSelectWithController>
-
-      {/* <PopoverFieldWithControlledCommands
-        setRef={setRef}
-        commandHeadings={resultsCallback([
-          fetchParams.contentId,
-          fetchParams.url,
-        ])}
-        observedRefs={observedRefs}
-        onLoad={(e) => {
-          console.log(e);
-          setIsYearOpened(true);
-        }}
-        onOpenChange={handleOpening}
-        onAddNewItem={newItemCallback}
-        form={form}
-        {...inputControllers[4]}
-      >
-        {isYearOpened && (
-          <ListMapper items={years}>
-            <NonLabelledGroupItem />
-          </ListMapper>
-        )}
-      </PopoverFieldWithControlledCommands> */}
-      {/* <ItemGroup id={`${pageId}-roles`} className="grid gap-2">
-        <ItemTitle>Ajouter des rôles</ItemTitle>
-        <Item variant={"default"} className="p-0">
-          <ItemContent className="flex-row flex-wrap gap-2">
-            <ListMapper items={roles}>
-              {(rawItem: string | { item: string; id?: string }) => {
-                const item =
-                  typeof rawItem === "string" ? rawItem : rawItem.item;
-                return (
-                  <ItemActions key={item} className="relative">
-                    <Popover
-                      open={state.selected && state.role === item}
-                      onOpenChange={(open) => onRoleOpenChange(open, item)}
-                    >
-                      <PopoverTrigger asChild>
-                        <Button
-                          // onBlur={handleOnTextEdited}
-                          // onFocus={handleOnTextEdit}
-                          // onClick={handleFocus}
-                          data-is-editing={
-                            state.isEditing && state.role === item
-                          }
-                          id={item}
-                          size="sm"
-                          variant="outline"
-                          contentEditable={
-                            state.isEditing && state.role === item
-                          }
-                        >
-                          {item}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        side="top"
-                        align="center"
-                        sideOffset={8}
-                        className="p-0.5 w-auto max-h-min-content"
-                      >
-                        {state.isEditing && state.role === item ? (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              id={item + "-validate"}
-                              onClick={handleOnValidate}
-                              aria-label={`Valider ${item}`}
-                            >
-                              <CheckIcon className="size-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              id={item + "-cancel"}
-                              onClick={handleOnCancel}
-                              aria-label={`Annuler ${item}`}
-                            >
-                              <RotateCcw className="size-4" />
-                            </Button>
-                          </>
-                        ) : (
-                          state.role === item && (
-                            <>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={handleOnEdit}
-                                id={item + "-edit"}
-                                aria-label={`Modifier ${item}`}
-                              >
-                                <Pencil className="size-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={handleOnDelete}
-                                id={item + "-delete"}
-                                aria-label={`Supprimer ${item}`}
-                              >
-                                <Trash2 className="size-4" />
-                              </Button>
-                              <PopoverClose asChild>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  id={item + "-close"}
-                                  aria-label={`Fermer ${item}`}
-                                >
-                                  <XIcon className="size-4" />
-                                </Button>
-                              </PopoverClose>
-                            </>
-                          )
-                        )}
-                        <PopoverArrow className="fill-popover" />
-                      </PopoverContent>
-                    </Popover>
-                  </ItemActions>
-                );
-              }}
-            </ListMapper>
-          </ItemContent>
-        </Item>
-        <ItemActions className="p-0">
-          <Button variant="ghost" size="icon" className="rounded-full max-h-5">
-            <PlusIcon />
-          </Button>
-        </ItemActions>
-      </ItemGroup> */}
-      {/* {data?.data?.classes.length > 0 && (
-            <>
-              <SelectSeparator />
-              <ListMapper items={data.data.classes}>
-                <LabelledGroup ischild>
-                  <NonLabelledGroupItem />
-                </LabelledGroup>
-              </ListMapper>
-            </>
-          )}
-          {/* </VerticalFieldSelect> */}
-
-      {/* School Year Select */}
     </form>
   );
-}
-
-/**
- * Save the provided keys into the given ref object.
- *
- * @description You can then call any query with these keys to get cached data.
- *
- * @param keys - The keys to be saved.
- * @param ref - The ref object where the keys will be stored.
- */
-function saveKeys(
-  keys: unknown[],
-  ref: { current: Record<string, unknown[]> }
-) {
-  const key = String(keys[0]);
-  ref.current = { ...ref.current, [key]: keys };
-}
-
-/**
- * Generates a list of school years within a specified range.
- *
- * @param year - The central year to base the range on.
- * @param range - The number of years to include before and after the central year.
- * @returns An array of objects containing the school year names and IDs.
- */
-function yearsListRange(
-  year: number,
-  range: number
-): { name: string; id: string }[] {
-  const startYear = year - range;
-  const endYear = year + range;
-  const length = endYear - startYear + 1;
-  return Array.from({ length }, (_v, i) => {
-    const yearLabel = `${startYear + i} - ${startYear + i + 1}`;
-    return {
-      name: yearLabel,
-      id: yearLabel,
-    };
-  });
 }
