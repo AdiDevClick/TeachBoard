@@ -26,7 +26,7 @@ export function DegreeModuleController({
   className = "grid gap-4",
   formId,
   form,
-}: Readonly<DegreeModuleProps>) {
+}: DegreeModuleProps) {
   const {
     setRef,
     observedRefs,
@@ -43,7 +43,7 @@ export function DegreeModuleController({
   const currentSkills =
     useWatch({
       control: form.control,
-      name: "skillListDetails",
+      name: "skillListDetails" as never,
     }) || [];
 
   /**
@@ -57,18 +57,6 @@ export function DegreeModuleController({
       API_ENDPOINTS.POST.CREATE_SKILL.endPoints.MODULE,
       API_ENDPOINTS.POST.CREATE_SKILL.dataReshape
     );
-  };
-
-  /**
-   * Handle opening of the VerticalFieldSelect component
-   *
-   * @description When opening, FETCH data based on the select's meta information
-   *
-   * @param open - Whether the select is opening
-   * @param metaData - The meta data from the popover field that was opened
-   */
-  const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
-    openingCallback(open, metaData, inputControllers);
   };
 
   /**
@@ -90,6 +78,11 @@ export function DegreeModuleController({
     selectionCallback(value, options);
   };
 
+  const controllers = {
+    dynamicTagsList: inputControllers[2],
+    controlledInputsList: inputControllers.slice(0, 2),
+  };
+
   return (
     <form
       id={formId}
@@ -97,7 +90,7 @@ export function DegreeModuleController({
       onSubmit={form.handleSubmit(handleSubmit)}
     >
       <ControlledInputList
-        items={inputControllers.slice(0, 2)}
+        items={controllers.controlledInputsList}
         form={form}
         setRef={setRef}
         observedRefs={observedRefs}
@@ -105,7 +98,7 @@ export function DegreeModuleController({
       <ControlledDynamicTagList
         form={form}
         setRef={setRef}
-        {...inputControllers[2]}
+        {...controllers.dynamicTagsList}
         observedRefs={observedRefs}
         itemList={currentSkills}
       />
@@ -113,11 +106,11 @@ export function DegreeModuleController({
         multiSelection
         setRef={setRef}
         onSelect={handleCommandSelection}
-        onOpenChange={handleOpening}
+        onOpenChange={openingCallback}
         observedRefs={observedRefs}
         onAddNewItem={newItemCallback}
         commandHeadings={resultsCallback()}
-        {...inputControllers[2]}
+        {...controllers.dynamicTagsList}
       />
     </form>
   );
