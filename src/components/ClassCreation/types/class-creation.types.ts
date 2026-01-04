@@ -9,9 +9,14 @@ import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 export type MutableRef<T> = { current: T };
 
 export type CommandItem = {
-  id: string | number;
+  id: UUID;
   name: string;
   [key: string]: unknown;
+};
+
+export type DetailedCommandItem = CommandItem & {
+  groupTitle?: string;
+  groupId: UUID;
 };
 
 export type CommandGroup = {
@@ -22,7 +27,7 @@ export type CommandGroup = {
 
 export type TaskTemplatesCacheShape = [CommandGroup, ...CommandGroup[]];
 
-type DiplomaTaskContext = {
+export type DiplomaTaskContext = {
   shortTemplatesList: string[];
   [key: string]: unknown;
 };
@@ -30,7 +35,7 @@ type DiplomaTaskContext = {
 /**
  * Class creation component props.
  */
-export type ClassCreationProps = { userId?: string } & Readonly<
+export type ClassCreationProps = { userId?: UUID } & Readonly<
   PageWithControllers<ClassCreationInputItem>
 >;
 
