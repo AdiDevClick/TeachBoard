@@ -5,7 +5,9 @@ import type { UseFormReturn } from "react-hook-form";
 /**
  * Props for DiplomaCreationController component
  */
-export type DiplomaCreationControllerProps = {
-  form: UseFormReturn<DiplomaCreationFormSchema>;
-  formId: string;
-} & Omit<Parameters<typeof DiplomaCreation>[0], "modalMode">;
+export type DiplomaCreationControllerProps = Readonly<
+  {
+    form: UseFormReturn<DiplomaCreationFormSchema>;
+    formId: string;
+  } & Omit<Parameters<typeof DiplomaCreation>[0], "modalMode">
+>;

@@ -26,7 +26,7 @@ export function DiplomaCreationController({
   form,
   formId,
   inputControllers = [],
-}: Readonly<DiplomaCreationControllerProps>) {
+}: DiplomaCreationControllerProps) {
   const {
     setRef,
     observedRefs,

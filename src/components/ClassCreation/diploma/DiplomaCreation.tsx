@@ -33,7 +33,6 @@ function DiplomaCreation({
   inputControllers = diplomaCreationInputControllers,
   ...props
 }: Readonly<PageWithControllers<DiplomaInputItem>>) {
-  const formId = pageId + "-form";
   const form = useForm<DiplomaCreationFormSchema>({
     resolver: zodResolver(diplomaCreationSchema),
     mode: "onTouched",
@@ -44,6 +43,8 @@ function DiplomaCreation({
       mainSkillsList: [],
     },
   });
+
+  const formId = pageId + "-form";
 
   const commonProps = useMemo(() => {
     return {
