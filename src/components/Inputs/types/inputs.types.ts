@@ -1,6 +1,6 @@
+import type { AppModalNames } from "@/configs/app.config.ts";
 import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
 import type { ComponentPropsWithRef, HTMLInputTypeAttribute } from "react";
-import type { AppModalNames } from "@/configs/app.config.ts";
 import type {
   ControllerFieldState,
   ControllerRenderProps,
