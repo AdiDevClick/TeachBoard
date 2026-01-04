@@ -19,10 +19,10 @@ export function SearchStudentsController({
   form,
   localForm,
   formId,
-}: Readonly<SearchStudentsControllerProps>) {
+}: SearchStudentsControllerProps) {
   const { closeDialog, openingCallback, resultsCallback, selectionCallback } =
     useCommandHandler({
-      form,
+      form: form!,
       pageId,
     });
 
@@ -52,7 +52,7 @@ export function SearchStudentsController({
         return;
       }
 
-      const newValue = String(commandItemDetails.id);
+      const newValue = commandItemDetails.id;
       const options = {
         mainFormField: "students",
         secondaryFormField: "studentsValues",
@@ -60,7 +60,7 @@ export function SearchStudentsController({
       };
       selectionCallback(newValue, options);
 
-      localForm.setValue("students", form.getValues("students") || [], {
+      localForm.setValue("students", form?.getValues("students") || [], {
         shouldValidate: true,
         shouldDirty: true,
       });
@@ -78,14 +78,14 @@ export function SearchStudentsController({
    * @description Sets up the fetch parameters for retrieving students and triggers the fetch on component mount.
    */
   useEffect(() => {
-    const metaData: Record<string, unknown> = {
+    const metaData = {
       dataReshapeFn: API_ENDPOINTS.GET.STUDENTS.dataReshape,
       apiEndpoint: API_ENDPOINTS.GET.STUDENTS.endpoint,
       task: pageId,
       form,
     };
 
-    openingCallback(true, metaData, null);
+    openingCallback(true, metaData);
   }, []);
 
   return (

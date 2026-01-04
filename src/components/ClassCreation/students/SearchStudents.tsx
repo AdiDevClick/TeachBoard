@@ -1,4 +1,5 @@
 import { SearchStudentsController } from "@/components/ClassCreation/students/controller/SearchStudentsController.tsx";
+import type { SearchStudentsProps } from "@/components/ClassCreation/students/types/search-students.types.ts";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import {
   type SearchStudentsFormSchema,
@@ -21,12 +22,13 @@ const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
  *
  * @param pageId - The unique identifier for the page/component using this controller
  * @param modalMode - Whether the component is used in a modal dialog or not
+ * @param props - Additional props to be passed to the SearchStudents component
  */
 function SearchStudents({
   pageId = "search-students",
   modalMode = true,
   ...props
-}) {
+}: SearchStudentsProps) {
   const localForm = useForm<SearchStudentsFormSchema>({
     resolver: zodResolver(searchStudentsSchema),
     mode: "onTouched",
