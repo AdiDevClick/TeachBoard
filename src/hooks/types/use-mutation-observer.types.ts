@@ -1,3 +1,5 @@
+import type { UniqueSet } from "@/utils/UniqueSet.ts";
+
 /**
  * Mutation Observer Options
  */
@@ -17,3 +19,18 @@ export interface MutationObserverHook {
   options?: MutationObserverOptions;
   onNodeReady?: (node: Element, meta?: Record<string, unknown>) => void;
 }
+
+export type SetRefFunction = (
+  node?: Element | null,
+  meta?: Record<string, unknown>
+) => void;
+
+export type MutationObserverEntry = {
+  element: Element;
+  meta?: Record<string, unknown>;
+};
+
+export type UseMutationObserverReturn = {
+  setRef: SetRefFunction;
+  observedRefs: UniqueSet<string, MutationObserverEntry>;
+};
