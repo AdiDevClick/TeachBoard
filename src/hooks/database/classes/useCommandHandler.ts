@@ -5,13 +5,11 @@ import {
   fetchParamsPropsInvalid,
 } from "@/configs/app-components.config.ts";
 import {
-  APP_REDIRECT_TIMEOUT_SUCCESS,
   DEV_MODE,
   NO_CACHE_LOGS,
   NO_QUERY_LOGS,
 } from "@/configs/app.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
-import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import type {
@@ -23,10 +21,10 @@ import type {
 } from "@/hooks/database/types/use-command-handler.types.ts";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
-import { wait } from "@/utils/utils.ts";
 import { type QueryKey, useQueryClient } from "@tanstack/react-query";
 import { startTransition, useCallback, useEffect, useRef } from "react";
-import type { FieldValues, Path } from "react-hook-form";
+import type { FieldValues, Path, PathValue } from "react-hook-form";
+import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 
 /**
  * Custom hook to handle command operations including data fetching, dialog management, and form submissions.
@@ -144,7 +142,7 @@ export function useCommandHandler<
 
       // Fail fast when a command/modal expects an endpoint but none is provided.
       // This catches regressions where inputControllers drift from API_ENDPOINTS.
-      if (!fetchParamsPropsInvalid(metaData || {})) {
+      if (!fetchParamsPropsInvalid(metaData ?? {})) {
         const message = `[useCommandHandler] Missing fetchParams for task "${String(
           task
         )}". Ensure the related input controller is wired to API_ENDPOINTS.*.endPoint(s).`;
@@ -165,7 +163,7 @@ export function useCommandHandler<
 
       setFetchParams((prev) => ({
         ...prev,
-        dataReshapeFn,
+        dataReshapeFn: dataReshapeFn ?? prev.dataReshapeFn,
         url: apiEndpoint ?? prev.url,
         contentId: task ?? prev.contentId,
       }));
@@ -209,10 +207,10 @@ export function useCommandHandler<
         });
       }
 
-      const retrievedFormField = new UniqueSet<unknown, any>(
-        null,
-        form.getValues(secondaryFormField) || []
-      );
+      const retrievedFormField = new UniqueSet<
+        string,
+        Record<string, unknown> & { isSelected?: boolean }
+      >(null, form.getValues(secondaryFormField) || []);
 
       if (retrievedFormField.has(value) || isSelected === false) {
         retrievedFormField.delete(value);
@@ -223,7 +221,7 @@ export function useCommandHandler<
         retrievedFormField.set(value, detailedCommandItem);
       }
 
-      let values: unknown[] | unknown = Array.from(retrievedFormField.keys());
+      let values: unknown = Array.from(retrievedFormField.keys());
       if (validationMode === "single") {
         if (Array.isArray(values) && values.length > 0) {
           values = values[0];
@@ -232,13 +230,20 @@ export function useCommandHandler<
         }
       }
 
-      form.setValue(mainFormField, values as any, {
-        shouldValidate: true,
-      });
+      form.setValue(
+        mainFormField,
+        values as PathValue<TFieldValues, Path<TFieldValues>>,
+        {
+          shouldValidate: true,
+        }
+      );
 
       form.setValue(
         secondaryFormField,
-        Array.from(retrievedFormField.entries()) as any,
+        Array.from(retrievedFormField.entries()) as PathValue<
+          TFieldValues,
+          Path<TFieldValues>
+        >,
         {
           shouldValidate: false,
           shouldDirty: false,
