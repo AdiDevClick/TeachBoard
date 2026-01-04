@@ -24,7 +24,6 @@ const footerProps = { submitText: "Créer", cancelText: "Annuler" };
  * @description This inits Zod validated form
  *
  * @param pageId - The ID of the page.
- * @param formId - The ID of the form.
  * @param inputControllers - The input controllers for the form (this needs to be already validated by Zod Schema).
  * @param modalMode - Whether the component is in modal mode.
  * @param props - Additional props.

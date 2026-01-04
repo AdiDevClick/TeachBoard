@@ -14,12 +14,12 @@ import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
  * @param inputControllers - The input controllers for the form (this needs to be already validated by Zod Schema).
  */
 export function TaskItemController({
-  pageId = "task-controller",
+  pageId,
   formId,
-  inputControllers,
+  inputControllers = [],
   className = "grid gap-4",
   form,
-}: Readonly<TaskItemControllerProps>) {
+}: TaskItemControllerProps) {
   const { setRef, observedRefs, submitCallback } = useCommandHandler({
     form,
     pageId,
