@@ -1,4 +1,5 @@
 import type {
+  CommandItem,
   CreateDisabledGroupParams,
   HandleDiplomaChangeParams,
 } from "@/components/ClassCreation/types/class-creation.types.ts";
@@ -148,7 +149,7 @@ export function createDisabledGroup({
   if (disabledSet.size > 0) {
     dataCopy[1] = {
       groupTitle: "Déjà utilisés",
-      items: Array.from(disabledSet.values()),
+      items: Array.from(disabledSet.values()) as CommandItem[],
     };
   }
   return dataCopy;

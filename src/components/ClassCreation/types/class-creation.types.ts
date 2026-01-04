@@ -1,3 +1,4 @@
+import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { ClassCreationInputItem } from "@/models/class-creation.models.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 
@@ -7,19 +8,19 @@ import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
  */
 export type MutableRef<T> = { current: T };
 
-type CommandItem = {
+export type CommandItem = {
   id: string | number;
   name: string;
   [key: string]: unknown;
 };
 
-type CommandGroup = {
+export type CommandGroup = {
   groupTitle?: string;
   items: CommandItem[];
   [key: string]: unknown;
 };
 
-type TaskTemplatesCacheShape = [CommandGroup, ...CommandGroup[]];
+export type TaskTemplatesCacheShape = [CommandGroup, ...CommandGroup[]];
 
 type DiplomaTaskContext = {
   shortTemplatesList: string[];
@@ -37,18 +38,19 @@ export type ClassCreationProps = { userId?: string } & Readonly<
  * Parameters for creating disabled groups in class creation.
  */
 export type CreateDisabledGroupParams = {
+  dataCopy: TaskTemplatesCacheShape;
   cachedData: TaskTemplatesCacheShape;
   diplomaDatas: DiplomaTaskContext;
-  currentDiplomaId: unknown;
-  activeDiplomaIdRef: MutableRef<unknown>;
+  currentDiplomaId: UUID;
+  activeDiplomaIdRef: MutableRef<UUID>;
 };
 
 /**
  * Parameters for handling diploma changes.
  */
 export type HandleDiplomaChangeParams = {
-  currentId: unknown;
-  activeDiplomaIdRef: MutableRef<unknown>;
+  currentId: UUID;
+  activeDiplomaIdRef: MutableRef<UUID>;
   savedSkills: MutableRef<unknown>;
   itemToDisplay: MutableRef<unknown>;
 };
@@ -58,9 +60,9 @@ export type HandleDiplomaChangeParams = {
  */
 export type HandleFetchedTasksParams = {
   cachedData: TaskTemplatesCacheShape;
-  currentDiplomaId: unknown;
+  currentDiplomaId: UUID;
   diplomaDatas: DiplomaTaskContext;
-  activeDiplomaIdRef: MutableRef<unknown>;
+  activeDiplomaIdRef: MutableRef<UUID>;
   itemToDisplay: MutableRef<TaskTemplatesCacheShape | null>;
   isDiplomaChanged: boolean;
 };

@@ -1,3 +1,4 @@
+import type { UUID } from "@/api/types/openapi/common.types.ts";
 import {
   createDisabledGroup,
   handleDiplomaChange,
@@ -7,6 +8,7 @@ import {
   updateValues,
 } from "@/components/ClassCreation/task/task-template/functions/task-template.functions.ts";
 import type { TaskTemplateCreationControllerProps } from "@/components/ClassCreation/task/task-template/types/task-template-creation.types.ts";
+import type { TaskTemplatesCacheShape } from "@/components/ClassCreation/types/class-creation.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/PopoverField.tsx";
 import { DynamicTag } from "@/components/Tags/DynamicTag.tsx";
@@ -66,8 +68,8 @@ export function TaskTemplateCreationController({
     };
   }, [dialogData]);
 
-  const itemToDisplay = useRef(null!);
-  const activeDiplomaIdRef = useRef(null!);
+  const itemToDisplay = useRef<ReturnType<typeof createDisabledGroup>>(null!);
+  const activeDiplomaIdRef = useRef<UUID>(null!);
 
   /**
    * Callback to reshape and retrieve cached data based on query keys.
@@ -76,8 +78,10 @@ export function TaskTemplateCreationController({
    * @returns The reshaped cached data or the original data if not found
    */
   const resultsCallback = useCallback(
-    (keys: unknown[]) => {
-      const cachedData = queryClient.getQueryData(keys ?? []);
+    (keys: string[]) => {
+      const cachedData = queryClient.getQueryData(
+        keys ?? []
+      ) as TaskTemplatesCacheShape;
       if (!data && cachedData === undefined && keys[0] === "none") return;
       if (DEV_MODE && !NO_CACHE_LOGS) {
         console.log("Cached data for ", keys, " is ", cachedData);
