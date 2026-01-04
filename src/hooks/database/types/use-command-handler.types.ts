@@ -1,4 +1,7 @@
-import type { DataReshapeFn } from "@/components/Inputs/types/inputs.types.ts";
+import type {
+  ApiEndpointType,
+  DataReshapeFn,
+} from "@/components/Inputs/types/inputs.types.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import type { MouseEvent, PointerEvent } from "react";
@@ -9,7 +12,7 @@ import type { FieldValues, UseFormReturn } from "react-hook-form";
  */
 export type CommandHandlerMetaData = Record<string, unknown> & {
   task?: AppModalNames;
-  apiEndpoint?: string;
+  apiEndpoint?: ApiEndpointType;
   dataReshapeFn?: DataReshapeFn;
 };
 
