@@ -2,6 +2,7 @@ import type ClassCreation from "@/components/ClassCreation/ClassCreation.tsx";
 import type DegreeItem from "@/components/ClassCreation/diploma/degree-item/DegreeItem.tsx";
 import type { DegreeModuleSkillController } from "@/components/ClassCreation/diploma/degree-module-skill/controller/DegreeModuleSkillController.tsx";
 import type DegreeModule from "@/components/ClassCreation/diploma/degree-module/DegreeModule.tsx";
+import type DiplomaCreation from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
 import type TaskItem from "@/components/ClassCreation/task/task-item/TaskItem";
 import type TaskTemplateCreation from "@/components/ClassCreation/task/task-template/TaskTemplateCreation";
 import type { InputItem } from "@/components/Inputs/types/inputs.types";
@@ -345,3 +346,55 @@ export const stepOneInputControllers = [
     useButtonAddNew: true,
   },
 ];
+
+export const diplomaCreationInputControllers = [
+  {
+    task: "new-degree-item-field",
+    name: "diplomaFieldId",
+    label: "Métier / Domaine du diplôme",
+    placeholder: "Sélectionnez...",
+    creationButtonText: "Ajouter un métier ou domaine",
+    useButtonAddNew: true,
+    useCommands: true,
+    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.FIELD,
+    dataReshapeFn: API_ENDPOINTS.GET.DEGREES.dataReshape,
+    id: "diploma-field-input",
+  },
+  {
+    task: "new-degree-item-year",
+    name: "yearId",
+    label: "Année scolaire",
+    placeholder: "Sélectionnez...",
+    creationButtonText: "Ajouter une année scolaire",
+    useButtonAddNew: true,
+    useCommands: true,
+    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.YEAR,
+    dataReshapeFn: API_ENDPOINTS.GET.DEGREES.dataReshape,
+    id: "school-year-input",
+  },
+  {
+    task: "new-degree-item-degree",
+    name: "levelId",
+    label: "Diplôme / Niveau scolaire",
+    placeholder: "Sélectionnez...",
+    creationButtonText: "Ajouter un niveau scolaire",
+    useButtonAddNew: true,
+    useCommands: true,
+    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.LEVEL,
+    dataReshapeFn: API_ENDPOINTS.GET.DEGREES.dataReshape,
+    id: "school-level-input",
+  },
+  {
+    id: "add-module-skills",
+    apiEndpoint: API_ENDPOINTS.GET.SKILLS.endPoints.MODULES,
+    dataReshapeFn: API_ENDPOINTS.GET.SKILLS.dataReshape,
+    task: "new-degree-module",
+    name: "mainSkillsList",
+    title: "Modules",
+    type: "text",
+    useButtonAddNew: true,
+    creationButtonText: "Ajouter un module",
+    useCommands: true,
+    placeholder: "Recherchez des modules...",
+  },
+] satisfies Parameters<typeof DiplomaCreation>[0]["inputControllers"];
