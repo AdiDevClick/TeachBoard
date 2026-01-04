@@ -5,7 +5,7 @@ import type {
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
-import type { useQueryClient } from "@tanstack/react-query";
+import type { QueryClient, QueryKey } from "@tanstack/react-query";
 
 type SelectedItemRef = {
   id: string | number;
@@ -54,9 +54,12 @@ function logResetLookupDebug(items: unknown, id: string | number) {
  * @param queryClient - The query client instance used to access and manipulate the cache
  */
 export function resetSelectedItemsFromCache(
-  queryKey: [string, string],
-  selectedItems: Record<string, unknown> | Array<unknown>,
-  queryClient: ReturnType<typeof useQueryClient>
+  queryKey: QueryKey,
+  selectedItems:
+    | Record<string, unknown>
+    | Array<unknown>
+    | Map<string, unknown>,
+  queryClient: QueryClient
 ) {
   if (!queryKey) return;
   const cachedData = queryClient.getQueryData(queryKey);
@@ -184,4 +187,43 @@ export function handleDiplomaChange({
   }
 
   return changed;
+}
+
+/**
+ * Save the provided keys into the given ref object.
+ *
+ * @description You can then call any query with these keys to get cached data.
+ *
+ * @param keys - The keys to be saved.
+ * @param ref - The ref object where the keys will be stored.
+ */
+export function saveKeys(
+  keys: readonly unknown[],
+  ref: { current: Record<string, readonly unknown[]> }
+) {
+  const key = String(keys[0]);
+  ref.current = { ...ref.current, [key]: keys };
+}
+
+/**
+ * Generates a list of school years within a specified range.
+ *
+ * @param year - The central year to base the range on.
+ * @param range - The number of years to include before and after the central year.
+ * @returns An array of objects containing the school year names and IDs.
+ */
+export function yearsListRange(
+  year: number,
+  range: number
+): { name: string; id: string }[] {
+  const startYear = year - range;
+  const endYear = year + range;
+  const length = endYear - startYear + 1;
+  return Array.from({ length }, (_v, i) => {
+    const yearLabel = `${startYear + i} - ${startYear + i + 1}`;
+    return {
+      name: yearLabel,
+      id: yearLabel,
+    };
+  });
 }
