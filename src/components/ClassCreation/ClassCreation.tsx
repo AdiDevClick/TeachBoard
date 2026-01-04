@@ -2,9 +2,10 @@ import { ClassCreationController } from "@/components/ClassCreation/controller/C
 import type { ClassCreationProps } from "@/components/ClassCreation/types/class-creation.types.ts";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { classCreationInputControllers } from "@/data/inputs-controllers.data.ts";
-import type { ClassCreationFormSchema } from "@/models/class-creation.models.ts";
-import { classCreationSchema } from "@/models/class-creation.models.ts";
-
+import {
+  classCreationSchema,
+  type ClassCreationFormSchema,
+} from "@/models/class-creation.models.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";

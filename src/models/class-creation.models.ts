@@ -1,5 +1,5 @@
 import type { FetchingInputItem } from "@/components/Inputs/types/inputs.types.ts";
-import z, { uuid } from "zod";
+import { z } from "zod";
 
 export type ClassCreationFormSchema = z.infer<typeof classCreationSchema>;
 
@@ -39,18 +39,21 @@ export const classCreationSchema = z.object({
     .uuid("L'identifiant utilisateur doit être un UUID valide.")
     .nonempty("Un identifiant utilisateur est requis."),
   primaryTeacherId: z
-    .preprocess(
-      (value) => (value === "" ? undefined : value),
-      z.uuid(
-        "L'identifiant de l'enseignant principal doit être un UUID valide."
-      ).optional()
-    )
-    .optional(),
+    .string()
+    .optional()
+    .transform((value) => (value === "" ? undefined : value))
+    .pipe(
+      z
+        .uuid(
+          "L'identifiant de l'enseignant principal doit être un UUID valide."
+        )
+        .optional()
+    ),
   tasks: z
-    .array(uuid("L'identifiant de la tâche doit être un UUID valide."))
+    .array(z.uuid("L'identifiant de la tâche doit être un UUID valide."))
     .nonempty("Au moins une tâche est requise."),
   students: z
-    .array(uuid("L'identifiant de l'élève doit être un UUID valide."))
+    .array(z.uuid("L'identifiant de l'élève doit être un UUID valide."))
     .nonempty("La liste des étudiants ne peut pas être vide.")
     .min(1, "La liste des étudiants ne peut pas être vide.")
     .max(50, "La liste des étudiants ne peut pas dépasser 50 éléments.")
