@@ -56,6 +56,6 @@ export type HandleOpeningCallbackParams = {
 export type HandleSubmitCallbackParams = {
   variables: MutationVariables;
   endpointUrl: string;
-  dataReshapeFn?: (...args: unknown[]) => unknown;
+  dataReshapeFn?: (...args: any[]) => unknown;
   reshapeOptions?: unknown;
 };
