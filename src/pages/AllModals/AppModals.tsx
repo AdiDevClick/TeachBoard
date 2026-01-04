@@ -14,7 +14,7 @@ import {
   degreeCreationInputControllersDegree,
   degreeCreationInputControllersField,
   degreeCreationInputControllersYear,
-  degreeModuleCreationInputControllers,
+  diplomaCreationInputControllers,
   inputLoginControllers,
   inputSignupControllers,
 } from "@/data/inputs-controllers.data.ts";
@@ -90,10 +90,13 @@ const modals = defineStrictModalsList([
     modalContent: DiplomaCreation,
     ...baseNonNavigationalProps,
     modalProps: {
+      isNavigationModal: false,
       className: "max-w-2",
     },
     contentProps: {
-      inputControllers: degreeModuleCreationInputControllers,
+      modalMode: true,
+      pageId: "create-diploma",
+      inputControllers: diplomaCreationInputControllers,
     },
   },
   {
