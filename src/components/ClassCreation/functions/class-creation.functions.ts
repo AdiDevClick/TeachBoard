@@ -75,7 +75,7 @@ export function resetSelectedItemsFromCache(
     console.log("[Reset DATA] Items to reset:", selectedItems);
   }
 
-  const selectedValues: unknown[] = Array.isArray(selectedItems)
+  const selectedValues = Array.isArray(selectedItems)
     ? selectedItems
     : Object.values(selectedItems ?? {});
 
@@ -88,16 +88,16 @@ export function resetSelectedItemsFromCache(
 
     if (!isSelectedItemRef(details)) return;
 
-    const items = (cachedData as { 0?: { items?: unknown } })[0]?.items;
-    let cachedItem: { isSelected?: boolean } | undefined;
+    const items = cachedData[0]?.items;
+    let cachedItem;
 
     logResetLookupDebug(items, details.id);
     if (Array.isArray(items)) {
       cachedItem = items.find((item) => {
-        if (typeof item !== "object" || item === null) return false;
-        if (!("id" in item)) return false;
-        return (item as { id?: unknown }).id === details.id;
-      }) as { isSelected?: boolean } | undefined;
+        if (typeof item !== "object" || item === null || !item.id) return false;
+
+        return item.id === details.id;
+      });
     }
 
     if (DEV_MODE && !NO_CACHE_LOGS) {
@@ -136,7 +136,7 @@ export function createDisabledGroup({
   // Move already-used tasks into a disabled group
   const disabledSet = new UniqueSet();
   const filteredItems = cachedData[0].items.filter((item) => {
-    if (diplomaDatas.shortTemplatesList.includes(item.name)) {
+    if (diplomaDatas.shortTemplatesList.includes(String(item.name))) {
       disabledSet.set(item.id, {
         ...item,
         disabled: true,
