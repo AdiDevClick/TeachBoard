@@ -5,6 +5,15 @@ import type { MouseEvent, PointerEvent } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 
 /**
+ * Shared metadata shape passed around by command controllers.
+ */
+export type CommandHandlerMetaData = Record<string, unknown> & {
+  task?: AppModalNames;
+  apiEndpoint?: string;
+  dataReshapeFn?: DataReshapeFn;
+};
+
+/**
  * Parameters for the useCommandHandler hook
  */
 export interface UseCommandHandlerParams<
@@ -19,12 +28,9 @@ export interface UseCommandHandlerParams<
 /**
  * Parameters for the handleAddNewItem function
  */
-export type HandleAddNewItemParams<TInput = unknown> = {
+export type HandleAddNewItemParams = {
   e?: PointerEvent<HTMLElement> | MouseEvent<HTMLElement>;
-  apiEndpoint?: TInput extends { apiEndpoint?: infer A } ? A : unknown;
-  task: AppModalNames;
-  dataReshapeFn?: TInput extends { dataReshapeFn?: infer D } ? D : unknown;
-};
+} & CommandHandlerMetaData;
 
 /**
  * Parameters for the handleSelectionCallback function
@@ -34,7 +40,10 @@ export type HandleSelectionCallbackParams = {
   options: {
     mainFormField: string;
     secondaryFormField: string;
-    detailedCommandItem?: {
+    /**
+     * Extra payload saved alongside the selected value.
+     */
+    detailedCommandItem?: Record<string, unknown> & {
       isSelected?: boolean;
     };
     /** Defaults to "array" for backward compatibility with multi-selection fields. */
@@ -45,9 +54,9 @@ export type HandleSelectionCallbackParams = {
 /**
  * Parameters for the handleOpeningCallback function
  */
-export type HandleOpeningCallbackParams<TInput = unknown> = {
+export type HandleOpeningCallbackParams = {
   open: boolean;
-  metaData?: Omit<HandleAddNewItemParams<TInput>, "e">;
+  metaData?: CommandHandlerMetaData;
 };
 
 /**
