@@ -135,7 +135,7 @@ export const fetchParamsPropsInvalid = (props: Record<string, unknown>) =>
  */
 const TASK_MODAL_REQUIRES = ["id"];
 
-export const taskModalPropsInvalid = (props: Record<string, unknown>) =>
+export const taskModalPropsInvalid = (props: unknown) =>
   checkPropsValidity(props, TASK_MODAL_REQUIRES, []);
 
 //                    ------------
