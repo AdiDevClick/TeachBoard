@@ -1,9 +1,13 @@
-import type { DataReshapeFn } from "@/components/Inputs/types/inputs.types.ts";
+import type {
+  ApiEndpointType,
+  DataReshapeFn,
+} from "@/components/Inputs/types/inputs.types.ts";
 import type {
   Select,
   SelectContent,
   SelectItem,
 } from "@/components/ui/select.tsx";
+import type { AppModalNames } from "@/configs/app.config.ts";
 import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
 import type { UniqueSet } from "@/utils/UniqueSet";
 import type {
@@ -58,9 +62,9 @@ export type VerticalSelectProps = Omit<
     string,
     { element: Element; meta?: Record<string, unknown> }
   >;
-  task?: string;
+  task?: AppModalNames;
   dataReshapeFn?: DataReshapeFn;
-  apiEndpoint?: string;
+  apiEndpoint?: ApiEndpointType;
   label?: ReactNode;
   placeholder?: string;
   fullWidth?: boolean;
