@@ -24,9 +24,5 @@ export type DialogContextType = {
   deleteRef: (id: AppModalNames) => void;
   setRef: (ref: Element | null) => void;
   observedRefs: UniqueSet<string, { element: Element | null }>;
-  /**
-   * Ordered list of opened dialogs with their associated options.
-   * Entries come from the underlying UniqueSet, preserving insertion order.
-   */
   openedDialogs: AppModalNames[];
 };
