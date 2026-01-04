@@ -75,12 +75,17 @@ export const menuButtonContainsInvalid = (props: Record<string, unknown>) =>
  */
 const COMMAND_GROUP_REQUIRES = ["items", "groupTitle"];
 const COMMAND_ITEM_REQUIRES = ["id", "value"];
+const COMMAND_SELECTION_REQUIRES = ["id"];
 
 export const commandGroupContainsInvalid = (props: Record<string, unknown>) =>
   checkPropsValidity(props, COMMAND_GROUP_REQUIRES, []);
 
 export const commandItemContainsInvalid = (props: Record<string, unknown>) =>
   checkPropsValidity(props, COMMAND_ITEM_REQUIRES, []);
+
+export const commandSelectionDoesNotContainId = (
+  props: Record<string, unknown>
+) => checkPropsValidity(props, COMMAND_SELECTION_REQUIRES, []);
 
 //                    ------------
 
@@ -140,10 +145,11 @@ export const taskModalPropsInvalid = (props: Record<string, unknown>) =>
  *
  * @param componentName - The name of the component for logging purposes.
  */
-export function debugLogs(componentName: string) {
+export function debugLogs(componentName: string, details?: unknown) {
   if (DEV_MODE && !NO_COMPONENT_WARNING_LOGS) {
     console.debug(
-      `[${componentName}] - Invalid props detected. Please check the component configuration.`
+      `[${componentName}] - Invalid props detected. Please check the component configuration.`,
+      details
     );
   }
 }
