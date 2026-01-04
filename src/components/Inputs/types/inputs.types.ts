@@ -1,5 +1,6 @@
 import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
 import type { ComponentPropsWithRef, HTMLInputTypeAttribute } from "react";
+import type { AppModalNames } from "@/configs/app.config.ts";
 import type {
   ControllerFieldState,
   ControllerRenderProps,
@@ -55,7 +56,7 @@ type FetchingInputBase<T> = InputItem<T> & {
  */
 export type CommandInputItem<T> = FetchingInputBase<T> & {
   useCommands: true;
-  task: string;
+  task: AppModalNames;
 };
 
 /**
@@ -63,7 +64,7 @@ export type CommandInputItem<T> = FetchingInputBase<T> & {
  */
 type NonCommandFetchingInputItem<T> = FetchingInputBase<T> & {
   useCommands?: false;
-  task?: string;
+  task?: AppModalNames;
 };
 
 export type FetchingInputItem<T> =
