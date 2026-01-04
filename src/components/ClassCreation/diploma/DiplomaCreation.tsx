@@ -1,10 +1,11 @@
 import { DiplomaCreationController } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import { diplomaCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import {
   diplomaCreationSchema,
   type DiplomaCreationFormSchema,
+  type DiplomaInputItem,
 } from "@/models/diploma-creation.models.ts";
-import type { SignupInputItem } from "@/pages/Signup/types/signup.types.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
@@ -29,9 +30,9 @@ const footerProps = {
 function DiplomaCreation({
   pageId = "create-diploma",
   modalMode = true,
-  inputControllers,
+  inputControllers = diplomaCreationInputControllers,
   ...props
-}: Readonly<PageWithControllers<SignupInputItem>>) {
+}: Readonly<PageWithControllers<DiplomaInputItem>>) {
   const formId = pageId + "-form";
   const form = useForm<DiplomaCreationFormSchema>({
     resolver: zodResolver(diplomaCreationSchema),
