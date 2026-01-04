@@ -31,7 +31,7 @@ import { useAvatarDataGenerator } from "@/hooks/useAvatarDataGenerator.ts";
 import type { ClassCreationFormSchema } from "@/models/class-creation.models.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { Activity, useEffect, useRef, useState } from "react";
-import { useWatch } from "react-hook-form";
+import { useWatch, type FieldErrors } from "react-hook-form";
 
 const year = new Date().getFullYear();
 const years = yearsListRange(year, 5);
@@ -132,10 +132,10 @@ export function ClassCreationController({
     const isNewTaskTemplate = metaData?.task === "new-task-template";
 
     if (isNewTaskTemplate && !taskModalPropsInvalid(linkedDiploma?.id)) {
-      debugLogs(
-        "ClassCreationController - Tried to open task templates without a selected diploma."
-      );
-      return;
+      const message =
+        "Tried to open task template modal without a selected diploma.";
+      debugLogs("[ClassCreationController] - " + message);
+      throw new Error(message);
     }
 
     if (isNewTaskTemplate && linkedDiploma) {
@@ -150,31 +150,46 @@ export function ClassCreationController({
   };
 
   /**
-   * Handle Class Creation form submission
-   *
-   * @description Provided API endpoint and data reshaping function
-   * in order to call the submit callback correctly.
+   * Handle Class Creation form submission when form is valid
    *
    * @param variables - The form data to submit
    */
-  const handleSubmit = (variables: ClassCreationFormSchema) => {
-    if (DEV_MODE) {
-      (globalThis as any).__TB_CLASS_CREATION_LAST_SUBMIT__ = {
-        at: Date.now(),
-        variables,
-      };
-    }
-
+  const handleValidSubmit = (variables: ClassCreationFormSchema) => {
     const yearVariable = variables.schoolYear
       .split(" - ")
       .map((s) => s.trim())
       .join("-");
     variables.schoolYear = yearVariable;
+
     submitCallback(
       variables,
       API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
       API_ENDPOINTS.POST.CREATE_CLASS.dataReshape
     );
+  };
+
+  /**
+   * Handle Class Creation form submission when there are validation errors
+   *
+   * @param errors - The validation errors
+   */
+  const handleInvalidSubmit = (
+    errors: FieldErrors<ClassCreationFormSchema>
+  ) => {
+    if (DEV_MODE) {
+      const currentValues = form.getValues() as ClassCreationFormSchema;
+      (globalThis as any).__TB_CLASS_CREATION_LAST_INVALID_SUBMIT__ = {
+        at: Date.now(),
+        keys: Object.keys(errors ?? {}),
+        values: {
+          ...currentValues,
+        },
+      };
+
+      if (!NO_CACHE_LOGS) {
+        console.debug("ClassCreation invalid submit", errors);
+      }
+    }
   };
 
   /**
@@ -233,11 +248,13 @@ export function ClassCreationController({
       console.log("Add new item triggered", {
         apiEndpoint: rest.apiEndpoint,
         task: rest.task,
+        selectedDiploma: selectedDiplomaRef.current,
+        selectedStudents: form.getValues("studentsValues"),
+        selectedPrimaryTeacher: form.getValues("primaryTeacherValue"),
       });
     }
     const task = rest.task;
     rest.form = form;
-    console.log("opening new students item");
 
     if (task === "search-students") {
       rest.selectedStudents = form.getValues("studentsValues") ?? {};
@@ -256,7 +273,12 @@ export function ClassCreationController({
 
       const cached = queryClient.getQueryData([task, rest.apiEndpoint]);
 
-      rest.shortTemplatesList = cached?.[0]?.shortTemplatesList ?? [];
+      let data;
+      if (Array.isArray(cached)) {
+        data = cached[0];
+      }
+
+      rest.shortTemplatesList = data?.shortTemplatesList ?? [];
     }
     saveKeys([task, rest.apiEndpoint], cachedKeysRef);
 
@@ -285,52 +307,35 @@ export function ClassCreationController({
     form.setValue("tasks", Array.from(tasks), { shouldValidate: true });
   };
 
-  const controllers = [
-    {
-      ...inputControllers[4],
-      items: studentsMemo,
-    },
-    {
-      ...inputControllers[5],
-      items: primaryTeacherMemo,
-    },
-  ];
+  const controllers = {
+    dynamicListControllers: inputControllers[2],
+    controlledInputsControllers: inputControllers.slice(0, 2),
+    popoverControllers: inputControllers.slice(3, 4),
+    avatarControllers: [
+      {
+        ...inputControllers[4],
+        items: studentsMemo,
+      },
+      {
+        ...inputControllers[5],
+        items: primaryTeacherMemo,
+      },
+    ],
+  };
   return (
     <form
       ref={(el) => setRef(el, { name: pageId, formId })}
       id={formId}
-      onSubmit={form.handleSubmit(handleSubmit, (errors) => {
-        if (DEV_MODE && !NO_CACHE_LOGS) {
-          console.debug("ClassCreation invalid submit", errors);
-        }
-
-        if (DEV_MODE) {
-          const v = form.getValues();
-          (globalThis as any).__TB_CLASS_CREATION_LAST_INVALID_SUBMIT__ = {
-            at: Date.now(),
-            keys: Object.keys(errors ?? {}),
-            values: {
-              name: v.name,
-              description: v.description,
-              schoolYear: v.schoolYear,
-              degreeConfigId: v.degreeConfigId,
-              userId: (v as any).userId,
-              primaryTeacherId: (v as any).primaryTeacherId,
-              tasks: (v as any).tasks,
-              students: (v as any).students,
-            },
-          };
-        }
-      })}
+      onSubmit={form.handleSubmit(handleValidSubmit, handleInvalidSubmit)}
       className={className}
     >
       <ControlledInputList
-        items={inputControllers.slice(0, 2)}
+        items={controllers.controlledInputsControllers}
         form={form}
         setRef={setRef}
       />
       <PopoverFieldWithControllerAndCommandsList
-        items={inputControllers.slice(3, 4)}
+        items={controllers.popoverControllers}
         form={form}
         setRef={setRef}
         commandHeadings={resultsCallback()}
@@ -340,7 +345,7 @@ export function ClassCreationController({
         onAddNewItem={handleNewItem}
       />
       <AvatarsWithLabelAndAddButtonList
-        items={controllers}
+        items={controllers.avatarControllers}
         type="button"
         onClick={handleNewItem}
       />
@@ -348,7 +353,7 @@ export function ClassCreationController({
         <ControlledDynamicTagList
           form={form}
           setRef={setRef}
-          {...inputControllers[2]}
+          {...controllers.dynamicListControllers}
           observedRefs={observedRefs}
           itemList={tasksValues}
           // onRemove={handleCommandSelection}
@@ -363,7 +368,7 @@ export function ClassCreationController({
           onAddNewItem={handleNewItem}
           resetKey={form.watch("degreeConfigId")}
           commandHeadings={resultsCallback()}
-          {...inputControllers[2]}
+          {...controllers.dynamicListControllers}
         />
       </Activity>
       <VerticalFieldSelectWithController
