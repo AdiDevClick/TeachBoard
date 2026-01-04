@@ -5,13 +5,23 @@ import { degreeSubSkillsCreationInputControllers } from "@/data/inputs-controlle
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 
+/**
+ * DegreeModuleSkillController component
+ *
+ * @param pageId - The unique identifier for the page or component instance
+ * @param formId - The unique identifier for the form
+ * @param inputControllers - An array of input controller configurations
+ * @param className - Additional CSS classes for styling the form
+ * @param form - The react-hook-form instance managing the form state
+ * @returns
+ */
 export function DegreeModuleSkillController({
   pageId,
   formId,
   inputControllers = degreeSubSkillsCreationInputControllers,
   form,
   className = "grid gap-4",
-}: Readonly<DegreeModuleSkillProps>) {
+}: DegreeModuleSkillProps) {
   const { setRef, observedRefs, submitCallback } = useCommandHandler({
     form,
     pageId,
