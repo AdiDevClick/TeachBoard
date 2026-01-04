@@ -12,10 +12,10 @@ import type { ComponentType } from "react";
  *
  * @param Wrapped - The component to be wrapped with command functionalities.
  */
-function withComboBoxCommands(Wrapped: ComponentType) {
-  return function Component<T extends CommandsProps>(
-    props: T & PopoverFieldProps
-  ) {
+function withComboBoxCommands<P extends PopoverFieldProps>(
+  Wrapped: ComponentType<P>
+) {
+  return function Component(props: P & CommandsProps) {
     const {
       useCommands,
       children,
@@ -29,7 +29,7 @@ function withComboBoxCommands(Wrapped: ComponentType) {
     const { apiEndpoint, task, dataReshapeFn } = props;
 
     return (
-      <Wrapped {...rest}>
+      <Wrapped {...(rest as P)}>
         {children}
         {useCommands && (
           <CommandItemsForComboBox
