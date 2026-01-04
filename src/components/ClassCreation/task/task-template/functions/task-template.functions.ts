@@ -13,7 +13,7 @@ import type {
   MutableRef,
 } from "@/components/ClassCreation/types/class-creation.types.ts";
 import type {
-  DetailedCommandItem,
+  CommandItemType,
   HeadingType,
 } from "@/components/Command/types/command.types.ts";
 
@@ -25,12 +25,14 @@ import type {
  * @returns The updated form values Map()
  */
 export function updateValues(
-  details: DetailedCommandItem,
+  details: CommandItemType,
   formValues?: Iterable<[UUID, SkillsFormValues]> | Map<UUID, SkillsFormValues>
 ) {
   const current = new Map(formValues);
 
   const main = details.groupId;
+  if (!main) return current;
+
   const sub = details.id;
   let subSkillsSet = new Set<UUID>();
 

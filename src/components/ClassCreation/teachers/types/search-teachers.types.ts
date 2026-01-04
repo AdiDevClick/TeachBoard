@@ -11,6 +11,7 @@ export type SearchPrimaryTeacherControllerProps = Readonly<
   {
     localForm: UseFormReturn<SearchPrimaryTeacherFormSchema>;
     formId: string;
+    pageId: string;
   } & Omit<Parameters<typeof SearchPrimaryTeacher>[0], "modalMode">
 >;
 

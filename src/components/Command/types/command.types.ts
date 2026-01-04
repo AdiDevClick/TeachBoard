@@ -9,17 +9,23 @@ export type HeadingType = {
   items: CommandItemType[];
 };
 
-export type DetailedCommandItem = CommandItemType & {
-  groupTitle?: string;
-  groupId: UUID;
-};
-
 export type CommandItemType = {
   id: UUID;
   value: string;
   name?: string;
   label?: string;
+  disabled?: boolean;
+  /** Optional user-ish fields used by AvatarDisplay in command lists */
+  email?: string;
+  avatar?: string;
+  /** Optional grouping metadata (present when coming from grouped headings) */
+  groupTitle?: string;
+  groupId?: UUID;
   [key: string]: unknown;
+};
+
+export type DetailedCommandItem = CommandItemType & {
+  groupId: UUID;
 };
 
 /**
@@ -34,7 +40,7 @@ export type CommandsProps = {
   onAddNewItem?: (payload: HandleAddNewItemParams) => void;
   commandHeadings?: HeadingType[];
   queryRecordsKey?: string[];
-  onSelect?: (value: string, commandItem: DetailedCommandItem) => void;
+  onSelect?: (value: string, commandItem: CommandItemType) => void;
 } & Omit<ComponentProps<typeof Command>, "onSelect">;
 
 /**

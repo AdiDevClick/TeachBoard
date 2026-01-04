@@ -67,6 +67,8 @@ export type VerticalSelectProps = Omit<
   apiEndpoint?: ApiEndpointType;
   label?: ReactNode;
   placeholder?: string;
+  /** Forwarded to the SelectTrigger element */
+  role?: string;
   fullWidth?: boolean;
   className?: string;
   side?: ComponentProps<typeof SelectContent>["side"];

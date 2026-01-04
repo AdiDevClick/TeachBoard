@@ -8,6 +8,7 @@ export type SearchStudentsControllerProps = Readonly<
   {
     localForm: UseFormReturn<SearchStudentsFormSchema>;
     formId: string;
+    pageId: string;
   } & Omit<Parameters<typeof SearchStudents>[0], "modalMode">
 >;
 

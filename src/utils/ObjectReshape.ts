@@ -519,7 +519,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
         return this.#dataSource.map((group) => {
           const transformedGroup = { ...group };
           this.#applyMappings(
-            group as Record<string, unknown>,
+            group,
             transformedGroup
           );
 
@@ -527,13 +527,13 @@ export class ObjectReshape<T extends Record<string, unknown>> {
           for (const key in transformedGroup) {
             if (Array.isArray(transformedGroup[key])) {
               transformedGroup[key] = this.#buildItemsArray(
-                transformedGroup[key] as Array<Record<string, unknown>>
+                transformedGroup[key]
               );
             }
           }
 
           return transformedGroup;
-        }) as Record<string, unknown>[];
+        })
       }
     }
 
@@ -753,8 +753,6 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   }
 
   #initShapedItem() {
-    if (this.#newShapedItem === null) {
-      this.#newShapedItem = {};
-    }
+    if (this.#newShapedItem === null) this.#newShapedItem = {};
   }
 }

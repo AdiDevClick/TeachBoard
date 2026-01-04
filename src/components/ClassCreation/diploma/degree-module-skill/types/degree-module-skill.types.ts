@@ -5,5 +5,6 @@ import type { UseFormReturn } from "react-hook-form";
 export type DegreeModuleSkillProps = Readonly<{
   formId: string;
   form: UseFormReturn<DegreeModuleSkillFormSchema>;
+  pageId: string;
 }> &
   Omit<Parameters<typeof DegreeModuleSkill>[0], "modalMode">;

@@ -68,6 +68,8 @@ export type RemainingProps<C, Provided> = Omit<C, keyof Provided>;
  */
 export type ExtractItemType<TItems> = TItems extends Array<infer T>
   ? T
+  : TItems extends readonly (infer T)[]
+  ? T
   : TItems extends Record<string, infer T>
   ? [string, T]
   : never;

@@ -55,7 +55,9 @@ export type CollapsibleMenuProps = GenericMenuItemProps<NavMainMenuItem>;
 
 /** Props for the collapsible menu item */
 export type CollapsibleMenuItemProps<T = NavMainMenuItem> =
-  GenericMenuItemProps<T> & Partial<T>;
+  Partial<T> & {
+    setStyle: (props: SetStyleMenuProps) => string;
+  };
 
 /** Props for the menu content */
 export type MenuContentProps = GenericMenuItemProps<NavMainMenuItem> &
@@ -70,6 +72,12 @@ export type NavSecondaryProps<T = NavSecondaryMenuItem> = Omit<
   "setStyle"
 > &
   Partial<T>;
+
+/**
+ * NOTE: Most secondary menu components receive the item fields directly
+ * (via `...item` spread) from ListMapper, not an `item` prop.
+ */
+export type NavSecondaryItemProps<T = NavSecondaryMenuItem> = Partial<T>;
 
 /** Props for the sidebar header */
 export type SidebarHeaderProps = {

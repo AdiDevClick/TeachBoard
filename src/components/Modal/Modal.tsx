@@ -282,7 +282,10 @@ export function Modal({
 
     if (observedRefs.size > 0) {
       const observedEntry = observedRefs.get(modalName);
-      const observedElement = observedEntry?.element ?? false;
+      const observedElement =
+        observedEntry?.element instanceof HTMLElement
+          ? observedEntry.element
+          : false;
 
       if (modalState.isReady !== observedElement) {
         setModalState((prev) => ({

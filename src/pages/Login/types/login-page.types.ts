@@ -1,5 +1,4 @@
-import type { LoginForm } from "@/components/LoginForms/LoginForm.tsx";
-import type { Login } from "@/pages/Login/Login.tsx";
+import LoginForm from "@/components/LoginForms/LoginForm.tsx";
 
 /**
  * Login Component Props

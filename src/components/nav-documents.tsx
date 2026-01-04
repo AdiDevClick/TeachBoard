@@ -27,10 +27,13 @@ export function NavDocuments({
   items,
 }: {
   items: {
-    name: string;
-    url: string;
-    icon: Icon;
-  }[];
+    label: string;
+    items: {
+      name: string;
+      url: string;
+      icon: Icon;
+    }[];
+  };
 }) {
   const { isMobile } = useSidebar();
 

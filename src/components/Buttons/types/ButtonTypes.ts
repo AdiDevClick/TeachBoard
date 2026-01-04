@@ -18,13 +18,7 @@ export type SimpleAddButtonWithToolTipProps = Omit<
   "onClick"
 > & {
   toolTipText?: string;
-  /**
-   * Click handler can either accept the custom payload object used by the
-   */
-  onClick?:
-    | ((
-        payload: HandleAddNewItemParams &
-          Omit<ComponentProps<typeof Button>, "onClick">
-      ) => void)
-    | ComponentProps<typeof Button>["onClick"];
+  onClick?: (
+    payload: HandleAddNewItemParams & Omit<ComponentProps<typeof Button>, "onClick">
+  ) => void;
 };

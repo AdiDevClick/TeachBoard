@@ -28,9 +28,6 @@ const emptyHandle: VerticalRefSetters = {
   setLastSelectedItemValue: (value: string) => value,
   getLastCommandValue: () => null,
   setLastCommandValue: (value: string) => value,
-  setVerticalFieldOpen: () => {},
-  setSelectedValue: () => {},
-  setState: () => {},
 };
 
 /**
@@ -62,11 +59,8 @@ export function VerticalFieldSelect({
 
   const id = useId();
   const [state, setState] = useState<VerticalFieldState>({});
-  const [selectedValue, setSelectedValue] = useState<string | undefined>(
-    undefined
-  );
   const lastSelectedValueRef = useRef<string>(null);
-  const lastCommandValueRef = useRef<string | null>(null);
+  const lastCommandValueRef = useRef<string>(null);
   const handleObjectRef = useRef<VerticalRefSetters>(emptyHandle);
 
   useImperativeHandle(controllerRef ?? ref, () => handleObjectRef.current);
@@ -78,9 +72,8 @@ export function VerticalFieldSelect({
     (open: boolean) => {
       if (open) {
         handleObjectRef.current = {
+          ...emptyHandle,
           props,
-          // setState: setVerticalStateCallback,
-          state,
           getMeta: () => observedRefs?.get(containerId)?.meta ?? undefined,
           getLastSelectedItemValue: () => lastSelectedValueRef.current,
           setLastSelectedItemValue: (value: string) => {
@@ -90,19 +83,12 @@ export function VerticalFieldSelect({
           setLastCommandValue: (value: string) => {
             lastCommandValueRef.current = value;
           },
-          // setVerticalFieldOpen: setVerticalStateCallback,
-          // setSelectedValue: setSelectedValueCallback,
-          // setVerticalState: setVerticalStateCallback,
+          setVerticalState: setState,
         };
         setState({ containerId, open });
-
-        if (controllerRef) controllerRef.current = handleObjectRef.current;
       } else {
-        console.log("ELSE => RESET DU VERTICAL STATE");
         setState({});
         handleObjectRef.current = emptyHandle;
-        if (controllerRef?.current === handleObjectRef.current)
-          controllerRef.current = null;
       }
 
       onOpenChange?.(open);
@@ -112,7 +98,6 @@ export function VerticalFieldSelect({
       containerId,
       props,
       observedRefs,
-      controllerRef,
       onOpenChange,
       onValueChange,
       handleObjectRef,
@@ -120,10 +105,9 @@ export function VerticalFieldSelect({
   );
 
   // wrap onValueChange to keep track of last clicked/selected item and expose it via the imperative handle
-  const handleValueChange = (value?: string) => {
-    console.log("Vertical value changed => ", value);
-    lastSelectedValueRef.current = value ?? null;
-    lastCommandValueRef.current = value ?? null;
+  const handleValueChange = (value: string) => {
+    lastSelectedValueRef.current = value;
+    lastCommandValueRef.current = value;
 
     handleObjectRef.current = {
       ...handleObjectRef.current,
@@ -133,10 +117,6 @@ export function VerticalFieldSelect({
     onValueChange?.(value);
   };
 
-  // console.log(props?.onSelect(), "PROPS ON SELECT");
-  const buttonValue =
-    handleObjectRef.current.getLastSelectedItemValue?.() ?? "";
-  console.log(state.command, "STATE COMMAND", controllerRef?.current?.state);
   return (
     <div
       id={containerId}

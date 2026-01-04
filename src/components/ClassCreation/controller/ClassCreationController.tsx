@@ -201,7 +201,7 @@ export function ClassCreationController({
    */
   const handleCommandSelection = (
     value: string,
-    commandItemDetails: DetailedCommandItem
+    commandItemDetails: CommandItemType
   ) => {
     const options = {
       mainFormField: "tasks",
@@ -296,12 +296,19 @@ export function ClassCreationController({
 
   const handleDeletingTask = (
     taskValue: string,
-    taskDetails?: Record<string, unknown>
+    _taskDetails?: Record<string, unknown>
   ) => {
     const tasks = new Set(form.getValues("tasks") || []);
-    const tasksValues = new Set(form.getValues("tasksValues") || []);
-    tasksValues.delete(taskValue);
-    form.setValue("tasksValues", Array.from(tasksValues), {
+    tasks.delete(taskValue);
+
+    const currentTasksValues =
+      (form.getValues("tasksValues") as Array<[string, DetailedCommandItem]>) ||
+      [];
+    const nextTasksValues = currentTasksValues.filter(
+      ([key]) => key !== taskValue
+    );
+
+    form.setValue("tasksValues", nextTasksValues, {
       shouldValidate: true,
     });
     form.setValue("tasks", Array.from(tasks), { shouldValidate: true });

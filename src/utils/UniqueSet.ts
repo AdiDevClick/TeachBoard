@@ -48,9 +48,10 @@ export class UniqueSet<K, V extends { [key: string]: unknown } | unknown[]> {
         let key: K;
         let itemToMap: V;
 
-        if (Array.isArray(item)) {
-          key = item[0];
-          itemToMap = item[1];
+        if (Array.isArray(item) && item.length === 2) {
+          const [tupleKey, tupleValue] = item as [K, V];
+          key = tupleKey;
+          itemToMap = tupleValue;
         } else if (cb) {
           key = cb(item);
           itemToMap = item;

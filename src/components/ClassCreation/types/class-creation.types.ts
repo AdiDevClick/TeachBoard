@@ -31,6 +31,7 @@ export type ClassCreationControllerProps = Readonly<
   {
     form: UseFormReturn<ClassCreationExtendedFormSchema>;
     formId: string;
+    pageId: string;
   } & Omit<Parameters<typeof ClassCreation>[0], "modalMode">
 >;
 

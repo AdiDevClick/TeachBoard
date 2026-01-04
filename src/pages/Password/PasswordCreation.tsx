@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { Field, FieldGroup } from "@/components/ui/field.tsx";
 import { DEV_MODE } from "@/configs/app.config.ts";
+import { passwordCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { usePasswordCreation } from "@/hooks/database/pw-creation/usePasswordCreation.ts";
 import { useAuthMemoryStore } from "@/hooks/store/AuthMemoryStore";
@@ -40,7 +41,7 @@ export function PasswordCreation({
   pageId = "password-creation-page-card",
   modalMode = false,
   className,
-  inputControllers,
+  inputControllers = passwordCreationInputControllers,
   ...props
 }: Readonly<PageWithControllers<PasswordCreationInputItem>>) {
   const { closeAllDialogs } = useDialog();
@@ -125,7 +126,10 @@ export function PasswordCreation({
                 className="grid gap-4"
               >
                 <FieldGroup>
-                  <ControlledInputList items={inputControllers} form={form} />
+                  <ControlledInputList
+                    items={inputControllers}
+                    form={form}
+                  />
                   <Field>
                     <Button
                       form={formId}

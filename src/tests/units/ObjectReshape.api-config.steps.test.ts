@@ -155,7 +155,7 @@ describe("ObjectReshape - API config step contracts", () => {
         " "
       )
       .assign([["fullName", "value", "name"]])
-      .build();
+      .build() as any;
 
     expect(built[0].groupTitle).toBe("Tous");
     // build() materializes computed properties (fullName) into the item

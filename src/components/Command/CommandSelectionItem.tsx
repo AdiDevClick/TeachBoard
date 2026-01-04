@@ -27,10 +27,13 @@ export function CommandSelectionItem(props: CommandSelectionItemProps) {
     command.isSelected || false
   );
 
-  const { id, disabled, value, ...otherCommands } = command;
-  const isSelected = multiSelection
-    ? selectedValue.has(value)
-    : selectedValue === value;
+  const { id, disabled, value } = command;
+  let isSelected = false;
+  if (multiSelection) {
+    isSelected = selectedValue instanceof Set && selectedValue.has(value);
+  } else {
+    isSelected = selectedValue === value;
+  }
 
   const selectCallback = useCallback((value: string) => {
     if (avatarDisplay) {
@@ -39,6 +42,13 @@ export function CommandSelectionItem(props: CommandSelectionItemProps) {
     }
     onSelect?.(value, { ...command, ...details });
   }, []);
+
+  const avatarProps = {
+    ...command,
+    name: command.name ?? command.label ?? command.value,
+    email: command.email ?? "",
+    avatar: command.avatar ?? "",
+  };
 
   return (
     <CommandItem
@@ -49,7 +59,7 @@ export function CommandSelectionItem(props: CommandSelectionItemProps) {
       {...rest}
     >
       <Activity mode={avatarDisplay ? "visible" : "hidden"}>
-        <AvatarDisplay props={command}>
+        <AvatarDisplay props={avatarProps}>
           <Button
             type="button"
             size="icon-sm"

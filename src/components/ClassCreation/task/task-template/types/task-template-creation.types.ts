@@ -20,6 +20,7 @@ export type TaskTemplateCreationControllerProps = Readonly<
     formId: string;
     className?: string;
     form: UseFormReturn<TaskTemplateCreationExtendedForm>;
+    pageId: string;
   } & Omit<Parameters<typeof TaskTemplateCreation>[0], "modalMode">
 >;
 /**

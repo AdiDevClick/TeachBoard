@@ -9,5 +9,6 @@ export type DiplomaCreationControllerProps = Readonly<
   {
     form: UseFormReturn<DiplomaCreationFormSchema>;
     formId: string;
+    pageId: string;
   } & Omit<Parameters<typeof DiplomaCreation>[0], "modalMode">
 >;

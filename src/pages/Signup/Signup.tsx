@@ -6,6 +6,7 @@ import {
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { Field, FieldGroup } from "@/components/ui/field.tsx";
+import { inputSignupControllers } from "@/data/inputs-controllers.data.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSignup } from "@/hooks/database/signup/useSignup.ts";
 import { signupSchema } from "@/models/signup.models.ts";
@@ -28,10 +29,10 @@ import { useForm } from "react-hook-form";
  * @param props - Optional props for the component of div type for the Card
  */
 export function Signup({
-  pageId = "signup-page-card",
+  pageId = "signup",
   modalMode = false,
   className,
-  inputControllers,
+  inputControllers = inputSignupControllers,
   ...props
 }: Readonly<PageWithControllers<SignupInputItem>>) {
   const { data, isLoaded, isLoading, onSubmit, error } = useSignup();

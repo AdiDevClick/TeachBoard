@@ -11,5 +11,6 @@ export type DegreeItemControllerProps = Readonly<{
   formId?: string;
   form: UseFormReturn<DegreeCreationFormSchema>;
   className?: string;
+  pageId: string;
 }> &
   Omit<Parameters<typeof DegreeItem>[0], "modalMode">;

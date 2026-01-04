@@ -87,25 +87,3 @@ export type QueryKeyDescriptor<S, E> = [
     ) => void;
   }
 ];
-
-// export interface QueryHookInterface<
-//   S extends ResponseInterface,
-//   E extends ApiError
-// > {
-//   mutateAsync: (
-//     variables: MutationVariables
-//   ) => Promise<GenericQueryResults<S, E>>;
-//   data: GenericQueryResults<S, E> | undefined;
-//   isPending: boolean;
-//   error?: CustomError<E>;
-// }
-
-// export interface QueryHookReturn<
-//   S extends ResponseInterface,
-//   E extends ApiError
-// > {
-//   onSubmit: QueryHookInterface<S, E>["mutateAsync"];
-//   data: QueryHookInterface<S, E>["data"];
-//   isLoading: QueryHookInterface<S, E>["isPending"];
-//   error: QueryHookInterface<S, E>["error"];
-// }

@@ -8,8 +8,8 @@ import type { ComponentProps } from "react";
  */
 export interface PageWithControllers<T = unknown>
   extends ComponentProps<"div"> {
-  pageId: AppModalNames;
-  inputControllers?: T[];
+  pageId?: AppModalNames;
+  inputControllers?: readonly T[];
   className?: string;
   modalMode?: boolean;
 }

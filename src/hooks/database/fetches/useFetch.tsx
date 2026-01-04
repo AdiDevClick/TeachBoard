@@ -50,7 +50,6 @@ const defaultStateParameters: FetchParams = {
  */
 export function useFetch() {
   const [fetchParams, setFetchParams] = useState(defaultStateParameters);
-  const clearUser = useAppStore((state) => state.clearUser);
   const setLastUserActivity = useAppStore((state) => state.setLastUserActivity);
   const navigate = useNavigate();
   const queryClient = useQueryClient();

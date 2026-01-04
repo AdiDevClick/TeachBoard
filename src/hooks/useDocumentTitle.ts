@@ -1,4 +1,4 @@
-import { completeDatas } from "@/main.tsx";
+import type { dataContext } from "@/api/providers/types/sidebar-data.provider.types";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
  * @param data Sidebar navigation data
  * @description This hook updates the document title according to the current active menu item in the sidebar navigation.
  */
-export function useDocumentTitle(data) {
+export function useDocumentTitle(data: dataContext) {
   const [done, setDone] = useState(false);
   const location = useLocation().pathname;
 

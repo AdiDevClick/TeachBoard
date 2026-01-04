@@ -1,7 +1,7 @@
 import { resetSelectedItemsFromCache } from "@/components/ClassCreation/functions/class-creation.functions.ts";
 import type { SearchPrimaryTeacherControllerProps } from "@/components/ClassCreation/teachers/types/search-teachers.types.ts";
 import { CommandItemsForComboBox } from "@/components/Command/CommandItems.tsx";
-import type { DetailedCommandItem } from "@/components/Command/types/command.types.ts";
+import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { useQueryClient } from "@tanstack/react-query";
@@ -43,7 +43,7 @@ export function SearchPrimaryTeacherController({
    * @param commandItemDetails - The details of the selected command item
    */
   const handleOnSelect = useCallback(
-    (_value: string, commandItemDetails: DetailedCommandItem) => {
+    (_value: string, commandItemDetails: CommandItemType) => {
       if (commandItemDetails.id === undefined || commandItemDetails.id === null)
         return;
 

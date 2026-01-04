@@ -12,7 +12,7 @@ import {
 } from "@/components/ClassCreation/task/task-template/functions/task-template.functions.ts";
 import type { TaskTemplateCreationControllerProps } from "@/components/ClassCreation/task/task-template/types/task-template-creation.types.ts";
 import type {
-  DetailedCommandItem,
+  CommandItemType,
   HeadingType,
 } from "@/components/Command/types/command.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
@@ -159,7 +159,7 @@ export function TaskTemplateCreationController({
    */
   const handleCommandSelection = (
     __value: string,
-    commandItemDetails: DetailedCommandItem
+    commandItemDetails: CommandItemType
   ) => {
     const isTask = Object.hasOwn(commandItemDetails, "description");
     if (isTask) {

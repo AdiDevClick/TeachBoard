@@ -9,7 +9,7 @@ export const useAuthMemoryStore = create(
       {
         signupToken: null,
       } as AuthMemoryState,
-      (set, get) => ({
+      (set) => ({
         setSignupToken(token: string | null) {
           set((state) => {
             state.signupToken = token;

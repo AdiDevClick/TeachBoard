@@ -1,4 +1,4 @@
-import type { NavSecondaryProps } from "@/components/Sidebar/nav/types/NavTypes.ts";
+import type { NavSecondaryItemProps } from "@/components/Sidebar/nav/types/NavTypes.ts";
 import {
   SidebarMenuButton,
   SidebarMenuItem,
@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
  *
  * @param item - item Props for the secondary menu button
  */
-export function SecondaryMenuButton({ ...item }: NavSecondaryProps) {
+export function SecondaryMenuButton({ ...item }: NavSecondaryItemProps) {
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild>

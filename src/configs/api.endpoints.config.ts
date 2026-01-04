@@ -14,6 +14,7 @@ import type {
 } from "@/api/types/routes/diplomas.types";
 import type {
   CreateSkillResponseData,
+  SkillDto,
   SkillsFetch,
 } from "@/api/types/routes/skills.types";
 import type { StudentsFetch } from "@/api/types/routes/students.types";
@@ -284,7 +285,10 @@ export const API_ENDPOINTS = Object.freeze({
         cachedDatas: CachedQueriesData | undefined
       ) => {
         // Extract the actual skill data from the response
-        const skillData = data?.skill || data;
+        const skillData =
+          data && typeof data === "object" && "skill" in data
+            ? (data as { skill: SkillDto }).skill
+            : data;
 
         // Mapping code -> value
         const newItem = {

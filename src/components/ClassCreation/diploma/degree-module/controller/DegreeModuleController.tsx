@@ -1,4 +1,4 @@
-import type { DegreeModuleProps } from "@/components/ClassCreation/diploma/degree-module/types/degree-module.types";
+import type { DegreeModuleControllerProps } from "@/components/ClassCreation/diploma/degree-module/types/degree-module.types.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { PopoverFieldWithCommands } from "@/components/Popovers/PopoverField.tsx";
@@ -26,7 +26,7 @@ export function DegreeModuleController({
   className = "grid gap-4",
   formId,
   form,
-}: DegreeModuleProps) {
+}: DegreeModuleControllerProps) {
   const {
     setRef,
     observedRefs,

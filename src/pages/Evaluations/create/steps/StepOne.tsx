@@ -6,8 +6,6 @@ import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { stepOneInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
-import { useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
 
 const loadingName = "load-classes";
 export function StepOne({
@@ -25,19 +23,10 @@ export function StepOne({
   // useFetch();
 
   const {
-    error,
-    isLoading,
-    isLoaded,
     setRef,
     observedRefs,
-    submitCallback,
-    fetchParams,
-    data,
     newItemCallback,
     openingCallback,
-    dialogOptions,
-    openedDialogs,
-    onOpenChange,
     resultsCallback,
   } = useCommandHandler({
     form: null,
@@ -104,7 +93,7 @@ export function StepOne({
    * @param metaData - The meta data from the popover field that was opened
    */
   const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
-    openingCallback(open, metaData, stepOneInputControllers);
+    openingCallback(open, metaData);
   };
 
   /**

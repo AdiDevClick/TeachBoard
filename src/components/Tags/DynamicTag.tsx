@@ -13,15 +13,21 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover.tsx";
+import type {
+  DynamicTagItemDetails,
+  DynamicTagProps,
+  DynamicTagState,
+} from "@/components/Tags/types.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
 import { CheckIcon, Pencil, RotateCcw, Trash2, XIcon } from "lucide-react";
 import { useState, type PointerEvent } from "react";
 
-const defaultState = {
+const defaultState: DynamicTagState = {
   selected: false,
   role: "",
   isEditing: false,
+  isEdited: false,
   prevText: "",
   newText: "",
   selectedText: "",
@@ -29,10 +35,10 @@ const defaultState = {
 };
 
 export function DynamicTag(props: Readonly<DynamicTagProps>) {
-  const [state, setState] = useState(defaultState);
+  const [state, setState] = useState<DynamicTagState>(defaultState);
 
-  const { id, name, label, pageId, value, onRemove, itemList, title, ...rest } =
-    props;
+  const { pageId, onRemove, itemList, title, ...rest } = props;
+  const scopedPageId = pageId ?? "dynamic-tag";
 
   const handleOnDelete = (e: PointerEvent<HTMLButtonElement>) => {
     preventDefaultAndStopPropagation(e);
@@ -54,7 +60,7 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
     editable.style.setProperty("-webkit-user-modify", "read-write");
     const newRange = new Range();
 
-    const selection = window.getSelection();
+    const selection = globalThis.getSelection();
     newRange.selectNodeContents(editable);
 
     selection?.focusNode;
@@ -91,7 +97,7 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
   const onRoleOpenChange = (
     open: boolean,
     role: string,
-    details?: Record<string, unknown>
+    details?: DynamicTagItemDetails
   ) => {
     if (state.isEditing) return;
     console.log("openChange");
@@ -103,6 +109,8 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
             isEditing: false,
             prevText: "",
             newText: "",
+            selectedText: "",
+            isEdited: false,
             itemDetails: details,
           }
         : defaultState
@@ -165,6 +173,7 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
     setState((prev) => ({
       ...prev,
       isEditing: false,
+      isEdited: false,
       newText: "",
       prevText: "",
     }));
@@ -197,18 +206,19 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
   // };
 
   return (
-    <ItemGroup id={`${pageId}-roles`} className="grid gap-2">
+    <ItemGroup id={`${scopedPageId}-roles`} className="grid gap-2">
       <ItemTitle>{title}</ItemTitle>
       <Item variant={"default"} className="p-0">
         <ItemContent className="flex-row flex-wrap gap-2">
           <ListMapper items={itemList}>
             {([value, itemDetails]) => {
+              const valueStr = String(value);
               return (
-                <ItemActions key={value} className="relative">
+                <ItemActions key={valueStr} className="relative">
                   <Popover
-                    open={state.selected && state.role === value}
+                    open={state.selected && state.role === valueStr}
                     onOpenChange={(open) =>
-                      onRoleOpenChange(open, value, itemDetails)
+                      onRoleOpenChange(open, valueStr, itemDetails)
                     }
                   >
                     <PopoverTrigger asChild>
@@ -217,16 +227,16 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
                         // onFocus={handleOnTextEdit}
                         // onClick={handleFocus}
                         data-is-editing={
-                          state.isEditing && state.role === value
+                          state.isEditing && state.role === valueStr
                         }
-                        id={value}
+                        id={valueStr}
                         size="sm"
                         variant="outline"
                         contentEditable={
-                          state.isEditing && state.role === value
+                          state.isEditing && state.role === valueStr
                         }
                       >
-                        {value}
+                        {valueStr}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent
@@ -240,31 +250,31 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
                           <Button
                             size="sm"
                             variant="outline"
-                            id={value + "-validate"}
+                            id={valueStr + "-validate"}
                             onClick={handleOnValidate}
-                            aria-label={`Valider ${value}`}
+                            aria-label={`Valider ${valueStr}`}
                           >
                             <CheckIcon className="size-4" />
                           </Button>
                           <Button
                             size="sm"
                             variant="ghost"
-                            id={value + "-cancel"}
+                            id={valueStr + "-cancel"}
                             onClick={handleOnCancel}
-                            aria-label={`Annuler ${value}`}
+                            aria-label={`Annuler ${valueStr}`}
                           >
                             <RotateCcw className="size-4" />
                           </Button>
                         </>
                       ) : (
-                        state.role === value && (
+                        state.role === valueStr && (
                           <>
                             <Button
                               size="sm"
                               variant="ghost"
                               onClick={handleOnEdit}
-                              id={value + "-edit"}
-                              aria-label={`Modifier ${value}`}
+                              id={valueStr + "-edit"}
+                              aria-label={`Modifier ${valueStr}`}
                             >
                               <Pencil className="size-4" />
                             </Button>
@@ -272,8 +282,8 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
                               size="sm"
                               variant="ghost"
                               onClick={handleOnDelete}
-                              id={value + "-delete"}
-                              aria-label={`Supprimer ${value}`}
+                              id={valueStr + "-delete"}
+                              aria-label={`Supprimer ${valueStr}`}
                             >
                               <Trash2 className="size-4" />
                             </Button>

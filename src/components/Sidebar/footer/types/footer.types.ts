@@ -1,4 +1,4 @@
-import type { dataContextUser } from "@/api/providers/types/sidebar-data.provider.types";
+import type { dataContextUser } from "@/api/providers/types/sidebar-data.provider.types.ts";
 import type { MouseEventHandler, PropsWithChildren } from "react";
 
 /** Props for the AvatarDisplay component */

@@ -10,5 +10,6 @@ export type TaskItemControllerProps = Readonly<
     formId?: string;
     form: UseFormReturn<TaskItemFormSchema>;
     className?: string;
+    pageId: string;
   } & Omit<Parameters<typeof TaskItem>[0], "modalMode">
 >;

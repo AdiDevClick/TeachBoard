@@ -2,7 +2,6 @@ import type { DialogContextType } from "@/api/contexts/types/context.types.ts";
 import { LANGUAGE, type AppModalNames } from "@/configs/app.config";
 import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
 import { clsx, type ClassValue } from "clsx";
-import type { MouseEvent } from "react";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -79,7 +78,8 @@ export function handleModalOpening({
   dialogFns,
   modalName = "signup",
 }: {
-  e: MouseEvent<HTMLAnchorElement>;
+  e: PreventDefaultAndStopPropagation;
+  // e: MouseEvent<HTMLAnchorElement>;
   dialogFns: Pick<DialogContextType, "closeAllDialogs" | "openDialog">;
   modalName?: AppModalNames;
 }) {

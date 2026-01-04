@@ -128,12 +128,6 @@ function clickFirstCommandItem(scope?: ParentNode) {
   selectCommandItem(items[0]);
 }
 
-function clickCommandItemByText(text: string) {
-  const el = findCommandItemByText(text);
-  if (!el) throw new Error(`Command item not found containing: ${text}`);
-  selectCommandItem(el);
-}
-
 function clickCommandItemByTextInScope(text: string, scope: ParentNode) {
   const el = findCommandItemByText(text, scope);
   if (!el) throw new Error(`Command item not found containing: ${text}`);
@@ -291,43 +285,6 @@ function getVisibleDialogCard(pageId: string): HTMLElement {
   return el;
 }
 
-function findButtonByText(text: string): HTMLButtonElement {
-  const buttons = Array.from(document.querySelectorAll("button"));
-  const btn = buttons.find(
-    (b) =>
-      (b.textContent ?? "").includes(text) &&
-      isVisibleElement(b) &&
-      !b.disabled &&
-      b.getAttribute("aria-disabled") !== "true"
-  );
-  if (!btn) throw new Error(`Button not found containing: ${text}`);
-  return btn;
-}
-
-function findButtonByPlaceholder(placeholder: string): HTMLButtonElement {
-  const escaped = (globalThis.CSS?.escape ?? ((s: string) => s))(placeholder);
-  const buttons = Array.from(
-    document.querySelectorAll(`button[placeholder="${escaped}"]`)
-  ) as HTMLButtonElement[];
-  const btn = buttons.find(
-    (b) =>
-      isVisibleElement(b) &&
-      !b.disabled &&
-      b.getAttribute("aria-disabled") !== "true"
-  );
-  if (!btn)
-    throw new Error(`Button not found with placeholder: ${placeholder}`);
-  return btn;
-}
-
-function clickButtonByText(text: string) {
-  findButtonByText(text).click();
-}
-
-function clickButtonByPlaceholder(placeholder: string) {
-  findButtonByPlaceholder(placeholder).click();
-}
-
 function findVisibleButtonByTextWithin(
   root: ParentNode,
   text: string
@@ -387,17 +344,6 @@ async function closeTaskTemplatesCommandList(timeoutMs = 6000) {
   }
 }
 
-function clickText(text: string) {
-  const candidates = Array.from(
-    document.querySelectorAll("*")
-  ) as HTMLElement[];
-  const el = candidates.find(
-    (n) => (n.textContent ?? "").trim() === text && isVisibleElement(n)
-  );
-  if (!el) throw new Error(`Text not found: ${text}`);
-  (el as HTMLElement).click();
-}
-
 function findVisibleTextWithin(
   root: ParentNode,
   text: string
@@ -409,67 +355,6 @@ function findVisibleTextWithin(
   ) as HTMLElement[];
   return candidates.find(
     (n) => isVisibleElement(n) && (n.textContent ?? "").includes(text)
-  );
-}
-
-function findEnabledButtonByTextWithin(
-  root: ParentNode,
-  text: string
-): HTMLButtonElement {
-  const buttons = Array.from(
-    (root as Document).querySelectorAll
-      ? (root as Document).querySelectorAll("button")
-      : []
-  ) as HTMLButtonElement[];
-  const btn = buttons.find(
-    (b) =>
-      isVisibleElement(b) &&
-      (b.textContent ?? "").includes(text) &&
-      !b.disabled &&
-      b.getAttribute("aria-disabled") !== "true"
-  );
-  if (!btn)
-    throw new Error(`Enabled button not found in scope containing: ${text}`);
-  return btn;
-}
-
-function findEnabledSubmitButtonForForm(
-  formId: string,
-  text: string
-): HTMLButtonElement {
-  const formLinked = Array.from(
-    document.querySelectorAll(
-      `button[form="${(globalThis.CSS?.escape ?? ((s: string) => s))(formId)}"]`
-    )
-  ) as HTMLButtonElement[];
-  const btn = formLinked.find(
-    (b) =>
-      isVisibleElement(b) &&
-      (b.textContent ?? "").includes(text) &&
-      !b.disabled &&
-      b.getAttribute("aria-disabled") !== "true"
-  );
-  if (btn) return btn;
-
-  // Fallback: in case the submit button is rendered inside the form.
-  const form = document.getElementById(formId);
-  if (!form) throw new Error(`Form not found: ${formId}`);
-  return findEnabledButtonByTextWithin(form, text);
-}
-
-function findSubmitButtonForForm(
-  formId: string,
-  text: string
-): HTMLButtonElement | null {
-  const formLinked = Array.from(
-    document.querySelectorAll(
-      `button[form="${(globalThis.CSS?.escape ?? ((s: string) => s))(formId)}"]`
-    )
-  ) as HTMLButtonElement[];
-  return (
-    formLinked.find(
-      (b) => isVisibleElement(b) && (b.textContent ?? "").includes(text)
-    ) ?? null
   );
 }
 
