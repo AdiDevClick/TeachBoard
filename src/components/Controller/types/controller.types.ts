@@ -20,7 +20,7 @@ export type AppControllerProps<T extends FieldValues> = {
  */
 export type WrapperProps<T extends FieldValues, C> = AppControllerProps<T> &
   Omit<ComponentPropsOf<C>, "field" | "fieldState" | "ref"> &
-  ComponentPropsWithRef<"div"> & {
+  Omit<ComponentPropsWithRef<"div">, "onSelect"> & {
     /**
      * Optional callback invoked when a controlled popover/select opens or closes.
      * The optional `meta` is the component's metadata (task, apiEndpoint, etc.).

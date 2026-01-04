@@ -1,7 +1,6 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { Command, CommandItem } from "@/components/ui/command.tsx";
 import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
-import type { BivariantCallback } from "@/utils/types/types.utils.ts";
 import type { ComponentProps, ReactNode } from "react";
 
 /** A heading with a title and corresponding values */
@@ -35,10 +34,7 @@ export type CommandsProps = {
   onAddNewItem?: (payload: HandleAddNewItemParams) => void;
   commandHeadings?: HeadingType[];
   queryRecordsKey?: string[];
-  /** Callback appelé quand un item de commande est sélectionné */
-  onSelect?: BivariantCallback<
-    (value: string, commandItem: CommandItemType) => void
-  >;
+  onSelect?: (value: string, commandItem: DetailedCommandItem) => void;
 } & Omit<ComponentProps<typeof Command>, "onSelect">;
 
 /**

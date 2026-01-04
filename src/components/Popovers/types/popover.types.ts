@@ -15,7 +15,7 @@ import type { ButtonProps } from "react-day-picker";
 /** Props spécifiques au PopoverField */
 export type PopoverFieldProps = Omit<
   VerticalSelectProps,
-  "side" | "onOpenChange"
+  "side" | "onOpenChange" | "onSelect"
 > & {
   side?: "top" | "bottom" | "left" | "right";
   /**
