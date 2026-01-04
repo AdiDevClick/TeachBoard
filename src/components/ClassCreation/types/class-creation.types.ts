@@ -19,9 +19,9 @@ type UserFullName = {
 export type DetailedItem = DetailedCommandItem & UserFullName;
 
 export type ClassCreationExtendedFormSchema = ClassCreationFormSchema & {
-  primaryTeacherValue?: Map<UUID, DetailedItem>;
+  primaryTeacherValue?: Array<[UUID, DetailedItem]>;
   tasksValues?: Array<[string, DetailedCommandItem]>;
-  studentsValues?: Map<UUID, DetailedItem>;
+  studentsValues?: Array<[UUID, DetailedItem]>;
 };
 
 /**
