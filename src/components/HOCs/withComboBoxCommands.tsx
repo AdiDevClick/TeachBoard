@@ -26,7 +26,7 @@ function withComboBoxCommands(Wrapped: ComponentType) {
       ...rest
     } = props;
 
-    const { apiEndpoint, task, dataReshape } = props;
+    const { apiEndpoint, task, dataReshapeFn, dataReshape } = props;
 
     return (
       <Wrapped {...rest}>
@@ -51,7 +51,7 @@ function withComboBoxCommands(Wrapped: ComponentType) {
                   e,
                   apiEndpoint: apiEndpoint!,
                   task,
-                  dataReshape,
+                  dataReshapeFn: dataReshapeFn ?? dataReshape,
                 })
               }
             >
