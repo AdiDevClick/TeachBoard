@@ -20,7 +20,7 @@ export type DetailedItem = DetailedCommandItem & UserFullName;
 
 export type ClassCreationExtendedFormSchema = ClassCreationFormSchema & {
   primaryTeacherValue?: Map<UUID, DetailedItem>;
-  tasksValues?: Map<UUID, DetailedCommandItem>;
+  tasksValues?: Array<[string, DetailedCommandItem]>;
   studentsValues?: Map<UUID, DetailedItem>;
 };
 
