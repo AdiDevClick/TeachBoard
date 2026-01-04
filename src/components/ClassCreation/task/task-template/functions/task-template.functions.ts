@@ -1,16 +1,19 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
-import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
+import type {
+  SkillsFormValues,
+  SkillsViewDto,
+} from "@/api/types/routes/skills.types.ts";
 import {
   createDisabledGroup,
   handleDiplomaChange,
 } from "@/components/ClassCreation/functions/class-creation.functions.ts";
 import type { FetchSkillsDataParams } from "@/components/ClassCreation/task/task-template/types/task-template-creation.types.ts";
 import type {
-  DetailedCommandItem,
   DiplomaTaskContext,
   MutableRef,
   TaskTemplatesCacheShape,
 } from "@/components/ClassCreation/types/class-creation.types.ts";
+import type { DetailedCommandItem } from "@/components/Command/types/command.types.ts";
 
 /**
  * Create a new Map() of form values based on selected command item details
@@ -21,7 +24,7 @@ import type {
  */
 export function updateValues(
   details: DetailedCommandItem,
-  formValues: Map<UUID, { mainSkill: UUID; subSkillId?: UUID[] }>
+  formValues?: Iterable<[UUID, SkillsFormValues]> | Map<UUID, SkillsFormValues>
 ) {
   const current = new Map(formValues);
 
@@ -29,7 +32,7 @@ export function updateValues(
   const sub = details.id;
   let subSkillsSet = new Set<UUID>();
 
-  if (!current.has(main)) {
+  if (current.has(main) === false) {
     subSkillsSet.add(sub);
   } else {
     const existing = current.get(main);

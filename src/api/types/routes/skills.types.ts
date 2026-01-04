@@ -35,6 +35,11 @@ type SubSkillsType = {
   name: string;
 };
 
+export type SkillsFormValues = {
+  mainSkill: UUID;
+  subSkillId?: UUID[];
+};
+
 /**
  * View structure for skills including sub-skills.
  */

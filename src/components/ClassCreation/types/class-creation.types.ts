@@ -1,4 +1,5 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
+import type { HeadingType } from "@/components/Command/types/command.types.ts";
 import type { ClassCreationInputItem } from "@/models/class-creation.models.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 
@@ -8,24 +9,7 @@ import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
  */
 export type MutableRef<T> = { current: T };
 
-export type CommandItem = {
-  id: UUID;
-  name: string;
-  [key: string]: unknown;
-};
-
-export type DetailedCommandItem = CommandItem & {
-  groupTitle?: string;
-  groupId: UUID;
-};
-
-export type CommandGroup = {
-  groupTitle?: string;
-  items: CommandItem[];
-  [key: string]: unknown;
-};
-
-export type TaskTemplatesCacheShape = [CommandGroup, ...CommandGroup[]];
+export type TaskTemplatesCacheShape = [HeadingType, ...HeadingType[]];
 
 export type DiplomaTaskContext = {
   shortTemplatesList: string[];

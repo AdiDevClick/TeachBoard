@@ -1,16 +1,25 @@
-import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
+import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { Command, CommandItem } from "@/components/ui/command.tsx";
+import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { ComponentProps, ReactNode } from "react";
 
 /** A heading with a title and corresponding values */
 export type HeadingType = {
   groupTitle: string;
+  groupId: UUID;
   items: CommandItemType[];
 };
 
+export type DetailedCommandItem = CommandItemType & {
+  groupTitle?: string;
+  groupId: UUID;
+};
+
 export type CommandItemType = {
-  id: string | number;
+  id: UUID;
   value: string;
+  name: string;
+  [key: string]: unknown;
 };
 
 /**

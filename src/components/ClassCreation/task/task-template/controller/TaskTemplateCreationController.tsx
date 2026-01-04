@@ -1,4 +1,5 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
+
 import {
   createDisabledGroup,
   handleDiplomaChange,
@@ -10,10 +11,8 @@ import {
   updateValues,
 } from "@/components/ClassCreation/task/task-template/functions/task-template.functions.ts";
 import type { TaskTemplateCreationControllerProps } from "@/components/ClassCreation/task/task-template/types/task-template-creation.types.ts";
-import type {
-  DetailedCommandItem,
-  TaskTemplatesCacheShape,
-} from "@/components/ClassCreation/types/class-creation.types.ts";
+import type { TaskTemplatesCacheShape } from "@/components/ClassCreation/types/class-creation.types.ts";
+import type { DetailedCommandItem } from "@/components/Command/types/command.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/PopoverField.tsx";
 import { DynamicTag } from "@/components/Tags/DynamicTag.tsx";
@@ -25,6 +24,7 @@ import {
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
+import type { TaskTemplateCreationFormSchema } from "@/models/class-task-template.models.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef } from "react";
@@ -182,9 +182,13 @@ export function TaskTemplateCreationController({
     });
 
     // Update the actual skills field used for submission & validation
-    form.setValue("skills", Array.from(current.values()), {
-      shouldValidate: true,
-    });
+    form.setValue(
+      "skills",
+      Array.from(current.values()) as TaskTemplateCreationFormSchema["skills"],
+      {
+        shouldValidate: true,
+      }
+    );
   };
 
   if (

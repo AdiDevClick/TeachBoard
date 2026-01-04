@@ -1,8 +1,8 @@
 import type {
-  CommandItem,
   CreateDisabledGroupParams,
   HandleDiplomaChangeParams,
 } from "@/components/ClassCreation/types/class-creation.types.ts";
+import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import type { useQueryClient } from "@tanstack/react-query";
@@ -149,7 +149,7 @@ export function createDisabledGroup({
   if (disabledSet.size > 0) {
     dataCopy[1] = {
       groupTitle: "Déjà utilisés",
-      items: Array.from(disabledSet.values()) as CommandItem[],
+      items: Array.from(disabledSet.values()) as CommandItemType[],
     };
   }
   return dataCopy;
