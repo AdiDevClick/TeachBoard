@@ -1,4 +1,5 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
+import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
 
 /**
  * Single diploma configuration returned by the backend.
@@ -10,7 +11,7 @@ export interface DiplomaConfigDto {
   degreeLevel: string;
   degreeYear: string;
   degreeField: string;
-  skills?: string[];
+  skills?: SkillsViewDto[];
 }
 
 /**

@@ -19,9 +19,26 @@ export interface SkillDto {
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string;
-  subskills?: string[];
-  mainSkills?: string[];
+  subskills?: SubSkillsType[];
+  mainSkills?: MainSkillsType[];
 }
+
+type MainSkillsType = {
+  mainSkillId: UUID;
+  mainSkillCode: string;
+  mainSkillName: string;
+};
+
+type SubSkillsType = {
+  id: UUID;
+  code: string;
+  name: string;
+};
+
+/**
+ * View structure for skills including sub-skills.
+ */
+export type SkillsViewDto = MainSkillsType & { subSkills: SubSkillsType[] };
 
 /**
  * Data payload returned by the "SKILLS" fetch.

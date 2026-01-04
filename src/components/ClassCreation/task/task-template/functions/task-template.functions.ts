@@ -1,3 +1,5 @@
+import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
+
 /**
  * Create a new Map() of form values based on selected command item details
  *
@@ -47,18 +49,18 @@ export function updateValues(
 /**
  * Create a view structure for task templates based on diploma data
  *
- * @param diplomaDatas - The diploma data containing skills information
+ * @param skills - The skills dataset from diploma configuration
  * @returns An array of heading structures for command items
  */
-export function createTaskTemplateView(diplomaDatas: any) {
-  return diplomaDatas.map((skill: string) => {
-    const mainSkillCode = skill.mainSkillCode || "Unknown Skill";
-    const mainSkillId = skill.mainSkillId || "unknown-id";
+export function createTaskTemplateView(skills?: SkillsViewDto[]) {
+  return (skills ?? []).map((skill) => {
+    const mainSkillCode = skill.mainSkillCode ?? "Unknown Skill";
+    const mainSkillId = skill.mainSkillId ?? "unknown-id";
 
     return {
       groupTitle: mainSkillCode,
       id: mainSkillId,
-      items: skill.subSkills.map((subSkill: string) => ({
+      items: skill.subSkills.map((subSkill) => ({
         value: subSkill.code,
         label: subSkill.name,
         id: subSkill.id,

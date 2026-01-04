@@ -49,7 +49,7 @@ export function TaskTemplateCreationController({
     pageId,
   });
   const queryClient = useQueryClient();
-  const savedSkills = useRef(null!);
+  const savedSkills = useRef<ReturnType<typeof createTaskTemplateView>>(null!);
   const dialogData = dialogOptions(pageId);
   const diplomaDatas = useMemo(() => {
     const selectedDiploma = dialogData?.selectedDiploma ?? null;
