@@ -1,3 +1,4 @@
+import type { DataReshapeFn } from "@/components/Inputs/types/inputs.types.ts";
 import type {
   Select,
   SelectContent,
@@ -58,7 +59,7 @@ export type VerticalSelectProps = Omit<
     { element: Element; meta?: Record<string, unknown> }
   >;
   task?: string;
-  dataReshapeFn?: (data: unknown) => unknown;
+  dataReshapeFn?: DataReshapeFn;
   apiEndpoint?: string;
   label?: ReactNode;
   placeholder?: string;
