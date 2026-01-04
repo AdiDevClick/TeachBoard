@@ -24,7 +24,6 @@ const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
  * @description This inits Zod validated form
  *
  * @param pageId - The ID of the page.
- * @param formId - The ID of the form.
  * @param inputControllers - The input controllers for the form (this needs to be already validated by Zod Schema).
  * @param modalMode - Whether the component is in modal mode.
  * @param props - Additional props.
@@ -35,7 +34,6 @@ function DegreeModule({
   inputControllers = degreeModuleCreationInputControllers,
   ...props
 }: Readonly<PageWithControllers<DegreeModuleInputItem>>) {
-  const formId = pageId + "-form";
   const form = useForm<DegreeModuleFormSchema>({
     resolver: zodResolver(degreeModuleData),
     mode: "onTouched",
@@ -45,6 +43,8 @@ function DegreeModule({
       skillList: [],
     },
   });
+
+  const formId = pageId + "-form";
 
   const commonProps = useMemo(
     () => ({
