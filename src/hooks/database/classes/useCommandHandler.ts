@@ -230,26 +230,30 @@ export function useCommandHandler<
         }
       }
 
-      form.setValue(
-        mainFormField,
-        values as PathValue<TFieldValues, Path<TFieldValues>>,
-        {
-          shouldValidate: true,
-        }
-      );
+      if (mainFormField) {
+        form.setValue(
+          mainFormField,
+          values as PathValue<TFieldValues, Path<TFieldValues>>,
+          {
+            shouldValidate: true,
+          }
+        );
+      }
 
-      form.setValue(
-        secondaryFormField,
-        Array.from(retrievedFormField.entries()) as PathValue<
-          TFieldValues,
-          Path<TFieldValues>
-        >,
-        {
-          shouldValidate: false,
-          shouldDirty: false,
-          shouldTouch: false,
-        }
-      );
+      if (secondaryFormField) {
+        form.setValue(
+          secondaryFormField,
+          Array.from(retrievedFormField.entries()) as PathValue<
+            TFieldValues,
+            Path<TFieldValues>
+          >,
+          {
+            shouldValidate: false,
+            shouldDirty: false,
+            shouldTouch: false,
+          }
+        );
+      }
     },
     []
   );

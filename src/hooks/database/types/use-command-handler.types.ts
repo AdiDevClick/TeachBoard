@@ -41,8 +41,8 @@ export type HandleAddNewItemParams = {
 export type HandleSelectionCallbackParams = {
   value: string;
   options: {
-    mainFormField: string;
-    secondaryFormField: string;
+    mainFormField?: string;
+    secondaryFormField?: string;
     /**
      * Extra payload saved alongside the selected value.
      */
