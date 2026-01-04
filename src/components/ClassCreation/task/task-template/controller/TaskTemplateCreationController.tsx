@@ -5,14 +5,23 @@ import {
 } from "@/components/ClassCreation/functions/class-creation.functions.ts";
 import {
   createTaskTemplateView,
+  fetchSkillsData,
+  fetchTasksData,
   updateValues,
 } from "@/components/ClassCreation/task/task-template/functions/task-template.functions.ts";
 import type { TaskTemplateCreationControllerProps } from "@/components/ClassCreation/task/task-template/types/task-template-creation.types.ts";
-import type { TaskTemplatesCacheShape } from "@/components/ClassCreation/types/class-creation.types.ts";
+import type {
+  DetailedCommandItem,
+  TaskTemplatesCacheShape,
+} from "@/components/ClassCreation/types/class-creation.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/PopoverField.tsx";
 import { DynamicTag } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import {
+  commandSelectionDoesNotContainId,
+  debugLogs,
+} from "@/configs/app-components.config.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
@@ -107,35 +116,18 @@ export function TaskTemplateCreationController({
       }
 
       if (isFetchedSkills) {
-        if (!diplomaDatas.diploma) return undefined;
-        if (!savedSkills.current) {
-          const displayedSkills = createTaskTemplateView(
-            diplomaDatas.diploma.skills
-          );
-          savedSkills.current = displayedSkills;
-          return displayedSkills;
-        }
-        return savedSkills.current;
+        return fetchSkillsData(diplomaDatas.diploma, savedSkills);
       }
 
       if (isFetchedTasks) {
-        if (!Array.isArray(cachedData)) return undefined;
-        let dataCopy = itemToDisplay.current;
-
-        // Build (or rebuild) the display list when needed.
-        // - first open: itemToDisplay is null
-        // - diploma changed: needs a reset
-        if (dataCopy === null || isDiplomaChanged) {
-          dataCopy = createDisabledGroup({
-            dataCopy,
-            cachedData,
-            diplomaDatas,
-            currentDiplomaId,
-            activeDiplomaIdRef,
-          });
-          itemToDisplay.current = dataCopy;
-        }
-        return dataCopy;
+        return fetchTasksData(
+          cachedData,
+          diplomaDatas,
+          currentDiplomaId,
+          isDiplomaChanged,
+          itemToDisplay,
+          activeDiplomaIdRef
+        );
       }
 
       return cachedData;
@@ -162,9 +154,19 @@ export function TaskTemplateCreationController({
    * @param value - Selected value
    * @param commandItemDetails - Details of the selected command item from the callback
    */
-  const handleCommandSelection = (value: string, commandItemDetails) => {
+  const handleCommandSelection = (
+    __value: string,
+    commandItemDetails: DetailedCommandItem
+  ) => {
     const isTask = Object.hasOwn(commandItemDetails, "description");
     if (isTask) {
+      if (!commandSelectionDoesNotContainId(commandItemDetails)) {
+        debugLogs(
+          `TaskTemplateCreationController Selected task item has no ID, selection ignored`,
+          commandItemDetails
+        );
+        return;
+      }
       form.setValue("taskId", commandItemDetails.id, { shouldValidate: true });
       return;
     }
