@@ -7,22 +7,38 @@ import type {
 } from "@/utils/types/types.utils.ts";
 import type { ComponentProps, ComponentType } from "react";
 
+type KeysOfUnion<T> = T extends unknown ? keyof T : never;
+type ProvidedKeyRecord<T> = Record<KeysOfUnion<T>, unknown>;
+type ReservedListMapperKeys = "items" | "optional" | "children";
+
+type PropsType<
+  Items,
+  TOptional extends Record<string, unknown> | undefined,
+  P
+> = Readonly<
+  Pick<
+    ListMapperProps<Items, ComponentType<P>, TOptional>,
+    ReservedListMapperKeys
+  > &
+    Omit<P, KeysOfUnion<ExtractItemType<Items>> | "children"> &
+    Partial<
+      Pick<
+        P,
+        Extract<
+          Exclude<KeysOfUnion<ExtractItemType<Items>>, ReservedListMapperKeys>,
+          keyof P
+        >
+      >
+    > &
+    MissingRequiredProps<P, ProvidedKeyRecord<ExtractItemType<Items>>>
+>;
+
 function withListMapper<C extends AnyComponentLike>(Wrapped: C) {
   return function Component<
     Items extends readonly unknown[] | Record<string, unknown>,
     TOptional extends Record<string, unknown> | undefined,
     P extends ComponentProps<C> = ComponentProps<C>
-  >(
-    props: Readonly<
-      Pick<
-        ListMapperProps<Items, ComponentType<P>, TOptional>,
-        "items" | "optional" | "children"
-      > &
-        Omit<P, keyof ExtractItemType<Items> | "children"> &
-        Partial<Pick<P, Extract<keyof ExtractItemType<Items>, keyof P>>> &
-        MissingRequiredProps<P, ExtractItemType<Items>>
-    >
-  ) {
+  >(props: PropsType<Items, TOptional, P>) {
     const { items, optional, ...rest } = props;
 
     return (
