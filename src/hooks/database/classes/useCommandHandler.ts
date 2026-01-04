@@ -95,10 +95,10 @@ export function useCommandHandler<
    * @param dataReshapeFn - Function to reshape the response data
    */
   const handleSubmit = useCallback(
-    (
+    <T extends (...args: unknown[]) => unknown>(
       variables: HandleSubmitCallbackParams["variables"],
       endpointUrl: HandleSubmitCallbackParams["endpointUrl"],
-      dataReshapeFn: HandleSubmitCallbackParams["dataReshapeFn"],
+      dataReshapeFn?: T,
       reshapeOptions: HandleSubmitCallbackParams["reshapeOptions"] = null
     ) => {
       if (DEV_MODE && !NO_CACHE_LOGS) {
