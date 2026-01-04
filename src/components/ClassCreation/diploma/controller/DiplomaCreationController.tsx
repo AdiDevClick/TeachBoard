@@ -1,3 +1,4 @@
+import { switchFields } from "@/components/ClassCreation/diploma/functions/diploma.functions.ts";
 import type { DiplomaCreationControllerProps } from "@/components/ClassCreation/diploma/types/diploma-creation.types.ts";
 import {
   PopoverFieldWithCommands,
@@ -6,7 +7,6 @@ import {
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
-import type { HandleOpeningCallbackParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { DiplomaCreationFormSchema } from "@/models/diploma-creation.models.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWatch } from "react-hook-form";
@@ -26,6 +26,7 @@ export function DiplomaCreationController({
   form,
   formId,
   inputControllers = [],
+  className,
 }: DiplomaCreationControllerProps) {
   const {
     setRef,
@@ -46,21 +47,6 @@ export function DiplomaCreationController({
       control: form.control,
       name: "mainSkillsListDetails" as never,
     }) || [];
-
-  /**
-   * Handle opening of the VerticalFieldSelect component
-   *
-   * @description When opening, fetch data based on the select's meta information
-   *
-   * @param open - Whether the select is opening
-   * @param metaData - The meta data from the popover field that was opened
-   */
-  const handleOpening = (
-    open: boolean,
-    metaData?: HandleOpeningCallbackParams["metaData"]
-  ) => {
-    openingCallback(open, metaData);
-  };
 
   /**
    * Handle form submission
@@ -121,7 +107,7 @@ export function DiplomaCreationController({
   return (
     <form
       id={formId}
-      className="grid gap-4"
+      className={className}
       onSubmit={form.handleSubmit(handleSubmit)}
     >
       <PopoverFieldWithControllerAndCommandsList
@@ -129,7 +115,7 @@ export function DiplomaCreationController({
         form={form}
         commandHeadings={resultsCallback()}
         onSelect={onSelectHandler}
-        onOpenChange={handleOpening}
+        onOpenChange={openingCallback}
         setRef={setRef}
         observedRefs={observedRefs}
         onAddNewItem={newItemCallback}
@@ -145,7 +131,7 @@ export function DiplomaCreationController({
         multiSelection
         setRef={setRef}
         onSelect={handleSelection}
-        onOpenChange={handleOpening}
+        onOpenChange={openingCallback}
         observedRefs={observedRefs}
         onAddNewItem={newItemCallback}
         commandHeadings={resultsCallback()}
@@ -153,24 +139,4 @@ export function DiplomaCreationController({
       />
     </form>
   );
-}
-
-/**
- * Verify the input type and return the corresponding field name
- *
- * @param fieldName
- */
-function switchFields(
-  fieldName: string
-): "diplomaFieldId" | "yearId" | "levelId" {
-  switch (fieldName) {
-    case "FIELD":
-      return "diplomaFieldId";
-    case "YEAR":
-      return "yearId";
-    case "LEVEL":
-      return "levelId";
-    default:
-      return "diplomaFieldId";
-  }
 }
