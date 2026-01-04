@@ -31,13 +31,14 @@ export type InputItem<T> =
   | (BaseInputItem<T> & { title: string; label?: string })
   | (BaseInputItem<T> & { title?: string; label: string });
 
+export type ApiEndpointType = string | ((id: number | string) => string);
+// NOTE: this intentionally accepts `any[]` so endpoint reshapers with specific
+// first parameter types (e.g. `DegreesFetch`) remain assignable here.
+export type DataReshapeFn = (...args: any[]) => unknown;
+
 type FetchingInputBase<T> = InputItem<T> & {
-  apiEndpoint?: string | ((id: number | string) => string);
-  dataReshapeFn?(
-    data: unknown,
-    cachedDatas?: unknown,
-    options?: unknown
-  ): Record<string, unknown>;
+  apiEndpoint?: ApiEndpointType;
+  dataReshapeFn?: DataReshapeFn;
   useButtonAddNew?: boolean;
   fullWidth?: boolean;
   creationButtonText?: string | boolean;
