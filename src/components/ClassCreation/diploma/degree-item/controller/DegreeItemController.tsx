@@ -15,10 +15,9 @@ import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
  * @param form - The react-hook-form instance.
  * @param className - Additional CSS classes for styling.
  * @param inputControllers - The input controllers for the form (this needs to be already validated by Zod Schema).
- * @param queryHooks - The query hooks for handling form submission and state.
  */
 export function DegreeItemController({
-  pageId = "new-degree-item",
+  pageId,
   inputControllers = degreeCreationInputControllersField,
   className = "grid gap-4",
   formId,
