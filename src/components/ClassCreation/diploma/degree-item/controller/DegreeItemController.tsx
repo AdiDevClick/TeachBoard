@@ -22,7 +22,7 @@ export function DegreeItemController({
   className = "grid gap-4",
   formId,
   form,
-}: Readonly<DegreeItemControllerProps>) {
+}: DegreeItemControllerProps) {
   const { setRef, observedRefs, submitCallback } = useCommandHandler({
     form,
     pageId,
