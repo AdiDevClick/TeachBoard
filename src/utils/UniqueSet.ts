@@ -8,7 +8,7 @@
  * retournent l'instance pour permettre le chaînage,
  * comme les classes natives `Map` et `Set`.
  *
- * Typage strict : `UniqueSet<K, V>` où `K` est le type de la clé et `V` le type de la valeur (objet).
+ * Typage strict : `UniqueSet<K, V>` où `K` est le type de la clé et `V` le type de la valeur.
  *
  * Exemple d'utilisation :
  *
@@ -34,7 +34,7 @@
  * @template K Type de la clé unique
  * @template V Type de la valeur (objet)
  */
-export class UniqueSet<K, V extends { [key: string]: unknown }> {
+export class UniqueSet<K, V extends { [key: string]: unknown } | unknown[]> {
   readonly #map = new Map<K, V>();
 
   /**
