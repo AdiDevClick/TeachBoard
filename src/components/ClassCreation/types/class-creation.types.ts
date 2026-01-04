@@ -27,8 +27,8 @@ export type ClassCreationProps = { userId?: UUID } & Readonly<
  * Parameters for creating disabled groups in class creation.
  */
 export type CreateDisabledGroupParams = {
-  dataCopy: TaskTemplatesCacheShape;
-  cachedData: TaskTemplatesCacheShape;
+  dataCopy: HeadingType[];
+  cachedData: HeadingType[];
   diplomaDatas: DiplomaTaskContext;
   currentDiplomaId: UUID;
   activeDiplomaIdRef: MutableRef<UUID>;

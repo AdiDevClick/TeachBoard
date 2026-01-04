@@ -22,7 +22,7 @@ export interface UseCommandHandlerParams<
 export type HandleAddNewItemParams = {
   e?: PointerEvent<HTMLElement> | MouseEvent<HTMLElement>;
   apiEndpoint?: (typeof inputs)[number]["apiEndpoint"];
-  task: AppModalNames;
+  task?: AppModalNames;
   dataReshapeFn?: (typeof inputs)[number]["dataReshapeFn"];
 };
 

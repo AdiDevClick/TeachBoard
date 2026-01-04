@@ -7,6 +7,8 @@ import {
   debugLogs,
   labelledInputContainsInvalid,
 } from "@/configs/app-components.config.ts";
+import sanitizeDOMProps from "@/utils/props.ts";
+import type { InputHTMLAttributes } from "react";
 import type { FieldValues } from "react-hook-form";
 
 /**
@@ -23,14 +25,17 @@ export function LabelledInputForController<T extends FieldValues>(
     return null;
   }
 
-  const { name, title, field, fieldState, form, ...rest } = props;
+  const { name, title, field, fieldState, ...rest } = props;
 
   return (
     <>
       <Label htmlFor={name ?? field.name}>{title}</Label>
       <Input
         required
-        {...rest}
+        {...(sanitizeDOMProps(rest, ["form"]) as Omit<
+          InputHTMLAttributes<HTMLInputElement>,
+          "form"
+        >)}
         {...field}
         id={name ?? field.name ?? "input-is-not-named"}
         aria-invalid={fieldState.invalid ?? false}

@@ -15,12 +15,13 @@ export type TaskTemplateCreationExtendedForm =
 /**
  * Props for the TaskTemplateCreationController component.
  */
-export type TaskTemplateCreationControllerProps = {
-  formId: string;
-  className?: string;
-  form: UseFormReturn<TaskTemplateCreationExtendedForm>;
-} & Omit<Parameters<typeof TaskTemplateCreation>[0], "modalMode">;
-
+export type TaskTemplateCreationControllerProps = Readonly<
+  {
+    formId: string;
+    className?: string;
+    form: UseFormReturn<TaskTemplateCreationExtendedForm>;
+  } & Omit<Parameters<typeof TaskTemplateCreation>[0], "modalMode">
+>;
 /**
  * Parameters for fetching skills data for task templates.
  */

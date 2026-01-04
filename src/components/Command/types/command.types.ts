@@ -6,7 +6,6 @@ import type { ComponentProps, ReactNode } from "react";
 /** A heading with a title and corresponding values */
 export type HeadingType = {
   groupTitle: string;
-  groupId: UUID;
   items: CommandItemType[];
 };
 

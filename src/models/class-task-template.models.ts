@@ -1,4 +1,4 @@
-import type { InputItem } from "@/components/Inputs/types/inputs.types.ts";
+import type { FetchingInputItem } from "@/components/Inputs/types/inputs.types.ts";
 import z from "zod";
 
 const dataField = {
@@ -71,6 +71,6 @@ const taskTemplateCreationSchema = (data: typeof dataField) =>
 export type TaskTemplateCreationFormSchema = z.infer<typeof taskTemplateSchema>;
 
 export type TaskTemplateCreationInputItem =
-  InputItem<TaskTemplateCreationFormSchema>;
+  FetchingInputItem<TaskTemplateCreationFormSchema>;
 
 export const taskTemplateSchema = taskTemplateCreationSchema(dataField);

@@ -3,8 +3,10 @@ import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { taskTemplateCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import {
   type TaskTemplateCreationFormSchema,
+  type TaskTemplateCreationInputItem,
   taskTemplateSchema,
 } from "@/models/class-task-template.models";
+import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -28,7 +30,7 @@ function TaskTemplateCreation({
   modalMode = true,
   inputControllers = taskTemplateCreationInputControllers,
   ...props
-}) {
+}: Readonly<PageWithControllers<TaskTemplateCreationInputItem>>) {
   const form = useForm<TaskTemplateCreationFormSchema>({
     resolver: zodResolver(taskTemplateSchema),
     mode: "onTouched",

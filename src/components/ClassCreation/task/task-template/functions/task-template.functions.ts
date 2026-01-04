@@ -11,9 +11,11 @@ import type { FetchSkillsDataParams } from "@/components/ClassCreation/task/task
 import type {
   DiplomaTaskContext,
   MutableRef,
-  TaskTemplatesCacheShape,
 } from "@/components/ClassCreation/types/class-creation.types.ts";
-import type { DetailedCommandItem } from "@/components/Command/types/command.types.ts";
+import type {
+  DetailedCommandItem,
+  HeadingType,
+} from "@/components/Command/types/command.types.ts";
 
 /**
  * Create a new Map() of form values based on selected command item details
@@ -92,7 +94,7 @@ export function createTaskTemplateView(skills?: SkillsViewDto[]) {
  * @returns The reshaped task template data with disabled groups if applicable
  */
 export function fetchTasksData(
-  cachedData: TaskTemplatesCacheShape,
+  cachedData: HeadingType[],
   diplomaDatas: DiplomaTaskContext,
   currentDiplomaId: UUID,
   isDiplomaChanged: ReturnType<typeof handleDiplomaChange>,

@@ -11,8 +11,10 @@ import {
   updateValues,
 } from "@/components/ClassCreation/task/task-template/functions/task-template.functions.ts";
 import type { TaskTemplateCreationControllerProps } from "@/components/ClassCreation/task/task-template/types/task-template-creation.types.ts";
-import type { TaskTemplatesCacheShape } from "@/components/ClassCreation/types/class-creation.types.ts";
-import type { DetailedCommandItem } from "@/components/Command/types/command.types.ts";
+import type {
+  DetailedCommandItem,
+  HeadingType,
+} from "@/components/Command/types/command.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/PopoverField.tsx";
 import { DynamicTag } from "@/components/Tags/DynamicTag.tsx";
@@ -41,10 +43,10 @@ import { useCallback, useMemo, useRef } from "react";
 export function TaskTemplateCreationController({
   pageId,
   formId,
-  inputControllers,
+  inputControllers = [],
   className = "grid gap-4",
   form,
-}: Readonly<TaskTemplateCreationControllerProps>) {
+}: TaskTemplateCreationControllerProps) {
   const {
     setRef,
     observedRefs,
@@ -88,9 +90,7 @@ export function TaskTemplateCreationController({
    */
   const resultsCallback = useCallback(
     (keys: string[]) => {
-      const cachedData = queryClient.getQueryData(
-        keys ?? []
-      ) as TaskTemplatesCacheShape;
+      const cachedData = queryClient.getQueryData<HeadingType[]>(keys ?? []);
       if (!data && cachedData === undefined && keys[0] === "none") return;
       if (DEV_MODE && !NO_CACHE_LOGS) {
         console.log("Cached data for ", keys, " is ", cachedData);
@@ -120,6 +120,9 @@ export function TaskTemplateCreationController({
       }
 
       if (isFetchedTasks) {
+        if (cachedData === undefined) {
+          return data;
+        }
         return fetchTasksData(
           cachedData,
           diplomaDatas,
@@ -200,6 +203,10 @@ export function TaskTemplateCreationController({
     });
   }
 
+  const controllerInputsControllers = inputControllers.slice(0, 2);
+  const popoverFieldsControllers = inputControllers.slice(3, 5);
+  const dynamicTagsControllers = inputControllers[2];
+
   return (
     <form
       id={formId}
@@ -207,15 +214,15 @@ export function TaskTemplateCreationController({
       onSubmit={form.handleSubmit(handleSubmit)}
     >
       <ControlledInputList
-        items={inputControllers.slice(0, 2)}
+        items={controllerInputsControllers}
         form={form}
         setRef={setRef}
         observedRefs={observedRefs}
         onOpenChange={openingCallback}
       />
-      <DynamicTag {...inputControllers[2]} itemList={diplomaDatas.tagData} />
+      <DynamicTag {...dynamicTagsControllers} itemList={diplomaDatas.tagData} />
       <PopoverFieldWithControllerAndCommandsList
-        items={inputControllers.slice(3, 5)}
+        items={popoverFieldsControllers}
         form={form}
         setRef={setRef}
         onSelect={handleCommandSelection}
