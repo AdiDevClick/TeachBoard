@@ -1,4 +1,4 @@
-import type { inputs } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
+import type { DataReshapeFn } from "@/components/Inputs/types/inputs.types.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import type { MouseEvent, PointerEvent } from "react";
@@ -19,11 +19,11 @@ export interface UseCommandHandlerParams<
 /**
  * Parameters for the handleAddNewItem function
  */
-export type HandleAddNewItemParams = {
+export type HandleAddNewItemParams<TInput = unknown> = {
   e?: PointerEvent<HTMLElement> | MouseEvent<HTMLElement>;
-  apiEndpoint?: (typeof inputs)[number]["apiEndpoint"];
-  task?: AppModalNames;
-  dataReshapeFn?: (typeof inputs)[number]["dataReshapeFn"];
+  apiEndpoint?: TInput extends { apiEndpoint?: infer A } ? A : unknown;
+  task: AppModalNames;
+  dataReshapeFn?: TInput extends { dataReshapeFn?: infer D } ? D : unknown;
 };
 
 /**
@@ -45,9 +45,9 @@ export type HandleSelectionCallbackParams = {
 /**
  * Parameters for the handleOpeningCallback function
  */
-export type HandleOpeningCallbackParams = {
+export type HandleOpeningCallbackParams<TInput = unknown> = {
   open: boolean;
-  metaData?: Omit<HandleAddNewItemParams, "e">;
+  metaData?: Omit<HandleAddNewItemParams<TInput>, "e">;
 };
 
 /**
@@ -56,6 +56,6 @@ export type HandleOpeningCallbackParams = {
 export type HandleSubmitCallbackParams = {
   variables: MutationVariables;
   endpointUrl: string;
-  dataReshapeFn?: (...args: any[]) => unknown;
+  dataReshapeFn?: DataReshapeFn;
   reshapeOptions?: unknown;
 };
