@@ -26,7 +26,6 @@ export function DiplomaCreationController({
   form,
   formId,
   inputControllers = [],
-  ...props
 }: Readonly<DiplomaCreationControllerProps>) {
   const {
     setRef,
@@ -45,7 +44,7 @@ export function DiplomaCreationController({
   const currentSkills =
     useWatch({
       control: form.control,
-      name: "mainSkillsListDetails",
+      name: "mainSkillsListDetails" as never,
     }) || [];
 
   /**
