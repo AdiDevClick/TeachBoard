@@ -1,4 +1,4 @@
-import type { InputItem } from "@/components/Inputs/types/inputs.types.ts";
+import type { FetchingInputItem } from "@/components/Inputs/types/inputs.types.ts";
 import { formsRegex } from "@/configs/formsRegex.config.ts";
 import z from "zod";
 
@@ -48,6 +48,6 @@ const diplomaSchema = (data: typeof fieldData) => {
 
 export type DiplomaCreationFormSchema = z.infer<typeof diplomaCreationSchema>;
 
-export type DiplomaInputItem = InputItem<DiplomaCreationFormSchema>;
+export type DiplomaInputItem = FetchingInputItem<DiplomaCreationFormSchema>;
 
 export const diplomaCreationSchema = diplomaSchema(fieldData);
