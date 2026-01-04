@@ -1,3 +1,4 @@
+import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
 import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types.ts";
 import type {
   AnyComponentLike,
@@ -19,14 +20,13 @@ export type AppControllerProps<T extends FieldValues> = {
  */
 export type WrapperProps<T extends FieldValues, C> = AppControllerProps<T> &
   Omit<ComponentPropsOf<C>, "field" | "fieldState" | "ref"> &
-  ComponentPropsWithRef<"div"> &
-  UseMutationObserverReturn & {
+  ComponentPropsWithRef<"div"> & {
     /**
      * Optional callback invoked when a controlled popover/select opens or closes.
      * The optional `meta` is the component's metadata (task, apiEndpoint, etc.).
      */
-    onOpenChange?: (open: boolean, meta?: Record<string, unknown>) => void;
-  };
+    onOpenChange?: (open: boolean, meta?: MetaDatasPopoverField) => void;
+  } & UseMutationObserverReturn;
 
 /**
  * Same as WrapperProps but with a non-generic form (any),
@@ -37,5 +37,5 @@ export type WrapperPropsAny<C extends AnyComponentLike = AnyComponentLike> =
   // intentionally accept any form instance type to reduce HOC friction in JSX
   AppControllerProps<any> &
     Omit<ComponentProps<C>, "field" | "fieldState" | "ref"> &
-    ComponentPropsWithRef<"div"> &
+    Omit<ComponentPropsWithRef<"div">, "onSelect"> &
     UseMutationObserverReturn;
