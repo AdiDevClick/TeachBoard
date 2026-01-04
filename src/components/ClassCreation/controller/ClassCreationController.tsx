@@ -98,11 +98,11 @@ export function ClassCreationController({
 
     if (isModalOpen) return;
 
-    const currentStudentsValues = form.getValues("studentsValues") ?? {};
+    const currentStudentsValues = form.getValues("studentsValues") ?? [];
     const currentPrimaryTeacherValue =
-      form.getValues("primaryTeacherValue") ?? {};
+      form.getValues("primaryTeacherValue") ?? [];
 
-    if (Object.keys(currentStudentsValues).length > 0) {
+    if (currentStudentsValues.length > 0) {
       resetSelectedItemsFromCache(
         cachedKeysRef.current["search-students"],
         currentStudentsValues,
@@ -110,7 +110,7 @@ export function ClassCreationController({
       );
     }
 
-    if (Object.keys(currentPrimaryTeacherValue).length > 0) {
+    if (currentPrimaryTeacherValue.length > 0) {
       resetSelectedItemsFromCache(
         cachedKeysRef.current["search-primaryteacher"],
         currentPrimaryTeacherValue,
