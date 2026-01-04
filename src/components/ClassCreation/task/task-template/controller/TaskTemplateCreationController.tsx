@@ -89,7 +89,7 @@ export function TaskTemplateCreationController({
    * @returns The reshaped cached data or the original data if not found
    */
   const resultsCallback = useCallback(
-    (keys: string[]) => {
+    (keys: string[]): HeadingType[] | undefined => {
       const cachedData = queryClient.getQueryData<HeadingType[]>(keys ?? []);
       if (!data && cachedData === undefined && keys[0] === "none") return;
       if (DEV_MODE && !NO_CACHE_LOGS) {
@@ -97,7 +97,7 @@ export function TaskTemplateCreationController({
       }
 
       if (!openedDialogs.includes(pageId)) {
-        return cachedData ?? data;
+        return cachedData ?? (data as HeadingType[] | undefined);
       }
 
       const isFetchedSkills = keys[0] === "new-task-skill";
@@ -112,7 +112,7 @@ export function TaskTemplateCreationController({
       });
 
       if (cachedData === undefined && !isFetchedSkills) {
-        return data;
+        return data as HeadingType[] | undefined;
       }
 
       if (isFetchedSkills) {
@@ -121,7 +121,7 @@ export function TaskTemplateCreationController({
 
       if (isFetchedTasks) {
         if (cachedData === undefined) {
-          return data;
+          return data as HeadingType[] | undefined;
         }
         return fetchTasksData(
           cachedData,
@@ -203,9 +203,11 @@ export function TaskTemplateCreationController({
     });
   }
 
-  const controllerInputsControllers = inputControllers.slice(0, 2);
-  const popoverFieldsControllers = inputControllers.slice(3, 5);
-  const dynamicTagsControllers = inputControllers[2];
+  const controllers = {
+    inputsControllers: inputControllers.slice(0, 2),
+    popoverFieldsControllers: inputControllers.slice(3, 5),
+    dynamicTagsControllers: inputControllers[2],
+  };
 
   return (
     <form
@@ -214,15 +216,18 @@ export function TaskTemplateCreationController({
       onSubmit={form.handleSubmit(handleSubmit)}
     >
       <ControlledInputList
-        items={controllerInputsControllers}
+        items={controllers.inputsControllers}
         form={form}
         setRef={setRef}
         observedRefs={observedRefs}
         onOpenChange={openingCallback}
       />
-      <DynamicTag {...dynamicTagsControllers} itemList={diplomaDatas.tagData} />
+      <DynamicTag
+        {...controllers.dynamicTagsControllers}
+        itemList={diplomaDatas.tagData}
+      />
       <PopoverFieldWithControllerAndCommandsList
-        items={popoverFieldsControllers}
+        items={controllers.popoverFieldsControllers}
         form={form}
         setRef={setRef}
         onSelect={handleCommandSelection}
