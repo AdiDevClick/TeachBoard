@@ -67,7 +67,7 @@ export function PopoverField({
   // Meta data for this field instance
   const memoizedMeta = useMemo(
     () => ({
-      task: rest?.task,
+      task: rest?.task ?? "none",
       apiEndpoint: rest?.apiEndpoint,
       dataReshapeFn: rest?.dataReshapeFn,
       name: state.fieldName,
