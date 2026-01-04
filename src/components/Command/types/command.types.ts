@@ -1,6 +1,7 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { Command, CommandItem } from "@/components/ui/command.tsx";
 import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
+import type { BivariantCallback } from "@/utils/types/types.utils.ts";
 import type { ComponentProps, ReactNode } from "react";
 
 /** A heading with a title and corresponding values */
@@ -17,7 +18,8 @@ export type DetailedCommandItem = CommandItemType & {
 export type CommandItemType = {
   id: UUID;
   value: string;
-  name: string;
+  name?: string;
+  label?: string;
   [key: string]: unknown;
 };
 
@@ -34,7 +36,9 @@ export type CommandsProps = {
   commandHeadings?: HeadingType[];
   queryRecordsKey?: string[];
   /** Callback appelé quand un item de commande est sélectionné */
-  onSelect?: (value: string, commandItem: CommandItemType) => void;
+  onSelect?: BivariantCallback<
+    (value: string, commandItem: CommandItemType) => void
+  >;
 } & Omit<ComponentProps<typeof Command>, "onSelect">;
 
 /**
@@ -42,7 +46,7 @@ export type CommandsProps = {
  */
 export type CommandSelectionItemProps = {
   command: CommandItemType & { isSelected?: boolean };
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   selectedValue: string | Set<string>;
 } & Omit<ComponentProps<typeof CommandItem>, "onSelect"> &
   Omit<CommandsProps, "commandHeadings">;
