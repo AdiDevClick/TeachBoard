@@ -1,7 +1,38 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
-import type { HeadingType } from "@/components/Command/types/command.types.ts";
-import type { ClassCreationInputItem } from "@/models/class-creation.models.ts";
+import type ClassCreation from "@/components/ClassCreation/ClassCreation.tsx";
+import type {
+  DetailedCommandItem,
+  HeadingType,
+} from "@/components/Command/types/command.types.ts";
+import type {
+  ClassCreationFormSchema,
+  ClassCreationInputItem,
+} from "@/models/class-creation.models.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
+import type { UseFormReturn } from "react-hook-form";
+
+type UserFullName = {
+  firstName?: string;
+  lastName?: string;
+};
+
+export type DetailedItem = DetailedCommandItem & UserFullName;
+
+export type ClassCreationExtendedFormSchema = ClassCreationFormSchema & {
+  primaryTeacherValue?: Map<UUID, DetailedItem>;
+  tasksValues?: Map<UUID, DetailedCommandItem>;
+  studentsValues?: Map<UUID, DetailedItem>;
+};
+
+/**
+ * Props for ClassCreationController component
+ */
+export type ClassCreationControllerProps = Readonly<
+  {
+    form: UseFormReturn<ClassCreationExtendedFormSchema>;
+    formId: string;
+  } & Omit<Parameters<typeof ClassCreation>[0], "modalMode">
+>;
 
 /**
  * Simple mutable ref shape (compatible with React's `useRef` result).
