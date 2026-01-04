@@ -70,6 +70,8 @@ export type AppModalNames =
   | "new-degree-module-skill"
   | "new-task-template"
   | "new-task-item"
+  // Used by TaskTemplateCreationController in the input - Not an actual modal
+  | "new-task-skill"
   | "search-students"
   | "search-primaryteacher";
 
