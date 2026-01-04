@@ -157,18 +157,6 @@ export function TaskTemplateCreationController({
   };
 
   /**
-   * Handle opening of the VerticalFieldSelect component
-   *
-   * @description When opening, FETCH data based on the select's meta information
-   *
-   * @param open - Whether the select is opening
-   * @param metaData - The meta data from the popover field that was opened
-   */
-  const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
-    openingCallback(open, metaData, inputControllers);
-  };
-
-  /**
    * Handle selection from command list
    *
    * @param value - Selected value
@@ -217,7 +205,7 @@ export function TaskTemplateCreationController({
         form={form}
         setRef={setRef}
         observedRefs={observedRefs}
-        onOpenChange={handleOpening}
+        onOpenChange={openingCallback}
       />
       <DynamicTag {...inputControllers[2]} itemList={diplomaDatas.tagData} />
       <PopoverFieldWithControllerAndCommandsList
@@ -225,7 +213,7 @@ export function TaskTemplateCreationController({
         form={form}
         setRef={setRef}
         onSelect={handleCommandSelection}
-        onOpenChange={handleOpening}
+        onOpenChange={openingCallback}
         observedRefs={observedRefs}
         onAddNewItem={newItemCallback}
         commandHeadings={resultsCallback([
