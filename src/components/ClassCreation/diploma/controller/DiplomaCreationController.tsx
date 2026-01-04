@@ -1,10 +1,8 @@
 import type { DiplomaCreationControllerProps } from "@/components/ClassCreation/diploma/types/diploma-creation.types.ts";
-import type { CommandsProps } from "@/components/Command/types/command.types.ts";
 import {
   PopoverFieldWithCommands,
   PopoverFieldWithControllerAndCommandsList,
 } from "@/components/Popovers/PopoverField.tsx";
-import type { PopoverFieldProps } from "@/components/Popovers/types/popover.types.ts";
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
@@ -12,68 +10,6 @@ import type { HandleOpeningCallbackParams } from "@/hooks/database/types/use-com
 import type { DiplomaCreationFormSchema } from "@/models/diploma-creation.models.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWatch } from "react-hook-form";
-
-export const inputs = [
-  {
-    task: "new-degree-item-field",
-    name: "diplomaFieldId",
-    label: "Métier / Domaine du diplôme",
-    placeholder: "Sélectionnez...",
-    creationButtonText: "Ajouter un métier ou domaine",
-    useButtonAddNew: true,
-    useCommands: true,
-    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.FIELD,
-    dataReshapeFn: API_ENDPOINTS.GET.DEGREES.dataReshape,
-    id: "diploma-field-input",
-  },
-  {
-    task: "new-degree-item-year",
-    name: "yearId",
-    label: "Année scolaire",
-    placeholder: "Sélectionnez...",
-    creationButtonText: "Ajouter une année scolaire",
-    useButtonAddNew: true,
-    useCommands: true,
-    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.YEAR,
-    dataReshapeFn: API_ENDPOINTS.GET.DEGREES.dataReshape,
-    id: "school-year-input",
-  },
-  {
-    task: "new-degree-item-degree",
-    name: "levelId",
-    label: "Diplôme / Niveau scolaire",
-    placeholder: "Sélectionnez...",
-    creationButtonText: "Ajouter un niveau scolaire",
-    useButtonAddNew: true,
-    useCommands: true,
-    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.LEVEL,
-    dataReshapeFn: API_ENDPOINTS.GET.DEGREES.dataReshape,
-    id: "school-level-input",
-  },
-  {
-    id: "add-module-skills",
-    apiEndpoint: API_ENDPOINTS.GET.SKILLS.endPoints.MODULES,
-    dataReshapeFn: API_ENDPOINTS.GET.SKILLS.dataReshape,
-    task: "new-degree-module",
-    name: "mainSkillsList",
-    title: "Modules",
-    type: "text",
-    useButtonAddNew: true,
-    creationButtonText: "Ajouter un module",
-    useCommands: true,
-    placeholder: "Recherchez des modules...",
-  },
-] satisfies (PopoverFieldProps & CommandsProps)[];
-// ] satisfies Parameters<typeof VerticalFieldSelectWithCommands>[];
-
-const defaultState = {
-  selected: false,
-  role: "",
-  isEditing: false,
-  prevText: "",
-  newText: "",
-  selectedText: "",
-};
 
 /**
  * Diploma creation controller component
@@ -89,6 +25,7 @@ export function DiplomaCreationController({
   pageId,
   form,
   formId,
+  inputControllers = [],
   ...props
 }: Readonly<DiplomaCreationControllerProps>) {
   const {
@@ -177,6 +114,11 @@ export function DiplomaCreationController({
     });
   };
 
+  const controllers = {
+    popoverControllers: inputControllers.slice(0, 3),
+    tagListController: inputControllers[3],
+  };
+
   return (
     <form
       id={formId}
@@ -184,7 +126,7 @@ export function DiplomaCreationController({
       onSubmit={form.handleSubmit(handleSubmit)}
     >
       <PopoverFieldWithControllerAndCommandsList
-        items={inputs.slice(0, 3)}
+        items={controllers.popoverControllers}
         form={form}
         commandHeadings={resultsCallback()}
         onSelect={onSelectHandler}
@@ -196,7 +138,7 @@ export function DiplomaCreationController({
       <ControlledDynamicTagList
         form={form}
         setRef={setRef}
-        {...inputs[3]}
+        {...controllers.tagListController}
         observedRefs={observedRefs}
         itemList={currentSkills}
       />
@@ -208,7 +150,7 @@ export function DiplomaCreationController({
         observedRefs={observedRefs}
         onAddNewItem={newItemCallback}
         commandHeadings={resultsCallback()}
-        {...inputs[3]}
+        {...controllers.tagListController}
       />
     </form>
   );
