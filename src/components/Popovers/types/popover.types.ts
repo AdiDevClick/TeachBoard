@@ -8,7 +8,7 @@ import type {
 } from "@/components/Inputs/types/inputs.types.ts";
 import type { VerticalSelectProps } from "@/components/Selects/types/select.types.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
-import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
+import type { CommandHandlerMetaData } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { BivariantCallback } from "@/utils/types/types.utils.ts";
 import type { ButtonProps } from "react-day-picker";
 
@@ -47,15 +47,7 @@ export type PopoverFieldState = {
   fieldName?: string;
 };
 
-type MetaPopoverInputLike = {
-  apiEndpoint?: ApiEndpointType;
-  dataReshapeFn?: DataReshapeFn;
-};
-
-export type MetaDatasPopoverField<TInput = MetaPopoverInputLike> = Omit<
-  HandleAddNewItemParams<TInput>,
-  "e"
-> & {
+export type MetaDatasPopoverField = CommandHandlerMetaData & {
   name?: string;
   id?: string;
 };
