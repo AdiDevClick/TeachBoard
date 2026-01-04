@@ -31,6 +31,6 @@ export type MutationObserverEntry = {
 };
 
 export type UseMutationObserverReturn = {
-  setRef: SetRefFunction;
-  observedRefs: UniqueSet<string, MutationObserverEntry>;
+  setRef?: SetRefFunction;
+  observedRefs?: UniqueSet<string, MutationObserverEntry>;
 };

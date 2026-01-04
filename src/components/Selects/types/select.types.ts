@@ -54,7 +54,7 @@ export type VerticalRefSetters = {
  */
 export type VerticalSelectProps = Omit<
   ComponentProps<typeof Select>,
-  "form"
+  "form" | "onValueChange"
 > & {
   ref?: Ref<VerticalRefSetters>;
   controllerRef?: Ref<VerticalRefSetters>;
@@ -72,6 +72,11 @@ export type VerticalSelectProps = Omit<
   side?: ComponentProps<typeof SelectContent>["side"];
   setRef?: (node?: Element | null, meta?: Record<string, unknown>) => void;
   id?: string;
+  /**
+   * Allow value-change handlers that accept extra args.
+   * The underlying Select will still call it with a single `value`.
+   */
+  onValueChange?: (value: string, ...args: unknown[]) => void;
 } & PropsWithChildren;
 
 type LabelledGroupBaseProps<T> = {
