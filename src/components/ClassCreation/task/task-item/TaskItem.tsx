@@ -34,8 +34,6 @@ export function TaskItem({
   modalMode = true,
   ...props
 }: Readonly<PageWithControllers<TaskItemCreationInputItem>>) {
-  const formId = pageId + "-form";
-
   const form = useForm<TaskItemFormSchema>({
     resolver: zodResolver(taskItemCreationSchema),
     mode: "onTouched",
@@ -44,6 +42,8 @@ export function TaskItem({
       description: "",
     },
   });
+
+  const formId = pageId + "-form";
 
   const commonProps = useMemo(
     () => ({
