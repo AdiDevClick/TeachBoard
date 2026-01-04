@@ -168,7 +168,6 @@ export function TaskTemplateCreationController({
           `TaskTemplateCreationController Selected task item has no ID, selection ignored`,
           commandItemDetails
         );
-        return;
       }
       form.setValue("taskId", commandItemDetails.id, { shouldValidate: true });
       return;
@@ -192,6 +191,7 @@ export function TaskTemplateCreationController({
         shouldValidate: true,
       }
     );
+    console.log(form.getValues("skills"));
   };
 
   if (
