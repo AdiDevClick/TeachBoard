@@ -10,6 +10,7 @@ import {
   NO_QUERY_LOGS,
 } from "@/configs/app.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
+import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import type {
@@ -24,7 +25,6 @@ import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { type QueryKey, useQueryClient } from "@tanstack/react-query";
 import { startTransition, useCallback, useEffect, useRef } from "react";
 import type { FieldValues, Path, PathValue } from "react-hook-form";
-import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 
 /**
  * Custom hook to handle command operations including data fetching, dialog management, and form submissions.
@@ -164,7 +164,7 @@ export function useCommandHandler<
       setFetchParams((prev) => ({
         ...prev,
         dataReshapeFn: dataReshapeFn ?? prev.dataReshapeFn,
-        url: apiEndpoint ?? prev.url,
+        url: (apiEndpoint ?? prev.url) as string,
         contentId: task ?? prev.contentId,
       }));
     },
