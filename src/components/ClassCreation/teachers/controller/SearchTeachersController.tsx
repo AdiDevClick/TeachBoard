@@ -1,7 +1,7 @@
 import { resetSelectedItemsFromCache } from "@/components/ClassCreation/functions/class-creation.functions.ts";
 import type { SearchPrimaryTeacherControllerProps } from "@/components/ClassCreation/teachers/types/search-teachers.types.ts";
 import { CommandItemsForComboBox } from "@/components/Command/CommandItems.tsx";
-import type { CommandItemType } from "@/components/Command/types/command.types.ts";
+import type { DetailedCommandItem } from "@/components/Command/types/command.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { useQueryClient } from "@tanstack/react-query";
@@ -12,8 +12,8 @@ import { useCallback, useEffect } from "react";
  *
  * @param pageId - The unique identifier for the page/component using this controller
  * @param form - The form object managing the state of selected primary teacher
- * @param selectedPrimaryTeacher - An object containing currently selected primary teacher
  * @param formId - The unique identifier for the form
+ * @param localForm - The local form instance for dialog reactivity
  * @returns A SearchPrimaryTeacherController component
  */
 export function SearchPrimaryTeacherController({
@@ -21,10 +21,10 @@ export function SearchPrimaryTeacherController({
   form,
   localForm,
   formId,
-}: Readonly<SearchPrimaryTeacherControllerProps>) {
+}: SearchPrimaryTeacherControllerProps) {
   const { closeDialog, openingCallback, resultsCallback, selectionCallback } =
     useCommandHandler({
-      form,
+      form: form!,
       pageId,
     });
 
@@ -43,17 +43,18 @@ export function SearchPrimaryTeacherController({
    * @param commandItemDetails - The details of the selected command item
    */
   const handleOnSelect = useCallback(
-    (_value: string, commandItemDetails: CommandItemType) => {
+    (_value: string, commandItemDetails: DetailedCommandItem) => {
       if (commandItemDetails.id === undefined || commandItemDetails.id === null)
         return;
 
-      const teacherId = String(commandItemDetails.id);
-      const currentTeacherId = form.getValues("primaryTeacherId");
+      const teacherId = commandItemDetails.id;
+      const currentTeacherId = form!.getValues("primaryTeacherId");
 
       // Deselect the previous teacher in cache if there was one
       if (currentTeacherId && currentTeacherId !== teacherId) {
         const previousTeacherValue =
-          form.getValues("primaryTeacherValue") ?? [];
+          form!.getValues("primaryTeacherValue") ?? [];
+
         resetSelectedItemsFromCache(
           ["search-primaryteacher", API_ENDPOINTS.GET.TEACHERS.endpoint],
           previousTeacherValue,
@@ -71,7 +72,7 @@ export function SearchPrimaryTeacherController({
       // Sync the dialog-local form (reactivity)
       localForm.setValue(
         "primaryTeacherId",
-        form.getValues("primaryTeacherId") ?? [],
+        form!.getValues("primaryTeacherId") as string,
         { shouldValidate: true }
       );
 
@@ -86,14 +87,14 @@ export function SearchPrimaryTeacherController({
    * @description Sets up the fetch parameters for retrieving students and triggers the fetch on component mount.
    */
   useEffect(() => {
-    const metaData: Record<string, unknown> = {
+    const metaData = {
       dataReshapeFn: API_ENDPOINTS.GET.TEACHERS.dataReshape,
       apiEndpoint: API_ENDPOINTS.GET.TEACHERS.endpoint,
       task: pageId,
       form,
     };
 
-    openingCallback(true, metaData, null);
+    openingCallback(true, metaData);
   }, []);
 
   const handleSubmit = () => {

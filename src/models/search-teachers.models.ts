@@ -12,8 +12,7 @@ const dataField = {
 const searchPrimaryTeacherModel = (data: typeof dataField) =>
   z.object({
     primaryTeacherId: z
-      .array(z.uuid(data.primaryTeacherValidUuidMessage))
-      .max(1, data.primaryTeacherMaxLengthMessage)
+      .uuid(data.primaryTeacherValidUuidMessage)
       .nonempty(data.primaryTeachersNotEmptyMessage)
       .nonoptional()
       .describe("Identifiant unique pour le professeur"),

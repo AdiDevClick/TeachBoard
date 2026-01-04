@@ -1,4 +1,5 @@
 import { SearchPrimaryTeacherController } from "@/components/ClassCreation/teachers/controller/SearchTeachersController.tsx";
+import type { SearchPrimaryTeacherProps } from "@/components/ClassCreation/teachers/types/search-teachers.types.ts";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import {
   type SearchPrimaryTeacherFormSchema,
@@ -26,7 +27,7 @@ export function SearchPrimaryTeacher({
   pageId = "search-primaryteacher",
   modalMode = true,
   ...props
-}) {
+}: SearchPrimaryTeacherProps) {
   const localForm = useForm<SearchPrimaryTeacherFormSchema>({
     resolver: zodResolver(SearchPrimaryTeacherSchema),
     mode: "onTouched",
