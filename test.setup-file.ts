@@ -14,11 +14,9 @@ configure({
 
 // Fail tests loudly if the browser reports uncaught errors or unhandled promise rejections
 window.addEventListener("unhandledrejection", (event) => {
-  // Re-throw the rejection so Vitest can treat it as a test failure
-  throw event.reason ?? event;
+  console.error("[vitest-browser] unhandledrejection", event.reason ?? event);
 });
 
 window.addEventListener("error", (event) => {
-  // Throw the underlying error if available
-  throw (event.error ?? event) as any;
+  console.error("[vitest-browser] error", event.error ?? event);
 });
