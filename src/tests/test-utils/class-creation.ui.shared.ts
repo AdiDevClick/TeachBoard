@@ -4,9 +4,9 @@ import { testQueryClient } from "@/tests/test-utils/AppTestWrapper";
 import { getOpenPopoverCommandItemTexts } from "@/tests/test-utils/vitest-browser.helpers";
 import { beforeEach, expect, vi } from "vitest";
 
-export async function expectPopoverToContain(text: RegExp) {
+export async function expectPopoverToContain(text: RegExp, timeout = 500) {
   await expect
-    .poll(() => getOpenPopoverCommandItemTexts().join(" "), { timeout: 500 })
+    .poll(() => getOpenPopoverCommandItemTexts().join(" "), { timeout })
     .toMatch(text);
 }
 
