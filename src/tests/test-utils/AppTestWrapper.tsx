@@ -6,6 +6,13 @@ import { MemoryRouter } from "react-router-dom";
 
 export const testQueryClient = new QueryClient();
 
+/**
+ * AppTestWrapper component to provide necessary context for testing.
+ *
+ * @description You can use this wrapper to wrap your components in tests to provide necessary context such as routing, query client, dialogs, and sidebar.
+ *
+ * @param children - child components to be wrapped
+ */
 export function AppTestWrapper({
   children,
 }: Readonly<PropsWithChildren<unknown>>) {
