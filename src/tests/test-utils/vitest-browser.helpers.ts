@@ -75,7 +75,7 @@ function findLabelElementScoped(
       document.querySelectorAll<HTMLElement>('[data-slot="dialog-content"]')
     );
     const lastVisibleDialog = [...dialogContents].reverse().find((el) => {
-      if (el.getAttribute("data-state") === "open") return true;
+      if (el.dataset.state === "open") return true;
       try {
         const style = getComputedStyle(el);
         return style.display !== "none" && style.visibility !== "hidden";
@@ -116,10 +116,8 @@ function getTriggerFromLabelElement(
     throw new TypeError(`Popover container not found for label: ${label}`);
 
   const trigger =
-    (container.querySelector(
-      'button[data-slot="popover-trigger"]'
-    ) as HTMLElement | null) ??
-    (container.querySelector("button") as HTMLElement | null);
+    container.querySelector<HTMLElement>('button[data-slot="popover-trigger"]') ??
+    container.querySelector<HTMLElement>("button");
 
   if (!trigger)
     throw new TypeError(`Popover trigger button not found for label: ${label}`);
@@ -238,8 +236,8 @@ export async function openPopoverByLabelText(
   // If no items to select, we're done.
   if (!opts?.items) return;
 
-  const patterns = Array.isArray(opts.items) ? opts.items : [opts.items];
-  await selectItemsByPatterns(label, patterns as RegExp[], {
+  const patterns: RegExp[] = Array.isArray(opts.items) ? opts.items : [opts.items];
+  await selectItemsByPatterns(label, patterns, {
     withinDialog: opts?.withinDialog,
     timeout: opts?.timeout,
   });
@@ -313,7 +311,7 @@ export function getOpenCommandContainer(): HTMLElement {
     document.querySelectorAll<HTMLElement>('[data-slot="dialog-content"]')
   );
   const lastVisibleDialog = [...dialogContents].reverse().find((el) => {
-    if (el.getAttribute("data-state") === "open") return true;
+    if (el.dataset.state === "open") return true;
     try {
       const style = getComputedStyle(el);
       return style.display !== "none" && style.visibility !== "hidden";
