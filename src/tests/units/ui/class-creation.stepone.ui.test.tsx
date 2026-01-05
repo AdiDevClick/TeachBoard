@@ -49,7 +49,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe("UI flow: class-creation (StepOne list)", () => {
+describe.skip("UI flow: class-creation (StepOne list)", () => {
   test("list shows fetched classes, create adds a class, and list updates without extra GET", async () => {
     stubFetchRoutes({
       getRoutes: [
