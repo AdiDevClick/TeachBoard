@@ -46,6 +46,7 @@ export default defineConfig({
     include: ["vitest-browser-react/pure"],
   },
   test: {
+    testTimeout: 5000,
     setupFiles: ["./test.setup-file.ts"],
     browser: {
       provider: playwright(),
