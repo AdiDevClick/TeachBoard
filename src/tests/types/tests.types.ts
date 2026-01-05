@@ -16,3 +16,17 @@ export type TestFormValues = {
     [string, Partial<CommandItemType> & { isSelected?: boolean }]
   >;
 };
+
+/**
+ * Represents a cached item with optional properties.
+ */
+export type CachedItem = {
+  id?: string;
+  name?: string;
+  value?: string;
+} & Record<string, unknown>;
+
+/**
+ * Represents a cached group containing a title and an array of cached items.
+ */
+export type CachedGroup = { groupTitle: string; items: CachedItem[] };
