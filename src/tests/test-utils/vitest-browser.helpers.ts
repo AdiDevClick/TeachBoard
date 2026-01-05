@@ -266,18 +266,39 @@ async function openPopover(trigger: Parameters<typeof userEvent.click>[0]) {
       '[data-slot="popover-content"][data-state="open"]'
     ) !== null;
 
+  const isDialogOpen = () =>
+    document.querySelector(
+      '[data-slot="dialog-content"][data-state="open"]'
+    ) !== null;
+
   // If it's already open (e.g., dialog opened on top), close first so we can
   // re-open and force a re-render with updated cached data.
   if (isOpen()) {
-    // Clicking the trigger can be flaky because the popover content may cover it
-    // and intercept pointer events. Escape + outside click is more reliable.
-    await userEvent.keyboard("{Escape}");
+    // When a dialog is open, Escape may close the dialog instead of the popover.
+    // Prefer clicking outside (dialog overlay/body) to dismiss only the popover.
+    if (isDialogOpen()) {
+      const overlay = document.querySelector<HTMLElement>(
+        '[data-slot="dialog-overlay"]'
+      );
 
-    try {
+      try {
+        (overlay ?? document.body).click();
+      } catch {
+        await userEvent.click(overlay ?? document.body);
+      }
+
       await expect.poll(isOpen).toBe(false);
-    } catch {
-      await userEvent.click(document.body);
-      await expect.poll(isOpen).toBe(false);
+    } else {
+      // Clicking the trigger can be flaky because the popover content may cover it
+      // and intercept pointer events. Escape + outside click is more reliable.
+      await userEvent.keyboard("{Escape}");
+
+      try {
+        await expect.poll(isOpen).toBe(false);
+      } catch {
+        await userEvent.click(document.body);
+        await expect.poll(isOpen).toBe(false);
+      }
     }
   }
 
