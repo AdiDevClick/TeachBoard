@@ -275,13 +275,13 @@ export const skillsModulesFetched = {
   ],
 } as const;
 
-export function stubFetchWithClassCreationItems() {
-  const okJson = (payload: unknown) =>
-    Promise.resolve({
-      ok: true,
-      json: async () => ({ data: payload }),
-    } as unknown);
+const okJson = (payload: unknown) =>
+  Promise.resolve({
+    ok: true,
+    json: async () => ({ data: payload }),
+  } as unknown);
 
+export function stubFetchWithClassCreationItems() {
   const postRoutes: Array<[string, unknown]> = [
     [API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.FIELD, degreeCreatedResponse],
     [API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.YEAR, degreeCreatedResponse],
@@ -372,12 +372,6 @@ export function stubFetchRoutes({
   readonly postRoutes?: readonly StubRoute[];
   readonly defaultGetPayload?: unknown;
 }) {
-  const okJson = (payload: unknown) =>
-    Promise.resolve({
-      ok: true,
-      json: async () => ({ data: payload }),
-    } as unknown);
-
   vi.stubGlobal(
     "fetch",
     vi.fn().mockImplementation((url: string, init?: RequestInit) => {
