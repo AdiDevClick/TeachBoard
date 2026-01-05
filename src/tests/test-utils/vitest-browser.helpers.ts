@@ -116,8 +116,9 @@ function getTriggerFromLabelElement(
     throw new TypeError(`Popover container not found for label: ${label}`);
 
   const trigger =
-    container.querySelector<HTMLElement>('button[data-slot="popover-trigger"]') ??
-    container.querySelector<HTMLElement>("button");
+    container.querySelector<HTMLElement>(
+      'button[data-slot="popover-trigger"]'
+    ) ?? container.querySelector<HTMLElement>("button");
 
   if (!trigger)
     throw new TypeError(`Popover trigger button not found for label: ${label}`);
@@ -236,7 +237,9 @@ export async function openPopoverByLabelText(
   // If no items to select, we're done.
   if (!opts?.items) return;
 
-  const patterns: RegExp[] = Array.isArray(opts.items) ? opts.items : [opts.items];
+  const patterns: RegExp[] = Array.isArray(opts.items)
+    ? opts.items
+    : [opts.items];
   await selectItemsByPatterns(label, patterns, {
     withinDialog: opts?.withinDialog,
     timeout: opts?.timeout,
