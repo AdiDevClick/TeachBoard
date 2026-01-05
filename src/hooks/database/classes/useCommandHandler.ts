@@ -99,20 +99,31 @@ export function useCommandHandler<
       dataReshapeFn: HandleSubmitCallbackParams["dataReshapeFn"],
       reshapeOptions: HandleSubmitCallbackParams["reshapeOptions"] = null
     ) => {
-      if (DEV_MODE && !NO_CACHE_LOGS) {
-        console.debug("useModuleCreation handleSubmit called", variables);
-      }
-
       const options = dialogOptions(pageId);
 
       // Store variables for deferred submission
       postVariables.current = variables;
 
       // Update fetchParams - this will trigger the useEffect above
+      if (DEV_MODE && !NO_CACHE_LOGS) {
+        console.debug(
+          "handleSubmit setting fetchParams",
+          {
+            endpointUrl,
+            options,
+            cachedFetchKey: options?.queryKey,
+            dataReshapeFn: dataReshapeFn ?? options?.dataReshapeFn,
+          },
+          " variables:",
+          variables
+        );
+      }
+
       setFetchParams((prev) => ({
         ...prev,
         url: endpointUrl ?? options?.apiEndpoint,
-        cachedFetchKey: options?.queryKey ?? [],
+        cachedFetchKey: options?.queryKey,
+        // cachedFetchKey: options?.queryKey ?? [],
         method: API_ENDPOINTS.POST.METHOD,
         contentId: options?.task ?? pageId,
         dataReshapeFn: dataReshapeFn ?? options?.dataReshapeFn,
