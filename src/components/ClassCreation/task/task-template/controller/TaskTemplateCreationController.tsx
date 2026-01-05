@@ -71,7 +71,9 @@ export function TaskTemplateCreationController({
       ? `${selectedDiploma?.degreeField} - ${selectedDiploma?.degreeLevel} ${selectedDiploma?.degreeYear}`
       : "Aucun diplôme sélectionné";
     newTagSet.set(diplomaTag, []);
-
+    if (DEV_MODE && !NO_CACHE_LOGS) {
+      console.log("Selected diploma => : ", selectedDiploma);
+    }
     return {
       diploma: selectedDiploma,
       shortTemplatesList: dialogData?.shortTemplatesList ?? [],
@@ -191,7 +193,6 @@ export function TaskTemplateCreationController({
         shouldValidate: true,
       }
     );
-    console.log(form.getValues("skills"));
   };
 
   if (
