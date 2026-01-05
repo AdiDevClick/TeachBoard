@@ -178,7 +178,7 @@ describe("UI flow: create-diploma (from class-creation)", () => {
     await expect
       .poll(
         () =>
-          !!Array.from(document.querySelectorAll("*")).find((el) =>
+          Array.from(document.querySelectorAll("*")).some((el) =>
             new RegExp(diplomaFetchedSkills[0].mainSkillName, "i").test(
               el.textContent ?? ""
             )
