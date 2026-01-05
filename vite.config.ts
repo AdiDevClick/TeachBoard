@@ -42,6 +42,9 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    include: ["vitest-browser-react/pure"],
+  },
   test: {
     setupFiles: ["./test.setup-file.ts"],
     browser: {
