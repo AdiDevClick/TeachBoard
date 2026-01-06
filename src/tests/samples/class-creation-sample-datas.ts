@@ -354,44 +354,5 @@ export function stubFetchWithClassCreationItems() {
   );
 }
 
-export type StubRoute = readonly [match: string, payload: unknown];
-
-/**
- * Generic fetch stub for UI tests.
- *
- * Use this in unit tests instead of the catch-all `stubFetchWithClassCreationItems()`.
- * Tests can provide only the endpoints they need, while still exercising the real
- * `useCommandHandler` fetch flow.
- */
-export function stubFetchRoutes({
-  getRoutes = [],
-  postRoutes = [],
-  defaultGetPayload = [],
-}: {
-  readonly getRoutes?: readonly StubRoute[];
-  readonly postRoutes?: readonly StubRoute[];
-  readonly defaultGetPayload?: unknown;
-}) {
-  vi.stubGlobal(
-    "fetch",
-    vi.fn().mockImplementation((url: string, init?: RequestInit) => {
-      const urlStr = String(url || "");
-      const method = String(init?.method ?? "GET").toUpperCase();
-
-      if (method === "POST") {
-        for (const [match, payload] of postRoutes) {
-          if (urlStr.includes(match)) return okJson(payload);
-        }
-        return okJson({});
-      }
-
-      for (const [match, payload] of getRoutes) {
-        if (urlStr.includes(match)) return okJson(payload);
-      }
-      return okJson(defaultGetPayload);
-    })
-  );
-}
-
 // Backwards-compatible alias for existing tests
 export const degreeFetched = degreeFieldFetched;
