@@ -178,7 +178,20 @@ export function ClassCreationController({
   ) => {
     if (DEV_MODE) {
       const currentValues = form.getValues() as ClassCreationFormSchema;
-      (globalThis as any).__TB_CLASS_CREATION_LAST_INVALID_SUBMIT__ = {
+
+      type InvalidSubmitDebug = {
+        at: number;
+        keys: string[];
+        values: ClassCreationFormSchema;
+      };
+
+      type GlobalWithInvalidSubmit = typeof globalThis & {
+        __TB_CLASS_CREATION_LAST_INVALID_SUBMIT__?: InvalidSubmitDebug;
+      };
+
+      (
+        globalThis as GlobalWithInvalidSubmit
+      ).__TB_CLASS_CREATION_LAST_INVALID_SUBMIT__ = {
         at: Date.now(),
         keys: Object.keys(errors ?? {}),
         values: {
