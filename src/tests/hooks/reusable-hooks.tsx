@@ -1,7 +1,7 @@
 import type { AppModalNames } from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
+import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import { skillModal } from "@/tests/samples/command-handler-sample-datas";
-import { AppTestWrapper } from "@/tests/test-utils/AppTestWrapper";
 import getHookResults from "@/tests/test-utils/getHookResults";
 import type { TestFormValues } from "@/tests/types/tests.types.ts";
 import type { ReactNode } from "react";
