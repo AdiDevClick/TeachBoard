@@ -1,50 +1,56 @@
 import { useAppStore } from "@/hooks/store/AppStore";
 import type { User } from "@/hooks/store/types/store.types";
-import { testQueryClient } from "@/tests/test-utils/AppTestWrapper";
-import { getOpenPopoverCommandDebugText } from "@/tests/test-utils/vitest-browser.helpers";
-import { beforeEach, expect, vi } from "vitest";
+import { testQueryClient } from "@/tests/test-utils/testQueryClient";
+import type { ReactNode } from "react";
+import { beforeEach, vi } from "vitest";
+import { render } from "vitest-browser-react";
 
-export async function expectPopoverToContain(text: RegExp, timeout = 1000) {
-  await expect
-    .poll(() => getOpenPopoverCommandDebugText(), { timeout })
-    .toMatch(text);
-}
+type GlobalWithUiTestFlags = typeof globalThis & {
+  __preventNavigationAdded?: boolean;
+};
 
-export function setupUiTestState() {
-  beforeEach(() => {
-    // Prevent tests from causing a page reload via form submit/navigation which
-    // breaks the vitest browser iframe orchestration when running suites together.
-    if (!(document as any).__preventSubmitHandlerAdded) {
-      document.addEventListener("submit", (e) => e.preventDefault(), true);
-      (document as any).__preventSubmitHandlerAdded = true;
-    }
+export function setupUiTestState(
+  initialRender?: ReactNode,
+  opts?: { beforeEach?: () => void }
+) {
+  beforeEach(async () => {
+    const g = globalThis as GlobalWithUiTestFlags;
 
     // Prevent programmatic navigation (assign/replace/open) during tests which can
     // break the browser-based test runner when multiple suites run together.
-    if (!(window as any).__preventNavigationAdded) {
+    if (!g.__preventNavigationAdded) {
       try {
         // Replace with no-op implementations for the test environment.
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        window.location.assign = () => undefined;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        window.location.replace = () => undefined;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        window.open = () => null;
+        const nav = globalThis as typeof globalThis & {
+          location: Location & {
+            assign: (url: string | URL) => void;
+            replace: (url: string | URL) => void;
+          };
+          open: (
+            url?: string | URL,
+            target?: string,
+            features?: string
+          ) => Window | null;
+        };
+
+        nav.location.assign = () => undefined;
+        nav.location.replace = () => undefined;
+        nav.open = () => null;
       } catch {
         // Ignore if not allowed to override in the environment.
       }
-      (window as any).__preventNavigationAdded = true;
+      g.__preventNavigationAdded = true;
     }
 
     history.replaceState({ idx: 0 }, "", "/");
     testQueryClient.clear();
     vi.unstubAllGlobals();
 
+    // Re-install test-specific stubs (e.g. fetch routes) after globals are reset.
+    opts?.beforeEach?.();
+
     const user: User = {
-      userId: "00000000-0000-0000-0000-000000000999",
+      userId: "00000000-0000-4000-8000-000000000999",
       name: "Test User",
       email: "test.user@example.com",
       role: "TEACHER",
@@ -55,7 +61,14 @@ export function setupUiTestState() {
     };
 
     useAppStore.getState().login(user);
+
+    // Optionally render an initial tree (JSX) in the test environment.
+    if (initialRender) {
+      try {
+        await render(initialRender as Parameters<typeof render>[0]);
+      } catch {
+        // ignore failures during setup rendering
+      }
+    }
   });
 }
-
-export { AppTestWrapper } from "@/tests/test-utils/AppTestWrapper";
