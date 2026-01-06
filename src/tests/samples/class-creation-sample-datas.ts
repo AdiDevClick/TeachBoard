@@ -135,6 +135,28 @@ export const diplomaFetchedSkills: SkillsViewDto[] = [
   },
 ];
 
+// A second set of skills for another diploma used in tests to ensure
+// diploma-specific skills are handled correctly.
+export const diplomaFetchedSkills2: SkillsViewDto[] = [
+  {
+    mainSkillId: "00000000-0000-4000-8000-000000000911",
+    mainSkillCode: "MAIN_NET123",
+    mainSkillName: "Module réseau",
+    subSkills: [
+      {
+        id: "00000000-0000-4000-8000-000000000912",
+        code: "NET_SUB_01",
+        name: "Câblage",
+      },
+      {
+        id: "00000000-0000-4000-8000-000000000913",
+        code: "NET_SUB_02",
+        name: "Configuration",
+      },
+    ],
+  },
+];
+
 export const diplomaFetched: DiplomaConfigDto = {
   id: "00000000-0000-4000-8000-000000000201",
   degreeField: "Cuisine",
@@ -148,7 +170,7 @@ export const diplomaFetched2: DiplomaConfigDto = {
   degreeField: "Cuisine",
   degreeLevel: "BTS",
   degreeYear: "3A",
-  skills: diplomaFetchedSkills,
+  skills: diplomaFetchedSkills2,
 };
 
 export const diplomaCreated: CreateDiplomaResponseData = {
