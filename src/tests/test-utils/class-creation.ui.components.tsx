@@ -2,6 +2,7 @@ import type { CommandItemType } from "@/components/Command/types/command.types";
 import { PopoverFieldWithCommands } from "@/components/Popovers/PopoverField";
 import type { AppModalNames } from "@/configs/app.config";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
+import { useAppStore } from "@/hooks/store/AppStore";
 import { useForm } from "react-hook-form";
 
 /**
@@ -26,6 +27,7 @@ export function SamplePopoverInput({
   readonly options?: Record<string, unknown>;
 }) {
   const form = useForm({ defaultValues: {} });
+  const userId = useAppStore((s) => s.user?.userId);
   const { openingCallback, resultsCallback, newItemCallback } =
     useCommandHandler({
       // tests don't submit this form; we just need a RHF instance for the hook.
@@ -37,6 +39,11 @@ export function SamplePopoverInput({
     if (args.task === "new-task-template") {
       args.selectedDiploma = options?.selectedDiploma ?? null;
     }
+
+    if (args.task === "class-creation" && typeof userId === "string") {
+      args.userId = userId;
+    }
+
     newItemCallback(args);
   };
 
