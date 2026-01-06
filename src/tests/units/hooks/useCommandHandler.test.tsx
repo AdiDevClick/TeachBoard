@@ -15,7 +15,7 @@ import {
   skillQueryKeySingle,
   stubFetchWithItems,
 } from "@/tests/samples/command-handler-sample-datas";
-import { testQueryClient } from "@/tests/test-utils/AppTestWrapper";
+import { testQueryClient } from "@/tests/test-utils/testQueryClient.ts";
 import {
   waitForCache,
   waitForQueryKey,
