@@ -77,19 +77,6 @@ describe("UI flow: create-diploma (from class-creation)", () => {
       (c) => c.name === "degreeConfigId" && c.task === "create-diploma"
     )!;
 
-    render(
-      <AppTestWrapper>
-        <AppModals />
-        <SamplePopoverInput
-          pageId="class-creation"
-          controller={classDiplomasController}
-        />
-      </AppTestWrapper>
-    );
-
-    const diplomaFieldController = diplomaCreationInputControllers.find(
-      (c) => c.name === "diplomaFieldId"
-    )!;
     const diplomaYearController = diplomaCreationInputControllers.find(
       (c) => c.name === "yearId"
     )!;
@@ -100,23 +87,34 @@ describe("UI flow: create-diploma (from class-creation)", () => {
       (c) => c.name === "mainSkillsList"
     )!;
 
-    await openPopoverByLabelText(controllerLabelRegex(classDiplomasController));
-    await expectPopoverToContain(/BTS\s+1A/i);
-    await expectPopoverToContain(/BTS\s+3A/i);
+    const diplomaFieldController = diplomaCreationInputControllers.find(
+      (c) => c.name === "diplomaFieldId"
+    )!;
 
-    // Important: close the underlying popover before opening the dialog.
-    // Otherwise subsequent `openPopover*` helpers can get stuck trying to close
-    // an already-open popover while Escape would close the dialog.
-    await userEvent.keyboard("{Escape}");
-    await expect
-      .poll(
-        () =>
-          document.querySelector(
-            '[data-slot="popover-content"][data-state="open"]'
-          ) === null,
-        { timeout: 1000 }
-      )
-      .toBe(true);
+    render(
+      <AppTestWrapper>
+        <AppModals />
+        <SamplePopoverInput
+          pageId="class-creation"
+          controller={classDiplomasController}
+        />
+      </AppTestWrapper>
+    );
+
+    await openPopoverByLabelText(controllerLabelRegex(classDiplomasController));
+
+    // Ensure both diplomas are visible
+    const diplomas = [
+      new RegExp(
+        String.raw`${diplomaFetched.degreeLevel}\s+${diplomaFetched.degreeYear}`,
+        "i"
+      ),
+      new RegExp(
+        String.raw`${diplomaFetched2.degreeLevel}\s+${diplomaFetched2.degreeYear}`,
+        "i"
+      ),
+    ];
+    for (const d of diplomas) await expectPopoverToContain(d);
 
     await userEvent.click(
       page.getByRole("button", {
@@ -138,33 +136,68 @@ describe("UI flow: create-diploma (from class-creation)", () => {
 
     await openPopoverByLabelText(controllerLabelRegex(diplomaFieldController), {
       withinDialog: true,
-      items: /Cuisine/i,
       timeout: 1000,
     });
-    await expectPopoverToContain(/Informatique/i);
+
+    // Ensure all fields are visible then select
+    const fields = [degreeFieldFetched.name, degreeFieldFetched2.name];
+    for (const f of fields) await expectPopoverToContain(new RegExp(f, "i"));
+
+    await selectCommandItemInContainer(
+      getOpenCommandContainer(),
+      new RegExp(degreeFieldFetched.name, "i")
+    );
 
     await openPopoverByLabelText(controllerLabelRegex(diplomaYearController), {
       withinDialog: true,
-      items: new RegExp(degreeYearFetched.name, "i"),
       timeout: 1000,
     });
-    await expectPopoverToContain(new RegExp(degreeYearFetched2.name, "i"));
+
+    // Ensure all years are visible then select
+    const years = [degreeYearFetched.name, degreeYearFetched2.name];
+    for (const y of years) await expectPopoverToContain(new RegExp(y, "i"));
+
+    await selectCommandItemInContainer(
+      getOpenCommandContainer(),
+      new RegExp(degreeYearFetched.name, "i")
+    );
 
     await openPopoverByLabelText(controllerLabelRegex(diplomaLevelController), {
       withinDialog: true,
-      items: new RegExp(degreeLevelFetched.name, "i"),
       timeout: 1000,
     });
-    await expectPopoverToContain(new RegExp(degreeLevelFetched2.name, "i"));
+
+    const names = [degreeLevelFetched.name, degreeLevelFetched2.name];
+
+    // Ensure all items are visible before selecting (selection may close the popover)
+    for (const element of names) {
+      await expectPopoverToContain(new RegExp(element, "i"));
+    }
+
+    // Select the intended one
+    await selectCommandItemInContainer(
+      getOpenCommandContainer(),
+      new RegExp(degreeLevelFetched.name, "i")
+    );
 
     await openPopoverByTriggerName(
       controllerTriggerRegex(diplomaModuleController)
     );
-    await expectPopoverToContain(/MAIN_2F90AB/i);
-    await expectPopoverToContain(/MAIN_F4B12C/i);
+
+    const modules = [
+      skillsModulesFetched.Skills[0].code,
+      skillsModulesFetched.Skills[1].code,
+    ];
+
+    // Ensure all module options are visible first
+    for (const mod of modules) {
+      await expectPopoverToContain(new RegExp(mod, "i"));
+    }
+
+    // Select the first module
     await selectCommandItemInContainer(
       getOpenCommandContainer(),
-      /MAIN_2F90AB/i
+      new RegExp(skillsModulesFetched.Skills[0].code, "i")
     );
 
     // Multi-select popover stays open; close it via its trigger (Escape would close the dialog).
@@ -179,7 +212,7 @@ describe("UI flow: create-diploma (from class-creation)", () => {
       .poll(
         () =>
           Array.from(document.querySelectorAll("*")).some((el) =>
-            new RegExp(diplomaFetchedSkills[0].mainSkillName, "i").test(
+            new RegExp(diplomaFetchedSkills[0].mainSkillCode, "i").test(
               el.textContent ?? ""
             )
           ),
@@ -210,10 +243,15 @@ describe("UI flow: create-diploma (from class-creation)", () => {
 
     // Validate class-creation command list refreshes from cache (no extra GET)
     await openPopoverByLabelText(controllerLabelRegex(classDiplomasController));
-    await expectPopoverToContain(/BTS\s+2A/i);
+    await expectPopoverToContain(
+      new RegExp(
+        String.raw`${diplomaCreated.degreeLevel}\s+${diplomaCreated.degreeYear}`,
+        "i"
+      )
+    );
 
     expect(
       countFetchCallsByUrl(API_ENDPOINTS.GET.DIPLOMAS.endpoint, "GET")
     ).toBe(getCallsBeforeCreation);
-  }, 15000);
+  });
 });
