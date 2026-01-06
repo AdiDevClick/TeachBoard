@@ -1,6 +1,18 @@
 import { wait } from "@/utils/utils.ts";
-import { expect } from "vitest";
-import { page, userEvent } from "vitest/browser";
+import { expect, vi } from "vitest";
+import { locators, page, userEvent, type Locator } from "vitest/browser";
+
+declare module "vitest/browser" {
+  interface LocatorSelectors {
+    getByCss(css: string): Locator;
+  }
+}
+
+locators.extend({
+  getByCss(css: string) {
+    return `css=${css}`;
+  },
+});
 
 const SELECTORS = {
   dialogContent: '[data-slot="dialog-content"]',
@@ -14,10 +26,249 @@ const SELECTORS = {
   commandEmpty: '[data-slot="command-empty"], [cmdk-empty]',
 } as const;
 
-function getLastVisibleDialogContent(): HTMLElement | null {
-  const dialogContents = Array.from(
-    document.querySelectorAll<HTMLElement>(SELECTORS.dialogContent)
+type UiLastAction = {
+  at: number;
+  action: string;
+  details?: Record<string, unknown>;
+};
+
+type GlobalWithUiLastAction = typeof globalThis & {
+  __TB_UI_LAST_ACTION__?: UiLastAction;
+};
+
+export function setLastUiAction(
+  action: string,
+  details?: Record<string, unknown>
+) {
+  (globalThis as GlobalWithUiLastAction).__TB_UI_LAST_ACTION__ = {
+    at: Date.now(),
+    action,
+    details,
+  } satisfies UiLastAction;
+}
+
+export function getLastUiAction(): UiLastAction | null {
+  return (globalThis as GlobalWithUiLastAction).__TB_UI_LAST_ACTION__ ?? null;
+}
+
+export async function expectPopoverToContain(text: RegExp, timeout = 1000) {
+  await expect
+    .poll(() => getOpenPopoverCommandDebugText(), { timeout })
+    .toMatch(text);
+}
+
+export async function expectFormToHaveNoErrors(timeout = 1000) {
+  await expect
+    .poll(
+      () =>
+        page
+          .getByRole("alert")
+          .elements()
+          .map((n) => n.textContent ?? "")
+          .filter(Boolean),
+      { timeout }
+    )
+    .toEqual([]);
+}
+
+/**
+ * Verify the form is valid (submit enabled) and submit it.
+ *
+ * @param name - The exact name of the submit button.
+ */
+export async function checkFormValidityAndSubmit(
+  name: string,
+  opts?: { timeout?: number }
+) {
+  const rgx = new RegExp(`^${name}$`, "i");
+
+  const submit = page.getByRole("button", { name: rgx });
+  await expect.element(submit).toBeEnabled();
+
+  await expectFormToHaveNoErrors(opts?.timeout);
+
+  await userEvent.click(submit);
+}
+
+/**
+ * Assert that the submit button with the given name is disabled.
+ *
+ * @param name - The exact name of the submit button.
+ */
+export async function submitButtonShouldBeDisabled(name: string) {
+  const rgx = new RegExp(`^${name}$`, "i");
+  const submit = page.getByRole("button", { name: rgx });
+
+  await expect.element(submit).toBeDisabled();
+}
+
+export async function fillAndTab(
+  target: Parameters<typeof userEvent.fill>[0],
+  value: string
+) {
+  await userEvent.fill(target, value);
+  await userEvent.tab();
+}
+
+/**
+ * Fill a field and tab out, asserting the submit button is disabled right before.
+ */
+export async function fillAndTabEnsuringSubmitDisabled(
+  submitName: string,
+  target: Parameters<typeof userEvent.fill>[0],
+  value: string
+) {
+  await submitButtonShouldBeDisabled(submitName);
+  await fillAndTab(target, value);
+}
+
+/**
+ * Fill multiple fields in sequence, asserting the submit button is disabled
+ * right before each field fill.
+ */
+export async function fillFieldsEnsuringSubmitDisabled(
+  submitName: string,
+  items: Array<
+    | { label: string | RegExp; value: string }
+    | { locator: Locator; value: string }
+  >
+) {
+  for (const it of items) {
+    const target = "locator" in it ? it.locator : page.getByLabelText(it.label);
+    await fillAndTabEnsuringSubmitDisabled(submitName, target, it.value);
+  }
+}
+
+export type StubRoute = readonly [match: string, payload: unknown];
+
+const okJson = (payload: unknown) =>
+  Promise.resolve({
+    ok: true,
+    json: async () => ({ data: payload }),
+  } as unknown);
+
+/**
+ * Generic fetch stub for UI tests.
+ *
+ * Tests can provide only the endpoints they need, while still exercising the real
+ * `useCommandHandler` fetch flow.
+ */
+export function stubFetchRoutes({
+  getRoutes = [],
+  postRoutes = [],
+  defaultGetPayload = [],
+}: {
+  readonly getRoutes?: readonly StubRoute[];
+  readonly postRoutes?: readonly StubRoute[];
+  readonly defaultGetPayload?: unknown;
+}) {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockImplementation((url: string, init?: RequestInit) => {
+      const urlStr = String(url || "");
+      const method = String(init?.method ?? "GET").toUpperCase();
+
+      if (method === "POST") {
+        for (const [match, payload] of postRoutes) {
+          if (urlStr.includes(match)) return okJson(payload);
+        }
+        return okJson({});
+      }
+
+      for (const [match, payload] of getRoutes) {
+        if (urlStr.includes(match)) return okJson(payload);
+      }
+      return okJson(defaultGetPayload);
+    })
   );
+}
+
+/**
+ * Escape a string so it can be safely used inside a RegExp.
+ */
+export function escapeRegExp(value: unknown) {
+  return String(value).replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+}
+
+/**
+ * Create a case-insensitive RegExp from a value, escaping it first.
+ */
+export function rx(value: unknown) {
+  return new RegExp(escapeRegExp(value), "i");
+}
+
+/**
+ * Create a RegExp escaping multiple parts and joining with flexible whitespace (\s+).
+ */
+export function rxJoin(...parts: unknown[]) {
+  return new RegExp(parts.map(escapeRegExp).join(String.raw`\s+`), "i");
+}
+
+/**
+ * Create a RegExp that matches the value exactly (anchors) and is case-insensitive.
+ */
+export function rxExact(value: unknown) {
+  return new RegExp(`^${escapeRegExp(value)}$`, "i");
+}
+
+/**
+ * Build a query key tuple from a controller object.
+ */
+export function queryKeyFor(controller: {
+  task?: string;
+  apiEndpoint?: unknown;
+}) {
+  return [controller.task, controller.apiEndpoint];
+}
+
+/**
+ * Assert that the currently open popover contains the provided items.
+ * Items can be strings (converted via `rx`) or RegExp instances.
+ */
+export async function expectOpenPopoverToContain(
+  items: Array<string | RegExp>,
+  timeout = 1000
+) {
+  for (const it of items) {
+    const pattern = it instanceof RegExp ? it : rx(it);
+    await expectPopoverToContain(pattern, timeout);
+  }
+}
+
+/**
+ * Open a popover by label and assert listed items are present.
+ */
+export async function openPopoverAndExpectByLabel(
+  label: RegExp,
+  items: Array<string | RegExp>,
+  opts?: { withinDialog?: boolean; timeout?: number }
+) {
+  await openPopoverByLabelText(label, { withinDialog: opts?.withinDialog });
+  await expectOpenPopoverToContain(items, opts?.timeout ?? 1000);
+}
+
+/**
+ * Open a popover by trigger name (regex) and assert listed items are present.
+ */
+export async function openPopoverAndExpectByTrigger(
+  trigger: RegExp,
+  items: Array<string | RegExp>,
+  timeout = 1000
+) {
+  await openPopoverByTriggerName(trigger);
+  await expectOpenPopoverToContain(items, timeout);
+}
+
+export function getOpenDialogContent(): HTMLElement {
+  const dialog = getLastVisibleDialogContent();
+  if (!dialog) throw new TypeError("No open dialog content found");
+  return dialog;
+}
+
+function getLastVisibleDialogContent(): HTMLElement | null {
+  const dialogContents = page
+    .getByCss(SELECTORS.dialogContent)
+    .elements() as unknown as HTMLElement[];
 
   const lastVisibleDialog = [...dialogContents].reverse().find((el) => {
     if (el.dataset.state === "open") return true;
@@ -30,6 +281,54 @@ function getLastVisibleDialogContent(): HTMLElement | null {
   });
 
   return lastVisibleDialog ?? null;
+}
+
+export function isDialogOpen(): boolean {
+  return getLastVisibleDialogContent() !== null;
+}
+
+export async function waitForDialogState(
+  expectedOpen: boolean,
+  timeout = 1000
+) {
+  await expect.poll(isDialogOpen, { timeout }).toBe(expectedOpen);
+}
+
+/**
+ * Wait for dialog open/close state and assert that a given text/label is
+ * present (or absent) inside the dialog.
+ *
+ * @param label - string or RegExp to look up inside the dialog
+ * @param opts.present - true to assert presence, false to assert absence (default true)
+ * @param opts.timeout - poll timeout in ms
+ */
+export async function waitForDialogAndAssertText(
+  label: string | RegExp,
+  opts?: { present?: boolean; timeout?: number }
+) {
+  let isPresent;
+
+  const timeout = opts?.timeout ?? 1000;
+  const present = opts?.present ?? true;
+  const elements = () => page.getByText(label).elements();
+
+  // First, make sure the dialog reaches the expected open/closed state.
+  await waitForDialogState(present, timeout);
+
+  if (present) {
+    isPresent = elements().length > 0;
+  } else {
+    isPresent = elements().length === 0;
+  }
+
+  await expect.poll(() => isPresent, { timeout }).toBe(true);
+}
+
+export async function waitForPopoverState(
+  expectedOpen: boolean,
+  timeout = 500
+) {
+  await expect.poll(isPopoverOpen, { timeout }).toBe(expectedOpen);
 }
 
 function isElementActuallyVisible(
@@ -59,60 +358,6 @@ function isPopoverOpen(): boolean {
   return getOpenPopoverContent() !== null;
 }
 
-async function waitForPopoverOpen(timeout = 500) {
-  await expect.poll(isPopoverOpen, { timeout }).toBe(true);
-}
-
-async function waitForPopoverClosed(timeout = 500) {
-  await expect.poll(isPopoverOpen, { timeout }).toBe(false);
-}
-
-function dispatchDismissClick(el: Element) {
-  // Avoid locator-based clicks (actionability/visibility checks can be flaky in the
-  // vitest browser iframe). Radix dismiss logic relies on pointer events.
-  const win = el.ownerDocument.defaultView ?? globalThis;
-  const common = {
-    bubbles: true,
-    cancelable: true,
-    composed: true,
-    button: 0,
-    buttons: 1,
-    clientX: 0,
-    clientY: 0,
-  };
-
-  const pointerEvents = ["pointerdown", "pointerup"];
-  const mouseEvents = ["mousedown", "mouseup", "click"];
-
-  // PointerEvent may not exist in every environment, but in vitest-browser
-  // (real Chromium) it does.
-  if (typeof win.PointerEvent === "function") {
-    const pointerOptions = {
-      ...common,
-      pointerId: 1,
-      isPrimary: true,
-      pointerType: "mouse",
-    };
-    pointerEvents.forEach((eventName) => {
-      el.dispatchEvent(new win.PointerEvent(eventName, pointerOptions));
-    });
-  }
-
-  mouseEvents.forEach((eventName) => {
-    el.dispatchEvent(new win.MouseEvent(eventName, common));
-  });
-}
-
-async function clickTrigger(trigger: Parameters<typeof userEvent.click>[0]) {
-  // Prefer direct DOM click when possible to avoid Playwright's strict
-  // actionability checks (which can be flaky in the vitest browser iframe).
-  if (trigger instanceof HTMLElement) {
-    trigger.click();
-  } else {
-    await userEvent.click(trigger);
-  }
-}
-
 async function closeOpenPopoverIfAny() {
   if (!isPopoverOpen()) return;
 
@@ -121,38 +366,17 @@ async function closeOpenPopoverIfAny() {
   await userEvent.keyboard("{Escape}");
 
   try {
-    await waitForPopoverClosed();
+    await waitForPopoverState(false, 200);
     return;
   } catch {
-    const overlay = document.querySelector<HTMLElement>(
-      SELECTORS.dialogOverlay
-    );
+    const overlay = page
+      .getByCss(SELECTORS.dialogOverlay)
+      .query() as HTMLElement | null;
     const dismissTarget =
       (getLastVisibleDialogContent() ? overlay : null) ?? document.body;
-    dispatchDismissClick(dismissTarget);
-    await waitForPopoverClosed();
+    await userEvent.click(dismissTarget);
+    await waitForPopoverState(false, 200);
   }
-}
-
-async function openPopoverWithRetries(
-  trigger: Parameters<typeof userEvent.click>[0]
-) {
-  // In some fast UI flows (especially inside dialogs), Radix popovers can
-  // briefly open and then immediately dismiss due to late focus/state updates.
-  // Retry opening a few times and ensure it stays open for at least a tick.
-  for (let attempt = 0; attempt < 3; attempt++) {
-    await clickTrigger(trigger);
-    await waitForPopoverOpen();
-
-    // Let pending focus/state updates flush.
-    await wait(25);
-
-    if (isPopoverOpen()) return;
-  }
-
-  // One last attempt: wait a bit longer after opening.
-  await clickTrigger(trigger);
-  await waitForPopoverOpen();
 }
 
 async function detectCmdkInOpenPopover(timeout = 250): Promise<boolean> {
@@ -191,12 +415,15 @@ async function waitForPopoverToCloseOrChange(
 }
 
 function hasCmdk(container: HTMLElement | null): boolean {
-  return container?.querySelector(SELECTORS.commandRoot) !== null;
+  if (!container) return false;
+  return (
+    page.elementLocator(container).getByCss(SELECTORS.commandRoot).length > 0
+  );
 }
 
 function resetCmdkInput(container: HTMLElement): void {
   const cmdkInput = getCommandItem(container);
-  if (cmdkInput && cmdkInput.value) {
+  if (cmdkInput?.value) {
     try {
       cmdkInput.value = "";
       cmdkInput.dispatchEvent(new Event("input", { bubbles: true }));
@@ -218,7 +445,10 @@ async function waitForCmdkReady(timeout = 1500) {
         const items = getCommandItemsInContainer(open);
         if (items.length > 0) return true;
 
-        const empty = open.querySelector<HTMLElement>(SELECTORS.commandEmpty);
+        const empty = page
+          .elementLocator(open)
+          .getByCss(SELECTORS.commandEmpty)
+          .query() as HTMLElement | null;
         return empty
           ? isElementActuallyVisible(empty, { checkOpacity: true })
           : false;
@@ -234,27 +464,24 @@ type FetchMock = typeof fetch & {
   };
 };
 
-function getCallUrl(call: unknown[]): string {
+function getFetchCallUrl(call: unknown[]): string {
   const urlArg = call[0];
-
   if (typeof urlArg === "string") return urlArg;
   if (urlArg instanceof URL) return urlArg.toString();
-
   if (typeof urlArg === "object" && urlArg !== null && "url" in urlArg) {
     const withUrl = urlArg as { url?: unknown };
-    if (typeof withUrl.url === "string") return withUrl.url;
+    return typeof withUrl.url === "string" ? withUrl.url : "";
   }
-
   return "";
 }
 
-function getCallMethod(call: unknown[]): string {
+function getFetchCallMethodUpper(call: unknown[]): string {
   const init = call[1];
-  if (typeof init !== "object" || init === null) return "GET";
-  if (!("method" in init)) return "GET";
-
-  const withMethod = init as { method?: unknown };
-  return typeof withMethod.method === "string" ? withMethod.method : "GET";
+  const m =
+    typeof init === "object" && init !== null && "method" in init
+      ? (init as { method?: unknown }).method
+      : "GET";
+  return (typeof m === "string" ? m : "GET").toUpperCase();
 }
 
 export function getFetchMock(): FetchMock {
@@ -268,40 +495,72 @@ export function countFetchCalls(method?: string): number {
   if (!method) return calls.length;
 
   const upper = method.toUpperCase();
-  return calls.filter((c) => getCallMethod(c).toUpperCase() === upper).length;
+  return calls.filter((c) => getFetchCallMethodUpper(c) === upper).length;
 }
 
 export function countFetchCallsByUrl(url: string | RegExp, method?: string) {
+  return getFetchCallsByUrl(url, method).length;
+}
+
+export function getFetchCallsByUrl(url: string | RegExp, method?: string) {
   const fetchMock = getFetchMock();
   const calls = fetchMock.mock?.calls ?? [];
 
   const methodUpper = method ? method.toUpperCase() : undefined;
 
   return calls.filter((c) => {
-    const calledUrl = getCallUrl(c);
-    const calledMethod = getCallMethod(c).toUpperCase();
+    const calledUrl = getFetchCallUrl(c);
+    const calledMethod = getFetchCallMethodUpper(c);
 
     const urlMatches =
       typeof url === "string" ? calledUrl.includes(url) : url.test(calledUrl);
     const methodMatches = methodUpper ? calledMethod === methodUpper : true;
 
     return urlMatches && methodMatches;
-  }).length;
+  });
+}
+
+export function getLastFetchCallByUrl(url: string | RegExp, method?: string) {
+  const calls = getFetchCallsByUrl(url, method);
+  return calls.at(-1) ?? null;
+}
+
+function getFetchCallBodyRaw(call: unknown[]) {
+  const init = call[1] as RequestInit | undefined;
+  return init?.body;
+}
+
+export function getFetchCallJsonBody(call: unknown[]): unknown {
+  const raw = getFetchCallBodyRaw(call);
+
+  if (raw == null) return undefined;
+
+  // Most code paths use fetchJSON which sets body to JSON.stringify(payload)
+  if (typeof raw === "string") {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return raw;
+    }
+  }
+
+  // Some environments may pass a plain object.
+  if (typeof raw === "object") return raw;
+
+  return raw;
+}
+
+export function getLastPostJsonBodyByUrl(url: string | RegExp): unknown {
+  const call = getLastFetchCallByUrl(url, "POST");
+  if (!call) return null;
+  return getFetchCallJsonBody(call);
 }
 
 export async function openPopoverByTriggerName(name: RegExp) {
   await openPopover(page.getByRole("button", { name }));
 }
 
-function isVisibleElement(el: HTMLElement): boolean {
-  return isElementActuallyVisible(el, { checkOpacity: true });
-}
-
-function isNotHiddenElement(el: HTMLElement): boolean {
-  return isElementActuallyVisible(el, { checkOpacity: false });
-}
-
-function getCommandItemLabel(el: HTMLElement): string {
+function getElementLabelText(el: HTMLElement): string {
   const text = (el.textContent ?? "").trim();
   if (text) return text;
 
@@ -313,19 +572,16 @@ function getCommandItemLabel(el: HTMLElement): string {
   return (valueAttr ?? "").trim();
 }
 
-function findLabelElementScoped(
-  label: RegExp,
-  withinDialog?: boolean
-): HTMLLabelElement | undefined {
-  if (withinDialog) {
-    const scope = getLastVisibleDialogContent() ?? document.body;
-    const labelElements = Array.from(scope.querySelectorAll("label"));
-    return labelElements.find((el) =>
-      label.test((el.textContent ?? "").trim())
-    );
-  }
+function getSearchScope(withinDialog?: boolean): HTMLElement {
+  return (withinDialog ? getLastVisibleDialogContent() : null) ?? document.body;
+}
 
-  const labelElements = Array.from(document.querySelectorAll("label"));
+function findLabelElementScoped(label: RegExp, withinDialog?: boolean) {
+  const scope = getSearchScope(withinDialog);
+  const labelElements = page
+    .elementLocator(scope)
+    .getByCss("label")
+    .elements() as unknown as HTMLLabelElement[];
   return labelElements.find((el) => label.test((el.textContent ?? "").trim()));
 }
 
@@ -333,31 +589,42 @@ function getTriggerFromLabelElement(
   labelElement: HTMLLabelElement,
   label: RegExp
 ): HTMLElement {
-  const htmlFor = labelElement.getAttribute("for");
-
-  if (htmlFor) {
-    const control = document.getElementById(htmlFor);
-    if (control instanceof HTMLElement) {
-      return control;
-    } else {
-      throw new TypeError(
-        `Popover control not found for label: ${String(label)}`
-      );
-    }
-  }
+  // Prefer the built-in association instead of manual document.getElementById.
+  // This works for <label for="..."> and nested controls.
+  const control = labelElement.control;
+  if (control instanceof HTMLElement) return control;
 
   const container = labelElement.parentElement;
   if (!container)
     throw new TypeError(`Popover container not found for label: ${label}`);
 
-  const trigger =
-    container.querySelector<HTMLElement>(
-      'button[data-slot="popover-trigger"]'
-    ) ?? container.querySelector<HTMLElement>("button");
+  const containerLocator = page.elementLocator(container);
+  const trigger = (containerLocator
+    .getByCss('button[data-slot="popover-trigger"]')
+    .query() ??
+    containerLocator.getByCss("button").query()) as HTMLElement | null;
 
   if (!trigger)
     throw new TypeError(`Popover trigger button not found for label: ${label}`);
 
+  return trigger;
+}
+
+export async function clickControlByLabelText(
+  label: RegExp,
+  opts?: { withinDialog?: boolean }
+): Promise<HTMLElement> {
+  setLastUiAction("clickControlByLabelText", {
+    label: String(label),
+    withinDialog: !!opts?.withinDialog,
+  });
+  const labelElement = findLabelElementScoped(label, opts?.withinDialog);
+  if (!labelElement) {
+    throw new Error(`Label not found: ${String(label)}`);
+  }
+
+  const trigger = getTriggerFromLabelElement(labelElement, label);
+  await userEvent.click(trigger);
   return trigger;
 }
 
@@ -366,6 +633,10 @@ export async function selectCommandItemInContainer(
   pattern: RegExp,
   timeout = 500
 ) {
+  setLastUiAction("selectCommandItemInContainer", {
+    pattern: String(pattern),
+    timeout,
+  });
   // In single-select popovers, selecting an item closes the popover.
   // That close can be asynchronous (state updates/animations). If we
   // immediately open the next popover, the late "close" can accidentally
@@ -377,14 +648,14 @@ export async function selectCommandItemInContainer(
     .poll(
       () => {
         const items = getCommandItemsInContainer(container);
-        return items.some((el) => pattern.test(getCommandItemLabel(el)));
+        return items.some((el) => pattern.test(getElementLabelText(el)));
       },
       { timeout }
     )
     .toBe(true);
 
   const items = getCommandItemsInContainer(container);
-  const target = items.find((el) => pattern.test(getCommandItemLabel(el)));
+  const target = items.find((el) => pattern.test(getElementLabelText(el)));
   if (!target)
     throw new Error(
       `[ui test] Command item not found for pattern: ${String(pattern)}`
@@ -403,11 +674,7 @@ export async function selectCommandItemInContainer(
     await userEvent.clear(input);
   }
 
-  if (target instanceof HTMLElement) {
-    target.click();
-  } else {
-    await userEvent.click(target);
-  }
+  await userEvent.click(target);
 
   if (!popoverBeforeSelection) return;
 
@@ -422,9 +689,13 @@ function getCommandItemsInContainer(container: ParentNode): HTMLElement[] {
   // Most of the app uses shadcn/ui's CommandItem wrapper (data-slot="command-item"),
   // but cmdk also renders raw items with the [cmdk-item] attribute.
   // In some environments, the most stable hook is the ARIA role.
-  return Array.from(
-    container.querySelectorAll<HTMLElement>(SELECTORS.commandItems)
-  ).filter((el) => isNotHiddenElement(el));
+  if (!(container instanceof Element)) return [];
+  return (
+    page
+      .elementLocator(container)
+      .getByCss(SELECTORS.commandItems)
+      .elements() as unknown as HTMLElement[]
+  ).filter((el) => isElementActuallyVisible(el));
 }
 
 function getCommandItem(container: ParentNode): HTMLInputElement | null {
@@ -432,19 +703,31 @@ function getCommandItem(container: ParentNode): HTMLInputElement | null {
   // but cmdk also renders raw items with the [cmdk-item] attribute.
   if (!container) return null;
 
-  return container.querySelector<HTMLInputElement>(SELECTORS.commandInput);
+  if (!(container instanceof Element)) return null;
+  const el = page
+    .elementLocator(container)
+    .getByCss(SELECTORS.commandInput)
+    .query();
+  return el instanceof HTMLInputElement ? el : null;
 }
 
 async function selectItemsByPatterns(
   label: RegExp,
   patterns: RegExp[],
-  opts?: { withinDialog?: boolean; timeout?: number }
+  opts?: {
+    withinDialog?: boolean;
+    timeout?: number;
+    beforeEachSelect?: () => Promise<void>;
+  }
 ) {
   const findNewPopover = () => getOpenPopoverContent() ?? document.body;
 
   let popover = findNewPopover();
 
   for (const [i, pattern] of patterns.entries()) {
+    if (opts?.beforeEachSelect) {
+      await opts.beforeEachSelect();
+    }
     await selectCommandItemInContainer(popover, pattern, opts?.timeout ?? 500);
 
     const stillOpen = getOpenPopoverContent() === popover;
@@ -461,7 +744,12 @@ async function selectItemsByPatterns(
 
 export async function openPopoverByLabelText(
   label: RegExp,
-  opts?: { withinDialog?: boolean; items?: RegExp | RegExp[]; timeout?: number }
+  opts?: {
+    withinDialog?: boolean;
+    items?: RegExp | RegExp[];
+    timeout?: number;
+    beforeEachSelect?: () => Promise<void>;
+  }
 ) {
   // Opens a popover by finding a label and clicking its associated control/trigger.
   // If `opts.withinDialog` is true, search will be scoped to the currently open dialog.
@@ -485,16 +773,80 @@ export async function openPopoverByLabelText(
   await selectItemsByPatterns(label, patterns, {
     withinDialog: opts?.withinDialog,
     timeout: opts?.timeout,
+    beforeEachSelect: opts?.beforeEachSelect,
   });
 }
 
+/**
+ * Open a popover by label, optionally selecting item(s), asserting the submit
+ * button is disabled right before each selection.
+ */
+export async function openPopoverByLabelTextEnsuringSubmitDisabled(
+  submitName: string,
+  label: RegExp,
+  opts?: { withinDialog?: boolean; items?: RegExp | RegExp[]; timeout?: number }
+) {
+  return openPopoverByLabelText(label, {
+    ...opts,
+    beforeEachSelect: async () => submitButtonShouldBeDisabled(submitName),
+  });
+}
+
+/**
+ * Select an item in a cmdk/shadcn Command container, asserting the submit
+ * button is disabled right before selection.
+ */
+export async function selectCommandItemInContainerEnsuringSubmitDisabled(
+  submitName: string,
+  container: HTMLElement,
+  pattern: RegExp,
+  timeout = 500
+) {
+  await submitButtonShouldBeDisabled(submitName);
+  return selectCommandItemInContainer(container, pattern, timeout);
+}
+
+/**
+ * Iterate several popover selections, asserting the submit button is disabled
+ * right before each selection. Each entry controls whether we tab after selection.
+ */
+export async function selectMultiplePopoversEnsuringSubmitDisabled(
+  submitName: string,
+  selections: Array<{
+    label: RegExp;
+    items: RegExp | RegExp[];
+    withinDialog?: boolean;
+    timeout?: number;
+    tabAfter?: boolean;
+  }>
+) {
+  for (const sel of selections) {
+    await openPopoverByLabelTextEnsuringSubmitDisabled(submitName, sel.label, {
+      withinDialog: sel.withinDialog,
+      items: sel.items,
+      timeout: sel.timeout,
+    });
+
+    // Default behaviour: tab after selection to trigger onBlur/onTouched if needed.
+    if (sel.tabAfter ?? true) {
+      await userEvent.tab();
+    }
+  }
+}
+
 export async function openPopoverByContainerId(containerId: string) {
-  const container = document.getElementById(containerId);
-  if (!container) {
+  setLastUiAction("openPopoverByContainerId", { containerId });
+  const escaped =
+    typeof CSS !== "undefined" && "escape" in CSS
+      ? CSS.escape(containerId)
+      : containerId.replaceAll(/[^a-zA-Z0-9_-]/g, String.raw`\\$&`);
+
+  const container = page.getByCss(`#${escaped}`).query();
+  if (!(container instanceof HTMLElement)) {
     throw new TypeError(`Popover container not found: ${containerId}`);
   }
 
-  const trigger = container.querySelector("button");
+  const trigger = page.elementLocator(container).getByCss("button").query();
   if (!(trigger instanceof HTMLElement)) {
     throw new TypeError(`Popover trigger button not found in: ${containerId}`);
   }
@@ -507,7 +859,11 @@ async function openPopover(trigger: Parameters<typeof userEvent.click>[0]) {
   // re-open and force a re-render with updated cached data.
   await closeOpenPopoverIfAny();
 
-  await openPopoverWithRetries(trigger);
+  await userEvent.click(trigger);
+  await waitForPopoverState(true, 500);
+  // Let pending focus/state updates flush (Radix can open then dismiss quickly).
+  await wait(25);
+  await waitForPopoverState(true, 250);
 
   // In tests, cmdk's input value can persist across open/close cycles and
   // filter out all items in the next popover. Also, cmdk content may mount a
@@ -531,18 +887,21 @@ async function openPopover(trigger: Parameters<typeof userEvent.click>[0]) {
 export function getOpenPopoverContent(): HTMLElement | null {
   // Radix popovers are portaled; during fast open/close cycles, multiple
   // contents can exist in the DOM. Prefer the most recently *open* one.
-  const open = Array.from(
-    document.querySelectorAll<HTMLElement>(SELECTORS.popoverContentOpen)
-  );
-  if (open.length > 0) return open[open.length - 1];
+  const open = page
+    .getByCss(SELECTORS.popoverContentOpen)
+    .elements() as unknown as HTMLElement[];
+  const lastOpen = open.at(-1);
+  if (lastOpen) return lastOpen;
 
   // Fallback: if data-state isn't present for some reason, prefer the most
   // recently visible one.
-  const contents = Array.from(
-    document.querySelectorAll<HTMLElement>(SELECTORS.popoverContent)
+  const contents = page
+    .getByCss(SELECTORS.popoverContent)
+    .elements() as unknown as HTMLElement[];
+  const visible = contents.filter((el) =>
+    isElementActuallyVisible(el, { checkOpacity: true })
   );
-  const visible = contents.filter((el) => isVisibleElement(el));
-  return visible.length > 0 ? visible[visible.length - 1] : null;
+  return visible.at(-1) ?? null;
 }
 
 export function getOpenPopoverCommandItemTexts(): string[] {
@@ -550,17 +909,17 @@ export function getOpenPopoverCommandItemTexts(): string[] {
   if (!popover) return [];
 
   return getCommandItemsInContainer(popover)
-    .map((el) => getCommandItemLabel(el))
+    .map((el) => getElementLabelText(el))
     .filter(Boolean);
 }
 
 export function getOpenPopoverCommandDebugText(): string {
   const popover = getOpenPopoverContent();
   if (!popover) {
-    const all = Array.from(
-      document.querySelectorAll<HTMLElement>(SELECTORS.popoverContent)
-    );
-    const last = all.length > 0 ? all[all.length - 1] : null;
+    const all = page
+      .getByCss(SELECTORS.popoverContent)
+      .elements() as unknown as HTMLElement[];
+    const last = all.at(-1) ?? null;
     let styleSummary = "";
     if (last) {
       try {
@@ -578,30 +937,34 @@ export function getOpenPopoverCommandDebugText(): string {
   const itemTexts = getOpenPopoverCommandItemTexts();
   if (itemTexts.length > 0) return itemTexts.join(" ");
 
+  const popoverLoc = page.elementLocator(popover);
   const counts = {
-    command: popover.querySelectorAll('[data-slot="command"], [cmdk-root]')
+    command: popoverLoc.getByCss('[data-slot="command"], [cmdk-root]').length,
+    list: popoverLoc.getByCss('[data-slot="command-list"], [cmdk-list]').length,
+    input: popoverLoc.getByCss('[data-slot="command-input"], [cmdk-input]')
       .length,
-    list: popover.querySelectorAll('[data-slot="command-list"], [cmdk-list]')
+    empty: popoverLoc.getByCss('[data-slot="command-empty"], [cmdk-empty]')
       .length,
-    input: popover.querySelectorAll('[data-slot="command-input"], [cmdk-input]')
-      .length,
-    empty: popover.querySelectorAll('[data-slot="command-empty"], [cmdk-empty]')
-      .length,
-    slotItems: popover.querySelectorAll('[data-slot="command-item"]').length,
-    cmdkItems: popover.querySelectorAll("[cmdk-item]").length,
-    roleOptions: popover.querySelectorAll('[role="option"]').length,
-    dataValue: popover.querySelectorAll("[data-value]").length,
+    slotItems: popoverLoc.getByCss('[data-slot="command-item"]').length,
+    cmdkItems: popoverLoc.getByCss("[cmdk-item]").length,
+    roleOptions: popoverLoc.getByCss('[role="option"]').length,
+    dataValue: popoverLoc.getByCss("[data-value]").length,
   };
 
-  const input = popover.querySelector<HTMLInputElement>(
-    '[data-slot="command-input"], [cmdk-input]'
-  );
-  const emptyEl = popover.querySelector<HTMLElement>(
-    '[data-slot="command-empty"], [cmdk-empty]'
-  );
+  const input = popoverLoc
+    .getByCss('[data-slot="command-input"], [cmdk-input]')
+    .query();
+  const emptyEl = popoverLoc
+    .getByCss('[data-slot="command-empty"], [cmdk-empty]')
+    .query();
 
-  const emptyText = (emptyEl?.textContent ?? "").trim().slice(0, 80);
-  const inputValue = (input?.value ?? "").trim().slice(0, 80);
+  const emptyText = ((emptyEl as HTMLElement | null)?.textContent ?? "")
+    .trim()
+    .slice(0, 80);
+  const inputValue =
+    input instanceof HTMLInputElement
+      ? (input.value ?? "").trim().slice(0, 80)
+      : "";
 
   return `__EMPTY__ counts=${JSON.stringify(
     counts
