@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 
-const titleProps = {
+export const degreeModuleTitleProps = {
   title: "Création de nouvelles compétences",
   description:
     "Ces compétences pourront être associées aux modules de diplôme.",
@@ -57,7 +57,7 @@ export function DegreeModuleSkill({
         formState: form.formState,
         formId,
       },
-      titleProps,
+      titleProps: degreeModuleTitleProps,
       ...props,
       form,
     }),
