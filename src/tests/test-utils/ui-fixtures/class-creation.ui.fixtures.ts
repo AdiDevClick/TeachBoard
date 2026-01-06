@@ -135,12 +135,19 @@ export function fixtureCreateClassStepOne(opts?: {
             [String(classFetched.degreeLevel)]: [classFetched, classFetched2],
           },
         ],
+        // Also stub canonical endpoints to be robust to trailing slash variants
         [
-          diplomasController.apiEndpoint,
-          { [diplomaFetched.degreeField]: [diplomaFetched, diplomaFetched2] },
+          API_ENDPOINTS.GET.CLASSES.endPoints.ALL,
+          {
+            [String(classFetched.degreeLevel)]: [classFetched, classFetched2],
+          },
         ],
-        [tasksController.apiEndpoint, [taskFetched, taskFetched2]],
-        [studentsController.apiEndpoint, [studentFetched, studentFetched2]],
+        [
+          API_ENDPOINTS.GET.CLASSES.endPoints.ALL.replace(/\/$/, ""),
+          {
+            [String(classFetched.degreeLevel)]: [classFetched, classFetched2],
+          },
+        ],
       ],
       postRoutes: [
         [
@@ -238,6 +245,8 @@ export function fixtureNewTaskTemplate() {
         ],
         [taskLabelController.apiEndpoint, [taskFetched, taskFetched2]],
         [templatesController.apiEndpoint, taskTemplateFetch],
+        // Also stub the global task templates endpoint (used in some flows)
+        [API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.ALL, taskTemplateFetch],
       ],
       postRoutes: [
         [API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.endpoint, taskTemplateCreated],
