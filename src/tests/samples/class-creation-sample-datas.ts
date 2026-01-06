@@ -24,7 +24,6 @@ import type {
 import type { TeacherDto } from "@/api/types/routes/teachers.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
-import { vi } from "vitest";
 
 export const degreeFieldModal: AppModalNames = "new-degree-item-field";
 export const degreeYearModal: AppModalNames = "new-degree-item-year";
@@ -274,85 +273,6 @@ export const skillsModulesFetched = {
     },
   ],
 } as const;
-
-const okJson = (payload: unknown) =>
-  Promise.resolve({
-    ok: true,
-    json: async () => ({ data: payload }),
-  } as unknown);
-
-export function stubFetchWithClassCreationItems() {
-  const postRoutes: Array<[string, unknown]> = [
-    [API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.FIELD, degreeCreatedResponse],
-    [API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.YEAR, degreeCreatedResponse],
-    [API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.LEVEL, degreeCreatedResponse],
-    [API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint, diplomaCreated],
-    [API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.endpoint, taskTemplateCreated],
-    [API_ENDPOINTS.POST.CREATE_TASK.endpoint, taskCreated],
-    [API_ENDPOINTS.POST.CREATE_CLASS.endpoint, classCreated],
-  ];
-
-  const getRoutes: Array<[string, unknown]> = [
-    [degreeFieldEndpoint, [degreeFieldFetched, degreeFieldFetched2]],
-    [degreeYearEndpoint, [degreeYearFetched, degreeYearFetched2]],
-    [degreeLevelEndpoint, [degreeLevelFetched, degreeLevelFetched2]],
-    [
-      diplomaEndpoint,
-      { [diplomaFetched.degreeField]: [diplomaFetched, diplomaFetched2] },
-    ],
-    [tasksEndpoint, [taskFetched, taskFetched2]],
-    [taskTemplatesEndpoint, taskTemplateFetch],
-    ["/api/task-templates/by-degree-config/", taskTemplateFetch],
-    [
-      classesEndpoint,
-      {
-        [String(classFetched.degreeLevel)]: [classFetched, classFetched2],
-      },
-    ],
-    [API_ENDPOINTS.GET.STUDENTS.endpoint, [studentFetched, studentFetched2]],
-    [API_ENDPOINTS.GET.TEACHERS.endpoint, [teacherFetched, teacherFetched2]],
-    [
-      API_ENDPOINTS.GET.SKILLS.endPoints.MODULES,
-      {
-        Skills: [
-          {
-            id: "00000000-0000-0000-0000-000000000901",
-            code: "MAIN_2F90AB",
-            name: "Module cuisine",
-            type: "MAIN",
-          },
-          {
-            id: "00000000-0000-0000-0000-000000000904",
-            code: "MAIN_F4B12C",
-            name: "Module réseaux",
-            type: "MAIN",
-          },
-        ],
-      },
-    ],
-  ];
-
-  vi.stubGlobal(
-    "fetch",
-    vi.fn().mockImplementation((url: string, init?: RequestInit) => {
-      const urlStr = String(url || "");
-      const method = String(init?.method ?? "GET").toUpperCase();
-
-      if (method === "POST") {
-        for (const [match, payload] of postRoutes) {
-          if (urlStr.includes(match)) return okJson(payload);
-        }
-
-        return okJson({});
-      }
-
-      for (const [match, payload] of getRoutes) {
-        if (urlStr.includes(match)) return okJson(payload);
-      }
-      return okJson([]);
-    })
-  );
-}
 
 // Backwards-compatible alias for existing tests
 export const degreeFetched = degreeFieldFetched;
