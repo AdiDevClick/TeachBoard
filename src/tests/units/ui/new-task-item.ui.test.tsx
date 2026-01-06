@@ -7,9 +7,9 @@ import {
   taskFetched,
   taskFetched2,
 } from "@/tests/samples/class-creation-sample-datas";
+import { fixtureNewTaskItem } from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { assertPostUpdatedCacheWithoutExtraGet } from "@/tests/test-utils/tests.functions";
-import { fixtureNewTaskItem } from "@/tests/test-utils/ui-fixtures/class-creation.ui.fixtures";
 import {
   checkFormValidityAndSubmit,
   countFetchCallsByUrl,

@@ -4,13 +4,13 @@ import { AppModals } from "@/pages/AllModals/AppModals";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import { SamplePopoverInput } from "@/tests/components/class-creation/SamplePopoverInput";
 import { diplomaFetchedSkills } from "@/tests/samples/class-creation-sample-datas";
+import { fixtureNewTaskTemplate } from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import {
   controllerLabelRegex,
   controllerTriggerRegex,
 } from "@/tests/test-utils/class-creation/regex.functions";
 import { assertPostUpdatedCacheWithoutExtraGet } from "@/tests/test-utils/tests.functions";
-import { fixtureNewTaskTemplate } from "@/tests/test-utils/ui-fixtures/class-creation.ui.fixtures";
 import {
   checkFormValidityAndSubmit,
   countFetchCallsByUrl,

@@ -18,6 +18,13 @@ import {
   taskTemplateCreated,
   taskTemplateModal,
 } from "@/tests/samples/class-creation-sample-datas";
+import {
+  fixtureCreateClassStepOne,
+  fixtureCreateDiplomaFromClassCreation,
+  fixtureNewDegreeItem,
+  fixtureNewTaskItem,
+  fixtureNewTaskTemplate,
+} from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
 import { testQueryClient } from "@/tests/test-utils/testQueryClient";
 import {
   click,
@@ -26,13 +33,6 @@ import {
   waitForPost,
   waitForQueryKey,
 } from "@/tests/test-utils/tests.functions";
-import {
-  fixtureCreateClassStepOne,
-  fixtureCreateDiplomaFromClassCreation,
-  fixtureNewDegreeItem,
-  fixtureNewTaskItem,
-  fixtureNewTaskTemplate,
-} from "@/tests/test-utils/ui-fixtures/class-creation.ui.fixtures";
 import {
   countFetchCalls,
   countFetchCallsByUrl,

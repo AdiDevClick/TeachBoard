@@ -10,6 +10,7 @@ import {
   studentFetched,
   taskFetched,
 } from "@/tests/samples/class-creation-sample-datas";
+import { fixtureCreateClassStepOne } from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import {
   controllerLabelRegex,
@@ -19,7 +20,6 @@ import {
   assertPostUpdatedCacheWithoutExtraGet,
   waitForCache,
 } from "@/tests/test-utils/tests.functions";
-import { fixtureCreateClassStepOne } from "@/tests/test-utils/ui-fixtures/class-creation.ui.fixtures";
 import {
   clickControlByLabelText,
   countFetchCallsByUrl,

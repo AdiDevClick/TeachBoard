@@ -8,10 +8,10 @@ import {
   degreeFieldFetched,
   degreeFieldFetched2,
 } from "@/tests/samples/class-creation-sample-datas";
+import { fixtureNewDegreeItem } from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { controllerLabelRegex } from "@/tests/test-utils/class-creation/regex.functions";
 import { assertPostUpdatedCacheWithoutExtraGet } from "@/tests/test-utils/tests.functions";
-import { fixtureNewDegreeItem } from "@/tests/test-utils/ui-fixtures/class-creation.ui.fixtures";
 import {
   checkFormValidityAndSubmit,
   countFetchCallsByUrl,

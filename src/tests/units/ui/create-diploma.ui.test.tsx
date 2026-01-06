@@ -1,8 +1,8 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { diplomaFetchedSkills } from "@/tests/samples/class-creation-sample-datas";
+import { fixtureCreateDiplomaFromClassCreation } from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { assertPostUpdatedCacheWithoutExtraGet } from "@/tests/test-utils/tests.functions";
-import { fixtureCreateDiplomaFromClassCreation } from "@/tests/test-utils/ui-fixtures/class-creation.ui.fixtures";
 import {
   checkFormValidityAndSubmit,
   countFetchCallsByUrl,
