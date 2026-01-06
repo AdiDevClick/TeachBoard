@@ -22,8 +22,14 @@ import type {
 } from "@/hooks/database/types/use-command-handler.types.ts";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
-import { type QueryKey, useQueryClient } from "@tanstack/react-query";
-import { startTransition, useCallback, useEffect, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import type { FieldValues, Path, PathValue } from "react-hook-form";
 
 /**
@@ -58,6 +64,14 @@ export function useCommandHandler<
 
   const hasStartedCreation = useRef(false);
   const postVariables = useRef<MutationVariables>(null);
+
+  const currentQueryCacheAndKey = useMemo(() => {
+    const key = [fetchParams.contentId, fetchParams.url];
+    return {
+      cacheKey: key,
+      cachedData: queryClient.getQueryData<HeadingType[]>(key),
+    };
+  }, [queryClient, fetchParams, data]);
 
   /**
    * Handle adding a new item/feature
@@ -289,21 +303,23 @@ export function useCommandHandler<
     * ```
    */
   const handleDataCacheUpdate = useCallback((): HeadingType[] | undefined => {
-    const queryKey = [fetchParams.contentId, fetchParams.url];
-    const cachedData = queryClient.getQueryData<HeadingType[]>(
-      queryKey as QueryKey
-    );
-
     if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Cached data for ", queryKey, " is ", cachedData);
+      console.log(
+        "Cached data for ",
+        currentQueryCacheAndKey.cacheKey,
+        " is ",
+        currentQueryCacheAndKey.cachedData
+      );
     }
 
-    if (cachedData === undefined) {
-      return data as HeadingType[] | undefined;
-    }
-
-    return cachedData;
-  }, [queryClient, fetchParams.contentId, fetchParams.url, data]);
+    return (currentQueryCacheAndKey.cachedData ?? data) as
+      | HeadingType[]
+      | undefined;
+  }, [
+    currentQueryCacheAndKey.cacheKey,
+    currentQueryCacheAndKey.cachedData,
+    data,
+  ]);
 
   /**
    * Handle form results
