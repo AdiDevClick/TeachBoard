@@ -1,35 +1,42 @@
-import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import { taskItemInputControllers } from "@/data/inputs-controllers.data";
 import { AppModals } from "@/pages/AllModals/AppModals";
+import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
+import { SamplePopoverInput } from "@/tests/components/class-creation/SamplePopoverInput";
 import {
-  stubFetchRoutes,
   taskCreated,
   taskFetched,
   taskFetched2,
-  tasksEndpoint,
-  tasksQueryKey,
 } from "@/tests/samples/class-creation-sample-datas";
-import { SamplePopoverInput } from "@/tests/test-utils/class-creation.ui.components.tsx";
+import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
+import { assertPostUpdatedCacheWithoutExtraGet } from "@/tests/test-utils/tests.functions";
+import { fixtureNewTaskItem } from "@/tests/test-utils/ui-fixtures/class-creation.ui.fixtures";
 import {
-  taskItemInputControllers,
-  taskTemplateCreationInputControllers,
-} from "@/data/inputs-controllers.data";
-import {
-  AppTestWrapper,
-  expectPopoverToContain,
-  setupUiTestState,
-} from "@/tests/test-utils/class-creation.ui.shared";
-import { waitForCache } from "@/tests/test-utils/tests.functions";
-import {
+  checkFormValidityAndSubmit,
   countFetchCallsByUrl,
-  openPopoverByLabelText,
+  fillFieldsEnsuringSubmitDisabled,
+  openPopoverAndExpectByLabel,
+  queryKeyFor,
+  rxExact,
+  submitButtonShouldBeDisabled,
+  waitForDialogAndAssertText,
 } from "@/tests/test-utils/vitest-browser.helpers";
-import { afterEach, describe, expect, test, vi } from "vitest";
-import { render } from "vitest-browser-react";
+import { afterEach, describe, test, vi } from "vitest";
 import { page, userEvent } from "vitest/browser";
 
-type CachedGroup<TItem> = { groupTitle: string; items: TItem[] };
+const fx = fixtureNewTaskItem();
+const taskController = fx.controller;
+const tasksQueryKey = queryKeyFor(taskController);
 
-setupUiTestState();
+setupUiTestState(
+  <AppTestWrapper>
+    <SamplePopoverInput
+      pageId="new-task-template"
+      controller={taskController}
+    />
+    <AppModals />
+  </AppTestWrapper>,
+  { beforeEach: () => fx.installFetchStubs(taskCreated) }
+);
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -37,68 +44,57 @@ afterEach(() => {
 
 describe("UI flow: new-task-item", () => {
   test("fetched items show up, add new opens modal, POST updates cache without extra GET", async () => {
-    stubFetchRoutes({
-      getRoutes: [[tasksEndpoint, [taskFetched, taskFetched2]]],
-      postRoutes: [[API_ENDPOINTS.POST.CREATE_TASK.endpoint, taskCreated]],
-      defaultGetPayload: [],
-    });
+    // Open templates popover and assert existing names
+    await openPopoverAndExpectByLabel(rxExact(taskController.label), [
+      taskFetched.name,
+      taskFetched2.name,
+    ]);
 
-    const taskController = taskTemplateCreationInputControllers.find(
-      (c) => c.name === "taskId"
-    )!;
-
-    render(
-      <AppTestWrapper>
-        <SamplePopoverInput
-          pageId="new-task-template"
-          controller={taskController}
-        />
-        <AppModals />
-      </AppTestWrapper>
-    );
-
-    await openPopoverByLabelText(new RegExp(`^${taskController.label}$`, "i"));
-
-    const tasks = [taskFetched.name, taskFetched2.name];
-    for (const t of tasks) await expectPopoverToContain(new RegExp(t, "i"));
-
+    // Snapshot GET count after initial fetch (triggered by opening the popover)
     const getCallsBeforeCreation = countFetchCallsByUrl(
-      API_ENDPOINTS.GET.TASKS.endpoint,
+      taskController.apiEndpoint,
       "GET"
     );
 
+    // Open creation modal
     await userEvent.click(
       page.getByRole("button", { name: taskController.creationButtonText })
     );
-    await expect
-      .element(page.getByText(/Création d'une nouvelle tâche/i))
-      .toBeInTheDocument();
 
-    const submit = page.getByRole("button", { name: /^Créer$/i });
+    // Ensure modal is opened and title is present
+    await waitForDialogAndAssertText(taskItemInputControllers[0].title, {
+      present: true,
+    });
+
+    await submitButtonShouldBeDisabled("Créer");
 
     const fills = [
-      { label: taskItemInputControllers[0].title, value: "Configurer un routeur" },
-      { label: taskItemInputControllers[1].title, value: "Une description valide." },
+      {
+        label: taskItemInputControllers[0].title,
+        value: "Configurer un routeur",
+      },
+      {
+        label: taskItemInputControllers[1].title,
+        value: "Une description valide.",
+      },
     ];
 
-    for (const f of fills) {
-      await userEvent.fill(page.getByLabelText(f.label), f.value);
-      await userEvent.tab();
-    }
+    await fillFieldsEnsuringSubmitDisabled("Créer", fills);
 
-    await expect.element(submit).toBeEnabled();
-    await userEvent.click(submit);
+    // Ensure there are no form validation alerts, then submit
+    await checkFormValidityAndSubmit("Créer");
 
-    const cached = (await waitForCache(tasksQueryKey)) as Array<
-      CachedGroup<{ id: string }>
-    >;
-    expect(cached[0]?.items.some((i) => i.id === taskCreated.id)).toBe(true);
+    // Ensure modal is closed and the modal title is absent
+    await waitForDialogAndAssertText(/Création d'une nouvelle tâche/i, {
+      present: false,
+    });
 
-    await openPopoverByLabelText(new RegExp(`^${taskController.label}$`, "i"));
-    await expectPopoverToContain(new RegExp(taskCreated.name, "i"));
-
-    expect(countFetchCallsByUrl(API_ENDPOINTS.GET.TASKS.endpoint, "GET")).toBe(
-      getCallsBeforeCreation
-    );
+    await assertPostUpdatedCacheWithoutExtraGet({
+      queryKey: tasksQueryKey,
+      expectedValue: taskCreated.name,
+      endpoint: taskController.apiEndpoint,
+      getCallsBefore: getCallsBeforeCreation,
+      openPopover: { label: rxExact(taskController.label) },
+    });
   });
 });
