@@ -63,6 +63,24 @@ async function expectFormToHaveNoErrors(timeout = 1000) {
 }
 
 /**
+ * Assert that a locator's text content matches a pattern, polling until it does.
+ * Useful for components that update their visible label asynchronously.
+ */
+export async function expectElementTextToMatch(
+  locator:
+    | ReturnType<typeof page.getByText>
+    | ReturnType<typeof page.getByLabelText>
+    | any,
+  pattern: RegExp | string,
+  timeout = 1000
+) {
+  const patt = pattern instanceof RegExp ? pattern : rx(pattern);
+  await expect
+    .poll(() => locator.element().textContent ?? "", { timeout })
+    .toMatch(patt);
+}
+
+/**
  * Verify the form is valid (submit enabled) and submit it.
  *
  * @param name - The exact name of the submit button.
@@ -97,6 +115,7 @@ export async function fillAndTab(
   target: Parameters<typeof userEvent.fill>[0],
   value: string
 ) {
+  await expect.element(target).toBeVisible();
   await userEvent.fill(target, value);
   await userEvent.tab();
 }
@@ -294,27 +313,54 @@ export async function waitForDialogState(
  * @param label - string or RegExp to look up inside the dialog
  * @param opts.present - true to assert presence, false to assert absence (default true)
  * @param opts.timeout - poll timeout in ms
+ * @param opts.withinDialog - when true, searches only inside the last visible dialog
  */
 export async function waitForDialogAndAssertText(
   label: string | RegExp,
-  opts?: { present?: boolean; timeout?: number }
+  opts?: { present?: boolean; timeout?: number; withinDialog?: boolean }
 ) {
-  let isPresent;
-
   const timeout = opts?.timeout ?? 1000;
   const present = opts?.present ?? true;
-  const elements = () => page.getByText(label).elements();
 
   // First, make sure the dialog reaches the expected open/closed state.
   await waitForDialogState(present, timeout);
 
-  if (present) {
-    isPresent = elements().length > 0;
-  } else {
-    isPresent = elements().length === 0;
-  }
+  await waitForTextToBeAbsent(label, opts);
+}
 
-  await expect.poll(() => isPresent, { timeout }).toBe(true);
+/**
+ * Poll until the given text/label is absent from the document (or scoped dialog).
+ * Use when a nested dialog or a portion of the UI is expected to be removed but
+ * other dialogs may remain open.
+ *
+ * @param label - string or RegExp to find
+ * @param opts.timeout - total ms to wait
+ * @param opts.withinDialog - when true, searches only inside the last visible dialog
+ */
+export async function waitForTextToBeAbsent(
+  label: string | RegExp,
+  opts?: { present?: boolean; timeout?: number; withinDialog?: boolean }
+) {
+  const timeout = opts?.timeout ?? 1000;
+  const present = opts?.present ?? false;
+
+  const scope = opts?.withinDialog
+    ? getLastVisibleDialogContent() ?? document.body
+    : undefined;
+  const count = () => {
+    try {
+      return scope
+        ? page.elementLocator(scope).getByText(label).elements().length
+        : page.getByText(label).elements().length;
+    } catch {
+      // If the locator query throws for any reason, treat as "not found".
+      return 0;
+    }
+  };
+
+  await expect
+    .poll(() => (present ? count() > 0 : count() === 0), { timeout })
+    .toBe(true);
 }
 
 export async function waitForPopoverState(
