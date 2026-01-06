@@ -1,54 +1,55 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { AppModals } from "@/pages/AllModals/AppModals";
+import { diplomaFetchedSkills } from "@/tests/samples/class-creation-sample-datas";
+import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
+import { assertPostUpdatedCacheWithoutExtraGet } from "@/tests/test-utils/tests.functions";
+import { fixtureCreateDiplomaFromClassCreation } from "@/tests/test-utils/ui-fixtures/class-creation.ui.fixtures";
 import {
-  degreeFieldEndpoint,
-  degreeFieldFetched,
-  degreeFieldFetched2,
-  degreeLevelEndpoint,
-  degreeLevelFetched,
-  degreeLevelFetched2,
-  degreeYearEndpoint,
-  degreeYearFetched,
-  degreeYearFetched2,
-  diplomaCreated,
-  diplomaEndpoint,
-  diplomaFetched,
-  diplomaFetched2,
-  diplomaFetchedSkills,
-  diplomaQueryKey,
-  skillsModulesFetched,
-  stubFetchRoutes,
-} from "@/tests/samples/class-creation-sample-datas";
-import {
-  AppTestWrapper,
-  expectPopoverToContain,
-  setupUiTestState,
-} from "@/tests/test-utils/class-creation.ui.shared";
-import { waitForCache } from "@/tests/test-utils/tests.functions";
-import {
+  checkFormValidityAndSubmit,
   countFetchCallsByUrl,
+  getLastPostJsonBodyByUrl,
   getOpenCommandContainer,
-  openPopoverByLabelText,
+  openPopoverAndExpectByLabel,
+  openPopoverAndExpectByTrigger,
   openPopoverByTriggerName,
-  selectCommandItemInContainer,
+  queryKeyFor,
+  rx,
+  rxJoin,
+  selectCommandItemInContainerEnsuringSubmitDisabled,
+  selectMultiplePopoversEnsuringSubmitDisabled,
+  waitForDialogAndAssertText,
+  waitForDialogState,
 } from "@/tests/test-utils/vitest-browser.helpers";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { render } from "vitest-browser-react";
 import { page, userEvent } from "vitest/browser";
 
-import {
-  classCreationInputControllers,
-  diplomaCreationInputControllers,
-} from "@/data/inputs-controllers.data";
-import { SamplePopoverInput } from "@/tests/test-utils/class-creation.ui.components.tsx";
+import { AppModals } from "@/pages/AllModals/AppModals.tsx";
+import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
+import { SamplePopoverInput } from "@/tests/components/class-creation/SamplePopoverInput";
 import {
   controllerLabelRegex,
   controllerTriggerRegex,
-} from "@/tests/test-utils/class-creation.ui.factories";
+} from "@/tests/test-utils/class-creation/regex.functions";
 
-type CachedGroup<TItem> = { groupTitle: string; items: TItem[] };
+const fx = fixtureCreateDiplomaFromClassCreation();
+const {
+  diplomasController,
+  diplomaFieldController,
+  diplomaYearController,
+  diplomaLevelController,
+  diplomaModuleController,
+} = fx.controllers;
+const diplomasQueryKey = queryKeyFor(diplomasController);
 
-setupUiTestState();
+setupUiTestState(
+  <AppTestWrapper>
+    <AppModals />
+    <SamplePopoverInput
+      pageId="class-creation"
+      controller={diplomasController}
+    />
+  </AppTestWrapper>,
+  { beforeEach: fx.installFetchStubs }
+);
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -56,148 +57,82 @@ afterEach(() => {
 
 describe("UI flow: create-diploma (from class-creation)", () => {
   test("selections validate, POST updates cache, and class-creation list updates without extra GET", async () => {
-    stubFetchRoutes({
-      getRoutes: [
-        [
-          diplomaEndpoint,
-          { [diplomaFetched.degreeField]: [diplomaFetched, diplomaFetched2] },
-        ],
-        [degreeFieldEndpoint, [degreeFieldFetched, degreeFieldFetched2]],
-        [degreeYearEndpoint, [degreeYearFetched, degreeYearFetched2]],
-        [degreeLevelEndpoint, [degreeLevelFetched, degreeLevelFetched2]],
-        [API_ENDPOINTS.GET.SKILLS.endPoints.MODULES, skillsModulesFetched],
-      ],
-      postRoutes: [
-        [API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint, diplomaCreated],
-      ],
-      defaultGetPayload: [],
-    });
-
-    const classDiplomasController = classCreationInputControllers.find(
-      (c) => c.name === "degreeConfigId" && c.task === "create-diploma"
-    )!;
-
-    const diplomaYearController = diplomaCreationInputControllers.find(
-      (c) => c.name === "yearId"
-    )!;
-    const diplomaLevelController = diplomaCreationInputControllers.find(
-      (c) => c.name === "levelId"
-    )!;
-    const diplomaModuleController = diplomaCreationInputControllers.find(
-      (c) => c.name === "mainSkillsList"
-    )!;
-
-    const diplomaFieldController = diplomaCreationInputControllers.find(
-      (c) => c.name === "diplomaFieldId"
-    )!;
-
-    render(
-      <AppTestWrapper>
-        <AppModals />
-        <SamplePopoverInput
-          pageId="class-creation"
-          controller={classDiplomasController}
-        />
-      </AppTestWrapper>
+    // Open templates popover and assert existing names
+    await openPopoverAndExpectByLabel(
+      controllerLabelRegex(diplomasController),
+      [
+        rxJoin(
+          fx.sample.diplomaFetched.degreeLevel,
+          fx.sample.diplomaFetched.degreeYear
+        ),
+        rxJoin(
+          fx.sample.diplomaFetched2.degreeLevel,
+          fx.sample.diplomaFetched2.degreeYear
+        ),
+      ]
     );
 
-    await openPopoverByLabelText(controllerLabelRegex(classDiplomasController));
+    // Snapshot GET count after initial fetch (triggered by opening the popover)
+    const getCallsBeforeCreation = countFetchCallsByUrl(
+      diplomasController.apiEndpoint,
+      "GET"
+    );
 
-    // Ensure both diplomas are visible
-    const diplomas = [
-      new RegExp(
-        String.raw`${diplomaFetched.degreeLevel}\s+${diplomaFetched.degreeYear}`,
-        "i"
-      ),
-      new RegExp(
-        String.raw`${diplomaFetched2.degreeLevel}\s+${diplomaFetched2.degreeYear}`,
-        "i"
-      ),
-    ];
-    for (const d of diplomas) await expectPopoverToContain(d);
-
+    // Open creation modal
     await userEvent.click(
       page.getByRole("button", {
-        name: classDiplomasController.creationButtonText,
+        name: diplomasController.creationButtonText,
       })
     );
-    await expect
-      .poll(
-        () =>
-          document.querySelector(
-            '[data-slot="dialog-content"][data-state="open"]'
-          ) !== null,
-        { timeout: 1000 }
-      )
-      .toBe(true);
-    await expect
-      .element(page.getByText(diplomaFieldController.label))
-      .toBeInTheDocument();
 
-    await openPopoverByLabelText(controllerLabelRegex(diplomaFieldController), {
-      withinDialog: true,
-      timeout: 1000,
+    // Ensure modal is opened and title is present
+    await waitForDialogAndAssertText(diplomaFieldController.label, {
+      present: true,
     });
 
-    // Ensure all fields are visible then select
-    const fields = [degreeFieldFetched.name, degreeFieldFetched2.name];
-    for (const f of fields) await expectPopoverToContain(new RegExp(f, "i"));
-
-    await selectCommandItemInContainer(
-      getOpenCommandContainer(),
-      new RegExp(degreeFieldFetched.name, "i")
-    );
-
-    await openPopoverByLabelText(controllerLabelRegex(diplomaYearController), {
+    const baseOpts = {
       withinDialog: true,
       timeout: 1000,
-    });
-
-    // Ensure all years are visible then select
-    const years = [degreeYearFetched.name, degreeYearFetched2.name];
-    for (const y of years) await expectPopoverToContain(new RegExp(y, "i"));
-
-    await selectCommandItemInContainer(
-      getOpenCommandContainer(),
-      new RegExp(degreeYearFetched.name, "i")
-    );
-
-    await openPopoverByLabelText(controllerLabelRegex(diplomaLevelController), {
-      withinDialog: true,
-      timeout: 1000,
-    });
-
-    const names = [degreeLevelFetched.name, degreeLevelFetched2.name];
-
-    // Ensure all items are visible before selecting (selection may close the popover)
-    for (const element of names) {
-      await expectPopoverToContain(new RegExp(element, "i"));
-    }
-
-    // Select the intended one
-    await selectCommandItemInContainer(
-      getOpenCommandContainer(),
-      new RegExp(degreeLevelFetched.name, "i")
-    );
+      tabAfter: false,
+    };
+    await selectMultiplePopoversEnsuringSubmitDisabled("Créer le diplôme", [
+      {
+        label: controllerLabelRegex(diplomaFieldController),
+        items: rx(fx.sample.degreeFieldFetched.name),
+        ...baseOpts,
+      },
+      {
+        label: controllerLabelRegex(diplomaYearController),
+        items: rx(fx.sample.degreeYearFetched.name),
+        ...baseOpts,
+      },
+      {
+        label: controllerLabelRegex(diplomaLevelController),
+        items: rx(fx.sample.degreeLevelFetched.name),
+        ...baseOpts,
+      },
+    ]);
 
     await openPopoverByTriggerName(
       controllerTriggerRegex(diplomaModuleController)
     );
 
     const modules = [
-      skillsModulesFetched.Skills[0].code,
-      skillsModulesFetched.Skills[1].code,
+      fx.sample.skillsModulesFetched.Skills[0].code,
+      fx.sample.skillsModulesFetched.Skills[1].code,
     ];
 
     // Ensure all module options are visible first
-    for (const mod of modules) {
-      await expectPopoverToContain(new RegExp(mod, "i"));
-    }
+    await openPopoverAndExpectByTrigger(
+      controllerTriggerRegex(diplomaModuleController),
+      modules
+    );
 
     // Select the first module
-    await selectCommandItemInContainer(
+    await selectCommandItemInContainerEnsuringSubmitDisabled(
+      "Créer le diplôme",
       getOpenCommandContainer(),
-      new RegExp(skillsModulesFetched.Skills[0].code, "i")
+      rx(fx.sample.skillsModulesFetched.Skills[0].code)
     );
 
     // Multi-select popover stays open; close it via its trigger (Escape would close the dialog).
@@ -209,49 +144,119 @@ describe("UI flow: create-diploma (from class-creation)", () => {
 
     // The selected module should appear as a tag in the dialog
     await expect
-      .poll(
-        () =>
-          Array.from(document.querySelectorAll("*")).some((el) =>
-            new RegExp(diplomaFetchedSkills[0].mainSkillCode, "i").test(
-              el.textContent ?? ""
-            )
-          ),
-        { timeout: 1000 }
-      )
-      .toBe(true);
+      .element(page.getByText(rx(diplomaFetchedSkills[0].mainSkillCode)))
+      .toBeInTheDocument();
 
-    const getCallsBeforeCreation = countFetchCallsByUrl(
-      API_ENDPOINTS.GET.DIPLOMAS.endpoint,
-      "GET"
+    // Ensure there are no form validation alerts, then submit
+    await checkFormValidityAndSubmit("Créer le diplôme");
+
+    // Ensure modal is closed and title is absent
+    await waitForDialogAndAssertText(diplomaFieldController.label, {
+      present: false,
+    });
+
+    await assertPostUpdatedCacheWithoutExtraGet({
+      queryKey: diplomasQueryKey,
+      // diploma created items are indexed under their degreeField group
+      expectedValue:
+        fx.sample.diplomaCreated.degreeLevel +
+        " " +
+        fx.sample.diplomaCreated.degreeYear,
+      endpoint: diplomasController.apiEndpoint,
+      getCallsBefore: getCallsBeforeCreation,
+      openPopover: {
+        label: controllerLabelRegex(diplomasController),
+      },
+    });
+  });
+
+  test("anti-falsification: selected ids/codes are exactly what gets POSTed", async () => {
+    // Open templates popover and assert existing names
+    await openPopoverAndExpectByLabel(
+      controllerLabelRegex(diplomasController),
+      [
+        rxJoin(
+          fx.sample.diplomaFetched.degreeLevel,
+          fx.sample.diplomaFetched.degreeYear
+        ),
+        rxJoin(
+          fx.sample.diplomaFetched2.degreeLevel,
+          fx.sample.diplomaFetched2.degreeYear
+        ),
+      ]
     );
 
-    const submit = page.getByRole("button", { name: /Créer le diplôme/i });
-    await expect.element(submit).toBeEnabled();
-    await userEvent.click(submit);
+    // Open creation modal
+    await userEvent.click(
+      page.getByRole("button", {
+        name: diplomasController.creationButtonText,
+      })
+    );
+    await waitForDialogState(true, 1000);
+
+    await selectMultiplePopoversEnsuringSubmitDisabled("Créer le diplôme", [
+      {
+        label: controllerLabelRegex(diplomaFieldController),
+        items: rx(fx.sample.degreeFieldFetched.name),
+        withinDialog: true,
+        timeout: 1000,
+        tabAfter: false,
+      },
+      {
+        label: controllerLabelRegex(diplomaYearController),
+        items: rx(fx.sample.degreeYearFetched.name),
+        withinDialog: true,
+        timeout: 1000,
+        tabAfter: false,
+      },
+      {
+        label: controllerLabelRegex(diplomaLevelController),
+        items: rx(fx.sample.degreeLevelFetched.name),
+        withinDialog: true,
+        timeout: 1000,
+        tabAfter: false,
+      },
+    ]);
+
+    await openPopoverByTriggerName(
+      controllerTriggerRegex(diplomaModuleController)
+    );
+    await openPopoverAndExpectByTrigger(
+      controllerTriggerRegex(diplomaModuleController),
+      [
+        fx.sample.skillsModulesFetched.Skills[0].code,
+        fx.sample.skillsModulesFetched.Skills[1].code,
+      ]
+    );
+
+    await selectCommandItemInContainerEnsuringSubmitDisabled(
+      "Créer le diplôme",
+      getOpenCommandContainer(),
+      rx(fx.sample.skillsModulesFetched.Skills[0].code)
+    );
+
+    // Close the multi-select popover.
+    await userEvent.click(
+      page.getByRole("button", {
+        name: controllerTriggerRegex(diplomaModuleController),
+      })
+    );
+
+    await checkFormValidityAndSubmit("Créer le diplôme");
 
     await expect
-      .element(page.getByText(/Création de diplômes ou certifications/i))
-      .not.toBeInTheDocument();
-
-    const cached = (await waitForCache(diplomaQueryKey)) as Array<
-      CachedGroup<{ id: string }>
-    >;
-    const group = cached.find(
-      (g) => g.groupTitle === diplomaCreated.degreeField
-    );
-    expect(group?.items.some((i) => i.id === diplomaCreated.id)).toBe(true);
-
-    // Validate class-creation command list refreshes from cache (no extra GET)
-    await openPopoverByLabelText(controllerLabelRegex(classDiplomasController));
-    await expectPopoverToContain(
-      new RegExp(
-        String.raw`${diplomaCreated.degreeLevel}\s+${diplomaCreated.degreeYear}`,
-        "i"
+      .poll(
+        () =>
+          getLastPostJsonBodyByUrl(API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint),
+        {
+          timeout: 2500,
+        }
       )
-    );
-
-    expect(
-      countFetchCallsByUrl(API_ENDPOINTS.GET.DIPLOMAS.endpoint, "GET")
-    ).toBe(getCallsBeforeCreation);
+      .toMatchObject({
+        diplomaFieldId: fx.sample.degreeFieldFetched.id,
+        yearId: fx.sample.degreeYearFetched.id,
+        levelId: fx.sample.degreeLevelFetched.id,
+        mainSkillsList: [fx.sample.skillsModulesFetched.Skills[0].code],
+      });
   });
 });
