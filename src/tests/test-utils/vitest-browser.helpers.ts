@@ -1,5 +1,232 @@
+import { wait } from "@/utils/utils.ts";
 import { expect } from "vitest";
 import { page, userEvent } from "vitest/browser";
+
+const SELECTORS = {
+  dialogContent: '[data-slot="dialog-content"]',
+  dialogOverlay: '[data-slot="dialog-overlay"]',
+  popoverContent: '[data-slot="popover-content"]',
+  popoverContentOpen: '[data-slot="popover-content"][data-state="open"]',
+  commandRoot:
+    '[data-slot="command"], [data-slot="command-list"], [data-slot="command-input"], [cmdk-root], [cmdk-list], [cmdk-input]',
+  commandItems: '[data-slot="command-item"], [cmdk-item], [role="option"]',
+  commandInput: '[data-slot="command-input"], [cmdk-input]',
+  commandEmpty: '[data-slot="command-empty"], [cmdk-empty]',
+} as const;
+
+function getLastVisibleDialogContent(): HTMLElement | null {
+  const dialogContents = Array.from(
+    document.querySelectorAll<HTMLElement>(SELECTORS.dialogContent)
+  );
+
+  const lastVisibleDialog = [...dialogContents].reverse().find((el) => {
+    if (el.dataset.state === "open") return true;
+    try {
+      const style = getComputedStyle(el);
+      return style.display !== "none" && style.visibility !== "hidden";
+    } catch {
+      return true;
+    }
+  });
+
+  return lastVisibleDialog ?? null;
+}
+
+function isElementActuallyVisible(
+  el: HTMLElement,
+  opts?: { checkOpacity?: boolean }
+): boolean {
+  if (el.hasAttribute("hidden")) return false;
+
+  try {
+    const style = getComputedStyle(el);
+    if (style.display === "none") return false;
+    if (style.visibility === "hidden") return false;
+    if (opts?.checkOpacity && style.opacity === "0") return false;
+  } catch {
+    // If styles can't be computed (rare in tests), assume visible.
+  }
+
+  if (opts?.checkOpacity) {
+    const rect = el.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+  }
+
+  return true;
+}
+
+function isPopoverOpen(): boolean {
+  return getOpenPopoverContent() !== null;
+}
+
+async function waitForPopoverOpen(timeout = 500) {
+  await expect.poll(isPopoverOpen, { timeout }).toBe(true);
+}
+
+async function waitForPopoverClosed(timeout = 500) {
+  await expect.poll(isPopoverOpen, { timeout }).toBe(false);
+}
+
+function dispatchDismissClick(el: Element) {
+  // Avoid locator-based clicks (actionability/visibility checks can be flaky in the
+  // vitest browser iframe). Radix dismiss logic relies on pointer events.
+  const win = el.ownerDocument.defaultView ?? globalThis;
+  const common = {
+    bubbles: true,
+    cancelable: true,
+    composed: true,
+    button: 0,
+    buttons: 1,
+    clientX: 0,
+    clientY: 0,
+  };
+
+  const pointerEvents = ["pointerdown", "pointerup"];
+  const mouseEvents = ["mousedown", "mouseup", "click"];
+
+  // PointerEvent may not exist in every environment, but in vitest-browser
+  // (real Chromium) it does.
+  if (typeof win.PointerEvent === "function") {
+    const pointerOptions = {
+      ...common,
+      pointerId: 1,
+      isPrimary: true,
+      pointerType: "mouse",
+    };
+    pointerEvents.forEach((eventName) => {
+      el.dispatchEvent(new win.PointerEvent(eventName, pointerOptions));
+    });
+  }
+
+  mouseEvents.forEach((eventName) => {
+    el.dispatchEvent(new win.MouseEvent(eventName, common));
+  });
+}
+
+async function clickTrigger(trigger: Parameters<typeof userEvent.click>[0]) {
+  // Prefer direct DOM click when possible to avoid Playwright's strict
+  // actionability checks (which can be flaky in the vitest browser iframe).
+  if (trigger instanceof HTMLElement) {
+    trigger.click();
+  } else {
+    await userEvent.click(trigger);
+  }
+}
+
+async function closeOpenPopoverIfAny() {
+  if (!isPopoverOpen()) return;
+
+  // Clicking the trigger can be flaky because the popover content may cover it
+  // and intercept pointer events. Escape + outside pointerdown is more reliable.
+  await userEvent.keyboard("{Escape}");
+
+  try {
+    await waitForPopoverClosed();
+    return;
+  } catch {
+    const overlay = document.querySelector<HTMLElement>(
+      SELECTORS.dialogOverlay
+    );
+    const dismissTarget =
+      (getLastVisibleDialogContent() ? overlay : null) ?? document.body;
+    dispatchDismissClick(dismissTarget);
+    await waitForPopoverClosed();
+  }
+}
+
+async function openPopoverWithRetries(
+  trigger: Parameters<typeof userEvent.click>[0]
+) {
+  // In some fast UI flows (especially inside dialogs), Radix popovers can
+  // briefly open and then immediately dismiss due to late focus/state updates.
+  // Retry opening a few times and ensure it stays open for at least a tick.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await clickTrigger(trigger);
+    await waitForPopoverOpen();
+
+    // Let pending focus/state updates flush.
+    await wait(25);
+
+    if (isPopoverOpen()) return;
+  }
+
+  // One last attempt: wait a bit longer after opening.
+  await clickTrigger(trigger);
+  await waitForPopoverOpen();
+}
+
+async function detectCmdkInOpenPopover(timeout = 250): Promise<boolean> {
+  const initial = getOpenPopoverContent();
+
+  try {
+    await expect
+      .poll(
+        () => {
+          const open = getOpenPopoverContent();
+          if (!open) return false;
+          return hasCmdk(open);
+        },
+        { timeout }
+      )
+      .toBe(true);
+    return true;
+  } catch {
+    return hasCmdk(getOpenPopoverContent() ?? initial);
+  }
+}
+
+async function waitForPopoverToCloseOrChange(
+  previous: HTMLElement,
+  timeout = 400
+) {
+  await expect
+    .poll(
+      () => {
+        const now = getOpenPopoverContent();
+        return now === null || now !== previous;
+      },
+      { timeout }
+    )
+    .toBe(true);
+}
+
+function hasCmdk(container: HTMLElement | null): boolean {
+  return container?.querySelector(SELECTORS.commandRoot) !== null;
+}
+
+function resetCmdkInput(container: HTMLElement): void {
+  const cmdkInput = getCommandItem(container);
+  if (cmdkInput && cmdkInput.value) {
+    try {
+      cmdkInput.value = "";
+      cmdkInput.dispatchEvent(new Event("input", { bubbles: true }));
+    } catch {
+      // non-fatal
+    }
+  }
+}
+
+async function waitForCmdkReady(timeout = 1500) {
+  await expect
+    .poll(
+      () => {
+        const open = getOpenPopoverContent();
+        if (!open) return false;
+
+        resetCmdkInput(open);
+
+        const items = getCommandItemsInContainer(open);
+        if (items.length > 0) return true;
+
+        const empty = open.querySelector<HTMLElement>(SELECTORS.commandEmpty);
+        return empty
+          ? isElementActuallyVisible(empty, { checkOpacity: true })
+          : false;
+      },
+      { timeout }
+    )
+    .toBe(true);
+}
 
 type FetchMock = typeof fetch & {
   mock?: {
@@ -66,24 +293,32 @@ export async function openPopoverByTriggerName(name: RegExp) {
   await openPopover(page.getByRole("button", { name }));
 }
 
+function isVisibleElement(el: HTMLElement): boolean {
+  return isElementActuallyVisible(el, { checkOpacity: true });
+}
+
+function isNotHiddenElement(el: HTMLElement): boolean {
+  return isElementActuallyVisible(el, { checkOpacity: false });
+}
+
+function getCommandItemLabel(el: HTMLElement): string {
+  const text = (el.textContent ?? "").trim();
+  if (text) return text;
+
+  // cmdk stores the resolved item value on the element.
+  const dataValue = el.dataset.value;
+  if (dataValue?.trim()) return dataValue.trim();
+
+  const valueAttr = el.getAttribute("value");
+  return (valueAttr ?? "").trim();
+}
+
 function findLabelElementScoped(
   label: RegExp,
   withinDialog?: boolean
 ): HTMLLabelElement | undefined {
   if (withinDialog) {
-    const dialogContents = Array.from(
-      document.querySelectorAll<HTMLElement>('[data-slot="dialog-content"]')
-    );
-    const lastVisibleDialog = [...dialogContents].reverse().find((el) => {
-      if (el.dataset.state === "open") return true;
-      try {
-        const style = getComputedStyle(el);
-        return style.display !== "none" && style.visibility !== "hidden";
-      } catch {
-        return true;
-      }
-    });
-    const scope = lastVisibleDialog ?? document.body;
+    const scope = getLastVisibleDialogContent() ?? document.body;
     const labelElements = Array.from(scope.querySelectorAll("label"));
     return labelElements.find((el) =>
       label.test((el.textContent ?? "").trim())
@@ -131,42 +366,34 @@ export async function selectCommandItemInContainer(
   pattern: RegExp,
   timeout = 500
 ) {
+  // In single-select popovers, selecting an item closes the popover.
+  // That close can be asynchronous (state updates/animations). If we
+  // immediately open the next popover, the late "close" can accidentally
+  // close the newly opened one. Track the current open popover and
+  // (best-effort) wait for it to close/change after selection.
+  const popoverBeforeSelection = getOpenPopoverContent();
+
   await expect
     .poll(
       () => {
-        const items = Array.from(
-          container.querySelectorAll<HTMLElement>('[data-slot="command-item"]')
-        );
-        return items.some((el) => pattern.test(el.textContent ?? ""));
+        const items = getCommandItemsInContainer(container);
+        return items.some((el) => pattern.test(getCommandItemLabel(el)));
       },
       { timeout }
     )
     .toBe(true);
 
-  const items = Array.from(
-    container.querySelectorAll<HTMLElement>('[data-slot="command-item"]')
-  );
-  const target = items.find((el) => pattern.test(el.textContent ?? ""));
+  const items = getCommandItemsInContainer(container);
+  const target = items.find((el) => pattern.test(getCommandItemLabel(el)));
   if (!target)
     throw new Error(
       `[ui test] Command item not found for pattern: ${String(pattern)}`
     );
 
-  const input = container.querySelector<HTMLInputElement>(
-    '[data-slot="command-input"]'
-  );
-  const maybeButton = target.querySelector("button");
-  if (maybeButton instanceof HTMLButtonElement) {
-    // Prefer DOM click to avoid Playwright actionability hangs in iframe.
-    maybeButton.click();
-    return;
-  }
+  const input = getCommandItem(container);
 
   if (input) {
-    const query = (target.textContent ?? "").trim();
-
-    // In vitest-browser (iframe), Playwright actionability can make clicks on
-    // inputs flaky; focusing is enough for typing.
+    // Clear any persisted filter text to avoid empty lists on subsequent opens.
     try {
       input.focus();
     } catch {
@@ -174,17 +401,38 @@ export async function selectCommandItemInContainer(
       await userEvent.click(input);
     }
     await userEvent.clear(input);
-    await userEvent.type(input, query);
-    await userEvent.keyboard("{ArrowDown}{Enter}");
-    return;
   }
 
   if (target instanceof HTMLElement) {
     target.click();
-    return;
+  } else {
+    await userEvent.click(target);
   }
 
-  await userEvent.click(target);
+  if (!popoverBeforeSelection) return;
+
+  try {
+    await waitForPopoverToCloseOrChange(popoverBeforeSelection, 400);
+  } catch {
+    // Multi-select popovers stay open; don't fail the test for that.
+  }
+}
+
+function getCommandItemsInContainer(container: ParentNode): HTMLElement[] {
+  // Most of the app uses shadcn/ui's CommandItem wrapper (data-slot="command-item"),
+  // but cmdk also renders raw items with the [cmdk-item] attribute.
+  // In some environments, the most stable hook is the ARIA role.
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(SELECTORS.commandItems)
+  ).filter((el) => isNotHiddenElement(el));
+}
+
+function getCommandItem(container: ParentNode): HTMLInputElement | null {
+  // Most of the app uses shadcn/ui's CommandItem wrapper (data-slot="command-item"),
+  // but cmdk also renders raw items with the [cmdk-item] attribute.
+  if (!container) return null;
+
+  return container.querySelector<HTMLInputElement>(SELECTORS.commandInput);
 }
 
 async function selectItemsByPatterns(
@@ -192,20 +440,14 @@ async function selectItemsByPatterns(
   patterns: RegExp[],
   opts?: { withinDialog?: boolean; timeout?: number }
 ) {
-  const findNewPopover = () =>
-    document.querySelector<HTMLElement>(
-      '[data-slot="popover-content"][data-state="open"]'
-    ) ?? document.body;
+  const findNewPopover = () => getOpenPopoverContent() ?? document.body;
 
   let popover = findNewPopover();
 
   for (const [i, pattern] of patterns.entries()) {
     await selectCommandItemInContainer(popover, pattern, opts?.timeout ?? 500);
 
-    const stillOpen =
-      document.querySelector(
-        '[data-slot="popover-content"][data-state="open"]'
-      ) === popover;
+    const stillOpen = getOpenPopoverContent() === popover;
     if (!stillOpen && i !== patterns.length - 1) {
       // Re-open the popover by label (since it closed on selection)
       await openPopoverByLabelText(label, {
@@ -261,88 +503,114 @@ export async function openPopoverByContainerId(containerId: string) {
 }
 
 async function openPopover(trigger: Parameters<typeof userEvent.click>[0]) {
-  const isOpen = () =>
-    document.querySelector(
-      '[data-slot="popover-content"][data-state="open"]'
-    ) !== null;
-
-  const isDialogOpen = () =>
-    document.querySelector(
-      '[data-slot="dialog-content"][data-state="open"]'
-    ) !== null;
-
-  // If it's already open (e.g., dialog opened on top), close first so we can
+  // If it's already open (e.g. dialog opened on top), close first so we can
   // re-open and force a re-render with updated cached data.
-  if (isOpen()) {
-    // When a dialog is open, Escape may close the dialog instead of the popover.
-    // Prefer clicking outside (dialog overlay/body) to dismiss only the popover.
-    if (isDialogOpen()) {
-      const overlay = document.querySelector<HTMLElement>(
-        '[data-slot="dialog-overlay"]'
-      );
+  await closeOpenPopoverIfAny();
 
-      try {
-        (overlay ?? document.body).click();
-      } catch {
-        await userEvent.click(overlay ?? document.body);
-      }
+  await openPopoverWithRetries(trigger);
 
-      await expect.poll(isOpen).toBe(false);
-    } else {
-      // Clicking the trigger can be flaky because the popover content may cover it
-      // and intercept pointer events. Escape + outside click is more reliable.
-      await userEvent.keyboard("{Escape}");
-
-      try {
-        await expect.poll(isOpen).toBe(false);
-      } catch {
-        await userEvent.click(document.body);
-        await expect.poll(isOpen).toBe(false);
-      }
+  // In tests, cmdk's input value can persist across open/close cycles and
+  // filter out all items in the next popover. Also, cmdk content may mount a
+  // moment *after* the popover opens. Detect cmdk and wait for it to be ready.
+  const hasCmdkInPopover = await detectCmdkInOpenPopover(250);
+  if (hasCmdkInPopover) {
+    // Best-effort: move focus inside the popover ASAP. In some fast UI flows
+    // (especially inside dialogs), a late focus shift can dismiss Radix popovers.
+    try {
+      const open = getOpenPopoverContent();
+      const cmdkInput = open ? getCommandItem(open) : null;
+      cmdkInput?.focus();
+    } catch {
+      // non-fatal
     }
-  }
 
-  // Prefer direct DOM click when possible to avoid Playwright's strict
-  // actionability checks (which can be flaky in the vitest browser iframe).
-  if (trigger instanceof HTMLElement) {
-    trigger.click();
-  } else {
-    await userEvent.click(trigger);
+    await waitForCmdkReady(1500);
   }
-  await expect.poll(isOpen).toBe(true);
 }
 
 export function getOpenPopoverContent(): HTMLElement | null {
-  return document.querySelector<HTMLElement>(
-    '[data-slot="popover-content"][data-state="open"]'
+  // Radix popovers are portaled; during fast open/close cycles, multiple
+  // contents can exist in the DOM. Prefer the most recently *open* one.
+  const open = Array.from(
+    document.querySelectorAll<HTMLElement>(SELECTORS.popoverContentOpen)
   );
+  if (open.length > 0) return open[open.length - 1];
+
+  // Fallback: if data-state isn't present for some reason, prefer the most
+  // recently visible one.
+  const contents = Array.from(
+    document.querySelectorAll<HTMLElement>(SELECTORS.popoverContent)
+  );
+  const visible = contents.filter((el) => isVisibleElement(el));
+  return visible.length > 0 ? visible[visible.length - 1] : null;
 }
 
 export function getOpenPopoverCommandItemTexts(): string[] {
   const popover = getOpenPopoverContent();
   if (!popover) return [];
 
-  return Array.from(popover.querySelectorAll('[data-slot="command-item"]'))
-    .map((el) => (el.textContent ?? "").trim())
+  return getCommandItemsInContainer(popover)
+    .map((el) => getCommandItemLabel(el))
     .filter(Boolean);
+}
+
+export function getOpenPopoverCommandDebugText(): string {
+  const popover = getOpenPopoverContent();
+  if (!popover) {
+    const all = Array.from(
+      document.querySelectorAll<HTMLElement>(SELECTORS.popoverContent)
+    );
+    const last = all.length > 0 ? all[all.length - 1] : null;
+    let styleSummary = "";
+    if (last) {
+      try {
+        const style = getComputedStyle(last);
+        styleSummary = `display=${style.display} visibility=${style.visibility} opacity=${style.opacity}`;
+      } catch {
+        styleSummary = "style=?";
+      }
+    }
+    return `__NO_OPEN_POPOVER__ total=${all.length} lastState=${
+      last?.dataset.state ?? ""
+    } ${styleSummary}`;
+  }
+
+  const itemTexts = getOpenPopoverCommandItemTexts();
+  if (itemTexts.length > 0) return itemTexts.join(" ");
+
+  const counts = {
+    command: popover.querySelectorAll('[data-slot="command"], [cmdk-root]')
+      .length,
+    list: popover.querySelectorAll('[data-slot="command-list"], [cmdk-list]')
+      .length,
+    input: popover.querySelectorAll('[data-slot="command-input"], [cmdk-input]')
+      .length,
+    empty: popover.querySelectorAll('[data-slot="command-empty"], [cmdk-empty]')
+      .length,
+    slotItems: popover.querySelectorAll('[data-slot="command-item"]').length,
+    cmdkItems: popover.querySelectorAll("[cmdk-item]").length,
+    roleOptions: popover.querySelectorAll('[role="option"]').length,
+    dataValue: popover.querySelectorAll("[data-value]").length,
+  };
+
+  const input = popover.querySelector<HTMLInputElement>(
+    '[data-slot="command-input"], [cmdk-input]'
+  );
+  const emptyEl = popover.querySelector<HTMLElement>(
+    '[data-slot="command-empty"], [cmdk-empty]'
+  );
+
+  const emptyText = (emptyEl?.textContent ?? "").trim().slice(0, 80);
+  const inputValue = (input?.value ?? "").trim().slice(0, 80);
+
+  return `__EMPTY__ counts=${JSON.stringify(
+    counts
+  )} input="${inputValue}" emptyText="${emptyText}"`;
 }
 
 export function getOpenCommandContainer(): HTMLElement {
   const openPopover = getOpenPopoverContent();
   if (openPopover) return openPopover;
 
-  const dialogContents = Array.from(
-    document.querySelectorAll<HTMLElement>('[data-slot="dialog-content"]')
-  );
-  const lastVisibleDialog = [...dialogContents].reverse().find((el) => {
-    if (el.dataset.state === "open") return true;
-    try {
-      const style = getComputedStyle(el);
-      return style.display !== "none" && style.visibility !== "hidden";
-    } catch {
-      return true;
-    }
-  });
-
-  return lastVisibleDialog ?? document.body;
+  return getLastVisibleDialogContent() ?? document.body;
 }
