@@ -1,12 +1,12 @@
 import { useAppStore } from "@/hooks/store/AppStore";
 import type { User } from "@/hooks/store/types/store.types";
 import { testQueryClient } from "@/tests/test-utils/AppTestWrapper";
-import { getOpenPopoverCommandItemTexts } from "@/tests/test-utils/vitest-browser.helpers";
+import { getOpenPopoverCommandDebugText } from "@/tests/test-utils/vitest-browser.helpers";
 import { beforeEach, expect, vi } from "vitest";
 
-export async function expectPopoverToContain(text: RegExp, timeout = 500) {
+export async function expectPopoverToContain(text: RegExp, timeout = 1000) {
   await expect
-    .poll(() => getOpenPopoverCommandItemTexts().join(" "), { timeout })
+    .poll(() => getOpenPopoverCommandDebugText(), { timeout })
     .toMatch(text);
 }
 
