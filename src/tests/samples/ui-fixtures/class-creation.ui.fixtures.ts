@@ -121,6 +121,16 @@ export function fixtureCreateClassStepOne(opts?: {
     ),
   };
 
+  const taskLabelController = taskTemplateCreationInputControllers.find(
+    (c) => c.name === "taskId"
+  )!;
+
+  const skillsController = taskTemplateCreationInputControllers.find(
+    (c) => c.name === "skills"
+  )!;
+
+  const createClassPostEndpoint = API_ENDPOINTS.POST.CREATE_CLASS.endpoint;
+
   const studentsController = classCreationInputControllers.find(
     (c) => c.name === "students"
   )!;
@@ -147,10 +157,27 @@ export function fixtureCreateClassStepOne(opts?: {
             [String(classFetched.degreeLevel)]: [classFetched, classFetched2],
           },
         ],
+        // Stub diplomas, tasks and students used in the Step One flow
+        [
+          diplomasController.apiEndpoint,
+          { [diplomaFetched.degreeField]: [diplomaFetched, diplomaFetched2] },
+        ],
+        [tasksController.apiEndpoint, taskTemplateFetch],
+        // Also stub the templates endpoint for the second diploma, so tests can
+        // switch diplomas and still exercise the real "by diploma" query.
+        [
+          API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
+            diplomaFetched2.id
+          ),
+          taskTemplateFetch,
+        ],
+        // Task list used by the nested "new task template" modal (taskId field)
+        [API_ENDPOINTS.GET.TASKS.endpoint, [taskFetched, taskFetched2]],
+        [studentsController.apiEndpoint, [studentFetched]],
       ],
       postRoutes: [
         [
-          API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
+          createClassPostEndpoint,
           opts?.createClassPostResponse ?? classCreated,
         ],
       ],
@@ -164,6 +191,11 @@ export function fixtureCreateClassStepOne(opts?: {
       diplomasController,
       tasksController,
       studentsController,
+      taskLabelController,
+      skillsController,
+    },
+    endpoints: {
+      createClassPostEndpoint,
     },
     sample: {
       classFetched,
