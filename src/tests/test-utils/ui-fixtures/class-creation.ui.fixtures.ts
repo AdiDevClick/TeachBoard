@@ -21,7 +21,6 @@ import {
   diplomaFetched2,
   skillsModulesFetched,
   studentFetched,
-  studentFetched2,
   taskFetched,
   taskFetched2,
   taskTemplateCreated,
