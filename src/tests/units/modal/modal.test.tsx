@@ -1,7 +1,7 @@
 import type { DialogContextType } from "@/api/contexts/types/context.types";
 import { useDialog } from "@/hooks/contexts/useDialog";
 import { AppModals } from "@/pages/AllModals/AppModals";
-import { AppTestWrapper } from "@/tests/test-utils/AppTestWrapper";
+import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import getHookResults from "@/tests/test-utils/getHookResults.ts";
 import { handleModalOpening, wait } from "@/utils/utils";
 
