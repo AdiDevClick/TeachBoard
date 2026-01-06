@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { degreeCreationInputControllersYear } from "@/data/inputs-controllers.data";
 import { AppModals } from "@/pages/AllModals/AppModals";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
@@ -105,6 +106,11 @@ describe("UI flow: new-degree-item-year", () => {
       endpoint: diplomaYearController.apiEndpoint,
       getCallsBefore: getCallsBeforeCreation,
       openPopover: { label: controllerLabelRegex(diplomaYearController) },
+      post: {
+        endpoint: API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.YEAR,
+        count: 1,
+        timeout: 2500,
+      },
     });
   });
 });

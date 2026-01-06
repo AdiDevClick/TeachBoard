@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { degreeCreationInputControllersDegree } from "@/data/inputs-controllers.data";
 import { AppModals } from "@/pages/AllModals/AppModals";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
@@ -109,6 +110,11 @@ describe("UI flow: new-degree-item-degree", () => {
       endpoint: diplomaLevelController.apiEndpoint,
       getCallsBefore: getCallsBeforeCreation,
       openPopover: { label: controllerLabelRegex(diplomaLevelController) },
+      post: {
+        endpoint: API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.LEVEL,
+        count: 1,
+        timeout: 2500,
+      },
     });
   });
 });

@@ -242,6 +242,7 @@ describe("UI flow: create-diploma (from class-creation)", () => {
       })
     );
 
+    // Ensure there are no form validation alerts, then submit
     await checkFormValidityAndSubmit("Créer le diplôme");
 
     await expect

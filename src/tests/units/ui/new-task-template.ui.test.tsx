@@ -126,6 +126,11 @@ describe("UI flow: new-task-template", () => {
       openPopover: {
         trigger: controllerTriggerRegex(templatesController),
       },
+      post: {
+        endpoint: API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.endpoint,
+        count: 1,
+        timeout: 2500,
+      },
     });
   });
 

@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { taskItemInputControllers } from "@/data/inputs-controllers.data";
 import { AppModals } from "@/pages/AllModals/AppModals";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
@@ -95,6 +96,11 @@ describe("UI flow: new-task-item", () => {
       endpoint: taskController.apiEndpoint,
       getCallsBefore: getCallsBeforeCreation,
       openPopover: { label: rxExact(taskController.label) },
+      post: {
+        endpoint: API_ENDPOINTS.POST.CREATE_TASK.endpoint,
+        count: 1,
+        timeout: 2500,
+      },
     });
   });
 });

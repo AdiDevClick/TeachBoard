@@ -1,5 +1,6 @@
 import { degreeModuleTitleProps } from "@/components/ClassCreation/diploma/degree-module-skill/DegreeModuleSkill.tsx";
 import { DegreeModuleController } from "@/components/ClassCreation/diploma/degree-module/controller/DegreeModuleController";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
   degreeModuleCreationInputControllers,
   degreeSubSkillsCreationInputControllers,
@@ -114,6 +115,11 @@ describe("DegreeModuleSkill modal UI interaction", () => {
       getCallsBefore: getCallsBeforeCreation,
       endpoint: skillsController.apiEndpoint,
       openPopover: { trigger: rx(skillsController.placeholder) },
+      post: {
+        endpoint: API_ENDPOINTS.POST.CREATE_SKILL.endPoints.SUBSKILL,
+        count: 1,
+        timeout: 2500,
+      },
     });
 
     // Additional strict assertion: check full cache shape
