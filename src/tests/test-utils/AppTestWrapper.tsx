@@ -1,10 +1,9 @@
 import { DialogProvider } from "@/api/providers/DialogProvider";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { testQueryClient } from "@/tests/test-utils/testQueryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { type PropsWithChildren } from "react";
 import { MemoryRouter } from "react-router-dom";
-
-export const testQueryClient = new QueryClient();
 
 /**
  * AppTestWrapper component to provide necessary context for testing.
