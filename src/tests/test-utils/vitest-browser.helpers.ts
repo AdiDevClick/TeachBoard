@@ -51,12 +51,6 @@ export function getLastUiAction(): UiLastAction | null {
   return (globalThis as GlobalWithUiLastAction).__TB_UI_LAST_ACTION__ ?? null;
 }
 
-export async function expectPopoverToContain(text: RegExp, timeout = 1000) {
-  await expect
-    .poll(() => getOpenPopoverCommandDebugText(), { timeout })
-    .toMatch(text);
-}
-
 export async function expectFormToHaveNoErrors(timeout = 1000) {
   await expect
     .poll(
@@ -231,7 +225,9 @@ export async function expectOpenPopoverToContain(
 ) {
   for (const it of items) {
     const pattern = it instanceof RegExp ? it : rx(it);
-    await expectPopoverToContain(pattern, timeout);
+    await expect
+      .poll(() => getOpenPopoverCommandDebugText(), { timeout })
+      .toMatch(pattern);
   }
 }
 

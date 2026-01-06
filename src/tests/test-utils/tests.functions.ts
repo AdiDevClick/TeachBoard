@@ -95,25 +95,6 @@ export async function waitForItemsLength(
 }
 
 /**
- * Helper to get the IDs of all cached items for a given query key
- *
- * @param queryKey - query key to retrieve cached items for
- * @returns array of item IDs
- */
-export function getCachedItemIds(queryKey: readonly unknown[]): string[] {
-  const cached = testQueryClient.getQueryData<CachedGroup[]>(queryKey);
-  const ids: string[] = [];
-
-  for (const group of cached ?? []) {
-    for (const item of group.items ?? []) {
-      if (typeof item.id === "string") ids.push(item.id);
-    }
-  }
-
-  return ids;
-}
-
-/**
  * Assert that after a creation POST, the provided queryKey is updated in cache
  * with an item matching `expectedValue` and that no extra GET was performed
  * on the given `endpoint` (count unchanged compared to `getCallsBefore`).
