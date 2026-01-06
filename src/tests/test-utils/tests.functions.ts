@@ -1,5 +1,12 @@
-import { testQueryClient } from "@/tests/test-utils/AppTestWrapper.tsx";
-import { countFetchCalls } from "@/tests/test-utils/vitest-browser.helpers.ts";
+import { testQueryClient } from "@/tests/test-utils/testQueryClient.ts";
+import {
+  countFetchCalls,
+  countFetchCallsByUrl,
+  expectOpenPopoverToContain,
+  openPopoverAndExpectByLabel,
+  openPopoverAndExpectByTrigger,
+  openPopoverByContainerId,
+} from "@/tests/test-utils/vitest-browser.helpers.ts";
 import type { CachedGroup, DialogOptions } from "@/tests/types/tests.types.ts";
 import { wait } from "@/utils/utils.ts";
 import { expect } from "vitest";
@@ -104,4 +111,100 @@ export function getCachedItemIds(queryKey: readonly unknown[]): string[] {
   }
 
   return ids;
+}
+
+/**
+ * Assert that after a creation POST, the provided queryKey is updated in cache
+ * with an item matching `expectedValue` and that no extra GET was performed
+ * on the given `endpoint` (count unchanged compared to `getCallsBefore`).
+ */
+export async function assertPostUpdatedCacheWithoutExtraGet(opts: {
+  queryKey: readonly unknown[];
+  expectedValue?: string; // item.value expected to appear in cache
+  endpoint?: string | RegExp;
+  getCallsBefore?: number; // count of GET calls recorded before POST
+  timeout?: number;
+  /** Optional visual check: open popover and assert item is visible */
+  openPopover?: {
+    label?: RegExp;
+    trigger?: RegExp;
+    containerId?: string;
+    withinDialog?: boolean;
+  };
+}) {
+  const timeout = opts.timeout ?? 1000;
+
+  // Wait for cache to be populated
+  await expect
+    .poll(
+      () => {
+        const cached = testQueryClient.getQueryData<CachedGroup[]>(
+          opts.queryKey
+        );
+        return cached ?? null;
+      },
+      { timeout }
+    )
+    .toBeTruthy();
+
+  // Optional check for expectedValue existence
+  if (opts.expectedValue) {
+    await expect
+      .poll(
+        () => {
+          const cached = testQueryClient.getQueryData<CachedGroup[]>(
+            opts.queryKey
+          );
+          if (!cached) return false;
+          return (
+            cached[0]?.items?.some(
+              (i: any) => i?.value === opts.expectedValue
+            ) ?? false
+          );
+        },
+        { timeout }
+      )
+      .toBe(true);
+  }
+
+  // If getCallsBefore provided, assert no additional GET was made
+  if (typeof opts.getCallsBefore === "number") {
+    if (opts.endpoint === undefined) {
+      // Fallback: assert global GET call count unchanged
+      expect(countFetchCalls("GET")).toBe(opts.getCallsBefore);
+    } else {
+      expect(countFetchCallsByUrl(opts.endpoint, "GET")).toBe(
+        opts.getCallsBefore
+      );
+    }
+  }
+
+  // Optional: open a popover and assert the new item is visible
+  if (opts.openPopover) {
+    if (!opts.expectedValue)
+      throw new Error(
+        "assertPostUpdatedCacheWithoutExtraGet: expectedValue is required when openPopover is used"
+      );
+
+    const op = opts.openPopover;
+
+    if (op.label) {
+      console.log("checking label");
+      await openPopoverAndExpectByLabel(op.label, [opts.expectedValue], {
+        withinDialog: !!op.withinDialog,
+        timeout,
+      });
+    } else if (op.trigger) {
+      console.log("checking trigger");
+      await openPopoverAndExpectByTrigger(
+        op.trigger,
+        [opts.expectedValue],
+        timeout
+      );
+    } else if (op.containerId) {
+      console.log("checking containerId");
+      await openPopoverByContainerId(op.containerId);
+      await expectOpenPopoverToContain([opts.expectedValue], timeout);
+    }
+  }
 }
