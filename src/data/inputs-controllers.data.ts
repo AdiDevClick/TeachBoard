@@ -95,6 +95,7 @@ export const classCreationInputControllers = [
     title: "Description (optionnelle)",
     type: "text",
     placeholder: "Description de la classe",
+    required: false,
   },
   {
     // id: "fetch-input-tasks-templates",
