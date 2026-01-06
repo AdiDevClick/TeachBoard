@@ -36,10 +36,7 @@ type GlobalWithUiLastAction = typeof globalThis & {
   __TB_UI_LAST_ACTION__?: UiLastAction;
 };
 
-export function setLastUiAction(
-  action: string,
-  details?: Record<string, unknown>
-) {
+function setLastUiAction(action: string, details?: Record<string, unknown>) {
   (globalThis as GlobalWithUiLastAction).__TB_UI_LAST_ACTION__ = {
     at: Date.now(),
     action,
@@ -47,11 +44,11 @@ export function setLastUiAction(
   } satisfies UiLastAction;
 }
 
-export function getLastUiAction(): UiLastAction | null {
+function getLastUiAction(): UiLastAction | null {
   return (globalThis as GlobalWithUiLastAction).__TB_UI_LAST_ACTION__ ?? null;
 }
 
-export async function expectFormToHaveNoErrors(timeout = 1000) {
+async function expectFormToHaveNoErrors(timeout = 1000) {
   await expect
     .poll(
       () =>
@@ -909,7 +906,7 @@ export function getOpenPopoverCommandItemTexts(): string[] {
     .filter(Boolean);
 }
 
-export function getOpenPopoverCommandDebugText(): string {
+function getOpenPopoverCommandDebugText(): string {
   const popover = getOpenPopoverContent();
   if (!popover) {
     const all = page
