@@ -96,8 +96,8 @@ describe("UI flow: new-task-template", () => {
 
     // Open templates popover and assert existing template names
     await openPopoverByTriggerName(controllerTriggerRegex(templatesController));
-    await expectPopoverToContain(new RegExp(taskFetched.name, "i"));
-    await expectPopoverToContain(new RegExp(taskFetched2.name, "i"));
+    const tasks = [taskFetched.name, taskFetched2.name];
+    for (const t of tasks) await expectPopoverToContain(new RegExp(t, "i"));
 
     // Open creation modal
     await userEvent.click(
@@ -191,9 +191,7 @@ describe("UI flow: new-task-template", () => {
     );
 
     await openPopoverByTriggerName(controllerTriggerRegex(templatesController));
-    await expectPopoverToContain(
-      new RegExp(taskTemplateCreated.task.name, "i")
-    );
+    await expectPopoverToContain(new RegExp(taskTemplateCreated.task.name, "i"));
 
     expect(countFetchCallsByUrl(templatesController.apiEndpoint, "GET")).toBe(
       getCallsBeforeCreation

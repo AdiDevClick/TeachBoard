@@ -67,8 +67,9 @@ describe("UI flow: new-degree-item-year", () => {
     );
 
     await openPopoverByContainerId(diplomaYearController.id);
-    await expectPopoverToContain(new RegExp(degreeYearFetched.name, "i"));
-    await expectPopoverToContain(new RegExp(degreeYearFetched2.name, "i"));
+
+    const years = [degreeYearFetched.name, degreeYearFetched2.name];
+    for (const y of years) await expectPopoverToContain(new RegExp(y, "i"));
 
     const getCallsBeforeCreation = countFetchCallsByUrl(
       API_ENDPOINTS.GET.DEGREES.endpoints.YEAR,

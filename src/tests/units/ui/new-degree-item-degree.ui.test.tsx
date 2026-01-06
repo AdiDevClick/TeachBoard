@@ -68,8 +68,8 @@ describe("UI flow: new-degree-item-degree", () => {
 
     await openPopoverByContainerId(diplomaLevelController.id);
 
-    await expectPopoverToContain(new RegExp(degreeLevelFetched.name, "i"));
-    await expectPopoverToContain(new RegExp(degreeLevelFetched2.name, "i"));
+    const levels = [degreeLevelFetched.name, degreeLevelFetched2.name];
+    for (const l of levels) await expectPopoverToContain(new RegExp(l, "i"));
 
     const getCallsBeforeCreation = countFetchCallsByUrl(
       API_ENDPOINTS.GET.DEGREES.endpoints.LEVEL,

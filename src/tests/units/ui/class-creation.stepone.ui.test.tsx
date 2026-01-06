@@ -99,8 +99,9 @@ describe.skip("UI flow: class-creation (StepOne list)", () => {
     await openPopoverByLabelText(
       controllerLabelRegex(stepOneClassesController)
     );
-    await expectPopoverToContain(/1A/i);
-    await expectPopoverToContain(/1B/i);
+
+    const classes = ["1A", "1B"];
+    for (const c of classes) await expectPopoverToContain(new RegExp(c, "i"));
 
     const getCallsBeforeCreation = countFetchCallsByUrl(
       API_ENDPOINTS.GET.CLASSES.endPoints.ALL,

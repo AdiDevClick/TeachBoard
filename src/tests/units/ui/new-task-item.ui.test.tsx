@@ -58,8 +58,9 @@ describe("UI flow: new-task-item", () => {
     );
 
     await openPopoverByLabelText(new RegExp(`^${taskController.label}$`, "i"));
-    await expectPopoverToContain(new RegExp(taskFetched.name, "i"));
-    await expectPopoverToContain(new RegExp(taskFetched2.name, "i"));
+
+    const tasks = [taskFetched.name, taskFetched2.name];
+    for (const t of tasks) await expectPopoverToContain(new RegExp(t, "i"));
 
     const getCallsBeforeCreation = countFetchCallsByUrl(
       API_ENDPOINTS.GET.TASKS.endpoint,
@@ -74,16 +75,16 @@ describe("UI flow: new-task-item", () => {
       .toBeInTheDocument();
 
     const submit = page.getByRole("button", { name: /^Créer$/i });
-    await userEvent.fill(
-      page.getByLabelText(taskItemInputControllers[0].title),
-      "Configurer un routeur"
-    );
-    await userEvent.tab();
-    await userEvent.fill(
-      page.getByLabelText(taskItemInputControllers[1].title),
-      "Une description valide."
-    );
-    await userEvent.tab();
+
+    const fills = [
+      { label: taskItemInputControllers[0].title, value: "Configurer un routeur" },
+      { label: taskItemInputControllers[1].title, value: "Une description valide." },
+    ];
+
+    for (const f of fills) {
+      await userEvent.fill(page.getByLabelText(f.label), f.value);
+      await userEvent.tab();
+    }
 
     await expect.element(submit).toBeEnabled();
     await userEvent.click(submit);

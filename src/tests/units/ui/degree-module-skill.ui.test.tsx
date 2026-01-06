@@ -76,16 +76,17 @@ describe("DegreeModuleSkill modal UI interaction", () => {
     const submitButton = page.getByRole("button", { name: /^Ajouter$/i });
     await expect.element(submitButton).toBeDisabled();
 
-    // Fill form with valid values (use userEvent.fill to trigger real input events)
-    const nameInput = page.getByLabelText(/Nom de la compétence/i);
-    const codeInput = page.getByLabelText(/^Code$/i);
-
     // Match the stubbed POST payload/response shape
-    await userEvent.fill(nameInput, "new");
-    await userEvent.tab();
-    await userEvent.fill(codeInput, "NEW");
-    // Blur the last field so RHF (mode: onTouched) can compute validity
-    await userEvent.tab();
+    const fills = [
+      { input: page.getByLabelText(/Nom de la compétence/i), value: "new" },
+      { input: page.getByLabelText(/^Code$/i), value: "NEW" },
+    ];
+
+    for (const f of fills) {
+      await userEvent.fill(f.input, f.value);
+      await userEvent.tab();
+    }
+    // Last tab blurs the final field so RHF (onTouched) can compute validity
 
     // Submit valid form
     await expect.element(submitButton).toBeEnabled();
