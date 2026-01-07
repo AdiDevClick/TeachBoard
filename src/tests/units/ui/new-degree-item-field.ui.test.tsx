@@ -17,13 +17,12 @@ import {
   checkFormValidityAndSubmit,
   countFetchCallsByUrl,
   fillFieldsEnsuringSubmitDisabled,
-  openPopoverAndExpectByLabel,
   queryKeyFor,
-  submitButtonShouldBeDisabled,
   waitForDialogAndAssertText,
 } from "@/tests/test-utils/vitest-browser.helpers";
+import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions";
 import { afterEach, describe, test, vi } from "vitest";
-import { page, userEvent } from "vitest/browser";
+import { page } from "vitest/browser";
 
 const fx = fixtureNewDegreeItem("FIELD");
 const diplomaFieldController = fx.controller;
@@ -48,9 +47,13 @@ describe("UI flow: new-degree-item-field", () => {
   test("fetched items show up, add new opens modal, POST updates cache without extra GET", async () => {
     // Open templates popover and assert existing names
     const fields = [degreeFieldFetched.name, degreeFieldFetched2.name];
-    await openPopoverAndExpectByLabel(
-      controllerLabelRegex(diplomaFieldController),
-      fields
+    await openModalAndAssertItsOpenedAndReady(
+      diplomaFieldController.creationButtonText,
+      {
+        controller: diplomaFieldController,
+        nameArray: fields,
+        readyText: degreeCreationInputControllersField[0].title,
+      }
     );
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
@@ -59,20 +62,7 @@ describe("UI flow: new-degree-item-field", () => {
       "GET"
     );
 
-    // Open creation modal
-    await userEvent.click(
-      page.getByRole("button", {
-        name: diplomaFieldController.creationButtonText,
-      })
-    );
-
-    // Ensure modal is opened and title is present
-    await waitForDialogAndAssertText(
-      degreeCreationInputControllersField[0].title,
-      { present: true }
-    );
-
-    await submitButtonShouldBeDisabled("Créer");
+    // await submitButtonShouldBeDisabled("Créer");
 
     await fillFieldsEnsuringSubmitDisabled("Créer", [
       {
