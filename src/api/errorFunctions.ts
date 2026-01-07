@@ -45,11 +45,11 @@ export function getErrorMessage(
     case 401:
       return errorMessage ?? "Unauthorized";
     case 403:
-      return errorMessage ?? "Forbidden";
+      return "Vous n'avez pas la permission d'accéder à cette ressource. Veillez à être connecté avec un compte disposant des droits nécessaires.";
     case 404:
       return (
         errorMessage ??
-        "The requested resource was not found. Please contact support if the issue persists."
+        "Ressource non trouvée. Veuillez vérifier l'URL ou contacter l'administrateur si le problème persiste."
       );
     case 500:
       return errorMessage ?? "Server error occurred during submission.";
