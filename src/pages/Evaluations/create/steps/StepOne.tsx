@@ -1,11 +1,18 @@
-import type { HandleAddNewItemParams } from "@/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { PopoverFieldWithCommands } from "@/components/Popovers/PopoverField.tsx";
+import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
 import { Card, CardContent } from "@/components/ui/card.tsx";
-import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
+import {
+  DEV_MODE,
+  NO_CACHE_LOGS,
+  NO_QUERY_LOGS,
+} from "@/configs/app.config.ts";
 import { stepOneInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
+import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 const loadingName = "load-classes";
 export function StepOne({
@@ -28,6 +35,10 @@ export function StepOne({
     newItemCallback,
     openingCallback,
     resultsCallback,
+    isLoaded,
+    isLoading,
+    data,
+    error,
   } = useCommandHandler({
     form: null,
     pageId: title,
@@ -49,26 +60,23 @@ export function StepOne({
   //   setSelected(false);
   // };
 
-  // useEffect(() => {
-  //   if (isLoading) {
-  //     toast.loading("Chargement des classes...", { id: loadingName });
-  //   }
+  useEffect(() => {
+    if (isLoading) {
+      toast.loading("Chargement des classes...", { id: loadingName });
+    }
 
-  //   if (data || error) {
-  //     toast.dismiss(loadingName);
-  //     if (DEV_MODE) {
-  //       console.log(
-  //         (data?.data.classes !== null) | (data?.data.classes !== undefined)
-  //       );
-  //       console.debug("useQueryOnSubmit data", data ?? error);
-  //     }
-  //     // You can handle additional side effects here if needed
-  //   }
+    if (data || error) {
+      toast.dismiss(loadingName);
+      if (DEV_MODE && !NO_QUERY_LOGS) {
+        console.debug("useQueryOnSubmit data", data ?? error);
+      }
+      // You can handle additional side effects here if needed
+    }
 
-  //   if (error) {
-  //     // Errors are handled in onError callback
-  //   }
-  // }, [data, error, isLoading]);
+    if (error) {
+      // Errors are handled in onError callback
+    }
+  }, [data, error, isLoading]);
 
   // const handleTriggerOpening = (isOpen: boolean) => {
   //   if (isOpen && !isLoaded && !isLoading) {
@@ -92,7 +100,11 @@ export function StepOne({
    * @param open - Whether the select is opening
    * @param metaData - The meta data from the popover field that was opened
    */
-  const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
+  const handleOpening = (open: boolean, metaData?: MetaDatasPopoverField) => {
+    if (metaData) {
+      metaData.silent = true;
+    }
+
     openingCallback(open, metaData);
   };
 
