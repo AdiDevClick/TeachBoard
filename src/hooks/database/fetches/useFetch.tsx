@@ -103,15 +103,7 @@ export function useFetch() {
         setLastUserActivity(contentId);
         errorCallback?.(error);
 
-        if (error.status === 403) {
-          navigate("/login", { replace: true });
-          // clearUser();
-          toast.dismiss();
-          toast.error(
-            `Vous n'avez pas la permission d'accéder à cette ressource. \nVeillez à être connecté avec un compte disposant des droits nécessaires.`,
-            { style: { whiteSpace: "pre-wrap" } }
-          );
-        }
+        navigateOnForbiddenError(error.status, navigate);
       },
     },
   ]);
@@ -121,4 +113,23 @@ export function useFetch() {
     setFetchParams,
     ...queryParams,
   };
+}
+
+/**
+ * Navigate to a specific page errors.
+ *
+ * @param status - The HTTP status code.
+ * @param navigate - The navigate function from react-router-dom.
+ */
+function navigateOnForbiddenError(
+  status: number,
+  navigate: ReturnType<typeof useNavigate>
+) {
+  switch (status) {
+    case 403:
+      navigate("/login", { replace: true });
+      break;
+    default:
+      break;
+  }
 }
