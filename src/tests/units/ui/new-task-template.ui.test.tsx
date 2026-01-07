@@ -16,17 +16,16 @@ import {
   countFetchCallsByUrl,
   fillFieldsEnsuringSubmitDisabled,
   getLastPostJsonBodyByUrl,
-  openPopoverAndExpectByTrigger,
   queryKeyFor,
   rx,
   rxExact,
   selectMultiplePopoversEnsuringSubmitDisabled,
   submitButtonShouldBeDisabled,
   waitForDialogAndAssertText,
-  waitForDialogState,
 } from "@/tests/test-utils/vitest-browser.helpers";
+import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { page, userEvent } from "vitest/browser";
+import { page } from "vitest/browser";
 
 const fx = fixtureNewTaskTemplate();
 const { templatesController, skillsController, taskLabelController } =
@@ -55,9 +54,13 @@ afterEach(() => {
 describe("UI flow: new-task-template", () => {
   test("fetched templates show up, add new opens modal, POST updates cache without extra GET", async () => {
     // Open templates popover and assert existing template names
-    await openPopoverAndExpectByTrigger(
-      controllerTriggerRegex(templatesController),
-      [fx.sample.taskFetched.name, fx.sample.taskFetched2.name]
+    await openModalAndAssertItsOpenedAndReady(
+      templatesController.creationButtonText,
+      {
+        controller: templatesController,
+        nameArray: [fx.sample.taskFetched.name, fx.sample.taskFetched2.name],
+        readyText: rxExact(taskLabelController.label),
+      }
     );
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
@@ -65,16 +68,6 @@ describe("UI flow: new-task-template", () => {
       templatesController.apiEndpoint,
       "GET"
     );
-
-    // Open creation modal
-    await userEvent.click(
-      page.getByRole("button", {
-        name: templatesController.creationButtonText,
-      })
-    );
-
-    // Wait for modal to be open
-    await waitForDialogState(true, 1000);
 
     // Fill required inputs
     const nameLabel = rx(taskTemplateCreationInputControllers[0].title!);
@@ -135,23 +128,27 @@ describe("UI flow: new-task-template", () => {
   });
 
   test("anti-falsification: selected task/skills ids are exactly what gets POSTed", async () => {
+    const tasks = [fx.sample.taskFetched.name, fx.sample.taskFetched2.name];
     // Open templates popover and then open creation modal
-    await openPopoverAndExpectByTrigger(
-      controllerTriggerRegex(templatesController),
-      [fx.sample.taskFetched.name, fx.sample.taskFetched2.name]
+    await openModalAndAssertItsOpenedAndReady(
+      templatesController.creationButtonText,
+      {
+        controller: templatesController,
+        nameArray: tasks,
+        readyText: rxExact(taskLabelController.label),
+      }
     );
 
-    await userEvent.click(
-      page.getByRole("button", {
-        name: templatesController.creationButtonText,
-      })
+    // Snapshot GET count after initial fetch (triggered by opening the popover)
+    const getCallsBeforeCreation = countFetchCallsByUrl(
+      templatesController.apiEndpoint,
+      "GET"
     );
-    await waitForDialogState(true, 1000);
 
     const nameLabel = rx(taskTemplateCreationInputControllers[0].title!);
     const descLabel = rx(taskTemplateCreationInputControllers[1].title!);
 
-    await submitButtonShouldBeDisabled("Ajouter");
+    // await submitButtonShouldBeDisabled("Ajouter");
 
     await fillFieldsEnsuringSubmitDisabled("Ajouter", [
       { label: nameLabel, value: "template" },
