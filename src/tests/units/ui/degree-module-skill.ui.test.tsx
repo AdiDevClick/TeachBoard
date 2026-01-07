@@ -20,18 +20,15 @@ import {
 } from "@/tests/test-utils/tests.functions";
 import {
   checkFormValidityAndSubmit,
-  countFetchCalls,
+  countFetchCallsByUrl,
   fillFieldsEnsuringSubmitDisabled,
-  openPopoverAndExpectByTrigger,
   queryKeyFor,
   rx,
-  submitButtonShouldBeDisabled,
   waitForDialogAndAssertText,
-  waitForDialogState,
 } from "@/tests/test-utils/vitest-browser.helpers";
+import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions";
 import { useForm } from "react-hook-form";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { page, userEvent } from "vitest/browser";
 // Render the controller wrapped in a small component that creates the form (hooks must be used in components)
 function DegreeModuleControllerWrapper() {
   const form = useForm<DegreeModuleFormSchema>({
@@ -66,25 +63,20 @@ afterEach(() => {
 describe("DegreeModuleSkill modal UI interaction", () => {
   test("clicking add new opens modal, form validates and POST updates cache and command list", async () => {
     // Open popover (command list) and assert it contains fetched skills
-    await openPopoverAndExpectByTrigger(rx(skillsController.placeholder), [
-      skillFetched.code,
-    ]);
-
-    // Snapshot GET count after initial fetch (triggered by opening the popover)
-    const getCallsBeforeCreation = countFetchCalls("GET");
-
-    // Click "Add new" inside popover to open the skill creation modal
-    await userEvent.click(
-      page.getByRole("button", {
-        name: rx(skillsController.creationButtonText),
-      })
+    await openModalAndAssertItsOpenedAndReady(
+      skillsController.creationButtonText,
+      {
+        controller: skillsController,
+        nameArray: [skillFetched.code],
+        readyText: degreeModuleTitleProps.title,
+      }
     );
 
-    // Ensure modal is opened
-    await waitForDialogState(true, 1000);
-
-    // Validation: submit should be disabled while form is invalid
-    await submitButtonShouldBeDisabled("Ajouter");
+    // Snapshot GET count after initial fetch (triggered by opening the popover)
+    const getCallsBeforeCreation = countFetchCallsByUrl(
+      skillsController.apiEndpoint,
+      "GET"
+    );
 
     // Match the stubbed POST payload/response shape
     const fills = [
