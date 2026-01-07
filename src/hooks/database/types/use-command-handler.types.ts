@@ -3,6 +3,7 @@ import type {
   DataReshapeFn,
 } from "@/components/Inputs/types/inputs.types.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
+import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import type { MouseEvent, PointerEvent } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
@@ -20,7 +21,8 @@ export type CommandHandlerMetaData = Record<string, unknown> & {
  * Parameters for the useCommandHandler hook
  */
 export interface UseCommandHandlerParams<
-  TFieldValues extends FieldValues = FieldValues
+  TFieldValues extends FieldValues = FieldValues,
+  TMeta extends CommandHandlerMetaData = CommandHandlerMetaData
 > {
   /** Zod validated form instance */
   form: UseFormReturn<TFieldValues>;
@@ -31,6 +33,7 @@ export interface UseCommandHandlerParams<
 /**
  * Parameters for the handleAddNewItem function
  */
+
 export type HandleAddNewItemParams = {
   e?: PointerEvent<HTMLElement> | MouseEvent<HTMLElement>;
 } & CommandHandlerMetaData;
@@ -56,10 +59,13 @@ export type HandleSelectionCallbackParams = {
 
 /**
  * Parameters for the handleOpeningCallback function
+ *
+ * T allows callers to pass a more specific metadata shape (e.g. Popover, Select)
+ * metaData is intentionally partial: callers usually only provide a subset of FetchParams
  */
-export type HandleOpeningCallbackParams = {
+export type HandleOpeningCallbackParams<T extends CommandHandlerMetaData> = {
   open: boolean;
-  metaData?: CommandHandlerMetaData;
+  metaData?: T & Partial<FetchParams>;
 };
 
 /**
