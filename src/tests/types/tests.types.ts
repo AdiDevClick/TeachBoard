@@ -30,3 +30,11 @@ export type CachedItem = {
  * Represents a cached group containing a title and an array of cached items.
  */
 export type CachedGroup = { groupTitle: string; items: CachedItem[] };
+
+export type ControllerLike = {
+  apiEndpoint: string;
+  task?: string;
+  label?: string;
+  placeholder?: string;
+  creationButtonText?: string;
+};
