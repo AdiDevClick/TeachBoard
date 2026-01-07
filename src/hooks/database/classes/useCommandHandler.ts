@@ -14,6 +14,7 @@ import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.
 import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import type {
+  CommandHandlerMetaData,
   HandleAddNewItemParams,
   HandleOpeningCallbackParams,
   HandleSelectionCallbackParams,
@@ -39,8 +40,9 @@ import type { FieldValues, Path, PathValue } from "react-hook-form";
  * @param pageId - The identifier for the current page or module
  */
 export function useCommandHandler<
-  TFieldValues extends FieldValues = FieldValues
->({ form, pageId }: UseCommandHandlerParams<TFieldValues>) {
+  TFieldValues extends FieldValues,
+  TMeta extends CommandHandlerMetaData
+>({ form, pageId }: UseCommandHandlerParams<TFieldValues, TMeta>) {
   const {
     fetchParams,
     onSubmit,
@@ -111,7 +113,8 @@ export function useCommandHandler<
       variables: HandleSubmitCallbackParams["variables"],
       endpointUrl: HandleSubmitCallbackParams["endpointUrl"],
       dataReshapeFn: HandleSubmitCallbackParams["dataReshapeFn"],
-      reshapeOptions: HandleSubmitCallbackParams["reshapeOptions"] = null
+      reshapeOptions: HandleSubmitCallbackParams["reshapeOptions"] = null,
+      silent: HandleSubmitCallbackParams["silent"] = false
     ) => {
       const options = dialogOptions(pageId);
 
@@ -141,7 +144,8 @@ export function useCommandHandler<
         method: API_ENDPOINTS.POST.METHOD,
         contentId: options?.task ?? pageId,
         dataReshapeFn: dataReshapeFn ?? options?.dataReshapeFn,
-        reshapeOptions: reshapeOptions,
+        reshapeOptions,
+        silent,
       }));
     },
     []
@@ -156,14 +160,15 @@ export function useCommandHandler<
    */
   const handleOpening = useCallback(
     (
-      open: HandleOpeningCallbackParams["open"],
-      metaData?: HandleOpeningCallbackParams["metaData"]
+      open: boolean,
+      metaData?: HandleOpeningCallbackParams<TMeta>["metaData"]
     ) => {
       if (!open) return;
 
-      const task = metaData?.task as FetchParams["contentId"] | undefined;
+      const task = metaData?.task as FetchParams["contentId"];
       const apiEndpoint = metaData?.apiEndpoint;
       const dataReshapeFn = metaData?.dataReshapeFn;
+      const silent = metaData?.silent;
 
       // Fail fast when a command/modal expects an endpoint but none is provided.
       // This catches regressions where inputControllers drift from API_ENDPOINTS.
@@ -186,12 +191,15 @@ export function useCommandHandler<
         console.debug("handleOpening callback in CommandHandler", metaData);
       }
 
-      setFetchParams((prev) => ({
-        ...prev,
-        dataReshapeFn: dataReshapeFn ?? prev.dataReshapeFn,
-        url: (apiEndpoint ?? prev.url) as string,
-        contentId: task ?? prev.contentId,
-      }));
+      setFetchParams(
+        (prev): FetchParams => ({
+          ...prev,
+          dataReshapeFn: dataReshapeFn ?? prev.dataReshapeFn,
+          url: (apiEndpoint ?? prev.url) as string,
+          contentId: task ?? prev.contentId,
+          silent,
+        })
+      );
     },
     []
   );
