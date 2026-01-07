@@ -155,12 +155,6 @@ export function ClassCreationController({
    * @param variables - The form data to submit
    */
   const handleValidSubmit = (variables: ClassCreationFormSchema) => {
-    const yearVariable = variables.schoolYear
-      .split(" - ")
-      .map((s) => s.trim())
-      .join("-");
-    variables.schoolYear = yearVariable;
-
     submitCallback(
       variables,
       API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
