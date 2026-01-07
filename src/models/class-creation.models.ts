@@ -27,11 +27,20 @@ export const classCreationSchema = z.object({
   schoolYear: z
     .string()
     .nonempty("Une année scolaire est requise.")
-    .regex(
-      /^\d{4} - \d{4}$/,
+    .refine(
+      (value) => /^\d{4} - \d{4}$/.test(value),
       "Le format de l'année scolaire doit être AAAA - AAAA."
     )
-    .trim(),
+    .transform((value) =>
+      value
+        .split(" - ")
+        .map((s) => s.trim())
+        .join("-")
+    )
+    .refine(
+      (value) => /^\d{4}-\d{4}$/.test(value),
+      "Le format de l'année scolaire doit être AAAA-AAAA."
+    ),
   degreeConfigId: z
     .uuid("L'identifiant de configuration de diplôme doit être un UUID valide.")
     .nonempty("Un identifiant de configuration de diplôme est requis."),
