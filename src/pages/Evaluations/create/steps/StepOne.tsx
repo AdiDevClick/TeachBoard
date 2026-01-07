@@ -101,10 +101,6 @@ export function StepOne({
    * @param metaData - The meta data from the popover field that was opened
    */
   const handleOpening = (open: boolean, metaData?: MetaDatasPopoverField) => {
-    if (metaData) {
-      metaData.silent = true;
-    }
-
     openingCallback(open, metaData);
   };
 
