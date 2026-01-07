@@ -257,9 +257,10 @@ function onQuerySuccess<TSuccess extends ResponseInterface>(
  * @param error The mutation error object.
  */
 function onQueryError<TError extends ApiError>(error: FetchJSONError<TError>) {
-  toast.error(error.error ?? error.message, {
-    style: { zIndex: 10000 + 1 },
-  });
+  toast.error(error.message ?? error.error);
+  // toast.error(error.error ?? error.message, {
+  //   style: { zIndex: 10000 + 1 },
+  // });
 }
 
 /**
