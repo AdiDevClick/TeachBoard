@@ -76,7 +76,7 @@ export function LoginFormController({
       // !! IMPORTANT !! - Use startTransition to avoid blocking UI updates
       startTransition(() => {
         if (!open) setOpen(true);
-        // form.reset();
+        form.reset();
       });
 
       navigate("/", { replace: true });
@@ -101,7 +101,6 @@ export function LoginFormController({
 
     if (data && !hasHandledLoginSuccess.current) {
       hasHandledLoginSuccess.current = true;
-      resetFormAndTriggerNavigation();
 
       if (isPwForgotten) {
         newItemCallback({ e: null, task: "pw-recovery-email-sent" });
@@ -110,6 +109,8 @@ export function LoginFormController({
           id: "login-success-toast",
         });
       }
+
+      resetFormAndTriggerNavigation();
 
       if (DEV_MODE && !NO_QUERY_LOGS) {
         console.debug("Query success in LoginForm", data);
@@ -138,7 +139,8 @@ export function LoginFormController({
       isPwForgotten
         ? API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.dataReshape
         : API_ENDPOINTS.POST.AUTH.LOGIN.dataReshape,
-      { login }
+      { login },
+      true
     );
   };
   console.log("Je rerender le LoginForm");
