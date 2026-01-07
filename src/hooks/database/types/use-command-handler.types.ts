@@ -76,4 +76,5 @@ export type HandleSubmitCallbackParams = {
   endpointUrl: string;
   dataReshapeFn?: DataReshapeFn;
   reshapeOptions?: unknown;
+  silent?: boolean;
 };
