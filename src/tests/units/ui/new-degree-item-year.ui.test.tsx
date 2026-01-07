@@ -17,12 +17,12 @@ import {
   checkFormValidityAndSubmit,
   countFetchCallsByUrl,
   fillFieldsEnsuringSubmitDisabled,
-  openPopoverAndExpectByLabel,
   queryKeyFor,
   waitForDialogAndAssertText,
 } from "@/tests/test-utils/vitest-browser.helpers";
+import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions";
 import { afterEach, describe, test, vi } from "vitest";
-import { page, userEvent } from "vitest/browser";
+import { page } from "vitest/browser";
 
 const fx = fixtureNewDegreeItem("YEAR");
 const diplomaYearController = fx.controller;
@@ -47,28 +47,19 @@ describe("UI flow: new-degree-item-year", () => {
   test("fetched items show up, add new opens modal, POST updates cache without extra GET", async () => {
     // Open templates popover and assert existing names
     const years = [degreeYearFetched.name, degreeYearFetched2.name];
-    await openPopoverAndExpectByLabel(
-      controllerLabelRegex(diplomaYearController),
-      years
+    await openModalAndAssertItsOpenedAndReady(
+      diplomaYearController.creationButtonText,
+      {
+        controller: diplomaYearController,
+        nameArray: years,
+        readyText: degreeCreationInputControllersYear[0].title,
+      }
     );
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
     const getCallsBeforeCreation = countFetchCallsByUrl(
       diplomaYearController.apiEndpoint,
       "GET"
-    );
-
-    // Open creation modal
-    await userEvent.click(
-      page.getByRole("button", {
-        name: diplomaYearController.creationButtonText,
-      })
-    );
-
-    // Ensure modal is opened and title is present
-    await waitForDialogAndAssertText(
-      degreeCreationInputControllersYear[0].title,
-      { present: true }
     );
 
     await fillFieldsEnsuringSubmitDisabled("Créer", [
