@@ -1,4 +1,3 @@
-import { wait } from "@/utils/utils.ts";
 import { expect, vi } from "vitest";
 import { locators, page, userEvent, type Locator } from "vitest/browser";
 
@@ -19,12 +18,40 @@ const SELECTORS = {
   dialogOverlay: '[data-slot="dialog-overlay"]',
   popoverContent: '[data-slot="popover-content"]',
   popoverContentOpen: '[data-slot="popover-content"][data-state="open"]',
+  // Command-related selectors
   commandRoot:
     '[data-slot="command"], [data-slot="command-list"], [data-slot="command-input"], [cmdk-root], [cmdk-list], [cmdk-input]',
+  commandList: '[data-slot="command-list"], [cmdk-list]',
   commandItems: '[data-slot="command-item"], [cmdk-item], [role="option"]',
+  commandSlotItem: '[data-slot="command-item"]',
+  cmdkItem: "[cmdk-item]",
+  roleOption: '[role="option"]',
+  dataValue: "[data-value]",
   commandInput: '[data-slot="command-input"], [cmdk-input]',
   commandEmpty: '[data-slot="command-empty"], [cmdk-empty]',
 } as const;
+
+/**
+ * Generic element query utilities to reduce repetitive locator boilerplate.
+ */
+export function elQuery(
+  container: Element | null | undefined,
+  css: string
+): HTMLElement | null {
+  const loc = container ? page.elementLocator(container) : page;
+  const el = loc.getByCss(css).query();
+  return el instanceof HTMLElement ? el : null;
+}
+
+export function elQueryAll(
+  container: Element | null | undefined,
+  css: string
+): HTMLElement[] {
+  const nodes = container
+    ? page.elementLocator(container).getByCss(css).elements()
+    : page.getByCss(css).elements();
+  return (nodes as HTMLElement[]).filter(Boolean);
+}
 
 type UiLastAction = {
   at: number;
@@ -115,7 +142,14 @@ export async function fillAndTab(
   target: Parameters<typeof userEvent.fill>[0],
   value: string
 ) {
-  await expect.element(target).toBeVisible();
+  // `userEvent.fill` accepts either a Locator or a DOM Element; `expect.element`
+  // expects a Locator or an HTMLElement/SVGElement, so narrow at runtime.
+  if (target instanceof Element) {
+    await expect.element(target as HTMLElement | SVGElement).toBeVisible();
+  } else {
+    await expect.element(target).toBeVisible();
+  }
+
   await userEvent.fill(target, value);
   await userEvent.tab();
 }
@@ -277,22 +311,31 @@ export function getOpenDialogContent(): HTMLElement {
   return dialog;
 }
 
+function getLastOpenOrVisible(
+  openSelector: string,
+  selector: string,
+  opts?: { checkOpacity?: boolean }
+): HTMLElement | null {
+  const open = elQueryAll(undefined, openSelector);
+  const lastOpen = open.at(-1);
+  if (lastOpen) return lastOpen;
+
+  const contents = elQueryAll(undefined, selector);
+  const visible = contents.filter((el) =>
+    isElementActuallyVisible(el, { checkOpacity: opts?.checkOpacity ?? false })
+  );
+  return visible.at(-1) ?? null;
+}
+
 function getLastVisibleDialogContent(): HTMLElement | null {
-  const dialogContents = page
-    .getByCss(SELECTORS.dialogContent)
-    .elements() as unknown as HTMLElement[];
-
-  const lastVisibleDialog = [...dialogContents].reverse().find((el) => {
-    if (el.dataset.state === "open") return true;
-    try {
-      const style = getComputedStyle(el);
-      return style.display !== "none" && style.visibility !== "hidden";
-    } catch {
-      return true;
+  // Use the shared helper; for dialogs we don't check opacity (visibility is enough).
+  return getLastOpenOrVisible(
+    `${SELECTORS.dialogContent}[data-state="open"]`,
+    SELECTORS.dialogContent,
+    {
+      checkOpacity: false,
     }
-  });
-
-  return lastVisibleDialog ?? null;
+  );
 }
 
 export function isDialogOpen(): boolean {
@@ -393,6 +436,60 @@ function isElementActuallyVisible(
   return true;
 }
 
+/**
+ * Count visible elements matching `selector` inside `container` (or the
+ * document when `container` is undefined). Uses
+ * `isElementActuallyVisible(..., { checkOpacity: true })`.
+ */
+function countVisibleElements(
+  container: Element | null | undefined,
+  selector: string,
+  opts?: { checkOpacity?: boolean }
+): number {
+  const els = container
+    ? elQueryAll(container, selector)
+    : elQueryAll(undefined, selector);
+  return els.filter((el) =>
+    isElementActuallyVisible(el, { checkOpacity: opts?.checkOpacity ?? true })
+  ).length;
+}
+
+/**
+ * Given a map of key -> selector, returns an object with visible counts for
+ * each key.
+ */
+function getVisibleCounts(
+  container: Element | null | undefined,
+  map: Record<string, string>
+) {
+  const out: Record<string, number> = {};
+  for (const [k, sel] of Object.entries(map)) {
+    out[k] = countVisibleElements(container, sel, { checkOpacity: true });
+  }
+  return out;
+}
+
+/**
+ * Get a brief visibility info for the first element matching `selector`.
+ * Returns { el, visible, text, inputValue } where text/inputValue are
+ * truncated to 80 chars when visible, otherwise empty strings.
+ */
+function getVisibleElementInfo(
+  container: Element | null | undefined,
+  selector: string
+) {
+  const el = elQuery(container, selector);
+  const visible = el
+    ? isElementActuallyVisible(el, { checkOpacity: true })
+    : false;
+  const text = visible ? (el?.textContent ?? "").trim().slice(0, 80) : "";
+  const inputValue =
+    visible && el instanceof HTMLInputElement
+      ? (el.value ?? "").trim().slice(0, 80)
+      : "";
+  return { el, visible, text, inputValue };
+}
+
 function isPopoverOpen(): boolean {
   return getOpenPopoverContent() !== null;
 }
@@ -408,9 +505,7 @@ async function closeOpenPopoverIfAny() {
     await waitForPopoverState(false, 200);
     return;
   } catch {
-    const overlay = page
-      .getByCss(SELECTORS.dialogOverlay)
-      .query() as HTMLElement | null;
+    const overlay = elQuery(undefined, SELECTORS.dialogOverlay);
     const dismissTarget =
       (getLastVisibleDialogContent() ? overlay : null) ?? document.body;
     await userEvent.click(dismissTarget);
@@ -455,9 +550,7 @@ async function waitForPopoverToCloseOrChange(
 
 function hasCmdk(container: HTMLElement | null): boolean {
   if (!container) return false;
-  return (
-    page.elementLocator(container).getByCss(SELECTORS.commandRoot).length > 0
-  );
+  return elQueryAll(container, SELECTORS.commandRoot).length > 0;
 }
 
 function resetCmdkInput(container: HTMLElement): void {
@@ -484,10 +577,7 @@ async function waitForCmdkReady(timeout = 1500) {
         const items = getCommandItemsInContainer(open);
         if (items.length > 0) return true;
 
-        const empty = page
-          .elementLocator(open)
-          .getByCss(SELECTORS.commandEmpty)
-          .query() as HTMLElement | null;
+        const empty = elQuery(open, SELECTORS.commandEmpty);
         return empty
           ? isElementActuallyVisible(empty, { checkOpacity: true })
           : false;
@@ -617,10 +707,7 @@ function getSearchScope(withinDialog?: boolean): HTMLElement {
 
 function findLabelElementScoped(label: RegExp, withinDialog?: boolean) {
   const scope = getSearchScope(withinDialog);
-  const labelElements = page
-    .elementLocator(scope)
-    .getByCss("label")
-    .elements() as unknown as HTMLLabelElement[];
+  const labelElements = elQueryAll(scope, "label") as HTMLLabelElement[];
   return labelElements.find((el) => label.test((el.textContent ?? "").trim()));
 }
 
@@ -637,11 +724,9 @@ function getTriggerFromLabelElement(
   if (!container)
     throw new TypeError(`Popover container not found for label: ${label}`);
 
-  const containerLocator = page.elementLocator(container);
-  const trigger = (containerLocator
-    .getByCss('button[data-slot="popover-trigger"]')
-    .query() ??
-    containerLocator.getByCss("button").query()) as HTMLElement | null;
+  const trigger =
+    elQuery(container, 'button[data-slot="popover-trigger"]') ??
+    elQuery(container, "button");
 
   if (!trigger)
     throw new TypeError(`Popover trigger button not found for label: ${label}`);
@@ -724,29 +809,27 @@ export async function selectCommandItemInContainer(
   }
 }
 
-function getCommandItemsInContainer(container: ParentNode): HTMLElement[] {
+function getCommandItemsInContainer(
+  container: Element | null | undefined
+): HTMLElement[] {
   // Most of the app uses shadcn/ui's CommandItem wrapper (data-slot="command-item"),
   // but cmdk also renders raw items with the [cmdk-item] attribute.
   // In some environments, the most stable hook is the ARIA role.
   if (!(container instanceof Element)) return [];
-  return (
-    page
-      .elementLocator(container)
-      .getByCss(SELECTORS.commandItems)
-      .elements() as unknown as HTMLElement[]
-  ).filter((el) => isElementActuallyVisible(el));
+  return elQueryAll(container, SELECTORS.commandItems).filter((el) =>
+    isElementActuallyVisible(el)
+  );
 }
 
-function getCommandItem(container: ParentNode): HTMLInputElement | null {
+function getCommandItem(
+  container: Element | null | undefined
+): HTMLInputElement | null {
   // Most of the app uses shadcn/ui's CommandItem wrapper (data-slot="command-item"),
   // but cmdk also renders raw items with the [cmdk-item] attribute.
   if (!container) return null;
 
   if (!(container instanceof Element)) return null;
-  const el = page
-    .elementLocator(container)
-    .getByCss(SELECTORS.commandInput)
-    .query();
+  const el = elQuery(container, SELECTORS.commandInput);
   return el instanceof HTMLInputElement ? el : null;
 }
 
@@ -880,29 +963,30 @@ export async function openPopoverByContainerId(containerId: string) {
       ? CSS.escape(containerId)
       : containerId.replaceAll(/[^a-zA-Z0-9_-]/g, String.raw`\\$&`);
 
-  const container = page.getByCss(`#${escaped}`).query();
-  if (!(container instanceof HTMLElement)) {
-    throw new TypeError(`Popover container not found: ${containerId}`);
-  }
+  const container = elQuery(undefined, `#${escaped}`);
+  const trigger = elQuery(container, "button");
 
-  const trigger = page.elementLocator(container).getByCss("button").query();
-  if (!(trigger instanceof HTMLElement)) {
-    throw new TypeError(`Popover trigger button not found in: ${containerId}`);
-  }
+  [container, trigger].forEach((el, idx) => {
+    if (!(el instanceof HTMLElement)) {
+      const what = idx === 0 ? "container" : "trigger button";
+      throw new TypeError(`Popover ${what} not found: ${containerId}`);
+    }
+  });
 
   await openPopover(trigger);
 }
 
-async function openPopover(trigger: Parameters<typeof userEvent.click>[0]) {
+async function openPopover(
+  trigger: Parameters<typeof userEvent.click>[0] | null
+) {
   // If it's already open (e.g. dialog opened on top), close first so we can
   // re-open and force a re-render with updated cached data.
   await closeOpenPopoverIfAny();
 
+  if (!trigger) throw new TypeError("Popover trigger not found");
+
   await userEvent.click(trigger);
   await waitForPopoverState(true, 500);
-  // Let pending focus/state updates flush (Radix can open then dismiss quickly).
-  await wait(25);
-  await waitForPopoverState(true, 250);
 
   // In tests, cmdk's input value can persist across open/close cycles and
   // filter out all items in the next popover. Also, cmdk content may mount a
@@ -924,23 +1008,13 @@ async function openPopover(trigger: Parameters<typeof userEvent.click>[0]) {
 }
 
 export function getOpenPopoverContent(): HTMLElement | null {
-  // Radix popovers are portaled; during fast open/close cycles, multiple
-  // contents can exist in the DOM. Prefer the most recently *open* one.
-  const open = page
-    .getByCss(SELECTORS.popoverContentOpen)
-    .elements() as unknown as HTMLElement[];
-  const lastOpen = open.at(-1);
-  if (lastOpen) return lastOpen;
-
-  // Fallback: if data-state isn't present for some reason, prefer the most
-  // recently visible one.
-  const contents = page
-    .getByCss(SELECTORS.popoverContent)
-    .elements() as unknown as HTMLElement[];
-  const visible = contents.filter((el) =>
-    isElementActuallyVisible(el, { checkOpacity: true })
+  return getLastOpenOrVisible(
+    SELECTORS.popoverContentOpen,
+    SELECTORS.popoverContent,
+    {
+      checkOpacity: true,
+    }
   );
-  return visible.at(-1) ?? null;
 }
 
 export function getOpenPopoverCommandItemTexts(): string[] {
@@ -955,59 +1029,52 @@ export function getOpenPopoverCommandItemTexts(): string[] {
 function getOpenPopoverCommandDebugText(): string {
   const popover = getOpenPopoverContent();
   if (!popover) {
-    const all = page
-      .getByCss(SELECTORS.popoverContent)
-      .elements() as unknown as HTMLElement[];
+    const all = elQueryAll(undefined, SELECTORS.popoverContent);
+    const visibleCount = countVisibleElements(
+      undefined,
+      SELECTORS.popoverContent,
+      { checkOpacity: true }
+    );
     const last = all.at(-1) ?? null;
-    let styleSummary = "";
-    if (last) {
-      try {
-        const style = getComputedStyle(last);
-        styleSummary = `display=${style.display} visibility=${style.visibility} opacity=${style.opacity}`;
-      } catch {
-        styleSummary = "style=?";
-      }
-    }
-    return `__NO_OPEN_POPOVER__ total=${all.length} lastState=${
+    const lastVisible = last
+      ? isElementActuallyVisible(last, { checkOpacity: true })
+      : false;
+
+    return `__NO_OPEN_POPOVER__ total=${
+      all.length
+    } visible=${visibleCount} lastState=${
       last?.dataset.state ?? ""
-    } ${styleSummary}`;
+    } lastVisible=${lastVisible}`;
   }
 
   const itemTexts = getOpenPopoverCommandItemTexts();
   if (itemTexts.length > 0) return itemTexts.join(" ");
 
-  const popoverLoc = page.elementLocator(popover);
-  const counts = {
-    command: popoverLoc.getByCss('[data-slot="command"], [cmdk-root]').length,
-    list: popoverLoc.getByCss('[data-slot="command-list"], [cmdk-list]').length,
-    input: popoverLoc.getByCss('[data-slot="command-input"], [cmdk-input]')
-      .length,
-    empty: popoverLoc.getByCss('[data-slot="command-empty"], [cmdk-empty]')
-      .length,
-    slotItems: popoverLoc.getByCss('[data-slot="command-item"]').length,
-    cmdkItems: popoverLoc.getByCss("[cmdk-item]").length,
-    roleOptions: popoverLoc.getByCss('[role="option"]').length,
-    dataValue: popoverLoc.getByCss("[data-value]").length,
+  const selectorMap: Record<string, string> = {
+    command: SELECTORS.commandRoot,
+    list: SELECTORS.commandList,
+    input: SELECTORS.commandInput,
+    empty: SELECTORS.commandEmpty,
+    slotItems: SELECTORS.commandSlotItem,
+    cmdkItems: SELECTORS.cmdkItem,
+    roleOptions: SELECTORS.roleOption,
+    dataValue: SELECTORS.dataValue,
   };
 
-  const input = popoverLoc
-    .getByCss('[data-slot="command-input"], [cmdk-input]')
-    .query();
-  const emptyEl = popoverLoc
-    .getByCss('[data-slot="command-empty"], [cmdk-empty]')
-    .query();
+  const counts = getVisibleCounts(popover, selectorMap);
 
-  const emptyText = ((emptyEl as HTMLElement | null)?.textContent ?? "")
-    .trim()
-    .slice(0, 80);
-  const inputValue =
-    input instanceof HTMLInputElement
-      ? (input.value ?? "").trim().slice(0, 80)
-      : "";
+  const inputInfo = getVisibleElementInfo(popover, SELECTORS.commandInput);
+  const emptyInfo = getVisibleElementInfo(popover, SELECTORS.commandEmpty);
+
+  const emptyVisible = emptyInfo.visible;
+  const inputVisible = inputInfo.visible;
+
+  const emptyText = emptyInfo.text;
+  const inputValue = inputInfo.inputValue;
 
   return `__EMPTY__ counts=${JSON.stringify(
     counts
-  )} input="${inputValue}" emptyText="${emptyText}"`;
+  )} inputVisible=${inputVisible} input="${inputValue}" emptyVisible=${emptyVisible} emptyText="${emptyText}"`;
 }
 
 export function getOpenCommandContainer(): HTMLElement {
