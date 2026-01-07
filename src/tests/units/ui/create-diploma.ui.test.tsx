@@ -8,7 +8,6 @@ import {
   countFetchCallsByUrl,
   getLastPostJsonBodyByUrl,
   getOpenCommandContainer,
-  openPopoverAndExpectByLabel,
   openPopoverAndExpectByTrigger,
   openPopoverByTriggerName,
   queryKeyFor,
@@ -17,10 +16,9 @@ import {
   selectCommandItemInContainerEnsuringSubmitDisabled,
   selectMultiplePopoversEnsuringSubmitDisabled,
   waitForDialogAndAssertText,
-  waitForDialogState,
 } from "@/tests/test-utils/vitest-browser.helpers";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { page, userEvent } from "vitest/browser";
+import { page } from "vitest/browser";
 
 import { AppModals } from "@/pages/AllModals/AppModals.tsx";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
@@ -29,6 +27,10 @@ import {
   controllerLabelRegex,
   controllerTriggerRegex,
 } from "@/tests/test-utils/class-creation/regex.functions";
+import {
+  clickTriggerAndWaitForPopoverState,
+  openModalAndAssertItsOpenedAndReady,
+} from "@/tests/units/ui/functions/useful-ui.functions";
 
 const fx = fixtureCreateDiplomaFromClassCreation();
 const {
@@ -39,6 +41,19 @@ const {
   diplomaModuleController,
 } = fx.controllers;
 const diplomasQueryKey = queryKeyFor(diplomasController);
+const labeled = {
+  controller: diplomasController,
+  nameArray: [
+    rxJoin(
+      fx.sample.diplomaFetched.degreeLevel,
+      fx.sample.diplomaFetched.degreeYear
+    ),
+    rxJoin(
+      fx.sample.diplomaFetched2.degreeLevel,
+      fx.sample.diplomaFetched2.degreeYear
+    ),
+  ],
+};
 
 setupUiTestState(
   <AppTestWrapper>
@@ -58,18 +73,13 @@ afterEach(() => {
 describe("UI flow: create-diploma (from class-creation)", () => {
   test("selections validate, POST updates cache, and class-creation list updates without extra GET", async () => {
     // Open templates popover and assert existing names
-    await openPopoverAndExpectByLabel(
-      controllerLabelRegex(diplomasController),
-      [
-        rxJoin(
-          fx.sample.diplomaFetched.degreeLevel,
-          fx.sample.diplomaFetched.degreeYear
-        ),
-        rxJoin(
-          fx.sample.diplomaFetched2.degreeLevel,
-          fx.sample.diplomaFetched2.degreeYear
-        ),
-      ]
+    await openModalAndAssertItsOpenedAndReady(
+      diplomasController.creationButtonText,
+      {
+        controller: labeled.controller,
+        nameArray: labeled.nameArray,
+        readyText: diplomaFieldController.label,
+      }
     );
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
@@ -78,23 +88,12 @@ describe("UI flow: create-diploma (from class-creation)", () => {
       "GET"
     );
 
-    // Open creation modal
-    await userEvent.click(
-      page.getByRole("button", {
-        name: diplomasController.creationButtonText,
-      })
-    );
-
-    // Ensure modal is opened and title is present
-    await waitForDialogAndAssertText(diplomaFieldController.label, {
-      present: true,
-    });
-
     const baseOpts = {
       withinDialog: true,
       timeout: 1000,
       tabAfter: false,
     };
+
     await selectMultiplePopoversEnsuringSubmitDisabled("Créer le diplôme", [
       {
         label: controllerLabelRegex(diplomaFieldController),
@@ -136,10 +135,9 @@ describe("UI flow: create-diploma (from class-creation)", () => {
     );
 
     // Multi-select popover stays open; close it via its trigger (Escape would close the dialog).
-    await userEvent.click(
-      page.getByRole("button", {
-        name: controllerTriggerRegex(diplomaModuleController),
-      })
+    await clickTriggerAndWaitForPopoverState(
+      controllerTriggerRegex(diplomaModuleController),
+      false
     );
 
     // The selected module should appear as a tag in the dialog
@@ -172,28 +170,16 @@ describe("UI flow: create-diploma (from class-creation)", () => {
 
   test("anti-falsification: selected ids/codes are exactly what gets POSTed", async () => {
     // Open templates popover and assert existing names
-    await openPopoverAndExpectByLabel(
-      controllerLabelRegex(diplomasController),
-      [
-        rxJoin(
-          fx.sample.diplomaFetched.degreeLevel,
-          fx.sample.diplomaFetched.degreeYear
-        ),
-        rxJoin(
-          fx.sample.diplomaFetched2.degreeLevel,
-          fx.sample.diplomaFetched2.degreeYear
-        ),
-      ]
+    await openModalAndAssertItsOpenedAndReady(
+      diplomasController.creationButtonText,
+      {
+        controller: labeled.controller,
+        nameArray: labeled.nameArray,
+        readyText: diplomaFieldController.label,
+      }
     );
 
-    // Open creation modal
-    await userEvent.click(
-      page.getByRole("button", {
-        name: diplomasController.creationButtonText,
-      })
-    );
-    await waitForDialogState(true, 1000);
-
+    // Select options
     await selectMultiplePopoversEnsuringSubmitDisabled("Créer le diplôme", [
       {
         label: controllerLabelRegex(diplomaFieldController),
@@ -218,9 +204,12 @@ describe("UI flow: create-diploma (from class-creation)", () => {
       },
     ]);
 
+    // Select modules
     await openPopoverByTriggerName(
       controllerTriggerRegex(diplomaModuleController)
     );
+
+    // Ensure all module options are visible first
     await openPopoverAndExpectByTrigger(
       controllerTriggerRegex(diplomaModuleController),
       [
@@ -229,6 +218,7 @@ describe("UI flow: create-diploma (from class-creation)", () => {
       ]
     );
 
+    // Select the first module
     await selectCommandItemInContainerEnsuringSubmitDisabled(
       "Créer le diplôme",
       getOpenCommandContainer(),
@@ -236,15 +226,20 @@ describe("UI flow: create-diploma (from class-creation)", () => {
     );
 
     // Close the multi-select popover.
-    await userEvent.click(
-      page.getByRole("button", {
-        name: controllerTriggerRegex(diplomaModuleController),
-      })
+    await clickTriggerAndWaitForPopoverState(
+      controllerTriggerRegex(diplomaModuleController),
+      false
     );
 
     // Ensure there are no form validation alerts, then submit
     await checkFormValidityAndSubmit("Créer le diplôme");
 
+    // Ensure modal is closed and title is absent
+    await waitForDialogAndAssertText(diplomaFieldController.label, {
+      present: false,
+    });
+
+    // Assert exactly what got POSTed
     await expect
       .poll(
         () =>
