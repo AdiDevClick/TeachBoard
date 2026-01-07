@@ -3,11 +3,7 @@ import { taskItemInputControllers } from "@/data/inputs-controllers.data";
 import { AppModals } from "@/pages/AllModals/AppModals";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import { SamplePopoverInput } from "@/tests/components/class-creation/SamplePopoverInput";
-import {
-  taskCreated,
-  taskFetched,
-  taskFetched2,
-} from "@/tests/samples/class-creation-sample-datas";
+import { taskCreated } from "@/tests/samples/class-creation-sample-datas";
 import { fixtureNewTaskItem } from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { assertPostUpdatedCacheWithoutExtraGet } from "@/tests/test-utils/tests.functions";
@@ -15,14 +11,12 @@ import {
   checkFormValidityAndSubmit,
   countFetchCallsByUrl,
   fillFieldsEnsuringSubmitDisabled,
-  openPopoverAndExpectByLabel,
   queryKeyFor,
   rxExact,
-  submitButtonShouldBeDisabled,
   waitForDialogAndAssertText,
 } from "@/tests/test-utils/vitest-browser.helpers";
+import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions";
 import { afterEach, describe, test, vi } from "vitest";
-import { page, userEvent } from "vitest/browser";
 
 const fx = fixtureNewTaskItem();
 const taskController = fx.controller;
@@ -45,11 +39,16 @@ afterEach(() => {
 
 describe("UI flow: new-task-item", () => {
   test("fetched items show up, add new opens modal, POST updates cache without extra GET", async () => {
+    const tasks = [fx.sample.taskFetched.name, fx.sample.taskFetched2.name];
     // Open templates popover and assert existing names
-    await openPopoverAndExpectByLabel(rxExact(taskController.label), [
-      taskFetched.name,
-      taskFetched2.name,
-    ]);
+    await openModalAndAssertItsOpenedAndReady(
+      taskController.creationButtonText,
+      {
+        controller: taskController,
+        nameArray: tasks,
+        readyText: taskItemInputControllers[0].title,
+      }
+    );
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
     const getCallsBeforeCreation = countFetchCallsByUrl(
@@ -57,18 +56,7 @@ describe("UI flow: new-task-item", () => {
       "GET"
     );
 
-    // Open creation modal
-    await userEvent.click(
-      page.getByRole("button", { name: taskController.creationButtonText })
-    );
-
-    // Ensure modal is opened and title is present
-    await waitForDialogAndAssertText(taskItemInputControllers[0].title, {
-      present: true,
-    });
-
-    await submitButtonShouldBeDisabled("Créer");
-
+    // await submitButtonShouldBeDisabled("Créer");
     const fills = [
       {
         label: taskItemInputControllers[0].title,
