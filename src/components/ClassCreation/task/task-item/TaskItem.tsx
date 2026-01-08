@@ -32,6 +32,7 @@ export function TaskItem({
   pageId = "new-task-item",
   inputControllers = taskItemInputControllers,
   modalMode = true,
+  className = "grid gap-4",
   ...props
 }: Readonly<PageWithControllers<TaskItemCreationInputItem>>) {
   const form = useForm<TaskItemFormSchema>({
@@ -50,6 +51,7 @@ export function TaskItem({
       pageId,
       inputControllers,
       formId,
+      className,
       footerProps: {
         ...footerProps,
         formState: form.formState,

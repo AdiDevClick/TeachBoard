@@ -26,6 +26,7 @@ const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
 export function SearchPrimaryTeacher({
   pageId = "search-primaryteacher",
   modalMode = true,
+  className = "display-none",
   ...props
 }: SearchPrimaryTeacherProps) {
   const localForm = useForm<SearchPrimaryTeacherFormSchema>({
@@ -43,6 +44,7 @@ export function SearchPrimaryTeacher({
       formId,
       localForm,
       modalMode,
+      className,
       footerProps: {
         ...footerProps,
         formState: localForm.formState,
