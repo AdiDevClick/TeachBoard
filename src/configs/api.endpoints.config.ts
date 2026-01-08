@@ -1,3 +1,4 @@
+import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 
 import type {
@@ -289,14 +290,26 @@ export const API_ENDPOINTS = Object.freeze({
           data && typeof data === "object" && "skill" in data
             ? (data as { skill: SkillDto }).skill
             : data;
-
         // Mapping code -> value
         const newItem = {
           ...skillData,
           value: skillData.code,
         };
 
-        return reshapeItemToCachedData(newItem, cachedDatas, "Tous");
+        const res = reshapeItemToCachedData(newItem, cachedDatas, "Tous");
+
+        if (DEV_MODE && !NO_QUERY_LOGS) {
+          console.debug(
+            "[API_ENDPOINTS.POST.CREATE_SKILL.dataReshape] data:",
+            data,
+            "cachedDatas:",
+            cachedDatas,
+            "result:",
+            res
+          );
+        }
+
+        return res;
       },
     },
     CREATE_DIPLOMA: {
