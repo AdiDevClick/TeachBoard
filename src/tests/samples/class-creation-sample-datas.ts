@@ -14,7 +14,7 @@ import {
   TaskTemplateFixtureCreator,
   TaskTemplatesFetchFixtureCreator,
   TeacherFixtureCreator,
-} from "@/tests/components/classes/FixtureCreator.ts";
+} from "@/utils/FixtureCreator";
 
 export const degreeFieldModal: AppModalNames = "new-degree-item-field";
 export const degreeYearModal: AppModalNames = "new-degree-item-year";
