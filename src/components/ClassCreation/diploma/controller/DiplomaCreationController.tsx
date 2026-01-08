@@ -6,6 +6,7 @@ import {
 } from "@/components/Popovers/PopoverField.tsx";
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import { HTTP_METHODS } from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { DiplomaCreationFormSchema } from "@/models/diploma-creation.models.ts";
 import { useQueryClient } from "@tanstack/react-query";
@@ -27,6 +28,8 @@ export function DiplomaCreationController({
   formId,
   inputControllers = [],
   className,
+  submitRoute = API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint,
+  submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_DIPLOMA.dataReshape,
 }: DiplomaCreationControllerProps) {
   const {
     setRef,
@@ -40,6 +43,8 @@ export function DiplomaCreationController({
   } = useCommandHandler({
     form,
     pageId,
+    submitRoute,
+    submitDataReshapeFn,
   });
   const queryClient = useQueryClient();
   const currentSkills =
@@ -54,11 +59,9 @@ export function DiplomaCreationController({
    * @param variables - form variables
    */
   const handleSubmit = (variables: DiplomaCreationFormSchema) => {
-    submitCallback(
-      variables,
-      API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint,
-      API_ENDPOINTS.POST.CREATE_DIPLOMA.dataReshape
-    );
+    submitCallback(variables, {
+      method: HTTP_METHODS.POST,
+    });
   };
 
   const handleSelection = (

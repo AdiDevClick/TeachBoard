@@ -20,6 +20,7 @@ export function SearchPrimaryTeacherController({
   pageId,
   form,
   localForm,
+  className,
   formId,
 }: SearchPrimaryTeacherControllerProps) {
   const { closeDialog, openingCallback, resultsCallback, selectionCallback } =
@@ -112,7 +113,7 @@ export function SearchPrimaryTeacherController({
       {/* Fix to avoid a focus effect */}
       <form
         id={formId}
-        className="display-none"
+        className={className}
         onSubmit={localForm.handleSubmit(handleSubmit)}
       />
     </>

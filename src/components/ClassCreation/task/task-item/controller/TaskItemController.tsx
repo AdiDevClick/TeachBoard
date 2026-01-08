@@ -1,6 +1,7 @@
 import type { TaskItemControllerProps } from "@/components/ClassCreation/task/task-item/types/task-item.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import { HTTP_METHODS } from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 
@@ -19,10 +20,14 @@ export function TaskItemController({
   inputControllers = [],
   className = "grid gap-4",
   form,
+  submitRoute = API_ENDPOINTS.POST.CREATE_TASK.endpoint,
+  submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_TASK.dataReshape,
 }: TaskItemControllerProps) {
   const { setRef, observedRefs, submitCallback } = useCommandHandler({
     form,
     pageId,
+    submitRoute,
+    submitDataReshapeFn,
   });
 
   /**
@@ -31,7 +36,9 @@ export function TaskItemController({
    * @param variables - form variables
    */
   const handleSubmit = (variables: MutationVariables) => {
-    submitCallback(variables, null, API_ENDPOINTS.POST.CREATE_TASK.dataReshape);
+    submitCallback(variables, {
+      method: HTTP_METHODS.POST,
+    });
   };
 
   const id = formId ?? pageId + "-form";

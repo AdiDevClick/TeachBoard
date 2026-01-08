@@ -23,7 +23,7 @@ import {
   debugLogs,
   taskModalPropsInvalid,
 } from "@/configs/app-components.config.ts";
-import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
+import { DEV_MODE, HTTP_METHODS, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { classCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
@@ -56,6 +56,8 @@ export function ClassCreationController({
   form,
   formId,
   className,
+  submitRoute = API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
+  submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
 }: ClassCreationControllerProps) {
   const [isSelectedDiploma, setIsSelectedDiploma] = useState(false);
 
@@ -83,6 +85,8 @@ export function ClassCreationController({
   } = useCommandHandler({
     form,
     pageId,
+    submitRoute,
+    submitDataReshapeFn,
   });
 
   const cachedKeysRef = useRef<Record<string, unknown[]>>({});
@@ -155,11 +159,9 @@ export function ClassCreationController({
    * @param variables - The form data to submit
    */
   const handleValidSubmit = (variables: ClassCreationFormSchema) => {
-    submitCallback(
-      variables,
-      API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
-      API_ENDPOINTS.POST.CREATE_CLASS.dataReshape
-    );
+    submitCallback(variables, {
+      method: HTTP_METHODS.POST,
+    });
   };
 
   /**

@@ -1,6 +1,7 @@
-import type { DegreeModuleSkillProps } from "@/components/ClassCreation/diploma/degree-module-skill/types/degree-module-skill.types.ts";
+import type { DegreeModuleSkillControllerProps } from "@/components/ClassCreation/diploma/degree-module-skill/types/degree-module-skill.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import { HTTP_METHODS } from "@/configs/app.config.ts";
 import { degreeSubSkillsCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
@@ -13,6 +14,8 @@ import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
  * @param inputControllers - An array of input controller configurations
  * @param className - Additional CSS classes for styling the form
  * @param form - The react-hook-form instance managing the form state
+ * @param submitRoute - The API endpoint for form submission
+ * @param submitDataReshapeFn - Function to reshape data before submission
  * @returns
  */
 export function DegreeModuleSkillController({
@@ -20,11 +23,15 @@ export function DegreeModuleSkillController({
   formId,
   inputControllers = degreeSubSkillsCreationInputControllers,
   form,
-  className = "grid gap-4",
-}: DegreeModuleSkillProps) {
+  className,
+  submitRoute = API_ENDPOINTS.POST.CREATE_SKILL.endPoints.SUBSKILL,
+  submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_SKILL.dataReshape,
+}: DegreeModuleSkillControllerProps) {
   const { setRef, observedRefs, submitCallback } = useCommandHandler({
     form,
     pageId,
+    submitRoute,
+    submitDataReshapeFn,
   });
 
   /**
@@ -33,11 +40,9 @@ export function DegreeModuleSkillController({
    * @param variables - form variables
    */
   const handleSubmit = (variables: MutationVariables) => {
-    submitCallback(
-      variables,
-      API_ENDPOINTS.POST.CREATE_SKILL.endPoints.SUBSKILL,
-      API_ENDPOINTS.POST.CREATE_SKILL.dataReshape
-    );
+    submitCallback(variables, {
+      method: HTTP_METHODS.POST,
+    });
   };
 
   const id = formId ?? pageId + "-form";

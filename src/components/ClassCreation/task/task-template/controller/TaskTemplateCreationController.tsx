@@ -23,7 +23,7 @@ import {
   commandSelectionDoesNotContainId,
   debugLogs,
 } from "@/configs/app-components.config.ts";
-import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
+import { DEV_MODE, HTTP_METHODS, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import type { TaskTemplateCreationFormSchema } from "@/models/class-task-template.models.ts";
@@ -44,8 +44,10 @@ export function TaskTemplateCreationController({
   pageId,
   formId,
   inputControllers = [],
-  className = "grid gap-4",
+  className,
   form,
+  submitRoute = API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.endpoint,
+  submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.dataReshape,
 }: TaskTemplateCreationControllerProps) {
   const {
     setRef,
@@ -60,6 +62,8 @@ export function TaskTemplateCreationController({
   } = useCommandHandler({
     form,
     pageId,
+    submitRoute,
+    submitDataReshapeFn,
   });
   const queryClient = useQueryClient();
   const savedSkills = useRef<ReturnType<typeof createTaskTemplateView>>(null!);
@@ -146,11 +150,9 @@ export function TaskTemplateCreationController({
    * @param variables - form variables
    */
   const handleSubmit = (variables: MutationVariables) => {
-    submitCallback(
-      variables,
-      API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.endpoint,
-      API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.dataReshape
-    );
+    submitCallback(variables, {
+      method: HTTP_METHODS.POST,
+    });
   };
 
   /**

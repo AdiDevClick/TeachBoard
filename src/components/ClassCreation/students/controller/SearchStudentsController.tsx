@@ -18,11 +18,12 @@ export function SearchStudentsController({
   pageId,
   form,
   localForm,
+  className,
   formId,
 }: SearchStudentsControllerProps) {
   const { closeDialog, openingCallback, resultsCallback, selectionCallback } =
     useCommandHandler({
-      form: form!,
+      form,
       pageId,
     });
 
@@ -100,7 +101,7 @@ export function SearchStudentsController({
       {/* Fix to avoid a focus effect */}
       <form
         id={formId}
-        className="display-none"
+        className={className}
         onSubmit={localForm.handleSubmit(handleSubmit)}
       />
     </>

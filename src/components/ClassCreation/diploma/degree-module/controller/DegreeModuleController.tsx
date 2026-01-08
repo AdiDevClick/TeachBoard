@@ -4,6 +4,7 @@ import { ControlledInputList } from "@/components/Inputs/LaballedInputForControl
 import { PopoverFieldWithCommands } from "@/components/Popovers/PopoverField.tsx";
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import { HTTP_METHODS } from "@/configs/app.config.ts";
 import { degreeModuleCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
@@ -23,9 +24,11 @@ import { useWatch } from "react-hook-form";
 export function DegreeModuleController({
   pageId = "new-degree-module",
   inputControllers = degreeModuleCreationInputControllers,
-  className = "grid gap-4",
+  className,
   formId,
   form,
+  submitRoute = API_ENDPOINTS.POST.CREATE_SKILL.endPoints.MODULE,
+  submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_SKILL.dataReshape,
 }: DegreeModuleControllerProps) {
   const {
     setRef,
@@ -38,6 +41,8 @@ export function DegreeModuleController({
   } = useCommandHandler({
     form,
     pageId,
+    submitRoute,
+    submitDataReshapeFn,
   });
 
   const currentSkills =
@@ -52,11 +57,9 @@ export function DegreeModuleController({
    * @param variables - form variables
    */
   const handleSubmit = (variables: MutationVariables) => {
-    submitCallback(
-      variables,
-      API_ENDPOINTS.POST.CREATE_SKILL.endPoints.MODULE,
-      API_ENDPOINTS.POST.CREATE_SKILL.dataReshape
-    );
+    submitCallback(variables, {
+      method: HTTP_METHODS.POST,
+    });
   };
 
   /**

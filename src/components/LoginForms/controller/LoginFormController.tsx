@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button.tsx";
 import { Field, FieldGroup, FieldSeparator } from "@/components/ui/field.tsx";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
+import { DEV_MODE, HTTP_METHODS, NO_QUERY_LOGS } from "@/configs/app.config.ts";
 import { loginButtonsSvgs } from "@/configs/social.config.ts";
 import { inputLoginControllers } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
@@ -139,7 +139,13 @@ export function LoginFormController({
       POSTendPoint = API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.dataReshape;
     }
 
-    submitCallback(variables, GETendPoint, POSTendPoint, { login }, true);
+    submitCallback(variables, {
+      method: HTTP_METHODS.POST,
+      endpointUrl: GETendPoint,
+      dataReshapeFn: POSTendPoint,
+      reshapeOptions: { login },
+      silent: true,
+    });
   };
   console.log("Je rerender le LoginForm");
   return (
