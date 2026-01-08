@@ -25,3 +25,5 @@ dist-ssr
 
 # Optional 
 package-lock.json
+src/api/types/openapi/openapi-graph
+src/tests/units/ui/__screenshots__
