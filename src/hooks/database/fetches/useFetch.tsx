@@ -1,8 +1,14 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { USER_ACTIVITIES } from "@/configs/app.config.ts";
+import {
+  DEV_MODE,
+  NO_QUERY_LOGS,
+  USER_ACTIVITIES,
+} from "@/configs/app.config.ts";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
+import type { ApiError } from "@/types/AppErrorInterface";
+import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -48,8 +54,13 @@ const defaultStateParameters: FetchParams = {
  *
  * @returns An object containing fetch parameters, a function to set them, and query status.
  */
-export function useFetch() {
+export function useFetch<
+  TServerData = Record<string, unknown>,
+  E extends ApiError = ApiError,
+  TViewData = unknown
+>() {
   const [fetchParams, setFetchParams] = useState(defaultStateParameters);
+  const [viewData, setViewData] = useState<TViewData | undefined>(undefined);
   const setLastUserActivity = useAppStore((state) => state.setLastUserActivity);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -62,26 +73,51 @@ export function useFetch() {
     ...params
   } = fetchParams;
 
-  const queryParams = useQueryOnSubmit([
+  // Note: cast to the appropriate QueryKeyDescriptor so generics flow into useQueryOnSubmit
+  const queryParams = useQueryOnSubmit<ResponseInterface<TServerData>, E>([
     contentId,
     {
       ...params,
-      onSuccess: (response: any) => {
+      onSuccess: (response) => {
         setLastUserActivity(contentId);
         successCallback?.(response);
 
         const cachedKey = cachedFetchKey ?? [contentId, params.url];
 
         // Reshape data for caching
+        const rawCachedDatas = queryClient.getQueriesData({
+          queryKey: cachedKey,
+        });
+
         const cachingDatas = fetchParams.dataReshapeFn
           ? fetchParams.dataReshapeFn(
               response.data,
-              queryClient.getQueriesData({ queryKey: cachedKey }),
+              rawCachedDatas,
               fetchParams.reshapeOptions
             )
           : response.data;
 
-        if (cachingDatas.items === 0) {
+        if (DEV_MODE && !NO_QUERY_LOGS) {
+          console.debug(
+            "[useFetch:onSuccess] endpoint:",
+            fetchParams.url,
+            "response.data:",
+            response.data,
+            "rawCachedDatas:",
+            rawCachedDatas,
+            "reshapedResult:",
+            cachingDatas
+          );
+        }
+        // Also expose reshaped data directly to consumers.
+        setViewData(cachingDatas as TViewData);
+
+        const maybeItems = (cachingDatas as { items?: unknown })?.items;
+        const isEmptyItemsCount = maybeItems === 0;
+        const isEmptyItemsArray =
+          Array.isArray(maybeItems) && maybeItems.length === 0;
+
+        if (isEmptyItemsCount || isEmptyItemsArray) {
           toast.dismiss();
           toast.info("Aucune donnée disponible. \nCréez-en une nouvelle !", {
             style: { whiteSpace: "pre-wrap", zIndex: 10001 },
@@ -112,6 +148,12 @@ export function useFetch() {
     fetchParams,
     setFetchParams,
     ...queryParams,
+    // raw server response.
+    response: queryParams.data,
+    // Convenience shortcut for `response.data`.
+    serverData: queryParams.data?.data,
+    // Override `data` to be the reshaped view data.
+    data: viewData,
   };
 }
 
@@ -125,11 +167,7 @@ function navigateOnForbiddenError(
   status: number,
   navigate: ReturnType<typeof useNavigate>
 ) {
-  switch (status) {
-    case 403:
-      navigate("/login", { replace: true });
-      break;
-    default:
-      break;
+  if (status === 403) {
+    navigate("/login", { replace: true });
   }
 }
