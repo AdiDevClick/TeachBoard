@@ -27,6 +27,7 @@ const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
 function SearchStudents({
   pageId = "search-students",
   modalMode = true,
+  className = "display-none",
   ...props
 }: SearchStudentsProps) {
   const localForm = useForm<SearchStudentsFormSchema>({
@@ -44,16 +45,17 @@ function SearchStudents({
       pageId,
       formId,
       localForm,
-      modalMode,
+      className,
       footerProps: {
         ...footerProps,
         formState: localForm.formState,
         formId,
       },
+      modalMode,
       titleProps,
       ...props,
     }),
-    [props]
+    [props, props.form, localForm]
   );
 
   return <SearchStudentsWithCard {...commonProps} />;
