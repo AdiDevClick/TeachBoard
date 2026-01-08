@@ -1,4 +1,5 @@
 import type LoginForm from "@/components/LoginForms/LoginForm.tsx";
+import type { AppModalNames } from "@/configs/app.config.ts";
 import type {
   LoginFormSchema,
   RecoveryFormSchema,
@@ -16,18 +17,28 @@ export type HandleRecoverPasswordClickParams = {
   form: ReturnType<typeof useForm<LoginFormSchema | RecoveryFormSchema>>;
 };
 
-/**
- * Props for the LoginFormController component.
- */
-export type LoginFormControllerProps = {
-  className?: string;
-  formId: string;
-  form: ReturnType<typeof useForm<LoginFormSchema | RecoveryFormSchema>>;
-  setIsPwForgotten: Dispatch<SetStateAction<boolean>>;
+type ForgottenPwLinkParams = {
   isPwForgotten: boolean;
+  setIsPwForgotten: Dispatch<SetStateAction<boolean>>;
+};
+
+type ForgottenPwAndDefaultLinkTexts = {
   textToDisplay: {
     defaultText: string;
     pwForgottenLinkTo: string;
     buttonText: string;
   };
-} & Omit<Parameters<typeof LoginForm>[0], "modalMode">;
+};
+
+type ForgottenPw = ForgottenPwLinkParams & ForgottenPwAndDefaultLinkTexts;
+
+/**
+ * Props for the LoginFormController component.
+ */
+export type LoginFormControllerProps = {
+  pageId: AppModalNames;
+  className?: string;
+  formId: string;
+  form: ReturnType<typeof useForm<LoginFormSchema | RecoveryFormSchema>>;
+} & Omit<Parameters<typeof LoginForm>[0], "modalMode"> &
+  ForgottenPw;

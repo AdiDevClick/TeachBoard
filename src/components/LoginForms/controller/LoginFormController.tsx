@@ -33,7 +33,7 @@ const toastId = "login-loading";
  */
 export function LoginFormController({
   pageId,
-  className = "grid gap-4",
+  className,
   form,
   setIsPwForgotten,
   isPwForgotten,
@@ -103,7 +103,7 @@ export function LoginFormController({
       hasHandledLoginSuccess.current = true;
 
       if (isPwForgotten) {
-        newItemCallback({ e: null, task: "pw-recovery-email-sent" });
+        newItemCallback({ task: "pw-recovery-email-sent" });
       } else {
         toast.success("Connexion réussie !", {
           id: "login-success-toast",
@@ -131,17 +131,15 @@ export function LoginFormController({
    * @param variables - The form data to submit
    */
   const handleSubmit = (variables: LoginFormSchema | RecoveryFormSchema) => {
-    submitCallback(
-      variables,
-      isPwForgotten
-        ? API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.endpoint
-        : API_ENDPOINTS.POST.AUTH.LOGIN.endpoint,
-      isPwForgotten
-        ? API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.dataReshape
-        : API_ENDPOINTS.POST.AUTH.LOGIN.dataReshape,
-      { login },
-      true
-    );
+    let GETendPoint = String(API_ENDPOINTS.POST.AUTH.LOGIN.endpoint);
+    let POSTendPoint = API_ENDPOINTS.POST.AUTH.LOGIN.dataReshape;
+
+    if (isPwForgotten) {
+      GETendPoint = API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.endpoint;
+      POSTendPoint = API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.dataReshape;
+    }
+
+    submitCallback(variables, GETendPoint, POSTendPoint, { login }, true);
   };
   console.log("Je rerender le LoginForm");
   return (

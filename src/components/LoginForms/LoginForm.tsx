@@ -38,15 +38,16 @@ let buttonText = "Se connecter";
  * @description This inits Zod validated form
  *
  * @param pageId - The ID of the page.
- * @param formId - The ID of the form.
  * @param inputControllers - The input controllers for the form (this needs to be already validated by Zod Schema).
  * @param modalMode - Whether the component is in modal mode.
+ * @param className - Additional class names for the component.
  * @param props - Additional props.
  * @returns
  */
 function LoginForm({
   pageId = "login",
   modalMode = false,
+  className = "grid gap-4",
   inputControllers = inputLoginControllers,
   ...props
 }: Readonly<PageWithControllers<LoginInputItem>>) {
@@ -79,11 +80,11 @@ function LoginForm({
     return {
       pageId,
       formId,
+      className,
       setIsPwForgotten,
       isPwForgotten,
       modalMode,
       titleProps,
-      displayFooter: false as const,
       inputControllers: inputControllersToUse,
       textToDisplay: {
         defaultText,
@@ -95,7 +96,7 @@ function LoginForm({
     };
   }, [form.formState, isPwForgotten, props]);
 
-  return <LoginFormWithCard {...commonProps} />;
+  return <LoginFormWithCard displayFooter={false} {...commonProps} />;
 }
 
 const LoginFormWithCard = withTitledCard(LoginFormController);
