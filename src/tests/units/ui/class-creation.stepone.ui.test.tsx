@@ -53,7 +53,7 @@ const {
   studentsController,
 } = fx.controllers;
 
-const { createClassPostEndpoint } = fx.endpoints;
+const createClassPostEndpoint = fx.post.endpoint;
 const classesQueryKey = queryKeyFor(classesController);
 const tasksNames = [taskFetched.name, taskFetched2.name];
 const labels = [
@@ -74,7 +74,7 @@ const labeler = {
 
 const flowArgs = {
   controllers: fx.controllers,
-  createdClassName: "2B",
+  createdClassName: classCreated.name,
   createdClassPayload: classCreated,
   fillDescription: false,
   // context

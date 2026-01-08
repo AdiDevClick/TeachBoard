@@ -9,14 +9,14 @@ import {
   skillModuleModal,
   skillQueryKey,
   skillQueryKeySingle,
-  stubFetchWithItems,
-} from "@/tests/samples/command-handler-sample-datas";
+} from "@/tests/samples/class-creation-sample-datas";
 import { testQueryClient } from "@/tests/test-utils/testQueryClient.ts";
 import {
   click,
   waitForCache,
   waitForQueryKey,
 } from "@/tests/test-utils/tests.functions";
+import { stubFetchRoutes } from "@/tests/test-utils/vitest-browser.helpers";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 beforeEach(() => {
@@ -41,7 +41,7 @@ describe("DegreeModuleSkill modal integration", () => {
     const fetchDatas = {
       apiEndpoint: skillApiEndpoint,
       queryKey: skillQueryKey,
-      dataReshapeFn: (d: any) => ({ items: d }),
+      dataReshapeFn: (d: unknown) => ({ items: d }),
       task: skillFetchActivity as AppModalNames,
     };
 
@@ -52,7 +52,10 @@ describe("DegreeModuleSkill modal integration", () => {
     await waitForQueryKey(() => dialogOptions(skillModuleModal));
 
     // Stub fetch to return one fetched item on GET and a created one on POST
-    stubFetchWithItems();
+    stubFetchRoutes({
+      getRoutes: [[skillApiEndpoint, [skillFetched]]],
+      postRoutes: [[skillApiEndpoint, skillCreated]],
+    });
 
     // Trigger opening fetch via the opening callback to emulate the internal command opening
     const { openingCallback } = await renderCommandHook();
@@ -73,9 +76,13 @@ describe("DegreeModuleSkill modal integration", () => {
     await waitForQueryKey(() => dialogOptions(skillModuleModal));
 
     // Now submit a new skill via submitCallback which should POST and reshaped cache
-    submitCallback({ name: "new" }, fetchDatas.apiEndpoint, (d: any) => ({
-      items: [d],
-    }));
+    submitCallback(
+      { name: "new" },
+      {
+        endpointUrl: fetchDatas.apiEndpoint,
+        dataReshapeFn: (d: unknown) => ({ items: [d] }),
+      }
+    );
 
     const newCached = await waitForCache(fetchDatas.queryKey);
     expect(newCached).toEqual({ items: [skillCreated] });
@@ -109,7 +116,6 @@ describe("DegreeModuleSkill modal integration", () => {
     };
 
     newItemCallback({
-      e: click(),
       apiEndpoint: fetchDatas.apiEndpoint,
       task: fetchDatas.task,
     });

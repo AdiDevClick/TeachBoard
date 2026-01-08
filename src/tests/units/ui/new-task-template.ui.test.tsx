@@ -84,7 +84,7 @@ describe("UI flow: new-task-template", () => {
       },
     ];
 
-    await expect.element(page.getByLabelText(nameLabel)).toBeInTheDocument();
+    await expect(page.getByLabelText(nameLabel)).toBeInTheDocument();
 
     await submitButtonShouldBeDisabled("Ajouter");
 

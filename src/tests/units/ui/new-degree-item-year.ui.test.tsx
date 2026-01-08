@@ -20,13 +20,14 @@ import {
   queryKeyFor,
   waitForDialogAndAssertText,
 } from "@/tests/test-utils/vitest-browser.helpers";
-import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions";
+import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions.ts";
 import { afterEach, describe, test, vi } from "vitest";
 import { page } from "vitest/browser";
 
 const fx = fixtureNewDegreeItem("YEAR");
 const diplomaYearController = fx.controller;
 const degreeYearQueryKey = queryKeyFor(diplomaYearController);
+const years = [degreeYearFetched.name, degreeYearFetched2.name];
 
 setupUiTestState(
   <AppTestWrapper>
@@ -46,7 +47,6 @@ afterEach(() => {
 describe("UI flow: new-degree-item-year", () => {
   test("fetched items show up, add new opens modal, POST updates cache without extra GET", async () => {
     // Open templates popover and assert existing names
-    const years = [degreeYearFetched.name, degreeYearFetched2.name];
     await openModalAndAssertItsOpenedAndReady(
       diplomaYearController.creationButtonText,
       {
@@ -62,6 +62,7 @@ describe("UI flow: new-degree-item-year", () => {
       "GET"
     );
 
+    // Fill fields
     await fillFieldsEnsuringSubmitDisabled("Créer", [
       {
         locator: page.getByRole("textbox", {

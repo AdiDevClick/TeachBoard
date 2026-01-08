@@ -13,13 +13,13 @@ import {
   skillModuleModal,
   skillQueryKey,
   skillQueryKeySingle,
-  stubFetchWithItems,
-} from "@/tests/samples/command-handler-sample-datas";
+} from "@/tests/samples/class-creation-sample-datas";
 import { testQueryClient } from "@/tests/test-utils/testQueryClient.ts";
 import {
   waitForCache,
   waitForQueryKey,
 } from "@/tests/test-utils/tests.functions.ts";
+import { stubFetchRoutes } from "@/tests/test-utils/vitest-browser.helpers";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 const click = () => new MouseEvent("click");
@@ -147,7 +147,7 @@ describe("useCommandHandler - basic behaviours", () => {
       apiEndpoint: skillApiEndpoint,
       queryKey: skillQueryKey,
       task: skillFetchActivity,
-      dataReshapeFn: (d: any) => ({ items: [d] }),
+      dataReshapeFn: (d: unknown) => ({ items: [d] }),
     };
 
     openDialog(click(), skillModuleModal, fetchDatas);
@@ -161,7 +161,9 @@ describe("useCommandHandler - basic behaviours", () => {
     });
 
     // fetch to return a created object
-    stubFetchWithItems();
+    stubFetchRoutes({
+      postRoutes: [[skillApiEndpoint, skillCreated]],
+    });
 
     // Ensure dialog has the queryKey so fetch handler caches under expected key
     setDialogOptions(skillModuleModal, {
@@ -172,9 +174,13 @@ describe("useCommandHandler - basic behaviours", () => {
     // Wait for setDialogOptions to apply
     await waitForQueryKey(() => dialogOptions(skillModuleModal));
     // Trigger the submission using the dialog-based flow (pass explicit endpoint and reshaper)
-    submitCallback({ name: "new" }, skillApiEndpoint, (d: any) => ({
-      items: [d],
-    }));
+    submitCallback(
+      { name: "new" },
+      {
+        endpointUrl: skillApiEndpoint,
+        dataReshapeFn: (d: unknown) => ({ items: [d] }),
+      }
+    );
 
     // Wait until the queryClient has the cached reshaped data
     const cached = await waitForCache(skillQueryKey);
@@ -200,7 +206,9 @@ describe("useCommandHandler - basic behaviours", () => {
     };
 
     // Stub global fetch to return items
-    stubFetchWithItems();
+    stubFetchRoutes({
+      getRoutes: [[skillApiEndpoint, [skillFetched]]],
+    });
 
     // Trigger the opening which should initiate a GET fetch
     // Note: intentionally omit `dataReshapeFn` to match validation logic in handleOpening

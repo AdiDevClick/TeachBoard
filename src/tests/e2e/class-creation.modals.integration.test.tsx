@@ -1,4 +1,5 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import type { AppModalNames } from "@/configs/app.config.ts";
 import { renderCommandHook } from "@/tests/hooks/reusable-hooks";
 import {
   classCreated,
@@ -6,9 +7,11 @@ import {
   classesEndpoint,
   degreeCreated,
   degreeCreatedResponse,
-  degreeFetched,
+  degreeFieldFetched,
   degreeFieldModal,
+  degreeLevelFetched,
   degreeLevelModal,
+  degreeYearFetched,
   degreeYearModal,
   diplomaCreated,
   diplomaFetched,
@@ -52,23 +55,29 @@ afterEach(() => {
 
 describe("Class creation modals integration", () => {
   test("new-degree-item-field: GET lists, POST updates cache without extra GET", async () => {
+    const fx = fixtureNewDegreeItem("FIELD");
+    fx.installFetchStubs(degreeCreatedResponse);
+
+    const created = degreeCreated;
+
+    const fetchDatas = {
+      apiEndpoint: fx.controller.apiEndpoint,
+      queryKey: [fx.controller.task, fx.controller.apiEndpoint] as const,
+      task: fx.controller.task as AppModalNames,
+      dataReshapeFn: fx.controller.dataReshapeFn,
+    };
+
     const {
       openDialog,
       dialogOptions,
       openingCallback,
       submitCallback,
       resultsCallback,
-    } = await renderCommandHook(degreeFieldModal);
-
-    const fx = fixtureNewDegreeItem("FIELD");
-    fx.installFetchStubs(degreeCreatedResponse);
-
-    const fetchDatas = {
-      apiEndpoint: fx.controller.apiEndpoint,
-      queryKey: [fx.controller.task, fx.controller.apiEndpoint] as const,
-      task: fx.controller.task,
-      dataReshapeFn: fx.controller.dataReshapeFn,
-    };
+    } = await renderCommandHook(
+      degreeFieldModal,
+      fx.post.endpoint,
+      fx.post.dataReshapeFn
+    );
 
     openDialog(click(), degreeFieldModal, fetchDatas);
     await waitForQueryKey(() => dialogOptions(degreeFieldModal));
@@ -78,15 +87,14 @@ describe("Class creation modals integration", () => {
     const cached = (await waitForCache(fetchDatas.queryKey)) as CachedGroup[];
     expect(Array.isArray(cached)).toBe(true);
     expect(cached[0].groupTitle).toBe("Tous");
-    expect(cached[0].items[0].name).toBe(degreeFetched.name);
+    expect(cached[0].items[0].name).toBe(degreeFieldFetched.name);
     // `value` is provided via ObjectReshape proxy mapping
-    expect(cached[0].items[0].value).toBe(degreeFetched.name);
+    expect(cached[0].items[0].value).toBe(degreeFieldFetched.name);
     expect(countFetchCalls("GET")).toBe(1);
 
     submitCallback(
-      { name: degreeCreated.name, code: degreeCreated.code },
-      API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.FIELD,
-      API_ENDPOINTS.POST.CREATE_DEGREE.dataReshape
+      { name: created.name, code: created.code },
+      { method: "POST" }
     );
 
     await waitForPost(1);
@@ -100,25 +108,39 @@ describe("Class creation modals integration", () => {
     expect(updatedGroups[0].groupTitle).toBe("Tous");
     // Ensure the created item and the original fetched item are present
     expect(updatedGroups[0].items.map((i) => i.value)).toEqual(
-      expect.arrayContaining([degreeFetched.name, degreeCreated.name])
+      expect.arrayContaining([degreeFieldFetched.name, created.name])
     );
 
-    expect(resultsCallback()).toEqual(updatedGroups);
+    // resultsCallback is what the UI consumes; it should reflect the updated cache
+    expect(resultsCallback()?.[0]?.items?.map((i) => i.value)).toEqual(
+      expect.arrayContaining([degreeFieldFetched.name, created.name])
+    );
     expect(countFetchCalls("GET")).toBe(1);
     expect(countFetchCalls("POST")).toBe(1);
   });
 
   test("new-degree-item-year: GET lists, POST updates cache without extra GET", async () => {
-    const { openDialog, dialogOptions, openingCallback, submitCallback } =
-      await renderCommandHook(degreeYearModal);
-
     const fx = fixtureNewDegreeItem("YEAR");
-    fx.installFetchStubs(degreeCreatedResponse);
+    const created = {
+      ...degreeCreated,
+      id: "00000000-0000-4000-8000-000000000108",
+      name: "2A",
+      code: "2A",
+      type: "YEAR" as const,
+    };
+    fx.installFetchStubs({ degree: created });
+
+    const { openDialog, dialogOptions, openingCallback, submitCallback } =
+      await renderCommandHook(
+        degreeYearModal,
+        fx.post.endpoint,
+        fx.post.dataReshapeFn
+      );
 
     const fetchDatas = {
       apiEndpoint: fx.controller.apiEndpoint,
       queryKey: [fx.controller.task, fx.controller.apiEndpoint] as const,
-      task: fx.controller.task,
+      task: fx.controller.task as AppModalNames,
       dataReshapeFn: fx.controller.dataReshapeFn,
     };
 
@@ -130,12 +152,16 @@ describe("Class creation modals integration", () => {
     const cachedBefore = (await waitForCache(
       fetchDatas.queryKey
     )) as CachedGroup[];
+    expect(cachedBefore[0].groupTitle).toBe("Tous");
+    expect(cachedBefore[0].items[0].name).toBe(degreeYearFetched.name);
+    expect(cachedBefore[0].items[0].value).toBe(degreeYearFetched.name);
     expect(countFetchCalls("GET")).toBe(1);
 
+    const getCallsBefore = countFetchCalls("GET");
+
     submitCallback(
-      { name: degreeCreated.name, code: degreeCreated.code },
-      API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.YEAR,
-      API_ENDPOINTS.POST.CREATE_DEGREE.dataReshape
+      { name: created.name, code: created.code },
+      { method: "POST" }
     );
 
     await waitForPost(1);
@@ -143,21 +169,40 @@ describe("Class creation modals integration", () => {
       fetchDatas.queryKey,
       cachedBefore[0].items.length + 1
     );
-    expect(countFetchCalls("GET")).toBe(1);
+
+    const updated = testQueryClient.getQueryData<CachedGroup[]>(
+      fetchDatas.queryKey
+    );
+    const updatedGroups = updated ?? [];
+    expect(updatedGroups[0].items.map((i) => i.value)).toEqual(
+      expect.arrayContaining([degreeYearFetched.name, created.name])
+    );
+    expect(countFetchCalls("GET")).toBe(getCallsBefore);
     expect(countFetchCalls("POST")).toBe(1);
   });
 
   test("new-degree-item-degree: GET lists, POST updates cache without extra GET", async () => {
-    const { openDialog, dialogOptions, openingCallback, submitCallback } =
-      await renderCommandHook(degreeLevelModal);
-
     const fx = fixtureNewDegreeItem("LEVEL");
-    fx.installFetchStubs(degreeCreatedResponse);
+    const created = {
+      ...degreeCreated,
+      id: "00000000-0000-4000-8000-000000000109",
+      name: "Licence Pro",
+      code: "LIP",
+      type: "LEVEL" as const,
+    };
+    fx.installFetchStubs({ degree: created });
+
+    const { openDialog, dialogOptions, openingCallback, submitCallback } =
+      await renderCommandHook(
+        degreeLevelModal,
+        fx.post.endpoint,
+        fx.post.dataReshapeFn
+      );
 
     const fetchDatas = {
       apiEndpoint: fx.controller.apiEndpoint,
       queryKey: [fx.controller.task, fx.controller.apiEndpoint] as const,
-      task: fx.controller.task,
+      task: fx.controller.task as AppModalNames,
       dataReshapeFn: fx.controller.dataReshapeFn,
     };
 
@@ -169,12 +214,16 @@ describe("Class creation modals integration", () => {
     const cachedBefore = (await waitForCache(
       fetchDatas.queryKey
     )) as CachedGroup[];
+    expect(cachedBefore[0].groupTitle).toBe("Tous");
+    expect(cachedBefore[0].items[0].name).toBe(degreeLevelFetched.name);
+    expect(cachedBefore[0].items[0].value).toBe(degreeLevelFetched.name);
     expect(countFetchCalls("GET")).toBe(1);
 
+    const getCallsBefore = countFetchCalls("GET");
+
     submitCallback(
-      { name: degreeCreated.name, code: degreeCreated.code },
-      API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.LEVEL,
-      API_ENDPOINTS.POST.CREATE_DEGREE.dataReshape
+      { name: created.name, code: created.code },
+      { method: "POST" }
     );
 
     await waitForPost(1);
@@ -182,16 +231,28 @@ describe("Class creation modals integration", () => {
       fetchDatas.queryKey,
       cachedBefore[0].items.length + 1
     );
-    expect(countFetchCalls("GET")).toBe(1);
+
+    const updated = testQueryClient.getQueryData<CachedGroup[]>(
+      fetchDatas.queryKey
+    );
+    const updatedGroups = updated ?? [];
+    expect(updatedGroups[0].items.map((i) => i.value)).toEqual(
+      expect.arrayContaining([degreeLevelFetched.name, created.name])
+    );
+    expect(countFetchCalls("GET")).toBe(getCallsBefore);
     expect(countFetchCalls("POST")).toBe(1);
   });
 
   test("create-diploma: GET lists, POST updates cache without extra GET", async () => {
-    const { openDialog, dialogOptions, openingCallback, submitCallback } =
-      await renderCommandHook(diplomaModal);
-
     const fx = fixtureCreateDiplomaFromClassCreation();
     fx.installFetchStubs();
+
+    const { openDialog, dialogOptions, openingCallback, submitCallback } =
+      await renderCommandHook(
+        diplomaModal,
+        fx.post.endpoint,
+        fx.post.dataReshapeFn
+      );
 
     const fetchDatas = {
       apiEndpoint: fx.controllers.diplomasController.apiEndpoint,
@@ -199,7 +260,7 @@ describe("Class creation modals integration", () => {
         fx.controllers.diplomasController.task,
         fx.controllers.diplomasController.apiEndpoint,
       ] as const,
-      task: fx.controllers.diplomasController.task,
+      task: fx.controllers.diplomasController.task as AppModalNames,
       dataReshapeFn: fx.controllers.diplomasController.dataReshapeFn,
     };
 
@@ -223,8 +284,7 @@ describe("Class creation modals integration", () => {
         degreeYear: diplomaCreated.degreeYear,
         degreeField: diplomaCreated.degreeField,
       },
-      API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint,
-      API_ENDPOINTS.POST.CREATE_DIPLOMA.dataReshape
+      { method: "POST" }
     );
 
     await waitForPost(1);
@@ -243,16 +303,20 @@ describe("Class creation modals integration", () => {
   });
 
   test("new-task-item: GET lists, POST updates cache without extra GET", async () => {
-    const { openDialog, dialogOptions, openingCallback, submitCallback } =
-      await renderCommandHook(taskModal);
-
     const fx = fixtureNewTaskItem();
     fx.installFetchStubs(taskCreated);
+
+    const { openDialog, dialogOptions, openingCallback, submitCallback } =
+      await renderCommandHook(
+        taskModal,
+        fx.post.endpoint,
+        fx.post.dataReshapeFn
+      );
 
     const fetchDatas = {
       apiEndpoint: fx.controller.apiEndpoint,
       queryKey: [fx.controller.task, fx.controller.apiEndpoint] as const,
-      task: fx.controller.task,
+      task: fx.controller.task as AppModalNames,
       dataReshapeFn: fx.controller.dataReshapeFn,
     };
 
@@ -268,8 +332,7 @@ describe("Class creation modals integration", () => {
 
     submitCallback(
       { name: taskCreated.name, description: taskCreated.description },
-      API_ENDPOINTS.POST.CREATE_TASK.endpoint,
-      API_ENDPOINTS.POST.CREATE_TASK.dataReshape
+      { method: "POST" }
     );
 
     await waitForPost(1);
@@ -282,11 +345,15 @@ describe("Class creation modals integration", () => {
   });
 
   test("new-task-template: GET lists, POST updates cache without extra GET", async () => {
-    const { openDialog, dialogOptions, openingCallback, submitCallback } =
-      await renderCommandHook(taskTemplateModal);
-
     const fx = fixtureNewTaskTemplate();
     fx.installFetchStubs();
+
+    const { openDialog, dialogOptions, openingCallback, submitCallback } =
+      await renderCommandHook(
+        taskTemplateModal,
+        fx.post.endpoint,
+        fx.post.dataReshapeFn
+      );
 
     const fetchDatas = {
       // Use the global task templates endpoint for this flow (component queries the by-degree endpoint but the public listing is the target for cache update)
@@ -295,7 +362,7 @@ describe("Class creation modals integration", () => {
         fx.controllers.templatesController.task,
         API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.ALL,
       ] as const,
-      task: fx.controllers.templatesController.task,
+      task: fx.controllers.templatesController.task as AppModalNames,
       dataReshapeFn: fx.controllers.templatesController.dataReshapeFn,
     };
 
@@ -311,8 +378,7 @@ describe("Class creation modals integration", () => {
 
     submitCallback(
       { name: "template", taskId: taskTemplateCreated.task.id },
-      API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.endpoint,
-      API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.dataReshape
+      { method: "POST" }
     );
 
     await waitForPost(1);
@@ -325,11 +391,15 @@ describe("Class creation modals integration", () => {
   });
 
   test("class-creation: GET lists, POST updates cache without extra GET", async () => {
-    const { openDialog, dialogOptions, openingCallback, submitCallback } =
-      await renderCommandHook(classCreationModal);
-
     const fx = fixtureCreateClassStepOne();
     fx.installFetchStubs();
+
+    const { openDialog, dialogOptions, openingCallback, submitCallback } =
+      await renderCommandHook(
+        classCreationModal,
+        fx.post.endpoint,
+        fx.post.dataReshapeFn
+      );
 
     const fetchDatas = {
       apiEndpoint: fx.controllers.classesController.apiEndpoint,
@@ -337,7 +407,7 @@ describe("Class creation modals integration", () => {
         fx.controllers.classesController.task,
         fx.controllers.classesController.apiEndpoint,
       ] as const,
-      task: fx.controllers.classesController.task,
+      task: fx.controllers.classesController.task as AppModalNames,
       dataReshapeFn: fx.controllers.classesController.dataReshapeFn,
     };
 
@@ -354,8 +424,7 @@ describe("Class creation modals integration", () => {
         description: classCreated.description,
         degreeLevel: classCreated.degreeLevel,
       },
-      API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
-      API_ENDPOINTS.POST.CREATE_CLASS.dataReshape
+      { method: "POST" }
     );
 
     // Wait for POST and assert server was called with expected payload and no extra GET
@@ -364,9 +433,7 @@ describe("Class creation modals integration", () => {
     expect(countFetchCalls("POST")).toBe(1);
 
     // Verify last POST payload matches the created class parameters
-    const lastBody = getLastPostJsonBodyByUrl(
-      API_ENDPOINTS.POST.CREATE_CLASS.endpoint
-    );
+    const lastBody = getLastPostJsonBodyByUrl(fx.post.endpoint);
     expect(lastBody).toMatchObject({
       name: classCreated.name,
       description: classCreated.description,

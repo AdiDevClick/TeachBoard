@@ -11,8 +11,7 @@ import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import {
   skillCreated,
   skillFetched,
-  stubFetchWithItems,
-} from "@/tests/samples/command-handler-sample-datas";
+} from "@/tests/samples/class-creation-sample-datas";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import {
   assertPostUpdatedCacheWithoutExtraGet,
@@ -24,6 +23,7 @@ import {
   fillFieldsEnsuringSubmitDisabled,
   queryKeyFor,
   rx,
+  stubFetchRoutes,
   waitForDialogAndAssertText,
 } from "@/tests/test-utils/vitest-browser.helpers";
 import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions";
@@ -53,7 +53,13 @@ setupUiTestState(
     <DegreeModuleControllerWrapper />
     <AppModals />
   </AppTestWrapper>,
-  { beforeEach: stubFetchWithItems }
+  {
+    beforeEach: () =>
+      stubFetchRoutes({
+        getRoutes: [["/api/skills/sub", { Skills: [skillFetched] }]],
+        postRoutes: [["/api/skills/sub", skillCreated]],
+      }),
+  }
 );
 
 afterEach(() => {
