@@ -1,19 +1,18 @@
 import type { SearchPrimaryTeacher } from "@/components/ClassCreation/teachers/SearchTeachers.tsx";
 import type { ClassCreationExtendedFormSchema } from "@/components/ClassCreation/types/class-creation.types.ts";
 import type { SearchPrimaryTeacherFormSchema } from "@/models/search-teachers.models.ts";
+import type { AppControllerInterface } from "@/types/AppControllerInterface.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import type { UseFormReturn } from "react-hook-form";
 
 /**
  * Props for the SearchPrimaryTeacherController component.
  */
-export type SearchPrimaryTeacherControllerProps = Readonly<
-  {
-    localForm: UseFormReturn<SearchPrimaryTeacherFormSchema>;
-    formId: string;
-    pageId: string;
-  } & Omit<Parameters<typeof SearchPrimaryTeacher>[0], "modalMode">
->;
+export type SearchPrimaryTeacherControllerProps =
+  AppControllerInterface<SearchPrimaryTeacherFormSchema> &
+    Omit<Parameters<typeof SearchPrimaryTeacher>[0], "modalMode"> & {
+      localForm: UseFormReturn<SearchPrimaryTeacherFormSchema>;
+    };
 
 /**
  * Props for the SearchPrimaryTeacher component.

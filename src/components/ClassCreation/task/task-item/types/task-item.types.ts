@@ -1,15 +1,15 @@
 import type TaskItem from "@/components/ClassCreation/task/task-item/TaskItem.tsx";
+import type { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { TaskItemFormSchema } from "@/models/task-item.models.ts";
-import type { UseFormReturn } from "react-hook-form";
 
 /**
  * Props for the TaskItemController component.
  */
-export type TaskItemControllerProps = Readonly<
-  {
-    formId?: string;
-    form: UseFormReturn<TaskItemFormSchema>;
-    className?: string;
-    pageId: string;
-  } & Omit<Parameters<typeof TaskItem>[0], "modalMode">
->;
+import type { AppControllerInterface } from "@/types/AppControllerInterface";
+
+export type TaskItemControllerProps = AppControllerInterface<
+  TaskItemFormSchema,
+  typeof API_ENDPOINTS.POST.CREATE_TASK.endpoint,
+  typeof API_ENDPOINTS.POST.CREATE_TASK.dataReshape
+> &
+  Omit<Parameters<typeof TaskItem>[0], "modalMode">;

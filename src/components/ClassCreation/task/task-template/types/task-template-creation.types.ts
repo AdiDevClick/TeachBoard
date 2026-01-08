@@ -3,8 +3,9 @@ import type { DiplomaConfigDto } from "@/api/types/routes/diplomas.types.ts";
 import type { SkillsFormValues } from "@/api/types/routes/skills.types.ts";
 import type { createTaskTemplateView } from "@/components/ClassCreation/task/task-template/functions/task-template.functions.ts";
 import type TaskTemplateCreation from "@/components/ClassCreation/task/task-template/TaskTemplateCreation.tsx";
+import type { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { TaskTemplateCreationFormSchema } from "@/models/class-task-template.models.ts";
-import type { UseFormReturn } from "react-hook-form";
+import type { AppControllerInterface } from "@/types/AppControllerInterface.ts";
 
 // Extend the form schema with transient fields used by the controller
 export type TaskTemplateCreationExtendedForm =
@@ -15,14 +16,13 @@ export type TaskTemplateCreationExtendedForm =
 /**
  * Props for the TaskTemplateCreationController component.
  */
-export type TaskTemplateCreationControllerProps = Readonly<
-  {
-    formId: string;
-    className?: string;
-    form: UseFormReturn<TaskTemplateCreationExtendedForm>;
-    pageId: string;
-  } & Omit<Parameters<typeof TaskTemplateCreation>[0], "modalMode">
->;
+
+export type TaskTemplateCreationControllerProps = AppControllerInterface<
+  TaskTemplateCreationExtendedForm,
+  typeof API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.endpoint,
+  typeof API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.dataReshape
+> &
+  Omit<Parameters<typeof TaskTemplateCreation>[0], "modalMode">;
 /**
  * Parameters for fetching skills data for task templates.
  */

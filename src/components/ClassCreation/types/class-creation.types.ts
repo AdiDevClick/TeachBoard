@@ -4,12 +4,13 @@ import type {
   DetailedCommandItem,
   HeadingType,
 } from "@/components/Command/types/command.types.ts";
+import type { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type {
   ClassCreationFormSchema,
   ClassCreationInputItem,
 } from "@/models/class-creation.models.ts";
+import type { AppControllerInterface } from "@/types/AppControllerInterface.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
-import type { UseFormReturn } from "react-hook-form";
 
 type UserFullName = {
   firstName?: string;
@@ -27,13 +28,13 @@ export type ClassCreationExtendedFormSchema = ClassCreationFormSchema & {
 /**
  * Props for ClassCreationController component
  */
-export type ClassCreationControllerProps = Readonly<
-  {
-    form: UseFormReturn<ClassCreationExtendedFormSchema>;
-    formId: string;
-    pageId: string;
-  } & Omit<Parameters<typeof ClassCreation>[0], "modalMode">
->;
+
+export type ClassCreationControllerProps = AppControllerInterface<
+  ClassCreationExtendedFormSchema,
+  typeof API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
+  typeof API_ENDPOINTS.POST.CREATE_CLASS.dataReshape
+> &
+  Omit<Parameters<typeof ClassCreation>[0], "modalMode">; 
 
 /**
  * Simple mutable ref shape (compatible with React's `useRef` result).

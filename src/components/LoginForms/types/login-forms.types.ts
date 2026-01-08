@@ -1,9 +1,9 @@
 import type LoginForm from "@/components/LoginForms/LoginForm.tsx";
-import type { AppModalNames } from "@/configs/app.config.ts";
 import type {
   LoginFormSchema,
   RecoveryFormSchema,
 } from "@/models/login.models.ts";
+import type { AppControllerInterface } from "@/types/AppControllerInterface.ts";
 import type { Dispatch, MouseEvent, SetStateAction } from "react";
 import type { useForm } from "react-hook-form";
 
@@ -35,10 +35,9 @@ type ForgottenPw = ForgottenPwLinkParams & ForgottenPwAndDefaultLinkTexts;
 /**
  * Props for the LoginFormController component.
  */
-export type LoginFormControllerProps = {
-  pageId: AppModalNames;
-  className?: string;
-  formId: string;
-  form: ReturnType<typeof useForm<LoginFormSchema | RecoveryFormSchema>>;
-} & Omit<Parameters<typeof LoginForm>[0], "modalMode"> &
+
+export type LoginFormControllerProps = AppControllerInterface<
+  LoginFormSchema | RecoveryFormSchema
+> &
+  Omit<Parameters<typeof LoginForm>[0], "modalMode"> &
   ForgottenPw;
