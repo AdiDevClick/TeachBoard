@@ -16,17 +16,17 @@ export const NO_QUERY_LOGS = false;
 export const NO_COMPONENT_WARNING_LOGS = true;
 
 /** Supported HTTP methods for API requests */
-export const HTTP_METHODS = [
-  "GET",
-  "POST",
-  "PUT",
-  "DELETE",
-  "PATCH",
-  "OPTIONS",
-  "HEAD",
-  "CONNECT",
-  "TRACE",
-] as const;
+export const HTTP_METHODS = {
+  GET: "GET",
+  POST: "POST",
+  PUT: "PUT",
+  DELETE: "DELETE",
+  PATCH: "PATCH",
+  OPTIONS: "OPTIONS",
+  HEAD: "HEAD",
+  CONNECT: "CONNECT",
+  TRACE: "TRACE",
+} as const;
 
 /**
  * User activities constants
