@@ -119,7 +119,7 @@ export async function checkFormValidityAndSubmit(
   const rgx = new RegExp(`^${name}$`, "i");
 
   const submit = page.getByRole("button", { name: rgx });
-  await expect.element(submit).toBeEnabled();
+  expect(submit).toBeEnabled();
 
   await expectFormToHaveNoErrors(opts?.timeout);
 
@@ -135,7 +135,7 @@ export async function submitButtonShouldBeDisabled(name: string) {
   const rgx = new RegExp(`^${name}$`, "i");
   const submit = page.getByRole("button", { name: rgx });
 
-  await expect.element(submit).toBeDisabled();
+  expect(submit).toBeDisabled();
 }
 
 export async function fillAndTab(
@@ -145,9 +145,9 @@ export async function fillAndTab(
   // `userEvent.fill` accepts either a Locator or a DOM Element; `expect.element`
   // expects a Locator or an HTMLElement/SVGElement, so narrow at runtime.
   if (target instanceof Element) {
-    await expect.element(target as HTMLElement | SVGElement).toBeVisible();
+    expect(target as HTMLElement | SVGElement).toBeVisible();
   } else {
-    await expect.element(target).toBeVisible();
+    expect(target).toBeVisible();
   }
 
   await userEvent.fill(target, value);
@@ -283,6 +283,10 @@ export async function expectOpenPopoverToContain(
 
 /**
  * Open a popover by label and assert listed items are present.
+ *
+ * @param label
+ * @param items -
+ * @param opts  -
  */
 export async function openPopoverAndExpectByLabel(
   label: RegExp,
@@ -368,7 +372,7 @@ export async function waitForDialogAndAssertText(
   // First, make sure the dialog reaches the expected open/closed state.
   await waitForDialogState(present, timeout);
 
-  await waitForTextToBeAbsent(label, opts);
+  await waitForTextToBeAbsent(label, { ...opts, present });
 }
 
 /**
