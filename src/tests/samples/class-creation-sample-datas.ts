@@ -1,29 +1,20 @@
-import type {
-  ClassDto,
-  CreateClassResponseData,
-} from "@/api/types/routes/classes.types.ts";
-import type {
-  CreateDegreeResponseData,
-  DegreeRefDto,
-} from "@/api/types/routes/degrees.types.ts";
-import type {
-  CreateDiplomaResponseData,
-  DiplomaConfigDto,
-} from "@/api/types/routes/diplomas.types.ts";
-import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
-import type { StudentDto } from "@/api/types/routes/students.types.ts";
-import type {
-  CreateTaskTemplateResponseData,
-  TaskTemplateDto,
-  TaskTemplatesFetch,
-} from "@/api/types/routes/task-templates.types.ts";
-import type {
-  CreateTaskResponseData,
-  TaskDto,
-} from "@/api/types/routes/tasks.types.ts";
-import type { TeacherDto } from "@/api/types/routes/teachers.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import type { AppModalNames } from "@/configs/app.config.ts";
+import { USER_ACTIVITIES, type AppModalNames } from "@/configs/app.config.ts";
+import {
+  ClassFixtureCreator,
+  CreateClassResponseFixtureCreator,
+  CreateDegreeResponseFixtureCreator,
+  CreateTaskTemplateResponseFixtureCreator,
+  DegreeFixtureCreator,
+  DiplomaConfigFixtureCreator,
+  SkillFixtureCreator,
+  SkillsViewFixtureCreator,
+  StudentFixtureCreator,
+  TaskFixtureCreator,
+  TaskTemplateFixtureCreator,
+  TaskTemplatesFetchFixtureCreator,
+  TeacherFixtureCreator,
+} from "@/tests/components/classes/FixtureCreator.ts";
 
 export const degreeFieldModal: AppModalNames = "new-degree-item-field";
 export const degreeYearModal: AppModalNames = "new-degree-item-year";
@@ -33,266 +24,127 @@ export const taskModal: AppModalNames = "new-task-item";
 export const taskTemplateModal: AppModalNames = "new-task-template";
 export const classCreationModal: AppModalNames = "class-creation";
 
-export const degreeFieldEndpoint = API_ENDPOINTS.GET.DEGREES.endpoints.FIELD;
-export const degreeYearEndpoint = API_ENDPOINTS.GET.DEGREES.endpoints.YEAR;
-export const degreeLevelEndpoint = API_ENDPOINTS.GET.DEGREES.endpoints.LEVEL;
-export const diplomaEndpoint = API_ENDPOINTS.GET.DIPLOMAS.endpoint;
-export const tasksEndpoint = API_ENDPOINTS.GET.TASKS.endpoint;
-export const taskTemplatesEndpoint =
-  API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.ALL;
+// Generic command-handler samples (kept here as single source of truth)
+export const skillModal: AppModalNames = "new-task-skill";
+export const skillModuleModal: AppModalNames = "new-degree-module-skill";
+export const skillFetchActivity = USER_ACTIVITIES.fetchModulesSkills;
+export const skillApiEndpoint = "/api/skills" as const;
+export const skillQueryKey = [skillModuleModal, skillApiEndpoint] as const;
+export const skillQueryKeySingle = [
+  skillFetchActivity,
+  skillApiEndpoint,
+] as const;
+
+// Degree module controller uses the SUBSKILLS endpoint (see API_ENDPOINTS.GET.SKILLS.endPoints.SUBSKILLS)
+
+export const skillFetched = new SkillFixtureCreator({
+  name: "fetched-item",
+});
+
+export const skillCreated = new SkillFixtureCreator({ name: "new" });
 export const classesEndpoint = API_ENDPOINTS.GET.CLASSES.endPoints.ALL;
 
-export const degreeFieldQueryKey = [
-  degreeFieldModal,
-  degreeFieldEndpoint,
-] as const;
-export const degreeYearQueryKey = [
-  degreeYearModal,
-  degreeYearEndpoint,
-] as const;
-export const degreeLevelQueryKey = [
-  degreeLevelModal,
-  degreeLevelEndpoint,
-] as const;
-export const diplomaQueryKey = [diplomaModal, diplomaEndpoint] as const;
-export const tasksQueryKey = [taskModal, tasksEndpoint] as const;
-export const taskTemplatesQueryKey = [
-  taskTemplateModal,
-  taskTemplatesEndpoint,
-] as const;
-export const classesQueryKey = [classCreationModal, classesEndpoint] as const;
+export const degreeFieldFetched = new DegreeFixtureCreator("FIELD");
 
-export const degreeFieldFetched: DegreeRefDto = {
-  id: "00000000-0000-4000-8000-000000000101",
-  name: "Cuisine",
-  code: "CUIS",
-  type: "FIELD",
-};
+export const degreeFieldFetched2 = new DegreeFixtureCreator("FIELD");
 
-export const degreeFieldFetched2: DegreeRefDto = {
-  id: "00000000-0000-4000-8000-000000000105",
-  name: "Informatique",
-  code: "INFO",
-  type: "FIELD",
-};
+export const degreeYearFetched = new DegreeFixtureCreator("YEAR");
 
-export const degreeYearFetched: DegreeRefDto = {
-  id: "00000000-0000-4000-8000-000000000103",
-  name: "1A",
-  code: "1A",
-  type: "YEAR",
-};
+export const degreeYearFetched2 = new DegreeFixtureCreator("YEAR");
 
-export const degreeYearFetched2: DegreeRefDto = {
-  id: "00000000-0000-4000-8000-000000000106",
-  name: "3A",
-  code: "3A",
-  type: "YEAR",
-};
+export const degreeLevelFetched = new DegreeFixtureCreator("LEVEL");
 
-export const degreeLevelFetched: DegreeRefDto = {
-  id: "00000000-0000-4000-8000-000000000104",
-  name: "BTS",
-  code: "BTS",
-  type: "LEVEL",
-};
+export const degreeLevelFetched2 = new DegreeFixtureCreator("LEVEL");
 
-export const degreeLevelFetched2: DegreeRefDto = {
-  id: "00000000-0000-4000-8000-000000000107",
-  name: "Master",
-  code: "MAS",
-  type: "LEVEL",
-};
+export const degreeCreated = new DegreeFixtureCreator("FIELD");
 
-export const degreeCreated: DegreeRefDto = {
-  id: "00000000-0000-4000-8000-000000000102",
-  name: "Licence",
-  code: "LIC",
-  type: "FIELD",
-};
-
-export const degreeCreatedResponse: CreateDegreeResponseData = {
+export const degreeCreatedResponse = new CreateDegreeResponseFixtureCreator({
   degree: degreeCreated,
-};
+});
 
-export const diplomaFetchedSkills: SkillsViewDto[] = [
-  {
-    mainSkillId: "00000000-0000-4000-8000-000000000901",
-    mainSkillCode: "MAIN_2F90AB",
-    mainSkillName: "Module cuisine",
-    subSkills: [
-      {
-        id: "00000000-0000-4000-8000-000000000902",
-        code: "SUB_01",
-        name: "Découper",
-      },
-      {
-        id: "00000000-0000-4000-8000-000000000903",
-        code: "SUB_02",
-        name: "Cuire",
-      },
-    ],
-  },
-];
+export const diplomaFetchedSkills = [new SkillsViewFixtureCreator()];
 
 // A second set of skills for another diploma used in tests to ensure
 // diploma-specific skills are handled correctly.
-export const diplomaFetchedSkills2: SkillsViewDto[] = [
-  {
-    mainSkillId: "00000000-0000-4000-8000-000000000911",
-    mainSkillCode: "MAIN_NET123",
-    mainSkillName: "Module réseau",
-    subSkills: [
-      {
-        id: "00000000-0000-4000-8000-000000000912",
-        code: "NET_SUB_01",
-        name: "Câblage",
-      },
-      {
-        id: "00000000-0000-4000-8000-000000000913",
-        code: "NET_SUB_02",
-        name: "Configuration",
-      },
-    ],
-  },
-];
+export const diplomaFetchedSkills2 = [new SkillsViewFixtureCreator()];
 
-export const diplomaFetched: DiplomaConfigDto = {
-  id: "00000000-0000-4000-8000-000000000201",
-  degreeField: "Cuisine",
-  degreeLevel: "BTS",
-  degreeYear: "1A",
+export const diplomaFetched = new DiplomaConfigFixtureCreator({
+  degreeField: degreeFieldFetched.name,
+  degreeLevel: degreeLevelFetched.name,
+  degreeYear: degreeYearFetched.code,
   skills: diplomaFetchedSkills,
-};
+});
 
-export const diplomaFetched2: DiplomaConfigDto = {
-  id: "00000000-0000-4000-8000-000000000203",
-  degreeField: "Cuisine",
-  degreeLevel: "BTS",
-  degreeYear: "3A",
+export const diplomaFetched2 = new DiplomaConfigFixtureCreator({
+  degreeField: degreeFieldFetched.name,
+  degreeLevel: degreeLevelFetched.name,
+  degreeYear: degreeYearFetched2.code,
   skills: diplomaFetchedSkills2,
-};
+});
 
-export const diplomaCreated: CreateDiplomaResponseData = {
-  id: "00000000-0000-4000-8000-000000000202",
-  degreeField: "Cuisine",
-  degreeLevel: "BTS",
+export const diplomaCreated = new DiplomaConfigFixtureCreator({
+  degreeField: degreeFieldFetched.name,
+  degreeLevel: degreeLevelFetched.name,
   degreeYear: "2A",
-};
+});
 
-export const taskFetched: TaskDto = {
-  id: "00000000-0000-4000-8000-000000000301",
-  name: "Installer un switch",
-  description: "...",
-};
+export const taskFetched = new TaskFixtureCreator();
 
-export const taskFetched2: TaskDto = {
-  id: "00000000-0000-4000-8000-000000000303",
-  name: "Câbler une baie",
-  description: "...",
-};
+export const taskFetched2 = new TaskFixtureCreator();
 
-export const taskCreated: CreateTaskResponseData = {
-  id: "00000000-0000-4000-8000-000000000302",
-  name: "Configurer un routeur",
-  description: "...",
-};
+export const taskCreated = new TaskFixtureCreator();
 
-export const taskTemplateFetched: TaskTemplateDto = {
-  id: "00000000-0000-4000-8000-000000000401",
-  task: {
-    id: "00000000-0000-4000-8000-000000000301",
-    name: "Installer un switch",
-    description: "...",
-  },
-};
+export const taskTemplateFetched = new TaskTemplateFixtureCreator({
+  task: taskFetched,
+});
 
-export const taskTemplateFetched2: TaskTemplateDto = {
-  id: "00000000-0000-4000-8000-000000000403",
-  task: {
-    id: "00000000-0000-4000-8000-000000000303",
-    name: "Câbler une baie",
-    description: "...",
-  },
-};
+export const taskTemplateFetched2 = new TaskTemplateFixtureCreator({
+  task: taskFetched2,
+});
 
-export const taskTemplateFetch: TaskTemplatesFetch = {
+export const taskTemplateFetch = new TaskTemplatesFetchFixtureCreator({
   taskTemplates: [taskTemplateFetched, taskTemplateFetched2],
   shortTemplatesList: ["short-1", "short-2"],
-};
+});
 
-export const taskTemplateCreated: CreateTaskTemplateResponseData = {
-  id: "00000000-0000-4000-8000-000000000402",
-  task: {
-    id: "00000000-0000-4000-8000-000000000302",
-    name: "Configurer un routeur",
-    description: "...",
-  },
-};
+export const taskTemplateCreated = new CreateTaskTemplateResponseFixtureCreator(
+  {
+    task: taskCreated,
+  }
+);
 
-export const classFetched: ClassDto = {
-  id: "00000000-0000-4000-8000-000000000501",
-  name: "1A",
-  description: "desc",
-  degreeLevel: "BTS",
-};
+export const classFetched = new ClassFixtureCreator({
+  degreeLevel: degreeLevelFetched.name,
+});
 
-export const classFetched2: ClassDto = {
-  id: "00000000-0000-4000-8000-000000000503",
-  name: "1B",
-  description: "desc",
-  degreeLevel: "BTS",
-};
+export const classFetched2 = new ClassFixtureCreator({
+  degreeLevel: degreeLevelFetched.name,
+});
 
-export const classCreated: CreateClassResponseData = {
-  id: "00000000-0000-4000-8000-000000000502",
-  name: "2B",
-  description: "desc",
-  degreeLevel: "BTS",
-};
+export const classCreated = new CreateClassResponseFixtureCreator({
+  degreeLevel: degreeLevelFetched.name,
+});
 
-export const studentFetched: StudentDto = {
-  id: "00000000-0000-4000-8000-000000000701",
-  firstName: "John",
-  lastName: "Doe",
-  email: "john.doe@example.com",
-};
+export const studentFetched = new StudentFixtureCreator();
 
-export const studentFetched2: StudentDto = {
-  id: "00000000-0000-4000-8000-000000000702",
-  firstName: "Alice",
-  lastName: "Smith",
-  email: "alice.smith@example.com",
-};
+export const studentFetched2 = new StudentFixtureCreator();
 
-export const teacherFetched: TeacherDto = {
-  id: "00000000-0000-4000-8000-000000000801",
-  firstName: "Jane",
-  lastName: "Doe",
-  email: "jane.doe@example.com",
-};
+export const teacherFetched = new TeacherFixtureCreator();
 
-export const teacherFetched2: TeacherDto = {
-  id: "00000000-0000-4000-8000-000000000802",
-  firstName: "Bob",
-  lastName: "Martin",
-  email: "bob.martin@example.com",
-};
+export const teacherFetched2 = new TeacherFixtureCreator();
 
 export const skillsModulesFetched = {
   Skills: [
-    {
-      id: "00000000-0000-0000-0000-000000000901",
-      code: "MAIN_2F90AB",
-      name: "Module cuisine",
+    new SkillFixtureCreator({
+      code: diplomaFetchedSkills[0].mainSkillCode,
+      name: diplomaFetchedSkills[0].mainSkillName,
       type: "MAIN",
-    },
-    {
-      id: "00000000-0000-0000-0000-000000000904",
-      code: "MAIN_F4B12C",
-      name: "Module réseaux",
+    }),
+    new SkillFixtureCreator({
+      code: diplomaFetchedSkills2[0].mainSkillCode,
+      name: diplomaFetchedSkills2[0].mainSkillName,
       type: "MAIN",
-    },
+    }),
   ],
 } as const;
 
