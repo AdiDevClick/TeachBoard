@@ -19,9 +19,13 @@ import type {
   HandleOpeningCallbackParams,
   HandleSelectionCallbackParams,
   HandleSubmitCallbackParams,
+  InferServerData,
+  InferViewData,
   UseCommandHandlerParams,
 } from "@/hooks/database/types/use-command-handler.types.ts";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
+import type { ApiError } from "@/types/AppErrorInterface";
+import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -40,9 +44,15 @@ import type { FieldValues, Path, PathValue } from "react-hook-form";
  * @param pageId - The identifier for the current page or module
  */
 export function useCommandHandler<
-  TFieldValues extends FieldValues,
-  TMeta extends CommandHandlerMetaData
->({ form, pageId }: UseCommandHandlerParams<TFieldValues, TMeta>) {
+  TFieldValues extends FieldValues = FieldValues,
+  TRoute = unknown,
+  TSubmitReshapeFn = never,
+  TServerData = InferServerData<TRoute, TSubmitReshapeFn>,
+  TViewData = InferViewData<TRoute, TSubmitReshapeFn>,
+  E extends ApiError = ApiError,
+  TMeta extends CommandHandlerMetaData = CommandHandlerMetaData
+>(params: UseCommandHandlerParams<TFieldValues, TRoute, TSubmitReshapeFn>) {
+  const { form, pageId } = params;
   const {
     fetchParams,
     onSubmit,
@@ -50,8 +60,10 @@ export function useCommandHandler<
     isLoaded,
     error,
     data,
+    response,
+    serverData,
     isLoading,
-  } = useFetch();
+  } = useFetch<TServerData, E, TViewData>();
   const {
     openDialog,
     closeDialog,
@@ -71,9 +83,8 @@ export function useCommandHandler<
     const key = [fetchParams.contentId, fetchParams.url];
     return {
       cacheKey: key,
-      cachedData: queryClient.getQueryData<HeadingType[]>(key),
     };
-  }, [queryClient, fetchParams, data]);
+  }, [fetchParams]);
 
   /**
    * Handle adding a new item/feature
@@ -105,51 +116,61 @@ export function useCommandHandler<
    * Handle form submission
    *
    * @param variables - form variables
-   * @param endpointUrl - The API endpoint URL
-   * @param dataReshapeFn - Function to reshape the response data
+   * @param submitOpts - submission options
    */
-  const handleSubmit = useCallback(
-    (
-      variables: HandleSubmitCallbackParams["variables"],
-      endpointUrl: HandleSubmitCallbackParams["endpointUrl"],
-      dataReshapeFn: HandleSubmitCallbackParams["dataReshapeFn"],
-      reshapeOptions: HandleSubmitCallbackParams["reshapeOptions"] = null,
-      silent: HandleSubmitCallbackParams["silent"] = false
-    ) => {
-      const options = dialogOptions(pageId);
+  function handleSubmit(
+    variables: HandleSubmitCallbackParams["variables"],
+    submitOpts?: HandleSubmitCallbackParams["submitOpts"]
+  ) {
+    const options = dialogOptions(pageId);
+    const {
+      dataReshapeFn,
+      endpointUrl,
+      method = "GET",
+      ...rest
+    } = submitOpts ?? {};
 
-      // Store variables for deferred submission
-      postVariables.current = variables;
+    // Default to GET
+    // It will grab information from the input controller's apiEndpoint and dataReshapeFn
+    let reshapeFn = dataReshapeFn ?? options?.dataReshapeFn;
+    let endpointUrlFinal = endpointUrl ?? options?.apiEndpoint;
 
-      // Update fetchParams - this will trigger the useEffect above
-      if (DEV_MODE && !NO_CACHE_LOGS) {
-        console.debug(
-          "handleSubmit setting fetchParams",
-          {
-            endpointUrl,
-            options,
-            cachedFetchKey: options?.queryKey,
-            dataReshapeFn: dataReshapeFn ?? options?.dataReshapeFn,
-          },
-          " variables:",
-          variables
-        );
-      }
+    // For non-GET methods, override with provided endpoint and reshaper
+    if (method !== "GET") {
+      reshapeFn = dataReshapeFn ?? params.submitDataReshapeFn;
+      endpointUrlFinal = endpointUrl ?? params.submitRoute;
+    }
 
-      setFetchParams((prev) => ({
-        ...prev,
-        url: endpointUrl ?? options?.apiEndpoint,
-        cachedFetchKey: options?.queryKey,
-        // cachedFetchKey: options?.queryKey ?? [],
-        method: API_ENDPOINTS.POST.METHOD,
-        contentId: options?.task ?? pageId,
-        dataReshapeFn: dataReshapeFn ?? options?.dataReshapeFn,
-        reshapeOptions,
-        silent,
-      }));
-    },
-    []
-  );
+    // Store variables for deferred submission
+    postVariables.current = variables;
+
+    // Update fetchParams - this will trigger the useEffect above
+    if (DEV_MODE && !NO_CACHE_LOGS) {
+      console.debug(
+        "handleSubmit setting fetchParams",
+        {
+          endpointUrlFinal,
+          options,
+          cachedFetchKey: options?.queryKey,
+          reshapeFn,
+        },
+        " variables:",
+        variables
+      );
+    }
+
+    setFetchParams((prev) => ({
+      ...prev,
+      url: endpointUrlFinal,
+      cachedFetchKey: options?.queryKey,
+      method: API_ENDPOINTS.POST.METHOD,
+      contentId: pageId as FetchParams["contentId"],
+      // contentId: options?.task ?? pageId,
+      dataReshapeFn: reshapeFn,
+      ...rest,
+    }));
+  }
+
   /**
    * Handle opening of the VerticalFieldSelect component
    *
@@ -311,23 +332,21 @@ export function useCommandHandler<
     * ```
    */
   const handleDataCacheUpdate = useCallback((): HeadingType[] | undefined => {
+    const cachedData = queryClient.getQueryData<HeadingType[]>(
+      currentQueryCacheAndKey.cacheKey
+    );
+
     if (DEV_MODE && !NO_CACHE_LOGS) {
       console.log(
         "Cached data for ",
         currentQueryCacheAndKey.cacheKey,
         " is ",
-        currentQueryCacheAndKey.cachedData
+        cachedData
       );
     }
 
-    return (currentQueryCacheAndKey.cachedData ?? data) as
-      | HeadingType[]
-      | undefined;
-  }, [
-    currentQueryCacheAndKey.cacheKey,
-    currentQueryCacheAndKey.cachedData,
-    data,
-  ]);
+    return (cachedData ?? data) as HeadingType[] | undefined;
+  }, [currentQueryCacheAndKey.cacheKey, queryClient, data]);
 
   /**
    * Handle form results
@@ -352,8 +371,6 @@ export function useCommandHandler<
         // For navigation flows (like login), the form will be unmounted anyway.
         // For dialog flows, the dialog closing will handle the form state.
         startTransition(async () => {
-          // form.reset();
-          // await wait(APP_REDIRECT_TIMEOUT_SUCCESS);
           closeDialog(null, pageId);
         });
       }
@@ -389,7 +406,12 @@ export function useCommandHandler<
 
   return {
     ...mutationObs,
+    // Reshaped view data (usually cached + rendered by controllers)
     data,
+
+    // Raw server response and payload (typed per `route` when provided)
+    response: response as ResponseInterface<TServerData> | undefined,
+    serverData,
     isLoading,
     error,
     isLoaded,
