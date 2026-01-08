@@ -1,7 +1,3 @@
-import {
-  classFetched,
-  classFetched2,
-} from "@/tests/samples/class-creation-sample-datas.ts";
 import type { InputControllerLike } from "@/tests/test-utils/class-creation/regex.functions.ts";
 import {
   controllerLabelRegex,
@@ -45,7 +41,7 @@ export async function closeTopDialogByCancel() {
  */
 export async function clickEnabledButton(name: string | RegExp) {
   const button = page.getByRole("button", { name: name });
-  await expect.element(button).toBeEnabled();
+  expect(button).toBeEnabled();
   await userEvent.click(button);
 }
 
@@ -72,18 +68,19 @@ export async function openModalAndAssertItsOpenedAndReady<
     readyText?: string | RegExp;
   }
 ) {
+  const defaultNameArray = ["default", "default2"];
   // The creation button lives inside the popover.
   if (!opts?.listAlreadyOpen) {
     try {
       await openPopoverAndExpectByLabel(
         controllerLabelRegex(opts?.controller as T),
-        opts?.nameArray ?? [classFetched.name, classFetched2.name]
+        opts?.nameArray ?? defaultNameArray
       );
     } catch {
       // Fall back to opening by trigger if there's no visible label for this controller
       await openPopoverAndExpectByTrigger(
         controllerTriggerRegex(opts?.controller as T),
-        opts?.nameArray ?? [classFetched.name, classFetched2.name]
+        opts?.nameArray ?? defaultNameArray
       );
     }
   }
@@ -114,9 +111,9 @@ export async function assertLucideIconForOptionInContainer(
   const icon = option.getByCss(`svg.lucide-${opts.icon}`);
 
   if (opts.present) {
-    await expect.element(icon).toBeInTheDocument();
+    expect(icon).toBeInTheDocument();
   } else {
-    await expect.element(icon).not.toBeInTheDocument();
+    expect(icon).not.toBeInTheDocument();
   }
 }
 
