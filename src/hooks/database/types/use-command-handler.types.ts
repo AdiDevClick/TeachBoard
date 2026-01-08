@@ -7,6 +7,44 @@ import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import type { MouseEvent, PointerEvent } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
+import type { FormMethod } from "react-router-dom";
+
+type IsNever<T> = [T] extends [never] ? true : false;
+
+type InferServerDataFromRoute<TRoute> = TRoute extends {
+  dataReshape: (data: infer TData, ...args: infer _Args) => unknown;
+}
+  ? TData
+  : unknown;
+
+type InferViewDataFromRoute<TRoute> = TRoute extends {
+  dataReshape: (...args: infer _Args) => infer TView;
+}
+  ? TView
+  : unknown;
+
+type InferServerDataFromReshapeFn<TFn> = TFn extends (
+  data: infer TData,
+  ...args: infer _Args
+) => unknown
+  ? TData
+  : unknown;
+
+type InferViewDataFromReshapeFn<TFn> = TFn extends (
+  ...args: infer _Args
+) => infer TView
+  ? TView
+  : unknown;
+
+export type InferServerData<TRoute, TSubmitReshapeFn> =
+  IsNever<TSubmitReshapeFn> extends true
+    ? InferServerDataFromRoute<TRoute>
+    : InferServerDataFromReshapeFn<TSubmitReshapeFn>;
+
+export type InferViewData<TRoute, TSubmitReshapeFn> =
+  IsNever<TSubmitReshapeFn> extends true
+    ? InferViewDataFromRoute<TRoute>
+    : InferViewDataFromReshapeFn<TSubmitReshapeFn>;
 
 /**
  * Shared metadata shape passed around by command controllers.
@@ -22,12 +60,18 @@ export type CommandHandlerMetaData = Record<string, unknown> & {
  */
 export interface UseCommandHandlerParams<
   TFieldValues extends FieldValues = FieldValues,
-  TMeta extends CommandHandlerMetaData = CommandHandlerMetaData
+  TRoute = unknown,
+  TSubmitReshapeFn = never,
+  TPageId extends AppModalNames = AppModalNames
 > {
   /** Zod validated form instance */
   form: UseFormReturn<TFieldValues>;
   /** Identifier for the current page/module */
-  pageId: AppModalNames;
+  pageId: TPageId;
+  /** Optional API_ENDPOINTS entry used for type inference in `useCommandHandler`. */
+  submitRoute?: TRoute;
+  /** Optional submit reshape function used as an alternative inference anchor. */
+  submitDataReshapeFn?: TSubmitReshapeFn;
 }
 
 /**
@@ -73,8 +117,11 @@ export type HandleOpeningCallbackParams<T extends CommandHandlerMetaData> = {
  */
 export type HandleSubmitCallbackParams = {
   variables: MutationVariables;
-  endpointUrl: string;
-  dataReshapeFn?: DataReshapeFn;
-  reshapeOptions?: unknown;
-  silent?: boolean;
+  submitOpts?: {
+    method?: FormMethod;
+    endpointUrl?: string;
+    dataReshapeFn?: DataReshapeFn;
+    reshapeOptions?: unknown;
+    silent?: boolean;
+  };
 };
