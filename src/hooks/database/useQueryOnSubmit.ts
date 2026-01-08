@@ -22,7 +22,10 @@ import { toast } from "sonner";
  * Options for the mutation hook.
  * @description Centralizing mutation functions
  */
-const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
+const mutationOptions = <
+  S extends ResponseInterface<unknown>,
+  E extends ApiError
+>(
   queryKeysArr: QueryKeyDescriptor<S, E>
 ): UseMutationOptions<
   FetchJSONSuccess<S>,
@@ -95,7 +98,7 @@ const mutationOptions = <S extends ResponseInterface, E extends ApiError>(
  * ```
  */
 export function useQueryOnSubmit<
-  S extends ResponseInterface,
+  S extends ResponseInterface<unknown>,
   E extends ApiError
 >(queryKeysArr: QueryKeyDescriptor<S, E>) {
   const { reset } = useQueryErrorResetBoundary();
@@ -141,16 +144,19 @@ export function useQueryOnSubmit<
         }
         return await mutateAsync(variables);
       } catch (err) {
-        // throw new Error(error);
-        if ((err as Error).message === "Request completed") {
-          return err.cause.success;
+        const caught = err as Error;
+        const message = caught.message;
+
+        if (message === "Request completed") {
+          const cause = caught.cause as FetchJSONSuccess<S> | undefined;
+          return cause?.success;
         }
 
         if (DEV_MODE) {
           console.debug("useQueryOnSubmit mutation rejected", err);
         }
 
-        return await err;
+        return err;
       }
     },
     [mutateAsync, localState.error, queryKeysArr]
@@ -174,7 +180,7 @@ export function useQueryOnSubmit<
  * @returns The mutation response object.
  */
 async function onFetch<
-  TSuccess extends ResponseInterface,
+  TSuccess extends ResponseInterface<unknown>,
   TError extends ApiError
 >({
   timeout = 1000,
@@ -237,7 +243,7 @@ async function onFetch<
  *
  * @param response The mutation response object.
  */
-function onQuerySuccess<TSuccess extends ResponseInterface>(
+function onQuerySuccess<TSuccess extends ResponseInterface<unknown>>(
   response: FetchJSONSuccess<TSuccess>,
   querySuccessDescription?: string
 ) {
