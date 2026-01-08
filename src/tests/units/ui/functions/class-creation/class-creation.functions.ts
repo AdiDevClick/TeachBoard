@@ -38,6 +38,11 @@ import {
   openModalAndAssertItsOpenedAndReady,
 } from "@/tests/units/ui/functions/useful-ui.functions.ts";
 
+import type {
+  ClassDto,
+  CreateClassResponseData,
+} from "@/api/types/routes/classes.types.ts";
+import type { DiplomaConfigDto } from "@/api/types/routes/diplomas.types.ts";
 import { wait } from "@/utils/utils.ts";
 import { expect } from "vitest";
 import { page, userEvent } from "vitest/browser";
@@ -66,10 +71,7 @@ export async function baseInit(labeler: {
  */
 export async function selectDiplomaInClassCreationDialog(
   controller: InputControllerLike,
-  diploma: {
-    degreeLevel: string;
-    degreeYear: string;
-  },
+  diploma: DiplomaConfigDto,
   opts?: { submitName?: string }
 ) {
   const submitName = opts?.submitName ?? "Créer la classe";
@@ -155,9 +157,9 @@ export async function assertSkillsForCurrentDiplomaAndSelect(params: {
   // We assert its absence inside the currently open popover.
   const openPopoverEl = getOpenPopoverContent();
   expect(openPopoverEl).not.toBeNull();
-  await expect
-    .element(page.elementLocator(openPopoverEl!).getByCss("svg.lucide-check"))
-    .not.toBeInTheDocument();
+  expect(
+    page.elementLocator(openPopoverEl!).getByCss("svg.lucide-check")
+  ).not.toBeInTheDocument();
 
   if (params.expectAbsent?.length) {
     for (const s of params.expectAbsent) {
@@ -215,7 +217,7 @@ export async function iterateDiplomaSkillAssertions(params: {
   taskNameForLabelSelection: string;
   primeFields?: Array<{ label: string | RegExp; value: string }>;
   steps: Array<{
-    diploma: { degreeLevel: string; degreeYear: string };
+    diploma: DiplomaConfigDto;
     skillToSelect: string;
     expectPresent?: string[];
     expectAbsent?: string[];
@@ -284,7 +286,7 @@ export async function prepareClassCreationForm(opts: {
   name: string;
   fillDescription?: boolean;
   diplomasController: InputControllerLike;
-  diplomaToSelect: { degreeLevel: string; degreeYear: string };
+  diplomaToSelect: DiplomaConfigDto;
   tasksController: InputControllerLike;
   taskToSelect: string;
   tasksNames?: string[];
@@ -339,7 +341,7 @@ export async function runCreateFlow(args: {
     diplomasController: InputControllerLike;
   };
   createdClassName: string;
-  createdClassPayload: { id: string };
+  createdClassPayload: CreateClassResponseData;
   fillDescription: boolean;
   // Context from the test needed for assertions
   labeler: {
@@ -347,12 +349,12 @@ export async function runCreateFlow(args: {
     controller: InputControllerLike;
     nameArray: (string | RegExp)[];
   };
-  diplomaToSelect: { degreeLevel: string; degreeYear: string };
+  diplomaToSelect: DiplomaConfigDto;
   tasksNames: string[];
   classesQueryKey: readonly unknown[];
   createClassPostEndpoint: string;
-  classFetched: { id: string };
-  classFetched2: { id: string };
+  classFetched: ClassDto;
+  classFetched2: ClassDto;
   studentName: string | RegExp;
   taskToSelect?: string;
 }) {
@@ -405,7 +407,7 @@ export async function runCreateFlow(args: {
   const cached = await waitForCache(args.classesQueryKey);
   expect(cached).toEqual([
     {
-      groupTitle: "BTS",
+      groupTitle: args.classFetched.degreeLevel,
       items: expect.arrayContaining([
         expect.objectContaining({ id: args.classFetched.id }),
         expect.objectContaining({ id: args.classFetched2.id }),
