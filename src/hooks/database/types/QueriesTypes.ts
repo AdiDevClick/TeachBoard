@@ -2,7 +2,8 @@ import type {
   FetchJSONError,
   FetchJSONSuccess,
 } from "@/api/types/api.types.ts";
-import type { HTTP_METHODS, USER_ACTIVITIES } from "@/configs/app.config.ts";
+import type { USER_ACTIVITIES } from "@/configs/app.config.ts";
+import type { FormMethod } from "react-router-dom";
 
 export type MutationViolation = Record<string, unknown> & {
   propertyPath?: string;
@@ -40,14 +41,12 @@ export type QueryOnSubmitMutationState = {
   variables: MutationVariables;
 };
 
-export type HttpMethod = (typeof HTTP_METHODS)[number];
-
 /**
  * Arguments for fetch function used in queries and mutations.
  */
 export type FetchArgs = {
   bodyVariables: MutationVariables;
-  method: HttpMethod;
+  method: FormMethod;
   headers?: Headers;
   url?: string;
   abortController?: AbortController;
@@ -71,7 +70,7 @@ export type QueryKeyDescriptor<S, E> = [
   task: (typeof USER_ACTIVITIES)[keyof typeof USER_ACTIVITIES],
   descriptor: {
     url: string;
-    method?: HttpMethod;
+    method?: FormMethod;
     headers?: Headers;
     abortController?: AbortController;
     successDescription?: string;
