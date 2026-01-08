@@ -106,7 +106,12 @@ export async function assertPostUpdatedCacheWithoutExtraGet(opts: {
   getCallsBefore?: number; // count of GET calls recorded before POST
   timeout?: number;
   /** Optional: wait for a POST to a specific endpoint before checking cache */
-  post?: { endpoint: string | RegExp; count?: number; timeout?: number };
+  post?: {
+    endpoint: string | RegExp;
+    count?: number;
+    timeout?: number;
+    callsBefore?: number;
+  };
   /** Optional visual check: open popover and assert item is visible */
   openPopover?: {
     label?: RegExp;
@@ -121,11 +126,22 @@ export async function assertPostUpdatedCacheWithoutExtraGet(opts: {
   if (opts.post) {
     const postCount = opts.post.count ?? 1;
     const postTimeout = opts.post.timeout ?? timeout;
+
+    const postCallsBefore = opts.post.callsBefore;
     await expect
-      .poll(() => countFetchCallsByUrl(opts.post!.endpoint, "POST"), {
-        timeout: postTimeout,
-      })
-      .toBe(postCount);
+      .poll(
+        () => {
+          const current = countFetchCallsByUrl(opts.post!.endpoint, "POST");
+          if (postCallsBefore !== undefined) {
+            return current + postCallsBefore <= postCount;
+          }
+          return current === postCount;
+        },
+        {
+          timeout: postTimeout,
+        }
+      )
+      .toBe(true);
   }
 
   // Wait for cache to be populated
