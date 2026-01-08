@@ -518,10 +518,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
         // Apply mappings to each group and their items
         return this.#dataSource.map((group) => {
           const transformedGroup = { ...group };
-          this.#applyMappings(
-            group,
-            transformedGroup
-          );
+          this.#applyMappings(group, transformedGroup);
 
           // If the group has an items array, apply mappings to each item
           for (const key in transformedGroup) {
@@ -533,7 +530,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
           }
 
           return transformedGroup;
-        })
+        });
       }
     }
 
