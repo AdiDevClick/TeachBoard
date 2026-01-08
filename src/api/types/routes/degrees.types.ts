@@ -6,6 +6,7 @@
 
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 
+export type DegreeType = "FIELD" | "YEAR" | "LEVEL";
 /**
  * OpenAPI: `DegreeViewDTO`
  * Used by GET `/degrees/level`, `/degrees/year`, `/degrees/field`.
@@ -15,7 +16,7 @@ export interface DegreeRefDto {
   name: string;
   code: string;
   description?: string;
-  type?: string;
+  type?: DegreeType;
   identifier?: string;
   entityTypeName?: string;
 }
