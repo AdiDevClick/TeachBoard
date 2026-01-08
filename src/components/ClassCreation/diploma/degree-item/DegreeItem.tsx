@@ -25,13 +25,13 @@ const footerProps = { submitText: "Créer", cancelText: "Annuler" };
  *
  * @param pageId - The ID of the page.
  * @param inputControllers - The input controllers for the form (this needs to be already validated by Zod Schema).
- * @param modalMode - Whether the component is in modal mode.
  * @param props - Additional props.
  */
 function DegreeItem({
   pageId = "new-degree-item-field",
-  modalMode = true,
   inputControllers = degreeCreationInputControllersField,
+  modalMode = true,
+  className = "grid gap-4",
   ...props
 }: Readonly<PageWithControllers<DegreeCreationInputItem>>) {
   const form = useForm<DegreeCreationFormSchema>({
@@ -44,19 +44,25 @@ function DegreeItem({
     },
   });
 
-  const formId = pageId + "-form";
+  const narrowedPageId = pageId as
+    | "new-degree-item-field"
+    | "new-degree-item-year"
+    | "new-degree-item-degree";
+
+  const formId = narrowedPageId + "-form";
 
   const commonProps = useMemo(
     () => ({
-      pageId,
+      pageId: narrowedPageId,
       inputControllers,
       formId,
+      className,
+      modalMode,
       footerProps: {
         ...footerProps,
         formState: form.formState,
         formId,
       },
-      modalMode,
       titleProps,
       ...props,
       form,

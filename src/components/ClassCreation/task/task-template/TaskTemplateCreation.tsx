@@ -28,6 +28,7 @@ const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
 function TaskTemplateCreation({
   pageId = "new-task-template",
   modalMode = true,
+  className = "grid gap-4",
   inputControllers = taskTemplateCreationInputControllers,
   ...props
 }: Readonly<PageWithControllers<TaskTemplateCreationInputItem>>) {
@@ -50,6 +51,7 @@ function TaskTemplateCreation({
       inputControllers,
       formId,
       modalMode,
+      className,
       footerProps: {
         ...footerProps,
         formState: form.formState,

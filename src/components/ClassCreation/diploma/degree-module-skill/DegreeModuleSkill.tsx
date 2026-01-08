@@ -32,6 +32,7 @@ const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
 export function DegreeModuleSkill({
   pageId = "new-degree-module-skill",
   modalMode = true,
+  className = "grid gap-4",
   inputControllers = degreeSubSkillsCreationInputControllers,
   ...props
 }: Readonly<PageWithControllers<DegreeModuleSkillInputItem>>) {
@@ -51,6 +52,7 @@ export function DegreeModuleSkill({
       pageId,
       inputControllers,
       formId,
+      className,
       modalMode,
       footerProps: {
         ...footerProps,

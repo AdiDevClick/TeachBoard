@@ -31,6 +31,7 @@ const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
 function DegreeModule({
   pageId = "new-degree-module",
   modalMode = true,
+  className = "grid gap-4",
   inputControllers = degreeModuleCreationInputControllers,
   ...props
 }: Readonly<PageWithControllers<DegreeModuleInputItem>>) {
@@ -51,6 +52,7 @@ function DegreeModule({
       pageId,
       inputControllers,
       formId,
+      className,
       modalMode,
       footerProps: {
         ...footerProps,
