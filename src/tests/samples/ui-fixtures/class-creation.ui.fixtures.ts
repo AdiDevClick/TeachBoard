@@ -48,6 +48,9 @@ export function fixtureCreateDiplomaFromClassCreation(opts?: {
     (c) => c.name === "mainSkillsList"
   )!;
 
+  const postRoute = API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint;
+  const postDataReshapeFn = API_ENDPOINTS.POST.CREATE_DIPLOMA.dataReshape;
+
   const installFetchStubs = () =>
     stubFetchRoutes({
       getRoutes: [
@@ -69,17 +72,18 @@ export function fixtureCreateDiplomaFromClassCreation(opts?: {
         ],
         [diplomaModuleController.apiEndpoint, skillsModulesFetched],
       ],
-      postRoutes: [
-        [
-          API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint,
-          opts?.diplomaPostResponse ?? diplomaCreated,
-        ],
-      ],
+      postRoutes: [[postRoute, opts?.diplomaPostResponse ?? diplomaCreated]],
       defaultGetPayload: [],
     });
 
+  const post = {
+    endpoint: postRoute,
+    dataReshapeFn: postDataReshapeFn,
+  };
+
   return {
     installFetchStubs,
+    post,
     controllers: {
       diplomasController,
       diplomaFieldController,
@@ -129,11 +133,12 @@ export function fixtureCreateClassStepOne(opts?: {
     (c) => c.name === "skills"
   )!;
 
-  const createClassPostEndpoint = API_ENDPOINTS.POST.CREATE_CLASS.endpoint;
-
   const studentsController = classCreationInputControllers.find(
     (c) => c.name === "students"
   )!;
+
+  const postRoute = API_ENDPOINTS.POST.CREATE_CLASS.endpoint;
+  const postDataReshapeFn = API_ENDPOINTS.POST.CREATE_CLASS.dataReshape;
 
   const installFetchStubs = () =>
     stubFetchRoutes({
@@ -175,17 +180,18 @@ export function fixtureCreateClassStepOne(opts?: {
         [API_ENDPOINTS.GET.TASKS.endpoint, [taskFetched, taskFetched2]],
         [studentsController.apiEndpoint, [studentFetched]],
       ],
-      postRoutes: [
-        [
-          createClassPostEndpoint,
-          opts?.createClassPostResponse ?? classCreated,
-        ],
-      ],
+      postRoutes: [[postRoute, opts?.createClassPostResponse ?? classCreated]],
       defaultGetPayload: [],
     });
 
+  const post = {
+    endpoint: postRoute,
+    dataReshapeFn: postDataReshapeFn,
+  };
+
   return {
     installFetchStubs,
+    post,
     controllers: {
       classesController,
       diplomasController,
@@ -195,7 +201,7 @@ export function fixtureCreateClassStepOne(opts?: {
       skillsController,
     },
     endpoints: {
-      createClassPostEndpoint,
+      postRoute,
     },
     sample: {
       classFetched,
@@ -232,6 +238,11 @@ export function fixtureNewDegreeItem(kind: "FIELD" | "YEAR" | "LEVEL") {
     postEndpoint = API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.YEAR;
   else postEndpoint = API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.LEVEL;
 
+  const post = {
+    endpoint: postEndpoint,
+    dataReshapeFn: API_ENDPOINTS.POST.CREATE_DEGREE.dataReshape,
+  };
+
   const installFetchStubs = (postResponse: unknown) =>
     stubFetchRoutes({
       getRoutes: [[controller.apiEndpoint, getPayload]],
@@ -239,7 +250,13 @@ export function fixtureNewDegreeItem(kind: "FIELD" | "YEAR" | "LEVEL") {
       defaultGetPayload: [],
     });
 
-  return { controller, getPayload, postEndpoint, installFetchStubs };
+  return {
+    controller,
+    getPayload,
+    postEndpoint,
+    post,
+    installFetchStubs,
+  };
 }
 
 export function fixtureNewTaskTemplate() {
@@ -285,8 +302,14 @@ export function fixtureNewTaskTemplate() {
       defaultGetPayload: [],
     });
 
+  const post = {
+    endpoint: API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.endpoint,
+    dataReshapeFn: API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.dataReshape,
+  };
+
   return {
     installFetchStubs,
+    post,
     controllers: {
       diplomasController,
       templatesController,
@@ -309,6 +332,11 @@ export function fixtureNewTaskItem() {
     (c) => c.name === "taskId"
   )!;
 
+  const post = {
+    endpoint: API_ENDPOINTS.POST.CREATE_TASK.endpoint,
+    dataReshapeFn: API_ENDPOINTS.POST.CREATE_TASK.dataReshape,
+  };
+
   const installFetchStubs = (postResponse: unknown) =>
     stubFetchRoutes({
       getRoutes: [[taskController.apiEndpoint, [taskFetched, taskFetched2]]],
@@ -318,6 +346,7 @@ export function fixtureNewTaskItem() {
 
   return {
     installFetchStubs,
+    post,
     controller: taskController,
     sample: {
       taskFetched,
