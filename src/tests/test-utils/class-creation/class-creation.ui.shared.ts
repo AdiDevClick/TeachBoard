@@ -11,7 +11,7 @@ type GlobalWithUiTestFlags = typeof globalThis & {
 
 export function setupUiTestState(
   initialRender?: ReactNode,
-  opts?: { beforeEach?: () => void }
+  opts?: { beforeEach?: () => void | Promise<void> }
 ) {
   beforeEach(async () => {
     const g = globalThis as GlobalWithUiTestFlags;
@@ -47,7 +47,7 @@ export function setupUiTestState(
     vi.unstubAllGlobals();
 
     // Re-install test-specific stubs (e.g. fetch routes) after globals are reset.
-    opts?.beforeEach?.();
+    await opts?.beforeEach?.();
 
     const user: User = {
       userId: "00000000-0000-4000-8000-000000000999",
