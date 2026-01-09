@@ -197,10 +197,10 @@ export function useCommandHandler<
         const message = `[useCommandHandler] Missing fetchParams for task "${String(
           task
         )}". Ensure the related input controller is wired to API_ENDPOINTS.*.endPoint(s).`;
+
         debugLogs(message);
         throw new Error(message);
       }
-
       // Ensure apiEndpoint is present and correspond to a known input
       // const found = inputControllers.find(
       //   (input: (typeof inputControllers)[number]) =>
@@ -395,6 +395,7 @@ export function useCommandHandler<
 
       // Avoid FetchParams initial state fetch
       if (keys[1] === "" && keys[0] === "none") return;
+
       const cachedData = queryClient.getQueryData(keys);
 
       if (cachedData === undefined) {
