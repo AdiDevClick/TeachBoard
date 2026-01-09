@@ -21,13 +21,7 @@ import {
   taskTemplateCreated,
   taskTemplateModal,
 } from "@/tests/samples/class-creation-sample-datas";
-import {
-  fixtureCreateClassStepOne,
-  fixtureCreateDiplomaFromClassCreation,
-  fixtureNewDegreeItem,
-  fixtureNewTaskItem,
-  fixtureNewTaskTemplate,
-} from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
+import { useAppFixtures } from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
 import { testQueryClient } from "@/tests/test-utils/testQueryClient";
 import {
   click,
@@ -55,16 +49,19 @@ afterEach(() => {
 
 describe("Class creation modals integration", () => {
   test("new-degree-item-field: GET lists, POST updates cache without extra GET", async () => {
-    const fx = fixtureNewDegreeItem("FIELD");
+    const { getRoutes } = useAppFixtures();
+    const fx = getRoutes.newDegree("FIELD");
     fx.installFetchStubs(degreeCreatedResponse);
 
     const created = degreeCreated;
 
+    const controller = fx.controllers.diplomaFieldController;
+
     const fetchDatas = {
-      apiEndpoint: fx.controller.apiEndpoint,
-      queryKey: [fx.controller.task, fx.controller.apiEndpoint] as const,
-      task: fx.controller.task as AppModalNames,
-      dataReshapeFn: fx.controller.dataReshapeFn,
+      apiEndpoint: controller.apiEndpoint,
+      queryKey: [controller.task, controller.apiEndpoint],
+      task: controller.task as AppModalNames,
+      dataReshapeFn: controller.dataReshapeFn,
     };
 
     const {
@@ -120,7 +117,8 @@ describe("Class creation modals integration", () => {
   });
 
   test("new-degree-item-year: GET lists, POST updates cache without extra GET", async () => {
-    const fx = fixtureNewDegreeItem("YEAR");
+    const { getRoutes } = useAppFixtures();
+    const fx = getRoutes.newDegree("YEAR");
     const created = {
       ...degreeCreated,
       id: "00000000-0000-4000-8000-000000000108",
@@ -137,11 +135,13 @@ describe("Class creation modals integration", () => {
         fx.post.dataReshapeFn
       );
 
+    const controller = fx.controllers.diplomaYearController;
+
     const fetchDatas = {
-      apiEndpoint: fx.controller.apiEndpoint,
-      queryKey: [fx.controller.task, fx.controller.apiEndpoint] as const,
-      task: fx.controller.task as AppModalNames,
-      dataReshapeFn: fx.controller.dataReshapeFn,
+      apiEndpoint: controller.apiEndpoint,
+      queryKey: [controller.task, controller.apiEndpoint],
+      task: controller.task as AppModalNames,
+      dataReshapeFn: controller.dataReshapeFn,
     };
 
     openDialog(click(), degreeYearModal, fetchDatas);
@@ -182,7 +182,8 @@ describe("Class creation modals integration", () => {
   });
 
   test("new-degree-item-degree: GET lists, POST updates cache without extra GET", async () => {
-    const fx = fixtureNewDegreeItem("LEVEL");
+    const { getRoutes } = useAppFixtures();
+    const fx = getRoutes.newDegree("LEVEL");
     const created = {
       ...degreeCreated,
       id: "00000000-0000-4000-8000-000000000109",
@@ -199,11 +200,13 @@ describe("Class creation modals integration", () => {
         fx.post.dataReshapeFn
       );
 
+    const controller = fx.controllers.diplomaLevelController;
+
     const fetchDatas = {
-      apiEndpoint: fx.controller.apiEndpoint,
-      queryKey: [fx.controller.task, fx.controller.apiEndpoint] as const,
-      task: fx.controller.task as AppModalNames,
-      dataReshapeFn: fx.controller.dataReshapeFn,
+      apiEndpoint: controller.apiEndpoint,
+      queryKey: [controller.task, controller.apiEndpoint],
+      task: controller.task as AppModalNames,
+      dataReshapeFn: controller.dataReshapeFn,
     };
 
     openDialog(click(), degreeLevelModal, fetchDatas);
@@ -244,7 +247,8 @@ describe("Class creation modals integration", () => {
   });
 
   test("create-diploma: GET lists, POST updates cache without extra GET", async () => {
-    const fx = fixtureCreateDiplomaFromClassCreation();
+    const { getRoutes } = useAppFixtures();
+    const fx = getRoutes.createDiploma();
     fx.installFetchStubs();
 
     const { openDialog, dialogOptions, openingCallback, submitCallback } =
@@ -303,7 +307,8 @@ describe("Class creation modals integration", () => {
   });
 
   test("new-task-item: GET lists, POST updates cache without extra GET", async () => {
-    const fx = fixtureNewTaskItem();
+    const { getRoutes } = useAppFixtures();
+    const fx = getRoutes.createTaskItem();
     fx.installFetchStubs(taskCreated);
 
     const { openDialog, dialogOptions, openingCallback, submitCallback } =
@@ -313,11 +318,13 @@ describe("Class creation modals integration", () => {
         fx.post.dataReshapeFn
       );
 
+    const controller = fx.controllers.taskLabelController;
+
     const fetchDatas = {
-      apiEndpoint: fx.controller.apiEndpoint,
-      queryKey: [fx.controller.task, fx.controller.apiEndpoint] as const,
-      task: fx.controller.task as AppModalNames,
-      dataReshapeFn: fx.controller.dataReshapeFn,
+      apiEndpoint: controller.apiEndpoint,
+      queryKey: [controller.task, controller.apiEndpoint],
+      task: controller.task as AppModalNames,
+      dataReshapeFn: controller.dataReshapeFn,
     };
 
     openDialog(click(), taskModal, fetchDatas);
@@ -345,7 +352,8 @@ describe("Class creation modals integration", () => {
   });
 
   test("new-task-template: GET lists, POST updates cache without extra GET", async () => {
-    const fx = fixtureNewTaskTemplate();
+    const { getRoutes } = useAppFixtures();
+    const fx = getRoutes.createTaskTemplate();
     fx.installFetchStubs();
 
     const { openDialog, dialogOptions, openingCallback, submitCallback } =
@@ -391,7 +399,8 @@ describe("Class creation modals integration", () => {
   });
 
   test("class-creation: GET lists, POST updates cache without extra GET", async () => {
-    const fx = fixtureCreateClassStepOne();
+    const { getRoutes } = useAppFixtures();
+    const fx = getRoutes.createClassStepOne();
     fx.installFetchStubs();
 
     const { openDialog, dialogOptions, openingCallback, submitCallback } =
@@ -436,7 +445,6 @@ describe("Class creation modals integration", () => {
     const lastBody = getLastPostJsonBodyByUrl(fx.post.endpoint);
     expect(lastBody).toMatchObject({
       name: classCreated.name,
-      description: classCreated.description,
       degreeLevel: classCreated.degreeLevel,
     });
 

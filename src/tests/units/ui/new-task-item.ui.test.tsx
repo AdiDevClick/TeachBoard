@@ -1,10 +1,6 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { taskItemInputControllers } from "@/data/inputs-controllers.data";
-import { AppModals } from "@/pages/AllModals/AppModals";
-import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
-import { SamplePopoverInput } from "@/tests/components/class-creation/SamplePopoverInput";
 import { taskCreated } from "@/tests/samples/class-creation-sample-datas";
-import { fixtureNewTaskItem } from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { assertPostUpdatedCacheWithoutExtraGet } from "@/tests/test-utils/tests.functions";
 import {
@@ -15,23 +11,30 @@ import {
   rxExact,
   waitForDialogAndAssertText,
 } from "@/tests/test-utils/vitest-browser.helpers";
+import { initSetup } from "@/tests/units/ui/functions/class-creation/class-creation.functions.ts";
 import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions";
 import { afterEach, describe, test, vi } from "vitest";
 
-const fx = fixtureNewTaskItem();
-const taskController = fx.controller;
-const tasksQueryKey = queryKeyFor(taskController);
+let taskController: any;
+let tasksQueryKey: any;
+let sample: any;
 
-setupUiTestState(
-  <AppTestWrapper>
-    <SamplePopoverInput
-      pageId="new-task-template"
-      controller={taskController}
-    />
-    <AppModals />
-  </AppTestWrapper>,
-  { beforeEach: () => fx.installFetchStubs(taskCreated) }
-);
+setupUiTestState(null, {
+  beforeEach: async () => {
+    const res = await initSetup(
+      "createTaskItem",
+      "taskLabelController",
+      "new-task-template"
+    );
+
+    taskController = res.controllers.taskLabelController;
+    tasksQueryKey = queryKeyFor(taskController);
+
+    sample = res.sample;
+
+    res.installFetchStubs?.(taskCreated);
+  },
+});
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -39,7 +42,7 @@ afterEach(() => {
 
 describe("UI flow: new-task-item", () => {
   test("fetched items show up, add new opens modal, POST updates cache without extra GET", async () => {
-    const tasks = [fx.sample.taskFetched.name, fx.sample.taskFetched2.name];
+    const tasks = [sample.taskFetched.name, sample.taskFetched2.name];
     // Open templates popover and assert existing names
     await openModalAndAssertItsOpenedAndReady(
       taskController.creationButtonText,
@@ -56,7 +59,6 @@ describe("UI flow: new-task-item", () => {
       "GET"
     );
 
-    // await submitButtonShouldBeDisabled("Créer");
     const fills = [
       {
         label: taskItemInputControllers[0].title,

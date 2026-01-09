@@ -1,7 +1,4 @@
 import { taskTemplateCreationInputControllers } from "@/data/inputs-controllers.data";
-import { AppModals } from "@/pages/AllModals/AppModals";
-import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
-import { SamplePopoverInput } from "@/tests/components/class-creation/SamplePopoverInput";
 import {
   classCreated,
   classFetched,
@@ -12,7 +9,6 @@ import {
   taskFetched,
   taskFetched2,
 } from "@/tests/samples/class-creation-sample-datas";
-import { fixtureCreateClassStepOne } from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { controllerLabelRegex } from "@/tests/test-utils/class-creation/regex.functions";
 
@@ -27,6 +23,7 @@ import {
 import {
   assertIconsInPopover,
   baseInit,
+  initSetup,
   iterateDiplomaSkillAssertions,
   openStudentSearchAndSelect,
   prepareClassCreationForm,
@@ -35,8 +32,10 @@ import {
 } from "@/tests/units/ui/functions/class-creation/class-creation.functions.ts";
 import { clickControlAndWaitForDialog } from "@/tests/units/ui/functions/useful-ui.functions";
 
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { page } from "vitest/browser";
+
+import type { InputControllerLike } from "@/tests/test-utils/class-creation/regex.functions";
 
 const classCreatedWithOptional = {
   ...classCreated,
@@ -44,17 +43,6 @@ const classCreatedWithOptional = {
   name: "2C",
   value: "2C",
 };
-
-const fx = fixtureCreateClassStepOne();
-const {
-  classesController,
-  diplomasController,
-  tasksController,
-  studentsController,
-} = fx.controllers;
-
-const createClassPostEndpoint = fx.post.endpoint;
-const classesQueryKey = queryKeyFor(classesController);
 const tasksNames = [taskFetched.name, taskFetched2.name];
 const labels = [
   {
@@ -66,75 +54,146 @@ const labels = [
     value: "Une description suffisamment longue.",
   },
 ];
-const labeler = {
-  name: "Créer une classe",
-  controller: classesController,
-  nameArray: [classFetched.name, classFetched2.name],
+
+let flowArgs: RunCreateFlowArgs;
+let ctx: Ctx;
+
+type RunCreateFlowArgs = Parameters<typeof runCreateFlow>[0];
+type ControllersForCreate = RunCreateFlowArgs["controllers"];
+
+type Ctx = {
+  classesController: InputControllerLike;
+  diplomasController: InputControllerLike;
+  tasksController: InputControllerLike;
+  taskLabelController: InputControllerLike;
+  skillsController: InputControllerLike;
+  studentsController: InputControllerLike;
+  flowArgs: RunCreateFlowArgs;
+  flowArgs2: RunCreateFlowArgs;
+  labeler: RunCreateFlowArgs["labeler"] & { apiEndpoint?: string };
+  labels: { name: RegExp; value: string }[];
+  tasksNames: string[];
+  installCreateClassStubs: (postResponse: unknown) => void;
 };
 
-const flowArgs = {
-  controllers: fx.controllers,
-  createdClassName: classCreated.name,
-  createdClassPayload: classCreated,
-  fillDescription: false,
-  // context
-  labeler,
-  diplomaToSelect: diplomaFetched,
-  tasksNames,
-  classesQueryKey,
-  createClassPostEndpoint,
-  classFetched,
-  classFetched2,
-  studentName: rxJoin(studentFetched.firstName, studentFetched.lastName),
-};
+function data(
+  controllers: ControllersForCreate,
+  labeler: Ctx["labeler"],
+  classesQueryKey: readonly unknown[],
+  createClassPostEndpoint: string
+): RunCreateFlowArgs {
+  return {
+    controllers,
+    createdClassName: classCreated.name,
+    createdClassPayload: classCreated,
+    fillDescription: false,
+    // context
+    labeler,
+    diplomaToSelect: diplomaFetched,
+    tasksNames,
+    classesQueryKey,
+    createClassPostEndpoint,
+    classFetched,
+    classFetched2,
+    studentName: rxJoin(studentFetched.firstName, studentFetched.lastName),
+  };
+}
 
-const flowArgs2 = {
-  ...flowArgs,
-  createdClassName: "2C",
-  createdClassPayload: classCreatedWithOptional,
-  fillDescription: true,
-};
+setupUiTestState(null, {
+  beforeEach: async () => {
+    const res = await initSetup(
+      "createClassStepOne",
+      "classesController",
+      "class-creation",
+      { routeArgs: [] }
+    );
+    const { getRoutes } = res;
+    const {
+      classesController,
+      diplomasController,
+      tasksController,
+      taskLabelController,
+      skillsController,
+      studentsController,
+    } = res.controllers;
 
-setupUiTestState(
-  <AppTestWrapper>
-    <AppModals />
-    <SamplePopoverInput
-      pageId="class-creation"
-      controller={classesController}
-    />
-  </AppTestWrapper>,
-  {
-    beforeEach: () => {
-      const testName = expect.getState().currentTestName ?? "";
-      const createClassPostResponse = testName.includes(
-        "optional fields filled"
-      )
-        ? classCreatedWithOptional
-        : classCreated;
+    const classesQueryKey = queryKeyFor(classesController);
 
-      fixtureCreateClassStepOne({
-        createClassPostResponse,
-      }).installFetchStubs();
-    },
-  }
-);
+    const createClassPostEndpoint =
+      getRoutes.createClassStepOne().post.endpoint;
+
+    const labeler = {
+      name: "Créer une classe",
+      controller: classesController,
+      nameArray: [res.sample.classFetched.name, res.sample.classFetched2.name],
+      apiEndpoint: classesController.apiEndpoint,
+    };
+
+    flowArgs = data(
+      {
+        classesController,
+        diplomasController,
+        tasksController,
+        studentsController,
+      },
+      labeler,
+      classesQueryKey,
+      createClassPostEndpoint
+    );
+
+    const flowArgs2 = {
+      ...flowArgs,
+      createdClassPayload: classCreatedWithOptional,
+      createdClassName: "2C",
+      fillDescription: true,
+    };
+
+    ctx = {
+      classesController,
+      diplomasController,
+      tasksController,
+      taskLabelController,
+      skillsController,
+      studentsController,
+      flowArgs,
+      flowArgs2,
+      labeler,
+      labels,
+      tasksNames,
+      installCreateClassStubs: (postResponse: unknown) =>
+        getRoutes
+          .createClassStepOne({ createClassPostResponse: postResponse })
+          .installFetchStubs(),
+    } satisfies Ctx;
+  },
+});
 
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
 describe("UI flow: class-creation (StepOne list)", () => {
+  beforeEach(() => {
+    const testName = expect.getState().currentTestName ?? "";
+    const createClassPostResponse = testName.includes("optional fields filled")
+      ? classCreatedWithOptional
+      : classCreated;
+    ctx.installCreateClassStubs(createClassPostResponse);
+  });
+
   test("submit works with optional fields empty", async () => {
-    await runCreateFlow(flowArgs);
+    expect(ctx).toBeDefined();
+    await runCreateFlow(ctx.flowArgs);
   });
 
   test("submit works with optional fields filled", async () => {
-    await runCreateFlow(flowArgs2);
+    expect(ctx).toBeDefined();
+    await runCreateFlow(ctx.flowArgs2);
   });
 
   test("sync: switching diploma refreshes skills in new-task-template modal (no stale data, no preselection)", async () => {
     // Open class creation modal.
-    await baseInit(labeler);
+    await baseInit(ctx.labeler);
 
     // Fill required name (some controls can be disabled until the form is started).
     await fillAndTab(page.getByLabelText(/^Nom$/i), "Classe sync diplômes");
@@ -148,10 +207,13 @@ describe("UI flow: class-creation (StepOne list)", () => {
     const B = subskills2[1]?.code;
 
     await iterateDiplomaSkillAssertions({
-      ...flowArgs.controllers,
-      tasksNames,
+      diplomasController: ctx.diplomasController,
+      tasksController: ctx.tasksController,
+      tasksNames: ctx.tasksNames,
+      taskLabelController: ctx.taskLabelController,
+      skillsController: ctx.skillsController,
       taskNameForLabelSelection: taskFetched.name,
-      primeFields: labels.map((l) => ({ label: l.name, value: l.value })),
+      primeFields: ctx.labels.map((l) => ({ label: l.name, value: l.value })),
       steps: [
         {
           diploma: diplomaFetched,
@@ -178,33 +240,36 @@ describe("UI flow: class-creation (StepOne list)", () => {
   test("sync: closing student search + class creation resets student preselection", async () => {
     // Open creation modal & grab the SNAPSHOT of GET calls
     await prepareClassCreationForm({
-      labeler,
+      labeler: ctx.labeler,
       name: "Classe sync étudiants (2)",
       fillDescription: false,
-      diplomasController,
+      diplomasController: ctx.diplomasController,
       diplomaToSelect: diplomaFetched,
-      tasksController,
+      tasksController: ctx.tasksController,
       taskToSelect: taskFetched.name,
-      tasksNames,
+      tasksNames: ctx.tasksNames,
     });
 
     // Open student search dialog and select a student using shared helper.
-    await openStudentSearchAndSelect(studentsController, flowArgs.studentName);
+    await openStudentSearchAndSelect(
+      ctx.studentsController,
+      ctx.flowArgs.studentName
+    );
 
     // Re-open and prepare modal using helper to reduce duplication
-    await reopenAndPrepare(labeler, {
+    await reopenAndPrepare(ctx.labeler, {
       name: "Classe sync étudiants (2)",
       fillDescription: false,
-      diplomasController,
+      diplomasController: ctx.diplomasController,
       diplomaToSelect: diplomaFetched,
-      tasksController,
+      tasksController: ctx.tasksController,
       taskToSelect: taskFetched.name,
-      tasksNames,
+      tasksNames: ctx.tasksNames,
     });
 
     // Re-open student search: ensure nothing is preselected ("Ajouter" disabled until user selects).
     await clickControlAndWaitForDialog(
-      controllerLabelRegex(studentsController),
+      controllerLabelRegex(ctx.studentsController),
       /Recherche d'étudiants/i,
       { withinDialog: true, timeout: 2000 }
     );
@@ -213,11 +278,11 @@ describe("UI flow: class-creation (StepOne list)", () => {
 
     const icons = [
       {
-        code: flowArgs.studentName,
+        code: ctx.flowArgs.studentName,
         icon: "check",
         present: false,
       },
-      { code: flowArgs.studentName, icon: "plus", present: true },
+      { code: ctx.flowArgs.studentName, icon: "plus", present: true },
     ];
 
     // Additionally assert that no item is visually marked as selected (no validation/check icon).

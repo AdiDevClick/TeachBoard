@@ -1,16 +1,13 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { degreeCreationInputControllersYear } from "@/data/inputs-controllers.data";
-import { AppModals } from "@/pages/AllModals/AppModals";
-import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
-import { SamplePopoverInput } from "@/tests/components/class-creation/SamplePopoverInput";
 import {
   degreeCreated,
   degreeCreatedResponse,
   degreeYearFetched,
   degreeYearFetched2,
 } from "@/tests/samples/class-creation-sample-datas";
-import { fixtureNewDegreeItem } from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
+import type { InputControllerLike } from "@/tests/test-utils/class-creation/regex.functions";
 import { controllerLabelRegex } from "@/tests/test-utils/class-creation/regex.functions";
 import { assertPostUpdatedCacheWithoutExtraGet } from "@/tests/test-utils/tests.functions";
 import {
@@ -20,25 +17,32 @@ import {
   queryKeyFor,
   waitForDialogAndAssertText,
 } from "@/tests/test-utils/vitest-browser.helpers";
+import { initSetup } from "@/tests/units/ui/functions/class-creation/class-creation.functions.ts";
 import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions.ts";
 import { afterEach, describe, test, vi } from "vitest";
 import { page } from "vitest/browser";
 
-const fx = fixtureNewDegreeItem("YEAR");
-const diplomaYearController = fx.controller;
-const degreeYearQueryKey = queryKeyFor(diplomaYearController);
-const years = [degreeYearFetched.name, degreeYearFetched2.name];
+let diplomaYearController: InputControllerLike;
+let degreeYearQueryKey: ReturnType<typeof queryKeyFor>;
+let years: string[];
 
-setupUiTestState(
-  <AppTestWrapper>
-    <SamplePopoverInput
-      pageId="create-diploma"
-      controller={diplomaYearController}
-    />
-    <AppModals />
-  </AppTestWrapper>,
-  { beforeEach: () => fx.installFetchStubs(degreeCreatedResponse) }
-);
+setupUiTestState(null, {
+  beforeEach: async () => {
+    const res = await initSetup(
+      "newDegree",
+      "diplomaYearController",
+      "create-diploma",
+      { routeArgs: ["YEAR"] }
+    );
+
+    diplomaYearController = res.controllers.diplomaYearController;
+
+    degreeYearQueryKey = queryKeyFor(diplomaYearController);
+    years = [degreeYearFetched.name, degreeYearFetched2.name];
+
+    res.installFetchStubs?.(degreeCreatedResponse);
+  },
+});
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -46,9 +50,14 @@ afterEach(() => {
 
 describe("UI flow: new-degree-item-year", () => {
   test("fetched items show up, add new opens modal, POST updates cache without extra GET", async () => {
+    const apiEndpointRaw = diplomaYearController.apiEndpoint;
+    if (typeof apiEndpointRaw !== "string") {
+      throw new TypeError("Expected a string apiEndpoint for year controller");
+    }
+
     // Open templates popover and assert existing names
     await openModalAndAssertItsOpenedAndReady(
-      diplomaYearController.creationButtonText,
+      String(diplomaYearController.creationButtonText),
       {
         controller: diplomaYearController,
         nameArray: years,
@@ -57,10 +66,7 @@ describe("UI flow: new-degree-item-year", () => {
     );
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
-    const getCallsBeforeCreation = countFetchCallsByUrl(
-      diplomaYearController.apiEndpoint,
-      "GET"
-    );
+    const getCallsBeforeCreation = countFetchCallsByUrl(apiEndpointRaw, "GET");
 
     // Fill fields
     await fillFieldsEnsuringSubmitDisabled("Créer", [
@@ -95,7 +101,7 @@ describe("UI flow: new-degree-item-year", () => {
     await assertPostUpdatedCacheWithoutExtraGet({
       queryKey: degreeYearQueryKey,
       expectedValue: degreeCreated.name,
-      endpoint: diplomaYearController.apiEndpoint,
+      endpoint: String(diplomaYearController.apiEndpoint),
       getCallsBefore: getCallsBeforeCreation,
       openPopover: { label: controllerLabelRegex(diplomaYearController) },
       post: {

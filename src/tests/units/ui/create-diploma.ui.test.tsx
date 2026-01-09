@@ -1,6 +1,5 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { diplomaFetchedSkills } from "@/tests/samples/class-creation-sample-datas";
-import { fixtureCreateDiplomaFromClassCreation } from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { assertPostUpdatedCacheWithoutExtraGet } from "@/tests/test-utils/tests.functions";
 import {
@@ -20,51 +19,69 @@ import {
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { page } from "vitest/browser";
 
-import { AppModals } from "@/pages/AllModals/AppModals.tsx";
-import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
-import { SamplePopoverInput } from "@/tests/components/class-creation/SamplePopoverInput";
+import type { InputControllerLike } from "@/tests/test-utils/class-creation/regex.functions";
 import {
   controllerLabelRegex,
   controllerTriggerRegex,
 } from "@/tests/test-utils/class-creation/regex.functions";
+import { initSetup } from "@/tests/units/ui/functions/class-creation/class-creation.functions.ts";
 import {
   clickTriggerAndWaitForPopoverState,
   openModalAndAssertItsOpenedAndReady,
 } from "@/tests/units/ui/functions/useful-ui.functions";
 
-const fx = fixtureCreateDiplomaFromClassCreation();
-const {
-  diplomasController,
-  diplomaFieldController,
-  diplomaYearController,
-  diplomaLevelController,
-  diplomaModuleController,
-} = fx.controllers;
-const diplomasQueryKey = queryKeyFor(diplomasController);
-const labeled = {
-  controller: diplomasController,
-  nameArray: [
-    rxJoin(
-      fx.sample.diplomaFetched.degreeLevel,
-      fx.sample.diplomaFetched.degreeYear
-    ),
-    rxJoin(
-      fx.sample.diplomaFetched2.degreeLevel,
-      fx.sample.diplomaFetched2.degreeYear
-    ),
-  ],
+type SetupResult = Awaited<ReturnType<typeof initSetup>>;
+
+// Test-scope variables that are initialized in the per-test beforeEach
+let sample: SetupResult["sample"];
+let diplomasController: InputControllerLike;
+let diplomaFieldController: InputControllerLike;
+let diplomaYearController: InputControllerLike;
+let diplomaLevelController: InputControllerLike;
+let diplomaModuleController: InputControllerLike;
+let diplomasQueryKey: ReturnType<typeof queryKeyFor>;
+let labeled: {
+  controller: InputControllerLike;
+  nameArray: Array<string | RegExp>;
 };
 
-setupUiTestState(
-  <AppTestWrapper>
-    <AppModals />
-    <SamplePopoverInput
-      pageId="class-creation"
-      controller={diplomasController}
-    />
-  </AppTestWrapper>,
-  { beforeEach: fx.installFetchStubs }
-);
+setupUiTestState(null, {
+  beforeEach: async () => {
+    const res = await initSetup(
+      "createDiploma",
+      "diplomasController",
+      "class-creation"
+    );
+
+    sample = res.sample;
+
+    ({
+      diplomasController,
+      diplomaFieldController,
+      diplomaYearController,
+      diplomaLevelController,
+      diplomaModuleController,
+    } = res.controllers);
+
+    diplomasQueryKey = queryKeyFor(diplomasController);
+    labeled = {
+      controller: diplomasController,
+      nameArray: [
+        rxJoin(
+          sample.diplomaFetched.degreeLevel,
+          sample.diplomaFetched.degreeYear
+        ),
+        rxJoin(
+          sample.diplomaFetched2.degreeLevel,
+          sample.diplomaFetched2.degreeYear
+        ),
+      ],
+    };
+
+    // Install stubs for this fixture
+    res.installFetchStubs?.();
+  },
+});
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -72,19 +89,28 @@ afterEach(() => {
 
 describe("UI flow: create-diploma (from class-creation)", () => {
   test("selections validate, POST updates cache, and class-creation list updates without extra GET", async () => {
+    const openButtonLabel: string | RegExp =
+      typeof diplomasController.creationButtonText === "string"
+        ? diplomasController.creationButtonText
+        : /Ajouter/i;
+
+    const diplomasEndpointRaw = diplomasController.apiEndpoint;
+    if (typeof diplomasEndpointRaw !== "string") {
+      throw new TypeError(
+        "Expected diplomasController.apiEndpoint to be a string"
+      );
+    }
+
     // Open templates popover and assert existing names
-    await openModalAndAssertItsOpenedAndReady(
-      diplomasController.creationButtonText,
-      {
-        controller: labeled.controller,
-        nameArray: labeled.nameArray,
-        readyText: diplomaFieldController.label,
-      }
-    );
+    await openModalAndAssertItsOpenedAndReady(openButtonLabel, {
+      controller: labeled.controller,
+      nameArray: labeled.nameArray,
+      readyText: controllerLabelRegex(diplomaFieldController),
+    });
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
     const getCallsBeforeCreation = countFetchCallsByUrl(
-      diplomasController.apiEndpoint,
+      diplomasEndpointRaw,
       "GET"
     );
 
@@ -97,17 +123,17 @@ describe("UI flow: create-diploma (from class-creation)", () => {
     await selectMultiplePopoversEnsuringSubmitDisabled("Créer le diplôme", [
       {
         label: controllerLabelRegex(diplomaFieldController),
-        items: rx(fx.sample.degreeFieldFetched.name),
+        items: rx(sample.degreeFieldFetched.name),
         ...baseOpts,
       },
       {
         label: controllerLabelRegex(diplomaYearController),
-        items: rx(fx.sample.degreeYearFetched.name),
+        items: rx(sample.degreeYearFetched.name),
         ...baseOpts,
       },
       {
         label: controllerLabelRegex(diplomaLevelController),
-        items: rx(fx.sample.degreeLevelFetched.name),
+        items: rx(sample.degreeLevelFetched.name),
         ...baseOpts,
       },
     ]);
@@ -117,8 +143,8 @@ describe("UI flow: create-diploma (from class-creation)", () => {
     );
 
     const modules = [
-      fx.sample.skillsModulesFetched.Skills[0].code,
-      fx.sample.skillsModulesFetched.Skills[1].code,
+      sample.skillsModulesFetched.Skills[0].code,
+      sample.skillsModulesFetched.Skills[1].code,
     ];
 
     // Ensure all module options are visible first
@@ -131,7 +157,7 @@ describe("UI flow: create-diploma (from class-creation)", () => {
     await selectCommandItemInContainerEnsuringSubmitDisabled(
       "Créer le diplôme",
       getOpenCommandContainer(),
-      rx(fx.sample.skillsModulesFetched.Skills[0].code)
+      rx(sample.skillsModulesFetched.Skills[0].code)
     );
 
     // Multi-select popover stays open; close it via its trigger (Escape would close the dialog).
@@ -149,18 +175,21 @@ describe("UI flow: create-diploma (from class-creation)", () => {
     await checkFormValidityAndSubmit("Créer le diplôme");
 
     // Ensure modal is closed and title is absent
-    await waitForDialogAndAssertText(diplomaFieldController.label, {
-      present: false,
-    });
+    await waitForDialogAndAssertText(
+      controllerLabelRegex(diplomaFieldController),
+      {
+        present: false,
+      }
+    );
 
     await assertPostUpdatedCacheWithoutExtraGet({
       queryKey: diplomasQueryKey,
       // diploma created items are indexed under their degreeField group
       expectedValue:
-        fx.sample.diplomaCreated.degreeLevel +
+        sample.diplomaCreated.degreeLevel +
         " " +
-        fx.sample.diplomaCreated.degreeYear,
-      endpoint: diplomasController.apiEndpoint,
+        sample.diplomaCreated.degreeYear,
+      endpoint: diplomasEndpointRaw,
       getCallsBefore: getCallsBeforeCreation,
       openPopover: {
         label: controllerLabelRegex(diplomasController),
@@ -169,35 +198,37 @@ describe("UI flow: create-diploma (from class-creation)", () => {
   });
 
   test("anti-falsification: selected ids/codes are exactly what gets POSTed", async () => {
+    const openButtonLabel: string | RegExp =
+      typeof diplomasController.creationButtonText === "string"
+        ? diplomasController.creationButtonText
+        : /Ajouter/i;
+
     // Open templates popover and assert existing names
-    await openModalAndAssertItsOpenedAndReady(
-      diplomasController.creationButtonText,
-      {
-        controller: labeled.controller,
-        nameArray: labeled.nameArray,
-        readyText: diplomaFieldController.label,
-      }
-    );
+    await openModalAndAssertItsOpenedAndReady(openButtonLabel, {
+      controller: labeled.controller,
+      nameArray: labeled.nameArray,
+      readyText: controllerLabelRegex(diplomaFieldController),
+    });
 
     // Select options
     await selectMultiplePopoversEnsuringSubmitDisabled("Créer le diplôme", [
       {
         label: controllerLabelRegex(diplomaFieldController),
-        items: rx(fx.sample.degreeFieldFetched.name),
+        items: rx(sample.degreeFieldFetched.name),
         withinDialog: true,
         timeout: 1000,
         tabAfter: false,
       },
       {
         label: controllerLabelRegex(diplomaYearController),
-        items: rx(fx.sample.degreeYearFetched.name),
+        items: rx(sample.degreeYearFetched.name),
         withinDialog: true,
         timeout: 1000,
         tabAfter: false,
       },
       {
         label: controllerLabelRegex(diplomaLevelController),
-        items: rx(fx.sample.degreeLevelFetched.name),
+        items: rx(sample.degreeLevelFetched.name),
         withinDialog: true,
         timeout: 1000,
         tabAfter: false,
@@ -213,8 +244,8 @@ describe("UI flow: create-diploma (from class-creation)", () => {
     await openPopoverAndExpectByTrigger(
       controllerTriggerRegex(diplomaModuleController),
       [
-        fx.sample.skillsModulesFetched.Skills[0].code,
-        fx.sample.skillsModulesFetched.Skills[1].code,
+        sample.skillsModulesFetched.Skills[0].code,
+        sample.skillsModulesFetched.Skills[1].code,
       ]
     );
 
@@ -222,7 +253,7 @@ describe("UI flow: create-diploma (from class-creation)", () => {
     await selectCommandItemInContainerEnsuringSubmitDisabled(
       "Créer le diplôme",
       getOpenCommandContainer(),
-      rx(fx.sample.skillsModulesFetched.Skills[0].code)
+      rx(sample.skillsModulesFetched.Skills[0].code)
     );
 
     // Close the multi-select popover.
@@ -235,9 +266,12 @@ describe("UI flow: create-diploma (from class-creation)", () => {
     await checkFormValidityAndSubmit("Créer le diplôme");
 
     // Ensure modal is closed and title is absent
-    await waitForDialogAndAssertText(diplomaFieldController.label, {
-      present: false,
-    });
+    await waitForDialogAndAssertText(
+      controllerLabelRegex(diplomaFieldController),
+      {
+        present: false,
+      }
+    );
 
     // Assert exactly what got POSTed
     await expect
@@ -249,10 +283,10 @@ describe("UI flow: create-diploma (from class-creation)", () => {
         }
       )
       .toMatchObject({
-        diplomaFieldId: fx.sample.degreeFieldFetched.id,
-        yearId: fx.sample.degreeYearFetched.id,
-        levelId: fx.sample.degreeLevelFetched.id,
-        mainSkillsList: [fx.sample.skillsModulesFetched.Skills[0].code],
+        diplomaFieldId: sample.degreeFieldFetched.id,
+        yearId: sample.degreeYearFetched.id,
+        levelId: sample.degreeLevelFetched.id,
+        mainSkillsList: [sample.skillsModulesFetched.Skills[0].code],
       });
   });
 });

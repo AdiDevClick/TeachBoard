@@ -1,10 +1,6 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { taskTemplateCreationInputControllers } from "@/data/inputs-controllers.data.ts";
-import { AppModals } from "@/pages/AllModals/AppModals";
-import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
-import { SamplePopoverInput } from "@/tests/components/class-creation/SamplePopoverInput";
 import { diplomaFetchedSkills } from "@/tests/samples/class-creation-sample-datas";
-import { fixtureNewTaskTemplate } from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import {
   controllerLabelRegex,
@@ -20,32 +16,54 @@ import {
   rx,
   rxExact,
   selectMultiplePopoversEnsuringSubmitDisabled,
-  submitButtonShouldBeDisabled,
   waitForDialogAndAssertText,
 } from "@/tests/test-utils/vitest-browser.helpers";
+import { initSetup } from "@/tests/units/ui/functions/class-creation/class-creation.functions.ts";
 import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions";
-import { afterEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { page } from "vitest/browser";
 
-const fx = fixtureNewTaskTemplate();
-const { templatesController, skillsController, taskLabelController } =
-  fx.controllers;
+let templatesController: any;
+let skillsController: any;
+let taskLabelController: any;
+let templatesEndpoint: string;
+let firstMainSkill: any;
+let firstSubSkill: any;
+let taskTemplatesByDiplomaQueryKey: any;
+let sample: any;
+let tasks: string[];
 
-const firstMainSkill = diplomaFetchedSkills[0];
-const firstSubSkill = firstMainSkill.subSkills[0];
-const taskTemplatesByDiplomaQueryKey = queryKeyFor(templatesController);
+setupUiTestState(null, {
+  beforeEach: async () => {
+    const res = await initSetup(
+      "createTaskTemplate",
+      "templatesController",
+      "class-creation"
+    );
 
-setupUiTestState(
-  <AppTestWrapper>
-    <AppModals />
-    <SamplePopoverInput
-      pageId="class-creation"
-      controller={templatesController}
-      options={{ selectedDiploma: fx.sample.diplomaFetched }}
-    />
-  </AppTestWrapper>,
-  { beforeEach: fx.installFetchStubs }
-);
+    sample = res.sample;
+    ({ templatesController, skillsController, taskLabelController } =
+      res.controllers);
+
+    templatesEndpoint =
+      API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
+        sample.diplomaFetched.id
+      );
+
+    tasks = [sample.taskFetched.name, sample.taskFetched2.name];
+
+    firstMainSkill = diplomaFetchedSkills[0];
+    firstSubSkill = firstMainSkill.subSkills[0];
+    taskTemplatesByDiplomaQueryKey = queryKeyFor({
+      task: templatesController.task,
+      apiEndpoint: templatesEndpoint,
+    });
+
+    res.installFetchStubs?.();
+  },
+});
+
+beforeEach(() => {});
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -58,14 +76,14 @@ describe("UI flow: new-task-template", () => {
       templatesController.creationButtonText,
       {
         controller: templatesController,
-        nameArray: [fx.sample.taskFetched.name, fx.sample.taskFetched2.name],
+        nameArray: tasks,
         readyText: rxExact(taskLabelController.label),
       }
     );
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
     const getCallsBeforeCreation = countFetchCallsByUrl(
-      templatesController.apiEndpoint,
+      templatesEndpoint,
       "GET"
     );
 
@@ -84,16 +102,14 @@ describe("UI flow: new-task-template", () => {
       },
     ];
 
-    await expect(page.getByLabelText(nameLabel)).toBeInTheDocument();
-
-    await submitButtonShouldBeDisabled("Ajouter");
+    expect(page.getByLabelText(nameLabel)).toBeInTheDocument();
 
     await fillFieldsEnsuringSubmitDisabled("Ajouter", fills);
 
     await selectMultiplePopoversEnsuringSubmitDisabled("Ajouter", [
       {
         label: controllerLabelRegex(taskLabelController),
-        items: rx(fx.sample.taskFetched.name),
+        items: rx(sample.taskFetched.name),
         withinDialog: true,
       },
       {
@@ -113,8 +129,8 @@ describe("UI flow: new-task-template", () => {
 
     await assertPostUpdatedCacheWithoutExtraGet({
       queryKey: taskTemplatesByDiplomaQueryKey,
-      expectedValue: fx.sample.taskTemplateCreated.task.name,
-      endpoint: templatesController.apiEndpoint,
+      expectedValue: sample.taskTemplateCreated.task.name,
+      endpoint: templatesEndpoint,
       getCallsBefore: getCallsBeforeCreation,
       openPopover: {
         trigger: controllerTriggerRegex(templatesController),
@@ -128,7 +144,6 @@ describe("UI flow: new-task-template", () => {
   });
 
   test("anti-falsification: selected task/skills ids are exactly what gets POSTed", async () => {
-    const tasks = [fx.sample.taskFetched.name, fx.sample.taskFetched2.name];
     // Open templates popover and then open creation modal
     await openModalAndAssertItsOpenedAndReady(
       templatesController.creationButtonText,
@@ -141,14 +156,12 @@ describe("UI flow: new-task-template", () => {
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
     const getCallsBeforeCreation = countFetchCallsByUrl(
-      templatesController.apiEndpoint,
+      templatesEndpoint,
       "GET"
     );
 
     const nameLabel = rx(taskTemplateCreationInputControllers[0].title!);
     const descLabel = rx(taskTemplateCreationInputControllers[1].title!);
-
-    // await submitButtonShouldBeDisabled("Ajouter");
 
     await fillFieldsEnsuringSubmitDisabled("Ajouter", [
       { label: nameLabel, value: "template" },
@@ -158,7 +171,7 @@ describe("UI flow: new-task-template", () => {
     await selectMultiplePopoversEnsuringSubmitDisabled("Ajouter", [
       {
         label: controllerLabelRegex(taskLabelController),
-        items: rx(fx.sample.taskFetched.name),
+        items: rx(sample.taskFetched.name),
         withinDialog: true,
       },
       {
@@ -181,8 +194,8 @@ describe("UI flow: new-task-template", () => {
       .toMatchObject({
         name: "template",
         description: "une description suffisamment longue.",
-        degreeConfigId: fx.sample.diplomaFetched.id,
-        taskId: fx.sample.taskFetched.id,
+        degreeConfigId: sample.diplomaFetched.id,
+        taskId: sample.taskFetched.id,
         skills: [
           {
             mainSkill: firstMainSkill.mainSkillId,

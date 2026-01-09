@@ -1,15 +1,11 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { degreeCreationInputControllersDegree } from "@/data/inputs-controllers.data";
-import { AppModals } from "@/pages/AllModals/AppModals";
-import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
-import { SamplePopoverInput } from "@/tests/components/class-creation/SamplePopoverInput";
 import {
   degreeCreated,
   degreeCreatedResponse,
   degreeLevelFetched,
   degreeLevelFetched2,
 } from "@/tests/samples/class-creation-sample-datas";
-import { fixtureNewDegreeItem } from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { controllerLabelRegex } from "@/tests/test-utils/class-creation/regex.functions";
 import { assertPostUpdatedCacheWithoutExtraGet } from "@/tests/test-utils/tests.functions";
@@ -20,25 +16,33 @@ import {
   queryKeyFor,
   waitForDialogAndAssertText,
 } from "@/tests/test-utils/vitest-browser.helpers";
+import { initSetup } from "@/tests/units/ui/functions/class-creation/class-creation.functions.ts";
 import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions.ts";
-import { afterEach, describe, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, test, vi } from "vitest";
 import { page } from "vitest/browser";
 
-const fx = fixtureNewDegreeItem("LEVEL");
-const diplomaLevelController = fx.controller;
-const degreeLevelQueryKey = queryKeyFor(diplomaLevelController);
-const levels = [degreeLevelFetched.name, degreeLevelFetched2.name];
+let diplomaLevelController: any;
+let degreeLevelQueryKey: any;
+let levels: string[];
 
-setupUiTestState(
-  <AppTestWrapper>
-    <SamplePopoverInput
-      pageId="create-diploma"
-      controller={diplomaLevelController}
-    />
-    <AppModals />
-  </AppTestWrapper>,
-  { beforeEach: () => fx.installFetchStubs(degreeCreatedResponse) }
-);
+setupUiTestState(null, {
+  beforeEach: async () => {
+    const res = await initSetup(
+      "newDegree",
+      "diplomaLevelController",
+      "create-diploma",
+      { routeArgs: ["LEVEL"] }
+    );
+
+    diplomaLevelController = res.controllers.diplomaLevelController;
+    degreeLevelQueryKey = queryKeyFor(diplomaLevelController);
+    levels = [degreeLevelFetched.name, degreeLevelFetched2.name];
+
+    res.installFetchStubs?.(degreeCreatedResponse);
+  },
+});
+
+beforeEach(() => {});
 
 afterEach(() => {
   vi.unstubAllGlobals();
