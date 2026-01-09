@@ -212,16 +212,32 @@ export function stubFetchRoutes({
       const urlStr = String(url || "");
       const method = String(init?.method ?? "GET").toUpperCase();
 
+      // Debug each fetch invocation
+      console.debug("[stubFetchRoutes] fetch called", method, urlStr);
+
       if (method === "POST") {
         for (const [match, payload] of postRoutes) {
-          if (urlStr.includes(match)) return okJson(payload);
+          if (urlStr.includes(match)) {
+            // Debug stubbed POST
+            console.debug("[stubFetchRoutes] POST matched", match, payload);
+            return okJson(payload);
+          }
         }
+        console.debug("[stubFetchRoutes] POST default response", {});
         return okJson({});
       }
 
       for (const [match, payload] of getRoutes) {
-        if (urlStr.includes(match)) return okJson(payload);
+        if (urlStr.includes(match)) {
+          // Debug stubbed GET
+          console.debug("[stubFetchRoutes] GET matched", match, payload);
+          return okJson(payload);
+        }
       }
+      console.debug(
+        "[stubFetchRoutes] GET default response",
+        defaultGetPayload
+      );
       return okJson(defaultGetPayload);
     })
   );
@@ -305,6 +321,8 @@ export async function openPopoverAndExpectByTrigger(
   items: Array<string | RegExp>,
   timeout = 1000
 ) {
+  console.log("TRIGGER CATCHED : ", trigger);
+  console.log("ITEMS CATCHED : ", items);
   await openPopoverByTriggerName(trigger);
   await expectOpenPopoverToContain(items, timeout);
 }
@@ -371,7 +389,8 @@ export async function waitForDialogAndAssertText(
 
   // First, make sure the dialog reaches the expected open/closed state.
   await waitForDialogState(present, timeout);
-
+  console.log("DIALOG IS: ", present);
+  console.log("LABEL SEARCH IS: ", label);
   await waitForTextToBeAbsent(label, { ...opts, present });
 }
 
