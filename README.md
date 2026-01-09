@@ -8,10 +8,22 @@ Bienvenue !
 
 Cette application représente le frontend de TeachBoard, une interface pédagogique développée en React et TypeScript.
 
+**Table des matières :**
+- [Prérequis](#prérequis)
+- [Installation](#installation)
+- [Configuration & variables d'environnement](#configuration--variables-denvironnement)
+- [Commandes utiles](#commandes-utiles)
+- [Proxy API et backend](#proxy-api-et-backend)
+- [Gestion des données réseau](#gestion-des-données-réseau)
+- [Recettes rapides](#recettes-rapides)
+- [Tests](#tests)
+- [Contribuer](#contribuer)
+
+
 ## Aperçu
 
 - Stack principale : React, TypeScript, Vite, TailwindCSS
-- Proxy dev : le serveur Vite redirige /api vers l'API backend définie par `VITE_BACKEND_URL`
+- Proxy dev : le serveur Vite redirige /api vers l'API backend définie par [VITE_BACKEND_URL](vite.config.ts)
 - Linting : ESLint
 
 ## Démo
@@ -119,7 +131,7 @@ npm run generate:launch
 
 Le serveur de développement Vite redirige toutes les requêtes `GET/POST/…` destinées à `/api/*`.
 
-Il envoie ces requêtes vers l'URL définie dans la variable d'environnement `VITE_BACKEND_URL`.
+Il envoie ces requêtes vers l'URL définie dans la variable d'environnement [VITE_BACKEND_URL](vite.config.ts).
 
 Ceci est utile si vous avez un backend local et que vous voulez rediriger les appels API vers votre machine.
 
@@ -132,6 +144,175 @@ const backendUrl = process.env.VITE_BACKEND_URL || 'https://localhost:8443';
 Si l'API backend est indisponible et que vous voulez développer côté frontend, vérifiez si des mocks sont présents.
 
 Les mocks peuvent se trouver dans `/src/data` ou être intégrés dans certains hooks.
+
+## Gestion des données réseau
+
+Remarque : le projet utilise le proxy de développement Vite qui redirige les requêtes commençant par `/api/` vers l'API définie par la variable d'environnement `VITE_BACKEND_URL` (voir la section **Proxy API et backend**).
+
+Ce projet centralise à la fois les **endpoints** et la **transformation des données** dans un seul fichier : [src/configs/api.endpoints.config.ts](src/configs/api.endpoints.config.ts).
+
+- **But :** fournir un point unique pour déclarer les routes API (GET/POST) et la logique de *reshaping* des réponses afin d'homogénéiser la forme des données consommées par l'application.
+
+- **Où :** le constant `API_ENDPOINTS` contient des groupes `GET` et `POST`. Chaque entrée peut définir :
+  - `endpoint` / `endPoints` (URL ou factory),
+  - `dataReshape: (payload, cachedDatas?, options?) => reshaped` — fonction qui normalise le payload serveur pour l'UI.
+
+- **Reshape :** les fonctions `dataReshape` utilisent l'utilitaire [`ObjectReshape`](src/utils/ObjectReshape.ts) via `dataReshaper(...)` pour composer des transformations déclaratives (rename, assign, group, addToRoot, etc.).
+
+  **Remarque :** le reshape offre de la flexibilité pour adapter les données à l'UI. Pour les transformations lourdes, privilégiez l'extraction dans des helpers testables et profilez avant d'optimiser. 
+
+  **Cas fréquent :** si un composant attend `value` tandis que le payload fournit `name`, un reshape simple (rename) est la solution idéale pour maintenir compatibilité sans changer le backend ni le composant.
+
+**Obligations lors d'une modification (checklist)** :
+- [ ] Si vous modifiez ou ajoutez un `dataReshape`, **ajoutez un test de contrat** (dans `src/tests/units/endpoints/`) vérifiant le reshape attendu.
+- [ ] Mettez à jour la documentation (README) et la checklist PR.
+- [ ] Reformulez toute transformation complexe en helpers testables et importables depuis le reshape (le reshape doit rester essentiellement déclaratif).
+
+
+  **Note :** le hook [`useFetch()`](src/hooks/database/fetches/useFetch.tsx) s'appuie sur `API_ENDPOINTS` et renvoie aux consommateurs le payload tel qu'il sort du `dataReshape` — assurez-vous que vos reshapes retournent la forme attendue par les composants ou services qui consomment ces données.
+
+  **Où :** dans [src/hooks/database/fetches/useFetch.tsx](src/hooks/database/fetches/useFetch.tsx) la transformation est appliquée dans le callback `onSuccess` :
+
+```ts
+// 1 — Appel : on récupère le reshape depuis l'API_ENDPOINTS
+// et on le passe à `useFetch` via `setFetchParams`.
+setFetchParams({
+  url: API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
+  method: API_ENDPOINTS.POST.METHOD,
+  dataReshapeFn: API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
+});
+```
+
+```ts
+// 2 — Réception du payload serveur
+// Extrait (simplifié) de `useFetch.tsx`
+const [fetchParams, setFetchParams] = useState(defaultStateParameters);
+
+const queryParams = useQueryOnSubmit<ResponseInterface<TServerData>, E>([
+  onSuccess: (response) => {
+    // useFetch applique automatiquement la fonction fournie (dataReshapeFn)
+    const cachingDatas = fetchParams.dataReshapeFn
+      // Spécifier une fonction dans le fetchParams
+      // va automatiquement la trigger à réception des données -
+      // Veillez donc à utiliser l'`API_ENDPOINTS` pour centraliser les fonctions
+      ? fetchParams.dataReshapeFn(response.data, rawCachedDatas, fetchParams.reshapeOptions)
+      : response.data;
+
+    // Expose la donnée reshaped aux consommateurs via `data`
+    setViewData(cachingDatas as TViewData);
+
+    // Met à jour le cache avec la structure reshaped (et / ou la nouvelle entrée pour un POST)
+    queryClient.setQueryData(cachedFetchKey ?? [contentId, params.url], cachingDatas);
+
+    // useFetch retourne `{ data: viewData }` — c'est donc `cachingDatas` qui sera lu par les composants
+  }
+]);
+```
+
+```ts
+// 3 — Exemple de traitement du reshape via la fonction
+dataReshape: (data: TasksFetch) =>
+  dataReshaper(data)
+    .assignSourceTo("items")
+    .addToRoot({ groupTitle: "Tous" })
+    .assign([["name", "value"]])
+    .newShape(),
+```
+
+Exemple : RÈGLE OBLIGATOIRE
+
+```ts
+// GET : mettre en forme la réponse pour des selects
+const shaped = API_ENDPOINTS.GET.CLASSES.dataReshape(rawPayload);
+
+// POST : transformer la réponse et mettre à jour le cache
+const updatedCache = API_ENDPOINTS.POST.CREATE_CLASS.dataReshape(createdItem, cachedDatas);
+```
+
+## Recettes rapides
+Une collection de petits exemples pour aller droit au but.
+
+- Rename d'une propriété (`name` → `value`) :
+```ts
+// dataReshape simple en utilisant dataReshaper
+API_ENDPOINTS.GET.CLASSES.dataReshape = (payload) =>
+  dataReshaper(payload).assign([['name', 'value']]).newShape();
+```
+
+- POST : recevoir le nouvel item et mettre à jour le cache :
+```ts
+// reshape appelé avec (createdItem, cachedDatas)
+API_ENDPOINTS.POST.CREATE_CLASS.dataReshape = (createdItem, cachedDatas) =>
+  reshapeItemToCachedData(createdItem, cachedDatas, createdItem.degreeLevel);
+```
+
+- `useFetch()` (extrait d'usage dans un composant) :
+```ts
+const { setFetchParams } = useFetch();
+setFetchParams({ 
+  url: API_ENDPOINTS.POST.CREATE_CLASS.endpoint, 
+  method: API_ENDPOINTS.POST.METHOD, 
+  dataReshapeFn: API_ENDPOINTS.POST.CREATE_CLASS.dataReshape 
+});
+```
+
+- Stub fetch rapide (tests) :
+```ts
+stubFetchRoutes({ 
+  getRoutes: 
+  [
+    [API_ENDPOINTS.GET.CLASSES.endpoint, [classSample]]
+  ], 
+  postRoutes: 
+  [
+    [API_ENDPOINTS.POST.CREATE_CLASS.endpoint, createdClass]
+  ] 
+});
+```
+
+- **Tests & contrats :** des tests de contrat vérifient les `dataReshape` dans [src/tests/units/endpoints/api-endpoints.config.contract.test.ts](src/tests/units/endpoints/api-endpoints.config.contract.test.ts) — ajoutez un test si vous modifiez un reshape.
+
+- **Bonnes pratiques :**
+  - Déclarez l'endpoint et la `dataReshape` ensemble pour garder la logique proche de la route.
+  - Gardez `dataReshape` pure et testable (retourner une valeur, éviter effets de bord).
+  - Utilisez `reshapeItemToCachedData(...)` (fourni dans le fichier) pour insérer proprement un nouvel item dans les données mises en cache.
+  - **Déclarez une interface TypeScript** décrivant la forme de sortie du serveur quand c'est pertinent (ex. [`ClassesFetch`](src/api/types/routes/classes.types.ts)) et utilisez-la dans les contrôleurs et composants pour garantir le typage.
+  - **Utilisez un schéma OpenAPI ou GraphQL** quand il est disponible pour générer ou valider automatiquement les interfaces/DTOs afin d'assurer la conformité entre le backend et l'UI.
+
+### RÈGLE OBLIGATOIRE — rôle du fichier `API_ENDPOINTS`
+
+> **Important :** `API_ENDPOINTS` doit uniquement contenir les *endpoints* (URLs/factories) et des fonctions pures de `dataReshape`. Toute logique plus avancée (orchestration, effets de bord, validation lourde) doit vivre dans un service dédié.
+
+**Résumé (OBLIGATOIRE)** : Le fichier [src/configs/api.endpoints.config.ts](src/configs/api.endpoints.config.ts) sert uniquement à **déclarer les endpoints** (URLs / factories) et à **définir des fonctions pures de `dataReshape`** qui transforment/normalisent les données renvoyées par l'API pour l'UI. Point final.
+
+Que **NE PAS** mettre dans `api.endpoints.config.ts` :
+- Logique métier (calculs business, règles métier complexes).
+- Effets de bord (modification de stores, appels réseau supplémentaires, IO, mutations globales).
+- Validation lourde, orchestration ou injection de dépendances.
+
+Si vous avez besoin d'un comportement plus avancé, créez un service dédié (p.ex. `src/services/…`) ou des helpers testables et réutilisables, puis appelez-les depuis l'endroit où ils sont nécessaires — **ne** les placez **pas** dans `API_ENDPOINTS`.
+
+Obligations lors d'une modification (checklist pour les PR) :
+- [ ] **Ajouter un test de contrat** (dans `src/tests/units/endpoints/`) pour tout `dataReshape` modifié/ajouté.
+- [ ] **Mettre à jour la documentation** (README, `.github/copilot-instructions.md`) et la checklist PR.
+- [ ] **Extraire la logique complexe** en helpers testables (le `dataReshape` doit rester essentiellement déclaratif).
+
+Exemples de contrôle :
+```ts
+// OK: pure reshape
+const shaped = API_ENDPOINTS.GET.CLASSES.dataReshape(rawPayload);
+
+// NON OK: ne pas écrire dans le store ici
+API_ENDPOINTS.POST.CREATE_CLASS.dataReshape = (data) => {
+  store.set('lastCreated', data.id); // ❌ interdit
+  return transformed;
+}
+```
+
+- **Voir aussi :**
+  - [src/configs/api.endpoints.config.ts](src/configs/api.endpoints.config.ts) — configuration centrale des endpoints + reshapers
+  - [src/utils/ObjectReshape.ts](src/utils/ObjectReshape.ts) — primitives pour composer des reshapes
+  - [src/tests/units/endpoints/api-endpoints.config.contract.test.ts](`src/tests/units/endpoints/api-endpoints.config.contract.test.ts`) — tests de contrat pour les reshapers
 
 <!-- --- -->
 
@@ -176,13 +357,21 @@ Voici comment lancer et écrire des tests, ainsi que des bonnes pratiques spéci
 - Lancer tous les tests en mode watch (développement)
 
 ```powershell
-npm test / npm run test ou 
+npm test
+# ou
+npm run test
 ```
 
 - Lancer les tests une seule fois (exécution CI)
 
 ```powershell
 npm run test -- run
+```
+
+- Lancer les tests E2E (Playwright)
+
+```powershell
+npm run test:e2e
 ```
 
 ### Environnement de test
@@ -284,11 +473,271 @@ Voyez [ce test de modale pour un exemple concret de l'implémentation.](src/test
 > // assert modal fermée
 > ```
 
+
+### Fixtures de test
+
+Cette section décrit les classes utilitaires utilisées pour générer des fixtures (DTOs et réponses d'API) destinées aux tests UI et unitaires. Les fixtures exposent des propriétés *own enumerable* afin d'être facilement spreadées, sérialisées et renvoyées depuis des stubs ou mocks.
+
+**Principales classes (résumé rapide)**
+- [`FixtureCreatorBase`](src/utils/FixtureCreator.ts)
+  - Quoi : utilitaires de base (id, random, formatage).
+  - Pourquoi : primitives partagées par toutes les fixtures.
+
+- [`SkillFixtureCreator`](src/utils/FixtureCreator.ts)
+  - Quoi : Skill DTO ({ name, code, type }).
+
+- [`DegreeFixtureCreator`](src/utils/FixtureCreator.ts)
+  - Quoi : `DegreeRefDto` (YEAR/FIELD/LEVEL, nom/code).
+
+- [`TaskFixtureCreator`](src/utils/FixtureCreator.ts)
+  - Quoi : Task DTO (name, description).
+
+- [`TaskTemplateFixtureCreator`](src/utils/FixtureCreator.ts)
+  - Quoi : TaskTemplate DTO (task + id).
+  - Exemple : voir `src/tests/samples/class-creation-sample-datas.ts`.
+
+- [`DiplomaConfigFixtureCreator`](src/utils/FixtureCreator.ts)
+  - Quoi : config diplôme (degreeLevel, degreeYear, degreeField, skills).
+
+- [`SkillsViewFixtureCreator`](src/utils/FixtureCreator.ts)
+  - Quoi : vue modules/skills (mainSkill + subSkills).
+
+- [`PersonFixtureCreatorBase`](src/utils/FixtureCreator.ts), [`StudentFixtureCreator`](src/utils/FixtureCreator.ts), [`TeacherFixtureCreator`](src/utils/FixtureCreator.ts)
+  - Quoi : personnes (firstName, lastName, email).
+
+- [`ClassFixtureCreator`](src/utils/FixtureCreator.ts)
+  - Quoi : Class DTO (name, description, degreeLevel).
+  - Exemple : `src/tests/samples/class-creation-sample-datas.ts`.
+
+### Bonnes pratiques pour créer de nouvelles classes de fixtures personnalisées
+
+La création de fixtures se doit d'être automatique et aléatoire.
+On utilise `FixtureCreatorBase` pour générer des `id` UUIDs aléatoires et aussi servir d'interface pour les méthodes génératrices.
+
+Pattern A — Création d'une classe(utilisation des méthodes)
+```ts
+export class SkillFixtureCreator extends FixtureCreatorBase implements SkillDto {
+  // L'implémentation de SkillDto s'assure du typing après avoir créé l'objet
+  
+  // Spécifier ici un declare des propriétés à récupérer
+  declare readonly name?: string;
+  declare readonly code: string;
+  declare readonly type?: SkillType;
+
+  /**
+   * Private fields to hold the code properties
+   */
+  readonly #code: string;
+
+  constructor(params?: {
+    id?: UUID;
+    name?: string;
+    code?: string;
+    type?: SkillType;
+  }) {
+    super(params?.id);
+
+    // On peut générer des values ou bien passer en params des values définies
+    const fallbackName = this.randomHumanWord({ minLen: 5, maxLen: 12 });
+    const nameForCode = params?.name ?? fallbackName;
+    this.#code = params?.code ?? this.codeFromName(nameForCode, 3);
+
+    // exposeGettersAsValues() crer automatiquement les propriétés ainsi que les getters pour l'accès
+    this.exposeGettersAsValues({
+      name: fallbackName,
+      code: this.#code,
+      type: params?.type,
+    });
+  }
+}
+```
+
+Pattern B — Création d'une classe(utilisation d'autres classes)
+```ts
+export class TaskTemplateFixtureCreator
+  extends FixtureCreatorBase
+  implements TaskTemplateDto
+{
+  /**
+   * TaskTemplate DTO declarations (TypeScript only). Runtime exposure
+   * is performed in constructor via own enumerable properties.
+   */
+  declare readonly name?: string;
+  declare readonly task: TaskViewDto & { id: UUID };
+  declare readonly degreeConfiguration?: DiplomaConfigDto;
+  declare readonly skills?: string[];
+
+  /**
+   * Private fields to hold the person properties
+   */
+  readonly #task: TaskViewDto;
+  readonly #degreeConfiguration: DiplomaConfigDto;
+
+  constructor(params?: {
+    id?: UUID;
+    name?: string;
+    task?: TaskDto;
+    degreeConfiguration?: DiplomaConfigDto;
+    skills?: string[];
+  }) {
+    super(params?.id);
+
+    // On peut générer des values directement en utilisant une classe spécifique
+    const task = params?.task ?? new TaskFixtureCreator();
+    this.#task = {
+      id: task.id,
+      name: task.name,
+      description: task.description,
+    };
+
+    this.#degreeConfiguration =
+      params?.degreeConfiguration ?? new DiplomaConfigFixtureCreator();
+
+    this.exposeGettersAsValues({
+      ...params,
+      task: this.#task,
+      degreeConfiguration: this.#degreeConfiguration,
+    });
+  }
+}
+
+```
+
+
+Voici quelques exemples courts montrant comment instancier des fixtures et comment les valeurs passées via le constructeur sont exposées comme propriétés énumérables (grâce à [exposeGettersAsValues](src/utils/FixtureCreator.ts) dans [FixtureCreatorBase](src/utils/FixtureCreator.ts)).
+
+### Créer des fixtures
+Pattern A — Exemple pour une propriété précise(Task)
+```ts
+import { TaskFixtureCreator } from '@/utils/FixtureCreator';
+
+const task = new TaskFixtureCreator({ name: 'Correction devoirs' });
+console.log(task.id); // UUID exposé via un accessor enumerable
+console.log(task.name); // 'Correction devoirs' — propriété propre et énumérable
+console.log(JSON.stringify(task)); // sérialisable
+```
+
+Pattern B — Exemple imbriqué aléatoire(TaskTemplate contenant une Task)
+```ts
+import { TaskTemplateFixtureCreator } from '@/utils/FixtureCreator';
+
+const template = new TaskTemplateFixtureCreator({ task: new TaskFixtureCreator() });
+console.log(template.task.id, template.task.name); // l'objet `task` est exposé comme un plain object avec id + champs
+```
+
+Pattern C — Exemple généré
+```ts
+import { TaskTemplateFixtureCreator } from '@/utils/FixtureCreator';
+
+const template = new TaskTemplateFixtureCreator();
+console.log(template.task.id, template.task.name, template.degreeConfiguration); // l'objet `task` est exposé comme un plain object avec id + champs, degreeConfiguration est aussi accessible
+```
+
+**Note :** si `degreeConfiguration` n'est pas fourni au constructeur, [`TaskTemplateFixtureCreator`](src/utils/FixtureCreator.ts) génère automatiquement une [`DiplomaConfigFixtureCreator`](src/utils/FixtureCreator.ts) et l'expose via la propriété `degreeConfiguration`.
+
+Ces patterns permettent de créer rapidement des DTOs testables et sérialisables — pratiques pour les stubs/mocks ou pour former des réponses d'API factices.
+
+**Où trouver des fixtures prêtes à l'emploi :**
+- `src/tests/samples/class-creation-sample-datas.ts` — données d'exemple réutilisables.
+- `src/tests/samples/ui-fixtures/class-creation.ui.fixtures.ts` — fixtures UI + helpers.
+- `src/tests/test-utils/vitest-browser.helpers.ts` — helpers pour stub fetch.
+
+**Comment les utiliser (exemples)**
+- Stub fetch (exemple rapide) :
+```ts
+import { ClassFixtureCreator } from '@/utils/FixtureCreator';
+import { stubFetchRoutes } from '@/tests/test-utils/vitest-browser.helpers';
+
+const classSample = new ClassFixtureCreator({ degreeLevel: '2A' });
+// Retourne [ { data: [classSample] } ] pour les GET correspondant à '/api/classes'
+stubFetchRoutes({ getRoutes: [["/api/classes", [classSample]]] });
+```
+
+### Mock de payloads pour des méthodes(routes) HTTP
+
+Cet utils permet de créer un payload en fonction des url qui lui sont passées
+
+- Signature :
+  ```ts
+  stubFetchRoutes({ getRoutes = [], postRoutes = [], defaultGetPayload = [] })
+  ```
+  - `getRoutes` / `postRoutes` : tableaux de tuples `[match, payload]`.
+    - `match` est une chaîne ou un motif partiel qui sera testé avec `url.includes(match)`.
+    - `payload` est la valeur renvoyée sous `{ data: payload }` par l'appel à `fetch().json()`.
+  - `defaultGetPayload` : valeur retournée pour les `GET` non appariés (par défaut : `[]`).
+
+- Comportement :
+  - Si la requête est `POST`, `postRoutes` est vérifié en priorité ; si aucun `match` ne convient, le stub répond `{ data: {} }`.
+  - Si la requête est `GET`, `getRoutes` est vérifié ; si aucun `match` ne convient, le stub répond `{ data: defaultGetPayload }`.
+  - Les correspondances sont basées sur `url.includes(match)` pour une utilisation simple (pas besoin de RegExp).
+  - Le helper utilise `vi.stubGlobal('fetch', ...)` pour remplacer `fetch` pendant le test.
+
+Exemples :
+```ts
+// GET + POST simultanés
+stubFetchRoutes({
+  getRoutes: [["/api/skills", [skill1, skill2]]],
+  postRoutes: [["/api/classes", createdClass]],
+  defaultGetPayload: [],
+});
+
+// Usage minimal : GET unique
+stubFetchRoutes({ getRoutes: [["/api/classes", [classSample]]] });
+```
+
+Astuce : Appelez `stubFetchRoutes()` *avant* le code qui déclenche les appels réseau (p.ex. juste avant l'action qui soumet un formulaire ou ouvre une page qui effectue des GET).
+
+Détail : `buildFetchStubs` (générer des routes dynamiquement)
+
+- But : `buildFetchStubs(spec, ctx)` transforme une spécification riche (utilisant des contrôleurs, fonctions et templates) en la forme plate attendue par `stubFetchRoutes` : `{ getRoutes: Array<[string, unknown]>, postRoutes: Array<[string, unknown]> }`.
+
+- Paramètres :
+  - `spec` : objet décrivant `getRoutes` et `postRoutes` où chaque route est de la forme `{ url: StubUrlSpec, response: StubResponseSpec }`.
+    - `StubUrlSpec` peut être :
+      - `string` — une URL ou un endpoint (sera utilisée telle quelle),
+      - une fonction `(ctx) => string` — générer dynamiquement l'URL depuis le contexte,
+      - ou `{ controller, mode? }` — dériver l'URL depuis un controller (utilise `controller.apiEndpoint`).
+        - si `controller.apiEndpoint` est une fonction, `mode: 'prefix'` permet d'obtenir un préfixe d'endpoint utile pour matcher des URLs dynamiques (p.ex. `/api/templates/`).
+  - `ctx` : contexte fourni aux `url`/`response` fonctions (ex. `{ controllers, sample, post, postResponse, vars }`).
+
+- `response` peut être :
+  - une valeur statique (objet, tableau, string...), ou
+  - une fonction `(ctx) => unknown` qui retourne la valeur à exposer sous `{ data: ... }` par `stubFetchRoutes`.
+
+- Comportement :
+  - `buildFetchStubs` appelle `resolveUrl` et `resolveResponse` pour chaque route et retourne les paires `[url, payload]` prêtes à être passées à `stubFetchRoutes`.
+  - Cela permet d'exprimer des routes réutilisables et dynamiques (voir `src/tests/samples/ui-fixtures/class-creation.ui.fixtures.ts`).
+
+Exemple d'utilisation :
+```ts
+// Dans un fixture d'UI (useAppFixtures) :
+const spec = buildFetchStubs(routeSpecs.createDiploma, {
+  controllers,
+  sample,
+  post,
+  postResponse: sample.diplomaCreated,
+});
+// spec est { getRoutes: [...], postRoutes: [...] }
+stubFetchRoutes(spec);
+```
+
+Astuce : `buildFetchStubs` est pratique pour centraliser les routes d'un flow (createDiploma, createTaskTemplate, createClassStepOne, ...) et utiliser ces specs dans différents tests ou scénarios UI.
+
+
+- Tester des hooks liés aux fixtures : utiliser [`getHookResults`](src/tests/test-utils/getHookResults.ts) + [`AppTestWrapper`](src/tests/test-utils/AppTestWrapper.tsx).
+
+Fichiers utiles :
+- [`FixtureCreatorBase`](src/utils/FixtureCreator.ts)
+- [`exposeGettersAsValues`](src/utils/FixtureCreator.ts) — helper pour exposer les getters en propriétés propres et énumérables
+- Classes de fixtures importantes : [`ClassFixtureCreator`](src/utils/FixtureCreator.ts), [`TaskFixtureCreator`](src/utils/FixtureCreator.ts), [`TaskTemplateFixtureCreator`](src/utils/FixtureCreator.ts), [`DiplomaConfigFixtureCreator`](src/utils/FixtureCreator.ts), [`SkillFixtureCreator`](src/utils/FixtureCreator.ts)
+- Exemples & helpers : [`class-creation-sample-datas`](src/tests/samples/class-creation-sample-datas.ts), [`class-creation.ui.fixtures`](src/tests/samples/ui-fixtures/class-creation.ui.fixtures.ts)
+- Helpers de test : [`stubFetchRoutes`](src/tests/test-utils/vitest-browser.helpers.ts) — helper pour stub fetch.
+
 <!-- --- -->
 
-## Modales ([`<Dialog/>`](src/components/ui/dialog.tsx))
+## Modales (Le projet utilise un système centralisé de modales (Dialog))
 
-Le projet utilise un système centralisé de modales (Dialog).
+
 
 Ce système est exposé via le [`<DialogProvider/>`](src/api/providers/DialogProvider.tsx).
 
@@ -548,6 +997,10 @@ handleModalOpening({
   - Ce pattern est utilisé par exemple dans [`LoginForm`](src/components/LoginForms/LoginForm.tsx) :  
     - On passe `dialogFns: { closeAllDialogs, openDialog }` au helper `handleModalOpening`.
 
+- `dataReshape` / `dataReshapeFn` — fonctions de *reshaping* utilisées pour transformer le payload renvoyé par l'API avant de le stocker ou l'exposer au reste de l'application. Elles sont définies dans `API_ENDPOINTS` (ex. `API_ENDPOINTS.GET.CLASSES.dataReshape`, `API_ENDPOINTS.POST.CREATE_CLASS.dataReshape`) et sont consommées comme `dataReshapeFn` dans les contrôleurs et flows (ex. `useCommandHandler`). Voir [`src/configs/api.endpoints.config.ts`](src/configs/api.endpoints.config.ts) et les tests `src/tests/units/endpoints/api-endpoints.config.contract.test.ts`.
+
+- `FixtureCreatorBase` / classes de fixtures — utilitaires pour générer des DTOs et réponses d'API factices (`ClassFixtureCreator`, `TaskFixtureCreator`, `TaskTemplateFixtureCreator`, etc.). Utilisez-les pour créer des objets testables, sérialisables et réutilisables dans vos tests ou stubs (ex. `src/tests/samples/*`). Voir : [`src/utils/FixtureCreator.ts`](src/utils/FixtureCreator.ts).
+
 Ces helpers centralisent des comportements courants et évitent la duplication de logique.
 
 Exemple : s’assurer qu’une seule modal est ouverte à la fois.
@@ -588,7 +1041,7 @@ Merci pour votre intérêt ! Quelques guidelines :
 ## Débogage & Ressources utiles
 
 - Logs navigateur & console serveur (backend proxy)
-- Vérifiez la variable `VITE_BACKEND_URL` si les requêtes API échouent
+- Vérifiez la variable [VITE_BACKEND_URL](vite.config.ts) si les requêtes API échouent
 - Si HMR ne se met pas à jour, redémarrez `npm run dev` et videz le cache du navigateur
 
 ---
