@@ -12,9 +12,14 @@ Cette application représente le frontend de TeachBoard, une interface pédagogi
 - [Prérequis](#prérequis)
 - [Installation](#installation)
 - [Configuration & variables d'environnement](#configuration--variables-denvironnement)
+- [Configuration des logs](#configuration-des-logs)
 - [Commandes utiles](#commandes-utiles)
 - [Proxy API et backend](#proxy-api-et-backend)
 - [Gestion des données réseau](#gestion-des-données-réseau)
+- [Structure du projet (aperçu rapide)](#structure-du-projet-apercu-rapide)
+- [Architecture & conventions — MVC (Controllers) et HOCs](#architecture-mvc-hocs)
+  - [HOCs — utilité & exemples](#hocs-utilite-exemples)
+- [Validation des props des composants](#validation-des-props-des-composants)
 - [Recettes rapides](#recettes-rapides)
 - [Tests](#tests)
 - [Contribuer](#contribuer)
@@ -327,18 +332,103 @@ API_ENDPOINTS.POST.CREATE_CLASS.dataReshape = (data) => {
   - `routes/` — configuration des routes
 
 <!-- --- -->
+<h2 id="architecture-mvc-hocs"/>
+
+## Architecture & conventions — MVC (Controllers) et HOCs
+
+Cette section décrit les **conventions d'architecture** utilisées dans le projet pour séparer la logique métier (Controllers) et la présentation (Composants), ainsi que l'usage des **Higher-Order Components (HOCs)** pour les petits patterns réutilisables de layout ou d'intégration.
+
+### Controllers (pattern MVC)
+- **Emplacement:** chaque feature peut contenir un dossier `controller/` près du composant (ex. `src/components/ClassCreation/controller/ClassCreationController.tsx`).
+- **Rôle:** orchestrer le flux (appel d'API via `useFetch`/`useCommandHandler`, gestion du formulaire, manipulation du cache React Query, callbacks, side-effects). Ne doit pas rendre des éléments purement présentiels complexes — déléguez le rendu aux composants enfants.
+- **Bonnes pratiques :**
+  - Garder la logique (fetching, transformation, orchestration) dans le controller.
+  - Utiliser des hooks partagés (`useCommandHandler`, `useFetch`, etc.) pour standardiser les interactions réseau.
+  - Exposer des props simples et typés au composant présentational (ex. `ClassCreationController` expose `form` et handlers, et rend `<ControlledInputList/>`, `<PopoverFieldWithCommands/>` etc.).
+  - Tester les controllers via des tests unitaires simulant les hooks et le store (Vitest + stubs).
+
+**Exemple simplifié (pattern courant)**
+```tsx
+// Dans un controller
+const handleValidSubmit = (values: FormSchema) => submitCallback(values, { method: 'POST' });
+
+return <FormComponent form={form} onSubmit={handleValidSubmit} />;
+```
+
+<h3 id="hocs-utilite-exemples"/>
+
+### HOCs — utilité & exemples
+- **But :** factoriser des patrons de présentation ou d'intégration (layout, ListMapper, intégration à react-hook-form) sans dupliquer du markup.
+- **Règles :**
+  - **HOCs = layout/integration only**. Évitez d'y placer de la logique métier lourde. Les exemples `withTitledCard`, `withListMapper`, `withController` montrent ce principe.
+  - Documentez l'API du HOC et fournissez un exemple d'utilisation (ex. `withController` montre comment intégrer `react-hook-form`).
+
+**Exemples :**
+```tsx
+// withController (wrap with react-hook-form Controller)
+const MyInputWithController = withController(MyInput);
+<MyInputWithController name="schoolYear" form={form} label="Année" />
+
+// withListMapper (wrap to map lists into a ListMapper)
+const ItemWithList = withListMapper(ItemComponent);
+<ItemWithList items={items} optional={optionalProps} otherProp={...} />
+```
+
+### Fichiers utiles (exemples)
+- Controllers :
+  - `src/components/ClassCreation/controller/ClassCreationController.tsx`
+  - `src/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx`
+- HOCs :
+  - `src/components/HOCs/withController.tsx` — intégration `react-hook-form` (Controller)
+  - `src/components/HOCs/withListMapper.tsx` — wrapper pour `ListMapper`
+  - `src/components/HOCs/withTitledCard.tsx` — layout card + title
+  - `src/components/HOCs/withComboBoxCommands.tsx`, `withIconItem.tsx`
+
+### Ajouter un nouveau controller / HOC
+- Pour un nouveau feature : créez `src/components/<Feature>/controller/<Feature>Controller.tsx` et gardez la présentation dans `src/components/<Feature>/<Feature>.tsx`.
+- Pour un nouveau HOC : ajoutez-le sous `src/components/HOCs/` et documentez l'usage (exemple et cas d'usage). Ajoutez des tests pour vérifier le comportement du HOC et un exemple d'intégration.
+
+> Note : cette convention facilite la testabilité, la réutilisation et la séparation des responsabilités.
+
+<!-- --- -->
+<h2 id="validation-des-props-des-composants"/>
 
 ## Validation des props des composants
 
 Pour éviter les usages invalides en développement, certains composants se protègent et retournent `null` si des props indispensables sont manquantes ou si des props interdites sont passées.
 
 - Les helpers vivent dans [Components Config](src/configs/app-components.config.ts) : `labelledInputContainsInvalid`, `controllerPropsInvalid`, `listMapperContainsInvalid`, `loginButtonContainsInvalid`, `menuButtonContainsInvalid` et `debugLogs`.
-- Pattern à placer en début de composant :
 
-```ts
-if (labelledInputContainsInvalid(props)) {
-  debugLogs("LaballedInputForController");
-  return null;
+### Exemple complet — validation & usage (snippet)
+Voici un exemple pratique montrant : 1) la définition des constantes d'acceptation / interdiction, 2) un helper `checkPropsValidity` plus informatif, 3) l'utilisation du guard en début de render et 4) un petit test Vitest.
+
+- Dans `app-components.config.ts`, spécifier des props qui devront être vérifiées :
+```tsx
+export const LABELLED_INPUT_SHOULD_NOT_ACCEPT = ["useCommands", "creationButtonText"];
+export const LABELLED_INPUT_REQUIRES = ["field", "fieldState"];
+
+export const labelledInputContainsInvalid = (props: LaballedInputForControllerProps) =>
+  checkPropsValidity(props, LABELLED_INPUT_REQUIRES, LABELLED_INPUT_SHOULD_NOT_ACCEPT);
+```
+
+- Dans `<LabelledInputForController/>`, appeler simplement la fonction et utilisez le logger pour retourner une alerte :
+```tsx
+// Exemple d'utilisation (top-of-render guard) — src/components/Inputs/LaballedInputForController.tsx
+import { labelledInputContainsInvalid } from '@/configs/app-components.config';
+
+export function LabelledInputForController<T extends FieldValues>(props: LaballedInputForControllerProps<T>) {
+  if (labelledInputContainsInvalid(props)) {
+    debugLogs("LabelledInputForController");
+    return null; // garde : rendu bloqué si props invalides
+  }
+
+  // rendu normal
+  return (
+    <>
+      <Label htmlFor={props.name ?? props.field.name}>{props.title}</Label>
+      <Input {...props.field} id={props.name ?? props.field.name} aria-invalid={props.fieldState.invalid ?? false} />
+    </>
+  );
 }
 ```
 
@@ -1037,6 +1127,29 @@ Merci pour votre intérêt ! Quelques guidelines :
 - Respectez le style du projet (ESLint, TS strict).
 
 ---
+
+## Configuration des logs
+
+Le projet expose plusieurs constantes de configuration des logs dans [src/configs/app.config.ts](src/configs/app.config.ts). Elles permettent d'activer ou de désactiver rapidement des catégories de logs (proxy, observer de mutations, cache, requêtes, warnings composants) afin de réduire le bruit en développement ou en CI.
+
+Principales constantes :
+- `DEV_MODE` — `import.meta.env.DEV` (utile pour activer du code de debug en dev).
+- `NO_PROXY_LOGS`, `NO_MUTATION_OBSERVER_LOGS`, `NO_CACHE_LOGS`, `NO_QUERY_LOGS`, `NO_COMPONENT_WARNING_LOGS` — lorsqu'elles sont `true`, les logs correspondants sont supprimés.
+
+Exemple d'utilisation :
+```ts
+import { NO_QUERY_LOGS } from '@/configs/app.config';
+if (!NO_QUERY_LOGS) {
+  debugLogs('Query result', result);
+}
+```
+
+Bonnes pratiques :
+- Préférez `debugLogs()` au `console.*` pour garder la cohérence et le formatting des messages de debug.
+- N'oubliez pas de remettre les logs verbeux à l'état souhaité avant d'ouvrir une PR (éviter de committer un état verbeux en production).
+- Si vous avez besoin d'un contrôle dynamique, envisagez d'ajouter des variables d'environnement `VITE_*` lues depuis `app.config.ts` (optionnel).
+
+Voir : `src/configs/app.config.ts`.
 
 ## Débogage & Ressources utiles
 
