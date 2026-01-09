@@ -47,6 +47,22 @@ import { wait } from "@/utils/utils.ts";
 import { expect } from "vitest";
 import { page, userEvent } from "vitest/browser";
 
+import type { AppModalNames } from "@/configs/app.config";
+import { AppModals } from "@/pages/AllModals/AppModals";
+import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
+import { SamplePopoverInput } from "@/tests/components/class-creation/SamplePopoverInput";
+import { useAppFixtures } from "@/tests/samples/ui-fixtures/class-creation.ui.fixtures";
+import getHookResults from "@/tests/test-utils/getHookResults";
+import React from "react";
+import { render, renderHook } from "vitest-browser-react";
+
+type FixtureLike = {
+  controllers: Record<string, InputControllerLike>;
+  installFetchStubs?: (postResponse?: unknown) => void;
+  sample: ReturnType<typeof useAppFixtures>["sample"];
+  post?: unknown;
+};
+
 /**
  * Initializes the class-creation modal for tests.
  */
@@ -86,6 +102,93 @@ export async function selectDiplomaInClassCreationDialog(
       timeout: 1500,
     }
   );
+}
+
+/**
+ * Shared test setup for the class-creation UI fixtures.
+ *
+ * @description The test flow is :
+ *  - Creating a popover input for the specified controller. This controller represents the same type as the one used in the modal that will be created. So we can assert that uppon completion, the new item appears in the popover input.
+ *
+ *  - Clicking the creation button.
+ *  - Make sure the modal is opened and ready.
+ *  - Assert the ZOD schema validations work as expected.
+ *  - Submit the form and assert the POST request updated the cache without extra GET.
+ *  - Finally, assert the new item appears in the popover input.
+ *
+ * @param string - Name of the route to get (e.g. "newDegree", "createDiploma").
+ * @param initControllerName - Name of the controller to initialize and mount.
+ * It MUST be the same type as the item being created in the modal.
+ * @param pageId - Page ID to use for the SamplePopoverInput component.
+ */
+export async function initSetup(
+  string: string,
+  initControllerName: string,
+  pageId: AppModalNames,
+  opts?: { routeArgs?: unknown[] }
+) {
+  const Wrapper = ({ children }: { children: React.ReactNode }) =>
+    React.createElement(
+      AppTestWrapper,
+      null,
+      React.createElement(AppModals, null),
+      children
+    );
+
+  const hook = await renderHook(() => useAppFixtures(), { wrapper: Wrapper });
+  const proxy = getHookResults(hook);
+
+  const getRoutes = proxy.getRoutes;
+  const routeFn = (getRoutes as Record<string, unknown>)[string];
+
+  if (typeof routeFn !== "function") {
+    throw new TypeError(`[initSetup] Unknown route: ${string}`);
+  }
+
+  const routeArgs = opts?.routeArgs;
+  if (!routeArgs && routeFn.length >= 1) {
+    throw new TypeError(
+      `[initSetup] Route '${string}' requires arguments; pass opts.routeArgs explicitly.`
+    );
+  }
+
+  const fx = (
+    Array.isArray(routeArgs) ? routeFn(...routeArgs) : routeFn()
+  ) as FixtureLike;
+
+  const controllers = fx.controllers;
+  const initController = controllers[initControllerName];
+  if (!initController) {
+    throw new TypeError(
+      `[initSetup] Could not resolve controller '${initControllerName}' for route '${string}'. Available controllers: ${Object.keys(
+        controllers
+      ).join(", ")}`
+    );
+  }
+
+  const selectedDiploma = fx.sample?.diplomaFetched;
+  // Mount helper components into the page so popover triggers can be found by
+  // the Playwright-based helpers which query the global document.
+  await render(
+    React.createElement(
+      AppTestWrapper,
+      null,
+      React.createElement(AppModals, null),
+      React.createElement(SamplePopoverInput, {
+        pageId,
+        controller: initController,
+        options: { selectedDiploma },
+      })
+    )
+  );
+
+  return {
+    getRoutes,
+    controllers,
+    installFetchStubs: fx.installFetchStubs?.bind(fx),
+    sample: fx.sample,
+    post: fx.post,
+  };
 }
 
 /**
