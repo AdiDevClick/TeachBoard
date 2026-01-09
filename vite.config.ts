@@ -46,7 +46,7 @@ export default defineConfig({
     include: ["vitest-browser-react/pure"],
   },
   test: {
-    testTimeout: 15000,
+    testTimeout: 12000,
     fileParallelism: false,
     maxConcurrency: 1,
     setupFiles: ["./test.setup-file.ts"],
