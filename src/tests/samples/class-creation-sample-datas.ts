@@ -48,9 +48,14 @@ export const degreeFieldFetched = new DegreeFixtureCreator("FIELD");
 
 export const degreeFieldFetched2 = new DegreeFixtureCreator("FIELD");
 
-export const degreeYearFetched = new DegreeFixtureCreator("YEAR");
+// Make YEARS deterministic so diploma switching tests don't randomly collide on the same year (e.g. both "2A").
+export const degreeYearFetched = new DegreeFixtureCreator("YEAR", {
+  yearNumber: 2,
+});
 
-export const degreeYearFetched2 = new DegreeFixtureCreator("YEAR");
+export const degreeYearFetched2 = new DegreeFixtureCreator("YEAR", {
+  yearNumber: 3,
+});
 
 export const degreeLevelFetched = new DegreeFixtureCreator("LEVEL");
 
