@@ -10,6 +10,7 @@ import type {
 } from "@/api/types/routes/degrees.types.ts";
 import type { DiplomaConfigDto } from "@/api/types/routes/diplomas.types.ts";
 import type {
+  SkillDto,
   SkillsViewDto,
   SkillType,
 } from "@/api/types/routes/skills.types.ts";
@@ -204,9 +205,31 @@ export class FixtureCreatorBase {
     const email = params?.email ?? this.emailFromNames(firstName, lastName);
     return { firstName, lastName, email };
   }
+
+  /**
+   * Generate a `DiplomaConfigDto` instance using `DiplomaConfigFixtureCreator`.
+   * This helper is useful when embedding a diploma configuration into other
+   * fixtures (for example in `TaskTemplateFixtureCreator`).
+   */
+  generateDiplomaConfig(params?: {
+    id?: UUID;
+    degreeLevel?: string;
+    degreeYear?: string;
+    degreeField?: string;
+    yearNumber?: number;
+    skills?: SkillsViewDto[];
+  }): DiplomaConfigDto {
+    // Return the fixture instance (its properties are own, enumerable values)
+    return new DiplomaConfigFixtureCreator(
+      params
+    ) as unknown as DiplomaConfigDto;
+  }
 }
 
-export class SkillFixtureCreator extends FixtureCreatorBase {
+export class SkillFixtureCreator
+  extends FixtureCreatorBase
+  implements SkillDto
+{
   /**
    * Skill DTO shape (TypeScript declarations only).
    * Runtime values are set as own enumerable properties by the constructor
@@ -377,7 +400,8 @@ export class TaskTemplateFixtureCreator
   /**
    * Private fields to hold the person properties
    */
-  readonly #task: TaskViewDto & { id: UUID };
+  readonly #task: TaskViewDto;
+  readonly #degreeConfiguration: DiplomaConfigDto;
 
   constructor(params?: {
     id?: UUID;
@@ -395,7 +419,14 @@ export class TaskTemplateFixtureCreator
       description: task.description,
     };
 
-    this.exposeGettersAsValues({ ...params, task: this.#task });
+    this.#degreeConfiguration =
+      params?.degreeConfiguration ?? new DiplomaConfigFixtureCreator();
+
+    this.exposeGettersAsValues({
+      ...params,
+      task: this.#task,
+      degreeConfiguration: this.#degreeConfiguration,
+    });
   }
 }
 
