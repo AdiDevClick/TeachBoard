@@ -47,9 +47,24 @@ export function SamplePopoverInput({
     newItemCallback(args);
   };
 
+  // Resolve dynamic apiEndpoint functions when we have enough context (e.g. selected diploma)
+  const selectedDiploma = (options?.selectedDiploma ?? null) as {
+    id?: string;
+  } | null;
+
+  const resolvedController = {
+    ...controller,
+    apiEndpoint:
+      typeof controller.apiEndpoint === "function" && selectedDiploma?.id
+        ? (controller.apiEndpoint as (id: string) => unknown)(
+            selectedDiploma.id
+          )
+        : controller.apiEndpoint,
+  };
+
   return (
     <PopoverFieldWithCommands
-      {...controller}
+      {...(resolvedController as Record<string, unknown>)}
       commandHeadings={resultsCallback()}
       onOpenChange={openingCallback}
       onAddNewItem={handleAddNew}
