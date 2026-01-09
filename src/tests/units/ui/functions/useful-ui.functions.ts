@@ -87,7 +87,6 @@ export async function openModalAndAssertItsOpenedAndReady<
 
   // Click the creation button (ensure it's enabled first).
   await clickEnabledButton(name);
-
   // Ensure modal is opened and ready (it should display the ready text).
   await waitForDialogAndAssertText(opts?.readyText ?? name, {
     present: true,
