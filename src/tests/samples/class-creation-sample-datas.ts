@@ -147,6 +147,3 @@ export const skillsModulesFetched = {
     }),
   ],
 } as const;
-
-// Backwards-compatible alias for existing tests
-export const degreeFetched = degreeFieldFetched;
