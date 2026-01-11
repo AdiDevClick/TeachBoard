@@ -19,6 +19,12 @@ Cette application représente le frontend de TeachBoard, une interface pédagogi
 - [Structure du projet (aperçu rapide)](#structure-du-projet-apercu-rapide)
 - [Architecture & conventions — MVC (Controllers) et HOCs](#architecture-mvc-hocs)
   - [HOCs — utilité & exemples](#hocs-utilite-exemples)
+    - [Liste des HOCs (usage dans des vues)](#liste-des-hocs-usage-dans-des-vues)
+      - [withTitledCard](#withtitledcard)
+      - [withController](#withcontroller)
+      - [withListMapper](#withlistmapper)
+      - [withComboBoxCommands](#withcomboboxcommands)
+      - [withIconItem](#withiconitem)
 - [Validation des props des composants](#validation-des-props-des-composants)
 - [Recettes rapides](#recettes-rapides)
 - [Tests](#tests)
@@ -355,6 +361,23 @@ const handleValidSubmit = (values: FormSchema) => submitCallback(values, { metho
 return <FormComponent form={form} onSubmit={handleValidSubmit} />;
 ```
 
+### Structure des dossiers pour une feature (pattern MVC)
+Voici la convention de structure (format demandé : `dossier > controller/types/functions/le-composant`) :
+
+- `src/components/<Feature>/` — dossier de la feature
+  - `controller/` — orchestration (fetchs, soumissions, cache, side-effects)
+  - `types/` — interfaces et types TypeScript (props, DTOs, responses)
+  - `functions/` — helpers et fonctions pures (reshapers, transformateurs, utilitaires)
+  - `<Feature>.tsx` — composant présentational (UI, rendu, props)
+
+- **Bonnes pratiques :**
+  - `controller` contient la logique métier et les effets de bord ; `functions` doit rester purement fonctionnel et testable.
+  - Nommez clairement : `XController.tsx`, `x.types.ts`, `x.helpers.ts`.
+  - Ajoutez des tests unitaires pour les fichiers dans `functions/` et pour le `controller` (stubs pour les hooks); testez l'UI des composants via des tests d'intégration si nécessaire.
+  - Évitez d'écrire des appels réseau ou side-effects dans `types/` ou `functions/`.
+
+
+
 <h3 id="hocs-utilite-exemples"/>
 
 ### HOCs — utilité & exemples
@@ -363,26 +386,176 @@ return <FormComponent form={form} onSubmit={handleValidSubmit} />;
   - **HOCs = layout/integration only**. Évitez d'y placer de la logique métier lourde. Les exemples `withTitledCard`, `withListMapper`, `withController` montrent ce principe.
   - Documentez l'API du HOC et fournissez un exemple d'utilisation (ex. `withController` montre comment intégrer `react-hook-form`).
 
-**Exemples :**
-```tsx
-// withController (wrap with react-hook-form Controller)
-const MyInputWithController = withController(MyInput);
-<MyInputWithController name="schoolYear" form={form} label="Année" />
 
-// withListMapper (wrap to map lists into a ListMapper)
-const ItemWithList = withListMapper(ItemComponent);
-<ItemWithList items={items} optional={optionalProps} otherProp={...} />
+<a id="liste-des-hocs-usage-dans-des-vues"></a>
+### Liste des HOCs (usage dans des vues)
+
+<a id="withtitledcard"></a>
+#### withTitledCard — Wrapper de présentation
+- **But :** encapsuler un controller ou un composant présentational dans une Card standardisée (titre, description, actions).
+- **Vue (exemple réel) :** `ClassCreation` montre l'utilisation typique :
+```tsx
+import { ClassCreationController } from '@/components/ClassCreation/controller/ClassCreationController.tsx';
+import withTitledCard from '@/components/HOCs/withTitledCard.tsx';
+
+const ClassCreationWithCard = withTitledCard(ClassCreationController);
+
+function ClassCreationView(props) {
+  return <ClassCreationWithCard {...props} />; // le controller reçoit titleProps, footerProps, form, etc.
+}
 ```
+- **Patterns :**
+  - **Pattern A (controller + card) :** wrappez le controller (comme ci-dessus)
+  - **Pattern B (composant présentational) :** wrappez un composant pur pour lui donner un layout
+- **Logique abstraite (extrait) :**
+```tsx
+// simplifié
+<Card className={className}>
+  <CardHeader title={title} description={description} actions={actions} />
+  <CardBody>
+    <Wrapped {...props} />
+  </CardBody>
+  <CardFooter>{footer}</CardFooter>
+</Card>
+```
+- **Retour / Abstraction :** un composant qui accepte `title`, `description`, `actions`, `className`, `form` (si applicable)
+- **Pourquoi :** standardise l'apparence des sections et réduit le markup dans les vues.
+
+---
+
+<a id="withcontroller"></a>
+#### withController — Intégration `react-hook-form`
+- **But :** simplifier l'intégration d'un composant contrôlé par `react-hook-form`.
+- **Vue (exemple d'utilisation dans une form) :**
+```tsx
+import withController from '@/components/HOCs/withController.tsx';
+import Input from '@/components/Inputs/Input.tsx';
+
+const InputWithController = withController(Input);
+
+function MyForm({ form }) {
+  return <InputWithController form={form} name="age" label="Âge" />;
+}
+```
+- **Patterns :**
+  - **Pattern A (simple) :** wrapper + props minimales
+  - **Pattern B (avec options) :** `controllerProps` pour règles, defaultValue, etc.
+- **Logique abstraite (extrait) :**
+```tsx
+<Controller
+  name={name}
+  control={form.control}
+  render={({ field, fieldState }) => (
+    <Field data-invalid={fieldState.invalid}>
+      <Wrapped {...restProps} field={field} fieldState={fieldState} />
+      <FieldError errors={[fieldState.error]} />
+    </Field>
+  )}
+/>
+```
+- **Retour / Abstraction :** composant qui expose `field`/`fieldState` et masque le `Controller` boilerplate.
+- **Pourquoi :** évite la répétition du pattern `Controller` et garde la présentation séparée de la logique de formulaire.
+
+---
+
+<a id="withlistmapper"></a>
+#### withListMapper — Mapping de listes
+- **But :** générer rapidement un renderer pour des listes à partir d'un item component.
+- **Vue (exemple d'utilisation) :**
+```tsx
+import withListMapper from '@/components/HOCs/withListMapper.tsx';
+import StudentItem from '@/components/Students/StudentItem.tsx';
+
+const StudentsList = withListMapper(StudentItem);
+
+function StudentsView({ students }) {
+  return <StudentsList items={students} emptyMessage="Aucun élève" />;
+}
+```
+- **Patterns :**
+  - **Pattern A (par défaut) :** `items` + rendu automatique
+  - **Pattern B (custom render) :** `renderItem` pour surcharger le rendu d'un item
+- **Logique abstraite (extrait) :**
+```tsx
+if (!items?.length) return <EmptyState message={emptyMessage} />;
+return items.map(item => <Wrapped key={keyExtractor(item)} {...item} />);
+```
+- **Retour / Abstraction :** composant qui standardise l'itération, les keys et l'empty-state.
+- **Pourquoi :** centralise la logique de listing et améliore la cohérence UI.
+
+---
+
+<a id="withcomboboxcommands"></a>
+#### withComboBoxCommands — Enrichissement de Combobox
+- **But :** ajouter une barre de commandes/actions à un champ combo/select.
+- **Vue (exemple d'utilisation) :**
+```tsx
+import withComboBoxCommands from '@/components/HOCs/withComboBoxCommands.tsx';
+import ComboBox from '@/components/Inputs/ComboBox.tsx';
+
+const ComboWithCmd = withComboBoxCommands(ComboBox);
+
+function TeachersView() {
+  const commands = [{ id: 'create', label: 'Créer un enseignant' }];
+  const handleCmd = (id) => { /* exécuter la commande */ };
+  return <ComboWithCmd commands={commands} onCommand={handleCmd} />;
+}
+```
+- **Patterns :**
+  - **Pattern A (statique) :** `commands` tableau
+  - **Pattern B (dynamique) :** `commands` fonction selon le contexte
+- **Logique abstraite (extrait) :**
+```tsx
+<div className="combo-with-commands">
+  <Wrapped {...props} />
+  <CommandsMenu commands={commands} onCommand={onCommand} />
+</div>
+```
+- **Retour / Abstraction :** expose `commands` et `onCommand(id, item)` ; sépare la logique d'actions du rendu du combo.
+- **Pourquoi :** évite de dupliquer la logique des actions sur plusieurs combos.
+
+---
+
+<a id="withiconitem"></a>
+#### withIconItem — Iconographie standardisée
+- **But :** ajouter une icône configurable (position/size) à un item sans modifier son rendu interne.
+- **Vue (exemple d'utilisation) :**
+```tsx
+import withIconItem from '@/components/HOCs/withIconItem.tsx';
+import ListItem from '@/components/ui/list-item.tsx';
+
+const IconListItem = withIconItem(ListItem);
+
+function Sidebar() {
+  return <IconListItem icon={<UserIcon />} iconPosition="left" />;
+}
+```
+- **Patterns :**
+  - **Pattern A (icône gauche) :** `iconPosition="left"`
+  - **Pattern B (taille / style) :** `iconSize` + `className`
+- **Logique abstraite (extrait) :**
+```tsx
+<div className={`icon-item ${className}`}>
+  {icon && <span className={`icon ${iconPosition}`}>{icon}</span>}
+  <Wrapped {...props} />
+</div>
+```
+- **Retour / Abstraction :** composant qui gère l'espacement et les classes liées à l'icône.
+- **Pourquoi :** standardise l'usage des icônes et assure une cohérence visuelle.
+
+> **Note :** Ces HOCs restent légers et orientés présentation. Pour la logique métier lourde, préférez un `controller` ou un service dédié.
+
 
 ### Fichiers utiles (exemples)
 - Controllers :
-  - `src/components/ClassCreation/controller/ClassCreationController.tsx`
-  - `src/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx`
+  - [ClassCreationController](src/components/ClassCreation/controller/ClassCreationController.tsx)
+  - [DiplomaCreationController](src/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx)
 - HOCs :
-  - `src/components/HOCs/withController.tsx` — intégration `react-hook-form` (Controller)
-  - `src/components/HOCs/withListMapper.tsx` — wrapper pour `ListMapper`
-  - `src/components/HOCs/withTitledCard.tsx` — layout card + title
-  - `src/components/HOCs/withComboBoxCommands.tsx`, `withIconItem.tsx`
+  - [withController](src/components/HOCs/withController.tsx) — intégration `react-hook-form` (Controller)
+  - [withListMapper](src/components/HOCs/withListMapper.tsx) — wrapper pour `ListMapper`
+  - [withTitledCard](src/components/HOCs/withTitledCard.tsx) — layout card + title
+  - [withComboBoxCommands](src/components/HOCs/withComboBoxCommands.tsx) — commands wrapper
+  - [withIconItem](src/components/HOCs/withIconItem.tsx) — icon helper
 
 ### Ajouter un nouveau controller / HOC
 - Pour un nouveau feature : créez `src/components/<Feature>/controller/<Feature>Controller.tsx` et gardez la présentation dans `src/components/<Feature>/<Feature>.tsx`.
