@@ -23,6 +23,16 @@ Cette application représente le frontend de TeachBoard, une interface pédagogi
   - [Year range](#year-range)
   - [OffsetDateTime](#offsetdatetime)
   - [SessionToken](#sessiontoken)
+- [Composants — Catalogue](#composants--catalogue)
+  - [Buttons](#buttons)
+  - [Inputs](#inputs)
+  - [Selects](#selects)
+  - [Modal](#modal)
+  - [Form components (LoginForm)](#form-components-loginform)
+  - [Lists & Data Table](#lists--data-table)
+  - [Charts](#charts)
+  - [Layout (Header / Sidebar / Footer)](#layout-header--sidebar--footer)
+  - [Icons](#icons)
 - [Architecture & conventions — MVC (Controllers) et HOCs](#architecture-mvc-hocs) 
   - [HOCs — utilité & exemples](#hocs-utilite-exemples)
     - [Liste des HOCs (usage dans des vues)](#liste-des-hocs-usage-dans-des-vues)
@@ -665,6 +675,149 @@ function Sidebar() {
 
 > **Note :** Ces HOCs restent légers et orientés présentation. Pour la logique métier lourde, préférez un `controller` ou un service dédié.
 
+
+## Composants — Catalogue
+
+Une vue d'ensemble des composants réutilisables fournis par le projet, avec un exemple d'usage (look), les patterns d'utilisation (A / B / C) et un lien vers leur emplacement.
+
+> Note : les exemples ci-dessous sont des snippets usage (prêts à copier/coller) — ils servent à se faire une idée rapide du rendu et de l'API du composant.
+
+---
+
+### Buttons
+- **Look / example**:
+```tsx
+import { LoginButton } from '@/components/Buttons/LoginButton';
+import { SimpleAddButtonWithToolTip } from '@/components/Buttons/SimpleAddButton';
+
+<LoginButton name="Sign in with Google" path="/icons/google.svg" url="/auth/google" />
+<SimpleAddButtonWithToolTip toolTipText="Ajouter" onClick={() => {}} />
+```
+- **Patterns**: Pattern A — Standalone buttons; Pattern B — Buttons with tooltip / extra handler
+- **Emplacement**: `src/components/Buttons/` (`LoginButton.tsx`, `SimpleAddButton.tsx`)
+
+---
+
+### Inputs
+- **Look / example**:
+```tsx
+import { ControlledLabelledInput } from '@/components/Inputs/LaballedInputForController';
+
+<ControlledLabelledInput form={form} name="email" title="Adresse e-mail" />
+```
+- **Patterns**: Pattern A — Controlled input via `withController`; Pattern B — list mapping via `withListMapper` (`ControlledInputList`)
+- **Emplacement**: `src/components/Inputs/LaballedInputForController.tsx`
+
+---
+
+### Selects
+- **Look / example**:
+```tsx
+import VerticalFieldSelect from '@/components/Selects/VerticalFieldSelect';
+
+<VerticalFieldSelect label="Tâche" placeholder="Choisir...">
+  <SelectItem value="task1">Task 1</SelectItem>
+</VerticalFieldSelect>
+
+// with controller
+<VerticalFieldSelectWithController form={form} name="taskId" />
+```
+- **Patterns**: Pattern A — plain `VerticalFieldSelect`; Pattern B — `VerticalFieldSelectWithController` (react-hook-form); Pattern C — Extended with commands / add-new buttons
+- **Emplacement**: `src/components/Selects/` (`VerticalFieldSelect.tsx`)
+
+---
+
+### Modal
+- **Look / example**:
+```tsx
+// register in AppModals
+{
+  modalName: 'login',
+  type: Modal,
+  modalContent: LoginForm,
+  contentProps: { inputControllers: inputLoginControllers }
+}
+
+// open programmatically
+openDialog(null, 'login');
+```
+- **Patterns**: Pattern A — modal content = controller wrapped (ex: `LoginForm`); Pattern B — `ModalWithSimpleAlert`
+- **Emplacement**: `src/components/Modal/`, `src/pages/AllModals/AppModals.tsx`
+
+---
+
+### Form components (LoginForm)
+- **Look / example**:
+```tsx
+import LoginForm from '@/components/LoginForms/LoginForm';
+
+<LoginForm />
+```
+- **Patterns**: Pattern A — use as page component; Pattern B — used as modal content (`modalMode = true`)
+- **Emplacement**: `src/components/LoginForms/LoginForm.tsx` (+ `controller/LoginFormController.tsx`)
+
+---
+
+### Lists & Data Table
+- **Look / example**:
+```tsx
+import DataTable from '@/components/data-table';
+
+<DataTable columns={columns} rows={rows} />
+```
+- **Patterns**: Pattern A — with default renderer; Pattern B — override renderers / custom item components
+- **Emplacement**: `src/components/data-table.tsx`, `src/components/Lists/`
+
+---
+
+### Charts
+- **Look / example**:
+```tsx
+import ChartAreaInteractive from '@/components/chart-area-interactive';
+
+<ChartAreaInteractive data={chartData} />
+```
+- **Patterns**: Pattern A — standalone visualization component
+- **Emplacement**: `src/components/chart-area-interactive.tsx`
+
+---
+
+### Layout (Header / Sidebar / Footer)
+- **Look / example**:
+```tsx
+import Header from '@/components/Header';
+import Sidebar from '@/components/Sidebar';
+import Footer from '@/components/Footer';
+
+<Header />
+<Sidebar />
+<Footer />
+```
+- **Patterns**: used in page layout; header accepts actions/menus, sidebar contains navigation list
+- **Emplacement**: `src/components/Header/`, `src/components/Sidebar/`, `src/components/Footer/`
+
+---
+
+### Icons
+- **Look / example**:
+```tsx
+import { Icon } from '@/components/Icons/Icon';
+
+<Icon iconPath="/icons/user.svg" />
+```
+- **Patterns**: use `Icon` as presentational atom; prefer using icon components where required
+- **Emplacement**: `src/components/Icons/` 
+
+---
+
+### Notes & Contribuer
+- Si tu ajoutes un nouveau composant :
+  - place-le sous `src/components/<Name>/` ;
+  - export le composant principal dans un fichier index si utile ;
+  - documente l'exemple d'usage dans cette section (snippet, patterns et emplacement) ;
+  - ajoute un test unit / snapshot si le composant est complexe.
+
+---
 
 ### Fichiers utiles (exemples)
 - Controllers :
