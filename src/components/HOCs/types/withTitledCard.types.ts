@@ -10,6 +10,8 @@ type BaseCardProps = {
   titleProps?: HeaderTitleProps;
   /** Ref to be forwarded to the Card component */
   ref?: React.Ref<HTMLDivElement>;
+  /** Props for customizing the Card content component*/
+  contentClassName?: string;
 };
 
 /**
