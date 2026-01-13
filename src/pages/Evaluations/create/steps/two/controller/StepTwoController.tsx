@@ -1,14 +1,6 @@
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
-import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem.tsx";
-import { VerticalFieldSelectWithController } from "@/components/Selects/VerticalFieldSelect.tsx";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemTitle,
-} from "@/components/ui/item.tsx";
-import { Switch } from "@/components/ui/switch.tsx";
+import { VerticalFieldWithInlineSwitchList } from "@/components/Selects/VerticalFieldSelect.tsx";
 import {
   DEV_MODE,
   NO_CACHE_LOGS,
@@ -20,12 +12,17 @@ import type { StepTwoControllerProps } from "@/pages/Evaluations/create/steps/tw
 import { useEffect } from "react";
 import { toast } from "sonner";
 
+const loadingName = "load-attendance-record-steps";
+
 export function StepTwoController({
   pageId,
   form,
   formId,
   className,
   inputControllers = [],
+  user,
+  students,
+  selectedClass,
 }: StepTwoControllerProps) {
   // Placeholder form, replace 'any' with actual form schema
   // const [selected, setSelected] = useState(false);
@@ -147,38 +144,44 @@ export function StepTwoController({
     // }
   };
 
+  const items = [
+    {
+      id: "generated-task1",
+      title: "Generated Task 1",
+      items: [
+        { id: "subtask1", name: "Subtask 1" },
+        { id: "subtask1b", name: "Subtask 1b" },
+        { id: "subtask1c", name: "Subtask 1c" },
+      ],
+    },
+    {
+      id: "generated-task2",
+      title: "Generated Task 2",
+      items: [
+        { id: "subtask2", name: "Subtask 2" },
+        { id: "subtask2b", name: "Subtask 2b" },
+        { id: "subtask2c", name: "Subtask 2c" },
+      ],
+    },
+    {
+      id: "generated-task3",
+      title: "Generated Task 3",
+      items: [
+        { id: "subtask3", name: "Subtask 3" },
+        { id: "subtask3b", name: "Subtask 3b" },
+      ],
+    },
+  ];
+
   return (
     <form id={formId} className={className}>
-      <Item>
-        <ItemContent>
-          <ItemTitle>Step Two Controller Placeholder</ItemTitle>
-        </ItemContent>
-        <ItemActions>
-          <Switch />
-        </ItemActions>
-        <ItemContent>
-          <VerticalFieldSelectWithController
-            {...inputControllers[0]}
-            setRef={setRef}
-            observedRefs={observedRefs}
-            form={form}
-            // defaultValue={defaultSchoolYear}
-            // label="Année scolaire"
-            id={`${pageId}-${inputControllers[0].name}-select`}
-            // onValueChange={handleOnYearSelect}
-          >
-            <NonLabelledGroupItem id="task1" name="Task1" />
-            <NonLabelledGroupItem id="task2" name="Task2" />
-            <NonLabelledGroupItem id="task3" name="Task3" />
-            {/* <ListMapper items={data ?? []}>
-              <NonLabelledGroupItem />
-              <SelectItem value="task1">Task 1</SelectItem>
-              <SelectItem value="task2">Task 2</SelectItem>
-              <SelectItem value="task3">Task 3</SelectItem>
-            </ListMapper> */}
-          </VerticalFieldSelectWithController>
-        </ItemContent>
-      </Item>
+      <VerticalFieldWithInlineSwitchList
+        items={items}
+        setRef={setRef}
+        observedRefs={observedRefs}
+        form={form}
+        {...inputControllers[0]}
+      />
     </form>
   );
 }
