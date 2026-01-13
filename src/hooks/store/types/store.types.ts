@@ -1,13 +1,15 @@
+import type { Email, UUID } from "@/api/types/openapi/common.types.ts";
 import type { USER_ACTIVITIES } from "@/configs/app.config.ts";
+export type AppRoles = "ADMIN" | "TEACHER" | "STUDENT" | "STAFF";
 
 export interface User {
-  userId: string;
+  userId: UUID;
   name: string;
-  email: string;
+  email: Email;
   firstName?: string;
   lastName?: string;
   username?: string;
-  role: string;
+  role: AppRoles;
   token: string;
   avatar: string;
   refreshToken: string;
