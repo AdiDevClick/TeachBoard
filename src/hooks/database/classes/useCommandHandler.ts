@@ -261,10 +261,11 @@ export function useCommandHandler<
         });
       }
 
+      // Use secondaryFormField if provided (this is the detailed data one), otherwise fallback to mainFormField
       const retrievedFormField = new UniqueSet<
         string,
         Record<string, unknown> & { isSelected?: boolean }
-      >(null, form.getValues(secondaryFormField) || []);
+      >(null, form.getValues(secondaryFormField ?? mainFormField) || []);
 
       if (retrievedFormField.has(value) || isSelected === false) {
         retrievedFormField.delete(value);
