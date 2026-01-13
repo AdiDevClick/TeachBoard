@@ -1,6 +1,7 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { attendanceRecordCreationBaseControllers } from "@/data/inputs-controllers.data.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
+import { useStepsCreationStore } from "@/hooks/store/StepsCreationStore.ts";
 import {
   attendanceRecordCreationSchemaInstance,
   type AttendanceRecordCreationFormSchema,
@@ -35,11 +36,14 @@ export const stepTwoCardProps = {
 export function StepTwo({
   pageId = "attendance-record-creation",
   modalMode = false,
-  className = "grid gap-4 max-w-2xl mx-auto",
+  className = "content__right",
+  // className = "grid gap-4 max-w-2xl mx-auto",
   inputControllers = attendanceRecordCreationBaseControllers,
   ...props
 }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
   const user = useAppStore((state) => state.user);
+  const selectedClass = useStepsCreationStore((state) => state.selectedClass);
+  const students = useStepsCreationStore((state) => state.students);
   const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({
     resolver: zodResolver(attendanceRecordCreationSchemaInstance([])),
     mode: "onTouched",
@@ -60,6 +64,9 @@ export function StepTwo({
     cardProps: stepTwoCardProps,
     ...props,
     form,
+    user,
+    students,
+    selectedClass,
   };
 
   return <StepTwoWithCard displayFooter={false} {...commonProps} />;
