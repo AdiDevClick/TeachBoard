@@ -4,6 +4,7 @@ import z from "zod";
 declare const __uuidBrand: unique symbol;
 declare const __offsetDateTimeBrand: unique symbol;
 declare const __emailBrand: unique symbol;
+declare const __yearRangeBrand: unique symbol;
 
 /** UUID string (OpenAPI format: uuid). */
 type UUIDFromSchema = string & {
@@ -16,15 +17,24 @@ const UUID_SCHEMA = z
 export type UUID = z.infer<typeof UUID_SCHEMA>;
 
 /** ISO-8601 date-time string (OpenAPI format: date-time). */
-const OFFSET_DATE_TIME_SCHEMA = z
-  .string()
-  .refine((s) => formsRegex.serverYearRange.test(s), {
-    message: "Invalid date-time format",
-  })
-  .transform((s) => s as OffsetDateTime);
-export type OffsetDateTime = string & {
+type OffsetDateTimeFromSchema = string & {
   readonly [__offsetDateTimeBrand]?: true;
 };
+const OFFSET_DATE_TIME_SCHEMA = z.iso
+  .datetime()
+  .transform((s) => s as OffsetDateTimeFromSchema);
+export type OffsetDateTime = z.infer<typeof OFFSET_DATE_TIME_SCHEMA>;
+
+type YearRangeFromSchema = string & { readonly [__yearRangeBrand]?: true };
+const YEAR_RANGE_SCHEMA = z
+  .string()
+  .refine((s) => formsRegex.serverYearRange.test(s), {
+    message: "Invalid year range format",
+  })
+  .transform((s) => s as YearRangeFromSchema);
+
+// Format: "YYYY-YYYY"
+export type YearRange = z.infer<typeof YEAR_RANGE_SCHEMA>;
 
 /** Email */
 type EmailFromSchema = string & { readonly [__emailBrand]?: true };
