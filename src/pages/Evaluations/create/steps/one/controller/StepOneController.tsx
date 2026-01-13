@@ -1,7 +1,6 @@
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { PopoverFieldWithCommands } from "@/components/Popovers/PopoverField.tsx";
 import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
-import { Card, CardContent } from "@/components/ui/card.tsx";
 import {
   DEV_MODE,
   NO_CACHE_LOGS,
@@ -11,19 +10,26 @@ import { stepOneInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import { useAppStore } from "@/hooks/store/AppStore.ts";
+import { useStepsCreationStore } from "@/hooks/store/StepsCreationStore.ts";
+import type { StepOneControllerProps } from "@/pages/Evaluations/create/steps/one/types/step-one.types.ts";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
 const loadingName = "load-classes";
-export function StepOne({
-  title,
-  placeholder,
-}: {
-  readonly title: string;
-  readonly placeholder?: string;
-}) {
+
+/**
+ * Step One Controller component for creating evaluations.
+ *
+ * @param pageId - The ID of the page.
+ */
+export function StepOneController({ pageId }: StepOneControllerProps) {
   // const { openDialog } = useDialog();
   const user = useAppStore((state) => state.user);
+  const setSelectedClass = useStepsCreationStore(
+    (state) => state.setSelectedClass
+  );
+  const selectedClassName = useStepsCreationStore((state) => state.className);
+  // Placeholder form, replace 'any' with actual form schema
   // const [selected, setSelected] = useState(false);
 
   // const { onSubmit, isLoading, isLoaded, data, error, setFetchParams } =
@@ -40,8 +46,8 @@ export function StepOne({
     data,
     error,
   } = useCommandHandler({
-    form: null,
-    pageId: title,
+    form: null!,
+    pageId,
   });
 
   // /**
@@ -125,6 +131,11 @@ export function StepOne({
       ...rest,
     });
   };
+  useEffect(() => {
+    if (selectedClassName) {
+      console.log("The selected parsed : ", selectedClassName);
+    }
+  }, [selectedClassName]);
 
   /**
    * Handle command selection from PopoverFieldWithControllerAndCommandsList
@@ -136,66 +147,25 @@ export function StepOne({
    */
   const handleOnSelect = (value: string, commandItem: CommandItemType) => {
     console.log("selected value :", value, commandItem);
+    setSelectedClass(JSON.parse(JSON.stringify(commandItem)));
     // if (form.watch("degreeConfigId") !== commandItem.id) {
     //   selectedDiplomaRef.current = commandItem;
     //   setIsSelectedDiploma(!!commandItem);
     //   form.setValue("degreeConfigId", commandItem.id, { shouldValidate: true });
     // }
   };
-
   return (
-    <Card className="content__right">
-      <CardContent className="right__content-container">
-        <PopoverFieldWithCommands
-          className="right__content"
-          {...stepOneInputControllers[0]}
-          // form={form}
-          // id={`${pageId}-year`}
-          setRef={setRef}
-          commandHeadings={resultsCallback()}
-          observedRefs={observedRefs}
-          onOpenChange={handleOpening}
-          onSelect={handleOnSelect}
-          onAddNewItem={handleNewItem}
-        />
-        {/*<VerticalFieldSelect
-          className="right__content"
-          placeholder={placeholder}
-          onValueChange={(value) => {
-            console.log("value => ", value);
-          }}
-          label={title}
-          // onOpenChange={handleTriggerOpening}
-        >
-          <SelectItem
-            inert={selected}
-            value="add-class"
-            onPointerDown={onClassAdd}
-          >
-            {/* <SelectItemIndicator>...</SelectItemIndicator> */}
-        {/*} <span className="loneText">Ajouter une classe</span>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="rounded-full max-h-2"
-            >
-              <PlusIcon />
-            </Button>
-          </SelectItem>
-          {data?.items !== null &&
-            data?.items !== undefined &&
-            data?.items.length > 0 && (
-              <>
-                <SelectSeparator />
-                <ListMapper items={data?.items}>
-                  <LabelledGroup ischild>
-                    <NonLabelledGroupItem />
-                  </LabelledGroup>
-                </ListMapper>
-              </>
-            )}
-        </VerticalFieldSelect>*/}
-      </CardContent>
-    </Card>
+    <PopoverFieldWithCommands
+      {...stepOneInputControllers[0]}
+      // form={form}
+      // id={`${pageId}-year`}
+      defaultValue={selectedClassName ?? stepOneInputControllers[0].placeholder}
+      setRef={setRef}
+      commandHeadings={resultsCallback()}
+      observedRefs={observedRefs}
+      onOpenChange={handleOpening}
+      onSelect={handleOnSelect}
+      onAddNewItem={handleNewItem}
+    />
   );
 }

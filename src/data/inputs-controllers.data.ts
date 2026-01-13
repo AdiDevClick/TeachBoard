@@ -9,6 +9,7 @@ import type { InputItem } from "@/components/Inputs/types/inputs.types";
 import type LoginForm from "@/components/LoginForms/LoginForm.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { RecoveryFormSchema } from "@/models/login.models.ts";
+import type { StepOne } from "@/pages/Evaluations/create/steps/one/StepOne.tsx";
 import type { StepTwo } from "@/pages/Evaluations/create/steps/two/StepTwo.tsx";
 import type { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
 import type { Signup } from "@/pages/Signup/Signup.tsx";
@@ -346,8 +347,9 @@ export const stepOneInputControllers = [
     useCommands: true,
     creationButtonText: "Créer une classe",
     useButtonAddNew: true,
+    className: "right__content",
   },
-];
+] satisfies Parameters<typeof StepOne>[0]["inputControllers"];
 
 export const diplomaCreationInputControllers = [
   {
