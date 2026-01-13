@@ -15,7 +15,7 @@ declare const __sessionTokenBrand: unique symbol;
 type UUIDFromSchema = string & {
   readonly [__uuidBrand]?: true;
 };
-const UUID_SCHEMA = z
+export const UUID_SCHEMA = z
   .uuid("Invalid UUID format")
   .transform((s) => s as UUIDFromSchema);
 
@@ -29,7 +29,7 @@ export type UUID = z.infer<typeof UUID_SCHEMA>;
 type OffsetDateTimeFromSchema = string & {
   readonly [__offsetDateTimeBrand]?: true;
 };
-const OFFSET_DATE_TIME_SCHEMA = z.iso
+export const OFFSET_DATE_TIME_SCHEMA = z.iso
   .datetime()
   .transform((s) => s as OffsetDateTimeFromSchema);
 export type OffsetDateTime = z.infer<typeof OFFSET_DATE_TIME_SCHEMA>;
@@ -40,7 +40,7 @@ export type OffsetDateTime = z.infer<typeof OFFSET_DATE_TIME_SCHEMA>;
  * @example: "2023-2024"
  */
 type YearRangeFromSchema = string & { readonly [__yearRangeBrand]?: true };
-const YEAR_RANGE_SCHEMA = z
+export const YEAR_RANGE_SCHEMA = z
   .string()
   .refine((s) => formsRegex.serverYearRange.test(s), {
     message: "Invalid year range format",
@@ -55,7 +55,7 @@ export type YearRange = z.infer<typeof YEAR_RANGE_SCHEMA>;
  * @example "user@example.com"
  */
 type EmailFromSchema = string & { readonly [__emailBrand]?: true };
-const EMAIL_SCHEMA = z
+export const EMAIL_SCHEMA = z
   .email("Invalid email format")
   .transform((s) => s as EmailFromSchema);
 export type Email = z.infer<typeof EMAIL_SCHEMA>;
@@ -68,7 +68,7 @@ export type Email = z.infer<typeof EMAIL_SCHEMA>;
 type SessionTokenFromSchema = string & {
   readonly [__sessionTokenBrand]?: true;
 };
-const SESSION_TOKEN_SCHEMA = z
+export const SESSION_TOKEN_SCHEMA = z
   .string()
   .regex(formsRegex.serverSessionToken, "Invalid session token")
   .transform((s) => s as SessionTokenFromSchema);
