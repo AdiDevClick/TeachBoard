@@ -86,6 +86,10 @@ type LabelledGroupBaseProps<T> = {
   readonly ["1"]: T[];
 };
 
+export type PropsWithListings<T> = {
+  items: T[];
+} & PropsWithChildren;
+
 /**
  * Props for the LabelledGroup component
  *
