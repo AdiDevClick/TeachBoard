@@ -1,4 +1,5 @@
 import type { FetchingInputItem } from "@/components/Inputs/types/inputs.types.ts";
+import { formsRegex } from "@/configs/formsRegex.config.ts";
 import { z } from "zod";
 
 export type ClassCreationFormSchema = z.infer<typeof classCreationSchema>;
@@ -28,7 +29,7 @@ export const classCreationSchema = z.object({
     .string()
     .nonempty("Une année scolaire est requise.")
     .refine(
-      (value) => /^\d{4} - \d{4}$/.test(value),
+      (value) => formsRegex.viewYearRange.test(value),
       "Le format de l'année scolaire doit être AAAA - AAAA."
     )
     .transform((value) =>
@@ -38,7 +39,7 @@ export const classCreationSchema = z.object({
         .join("-")
     )
     .refine(
-      (value) => /^\d{4}-\d{4}$/.test(value),
+      (value) => formsRegex.serverYearRange.test(value),
       "Le format de l'année scolaire doit être AAAA-AAAA."
     ),
   degreeConfigId: z
