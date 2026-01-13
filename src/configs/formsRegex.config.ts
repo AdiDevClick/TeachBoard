@@ -22,4 +22,6 @@ export const formsRegex = {
   // (allows accented letters through Unicode \p{L} property).
   allowedCharNameTest: /^[\p{L}0-9 ._'-]$/u,
   allowedCharEmailTest: /^[a-zA-Z0-9@._-]$/,
+  viewYearRange: /^\d{4} - \d{4}$/,
+  serverYearRange: /^\d{4}-\d{4}$/,
 };

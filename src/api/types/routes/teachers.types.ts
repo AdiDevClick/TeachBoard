@@ -1,4 +1,5 @@
-import type { UUID } from "@/api/types/openapi/common.types.ts";
+import type { Email, UUID } from "@/api/types/openapi/common.types.ts";
+import type { AppRoles } from "@/hooks/store/types/store.types.ts";
 
 /**
  * Teacher item returned by GET `/teachers/`.
@@ -7,9 +8,9 @@ export interface TeacherDto {
   id: UUID;
   firstName: string;
   lastName: string;
-  email?: string;
+  email?: Email;
   username?: string;
-  role?: "ADMIN" | "TEACHER" | "STUDENT" | "STAFF";
+  role?: Extract<AppRoles, "TEACHER">;
   schoolName?: string;
   profilePictureUrl?: string;
 
