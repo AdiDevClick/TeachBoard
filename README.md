@@ -563,6 +563,112 @@ function Sidebar() {
 
 > Note : cette convention facilite la testabilité, la réutilisation et la séparation des responsabilités.
 
+---
+
+#### Créer un controller proprement — typage des `inputControllers`, schéma et rôle centralisateur
+
+Voici une checklist et des exemples concrets pour garantir la cohérence des controllers et des vues :
+
+- **Déclarer les `inputControllers` typés et réutilisables**
+
+  - Définissez toujours une constante itérable exportée pour les contrôleurs d'entrée et **assurez-vous** qu'elle *satisfies* le type attendu par le composant/vues. Cela protège contre les régressions lors de la création du formulaire.
+
+  ```ts
+  // Ex: src/data/inputs-controllers.data.ts
+  export const attendanceRecordCreationBaseControllers = [
+    {
+      name: "students",
+      title: "Tâche",
+      type: "button",
+      placeholder: "Sélectionnez une tâche",
+      fullWidth: true,
+    },
+  ] satisfies Parameters<typeof StepTwo>[0]["inputControllers"];
+  ```
+  
+  - Cette variable permet de construire les données reçu par un composant du controlleur.
+
+   ```ts
+  <VerticalFieldSelectWithController
+    {...inputController[0]}
+    setRef={setRef}
+    observedRefs={observedRefs}
+    form={form}
+    id={`${pageId}-${inputController.name}`}
+
+    // C'est comme avoir : 
+    // name="students"
+    // fullWidth
+    // placeholder={"Sélectionnez une tâche"}
+    // title: "Tâche"
+  >
+  ```
+
+- **Typage de la vue / du controller**
+
+  - La vue ou le controller doit être typée avec `PageWithControllers<YourInputItemType>`. Exemple d'utilisation dans `StepTwo` :
+
+  ```ts
+  export function StepTwo({
+    pageId = "attendance-record-creation",
+    modalMode = false,
+    className = "grid gap-4 max-w-2xl mx-auto",
+    inputControllers = [],
+    ...props
+  }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
+    // ...
+  }
+  ```
+
+  - Cette déclaration garantit que `inputControllers` est du bon format et que la vue expose l'API attendue (form, handlers, etc.).
+
+- **Typage de l'InputItem**
+
+  - Pour une input list qui peut impliquer des fetchs (sélection depuis l'API, `apiEndpoint`/`dataReshapeFn`), utilisez le type `FetchingInputItem<TSchema>` :
+
+  ```ts
+  export type AttendanceRecordCreationInputItem =
+    FetchingInputItem<AttendanceRecordCreationFormSchema>;
+  ```
+
+  - Pour des inputs statiques simples, préférez `InputItem<TSchema>`. L'important est d'être **cohérent** et d'expliquer quand utiliser `FetchingInputItem` vs `InputItem` (fetching behaviour, présence d'`apiEndpoint`, etc.).
+
+- **Créer et exporter le schéma (Zod)**
+
+  - Placez le schéma dans `src/models/…` et exposez une factory si le schéma dépend du contexte (ex: `availableTaskIds`). Exemple simplifié :
+
+  ```ts
+  // src/models/attendance-record-creation.models.ts
+  const attendanceRecordCreationSchema = (data, availableTaskIds: string[] = []) =>
+    z.object({/* ... */});
+
+  export const attendanceRecordCreationSchemaInstance = (availableTaskIds: string[] = []) =>
+    attendanceRecordCreationSchema(dataField, availableTaskIds);
+  ```
+
+  - Utilisez `zodResolver(schemaInstance)` dans `useForm` pour garder le form validé côté client :
+
+  ```ts
+  const form = useForm<AttendanceRecordCreationFormSchema>({
+    resolver: zodResolver(attendanceRecordCreationSchemaInstance(user.availableTaskIds || [])),
+    mode: "onTouched",
+    defaultValues: { students: [] },
+  });
+  ```
+
+- **Rôle centralisateur de l'`inputController`**
+
+  - L'`inputController` sert **à la fois** d'assurance de typage (garantie que la forme du champ correspond aux props attendues par le composant) et de **centralisation** des métadonnées nécessaires au rendu (labels, placeholder, `apiEndpoint`, `dataReshapeFn`, `task`, flags `useButtonAddNew`, etc.).
+
+- **Bonnes pratiques rapides**
+  - Exportez les controllers depuis `src/data/inputs-controllers.data.ts` et utilisez `satisfies Parameters<typeof Component>[0]["inputControllers"]` pour la sécurité de type.
+  - Choisissez `InputItem` pour des entrées statiques et `FetchingInputItem` pour les entrées basées sur fetchs; documentez le choix dans le fichier du controller.
+  - Mettez le schéma Zod dans `src/models/…` et exposez une factory si le schéma a des dépendances runtime (ex: `availableTaskIds`).
+  - Testez les reshapes et les controllers via des tests unitaires ciblés (Vitest) et ajoutez des contrats pour les reshapers si nécessaire.
+
+---
+
+
 <!-- --- -->
 <h2 id="validation-des-props-des-composants"/>
 
