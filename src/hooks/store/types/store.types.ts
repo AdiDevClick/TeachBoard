@@ -1,4 +1,8 @@
-import type { Email, UUID } from "@/api/types/openapi/common.types.ts";
+import type {
+  Email,
+  SessionToken,
+  UUID,
+} from "@/api/types/openapi/common.types.ts";
 import type { USER_ACTIVITIES } from "@/configs/app.config.ts";
 export type AppRoles = "ADMIN" | "TEACHER" | "STUDENT" | "STAFF";
 
@@ -10,9 +14,9 @@ export interface User {
   lastName?: string;
   username?: string;
   role: AppRoles;
-  token: string;
+  token: SessionToken;
   avatar: string;
-  refreshToken: string;
+  refreshToken: SessionToken;
   schoolName: string;
 }
 
@@ -27,21 +31,23 @@ export type LastUserActivityType =
 
 /**
  * Persisting Application store.
+ *
+ * @remark Setters are not needed in the type definition and are managed by Zustand/combine internally
  */
 export interface AppStore {
   lastUserActivity: LastUserActivityType;
   isLoggedIn: boolean;
   user: User | null;
   sessionSynced: boolean;
-  // Setters are not needed in the type definition and are managed by Zustand/combine internally
 }
 
 /**
  * In-memory Authentication store.
  *
+ * @remark Setters are not needed in the type definition and are managed by Zustand/combine internally
+ *
  * @description This store is used to hold temporary authentication data that should not persist across page reloads.
  */
 export type AuthMemoryState = {
-  signupToken: string | null;
-  // Setters are not needed in the type definition and are managed by Zustand/combine internally
+  signupToken: SessionToken | null;
 };

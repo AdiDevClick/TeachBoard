@@ -24,4 +24,5 @@ export const formsRegex = {
   allowedCharEmailTest: /^[a-zA-Z0-9@._-]$/,
   viewYearRange: /^\d{4} - \d{4}$/,
   serverYearRange: /^\d{4}-\d{4}$/,
+  serverSessionToken: /^[0-9a-f]{32}$/i,
 };
