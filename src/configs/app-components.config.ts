@@ -141,6 +141,15 @@ export const taskModalPropsInvalid = (props: unknown) =>
 //                    ------------
 
 /**
+ * Validation requirements for withInlineItemAndSwitchSelection HOC.
+ */
+const INLINE_ITEM_AND_SWITCH_SELECTION_REQUIRES = ["title"];
+
+export const inlineItemAndSwitchSelectionPropsInvalid = (
+  props: Record<string, unknown>
+) => checkPropsValidity(props, INLINE_ITEM_AND_SWITCH_SELECTION_REQUIRES, []);
+
+/**
  * Logs debug information for a component when in development mode.
  *
  * @param componentName - The name of the component for logging purposes.
