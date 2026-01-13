@@ -17,7 +17,13 @@ Cette application représente le frontend de TeachBoard, une interface pédagogi
 - [Proxy API et backend](#proxy-api-et-backend)
 - [Gestion des données réseau](#gestion-des-données-réseau)
 - [Structure du projet (aperçu rapide)](#structure-du-projet-apercu-rapide)
-- [Architecture & conventions — MVC (Controllers) et HOCs](#architecture-mvc-hocs)
+- [Types communs & validation](#types-communs--validation)
+  - [UUID](#uuid)
+  - [Email](#email)
+  - [Year range](#year-range)
+  - [OffsetDateTime](#offsetdatetime)
+  - [SessionToken](#sessiontoken)
+- [Architecture & conventions — MVC (Controllers) et HOCs](#architecture-mvc-hocs) 
   - [HOCs — utilité & exemples](#hocs-utilite-exemples)
     - [Liste des HOCs (usage dans des vues)](#liste-des-hocs-usage-dans-des-vues)
       - [withTitledCard](#withtitledcard)
@@ -338,6 +344,120 @@ API_ENDPOINTS.POST.CREATE_CLASS.dataReshape = (data) => {
   - `routes/` — configuration des routes
 
 <!-- --- -->
+
+## Types communs & validation
+
+Cette section présente les **types communs** fournis par le projet (branded types + schémas Zod) et des exemples d'utilisation pour la validation runtime et le typage TypeScript.
+
+**Fichiers utiles :**
+- [`src/api/types/openapi/common.types.ts`](src/api/types/openapi/common.types.ts) — définitions et `Zod` schemas exportés (UUID, Email, YearRange, OffsetDateTime, SessionToken).
+
+### Pourquoi utiliser ces types ?
+- **Clarté** : un `Email`/`UUID` n'est pas un simple `string` — le branded type le rend explicite.
+- **Sécurité** : validez aux frontières (API / forms) avec `Zod` et transformez en type brandé avant usage.
+- **Interopérabilité** : réutilisez les mêmes schémas dans controllers, forms et tests.
+
+### Exemples d'utilisation
+
+- Valider une adresse e-mail (et obtenir le type `Email`) :
+
+```ts
+import { EMAIL_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+const email = EMAIL_SCHEMA.parse('user@example.com'); // email : Email
+```
+
+- Valider un UUID :
+
+```ts
+import { UUID_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+// id : UUID
+const id = UUID_SCHEMA.parse('123e4567-e89b-12d3-a456-426614174000'); 
+```
+
+- Utiliser le `SessionToken` dans une réponse API :
+
+```ts
+import { SESSION_TOKEN_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+const LoginResponse = z.object({
+  token: SESSION_TOKEN_SCHEMA,
+  user: UserSchema,
+});
+
+const data = LoginResponse.parse(await res.json());
+// data.token est typé `SessionToken` et validé au runtime
+```
+
+- Intégrer les schémas dans `react-hook-form` via `zodResolver` :
+
+```ts
+const form = useForm({
+  resolver: zodResolver(MyFormSchema),
+});
+```
+
+#### UUID
+
+- **But :** représenter un identifiant de ressource (UUID) comme un type *brandé* et le valider au runtime.
+
+```ts
+import { UUID_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+// Zod fournit .uuid(), le schéma du projet exporte UUID_SCHEMA (brandé)
+const id = UUID_SCHEMA.parse('123e4567-e89b-12d3-a456-426614174000'); // id : UUID
+```
+
+> Astuce : utilisez `UUID_SCHEMA` directement pour valider la réponse d'une API, ou `.uuid()` pour validations simples.
+
+#### Email
+
+- **But :** valider un e-mail et obtenir le type `Email` garantissant le format.
+
+```ts
+import { EMAIL_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+const email = EMAIL_SCHEMA.parse('user@example.com'); // email : Email
+```
+
+#### Year range
+
+- **But :** valider la chaîne `"YYYY-YYYY"` (ex: "2023-2024") et obtenir un type dédié `YearRange`.
+
+```ts
+import { YEAR_RANGE_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+const schoolYear = YEAR_RANGE_SCHEMA.parse('2023-2024'); // schoolYear : YearRange
+```
+
+#### OffsetDateTime
+
+- **But :** représenter une date/heure ISO-8601 et bénéficier d'un schéma Zod (`z.date`/`z.string().datetime()` selon l'usage).
+
+```ts
+import { OFFSET_DATE_TIME_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+const ts = OFFSET_DATE_TIME_SCHEMA.parse('2023-10-05T14:48:00.000Z'); // ts : OffsetDateTime
+```
+
+#### SessionToken
+
+- **But :** typer et valider le token de session renvoyé par le backend (format hex ou pattern du serveur).
+
+```ts
+import { SESSION_TOKEN_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+const token = SESSION_TOKEN_SCHEMA.parse('2682dc7e6b3b0d08547106ebac94cee8'); // token : SessionToken
+```
+
+### Bonnes pratiques
+- **Toujours** valider les données externes avant de les `as`-caster en branded types ; préférez les transformations (`.transform()`) ou des assertions (`assertIsUUID`).
+- Placez les schémas dans `src/api/types/...` ou `src/models/...` selon le rôle (types purs vs logique métier).
+- Ajoutez des tests unitaires (Vitest) pour couvrir les cas valides et invalides des schémas.
+
+---
+
 <h2 id="architecture-mvc-hocs"/>
 
 ## Architecture & conventions — MVC (Controllers) et HOCs
