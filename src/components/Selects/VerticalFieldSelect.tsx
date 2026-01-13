@@ -202,9 +202,8 @@ export function VerticalFieldSelect({
 
 export default VerticalFieldSelect;
 
-export const VerticalFieldSelectWithController: ReturnType<
-  typeof withController<typeof VerticalFieldSelect>
-> = withController(VerticalFieldSelect);
+export const VerticalFieldSelectWithController =
+  withController(VerticalFieldSelect);
 
 // export const VerticalFieldSelectWithCommands =
 //   withCommands(VerticalFieldSelect);
