@@ -1,5 +1,10 @@
 import withController from "@/components/HOCs/withController.tsx";
+import { withInlineItemAndSwitchSelection } from "@/components/HOCs/withInlineItemAndSwitchSelection.tsx";
+import withListMapper from "@/components/HOCs/withListMapper.tsx";
+import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem.tsx";
 import type {
+  PropsWithListings,
   VerticalFieldState,
   VerticalRefSetters,
   VerticalSelectProps,
@@ -19,6 +24,8 @@ import {
   useRef,
   useState,
   type ComponentProps,
+  type ComponentType,
+  type PropsWithChildren,
 } from "react";
 
 const emptyHandle: VerticalRefSetters = {
@@ -200,11 +207,37 @@ export function VerticalFieldSelect({
 //   };
 // }
 
+function withListings<TProps extends object, TItem = unknown>(
+  Wrapped: ComponentType<TProps & PropsWithChildren>
+) {
+  return function Component(props: TProps & PropsWithListings<TItem>) {
+    const { items, children, ...rest } = props;
+    return (
+      <Wrapped {...(rest as TProps)}>
+        <ListMapper items={items}>
+          <NonLabelledGroupItem />
+        </ListMapper>
+        {children}
+      </Wrapped>
+    );
+  };
+}
+
 export default VerticalFieldSelect;
 
 export const VerticalFieldSelectWithController =
   withController(VerticalFieldSelect);
 
+export const VerticalFieldSelectWithListings =
+  withListings(VerticalFieldSelect);
+
+export const VerticalFieldSelectWithControllerAndInlineSwitch = withController(
+  withInlineItemAndSwitchSelection(VerticalFieldSelectWithListings)
+);
+
+export const VerticalFieldWithInlineSwitchList = withListMapper(
+  VerticalFieldSelectWithControllerAndInlineSwitch
+);
 // export const VerticalFieldSelectWithCommands =
 //   withCommands(VerticalFieldSelect);
 
