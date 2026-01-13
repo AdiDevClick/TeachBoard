@@ -147,7 +147,7 @@ export function LoginFormController({
       silent: true,
     });
   };
-  console.log("Je rerender le LoginForm");
+
   return (
     <form
       ref={(el) => setRef(el, { name: pageId, id: formId })}
