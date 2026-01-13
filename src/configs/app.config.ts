@@ -75,7 +75,8 @@ export type AppModalNames =
   // Used by ClassCreationController in the input - Not an actual modal
   | "add-school-year"
   | "search-students"
-  | "search-primaryteacher";
+  | "search-primaryteacher"
+  | "attendance-record-creation";
 
 /**
  * Pages that do not require session checks
