@@ -97,6 +97,7 @@ function withTitledCard<C extends object, F extends object = object>(
       modalMode = false,
       ref,
       displayFooter = true,
+      contentClassName = "",
       ...rest
     } = props;
 
@@ -122,7 +123,7 @@ function withTitledCard<C extends object, F extends object = object>(
           }}
           {...titleProps}
         />
-        <CardContent>
+        <CardContent className={contentClassName}>
           <WrappedContent pageId={pageId} {...(rest as C)} />
         </CardContent>
         {displayFooter ? (
