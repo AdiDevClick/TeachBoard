@@ -29,6 +29,8 @@ import {
   taskCreated,
   taskFetched,
   taskFetched2,
+  taskFetched3,
+  taskFetched4,
   taskTemplateCreated,
   taskTemplateFetch,
 } from "@/tests/samples/class-creation-sample-datas";
@@ -154,6 +156,8 @@ const sample = {
   taskCreated,
   taskFetched,
   taskFetched2,
+  taskFetched3,
+  taskFetched4,
   taskTemplateCreated,
   taskTemplateFetch,
 };
@@ -292,6 +296,8 @@ const routes = (
           response: ({ sample }: StubRouteCtx) => [
             sample.taskFetched,
             sample.taskFetched2,
+            sample.taskFetched3,
+            sample.taskFetched4,
           ],
         },
       ],
@@ -326,6 +332,8 @@ const routes = (
           response: ({ sample }: StubRouteCtx) => [
             sample.taskFetched,
             sample.taskFetched2,
+            sample.taskFetched3,
+            sample.taskFetched4,
           ],
         },
         {
@@ -397,6 +405,8 @@ const routes = (
           response: ({ sample }: StubRouteCtx) => [
             sample.taskFetched,
             sample.taskFetched2,
+            sample.taskFetched3,
+            sample.taskFetched4,
           ],
         },
         {

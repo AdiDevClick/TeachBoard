@@ -97,6 +97,10 @@ export const taskFetched = new TaskFixtureCreator();
 
 export const taskFetched2 = new TaskFixtureCreator();
 
+export const taskFetched3 = new TaskFixtureCreator();
+
+export const taskFetched4 = new TaskFixtureCreator();
+
 export const taskCreated = new TaskFixtureCreator();
 
 export const taskTemplateFetched = new TaskTemplateFixtureCreator({
@@ -107,8 +111,21 @@ export const taskTemplateFetched2 = new TaskTemplateFixtureCreator({
   task: taskFetched2,
 });
 
+export const taskTemplateFetched3 = new TaskTemplateFixtureCreator({
+  task: taskFetched3,
+});
+
+export const taskTemplateFetched4 = new TaskTemplateFixtureCreator({
+  task: taskFetched4,
+});
+
 export const taskTemplateFetch = new TaskTemplatesFetchFixtureCreator({
-  taskTemplates: [taskTemplateFetched, taskTemplateFetched2],
+  taskTemplates: [
+    taskTemplateFetched,
+    taskTemplateFetched2,
+    taskTemplateFetched3,
+    taskTemplateFetched4,
+  ],
   shortTemplatesList: ["short-1", "short-2"],
 });
 

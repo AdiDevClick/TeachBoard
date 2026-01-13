@@ -8,7 +8,15 @@ import {
   studentFetched,
   taskFetched,
   taskFetched2,
+  taskFetched3,
+  taskFetched4,
 } from "@/tests/samples/class-creation-sample-datas";
+
+import type {
+  ClassDto,
+  CreateClassResponseData,
+} from "@/api/types/routes/classes.types";
+import type { TaskTemplateDto } from "@/api/types/routes/task-templates.types";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { controllerLabelRegex } from "@/tests/test-utils/class-creation/regex.functions";
 
@@ -43,7 +51,13 @@ const classCreatedWithOptional = {
   name: "2C",
   value: "2C",
 };
-const tasksNames = [taskFetched.name, taskFetched2.name];
+const tasksNames = [
+  taskFetched.name,
+  taskFetched2.name,
+  taskFetched3.name,
+  taskFetched4.name,
+];
+const tasksToSelectForSubmit = tasksNames.slice(0, 3);
 const labels = [
   {
     name: rx(taskTemplateCreationInputControllers[0].title!),
@@ -70,9 +84,11 @@ type Ctx = {
   studentsController: InputControllerLike;
   flowArgs: RunCreateFlowArgs;
   flowArgs2: RunCreateFlowArgs;
+  flowArgsToggle: RunCreateFlowArgs;
   labeler: RunCreateFlowArgs["labeler"] & { apiEndpoint?: string };
   labels: { name: RegExp; value: string }[];
   tasksNames: string[];
+  taskTemplateIdByName: Record<string, string>;
   installCreateClassStubs: (postResponse: unknown) => void;
 };
 
@@ -85,7 +101,7 @@ function data(
   return {
     controllers,
     createdClassName: classCreated.name,
-    createdClassPayload: classCreated,
+    createdClassPayload: classCreated as unknown as CreateClassResponseData,
     fillDescription: false,
     // context
     labeler,
@@ -93,8 +109,8 @@ function data(
     tasksNames,
     classesQueryKey,
     createClassPostEndpoint,
-    classFetched,
-    classFetched2,
+    classFetched: classFetched as unknown as ClassDto,
+    classFetched2: classFetched2 as unknown as ClassDto,
     studentName: rxJoin(studentFetched.firstName, studentFetched.lastName),
   };
 }
@@ -126,7 +142,7 @@ setupUiTestState(null, {
       name: "Créer une classe",
       controller: classesController,
       nameArray: [res.sample.classFetched.name, res.sample.classFetched2.name],
-      apiEndpoint: classesController.apiEndpoint,
+      apiEndpoint: classesController.apiEndpoint as string,
     };
 
     flowArgs = data(
@@ -141,13 +157,37 @@ setupUiTestState(null, {
       createClassPostEndpoint
     );
 
+    const taskTemplateIdByName = Object.fromEntries(
+      (res.sample.taskTemplateFetch.taskTemplates ?? []).map(
+        (tpl: TaskTemplateDto) => [tpl.task.name, tpl.id]
+      )
+    ) ;
+
+    // Ensure the test selects at least 3 templates during creation to reflect the multi-select feature
+    flowArgs.tasksToSelect = tasksToSelectForSubmit;
+
     const flowArgs2 = {
       ...flowArgs,
-      createdClassPayload: classCreatedWithOptional,
+      createdClassPayload: classCreatedWithOptional as unknown as CreateClassResponseData,
       createdClassName: "2C",
       fillDescription: true,
     };
 
+    // Also select at least 3 templates for the optional-fields flow
+    flowArgs2.tasksToSelect = tasksToSelectForSubmit;
+
+    const flowArgsToggle: RunCreateFlowArgs = {
+      ...flowArgs,
+      // Explicitly test the toggle scenario: select 3, remove 1 via tag click, add another.
+      tasksToSelect: undefined,
+      tasksToggleSelection: {
+        availableTaskNames: tasksNames,
+        initialSelectNames: [tasksNames[0], tasksNames[1], tasksNames[2]],
+        removeName: tasksNames[1],
+        addName: tasksNames[3],
+        taskTemplateIdByName,
+      },
+    };
     ctx = {
       classesController,
       diplomasController,
@@ -157,9 +197,11 @@ setupUiTestState(null, {
       studentsController,
       flowArgs,
       flowArgs2,
+      flowArgsToggle,
       labeler,
       labels,
       tasksNames,
+      taskTemplateIdByName,
       installCreateClassStubs: (postResponse: unknown) =>
         getRoutes
           .createClassStepOne({ createClassPostResponse: postResponse })
@@ -189,6 +231,11 @@ describe("UI flow: class-creation (StepOne list)", () => {
   test("submit works with optional fields filled", async () => {
     expect(ctx).toBeDefined();
     await runCreateFlow(ctx.flowArgs2);
+  });
+
+  test("tasks multi-select: select 3, remove 1, add 1 updates POST payload", async () => {
+    expect(ctx).toBeDefined();
+    await runCreateFlow(ctx.flowArgsToggle);
   });
 
   test("sync: switching diploma refreshes skills in new-task-template modal (no stale data, no preselection)", async () => {

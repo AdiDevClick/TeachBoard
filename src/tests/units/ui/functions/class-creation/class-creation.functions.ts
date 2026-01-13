@@ -63,6 +63,8 @@ type FixtureLike = {
   post?: unknown;
 };
 
+type TaskTemplateIdByName = Record<string, string>;
+
 /**
  * Initializes the class-creation modal for tests.
  */
@@ -391,8 +393,15 @@ export async function prepareClassCreationForm(opts: {
   diplomasController: InputControllerLike;
   diplomaToSelect: DiplomaConfigDto;
   tasksController: InputControllerLike;
-  taskToSelect: string;
+  taskToSelect?: string;
+  tasksToSelect?: string[];
   tasksNames?: string[];
+  tasksToggleSelection?: {
+    availableTaskNames: string[];
+    initialSelectNames: [string, string, string];
+    removeName: string;
+    addName: string;
+  };
   submitName?: string;
 }) {
   const submitName = opts.submitName ?? "Créer la classe";
@@ -422,12 +431,32 @@ export async function prepareClassCreationForm(opts: {
     opts.diplomaToSelect
   );
 
-  await selectTaskTemplate(
-    opts.tasksController,
-    opts.taskToSelect,
-    opts.tasksNames,
-    submitName
-  );
+  if (opts.tasksToggleSelection) {
+    await selectTaskTemplatesWithToggle({
+      tasksController: opts.tasksController,
+      submitName,
+      timeout: 1500,
+      ...opts.tasksToggleSelection,
+    });
+  } else if (opts.tasksToSelect?.length) {
+    await selectTaskTemplates(opts.tasksController, opts.tasksToSelect, {
+      submitName,
+      availableTaskNames: opts.tasksNames,
+      timeout: 1500,
+    });
+  } else {
+    if (!opts.taskToSelect) {
+      throw new Error(
+        "prepareClassCreationForm requires taskToSelect when tasksToSelect/tasksToggleSelection are not provided"
+      );
+    }
+    await selectTaskTemplate(
+      opts.tasksController,
+      opts.taskToSelect,
+      opts.tasksNames,
+      submitName
+    );
+  }
 
   return getCallsBeforeCreation;
 }
@@ -459,7 +488,14 @@ export async function runCreateFlow(args: {
   classFetched: ClassDto;
   classFetched2: ClassDto;
   studentName: string | RegExp;
-  taskToSelect?: string;
+  tasksToSelect?: string[];
+  tasksToggleSelection?: {
+    availableTaskNames: string[];
+    initialSelectNames: [string, string, string];
+    removeName: string;
+    addName: string;
+    taskTemplateIdByName: TaskTemplateIdByName;
+  };
 }) {
   const {
     controllers: {
@@ -478,8 +514,10 @@ export async function runCreateFlow(args: {
     diplomasController,
     diplomaToSelect: args.diplomaToSelect,
     tasksController,
-    taskToSelect: args.taskToSelect ?? args.tasksNames[0],
+    taskToSelect: args.tasksToSelect?.[0] ?? args.tasksNames[0],
+    tasksToSelect: args.tasksToSelect,
     tasksNames: args.tasksNames,
+    tasksToggleSelection: args.tasksToggleSelection,
   });
 
   // Open student search dialog and select the expected student
@@ -525,6 +563,22 @@ export async function runCreateFlow(args: {
   expect(lastBody).toMatchObject({
     schoolYear: `${currentYear}-${currentYear + 1}`,
   });
+
+  if (args.tasksToggleSelection) {
+    const expectedNames = args.tasksToggleSelection.initialSelectNames
+      .filter((n) => n !== args.tasksToggleSelection!.removeName)
+      .concat(args.tasksToggleSelection.addName);
+
+    const expectedIds = expectedNames.map(
+      (n) => args.tasksToggleSelection!.taskTemplateIdByName[n]
+    );
+
+    const payload = lastBody as Record<string, unknown>;
+    const payloadTasks = payload.tasks;
+    expect(Array.isArray(payloadTasks)).toBe(true);
+    expect(payloadTasks).toHaveLength(3);
+    expect(payloadTasks).toEqual(expect.arrayContaining(expectedIds));
+  }
 }
 
 /**
@@ -549,6 +603,118 @@ export async function selectTaskTemplate(
   );
   await clickTriggerAndWaitForPopoverState(
     controllerTriggerRegex(tasksController),
+    false
+  );
+}
+
+/**
+ * Selects multiple task templates from the tasks popover.
+ */
+export async function selectTaskTemplates(
+  tasksController: InputControllerLike,
+  taskNames: string[],
+  opts?: {
+    submitName?: string;
+    availableTaskNames?: string[];
+    timeout?: number;
+  }
+): Promise<void> {
+  const submitName = opts?.submitName ?? "Créer la classe";
+  const timeout = opts?.timeout ?? 1500;
+
+  if (!Array.isArray(taskNames) || taskNames.length === 0) {
+    throw new Error("selectTaskTemplates requires at least 1 task name");
+  }
+
+  await openPopoverAndExpectByTrigger(
+    controllerTriggerRegex(tasksController),
+    opts?.availableTaskNames ?? taskNames
+  );
+
+  for (const name of taskNames) {
+    await selectCommandItemInContainerEnsuringSubmitDisabled(
+      submitName,
+      getOpenCommandContainer(),
+      rx(name),
+      timeout
+    );
+  }
+
+  await clickTriggerAndWaitForPopoverState(
+    controllerTriggerRegex(tasksController),
+    false
+  );
+}
+
+/**
+ * Removes a selected task template using the tag UI (click tag -> "Supprimer <id>").
+ */
+export async function removeSelectedTaskTemplateById(
+  taskTemplateId: string,
+  opts?: { timeout?: number }
+): Promise<void> {
+  const timeout = opts?.timeout ?? 1500;
+
+  // Tag trigger button has accessible name equal to its text content.
+  await userEvent.click(page.getByRole("button", { name: rx(taskTemplateId) }));
+  await userEvent.click(
+    page.getByRole("button", { name: rx(`Supprimer ${taskTemplateId}`) })
+  );
+
+  await waitForTextToBeAbsent(rx(taskTemplateId), { timeout });
+}
+
+/**
+ * Feature-driven selection flow:
+ * - select 3 templates
+ * - remove one via click (tag delete)
+ * - add another one
+ */
+export async function selectTaskTemplatesWithToggle(params: {
+  tasksController: InputControllerLike;
+  submitName?: string;
+  availableTaskNames: string[];
+  initialSelectNames: [string, string, string];
+  removeName: string;
+  addName: string;
+  timeout?: number;
+}): Promise<void> {
+  const submitName = params.submitName ?? "Créer la classe";
+  const timeout = params.timeout ?? 1500;
+
+  // Open once and keep it open: the command handler supports toggle-by-click.
+  await openPopoverAndExpectByTrigger(
+    controllerTriggerRegex(params.tasksController),
+    params.availableTaskNames
+  );
+
+  for (const name of params.initialSelectNames) {
+    await selectCommandItemInContainerEnsuringSubmitDisabled(
+      submitName,
+      getOpenCommandContainer(),
+      rx(name),
+      timeout
+    );
+  }
+
+  // Toggle OFF one item by clicking it again.
+  await selectCommandItemInContainerEnsuringSubmitDisabled(
+    submitName,
+    getOpenCommandContainer(),
+    rx(params.removeName),
+    timeout
+  );
+
+  // Add another template.
+  await selectCommandItemInContainerEnsuringSubmitDisabled(
+    submitName,
+    getOpenCommandContainer(),
+    rx(params.addName),
+    timeout
+  );
+
+  await clickTriggerAndWaitForPopoverState(
+    controllerTriggerRegex(params.tasksController),
     false
   );
 }
