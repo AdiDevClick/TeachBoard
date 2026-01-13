@@ -16,6 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  debugLogs,
+  listMapperContainsInvalid,
+} from "@/configs/app-components.config.ts";
 import { cn } from "@/utils/utils";
 import {
   useCallback,
@@ -211,6 +215,10 @@ function withListings<TProps extends object, TItem = unknown>(
   Wrapped: ComponentType<TProps & PropsWithChildren>
 ) {
   return function Component(props: TProps & PropsWithListings<TItem>) {
+    if (listMapperContainsInvalid(props)) {
+      debugLogs("withListings for VerticalFieldSelect");
+      return <Wrapped {...(props as TProps)}>{props.children}</Wrapped>;
+    }
     const { items, children, ...rest } = props;
     return (
       <Wrapped {...(rest as TProps)}>
