@@ -19,6 +19,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   #newShapedItem: Record<string, unknown> = null!;
   /** Stores the current selection during transformation */
   #currentSelection = [];
+  // #currentSelection: unknown;
   /** Maps targetKey -> sourceKeys[] for property aliasing with fallback support */
   readonly #mappingProxies = new Map<string, string[]>();
   #assignedSourceKey?: string;
@@ -189,7 +190,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     this.#initShapedItem();
     // Clone the provided data source for shaping as we don't want to mutate the
     // original input passed by the caller.
-    const clonedSource = structuredClone(this.#dataSource) as unknown[];
+    const clonedSource = structuredClone(this.#dataSource);
     // If it's an array, deep-proxy it so items are proxied before external
     // code (e.g. mappers) read from them — ensures our interceptors run
     // early enough.
@@ -230,6 +231,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   assign(
     pairs: Array<[string, ...string[]] | { target: string; sources: string[] }>
   ) {
+    this.#initShapedItem();
     for (const pair of pairs) {
       if (Array.isArray(pair)) {
         // Syntax 1: [sourceKey, targetKey1, targetKey2, ...]
@@ -742,11 +744,17 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    * @description All nested objects/arrays are also proxied to ensure mappings work at all levels.
    */
   newShape() {
+    let isEmpty;
+
     if (!Array.isArray(this.#newShapedItem)) {
+      isEmpty =
+        !this.#newShapedItem || Object.keys(this.#newShapedItem).length === 0;
       this.#newShapedItem = [this.#newShapedItem];
     }
 
-    return this.deepProxy(this.#newShapedItem, this.#handler());
+    const data = isEmpty ? this.#dataSource : this.#newShapedItem;
+
+    return this.deepProxy(data, this.#handler());
   }
 
   #initShapedItem() {
