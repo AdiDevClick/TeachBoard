@@ -44,6 +44,10 @@ export function StepTwo({
   const user = useAppStore((state) => state.user);
   const selectedClass = useStepsCreationStore((state) => state.selectedClass);
   const students = useStepsCreationStore((state) => state.students);
+  const tasks = useStepsCreationStore((state) => state.tasks);
+  const preparedStudentsTasksSelection = useStepsCreationStore(
+    (state) => state.getStudentsPresenceSelectionData
+  );
   const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({
     resolver: zodResolver(attendanceRecordCreationSchemaInstance([])),
     mode: "onTouched",
@@ -67,6 +71,8 @@ export function StepTwo({
     user,
     students,
     selectedClass,
+    tasks,
+    preparedStudentsTasksSelection,
   };
 
   return <StepTwoWithCard displayFooter={false} {...commonProps} />;
