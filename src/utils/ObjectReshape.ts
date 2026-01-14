@@ -19,7 +19,6 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   #newShapedItem: Record<string, unknown> = null!;
   /** Stores the current selection during transformation */
   #currentSelection = [];
-  // #currentSelection: unknown;
   /** Maps targetKey -> sourceKeys[] for property aliasing with fallback support */
   readonly #mappingProxies = new Map<string, string[]>();
   #assignedSourceKey?: string;
