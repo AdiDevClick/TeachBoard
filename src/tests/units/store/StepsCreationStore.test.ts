@@ -1,16 +1,18 @@
-import { describe, expect, it, beforeEach } from "vitest";
 import { useStepsCreationStore } from "@/hooks/store/StepsCreationStore";
+import { beforeEach, describe, expect, it } from "vitest";
 
 describe("StepsCreationStore - students reshape", () => {
   beforeEach(() => {
     // reset relevant parts of the store
-    useStepsCreationStore.setState({ students: null, tasks: null, selectedClass: null });
+    useStepsCreationStore.setState({
+      students: null,
+      tasks: null,
+      selectedClass: null,
+    });
   });
 
   it("getStudentsPresenceSelectionData returns mapped fields and items", () => {
-    const studentsPayload = [
-      { id: "1", firstName: "John", lastName: "Stud" },
-    ];
+    const studentsPayload = [{ id: "1", firstName: "John", lastName: "Stud" }];
 
     const templates = [{ id: "t1", taskName: "T1", skills: [] }];
 
@@ -18,7 +20,9 @@ describe("StepsCreationStore - students reshape", () => {
     useStepsCreationStore.getState().setStudents(studentsPayload as any);
     useStepsCreationStore.getState().setClassTasks(templates as any);
 
-    const result = useStepsCreationStore.getState().getStudentsPresenceSelectionData();
+    const result = useStepsCreationStore
+      .getState()
+      .getStudentsPresenceSelectionData();
 
     expect(Array.isArray(result)).toBe(true);
     expect(result[0].title).toBe("John Stud");
