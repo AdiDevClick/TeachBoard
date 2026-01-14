@@ -1,5 +1,6 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { DiplomaConfigDto } from "@/api/types/routes/diplomas.types.ts";
+import type { TemplateSkillsViewDto } from "@/api/types/routes/skills.types.ts";
 import type { TaskDto } from "@/api/types/routes/tasks.types";
 
 /** OpenAPI: `TaskViewDTO` (concise view) */
@@ -13,7 +14,7 @@ export interface TaskTemplateDto {
   name?: string;
   task: TaskViewDto & { id: UUID };
   degreeConfiguration?: DiplomaConfigDto;
-  skills?: string[];
+  skills?: TemplateSkillsViewDto[];
   taskName?: string;
 }
 
