@@ -45,6 +45,10 @@ export type SkillsFormValues = {
  */
 export type SkillsViewDto = MainSkillsType & { subSkills: SubSkillsType[] };
 
+export type TemplateSkillsViewDto = { mainSkill: SubSkillsType } & {
+  subSkills: SubSkillsType[];
+};
+
 /**
  * Data payload returned by the "SKILLS" fetch.
  * The current reshaper reads `data.Skills`.
