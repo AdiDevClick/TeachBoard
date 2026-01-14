@@ -13,7 +13,40 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 
 const loadingName = "load-attendance-record-steps";
-
+const items = [
+  {
+    id: "generated-task1",
+    title: "Generated Task 1",
+    isSelected: false,
+    otherTestDetails: "test info task 1",
+    items: [
+      { id: "subtask1", name: "Subtask 1", selectedSubField: false },
+      { id: "subtask1b", name: "Subtask 1b", selectedSubField: false },
+      { id: "subtask1c", name: "Subtask 1c", selectedSubField: false },
+    ],
+  },
+  {
+    id: "generated-task2",
+    title: "Generated Task 2",
+    isSelected: false,
+    otherTestDetails: "test info task 2",
+    items: [
+      { id: "subtask2", name: "Subtask 2", selectedSubField: false },
+      { id: "subtask2b", name: "Subtask 2b", selectedSubField: false },
+      { id: "subtask2c", name: "Subtask 2c", selectedSubField: false },
+    ],
+  },
+  {
+    id: "generated-task3",
+    title: "Generated Task 3",
+    isSelected: false,
+    otherTestDetails: "test info task 3",
+    items: [
+      { id: "subtask3", name: "Subtask 3", selectedSubField: false },
+      { id: "subtask3b", name: "Subtask 3b", selectedSubField: false },
+    ],
+  },
+];
 export function StepTwoController({
   pageId,
   form,
@@ -102,7 +135,8 @@ export function StepTwoController({
    * @param metaData - The meta data from the popover field that was opened
    */
   const handleOpening = (open: boolean, metaData?: MetaDatasPopoverField) => {
-    openingCallback(open, metaData);
+    console.log("Opening :", open, metaData);
+    // openingCallback(open, metaData);
   };
 
   /**
@@ -136,42 +170,11 @@ export function StepTwoController({
    * @param commandItem - The details of the selected command item
    */
   const handleOnSelect = (value: string, commandItem: CommandItemType) => {
-    console.log("selected value :", value, commandItem);
-    // if (form.watch("degreeConfigId") !== commandItem.id) {
-    //   selectedDiplomaRef.current = commandItem;
-    //   setIsSelectedDiploma(!!commandItem);
-    //   form.setValue("degreeConfigId", commandItem.id, { shouldValidate: true });
-    // }
-  };
+    const selectedItem = items[commandItem.index];
+    selectedItem.isSelected = commandItem.isSelected;
 
-  const items = [
-    {
-      id: "generated-task1",
-      title: "Generated Task 1",
-      items: [
-        { id: "subtask1", name: "Subtask 1" },
-        { id: "subtask1b", name: "Subtask 1b" },
-        { id: "subtask1c", name: "Subtask 1c" },
-      ],
-    },
-    {
-      id: "generated-task2",
-      title: "Generated Task 2",
-      items: [
-        { id: "subtask2", name: "Subtask 2" },
-        { id: "subtask2b", name: "Subtask 2b" },
-        { id: "subtask2c", name: "Subtask 2c" },
-      ],
-    },
-    {
-      id: "generated-task3",
-      title: "Generated Task 3",
-      items: [
-        { id: "subtask3", name: "Subtask 3" },
-        { id: "subtask3b", name: "Subtask 3b" },
-      ],
-    },
-  ];
+    console.log("selected value :", value, commandItem);
+  };
 
   return (
     <form id={formId} className={className}>
@@ -181,6 +184,9 @@ export function StepTwoController({
         observedRefs={observedRefs}
         form={form}
         {...inputControllers[0]}
+        onOpenChange={handleOpening}
+        onValueChange={handleOnSelect}
+        onSwitchClick={handleOnSelect}
       />
     </form>
   );
