@@ -29,7 +29,6 @@ import {
   useState,
   type ComponentProps,
   type ComponentType,
-  type PropsWithChildren,
 } from "react";
 
 const emptyHandle: VerticalRefSetters = {
@@ -125,7 +124,9 @@ export function VerticalFieldSelect({
       getLastSelectedItemValue: () => value,
       getLastCommandValue: () => lastCommandValueRef.current,
     };
-    onValueChange?.(value);
+    const allDetails = observedRefs?.get(containerId);
+    const metas = allDetails ? { ...rest, ...allDetails.meta } : { ...rest };
+    onValueChange?.(value, metas);
   };
 
   return (
@@ -212,20 +213,20 @@ export function VerticalFieldSelect({
 // }
 
 function withListings<TProps extends object, TItem = unknown>(
-  Wrapped: ComponentType<TProps & PropsWithChildren>
+  Wrapped: ComponentType<TProps>
 ) {
   return function Component(props: TProps & PropsWithListings<TItem>) {
     if (listMapperContainsInvalid(props)) {
       debugLogs("withListings for VerticalFieldSelect");
       return <Wrapped {...(props as TProps)}>{props.children}</Wrapped>;
     }
-    const { items, children, ...rest } = props;
+    const { items, ...rest } = props;
     return (
       <Wrapped {...(rest as TProps)}>
         <ListMapper items={items}>
           <NonLabelledGroupItem />
         </ListMapper>
-        {children}
+        {props.children}
       </Wrapped>
     );
   };
