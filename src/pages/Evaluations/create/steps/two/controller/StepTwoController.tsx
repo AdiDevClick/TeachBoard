@@ -1,3 +1,4 @@
+import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
 import { VerticalFieldWithInlineSwitchList } from "@/components/Selects/VerticalFieldSelect.tsx";
@@ -9,44 +10,11 @@ import {
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { StepTwoControllerProps } from "@/pages/Evaluations/create/steps/two/types/step-two.types.ts";
-import { useEffect } from "react";
+import { useEffect, type MouseEvent } from "react";
 import { toast } from "sonner";
 
 const loadingName = "load-attendance-record-steps";
-const items = [
-  {
-    id: "generated-task1",
-    title: "Generated Task 1",
-    isSelected: false,
-    otherTestDetails: "test info task 1",
-    items: [
-      { id: "subtask1", name: "Subtask 1", selectedSubField: false },
-      { id: "subtask1b", name: "Subtask 1b", selectedSubField: false },
-      { id: "subtask1c", name: "Subtask 1c", selectedSubField: false },
-    ],
-  },
-  {
-    id: "generated-task2",
-    title: "Generated Task 2",
-    isSelected: false,
-    otherTestDetails: "test info task 2",
-    items: [
-      { id: "subtask2", name: "Subtask 2", selectedSubField: false },
-      { id: "subtask2b", name: "Subtask 2b", selectedSubField: false },
-      { id: "subtask2c", name: "Subtask 2c", selectedSubField: false },
-    ],
-  },
-  {
-    id: "generated-task3",
-    title: "Generated Task 3",
-    isSelected: false,
-    otherTestDetails: "test info task 3",
-    items: [
-      { id: "subtask3", name: "Subtask 3", selectedSubField: false },
-      { id: "subtask3b", name: "Subtask 3b", selectedSubField: false },
-    ],
-  },
-];
+
 export function StepTwoController({
   pageId,
   form,
@@ -54,8 +22,10 @@ export function StepTwoController({
   className,
   inputControllers = [],
   user,
+  preparedStudentsTasksSelection,
   students,
   selectedClass,
+  tasks,
 }: StepTwoControllerProps) {
   // Placeholder form, replace 'any' with actual form schema
   // const [selected, setSelected] = useState(false);
@@ -166,27 +136,55 @@ export function StepTwoController({
    *
    * @description Updates the selected diploma reference and selection state.
    *
-   * @param value - The value of the selected command item
-   * @param commandItem - The details of the selected command item
+   * @param id - The value of the selected command item
+   * @param studentData - The details of the selected student data
    */
-  const handleOnSelect = (value: string, commandItem: CommandItemType) => {
-    const selectedItem = items[commandItem.index];
-    selectedItem.isSelected = commandItem.isSelected;
+  const handleOnSelect = (taskId: UUID, studentData: CommandItemType) => {
+    const selectedTask = tasks?.get(taskId);
+    const selectedStudent = students?.get(studentData.id);
 
-    console.log("selected value :", value, commandItem);
+    if (selectedStudent && selectedTask) {
+      selectedStudent.assignedTask = {
+        id: selectedTask.id,
+        name: selectedTask.name,
+      };
+    }
+
+    console.log("selected value :", taskId, studentData);
+  };
+
+  /**
+   * Handle switch click from VerticalFieldWithInlineSwitchList
+   *
+   * @description Updates the selected diploma reference and selection state.
+   *
+   * @param e - The mouse event triggered by the switch click
+   * @param studentData - The details of the selected student data
+   */
+  const handleOnSwitch = (
+    e: MouseEvent<HTMLButtonElement>,
+    studentData: CommandItemType
+  ) => {
+    const selectedItem = students?.get(studentData.id);
+
+    if (selectedItem) {
+      selectedItem.isPresent = studentData.isSelected;
+    }
+
+    console.log("selected value :", e, studentData);
   };
 
   return (
     <form id={formId} className={className}>
       <VerticalFieldWithInlineSwitchList
-        items={items}
+        items={preparedStudentsTasksSelection()}
         setRef={setRef}
         observedRefs={observedRefs}
         form={form}
         {...inputControllers[0]}
         onOpenChange={handleOpening}
         onValueChange={handleOnSelect}
-        onSwitchClick={handleOnSelect}
+        onSwitchClick={handleOnSwitch}
       />
     </form>
   );
