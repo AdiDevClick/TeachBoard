@@ -56,7 +56,7 @@ export class UniqueSet<K, V extends { [key: string]: unknown } | unknown[]> {
           key = cb(item);
           itemToMap = item;
         } else {
-          key = item as unknown as K;
+          key = (item as { id?: K }).id ?? (item as unknown as K);
           itemToMap = item;
         }
 
