@@ -2,6 +2,24 @@ import { ObjectReshape } from "@/utils/ObjectReshape";
 import { describe, expect, it } from "vitest";
 
 describe("ObjectReshape - API config step contracts", () => {
+  it("newShape() proxies an array data source when only assign() is used", () => {
+    const payload = [
+      { id: "1", fullName: "John Stud", isPresent: false, assignedTask: null },
+    ];
+
+    const shaped = new ObjectReshape(payload as any)
+      .assign([
+        ["fullName", "title"],
+        ["isPresent", "isSelected"],
+      ])
+      .newShape() as any;
+
+    expect(Array.isArray(shaped)).toBe(true);
+    expect(shaped[0].id).toBe("1");
+    expect(shaped[0].title).toBe("John Stud");
+    expect(shaped[0].isSelected).toBe(false);
+  });
+
   it("assignSourceTo('items') exposes the original array under root.items", () => {
     const payload = [
       { id: "1", firstName: "Alice", lastName: "Doe", img: "a.png" },
