@@ -1,5 +1,5 @@
+import { useAppStore } from "@/api/store/AppStore";
 import type { AppModalNames } from "@/configs/app.config.ts";
-import { useAppStore } from "@/hooks/store/AppStore";
 import { renderCommandHook } from "@/tests/hooks/reusable-hooks";
 import {
   skillApiEndpoint,

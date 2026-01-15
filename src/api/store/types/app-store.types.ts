@@ -6,6 +6,9 @@ import type {
 import type { USER_ACTIVITIES } from "@/configs/app.config.ts";
 export type AppRoles = "ADMIN" | "TEACHER" | "STUDENT" | "STAFF";
 
+/**
+ * User information stored in the application store.
+ */
 export interface User {
   userId: UUID;
   name: string;
@@ -26,6 +29,9 @@ export interface User {
 //   email: string;
 // }
 
+/**
+ * Type representing the last user activity in the application.
+ */
 export type LastUserActivityType =
   (typeof USER_ACTIVITIES)[keyof typeof USER_ACTIVITIES];
 

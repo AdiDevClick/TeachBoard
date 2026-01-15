@@ -1,3 +1,4 @@
+import { useAppStore } from "@/api/store/AppStore";
 import { AppBreadCrumb } from "@/components/BreadCrumbs/AppBreadCrumb";
 import { AppBreadCrumbList } from "@/components/BreadCrumbs/AppBreadCrumbList.tsx";
 import { Breadcrumb } from "@/components/ui/breadcrumb.tsx";
@@ -5,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
-import { useAppStore } from "@/hooks/store/AppStore.ts";
 import "@css/Dialog.scss";
 import "@css/PageHeader.scss";
 import { Activity, type MouseEvent } from "react";

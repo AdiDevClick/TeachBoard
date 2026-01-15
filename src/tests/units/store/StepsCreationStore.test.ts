@@ -1,4 +1,4 @@
-import { useStepsCreationStore } from "@/hooks/store/StepsCreationStore";
+import { useStepsCreationStore } from "@/api/store/StepsCreationStore";
 import { beforeEach, describe, expect, it } from "vitest";
 
 describe("StepsCreationStore - students reshape", () => {

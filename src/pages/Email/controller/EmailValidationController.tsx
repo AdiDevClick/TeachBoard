@@ -1,3 +1,4 @@
+import { useAuthMemoryStore } from "@/api/store/AuthMemoryStore";
 import { Button } from "@/components/ui/button.tsx";
 import {
   APP_REDIRECT_TIMEOUT,
@@ -6,7 +7,6 @@ import {
 } from "@/configs/app.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
-import { useAuthMemoryStore } from "@/hooks/store/AuthMemoryStore.ts";
 import type { EmailControllerProps } from "@/pages/Signup/types/signup.types.ts";
 import { wait } from "@/utils/utils.ts";
 import { useCallback, useEffect, useRef } from "react";

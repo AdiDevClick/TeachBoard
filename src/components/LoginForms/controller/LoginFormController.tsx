@@ -1,3 +1,4 @@
+import { useAppStore } from "@/api/store/AppStore";
 import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
 import { AppFieldDescriptionWithLink } from "@/components/Fields/AppFieldDescriptionWithLink.tsx";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
@@ -13,7 +14,6 @@ import { loginButtonsSvgs } from "@/configs/social.config.ts";
 import { inputLoginControllers } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
-import { useAppStore } from "@/hooks/store/AppStore.ts";
 import type {
   LoginFormSchema,
   RecoveryFormSchema,

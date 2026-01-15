@@ -1,3 +1,5 @@
+import { useAppStore } from "@/api/store/AppStore";
+import { useStepsCreationStore } from "@/api/store/StepsCreationStore";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { PopoverFieldWithCommands } from "@/components/Popovers/PopoverField.tsx";
 import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
@@ -9,8 +11,6 @@ import {
 import { stepOneInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
-import { useAppStore } from "@/hooks/store/AppStore.ts";
-import { useStepsCreationStore } from "@/hooks/store/StepsCreationStore.ts";
 import type { StepOneControllerProps } from "@/pages/Evaluations/create/steps/one/types/step-one.types.ts";
 import { useEffect } from "react";
 import { toast } from "sonner";

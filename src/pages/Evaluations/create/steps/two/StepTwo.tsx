@@ -1,7 +1,7 @@
+import { useAppStore } from "@/api/store/AppStore";
+import { useStepsCreationStore } from "@/api/store/StepsCreationStore";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { attendanceRecordCreationBaseControllers } from "@/data/inputs-controllers.data.ts";
-import { useAppStore } from "@/hooks/store/AppStore.ts";
-import { useStepsCreationStore } from "@/hooks/store/StepsCreationStore.ts";
 import {
   attendanceRecordCreationSchemaInstance,
   type AttendanceRecordCreationFormSchema,

@@ -1,8 +1,8 @@
+import { useAppStore } from "@/api/store/AppStore";
 import type { SkillDto } from "@/api/types/routes/skills.types.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import type { HandleSelectionCallbackParams } from "@/hooks/database/types/use-command-handler.types.ts";
-import { useAppStore } from "@/hooks/store/AppStore.ts";
 import { renderCommandHook } from "@/tests/hooks/reusable-hooks";
 import {
   skillApiEndpoint,

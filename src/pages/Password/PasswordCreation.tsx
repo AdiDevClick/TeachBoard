@@ -1,3 +1,4 @@
+import { useAuthMemoryStore } from "@/api/store/AuthMemoryStore";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { HeaderTitle } from "@/components/Titles/ModalTitle.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -7,7 +8,6 @@ import { DEV_MODE } from "@/configs/app.config.ts";
 import { passwordCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { usePasswordCreation } from "@/hooks/database/pw-creation/usePasswordCreation.ts";
-import { useAuthMemoryStore } from "@/hooks/store/AuthMemoryStore";
 import { pwCreationSchema } from "@/models/password-creation.models.ts";
 import type {
   PasswordCreationFormSchema,
@@ -126,10 +126,7 @@ export function PasswordCreation({
                 className="grid gap-4"
               >
                 <FieldGroup>
-                  <ControlledInputList
-                    items={inputControllers}
-                    form={form}
-                  />
+                  <ControlledInputList items={inputControllers} form={form} />
                   <Field>
                     <Button
                       form={formId}

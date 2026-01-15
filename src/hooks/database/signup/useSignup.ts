@@ -1,7 +1,7 @@
+import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { USER_ACTIVITIES } from "@/configs/app.config.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
-import { useAppStore } from "@/hooks/store/AppStore.ts";
 import { toast } from "sonner";
 
 /**
