@@ -46,14 +46,3 @@ export interface AppStore {
   user: User | null;
   sessionSynced: boolean;
 }
-
-/**
- * In-memory Authentication store.
- *
- * @remark Setters are not needed in the type definition and are managed by Zustand/combine internally
- *
- * @description This store is used to hold temporary authentication data that should not persist across page reloads.
- */
-export type AuthMemoryState = {
-  signupToken: SessionToken | null;
-};
