@@ -1,5 +1,5 @@
 import { useAppStore } from "@/api/store/AppStore";
-import { useStepsCreationStore } from "@/api/store/StepsCreationStore";
+import { useStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { attendanceRecordCreationBaseControllers } from "@/data/inputs-controllers.data.ts";
 import {

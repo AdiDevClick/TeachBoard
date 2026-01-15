@@ -1,5 +1,5 @@
 import { useAppStore } from "@/api/store/AppStore";
-import { useStepsCreationStore } from "@/api/store/StepsCreationStore";
+import { useStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { PopoverFieldWithCommands } from "@/components/Popovers/PopoverField.tsx";
 import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
