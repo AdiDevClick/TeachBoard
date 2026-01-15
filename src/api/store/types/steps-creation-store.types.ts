@@ -36,20 +36,3 @@ export interface StepsCreationState {
   tasks?: UniqueSet<UUID, ClassTasks>;
   evaluations?: unknown[] | null;
 }
-
-/**
- * Actions interface for Steps Creation Store.
- */
-export interface StepsCreationActions {
-  /** Resets the store to its default values */
-  clear(): void;
-  setSelectedClass(selectedClass: ClassSummaryDto): void;
-  setDiplomaName(name: string): void;
-  setStudents(students: ClassSummaryDto["students"]): void;
-  setClassTasks(tasks: ClassSummaryDto["templates"]): void;
-}
-
-/**
- * Combined state and actions for Steps Creation Store.
- */
-export type StepsCreationStore = StepsCreationState & StepsCreationActions;
