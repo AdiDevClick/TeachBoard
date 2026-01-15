@@ -385,12 +385,12 @@ Cette section décrit les **conventions** et la **structure** attendues pour les
 - [`AppStore.ts`](src/api/store/AppStore.ts) — store combiné / point d'export principal
 - [`AuthMemoryStore.ts`](src/api/store/AuthMemoryStore.ts) — store mémoire pour l'authentification
 - [`DiplomaCreationStore.ts`](src/api/store/DiplomaCreationStore.ts) — store pour la création de diplômes
-- [`StepsCreationStore.ts`](src/api/store/StepsCreationStore.ts) — store d'exemple (voir `src/api/store/types/steps-creation-store.types.ts`)
+- [`EvaluationStepsCreationStore.ts`](src/api/store/EvaluationStepsCreationStore.ts) — store pour la création d'évaluation
 - [`selectors.ts`](src/api/store/selectors.ts) — selecteurs / helpers pour interroger les stores
 
 <a id="app-stores-comment-construire-un-store"></a>
 
-### Comment construire un store (How To Build)
+### How to build
 
 - Voir la section `Types` ci-dessous pour les conventions de fichiers de types (`<store-name>.types.ts`) et l'exemple. 
 - En complément : créez le fichier d'implémentation du store `src/api/store/<StoreName>.ts` et exposez/implémentez les actions mentionnées dans le fichier de types.
