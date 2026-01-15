@@ -1,5 +1,5 @@
 import { useAppStore } from "@/api/store/AppStore";
-import { useStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore";
+import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { attendanceRecordCreationBaseControllers } from "@/data/inputs-controllers.data.ts";
 import {
@@ -42,10 +42,12 @@ export function StepTwo({
   ...props
 }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
   const user = useAppStore((state) => state.user);
-  const selectedClass = useStepsCreationStore((state) => state.selectedClass);
-  const students = useStepsCreationStore((state) => state.students);
-  const tasks = useStepsCreationStore((state) => state.tasks);
-  const preparedStudentsTasksSelection = useStepsCreationStore(
+  const selectedClass = useEvaluationStepsCreationStore(
+    (state) => state.selectedClass
+  );
+  const students = useEvaluationStepsCreationStore((state) => state.students);
+  const tasks = useEvaluationStepsCreationStore((state) => state.tasks);
+  const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
     (state) => state.getStudentsPresenceSelectionData
   );
   const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({

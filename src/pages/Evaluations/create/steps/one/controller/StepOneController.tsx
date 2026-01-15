@@ -1,5 +1,5 @@
 import { useAppStore } from "@/api/store/AppStore";
-import { useStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore";
+import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { PopoverFieldWithCommands } from "@/components/Popovers/PopoverField.tsx";
 import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
@@ -25,10 +25,12 @@ const loadingName = "load-classes";
 export function StepOneController({ pageId }: StepOneControllerProps) {
   // const { openDialog } = useDialog();
   const user = useAppStore((state) => state.user);
-  const setSelectedClass = useStepsCreationStore(
+  const setSelectedClass = useEvaluationStepsCreationStore(
     (state) => state.setSelectedClass
   );
-  const selectedClassName = useStepsCreationStore((state) => state.className);
+  const selectedClassName = useEvaluationStepsCreationStore(
+    (state) => state.className
+  );
   // Placeholder form, replace 'any' with actual form schema
   // const [selected, setSelected] = useState(false);
 

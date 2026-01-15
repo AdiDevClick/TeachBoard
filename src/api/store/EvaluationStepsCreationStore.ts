@@ -27,7 +27,7 @@ const DEFAULT_VALUES: StepsCreationState = {
  *
  * @remark Setters are not needed in the type definition and are managed by Zustand/combine internally
  */
-export const useStepsCreationStore = create(
+export const useEvaluationStepsCreationStore = create(
   devtools(
     immer(
       combine(DEFAULT_VALUES, (set, get) => {

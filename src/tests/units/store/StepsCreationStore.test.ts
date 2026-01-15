@@ -1,10 +1,10 @@
-import { useStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore";
+import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore";
 import { beforeEach, describe, expect, it } from "vitest";
 
 describe("StepsCreationStore - students reshape", () => {
   beforeEach(() => {
     // reset relevant parts of the store
-    useStepsCreationStore.setState({
+    useEvaluationStepsCreationStore.setState({
       students: null,
       tasks: null,
       selectedClass: null,
@@ -17,10 +17,12 @@ describe("StepsCreationStore - students reshape", () => {
     const templates = [{ id: "t1", taskName: "T1", skills: [] }];
 
     // Populate store
-    useStepsCreationStore.getState().setStudents(studentsPayload as any);
-    useStepsCreationStore.getState().setClassTasks(templates as any);
+    useEvaluationStepsCreationStore
+      .getState()
+      .setStudents(studentsPayload as any);
+    useEvaluationStepsCreationStore.getState().setClassTasks(templates as any);
 
-    const result = useStepsCreationStore
+    const result = useEvaluationStepsCreationStore
       .getState()
       .getStudentsPresenceSelectionData();
 

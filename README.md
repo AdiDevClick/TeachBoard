@@ -484,7 +484,7 @@ import { combine } from 'zustand/middleware';
 
 const DEFAULT_VALUES = { /* ... */ } as const;
 
-export const useStepsCreationStore = create(
+export const useEvaluationStepsCreationStore = create(
   devtools(
     immer(
       persist(
@@ -553,7 +553,7 @@ const DEFAULT_VALUES: StepsCreationState = {
   selectedClass: null,
 };
 
-export const useStepsCreationStore = create(
+export const useEvaluationStepsCreationStore = create(
   devtools(
     immer(
       combine(DEFAULT_VALUES, (set, get) => {
