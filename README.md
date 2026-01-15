@@ -17,6 +17,13 @@ Cette application représente le frontend de TeachBoard, une interface pédagogi
 - [Proxy API et backend](#proxy-api-et-backend)
 - [Gestion des données réseau](#gestion-des-données-réseau)
 - [Structure du projet (aperçu rapide)](#structure-du-projet-apercu-rapide)
+- [App Stores](#app-stores)
+  - [Structure](#app-stores-structure)
+  - [Liste des stores existants](#app-stores-liste-des-stores)
+  - [Comment construire un store (How To Build)](#app-stores-comment-construire-un-store)
+    - [Types](#app-stores-types)
+    - [Store](#app-stores-store)
+    - [Extensions Zustand](#app-stores-extensions-zustand)
 - [Types communs & validation](#types-communs--validation)
   - [UUID](#uuid)
   - [Email](#email)
@@ -343,6 +350,8 @@ API_ENDPOINTS.POST.CREATE_CLASS.dataReshape = (data) => {
 
 <!-- --- -->
 
+<a id="structure-du-projet-apercu-rapide"></a>
+
 ## Structure du projet (aperçu rapide)
 
 - `src/` — code source principal
@@ -354,6 +363,264 @@ API_ENDPOINTS.POST.CREATE_CLASS.dataReshape = (data) => {
   - `routes/` — configuration des routes
 
 <!-- --- -->
+
+<a id="app-stores"></a>
+
+## App Stores
+
+Le projet utilise **Zustand**.
+Cette section décrit les **conventions** et la **structure** attendues pour les stores d'application présents.
+
+<a id="app-stores-structure"></a>
+
+### Structure
+
+- `src/api/store/` — stores d'application
+  - `types/` — définitions TypeScript pour les stores
+
+<a id="app-stores-liste-des-stores"></a>
+
+### Liste des stores existants
+
+- [`AppStore.ts`](src/api/store/AppStore.ts) — store combiné / point d'export principal
+- [`AuthMemoryStore.ts`](src/api/store/AuthMemoryStore.ts) — store mémoire pour l'authentification
+- [`DiplomaCreationStore.ts`](src/api/store/DiplomaCreationStore.ts) — store pour la création de diplômes
+- [`StepsCreationStore.ts`](src/api/store/StepsCreationStore.ts) — store d'exemple (voir `src/api/store/types/steps-creation-store.types.ts`)
+- [`selectors.ts`](src/api/store/selectors.ts) — selecteurs / helpers pour interroger les stores
+
+<a id="app-stores-comment-construire-un-store"></a>
+
+### Comment construire un store (How To Build)
+
+- Voir la section `Types` ci-dessous pour les conventions de fichiers de types (`<store-name>.types.ts`) et l'exemple. 
+- En complément : créez le fichier d'implémentation du store `src/api/store/<StoreName>.ts` et exposez/implémentez les actions mentionnées dans le fichier de types.
+
+<a id="app-stores-extensions-zustand"></a>
+
+#### Extensions Zustand
+
+- **Extensions utilisées :**
+  - `devtools` — intégration aux Redux DevTools, utile pour le debugging et le time-travel.
+
+    Exemple :
+    ```ts
+    import { create } from 'zustand';
+    import { devtools } from 'zustand/middleware';
+
+    export const useAppStore = create(
+      devtools((set) => ({
+        count: 0,
+        inc: () => set((s) => ({ ...s, count: s.count + 1 })),
+      }), { name: 'TeachBoardStore' })
+    );
+    ```
+
+  - `immer` — permet un style mutatif pour les mises à jour d'état tout en conservant l'immuabilité.
+
+    Exemple — Avant / Après :
+
+    Avant (sans `immer`) — pattern immuable explicite :
+    ```ts
+    import { create } from 'zustand';
+
+    export const useStore = create((set) => ({
+      items: [],
+      add: (item) => set((s) => ({ ...s, items: [...s.items, item] })),
+    }));
+    ```
+
+    Après (avec `immer`) — syntaxe mutative simplifiée :
+    ```ts
+    import { create } from 'zustand';
+    import { immer } from 'zustand/middleware/immer';
+
+    export const useStore = create(
+      immer((set) => ({
+        items: [],
+        add: (item) => set((draft) => { draft.items.push(item); }),
+      }))
+    );
+    ```
+
+    Note : `immer` réduit le boilerplate lié aux copies (spread) et rend les mises à jour plus lisibles tout en conservant l'immuabilité sous-jacente.
+
+  - `persist` — persistance du store (localStorage/sessionStorage) pour conserver l'état entre sessions.
+
+    Exemple :
+    ```ts
+    import { create } from 'zustand';
+    import { persist } from 'zustand/middleware';
+
+    export const useStore = create(
+      persist((set) => ({
+        // Tous les setters du store seront persistés
+        theme: 'light',
+        setTheme: (t) => set({ theme: t }),
+      }), { name: 'teachboard-storage' })
+    );
+    ```
+
+  - `combine` — helper qui facilite la composition d'un `state` initial typé avec les `actions` du store.
+
+    Exemple :
+    ```ts
+    import { create } from 'zustand';
+    import { combine } from 'zustand/middleware';
+
+    const DEFAULT = { count: 0 };
+    export const useStore = create(combine(DEFAULT, (set) => ({
+      inc: () => set((s) => ({ ...s, count: s.count + 1 })),
+    })));
+    ```
+
+- **Exemple combiné (pattern courant dans ce repo)** :
+
+```ts
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
+import { persist } from 'zustand/middleware';
+import { combine } from 'zustand/middleware';
+
+const DEFAULT_VALUES = { /* ... */ } as const;
+
+export const useStepsCreationStore = create(
+  devtools(
+    immer(
+      persist(
+        combine(DEFAULT_VALUES, (set, get) => ({
+          clear: () => set(() => ({ ...DEFAULT_VALUES })),
+          // actions...
+        })),
+        { name: 'steps-creation-store' }
+      )
+    ),
+    { name: 'StepsCreationStore' }
+  )
+);
+```
+
+> Astuce : adaptez l'ordre et les options selon vos besoins (persist généralement autour du state interne, devtools en extérieur pour capturer l'historique).
+
+<a id="app-stores-store"></a>
+
+#### Store
+
+- Conventions :
+  1. **DEFAULT_VALUES — State only**
+     - Déclarez `const DEFAULT_VALUES: <StoreName>State = { ... }` (toujours typer avec l'interface *state* uniquement).
+     - Préférez des instances vides pour les collections (ex. `new UniqueSet()`) plutôt que `null` quand cela a du sens.
+
+  2. **Créer le store avec `combine(DEFAULT_VALUES, ...)`**
+     - Ex : `combine(DEFAULT_VALUES, (set, get) => { ... })`.
+     - Utilisez `DEFAULT_VALUES` pour garantir une réinitialisation cohérente via une action `clear` :
+       `clear: () => set(() => ({ ...DEFAULT_VALUES }))`.
+
+  3. **Pattern recommandé — objet `ACTIONS` explicite**
+     - À l'intérieur de `combine(...)`, créez `const ACTIONS: <StoreName>Actions = { ... }` et implémentez tous les setters / getters dedans.
+     - Retournez `ACTIONS` à la fin de `combine`.
+     - Avantages : appels internes sûrs (`ACTIONS.setX(...)`), pas de binding `this` fragile, meilleure lisibilité et testabilité.
+
+     Exemple court :
+     ```ts
+     const ACTIONS: StepsCreationActions = {
+       clear() { set(() => ({ ...DEFAULT_VALUES })); },
+       setStudents(students) { /* ... */ },
+       setSelectedClass(c) { ACTIONS.setStudents(c.students); }
+     };
+     return ACTIONS;
+     ```
+
+  4. **NE PAS UTILISER `this`**
+     - Ne pas utiliser `this` dans les setters (risque si la méthode est extraite ou passée en callback).
+     - Si vous voulez uniquement l'auto‑complétion, vous pouvez typer `get` : `(set, get: () => <StoreName>Store) => ({ ... })` et appeler `get().setX(...)`, mais `ACTIONS` reste la solution recommandée.
+
+- Raison : ce pattern rend l'implémentation prévisible (single source of truth pour les valeurs par défaut), stable (pas de binding `this`) et testable (on peut stuber/spyer `ACTIONS` dans les tests) et il évite de typer manuellement les setters 
+
+
+Exemple (extrait simplifié de `StepsCreationStore`) :
+
+```ts
+// Type the DEFAULT values with the *state* interface
+const DEFAULT_VALUES: StepsCreationState = {
+  id: null,
+  description: null,
+  students: new UniqueSet(),
+  tasks: new UniqueSet(),
+  evaluations: null,
+  diplomaName: null,
+  className: null,
+  selectedClass: null,
+};
+
+export const useStepsCreationStore = create(
+  devtools(
+    immer(
+      combine(DEFAULT_VALUES, (set, get) => {
+        // Use a local ACTIONS object so actions can call each other safely
+        const ACTIONS = {
+          clear: () => set(() => ({ ...DEFAULT_VALUES })),
+          setSelectedClass(selectedClass: ClassSummaryDto) {
+            set((state) => {
+              state.selectedClass = selectedClass;
+              state.id = selectedClass.id || null;
+              // ...other state mapping
+            });
+
+            // Call other actions via ACTIONS (stable & testable)
+            ACTIONS.setStudents(selectedClass.students);
+            ACTIONS.setClassTasks(selectedClass.templates);
+          },
+          // ...other actions
+        };
+
+        return ACTIONS;
+      })
+    )
+  )
+);
+```
+
+
+<a id="app-stores-types"></a>
+
+#### Types
+
+- Emplacement : `src/api/store/types/`.
+- Convention :
+  - Créez un fichier de types `<store-name>.types.ts` pour chaque store.
+  - Exportez :
+    - `interface <StoreName>State` (seulement l'état, *sans* les setters),
+
+> Astuce : La création d'une `interface <StoreName>Action` n'est pas nécessaire (`Combine` gère automatiquement le typage des setters/getters).
+
+Exemple de fichier de types (convention recommandée) :
+```ts
+// src/api/store/types/steps-creation-store.types.ts
+import type { ClassSummaryDto } from '@/api/routes/classes.types.ts';
+
+export interface StepsCreationState {
+  // UUID existe et est un type commun de l'app
+  id: UUID | null;
+  description: string | null;
+  students: UniqueSet<StudentWithPresence> | null;
+  tasks: UniqueSet<Task> | null;
+  evaluations: unknown | null;
+  diplomaName: string | null;
+  className: string | null;
+  // ClassSummaryDto existe déjà dans l'app
+  selectedClass: ClassSummaryDto | null;
+}
+
+```
+
+**Checklist rapide pour une PR :**
+- [ ]  Ajouter / mettre à jour `src/api/store/<StoreName>.ts` et `src/api/store/types/<store-name>.types.ts`.
+- [ ]  Déclarer `const DEFAULT_VALUES` et typer les valeurs par défaut avec `<StoreName>State` (ex. `const DEFAULT_VALUES: StepsCreationState = {...}`).
+- [ ]  Déclarer `const ACTIONS = { ... }` dans `combine(...)` pour appeler des actions entre elles.
+- [ ]  Réutiliser les types existants quand cela est pertinent (p.ex. `ClassSummaryDto`).
+- [ ]  Mettre à jour la documentation (README) et vérifier la TOC.
+
 
 ## Types communs & validation
 
