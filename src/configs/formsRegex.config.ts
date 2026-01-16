@@ -7,8 +7,12 @@ export const formsRegex = {
   // Name fields (e.g. diploma names) should support Unicode letters and
   // common separators like spaces, hyphens and apostrophes. These patterns
   // are used server-side and for client-side immediate sanitization.
-  serverName: /^[\p{L}0-9 ._'-]{1,255}$/u,
-  allowedCharsNameRemove: /[^\p{L}0-9 ._'-]/gu,
+  // Accept commas, ampersand (&) and parentheses () in names as well.
+  serverName: /^[\p{L}\p{M}0-9 ._'&,()/-]{1,100}$/u,
+  serverDescription: /^[\p{L}\p{M}0-9 ._'&,()/-]{1,500}$/u,
+
+  // Client-side patterns (for immediate input sanitization)
+  allowedCharsNameRemove: /[^\p{L}\p{M}0-9 ._'&,()-]/gu,
   // Sanitizers / character classes used on the client for immediate feedback
   // Remove anything that is not ASCII letter/digit or the small set of allowed
   // punctuation for usernames
@@ -19,8 +23,9 @@ export const formsRegex = {
   // Single-character allowed tests (used for onBeforeInput checks)
   allowedCharUsernameTest: /^[a-zA-Z0-9._-]$/,
   // Single-character test for name fields to be used on input events
-  // (allows accented letters through Unicode \p{L} property).
-  allowedCharNameTest: /^[\p{L}0-9 ._'-]$/u,
+  // (allows accented letters through Unicode \p{L} property). Accepts comma, &, and parentheses.
+  allowedCharNameTest: /^[\p{L}0-9 ._'&,()-]$/u,
+  allowedCharDescriptionTest: /^[\p{L}\p{M}0-9'.,/;:!?"%&$€@#\n\r -]$/u,
   allowedCharEmailTest: /^[a-zA-Z0-9@._-]$/,
   viewYearRange: /^\d{4} - \d{4}$/,
   serverYearRange: /^\d{4}-\d{4}$/,
