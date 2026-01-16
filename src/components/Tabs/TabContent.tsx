@@ -23,7 +23,6 @@ export function TabContent({
   ...props
 }: Readonly<TabContentProps>) {
   const { isMobile } = useSidebar();
-  const GetOutletContent = useOutletContext<() => ReactNode | null>();
   const { leftSide } = item;
   const { onClick: onClickHandler, clickProps } = props;
 
