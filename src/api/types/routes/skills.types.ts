@@ -23,7 +23,7 @@ export interface SkillDto {
   modules?: SkillsType[];
 }
 
-type SkillsType = {
+export type SkillsType = {
   id: UUID;
   code: string;
   name: string;
