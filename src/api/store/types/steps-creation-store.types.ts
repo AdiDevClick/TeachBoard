@@ -1,6 +1,9 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
-import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
+import type {
+  SkillsType,
+  SkillsViewDto,
+} from "@/api/types/routes/skills.types.ts";
 import type { UniqueSet } from "@/utils/UniqueSet.ts";
 
 /**
@@ -35,5 +38,8 @@ export interface StepsCreationState {
   students: UniqueSet<UUID, StudentWithPresence>;
   tasks: UniqueSet<UUID, ClassTasks>;
   evaluations?: unknown[] | null;
-  modules: UniqueSet<UUID, SkillsViewDto>;
+  modules: UniqueSet<
+    UUID,
+    SkillsType & { subSkills: UniqueSet<UUID, SkillsType> }
+  >;
 }
