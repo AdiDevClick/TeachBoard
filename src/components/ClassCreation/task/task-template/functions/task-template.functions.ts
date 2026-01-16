@@ -55,7 +55,7 @@ export function updateValues(
 
   if (subSkillsSet.size > 0) {
     current.set(main, {
-      mainSkill: main,
+      moduleId: main,
       subSkillId: Array.from(subSkillsSet.values()),
     });
   }
@@ -69,15 +69,15 @@ export function updateValues(
  * @param skills - The skills dataset from diploma configuration
  * @returns An array of heading structures for command items
  */
-export function createTaskTemplateView(skills?: SkillsViewDto[]) {
-  return (skills ?? []).map((skill) => {
-    const mainSkillCode = skill.mainSkillCode ?? "Unknown Skill";
-    const mainSkillId = skill.mainSkillId ?? "unknown-id";
+export function createTaskTemplateView(modules?: SkillsViewDto[]) {
+  return (modules ?? []).map((module) => {
+    const mainSkillCode = module.code ?? "Unknown Skill";
+    const mainSkillId = module.id ?? "unknown-id";
 
     return {
       groupTitle: mainSkillCode,
       id: mainSkillId,
-      items: skill.subSkills.map((subSkill) => ({
+      items: module.subSkills.map((subSkill) => ({
         value: subSkill.code,
         label: subSkill.name,
         id: subSkill.id,
@@ -105,8 +105,14 @@ export function fetchTasksData(
 ) {
   if (!Array.isArray(cachedData)) return undefined;
   let dataCopy = itemToDisplay.current;
+  let viewShouldBeUpdated = false;
 
-  if (dataCopy === null || isDiplomaChanged) {
+  if (dataCopy !== null) {
+    viewShouldBeUpdated =
+      dataCopy[0].items.length !== cachedData[0].items.length;
+  }
+
+  if (dataCopy === null || isDiplomaChanged || viewShouldBeUpdated) {
     dataCopy = createDisabledGroup({
       dataCopy,
       cachedData,
@@ -131,6 +137,6 @@ export function fetchSkillsData(
   savedSkills: FetchSkillsDataParams["savedSkills"]
 ) {
   if (!diploma) return undefined;
-  savedSkills.current ??= createTaskTemplateView(diploma.skills);
+  savedSkills.current ??= createTaskTemplateView(diploma.modules);
   return savedSkills.current;
 }
