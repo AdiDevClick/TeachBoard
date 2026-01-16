@@ -3,6 +3,8 @@ import { LeftSidePageContent } from "@/pages/Evaluations/create/left-content/Lef
 import "@css/EvaluationPage.scss";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { IconArrowLeft, IconArrowRightDashed } from "@tabler/icons-react";
+import type { ReactNode } from "react";
+import { useOutletContext } from "react-router-dom";
 import { Card, CardContent, CardFooter, CardHeader } from "../ui/card.tsx";
 import { Separator } from "../ui/separator.tsx";
 import { useSidebar } from "../ui/sidebar.tsx";
@@ -18,10 +20,10 @@ import { useSidebar } from "../ui/sidebar.tsx";
 export function TabContent({
   item,
   index,
-  children,
   ...props
 }: Readonly<TabContentProps>) {
   const { isMobile } = useSidebar();
+  const GetOutletContent = useOutletContext<() => ReactNode | null>();
   const { leftSide } = item;
   const { onClick: onClickHandler, clickProps } = props;
 
@@ -35,12 +37,14 @@ export function TabContent({
           />
         </CardHeader>
         <CardContent className="cards-container__content">
-          <LeftSidePageContent item={leftSide} />
+          <LeftSidePageContent item={leftSide}>
+            {/* {<GetOutletContent />} */}
+          </LeftSidePageContent>
           <Separator
             className="content__separator"
             orientation={isMobile ? "vertical" : "horizontal"}
           />
-          {children}
+          {props.children}
         </CardContent>
         <CardFooter className="cards-container__footer">
           <IconArrowRightDashed
