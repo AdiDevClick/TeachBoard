@@ -1,6 +1,7 @@
 import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.js";
 import { Tabs } from "@/components/ui/tabs";
+import { StepTwo } from "@/pages/Evaluations/create/steps/two/StepTwo.js";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/pages/Evaluations/create/types/create.types.js";
 import type { CreateEvaluationsLoaderData } from "@/routes/routes.config.js";
 import "@css/PageContent.scss";
@@ -67,7 +68,7 @@ export function CreateEvaluations() {
               index={index}
               {...tabContentPropsAndFunctions}
             >
-              {<Outlet />}
+              <Outlet context={StepTwo} />
             </TabContent>
           );
         }}
