@@ -196,9 +196,9 @@ describe("UI flow: new-task-template", () => {
         description: "une description suffisamment longue.",
         degreeConfigId: sample.diplomaFetched.id,
         taskId: sample.taskFetched.id,
-        skills: [
+        modules: [
           {
-            mainSkill: firstMainSkill.mainSkillId,
+            moduleId: firstMainSkill.id,
             subSkillId: [firstSubSkill.id],
           },
         ],

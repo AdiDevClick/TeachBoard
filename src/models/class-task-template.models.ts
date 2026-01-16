@@ -55,10 +55,10 @@ const taskTemplateCreationSchema = (data: typeof dataField) =>
       .trim()
       .nonempty(data.degreeConfigRequiredMessage)
       .describe("Unique identifier for the diploma associated with the task"),
-    skills: z
+    modules: z
       .array(
         z.object({
-          mainSkill: z.uuid(data.skillsValidUuidMessage),
+          moduleId: z.uuid(data.skillsValidUuidMessage),
           subSkillId: z.array(z.uuid(data.skillsValidUuidMessage)),
         })
       )
@@ -66,7 +66,7 @@ const taskTemplateCreationSchema = (data: typeof dataField) =>
       .describe("List of skills associated with the task"),
   });
 
-// skills like : [ { mainSkill: uuid, subSkillId: [ uuid, uuid ] }, { mainSkill: uuid, subSkillId: [ uuid, uuid ] } ]
+// skills like : [ { moduleId: uuid, subSkillId: [ uuid, uuid ] }, { moduleId: uuid, subSkillId: [ uuid, uuid ] } ]
 
 export type TaskTemplateCreationFormSchema = z.infer<typeof taskTemplateSchema>;
 

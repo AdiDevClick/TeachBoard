@@ -77,14 +77,14 @@ export const diplomaFetched = new DiplomaConfigFixtureCreator({
   degreeField: degreeFieldFetched.name,
   degreeLevel: degreeLevelFetched.name,
   degreeYear: degreeYearFetched.code,
-  skills: diplomaFetchedSkills,
+  modules: diplomaFetchedSkills,
 });
 
 export const diplomaFetched2 = new DiplomaConfigFixtureCreator({
   degreeField: degreeFieldFetched.name,
   degreeLevel: degreeLevelFetched.name,
   degreeYear: degreeYearFetched2.code,
-  skills: diplomaFetchedSkills2,
+  modules: diplomaFetchedSkills2,
 });
 
 export const diplomaCreated = new DiplomaConfigFixtureCreator({
@@ -158,13 +158,13 @@ export const teacherFetched2 = new TeacherFixtureCreator();
 export const skillsModulesFetched = {
   Skills: [
     new SkillFixtureCreator({
-      code: diplomaFetchedSkills[0].mainSkillCode,
-      name: diplomaFetchedSkills[0].mainSkillName,
+      code: diplomaFetchedSkills[0].code,
+      name: diplomaFetchedSkills[0].name,
       type: "MAIN",
     }),
     new SkillFixtureCreator({
-      code: diplomaFetchedSkills2[0].mainSkillCode,
-      name: diplomaFetchedSkills2[0].mainSkillName,
+      code: diplomaFetchedSkills2[0].code,
+      name: diplomaFetchedSkills2[0].name,
       type: "MAIN",
     }),
   ],

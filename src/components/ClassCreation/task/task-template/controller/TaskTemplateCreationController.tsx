@@ -189,8 +189,8 @@ export function TaskTemplateCreationController({
 
     // Update the actual skills field used for submission & validation
     form.setValue(
-      "skills",
-      Array.from(current.values()) as TaskTemplateCreationFormSchema["skills"],
+      "modules",
+      Array.from(current.values()) as TaskTemplateCreationFormSchema["modules"],
       {
         shouldValidate: true,
       }

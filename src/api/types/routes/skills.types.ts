@@ -19,42 +19,32 @@ export interface SkillDto {
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string;
-  subskills?: SubSkillsType[];
-  mainSkills?: MainSkillsType[];
+  subskills?: SkillsType[];
+  modules?: SkillsType[];
 }
 
-type MainSkillsType = {
-  mainSkillId: UUID;
-  mainSkillCode: string;
-  mainSkillName: string;
-};
-
-type SubSkillsType = {
+type SkillsType = {
   id: UUID;
   code: string;
   name: string;
 };
 
 export type SkillsFormValues = {
-  mainSkill: UUID;
+  moduleId: UUID;
   subSkillId?: UUID[];
 };
 
 /**
  * View structure for skills including sub-skills.
  */
-export type SkillsViewDto = MainSkillsType & { subSkills: SubSkillsType[] };
-
-export type TemplateSkillsViewDto = { mainSkill: SubSkillsType } & {
-  subSkills: SubSkillsType[];
-};
+export type SkillsViewDto = SkillsType & { subSkills: SkillsType[] };
 
 /**
  * Data payload returned by the "SKILLS" fetch.
  * The current reshaper reads `data.Skills`.
  */
 export interface SkillsFetch {
-  Skills: SkillDto[];
+  modules: SkillDto[];
 }
 
 /**

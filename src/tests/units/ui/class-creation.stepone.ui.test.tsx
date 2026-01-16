@@ -161,14 +161,15 @@ setupUiTestState(null, {
       (res.sample.taskTemplateFetch.taskTemplates ?? []).map(
         (tpl: TaskTemplateDto) => [tpl.task.name, tpl.id]
       )
-    ) ;
+    );
 
     // Ensure the test selects at least 3 templates during creation to reflect the multi-select feature
     flowArgs.tasksToSelect = tasksToSelectForSubmit;
 
     const flowArgs2 = {
       ...flowArgs,
-      createdClassPayload: classCreatedWithOptional as unknown as CreateClassResponseData,
+      createdClassPayload:
+        classCreatedWithOptional as unknown as CreateClassResponseData,
       createdClassName: "2C",
       fillDescription: true,
     };
@@ -246,8 +247,8 @@ describe("UI flow: class-creation (StepOne list)", () => {
     await fillAndTab(page.getByLabelText(/^Nom$/i), "Classe sync diplômes");
 
     // Derive skill codes from fixtures to avoid hardcoded strings and keep the test resilient to sample data changes
-    const subskills1 = diplomaFetched?.skills?.[0]?.subSkills ?? [];
-    const subskills2 = diplomaFetched2?.skills?.[0]?.subSkills ?? [];
+    const subskills1 = diplomaFetched?.modules?.[0]?.subSkills ?? [];
+    const subskills2 = diplomaFetched2?.modules?.[0]?.subSkills ?? [];
     const subA = subskills1[0]?.code;
     const subB = subskills1[1]?.code;
     const A = subskills2[0]?.code;

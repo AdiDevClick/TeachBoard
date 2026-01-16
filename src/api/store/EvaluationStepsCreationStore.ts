@@ -18,6 +18,7 @@ const DEFAULT_VALUES: StepsCreationState = {
   diplomaName: null,
   className: null,
   selectedClass: null,
+  modules: new UniqueSet(),
 };
 
 /**
@@ -43,15 +44,35 @@ export const useEvaluationStepsCreationStore = create(
             });
             ACTIONS.setStudents(selectedClass.students);
             ACTIONS.setClassTasks(selectedClass.templates);
+            // Populate modules for the selected class
+            if (selectedClass.modules)
+              ACTIONS.setModules(selectedClass.modules);
           },
           setClassTasks(tasks: ClassSummaryDto["templates"]) {
             set((state) => {
-              const mappedTasks = tasks.map((task) => ({
-                id: task.id,
-                name: task.taskName ?? null,
-                skills: task.skills ?? [],
-              }));
-              state.tasks = new UniqueSet(null, mappedTasks);
+              state.tasks ??= new UniqueSet();
+              tasks.forEach((task) => {
+                const details = {
+                  id: task.id,
+                  name: task.taskName ?? null,
+                  modules: task.modules ?? [],
+                };
+                state.tasks.set(task.id, details);
+              });
+            });
+          },
+          setModules(modules: ClassSummaryDto["modules"]) {
+            set((state) => {
+              // state.modules ??= new UniqueSet();
+              modules.forEach((m) => {
+                const details = {
+                  id: m.id,
+                  code: m.code ?? "",
+                  name: m.name ?? null,
+                  subSkills: m.subSkills ?? [],
+                };
+                state.modules.set(m.id, details);
+              });
             });
           },
           setDiplomaName(name: string) {
@@ -61,13 +82,16 @@ export const useEvaluationStepsCreationStore = create(
           },
           setStudents(students: ClassSummaryDto["students"]) {
             set((state) => {
-              const mappedStudents = students.map((student) => ({
-                id: student.id,
-                fullName: student.firstName + " " + student.lastName,
-                isPresent: false,
-                assignedTask: null,
-              }));
-              state.students = new UniqueSet(null, mappedStudents);
+              state.students ??= new UniqueSet();
+              students.forEach((student) => {
+                const details = {
+                  id: student.id,
+                  fullName: student.firstName + " " + student.lastName,
+                  isPresent: false,
+                  assignedTask: null,
+                };
+                state.students.set(student.id, details);
+              });
             });
           },
           getStudentsPresenceSelectionData() {

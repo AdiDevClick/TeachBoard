@@ -396,7 +396,7 @@ export const diplomaCreationInputControllers = [
     apiEndpoint: API_ENDPOINTS.GET.SKILLS.endPoints.MODULES,
     dataReshapeFn: API_ENDPOINTS.GET.SKILLS.dataReshape,
     task: "new-degree-module",
-    name: "mainSkillsList",
+    name: "modulesList",
     title: "Modules",
     type: "button",
     useButtonAddNew: true,

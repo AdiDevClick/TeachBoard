@@ -14,7 +14,7 @@ describe("StepsCreationStore - students reshape", () => {
   it("getStudentsPresenceSelectionData returns mapped fields and items", () => {
     const studentsPayload = [{ id: "1", firstName: "John", lastName: "Stud" }];
 
-    const templates = [{ id: "t1", taskName: "T1", skills: [] }];
+    const templates = [{ id: "t1", taskName: "T1", modules: [] }];
 
     // Populate store
     useEvaluationStepsCreationStore

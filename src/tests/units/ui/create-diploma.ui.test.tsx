@@ -168,7 +168,7 @@ describe("UI flow: create-diploma (from class-creation)", () => {
 
     // The selected module should appear as a tag in the dialog
     await expect
-      .element(page.getByText(rx(diplomaFetchedSkills[0].mainSkillCode)))
+      .element(page.getByText(rx(diplomaFetchedSkills[0].code)))
       .toBeInTheDocument();
 
     // Ensure there are no form validation alerts, then submit
@@ -286,7 +286,7 @@ describe("UI flow: create-diploma (from class-creation)", () => {
         diplomaFieldId: sample.degreeFieldFetched.id,
         yearId: sample.degreeYearFetched.id,
         levelId: sample.degreeLevelFetched.id,
-        mainSkillsList: [sample.skillsModulesFetched.Skills[0].code],
+        modulesList: [sample.skillsModulesFetched.Skills[0].code],
       });
   });
 });

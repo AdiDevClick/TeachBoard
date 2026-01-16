@@ -41,7 +41,7 @@ function DiplomaCreation({
       diplomaFieldId: "",
       yearId: "",
       levelId: "",
-      mainSkillsList: [],
+      modulesList: [],
     },
   });
 

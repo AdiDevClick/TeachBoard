@@ -50,8 +50,8 @@ export function DiplomaCreationController({
   const currentSkills =
     useWatch({
       control: form.control,
-      name: "mainSkillsListDetails" as never,
-    }) || [];
+      name: "modulesListDetails" as never,
+    }) || []; 
 
   /**
    * Handle form submission
@@ -69,8 +69,8 @@ export function DiplomaCreationController({
     taskDetails?: Record<string, unknown>
   ) => {
     const options = {
-      mainFormField: "mainSkillsList",
-      secondaryFormField: "mainSkillsListDetails",
+      mainFormField: "modulesList",
+      secondaryFormField: "modulesListDetails",
       detailedCommandItem: taskDetails,
     };
     selectionCallback(value, options);

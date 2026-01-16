@@ -207,7 +207,7 @@ const controllersConfig: Array<ControllersConfig<ControllerLike>> = [
       diplomaFieldController: "diplomaFieldId",
       diplomaYearController: "yearId",
       diplomaLevelController: "levelId",
-      diplomaModuleController: "mainSkillsList",
+      diplomaModuleController: "modulesList",
     },
   },
   {
