@@ -27,6 +27,6 @@ export type TaskTemplateCreationControllerProps = AppControllerInterface<
  * Parameters for fetching skills data for task templates.
  */
 export type FetchSkillsDataParams = {
-  diploma: Pick<DiplomaConfigDto, "skills">;
+  diploma: Pick<DiplomaConfigDto, "modules">;
   savedSkills: { current?: ReturnType<typeof createTaskTemplateView> };
 };
