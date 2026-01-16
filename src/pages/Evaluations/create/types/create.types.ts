@@ -2,7 +2,7 @@
  * Types for the create evaluations page
  */
 
-import type { ComponentType, MouseEvent } from "react";
+import type { ComponentType, MouseEvent, PropsWithChildren } from "react";
 
 /**
  * Types for the left content component props
@@ -13,7 +13,7 @@ export type LeftContentProps = {
     title: string;
     description: string;
   };
-};
+} & PropsWithChildren;
 
 /**
  * Types for the right content component props
