@@ -13,8 +13,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type FieldValues } from "react-hook-form";
 
 export const stepThreeTitleProps = {
-  title: "Liste d'élèves",
-  description: "Définir les élèves présents ainsi que leurs fonctions.",
+  title: "Liste des catégories",
+  description: "Par quoi doit-on commencer ?",
 };
 
 export const stepThreeCardProps = {
