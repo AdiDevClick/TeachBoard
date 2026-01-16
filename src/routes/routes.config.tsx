@@ -10,6 +10,7 @@ import EmailValidation from "@/pages/Email/EmailValidation";
 import { PageError } from "@/pages/Error/PageError.tsx";
 import { CreateEvaluations } from "@/pages/Evaluations/create/CreateEvaluations.tsx";
 import { StepOne } from "@/pages/Evaluations/create/steps/one/StepOne";
+import { StepThree } from "@/pages/Evaluations/create/steps/three/StepThree.tsx";
 import { StepTwo } from "@/pages/Evaluations/create/steps/two/StepTwo.tsx";
 import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
@@ -151,7 +152,7 @@ export const routeChildren = [
           },
           {
             path: EvaluationPageTabsDatas.step3.name,
-            element: <StepOne title="dsq" placeholder="dsq" />,
+            element: <StepThree />,
             loader: async () => {
               const date = new Date().toLocaleDateString();
               return {
