@@ -1409,7 +1409,7 @@ Cette section décrit les classes utilitaires utilisées pour générer des fixt
   - Quoi : config diplôme (degreeLevel, degreeYear, degreeField, skills).
 
 - [`SkillsViewFixtureCreator`](src/utils/FixtureCreator.ts)
-  - Quoi : vue modules/skills (mainSkill + subSkills).
+  - Quoi : vue modules/skills (module + subSkills).
 
 - [`PersonFixtureCreatorBase`](src/utils/FixtureCreator.ts), [`StudentFixtureCreator`](src/utils/FixtureCreator.ts), [`TeacherFixtureCreator`](src/utils/FixtureCreator.ts)
   - Quoi : personnes (firstName, lastName, email).
