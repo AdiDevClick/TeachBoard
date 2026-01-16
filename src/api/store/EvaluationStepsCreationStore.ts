@@ -44,13 +44,10 @@ export const useEvaluationStepsCreationStore = create(
             });
             ACTIONS.setStudents(selectedClass.students);
             ACTIONS.setClassTasks(selectedClass.templates);
-            // Populate modules for the selected class
-            if (selectedClass.modules)
-              ACTIONS.setModules(selectedClass.modules);
           },
           setClassTasks(tasks: ClassSummaryDto["templates"]) {
             set((state) => {
-              state.tasks ??= new UniqueSet();
+              // state.tasks ??= new UniqueSet();
               tasks.forEach((task) => {
                 const details = {
                   id: task.id,
@@ -58,20 +55,31 @@ export const useEvaluationStepsCreationStore = create(
                   modules: task.modules ?? [],
                 };
                 state.tasks.set(task.id, details);
+                ACTIONS.setModules(task.modules);
               });
             });
           },
-          setModules(modules: ClassSummaryDto["modules"]) {
+          setModules(modules: ClassSummaryDto["templates"][number]["modules"]) {
             set((state) => {
-              // state.modules ??= new UniqueSet();
-              modules.forEach((m) => {
-                const details = {
-                  id: m.id,
-                  code: m.code ?? "",
-                  name: m.name ?? null,
-                  subSkills: m.subSkills ?? [],
-                };
-                state.modules.set(m.id, details);
+              (modules ?? []).forEach((module) => {
+                if (!module.id) return;
+                const { subSkills, ...rest } = module;
+
+                // Save or update module without subSkills first
+                state.modules.set(module.id, rest);
+                // state.modules.set(module.id, rest);
+                const savedModule = state.modules.get(module.id);
+
+                if (!savedModule) return;
+
+                // We now have the possibility to use a hash set for subSkills
+                if (savedModule.subSkills === undefined) {
+                  savedModule.subSkills = new UniqueSet(null, subSkills);
+                } else {
+                  for (const subSkill of subSkills ?? []) {
+                    savedModule.subSkills.set(subSkill.id, subSkill);
+                  }
+                }
               });
             });
           },
@@ -82,7 +90,7 @@ export const useEvaluationStepsCreationStore = create(
           },
           setStudents(students: ClassSummaryDto["students"]) {
             set((state) => {
-              state.students ??= new UniqueSet();
+              // state.students ??= new UniqueSet();
               students.forEach((student) => {
                 const details = {
                   id: student.id,
