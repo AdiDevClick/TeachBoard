@@ -10,6 +10,7 @@ import {
 import { StepThreeController } from "@/pages/Evaluations/create/steps/three/controller/StepThreeController.tsx";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconArrowLeft } from "@tabler/icons-react";
 import { useForm, type FieldValues } from "react-hook-form";
 
 export const stepThreeTitleProps = {
@@ -80,7 +81,16 @@ export function StepThree({
     preparedStudentsTasksSelection,
   };
 
-  return <StepThreeWithCard displayFooter={false} {...commonProps} />;
+  return (
+    <>
+      <IconArrowLeft
+        className={stepThreeCardProps.cardClassName + " arrow-back"}
+        // onClick={(e) => onClickHandler({ e, ...clickProps, index })}
+        data-name="modules-previous"
+      />
+      <StepThreeWithCard displayFooter={false} {...commonProps} />
+    </>
+  );
 }
 
 const StepThreeWithCard = withTitledCard(StepThreeController);
