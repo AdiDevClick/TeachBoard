@@ -42,13 +42,16 @@ export function StepThree({
 }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
   const user = useAppStore((state) => state.user);
   const selectedClass = useEvaluationStepsCreationStore(
-    (state) => state.selectedClass
+    (state) => state.selectedClass,
   );
   const students = useEvaluationStepsCreationStore((state) => state.students);
   const tasks = useEvaluationStepsCreationStore((state) => state.tasks);
+  const modules = useEvaluationStepsCreationStore(
+    (state) => state.getSelectedClassModules,
+  )();
   const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
-    (state) => state.getStudentsPresenceSelectionData
-  );
+    (state) => state.getStudentsPresenceSelectionData,
+  )();
   const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({
     resolver: zodResolver(attendanceRecordCreationSchemaInstance([])),
     mode: "onTouched",
@@ -71,6 +74,7 @@ export function StepThree({
     form,
     user,
     students,
+    modules,
     selectedClass,
     tasks,
     preparedStudentsTasksSelection,
