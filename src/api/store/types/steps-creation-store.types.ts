@@ -25,6 +25,10 @@ export type ClassTasks = {
   modules: SkillsViewDto[];
 };
 
+export type ClassModules = SkillsType & {
+  subSkills: UniqueSet<UUID, SkillsType>;
+};
+
 /**
  * State interface for Steps Creation Store.
  */
@@ -38,8 +42,7 @@ export interface StepsCreationState {
   students: UniqueSet<UUID, StudentWithPresence>;
   tasks: UniqueSet<UUID, ClassTasks>;
   evaluations?: unknown[] | null;
-  modules: UniqueSet<
-    UUID,
-    SkillsType & { subSkills: UniqueSet<UUID, SkillsType> }
-  >;
+  modules: UniqueSet<UUID, ClassModules>;
 }
+
+export type SelectedClassModulesReturn = ClassModules[];
