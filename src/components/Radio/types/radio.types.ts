@@ -1,7 +1,7 @@
 import type { ClassModules } from "@/api/store/types/steps-creation-store.types.ts";
 import type { UUID } from "@/api/types/openapi/common.types.ts";
-import type { RadioGroup } from "@radix-ui/react-dropdown-menu";
-import type { ComponentProps } from "react";
+import type { Item } from "@/components/ui/item.tsx";
+import type { ComponentProps, MouseEvent } from "react";
 
 /**
  * Validation requirements for RadioItem.
@@ -11,4 +11,8 @@ export type EvaluationRadioItemProps = {
   name: string;
   subSkills: ClassModules["subSkills"];
   description?: string;
-} & ComponentProps<typeof RadioGroup>;
+  itemClick?: (
+    e: MouseEvent<HTMLDivElement>,
+    props: EvaluationRadioItemProps,
+  ) => void;
+} & ComponentProps<typeof Item>;
