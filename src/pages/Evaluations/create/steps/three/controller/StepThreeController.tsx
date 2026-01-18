@@ -1,9 +1,15 @@
+import { Badge } from "@/components/ui/badge.tsx";
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemTitle,
+} from "@/components/ui/item.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group.tsx";
 
 export function StepThreeController({
   pageId,
-  modalMode,
   className,
   inputControllers = [],
   user,
@@ -13,12 +19,11 @@ export function StepThreeController({
   selectedClass,
   tasks,
   formId,
-  setRef,
-  observedRefs,
+  modules,
 }) {
   console.log(tasks);
   return (
-    <form id={formId} className={className}>
+    <form id={formId}>
       <RadioGroup>
         {/* <VerticalFieldWithInlineSwitchList
         items={preparedStudentsTasksSelection()}
@@ -27,21 +32,29 @@ export function StepThreeController({
         form={form}
         {...inputControllers[0]}
       /> */}
-        {preparedStudentsTasksSelection()?.map((item) => (
-          <div className="flex items-center gap-3" key={item?.id}>
-            <RadioGroupItem
-              id={`r-${item?.id}`}
-              value={item?.fullName}
-              // className="radio-item"
-            >
-              {/* <Radio className="radio-item__icon" /> */}
-              {/* <Radio className="radio-item__icon" /> */}
-            </RadioGroupItem>
-            <Label htmlFor={`r-${item?.id}`}>
-              {/* <Label htmlFor={`r${item.id}`} className="radio-item__label"> */}
-              {item?.fullName}
-            </Label>
-          </div>
+        {modules.map((item) => (
+          <Item key={item.id} variant="outline">
+            <ItemContent className="w-full">
+              <ItemTitle className="min-w-full">
+                <RadioGroupItem id={`r-${item.id}`} value={item.name} />
+                <Label className="w-full" htmlFor={`r-${item.id}`}>
+                  {item.name}
+                </Label>
+              </ItemTitle>
+              <ItemDescription className="flex">
+                <Badge
+                  variant="destructive"
+                  className="w-4.5 h-4.5 items-center rounded-full mr-2"
+                >
+                  {item.subSkills?.size ?? 0}
+                </Badge>
+                <Label className="font-normal" htmlFor={`r-${item.id}`}>
+                  Sous-compétences
+                </Label>
+              </ItemDescription>
+            </ItemContent>
+          </Item>
+          // </Select>
         ))}
       </RadioGroup>
     </form>
