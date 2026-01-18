@@ -67,7 +67,6 @@ export const useEvaluationStepsCreationStore = create(
 
                 // Save or update module without subSkills first
                 state.modules.set(module.id, rest);
-                // state.modules.set(module.id, rest);
                 const savedModule = state.modules.get(module.id);
 
                 if (!savedModule) return;
