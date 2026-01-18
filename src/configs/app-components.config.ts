@@ -1,5 +1,6 @@
 import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.ts";
 import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
+import type { EvaluationRadioItemProps } from "@/components/Radio/types/radio.types.ts";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
 import { checkPropsValidity } from "@/utils/utils.ts";
 
@@ -17,7 +18,7 @@ export const labelledInputContainsInvalid = (props: Record<string, unknown>) =>
   checkPropsValidity(
     props,
     LABELLED_INPUT_REQUIRES,
-    LABELLED_INPUT_SHOULD_NOT_ACCEPT
+    LABELLED_INPUT_SHOULD_NOT_ACCEPT,
   );
 
 //                    ------------
@@ -84,7 +85,7 @@ export const commandItemContainsInvalid = (props: Record<string, unknown>) =>
   checkPropsValidity(props, COMMAND_ITEM_REQUIRES, []);
 
 export const commandSelectionDoesNotContainId = (
-  props: Record<string, unknown>
+  props: Record<string, unknown>,
 ) => checkPropsValidity(props, COMMAND_SELECTION_REQUIRES, []);
 
 //                    ------------
@@ -110,7 +111,7 @@ export function simpleAvatarPropsInvalid(props: SimpleAvatarProps) {
 const SIMPLE_ADD_BUTTON_REQUIRES = ["toolTipText"];
 
 export function simpleAddButtonWithToolTipPropsInvalid(
-  props: SimpleAddButtonWithToolTipProps
+  props: SimpleAddButtonWithToolTipProps,
 ) {
   return checkPropsValidity(props, SIMPLE_ADD_BUTTON_REQUIRES, []);
 }
@@ -146,8 +147,21 @@ export const taskModalPropsInvalid = (props: unknown) =>
 const INLINE_ITEM_AND_SWITCH_SELECTION_REQUIRES = ["title"];
 
 export const inlineItemAndSwitchSelectionPropsInvalid = (
-  props: Record<string, unknown>
+  props: Record<string, unknown>,
 ) => checkPropsValidity(props, INLINE_ITEM_AND_SWITCH_SELECTION_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for EvaluationRadioItem.
+ */
+const EVALUATION_RADIO_ITEM_REQUIRES = ["id", "name", "subSkills"];
+
+export const evaluationRadioItemPropsInvalid = (
+  props: EvaluationRadioItemProps,
+) => checkPropsValidity(props, EVALUATION_RADIO_ITEM_REQUIRES, []);
+
+//                    ------------
 
 /**
  * Logs debug information for a component when in development mode.
@@ -158,7 +172,7 @@ export function debugLogs(componentName: string, details?: unknown) {
   if (DEV_MODE && !NO_COMPONENT_WARNING_LOGS) {
     console.debug(
       `[${componentName}] - Invalid props detected. Please check the component configuration.`,
-      details
+      details,
     );
   }
 }

@@ -1,0 +1,33 @@
+/**
+  * Styles for the EvaluationRadio component.
+  */
+.evaluation-radio-item--container {
+
+  .evaluation-radio-item__content {
+    width: 100%;
+
+    &--title {
+      min-width: 100%;
+
+      &__label {
+        width: 100%;
+      }
+    }
+
+    &--description {
+      display: flex;
+
+      .destructive-badge {
+        width: calc(var(--spacing) * 4.5);
+        height: calc(var(--spacing) * 4.5);
+        align-items: center;
+        border-radius: 50%;
+        margin-right: calc(var(--spacing) * 2);
+      }
+
+      &__label {
+        font-weight: var(--font-weight-normal);
+      }
+    }
+  }
+}

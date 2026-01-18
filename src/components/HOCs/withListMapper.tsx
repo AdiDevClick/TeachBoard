@@ -14,7 +14,7 @@ type ReservedListMapperKeys = "items" | "optional" | "children";
 type PropsType<
   Items,
   TOptional extends Record<string, unknown> | undefined,
-  P
+  P,
 > = Readonly<
   Pick<
     ListMapperProps<Items, ComponentType<P>, TOptional>,
@@ -37,7 +37,7 @@ function withListMapper<C extends AnyComponentLike>(Wrapped: C) {
   return function Component<
     Items extends readonly unknown[] | Record<string, unknown>,
     TOptional extends Record<string, unknown> | undefined,
-    P extends ComponentProps<C> = ComponentProps<C>
+    P extends ComponentProps<C> = ComponentProps<C>,
   >(props: PropsType<Items, TOptional, P>) {
     const { items, optional, ...rest } = props;
 
