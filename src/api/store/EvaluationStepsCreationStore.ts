@@ -122,9 +122,12 @@ export const useEvaluationStepsCreationStore = create(
               })),
             }));
           },
+          getSelectedClassModules() {
+            return Array.from(get().modules?.values() ?? []);
+          },
         };
         return ACTIONS;
-      })
-    )
-  )
+      }),
+    ),
+  ),
 );
