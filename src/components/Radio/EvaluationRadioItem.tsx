@@ -13,7 +13,9 @@ import {
   debugLogs,
   evaluationRadioItemPropsInvalid,
 } from "@/configs/app-components.config.ts";
+import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import "@css/EvaluationRadio.scss";
+import type { MouseEvent } from "react";
 
 /**
  * Evaluation radio item component.
@@ -34,6 +36,7 @@ export function EvaluationRadioItem(props: EvaluationRadioItemProps) {
     name,
     subSkills,
     description = "Sous-compétences",
+    itemClick,
     ...rest
   } = props;
 
@@ -42,11 +45,24 @@ export function EvaluationRadioItem(props: EvaluationRadioItemProps) {
     return null;
   }
 
+  /**
+   * Handles click event on the radio item.
+   *
+   * @description If an itemClick() handler is provided in props, it invokes that handler
+   *
+   * @param e - Mouse event object
+   */
+  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
+    preventDefaultAndStopPropagation(e);
+    itemClick?.(e, props);
+  };
+
   return (
     <Item
       key={id}
       variant="outline"
       className="evaluation-radio-item--container"
+      onClick={handleClick}
       {...rest}
     >
       <ItemContent className="evaluation-radio-item__content">
