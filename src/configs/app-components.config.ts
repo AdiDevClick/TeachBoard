@@ -1,7 +1,9 @@
 import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.ts";
 import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
+import type { ClassCreationControllerProps } from "@/components/ClassCreation/types/class-creation.types.ts";
 import type { EvaluationRadioItemProps } from "@/components/Radio/types/radio.types.ts";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
+import type { StepThreeControllerProps } from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
 import { checkPropsValidity } from "@/utils/utils.ts";
 
 //                    ------------
@@ -162,6 +164,38 @@ export const evaluationRadioItemPropsInvalid = (
 ) => checkPropsValidity(props, EVALUATION_RADIO_ITEM_REQUIRES, []);
 
 //                    ------------
+
+const BASE_CONTROLLERS_PROPS_REQUIRES = ["form", "pageId", "formId"];
+
+/**
+ * Validation requirements for ClassCreationController.
+ *
+ * {@link import("@/pages/Classes/create/controller/ClassCreationController.tsx").ClassCreationController}
+ */
+
+const CLASS_CREATION_CONTROLLER_REQUIRES = [
+  ...BASE_CONTROLLERS_PROPS_REQUIRES,
+  "inputControllers",
+  "className",
+  "submitRoute",
+  "submitDataReshapeFn",
+];
+
+export const classCreationControllerPropsInvalid = (
+  props: ClassCreationControllerProps,
+) => checkPropsValidity(props, CLASS_CREATION_CONTROLLER_REQUIRES, []);
+
+/**
+ * Validation requirements for StepThreeController.
+ */
+const STEP_THREE_CONTROLLER_REQUIRES = [
+  ...BASE_CONTROLLERS_PROPS_REQUIRES,
+  "modules",
+];
+
+export const stepThreeControllerPropsInvalid = (
+  props: StepThreeControllerProps,
+) => checkPropsValidity(props, STEP_THREE_CONTROLLER_REQUIRES, []);
 
 /**
  * Logs debug information for a component when in development mode.

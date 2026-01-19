@@ -20,6 +20,7 @@ import { VerticalFieldSelectWithController } from "@/components/Selects/Vertical
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
+  classCreationControllerPropsInvalid,
   debugLogs,
   taskModalPropsInvalid,
 } from "@/configs/app-components.config.ts";
@@ -49,29 +50,34 @@ const defaultSchoolYear = year + " - " + (year + 1);
  * @param form - The form object for managing form state
  * @param formId - The unique identifier for the form
  * @param props - Additional props
+ * @param submitRoute - The API endpoint for form submission
+ * @param submitDataReshapeFn - The function to reshape data before submission
  */
-export function ClassCreationController({
-  inputControllers = classCreationInputControllers,
-  pageId,
-  form,
-  formId,
-  className,
-  submitRoute = API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
-  submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
-}: ClassCreationControllerProps) {
+export function ClassCreationController(props: ClassCreationControllerProps) {
+  if (!classCreationControllerPropsInvalid(props)) {
+    debugLogs("ClassCreationController", props);
+  }
+
+  const {
+    inputControllers = classCreationInputControllers,
+    pageId,
+    form,
+    formId,
+    className,
+    submitRoute = API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
+    submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
+  } = props;
+
+  // End of defensive props check
+
   const [isSelectedDiploma, setIsSelectedDiploma] = useState(false);
 
   const queryClient = useQueryClient();
   const studentsMemo = useAvatarDataGenerator(form, "studentsValues");
   const primaryTeacherMemo = useAvatarDataGenerator(
     form,
-    "primaryTeacherValue"
+    "primaryTeacherValue",
   );
-  const tasksValues =
-    useWatch({
-      control: form.control,
-      name: "tasksValues",
-    }) ?? [];
 
   const {
     setRef,
@@ -87,6 +93,11 @@ export function ClassCreationController({
     pageId,
     submitRoute,
     submitDataReshapeFn,
+  });
+
+  const tasksValues = useWatch({
+    control: form.control,
+    name: "tasksValues",
   });
 
   const cachedKeysRef = useRef<Record<string, unknown[]>>({});
@@ -110,7 +121,7 @@ export function ClassCreationController({
       resetSelectedItemsFromCache(
         cachedKeysRef.current["search-students"],
         currentStudentsValues,
-        queryClient
+        queryClient,
       );
     }
 
@@ -118,7 +129,7 @@ export function ClassCreationController({
       resetSelectedItemsFromCache(
         cachedKeysRef.current["search-primaryteacher"],
         currentPrimaryTeacherValue,
-        queryClient
+        queryClient,
       );
     }
   }, [openedDialogs]);
@@ -145,7 +156,7 @@ export function ClassCreationController({
     if (isNewTaskTemplate && linkedDiploma) {
       metaData.apiEndpoint =
         API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
-          linkedDiploma.id
+          linkedDiploma.id,
         );
       metaData["degreeConfig"] = linkedDiploma;
     }
@@ -170,7 +181,7 @@ export function ClassCreationController({
    * @param errors - The validation errors
    */
   const handleInvalidSubmit = (
-    errors: FieldErrors<ClassCreationFormSchema>
+    errors: FieldErrors<ClassCreationFormSchema>,
   ) => {
     if (DEV_MODE) {
       const currentValues = form.getValues() as ClassCreationFormSchema;
@@ -210,7 +221,7 @@ export function ClassCreationController({
    */
   const handleCommandSelection = (
     value: string,
-    commandItemDetails: CommandItemType
+    commandItemDetails: CommandItemType,
   ) => {
     const options = {
       mainFormField: "tasks",
@@ -276,7 +287,7 @@ export function ClassCreationController({
     if (task === "new-task-template" && selectedDiplomaRef.current) {
       rest.apiEndpoint =
         API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
-          selectedDiplomaRef.current.id
+          selectedDiplomaRef.current.id,
         );
       rest.selectedDiploma = selectedDiplomaRef.current;
 
@@ -305,7 +316,7 @@ export function ClassCreationController({
 
   const handleDeletingTask = (
     taskValue: string,
-    _taskDetails?: Record<string, unknown>
+    _taskDetails?: Record<string, unknown>,
   ) => {
     const tasks = new Set(form.getValues("tasks") || []);
     tasks.delete(taskValue);
@@ -314,7 +325,7 @@ export function ClassCreationController({
       (form.getValues("tasksValues") as Array<[string, DetailedCommandItem]>) ||
       [];
     const nextTasksValues = currentTasksValues.filter(
-      ([key]) => key !== taskValue
+      ([key]) => key !== taskValue,
     );
 
     form.setValue("tasksValues", nextTasksValues, {

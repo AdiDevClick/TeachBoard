@@ -1,22 +1,21 @@
 import { EvaluationRadioItemList } from "@/components/Radio/EvaluationRadioItem.tsx";
 import type { EvaluationRadioItemProps } from "@/components/Radio/types/radio.types.ts";
 import { RadioGroup } from "@/components/ui/radio-group.tsx";
+import {
+  debugLogs,
+  stepThreeControllerPropsInvalid,
+} from "@/configs/app-components.config.ts";
 import type { StepThreeControllerProps } from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
 import type { MouseEvent } from "react";
 
-export function StepThreeController({
-  pageId,
-  className,
-  inputControllers = [],
-  user,
-  preparedStudentsTasksSelection,
-  form,
-  students,
-  selectedClass,
-  tasks,
-  formId,
-  modules,
-}: StepThreeControllerProps) {
+export function StepThreeController(props: StepThreeControllerProps) {
+  if (!stepThreeControllerPropsInvalid(props)) {
+    debugLogs("StepThreeController", props);
+    return null;
+  }
+
+  const { formId, modules } = props;
+
   const handleOnClick = (
     e: MouseEvent<HTMLDivElement>,
     props: EvaluationRadioItemProps,
