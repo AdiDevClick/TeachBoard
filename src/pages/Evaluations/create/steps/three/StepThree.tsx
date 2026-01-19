@@ -9,8 +9,10 @@ import {
 } from "@/models/attendance-record-creation.models.ts";
 import { StepThreeController } from "@/pages/Evaluations/create/steps/three/controller/StepThreeController.tsx";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
+import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconArrowLeft } from "@tabler/icons-react";
+import { useState, type MouseEvent } from "react";
 import { useForm, type FieldValues } from "react-hook-form";
 
 export const stepThreeTitleProps = {
@@ -41,6 +43,12 @@ export function StepThree({
   inputControllers = attendanceRecordCreationBaseControllers,
   ...props
 }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
+  const [state, setState] = useState({
+    count: 0,
+    isClicked: false,
+    modulesAvailable: true,
+    modulesSelection: [] as string[],
+  });
   const user = useAppStore((state) => state.user);
   const selectedClass = useEvaluationStepsCreationStore(
     (state) => state.selectedClass,
@@ -81,13 +89,26 @@ export function StepThree({
     preparedStudentsTasksSelection,
   };
 
+  const handlePreviousClick = (e: MouseEvent<SVGSVGElement>) => {
+    preventDefaultAndStopPropagation(e);
+    setState({
+      ...state,
+      isClicked: !state.isClicked,
+      count: 0,
+      modulesAvailable: true,
+      modulesSelection: [],
+    });
+  };
+
   return (
     <>
       <IconArrowLeft
         className={stepThreeCardProps.cardClassName + " arrow-back"}
-        // onClick={(e) => onClickHandler({ e, ...clickProps, index })}
+        onClick={handlePreviousClick}
         data-name="modules-previous"
+        // onClick={(e) => onClickHandler({ e, ...clickProps, index })}
       />
+
       <StepThreeWithCard displayFooter={false} {...commonProps} />
     </>
   );
