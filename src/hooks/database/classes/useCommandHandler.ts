@@ -1,4 +1,7 @@
-import type { HeadingType } from "@/components/Command/types/command.types.ts";
+import type {
+  CommandSelectionItemProps,
+  HeadingType,
+} from "@/components/Command/types/command.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
   debugLogs,
@@ -10,6 +13,10 @@ import {
   NO_QUERY_LOGS,
 } from "@/configs/app.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
+import {
+  retrieveValuesByMode,
+  setValuesAfterAnimation,
+} from "@/hooks/database/classes/functions/use-command-handler.functions.ts";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
@@ -35,7 +42,7 @@ import {
   useMemo,
   useRef,
 } from "react";
-import type { FieldValues, Path, PathValue } from "react-hook-form";
+import type { FieldValues, Path } from "react-hook-form";
 
 /**
  * Custom hook to handle command operations including data fetching, dialog management, and form submissions.
@@ -50,7 +57,7 @@ export function useCommandHandler<
   TServerData = InferServerData<TRoute, TSubmitReshapeFn>,
   TViewData = InferViewData<TRoute, TSubmitReshapeFn>,
   E extends ApiError = ApiError,
-  TMeta extends CommandHandlerMetaData = CommandHandlerMetaData
+  TMeta extends CommandHandlerMetaData = CommandHandlerMetaData,
 >(params: UseCommandHandlerParams<TFieldValues, TRoute, TSubmitReshapeFn>) {
   const { form, pageId } = params;
   const {
@@ -109,7 +116,7 @@ export function useCommandHandler<
         queryKey: [task, rest.apiEndpoint],
       });
     },
-    []
+    [],
   );
 
   /**
@@ -120,7 +127,7 @@ export function useCommandHandler<
    */
   function handleSubmit(
     variables: HandleSubmitCallbackParams["variables"],
-    submitOpts?: HandleSubmitCallbackParams["submitOpts"]
+    submitOpts?: HandleSubmitCallbackParams["submitOpts"],
   ) {
     const options = dialogOptions(pageId);
     const {
@@ -155,7 +162,7 @@ export function useCommandHandler<
           reshapeFn,
         },
         " variables:",
-        variables
+        variables,
       );
     }
 
@@ -182,7 +189,7 @@ export function useCommandHandler<
   const handleOpening = useCallback(
     (
       open: boolean,
-      metaData?: HandleOpeningCallbackParams<TMeta>["metaData"]
+      metaData?: HandleOpeningCallbackParams<TMeta>["metaData"],
     ) => {
       if (!open) return;
 
@@ -195,7 +202,7 @@ export function useCommandHandler<
       // This catches regressions where inputControllers drift from API_ENDPOINTS.
       if (!fetchParamsPropsInvalid(metaData ?? {})) {
         const message = `[useCommandHandler] Missing fetchParams for task "${String(
-          task
+          task,
         )}". Ensure the related input controller is wired to API_ENDPOINTS.*.endPoint(s).`;
 
         debugLogs(message);
@@ -219,10 +226,10 @@ export function useCommandHandler<
           url: (apiEndpoint ?? prev.url) as string,
           contentId: task ?? prev.contentId,
           silent,
-        })
+        }),
       );
     },
-    []
+    [],
   );
 
   /**
@@ -243,7 +250,7 @@ export function useCommandHandler<
   const handleSelection = useCallback(
     (
       value: HandleSelectionCallbackParams["value"],
-      options: HandleSelectionCallbackParams["options"]
+      options: HandleSelectionCallbackParams["options"],
     ) => {
       const mainFormField = options.mainFormField as Path<TFieldValues>;
       const secondaryFormField =
@@ -264,7 +271,7 @@ export function useCommandHandler<
       // Use secondaryFormField if provided (this is the detailed data one), otherwise fallback to mainFormField
       const retrievedFormField = new UniqueSet<
         string,
-        Record<string, unknown> & { isSelected?: boolean }
+        CommandSelectionItemProps["command"]
       >(null, form.getValues(secondaryFormField ?? mainFormField) || []);
 
       if (retrievedFormField.has(value) || isSelected === false) {
@@ -276,41 +283,39 @@ export function useCommandHandler<
         retrievedFormField.set(value, detailedCommandItem);
       }
 
-      let values: unknown = Array.from(retrievedFormField.keys());
-      if (validationMode === "single") {
-        if (Array.isArray(values) && values.length > 0) {
-          values = values[0];
-        } else {
-          values = "";
-        }
-      }
+      const values = retrieveValuesByMode(validationMode, retrievedFormField);
 
-      if (mainFormField) {
-        form.setValue(
-          mainFormField,
-          values as PathValue<TFieldValues, Path<TFieldValues>>,
-          {
-            shouldValidate: true,
-          }
-        );
-      }
+      // !! IMPORTANT !! This function relies on mutation observer to handle the animation end event.
+      // The mutation observer is set up in the useMutationObserver hook and listens to changes in the DOM.
 
-      if (secondaryFormField) {
-        form.setValue(
-          secondaryFormField,
-          Array.from(retrievedFormField.entries()) as PathValue<
-            TFieldValues,
-            Path<TFieldValues>
-          >,
-          {
-            shouldValidate: false,
-            shouldDirty: false,
-            shouldTouch: false,
-          }
-        );
-      }
+      setValuesAfterAnimation(
+        mainFormField,
+        secondaryFormField,
+        retrievedFormField,
+        values,
+        form,
+      );
+
+      ///
+
+      // if (animating) {
+      //   console.log("SAVED ITEM = ", itemToAnimate);
+      //   const htmlElement = mutationObs.observedRefs.get(
+      //     itemToAnimate.id,
+      //   )?.element;
+
+      //   htmlElement?.addEventListener(
+      //     "animationend",
+      //     (e) => (animating = onTransitionEnd(e, retrievedFormField, value)),
+      //     {
+      //       once: true,
+      //     },
+      //   );
+
+      //   animating = triggerAnimation(htmlElement);
+      // }
     },
-    []
+    [],
   );
 
   /**
@@ -334,7 +339,7 @@ export function useCommandHandler<
    */
   const handleDataCacheUpdate = useCallback((): HeadingType[] | undefined => {
     const cachedData = queryClient.getQueryData<HeadingType[]>(
-      currentQueryCacheAndKey.cacheKey
+      currentQueryCacheAndKey.cacheKey,
     );
 
     if (DEV_MODE && !NO_CACHE_LOGS) {
@@ -342,7 +347,7 @@ export function useCommandHandler<
         "Cached data for ",
         currentQueryCacheAndKey.cacheKey,
         " is ",
-        cachedData
+        cachedData,
       );
     }
 
