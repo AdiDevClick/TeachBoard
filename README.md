@@ -40,7 +40,10 @@ Cette application représente le frontend de TeachBoard, une interface pédagogi
   - [Charts](#charts)
   - [Layout (Header / Sidebar / Footer)](#layout-header--sidebar--footer)
   - [Icons](#icons)
-- [Architecture & conventions — MVC (Controllers) et HOCs](#architecture-mvc-hocs) 
+- [Architecture & conventions — MVC (Controllers) et HOCs](#architecture-mvc-hocs)
+  - [Controllers (pattern MVC)](#controllers-pattern-mvc)
+  - [Structure des dossiers pour une feature (pattern MVC)](#structure-des-dossiers-pour-une-feature-pattern-mvc)
+  - [Construction d'un controller — Conventions obligatoires](#construction-dun-controller---conventions-obligatoires)
   - [HOCs — utilité & exemples](#hocs-utilite-exemples)
     - [Liste des HOCs (usage dans des vues)](#liste-des-hocs-usage-dans-des-vues)
       - [withTitledCard](#withtitledcard)
@@ -742,37 +745,81 @@ const token = SESSION_TOKEN_SCHEMA.parse('2682dc7e6b3b0d08547106ebac94cee8'); //
 Cette section décrit les **conventions d'architecture** utilisées dans le projet pour séparer la logique métier (Controllers) et la présentation (Composants), ainsi que l'usage des **Higher-Order Components (HOCs)** pour les petits patterns réutilisables de layout ou d'intégration.
 
 ### Controllers (pattern MVC)
-- **Emplacement:** chaque feature peut contenir un dossier `controller/` près du composant (ex. `src/components/ClassCreation/controller/ClassCreationController.tsx`).
 - **Rôle:** orchestrer le flux (appel d'API via `useFetch`/`useCommandHandler`, gestion du formulaire, manipulation du cache React Query, callbacks, side-effects). Ne doit pas rendre des éléments purement présentiels complexes — déléguez le rendu aux composants enfants.
 - **Bonnes pratiques :**
   - Garder la logique (fetching, transformation, orchestration) dans le controller.
   - Utiliser des hooks partagés (`useCommandHandler`, `useFetch`, etc.) pour standardiser les interactions réseau.
+    - `useCommandHandler` expose déjà toute la logique de fetching, opening, selection etc... que demande un formulaire et est donc un hook très pratique à prioriser.
   - Exposer des props simples et typés au composant présentational (ex. `ClassCreationController` expose `form` et handlers, et rend `<ControlledInputList/>`, `<PopoverFieldWithCommands/>` etc.).
   - Tester les controllers via des tests unitaires simulant les hooks et le store (Vitest + stubs).
 
-**Exemple simplifié (pattern courant)**
-```tsx
-// Dans un controller
-const handleValidSubmit = (values: FormSchema) => submitCallback(values, { method: 'POST' });
-
-return <FormComponent form={form} onSubmit={handleValidSubmit} />;
-```
+<a id="structure-des-dossiers-pour-une-feature-pattern-mvc"></a>
 
 ### Structure des dossiers pour une feature (pattern MVC)
 Voici la convention de structure (format demandé : `dossier > controller/types/functions/le-composant`) :
 
 - `src/components/<Feature>/` — dossier de la feature
-  - `controller/` — orchestration (fetchs, soumissions, cache, side-effects)
+  - `controller/` — orchestration (fetchs, soumissions, cache, side-effects) — voir [Controllers (pattern MVC)](#controllers-pattern-mvc) pour les principes et bonnes pratiques.
   - `types/` — interfaces et types TypeScript (props, DTOs, responses)
   - `functions/` — helpers et fonctions pures (reshapers, transformateurs, utilitaires)
   - `<Feature>.tsx` — composant présentational (UI, rendu, props)
 
-- **Bonnes pratiques :**
-  - `controller` contient la logique métier et les effets de bord ; `functions` doit rester purement fonctionnel et testable.
-  - Nommez clairement : `XController.tsx`, `x.types.ts`, `x.helpers.ts`.
-  - Ajoutez des tests unitaires pour les fichiers dans `functions/` et pour le `controller` (stubs pour les hooks); testez l'UI des composants via des tests d'intégration si nécessaire.
-  - Évitez d'écrire des appels réseau ou side-effects dans `types/` ou `functions/`.
+> Note : Les bonnes pratiques détaillées (typage, tests, exposition des endpoints POST) sont documentées dans la section **Controllers (pattern MVC)** et dans **Construction d'un controller — Conventions obligatoires**.
 
+
+
+### Construction d'un controller — Conventions obligatoires
+
+- **Typage :** Les props du controller **doivent** utiliser `AppControllerInterface` en passant le schéma du formulaire. Exemple de signature :
+
+```ts
+type MyControllerProps = AppControllerInterface<
+  MyFormSchema,
+  typeof API_ENDPOINTS.POST.CREATE_X.endpoint,
+  typeof API_ENDPOINTS.POST.CREATE_X.dataReshape
+>;
+```
+
+- **Endpoint POST (obligatoire quand utilisé) :** Si le controller effectue un `POST` (soumission), exposez dans les props au moins : `submitRoute` et `submitDataReshapeFn`, typés (idéalement avec `typeof API_ENDPOINTS.POST.<NAME>.endpoint` et `typeof API_ENDPOINTS.POST.<NAME>.dataReshape`) afin qu'ils puissent être passés au `useCommandHandler` ou au `submitCallback`.
+
+- **Valeurs par défaut :** Il est recommandé d'initialiser `submitRoute` / `submitDataReshapeFn` depuis `API_ENDPOINTS` pour garantir la cohérence (voir exemple ci-dessous et [`ClassCreationController`](src/components/ClassCreation/controller/ClassCreationController.tsx)).
+
+- **Tests & contrats :** Toute modification d'un `dataReshape` (ou ajout d'un endpoint) **doit** être accompagnée d'un test de contrat dans `src/tests/units/endpoints/` (voir `api-endpoints.config.contract.test.ts`).
+
+**Exemple (pattern courant)**
+
+```ts
+export function MyController({
+  form,
+  pageId,
+  submitRoute = API_ENDPOINTS.POST.CREATE_X.endpoint,
+  submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_X.dataReshape,
+}: MyControllerProps) {
+  const { submitCallback } = useCommandHandler({ form, pageId, submitRoute, submitDataReshapeFn });
+
+  const handleValidSubmit = (values: MyFormSchema) =>
+    submitCallback(values, { method: HTTP_METHODS.POST });
+
+  return <FormComponent form={form} onSubmit={form.handleSubmit(handleValidSubmit)} />;
+}
+```
+
+**Fichiers utiles :**
+- [`AppControllerInterface`](src/types/AppControllerInterface.ts)
+- [`useCommandHandler`](src/hooks/database/classes/useCommandHandler.ts)
+- [`API_ENDPOINTS`](src/configs/api.endpoints.config.ts)
+- [`ClassCreationController`](src/components/ClassCreation/controller/ClassCreationController.tsx)
+- [`api-endpoints.config.contract.test.ts`](src/tests/units/endpoints/api-endpoints.config.contract.test.ts)
+
+**Exemple simplifié (pattern courant)**
+```tsx
+// Dans un controller
+import { HTTP_METHODS } from "@/configs/app.config.ts";
+
+const handleValidSubmit = (values: FormSchema) => submitCallback(values, { method: HTTP_METHODS.POST });
+
+return <FormComponent form={form} onSubmit={handleValidSubmit} />;
+```
 
 
 <h3 id="hocs-utilite-exemples"/>
