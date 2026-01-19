@@ -11,7 +11,7 @@ import type {
  * Union of common event types where we want to call preventDefault/stopPropagation safely.
  */
 export type PreventDefaultAndStopPropagation =
-  | MouseEvent<HTMLElement>
+  | MouseEvent<HTMLElement | SVGElement>
   | undefined
   | null
   | Event;
@@ -66,13 +66,14 @@ export type RemainingProps<C, Provided> = Omit<C, keyof Provided>;
 /**
  * Extract the element type from an array or the tuple [key, value] from a record.
  */
-export type ExtractItemType<TItems> = TItems extends Array<infer T>
-  ? T
-  : TItems extends readonly (infer T)[]
-  ? T
-  : TItems extends Record<string, infer T>
-  ? [string, T]
-  : never;
+export type ExtractItemType<TItems> =
+  TItems extends Array<infer T>
+    ? T
+    : TItems extends readonly (infer T)[]
+      ? T
+      : TItems extends Record<string, infer T>
+        ? [string, T]
+        : never;
 
 /**
  * Extract React element props from an element-like type.
@@ -131,7 +132,7 @@ export type EnsureContentProps<T, S extends string> = T extends {
  */
 export type EnsureContentList<
   T extends readonly unknown[],
-  PropName extends string
+  PropName extends string,
 > = T & { [K in keyof T]: EnsureContentProps<T[K], PropName> };
 
 /**
