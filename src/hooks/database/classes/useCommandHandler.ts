@@ -285,9 +285,6 @@ export function useCommandHandler<
 
       const values = retrieveValuesByMode(validationMode, retrievedFormField);
 
-      // !! IMPORTANT !! This function relies on mutation observer to handle the animation end event.
-      // The mutation observer is set up in the useMutationObserver hook and listens to changes in the DOM.
-
       setValuesAfterAnimation(
         mainFormField,
         secondaryFormField,
