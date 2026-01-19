@@ -14,6 +14,7 @@ export const NO_MUTATION_OBSERVER_LOGS = true;
 export const NO_CACHE_LOGS = true;
 export const NO_QUERY_LOGS = false;
 export const NO_COMPONENT_WARNING_LOGS = true;
+export const ANIMATIONS_LOGS = false;
 
 /** Supported HTTP methods for API requests */
 export const HTTP_METHODS = {
