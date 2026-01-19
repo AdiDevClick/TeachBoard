@@ -252,7 +252,7 @@ export function Modal({
           ...popStateEvent?.state,
         },
         modalURL,
-        10
+        10,
       );
     }
 
