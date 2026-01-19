@@ -1,3 +1,4 @@
+import type { CommandSelectionItemProps } from "@/components/Command/types/command.types.ts";
 import type {
   ApiEndpointType,
   DataReshapeFn,
@@ -62,7 +63,7 @@ export interface UseCommandHandlerParams<
   TFieldValues extends FieldValues = FieldValues,
   TRoute = unknown,
   TSubmitReshapeFn = never,
-  TPageId extends AppModalNames = AppModalNames
+  TPageId extends AppModalNames = AppModalNames,
 > {
   /** Zod validated form instance */
   form: UseFormReturn<TFieldValues>;
@@ -93,9 +94,7 @@ export type HandleSelectionCallbackParams = {
     /**
      * Extra payload saved alongside the selected value.
      */
-    detailedCommandItem?: Record<string, unknown> & {
-      isSelected?: boolean;
-    };
+    detailedCommandItem?: CommandSelectionItemProps["command"];
     /** Defaults to "array" for backward compatibility with multi-selection fields. */
     validationMode?: "array" | "single";
   };
