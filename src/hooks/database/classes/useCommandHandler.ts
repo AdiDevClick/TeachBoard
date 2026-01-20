@@ -292,25 +292,6 @@ export function useCommandHandler<
         values,
         form,
       );
-
-      ///
-
-      // if (animating) {
-      //   console.log("SAVED ITEM = ", itemToAnimate);
-      //   const htmlElement = mutationObs.observedRefs.get(
-      //     itemToAnimate.id,
-      //   )?.element;
-
-      //   htmlElement?.addEventListener(
-      //     "animationend",
-      //     (e) => (animating = onTransitionEnd(e, retrievedFormField, value)),
-      //     {
-      //       once: true,
-      //     },
-      //   );
-
-      //   animating = triggerAnimation(htmlElement);
-      // }
     },
     [],
   );
