@@ -1,7 +1,7 @@
 import type {
   DynamicTagItemDetails,
   DynamicTagState,
-} from "@/components/Tags/types.ts";
+} from "@/components/Tags/types/tags.types";
 import type { UsePopoverCRUDProps } from "@/hooks/types/use-popover-CRUD.types.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { useState, type PointerEvent } from "react";

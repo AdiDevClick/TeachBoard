@@ -5,7 +5,7 @@ import type {
   DynamicTagProps,
   DynamicTagsProps,
   DynamicTagsState,
-} from "@/components/Tags/types.ts";
+} from "@/components/Tags/types/tags.types";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Item,

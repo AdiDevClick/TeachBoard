@@ -1,3 +1,5 @@
+import type { PopoverItem } from "@/hooks/types/use-popover-CRUD.types.ts";
+
 export type DynamicTagItemDetails = {
   id: string;
   [key: string]: unknown;
@@ -5,17 +7,17 @@ export type DynamicTagItemDetails = {
 
 export type DynamicTagsState = DynamicTagItemDetails & { isExiting?: boolean };
 
-export type DynamicTagProps = {
+export type DynamicItemTuple = readonly [string, DynamicTagItemDetails];
+
+export type DynamicTagProps = PopoverItem & {
   onExitComplete?: (value: string) => void;
-  itemDetails?: DynamicTagsState;
-  value?: string;
 } & DynamicTagsSetters;
 
-export type DynamicTagItemList =
+export type DynamicTagsItemList =
   | Readonly<Record<string, DynamicTagItemDetails>>
-  | ReadonlyArray<readonly [unknown, DynamicTagItemDetails]>;
+  | DynamicItemTuple[];
 
-type DynamicTagsSetters = {
+export type DynamicTagsSetters = {
   onRemove?: (value: string, details?: DynamicTagItemDetails) => void;
   setRef?: (node?: Element | null, meta?: Record<string, unknown>) => void;
   observedRefs?: {
@@ -26,8 +28,7 @@ type DynamicTagsSetters = {
 export type DynamicTagsProps = DynamicTagsSetters & {
   pageId?: string;
   title?: string;
-  itemList: DynamicTagItemList;
-  onRemove?: (value: string, details?: DynamicTagItemDetails) => void;
+  itemList: DynamicTagsItemList;
 } & Record<string, unknown>;
 
 export type DynamicTagState = {

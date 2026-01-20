@@ -1,4 +1,3 @@
-import type { DynamicTagProps } from "@/components/Tags/types.ts";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Popover,
@@ -18,7 +17,7 @@ import { type ComponentType } from "react";
  *
  * @returns A new component with Popover CRUD functionality.
  */
-export function withPopoverCRUD<T extends DynamicTagProps>(
+export function withPopoverCRUD<T extends object>(
   WrappedComponent: ComponentType<T>,
 ) {
   return function PopoverCRUDWrapper(props: Readonly<UsePopoverCRUDProps & T>) {
