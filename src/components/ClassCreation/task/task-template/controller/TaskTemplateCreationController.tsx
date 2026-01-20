@@ -17,7 +17,7 @@ import type {
 } from "@/components/Command/types/command.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
 import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/PopoverField.tsx";
-import { DynamicTag } from "@/components/Tags/DynamicTag.tsx";
+import { DynamicTags } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
   commandSelectionDoesNotContainId,
@@ -135,13 +135,13 @@ export function TaskTemplateCreationController({
           currentDiplomaId,
           isDiplomaChanged,
           itemToDisplay,
-          activeDiplomaIdRef
+          activeDiplomaIdRef,
         );
       }
 
       return cachedData;
     },
-    [data, diplomaDatas, openedDialogs, pageId, queryClient]
+    [data, diplomaDatas, openedDialogs, pageId, queryClient],
   );
 
   /**
@@ -163,14 +163,14 @@ export function TaskTemplateCreationController({
    */
   const handleCommandSelection = (
     __value: string,
-    commandItemDetails: CommandItemType
+    commandItemDetails: CommandItemType,
   ) => {
     const isTask = Object.hasOwn(commandItemDetails, "description");
     if (isTask) {
       if (!commandSelectionDoesNotContainId(commandItemDetails)) {
         debugLogs(
           `TaskTemplateCreationController Selected task item has no ID, selection ignored`,
-          commandItemDetails
+          commandItemDetails,
         );
       }
       form.setValue("taskId", commandItemDetails.id, { shouldValidate: true });
@@ -179,7 +179,7 @@ export function TaskTemplateCreationController({
 
     const current = updateValues(
       commandItemDetails,
-      form.getValues("skillsDuplicate")
+      form.getValues("skillsDuplicate"),
     );
 
     // Convenient copy - This is used to avoid rebuilding the original Map reference in the form values
@@ -193,7 +193,7 @@ export function TaskTemplateCreationController({
       Array.from(current.values()) as TaskTemplateCreationFormSchema["modules"],
       {
         shouldValidate: true,
-      }
+      },
     );
   };
 
@@ -225,7 +225,7 @@ export function TaskTemplateCreationController({
         observedRefs={observedRefs}
         onOpenChange={openingCallback}
       />
-      <DynamicTag
+      <DynamicTags
         {...controllers.dynamicTagsControllers}
         itemList={diplomaDatas.tagData}
       />
