@@ -9,7 +9,6 @@ import type { ComponentProps, MouseEvent } from "react";
 export type EvaluationRadioItemProps = {
   id: UUID;
   name: string;
-  subSkills: ClassModules["subSkills"];
   description?: string;
   itemClick?: (
     e: MouseEvent<HTMLLabelElement>,
