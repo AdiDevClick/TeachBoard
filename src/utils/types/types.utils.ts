@@ -162,5 +162,14 @@ export type ContentPropsFor<T extends ComponentLike<unknown>> = Omit<
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Modal config must accept any component signature
 export type AnyComponentLike = ComponentLike<any>;
 
+/**
+ * Result type for probeProxyKey function.
+ */
+export type ProbeProxyResult = {
+  trapAvailable: boolean;
+  isProxyfied: boolean;
+  unsupported?: boolean;
+};
+
 type GenericSuccess<T extends ResponseInterface> = T;
 type GenericError<T extends ApiError> = T;

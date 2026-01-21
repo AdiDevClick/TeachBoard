@@ -1,7 +1,10 @@
 import type { DialogContextType } from "@/api/contexts/types/context.types.ts";
 import { debugLogs } from "@/configs/app-components.config.ts";
 import { LANGUAGE, type AppModalNames } from "@/configs/app.config";
-import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
+import type {
+  PreventDefaultAndStopPropagation,
+  ProbeProxyResult,
+} from "@/utils/types/types.utils.ts";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -94,6 +97,7 @@ export function handleModalOpening({
  * @param props - The props object to validate.
  * @param required - An array of required prop keys.
  * @param forbidden - An array of forbidden prop keys.
+ *
  * @returns True if any forbidden keys are present or any required keys are missing; otherwise, false.
  */
 export function checkPropsValidity(
@@ -138,6 +142,11 @@ export function checkPropsValidity(
 
 /**
  * Find forbidden keys present in props.
+ *
+ * @param propsKeys - Set of keys present in the props object
+ * @param forbiddenKeys - Set of forbidden prop keys
+ *
+ * @returns Object indicating if forbidden keys are present and which ones were found
  */
 function findForbiddenKeys(propsKeys: Set<string>, forbiddenKeys: Set<string>) {
   const found: string[] = [];
@@ -154,39 +163,77 @@ function findForbiddenKeys(propsKeys: Set<string>, forbiddenKeys: Set<string>) {
 
 /**
  * Find missing required keys and handle proxy-specific early return.
+ *
+ * @param props - The props object to validate
+ * @param k - The key to probe
+ *
+ * @returns ProbeProxyResult indicating the status of the key probe
+ */
+function probeProxyKey(
+  props: Record<string, unknown>,
+  k: string,
+): ProbeProxyResult {
+  const notSupportedMessage = "Proxy or Reflect.ownKeys not supported";
+  const returnDetails: ProbeProxyResult = {
+    trapAvailable: false,
+    isProxyfied: true,
+    unsupported: false,
+  };
+
+  try {
+    if (typeof Proxy === "undefined" || typeof Reflect.ownKeys !== "function") {
+      throw new TypeError(notSupportedMessage);
+    }
+
+    const trapAvailable = Reflect.ownKeys(props).includes(k);
+
+    if (!trapAvailable) {
+      throw new TypeError("Proxy traps not available");
+    }
+
+    Reflect.get(props, k);
+    const isProxyfied = props.__isProxyfied === true && k !== undefined;
+    
+    returnDetails.trapAvailable = true;
+    returnDetails.isProxyfied = isProxyfied;
+
+    return returnDetails;
+  } catch (error) {
+    if (error instanceof TypeError && error.message === notSupportedMessage) {
+      returnDetails.unsupported = true;
+    }
+
+    return returnDetails;
+  }
+}
+
+/**
+ * Find missing required keys in props.
+ *
+ * @description This will check under proxy conditions if needed.
+ *
+ * @param props - The props object to validate
+ * @param requiredKeys - Set of required prop keys
+ * @param propsKeys - Set of keys present in the props object
  */
 function findMissingRequiredKeys(
   props: Record<string, unknown>,
   requiredKeys: Set<string>,
   propsKeys: Set<string>,
 ) {
-  const missing = new Set();
-  const shouldBeProxyfied = new Set();
+  const missing = new Set<string>();
+  const shouldBeProxyfied = new Set<string>();
 
   for (const k of requiredKeys) {
-    let isProxyfied = false;
+    const { trapAvailable, isProxyfied, unsupported } = probeProxyKey(props, k);
 
-    // Object is a proxy
-    if (typeof Proxy !== "undefined" && typeof Reflect.ownKeys === "function") {
-      try {
-        // If ObjectReshaper() is used and a value is proxyfied, this should always be true
-        const trapAvailable = Reflect.ownKeys(props).includes(k);
-
-        if (trapAvailable) {
-          Reflect.get(props, k);
-          isProxyfied = props.__isProxyfied === true && k !== undefined;
-        }
-
-        if (!trapAvailable) {
-          shouldBeProxyfied.add(k);
-          missing.add(k);
-        }
-      } catch {
-        // Ignore errors from proxy detection/traps
-      }
+    if (!trapAvailable) {
+      shouldBeProxyfied.add(k);
+      missing.add(k);
+      continue;
     }
 
-    if (!isProxyfied && !propsKeys.has(k)) {
+    if (!isProxyfied && unsupported && !propsKeys.has(k)) {
       missing.add(k);
     }
   }
