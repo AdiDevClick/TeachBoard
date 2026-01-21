@@ -227,7 +227,7 @@ export function useCommandHandler<
 
       // Fail fast when a command/modal expects an endpoint but none is provided.
       // This catches regressions where inputControllers drift from API_ENDPOINTS.
-      if (!fetchParamsPropsInvalid(metaData ?? {})) {
+      if (fetchParamsPropsInvalid<TMeta>(metaData)) {
         const message = `[useCommandHandler] Missing fetchParams for task "${String(
           task,
         )}". Ensure the related input controller is wired to API_ENDPOINTS.*.endPoint(s).`;
