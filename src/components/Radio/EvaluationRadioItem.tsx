@@ -89,8 +89,15 @@ export const EvaluationRadioItemWithDescription = withEvaluationRadioItem(
 );
 
 /**
- * List of EvaluationRadioItem components.
+ * List of EvaluationRadioItem components with description.
  */
 export const EvaluationRadioItemList = withListMapper(
   EvaluationRadioItemWithDescription,
+);
+
+/**
+ * List of EvaluationRadioItem components without description.
+ */
+export const EvaluationRadioItemWithoutDescriptionList = withListMapper(
+  withEvaluationRadioItem(() => null),
 );
