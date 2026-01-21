@@ -166,7 +166,7 @@ export const inlineItemAndSwitchSelectionPropsInvalid = (
 /**
  * Validation requirements for EvaluationRadioItem.
  */
-const EVALUATION_RADIO_ITEM_REQUIRES = ["id", "name", "subSkills"];
+const EVALUATION_RADIO_ITEM_REQUIRES = ["id", "name"];
 
 export const evaluationRadioItemPropsInvalid = (
   props: EvaluationRadioItemProps,
