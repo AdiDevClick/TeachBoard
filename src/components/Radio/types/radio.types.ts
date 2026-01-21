@@ -1,6 +1,6 @@
 import type { ClassModules } from "@/api/store/types/steps-creation-store.types.ts";
 import type { UUID } from "@/api/types/openapi/common.types.ts";
-import type { Item } from "@/components/ui/item.tsx";
+import type { FieldLabel } from "@/components/ui/field.tsx";
 import type { ComponentProps, MouseEvent } from "react";
 
 /**
@@ -12,7 +12,16 @@ export type EvaluationRadioItemProps = {
   subSkills: ClassModules["subSkills"];
   description?: string;
   itemClick?: (
-    e: MouseEvent<HTMLDivElement>,
+    e: MouseEvent<HTMLLabelElement>,
     props: EvaluationRadioItemProps,
   ) => void;
-} & ComponentProps<typeof Item>;
+} & ComponentProps<typeof FieldLabel>;
+
+/**
+ * Evaluation radio item description props.
+ */
+export type EvaluationRadioItemDescriptionProps = Readonly<{
+  id: string;
+  subSkills: ClassModules["subSkills"];
+  description?: string;
+}>;
