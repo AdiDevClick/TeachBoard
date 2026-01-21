@@ -54,7 +54,7 @@ const defaultSchoolYear = year + " - " + (year + 1);
  * @param submitDataReshapeFn - The function to reshape data before submission
  */
 export function ClassCreationController(props: ClassCreationControllerProps) {
-  if (!classCreationControllerPropsInvalid(props)) {
+  if (classCreationControllerPropsInvalid(props)) {
     debugLogs("ClassCreationController", props);
   }
 

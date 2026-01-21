@@ -42,7 +42,7 @@ export function CommandItems(props: Readonly<CommandsProps>) {
       contextOnSelect?.(value, commandItem);
       externalOnSelect?.(value, commandItem);
     },
-    []
+    [],
   );
 
   return (
@@ -61,7 +61,7 @@ export function CommandItems(props: Readonly<CommandsProps>) {
                   <ListMapper items={item.items}>
                     {(command) => {
                       if (commandItemContainsInvalid(command)) {
-                        debugLogs("Rendering CommandItem");
+                        debugLogs("Rendering CommandItems", command);
                       }
 
                       const itemDetails = {
@@ -93,7 +93,7 @@ export function CommandItems(props: Readonly<CommandsProps>) {
 
 function withDialog(WrappedComponent: ComponentType) {
   return function DialogComponent(
-    props: ComponentProps<typeof WrappedComponent>
+    props: ComponentProps<typeof WrappedComponent>,
   ) {
     return (
       <CommandDialog>

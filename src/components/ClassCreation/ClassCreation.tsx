@@ -1,6 +1,7 @@
 import { ClassCreationController } from "@/components/ClassCreation/controller/ClassCreationController.tsx";
 import type { ClassCreationProps } from "@/components/ClassCreation/types/class-creation.types.ts";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { classCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import {
   classCreationSchema,
@@ -69,8 +70,10 @@ function ClassCreation({
       inputControllers,
       ...props,
       form,
+      submitRoute: API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
+      submitDataReshapeFn: API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
     }),
-    [form.formState, props]
+    [form.formState, props],
   );
   return <ClassCreationWithCard {...commonProps} />;
 }
