@@ -39,7 +39,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     dataSource: T[] | T,
     shapeToBuild: Partial<Record<keyof T, unknown>> = {} as Partial<
       Record<keyof T, unknown>
-    >
+    >,
   ) {
     this.#dataSource = this.#deepClone(dataSource);
     this.#shapeToBuild = shapeToBuild;
@@ -59,7 +59,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
       if (DEV_MODE && !NO_PROXY_LOGS) {
         console.warn(
           "[ObjectReshape] structuredClone failed, using JSON serialization fallback:",
-          error
+          error,
         );
       }
       return JSON.parse(JSON.stringify(data));
@@ -123,7 +123,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
       for (const [key, value] of Object.entries(this.#dataSource)) {
         const clonedItems = Array.isArray(value)
           ? value.map((item) =>
-              typeof item === "object" && item !== null ? { ...item } : item
+              typeof item === "object" && item !== null ? { ...item } : item,
             )
           : value;
 
@@ -156,7 +156,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   createPropertyWithContentFromKeys(
     keys: string[],
     outputKey: string,
-    separator = " "
+    separator = " ",
   ) {
     this.#computedProperties.set(outputKey, (item) => {
       return keys
@@ -228,7 +228,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    * For simple fallback, use `assignWithFallback()` directly.
    */
   assign(
-    pairs: Array<[string, ...string[]] | { target: string; sources: string[] }>
+    pairs: Array<[string, ...string[]] | { target: string; sources: string[] }>,
   ) {
     this.#initShapedItem();
     for (const pair of pairs) {
@@ -305,7 +305,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     newItem: Record<string, unknown>,
     itemsKey = "items",
     groupConditionKey?: string,
-    groupConditionValue?: string
+    groupConditionValue?: string,
   ) {
     let jobDone = false;
 
@@ -338,7 +338,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    */
   #copyObjectExcluding(
     source: Record<string, unknown>,
-    excludeKey?: string
+    excludeKey?: string,
   ): Record<string, unknown> {
     const result: Record<string, unknown> = {};
     for (const key in source) {
@@ -416,7 +416,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    */
   #resolveValue(
     item: Record<string, unknown>,
-    sourceKeys: string[]
+    sourceKeys: string[],
   ): { value: unknown; sourceKey: string } | undefined {
     for (const sourceKey of sourceKeys) {
       if (Object.hasOwn(item, sourceKey)) {
@@ -436,7 +436,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    */
   #applyMappings(
     item: Record<string, unknown>,
-    target: Record<string, unknown>
+    target: Record<string, unknown>,
   ): void {
     for (const [targetKey, sourceKeys] of this.#mappingProxies.entries()) {
       const resolved = this.#resolveValue(item, sourceKeys);
@@ -466,7 +466,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    */
   #applyComputedProperties(
     source: Record<string, unknown>,
-    target: Record<string, unknown>
+    target: Record<string, unknown>,
   ): void {
     for (const [key, computeFn] of this.#computedProperties.entries()) {
       target[key] = computeFn(source);
@@ -494,7 +494,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    * @returns A new array with all items transformed
    */
   #buildItemsArray(
-    sourceArray: Array<Record<string, unknown>>
+    sourceArray: Array<Record<string, unknown>>,
   ): Array<Record<string, unknown>> {
     return sourceArray.map((item) => this.buildItem(item));
   }
@@ -525,7 +525,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
           for (const key in transformedGroup) {
             if (Array.isArray(transformedGroup[key])) {
               transformedGroup[key] = this.#buildItemsArray(
-                transformedGroup[key]
+                transformedGroup[key],
               );
             }
           }
@@ -538,7 +538,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     // Original behavior for assignSourceTo() pattern
     const result = this.#copyObjectExcluding(
       this.#newShapedItem,
-      this.#assignedSourceKey
+      this.#assignedSourceKey,
     );
 
     if (this.#assignedSourceKey) {
@@ -571,7 +571,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    */
   deepProxy<T extends Record<string, unknown> | unknown[]>(
     obj: T,
-    handler: ProxyHandler<Record<string, unknown>>
+    handler: ProxyHandler<Record<string, unknown>>,
   ): T {
     if (typeof obj !== "object" || obj === null) {
       return obj;
@@ -583,7 +583,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
       if (typeof val === "object" && val !== null) {
         (obj as Record<string, unknown>)[key] = this.deepProxy(
           val as Record<string, unknown> | unknown[],
-          handler
+          handler,
         );
       }
     }
@@ -610,7 +610,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
       },
       getOwnPropertyDescriptor: (
         target: Record<string, unknown>,
-        prop: string | symbol
+        prop: string | symbol,
       ) => {
         // !! IMPORTANT !! Check if the property exists directly on the target first
         const directDescendant = Reflect.getOwnPropertyDescriptor(target, prop);
@@ -626,10 +626,12 @@ export class ObjectReshape<T extends Record<string, unknown>> {
             if (resolved) {
               const desc = Reflect.getOwnPropertyDescriptor(
                 target,
-                resolved.sourceKey
+                resolved.sourceKey,
               );
-              if (desc)
+              if (desc) {
+                Reflect.set(target, "__isProxyfied", true);
                 return { ...desc, enumerable: true, configurable: true };
+              }
             }
           }
         }
@@ -638,7 +640,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
       get: (
         target: Record<string, unknown>,
         prop: string | symbol,
-        receiver: unknown
+        receiver: unknown,
       ): unknown => {
         if (typeof prop === "string") {
           // !! IMPORTANT !! Check if the property exists directly on the target first
@@ -662,9 +664,10 @@ export class ObjectReshape<T extends Record<string, unknown>> {
                   "(tried:",
                   sourceKeys.join(" -> "),
                   ") with value:",
-                  resolved.value
+                  resolved.value,
                 );
               }
+              Reflect.set(target, "__isProxyfied", true, receiver);
               return resolved.value;
             }
 
@@ -680,9 +683,10 @@ export class ObjectReshape<T extends Record<string, unknown>> {
                     "resolved to computed source:",
                     sourceKey,
                     "with value:",
-                    computedValue
+                    computedValue,
                   );
                 }
+                Reflect.set(target, "__isProxyfied", true, receiver);
                 return computedValue;
               }
             }
@@ -695,14 +699,14 @@ export class ObjectReshape<T extends Record<string, unknown>> {
         target: Record<string, unknown>,
         prop: string | symbol,
         value: unknown,
-        receiver: unknown
+        receiver: unknown,
       ): boolean => {
         if (DEV_MODE && !NO_PROXY_LOGS) {
           console.log(
             "SET EARLY trap called for prop:",
             prop,
             "with value:",
-            value
+            value,
           );
         }
 
@@ -722,7 +726,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   rename(oldKey: string, newName: string) {
     if (!this.#isPlainObject) {
       throw new TypeError(
-        "rename() can only be used if #dataSource is a plain object"
+        "rename() can only be used if #dataSource is a plain object",
       );
     }
     if (Object.hasOwn(this.#dataSource, oldKey)) {
