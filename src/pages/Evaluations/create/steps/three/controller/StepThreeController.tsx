@@ -9,7 +9,7 @@ import type { StepThreeControllerProps } from "@/pages/Evaluations/create/steps/
 import type { MouseEvent } from "react";
 
 export function StepThreeController(props: StepThreeControllerProps) {
-  if (!stepThreeControllerPropsInvalid(props)) {
+  if (stepThreeControllerPropsInvalid(props)) {
     debugLogs("StepThreeController", props);
     return null;
   }
