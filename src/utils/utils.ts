@@ -101,7 +101,7 @@ export function handleModalOpening({
  * @returns True if any forbidden keys are present or any required keys are missing; otherwise, false.
  */
 export function checkPropsValidity(
-  props: Record<string, unknown> | null | undefined,
+  props: Record<string, unknown>,
   required: string[],
   forbidden: string[],
 ) {
@@ -193,7 +193,7 @@ function probeProxyKey(
 
     Reflect.get(props, k);
     const isProxyfied = props.__isProxyfied === true && k !== undefined;
-    
+
     returnDetails.trapAvailable = true;
     returnDetails.isProxyfied = isProxyfied;
 
