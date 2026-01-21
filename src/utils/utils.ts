@@ -118,19 +118,17 @@ export function checkPropsValidity(
   // If proxy special-case applies, helper returns an early boolean result
   const missingResult = findMissingRequiredKeys(props, newRequired, propsKeys);
 
-  if (typeof missingResult.earlyProxyResult === "boolean") {
-    return missingResult.earlyProxyResult;
-  }
-
   const requiredIsMissing = missingResult.requiredIsMissing;
   const requiredMissing = missingResult.missingKeys;
 
   const baseDetails = {
-    providedProps: props,
+    originalProvidedProps: props,
+    listOfPropsKeys: propsKeys,
     requiredKeys: required,
     forbiddenKeys: forbidden,
     __requiredMissing: requiredMissing,
     __forbiddenKeysFound: forbiddenKeysFound,
+    shouldBeProxyfied: missingResult.shouldBeProxyfied ?? [],
   };
 
   displayLogs(forbiddenPresent, requiredIsMissing, baseDetails);
@@ -162,30 +160,41 @@ function findMissingRequiredKeys(
   requiredKeys: Set<string>,
   propsKeys: Set<string>,
 ) {
-  const missing: string[] = [];
+  const missing = new Set();
+  const shouldBeProxyfied = new Set();
 
   for (const k of requiredKeys) {
-    const value = (props as any)[k];
+    let isProxyfied = false;
 
     // Object is a proxy
     if (typeof Proxy !== "undefined" && typeof Reflect.ownKeys === "function") {
-      const isProxy = value.get("__isProxyfied");
+      try {
+        // If ObjectReshaper() is used and a value is proxyfied, this should always be true
+        const trapAvailable = Reflect.ownKeys(props).includes(k);
 
-      if (isProxy) {
-        const keys = Reflect.ownKeys(props);
-        // If proxy logic applies, return an early result that caller must respect
-        return { earlyProxyResult: !keys.includes(k) };
+        if (trapAvailable) {
+          Reflect.get(props, k);
+          isProxyfied = props.__isProxyfied === true && k !== undefined;
+        }
+
+        if (!trapAvailable) {
+          shouldBeProxyfied.add(k);
+          missing.add(k);
+        }
+      } catch {
+        // Ignore errors from proxy detection/traps
       }
     }
 
-    if (!propsKeys.has(k)) {
-      missing.push(k);
+    if (!isProxyfied && !propsKeys.has(k)) {
+      missing.add(k);
     }
   }
 
   return {
-    requiredIsMissing: missing.length > 0,
-    missingKeys: missing,
+    shouldBeProxyfied: Array.from(shouldBeProxyfied),
+    requiredIsMissing: missing.size > 0,
+    missingKeys: Array.from(missing),
   };
 }
 /**
