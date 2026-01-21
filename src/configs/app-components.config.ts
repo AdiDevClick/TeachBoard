@@ -1,8 +1,13 @@
 import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.ts";
 import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import type { ClassCreationControllerProps } from "@/components/ClassCreation/types/class-creation.types.ts";
+import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import type { EvaluationRadioItemProps } from "@/components/Radio/types/radio.types.ts";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
+import type {
+  CommandHandlerMetaData,
+  HandleOpeningCallbackParams,
+} from "@/hooks/database/types/use-command-handler.types.ts";
 import type { StepThreeControllerProps } from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
 import { checkPropsValidity } from "@/utils/utils.ts";
 
@@ -126,8 +131,9 @@ export function simpleAddButtonWithToolTipPropsInvalid(
  * Used by {@link useCommandHandler}
  */
 const FETCH_PARAMS_REQUIRES = ["contentId", "apiEndpoint", "dataReshapeFn"];
-export const fetchParamsPropsInvalid = (props: Record<string, unknown>) =>
-  checkPropsValidity(props, FETCH_PARAMS_REQUIRES, []);
+export const fetchParamsPropsInvalid = <T extends CommandHandlerMetaData>(
+  props: HandleOpeningCallbackParams<T>["metaData"],
+) => checkPropsValidity(props!, FETCH_PARAMS_REQUIRES, []);
 
 //                    ------------
 
@@ -138,7 +144,7 @@ export const fetchParamsPropsInvalid = (props: Record<string, unknown>) =>
  */
 const TASK_MODAL_REQUIRES = ["id"];
 
-export const taskModalPropsInvalid = (props: unknown) =>
+export const taskModalPropsInvalid = (props: Pick<CommandItemType, "id">) =>
   checkPropsValidity(props, TASK_MODAL_REQUIRES, []);
 
 //                    ------------
@@ -161,7 +167,12 @@ const EVALUATION_RADIO_ITEM_REQUIRES = ["id", "name", "subSkills"];
 
 export const evaluationRadioItemPropsInvalid = (
   props: EvaluationRadioItemProps,
-) => checkPropsValidity(props, EVALUATION_RADIO_ITEM_REQUIRES, []);
+) =>
+  checkPropsValidity(
+    props as unknown as Record<string, unknown>,
+    EVALUATION_RADIO_ITEM_REQUIRES,
+    [],
+  );
 
 //                    ------------
 
