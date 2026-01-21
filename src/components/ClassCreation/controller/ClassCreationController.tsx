@@ -32,7 +32,7 @@ import { useAvatarDataGenerator } from "@/hooks/useAvatarDataGenerator.ts";
 import type { ClassCreationFormSchema } from "@/models/class-creation.models.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { Activity, useEffect, useRef, useState } from "react";
-import { useWatch, type FieldErrors } from "react-hook-form";
+import { useWatch } from "react-hook-form";
 
 const year = new Date().getFullYear();
 const years = yearsListRange(year, 5);
@@ -88,6 +88,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     openedDialogs,
     resultsCallback,
     selectionCallback,
+    invalidSubmitCallback,
   } = useCommandHandler({
     form,
     pageId,
@@ -173,43 +174,6 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     submitCallback(variables, {
       method: HTTP_METHODS.POST,
     });
-  };
-
-  /**
-   * Handle Class Creation form submission when there are validation errors
-   *
-   * @param errors - The validation errors
-   */
-  const handleInvalidSubmit = (
-    errors: FieldErrors<ClassCreationFormSchema>,
-  ) => {
-    if (DEV_MODE) {
-      const currentValues = form.getValues() as ClassCreationFormSchema;
-
-      type InvalidSubmitDebug = {
-        at: number;
-        keys: string[];
-        values: ClassCreationFormSchema;
-      };
-
-      type GlobalWithInvalidSubmit = typeof globalThis & {
-        __TB_CLASS_CREATION_LAST_INVALID_SUBMIT__?: InvalidSubmitDebug;
-      };
-
-      (
-        globalThis as GlobalWithInvalidSubmit
-      ).__TB_CLASS_CREATION_LAST_INVALID_SUBMIT__ = {
-        at: Date.now(),
-        keys: Object.keys(errors ?? {}),
-        values: {
-          ...currentValues,
-        },
-      };
-
-      if (!NO_CACHE_LOGS) {
-        console.debug("ClassCreation invalid submit", errors);
-      }
-    }
   };
 
   /**
@@ -353,7 +317,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     <form
       ref={(el) => setRef(el, { name: pageId, formId })}
       id={formId}
-      onSubmit={form.handleSubmit(handleValidSubmit, handleInvalidSubmit)}
+      onSubmit={form.handleSubmit(handleValidSubmit, invalidSubmitCallback)}
       className={className}
     >
       <ControlledInputList
