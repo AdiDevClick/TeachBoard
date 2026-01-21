@@ -1,4 +1,5 @@
 import type { DialogContextType } from "@/api/contexts/types/context.types.ts";
+import { debugLogs } from "@/configs/app-components.config.ts";
 import { LANGUAGE, type AppModalNames } from "@/configs/app.config";
 import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
 import { clsx, type ClassValue } from "clsx";
@@ -60,7 +61,7 @@ export function wait(duration: number, message = "") {
  * @param e  Event to prevent default action and stop propagation
  */
 export function preventDefaultAndStopPropagation(
-  e: PreventDefaultAndStopPropagation
+  e: PreventDefaultAndStopPropagation,
 ) {
   if (!e) return;
   e.preventDefault();
@@ -96,21 +97,117 @@ export function handleModalOpening({
  * @returns True if any forbidden keys are present or any required keys are missing; otherwise, false.
  */
 export function checkPropsValidity(
-  props: unknown,
+  props: Record<string, unknown> | null | undefined,
   required: string[],
-  forbidden: string[]
+  forbidden: string[],
 ) {
-  if (typeof props !== "object" || props === null) return true;
-  const propsRecord = props as Record<string, unknown>;
+  if (typeof props !== "object" || props === null) {
+    debugLogs("Props validation failed: Props is not an object", props);
+    return true;
+  }
 
-  const forbiddenPresent = forbidden.some(
-    (forbiddenKey) => forbiddenKey in propsRecord
+  const newRequired = new Set(required);
+  const newForbidden = new Set(forbidden);
+  const propsKeys = new Set(Object.keys(props));
+
+  const { forbiddenPresent, forbiddenKeysFound } = findForbiddenKeys(
+    propsKeys,
+    newForbidden,
   );
 
-  const requiredPresent = required.some((requiredKey) => {
-    if (!(requiredKey in propsRecord)) return true;
-    const value = propsRecord[requiredKey];
-    return value === undefined || value === null || value === "";
-  });
-  return forbiddenPresent || requiredPresent;
+  // If proxy special-case applies, helper returns an early boolean result
+  const missingResult = findMissingRequiredKeys(props, newRequired, propsKeys);
+
+  if (typeof missingResult.earlyProxyResult === "boolean") {
+    return missingResult.earlyProxyResult;
+  }
+
+  const requiredIsMissing = missingResult.requiredIsMissing;
+  const requiredMissing = missingResult.missingKeys;
+
+  const baseDetails = {
+    providedProps: props,
+    requiredKeys: required,
+    forbiddenKeys: forbidden,
+    __requiredMissing: requiredMissing,
+    __forbiddenKeysFound: forbiddenKeysFound,
+  };
+
+  displayLogs(forbiddenPresent, requiredIsMissing, baseDetails);
+
+  return forbiddenPresent || requiredIsMissing;
+}
+
+/**
+ * Find forbidden keys present in props.
+ */
+function findForbiddenKeys(propsKeys: Set<string>, forbiddenKeys: Set<string>) {
+  const found: string[] = [];
+
+  for (const k of forbiddenKeys) {
+    if (propsKeys.has(k)) found.push(k);
+  }
+
+  return {
+    forbiddenPresent: found.length > 0,
+    forbiddenKeysFound: found,
+  };
+}
+
+/**
+ * Find missing required keys and handle proxy-specific early return.
+ */
+function findMissingRequiredKeys(
+  props: Record<string, unknown>,
+  requiredKeys: Set<string>,
+  propsKeys: Set<string>,
+) {
+  const missing: string[] = [];
+
+  for (const k of requiredKeys) {
+    const value = (props as any)[k];
+
+    // Object is a proxy
+    if (typeof Proxy !== "undefined" && typeof Reflect.ownKeys === "function") {
+      const isProxy = value.get("__isProxyfied");
+
+      if (isProxy) {
+        const keys = Reflect.ownKeys(props);
+        // If proxy logic applies, return an early result that caller must respect
+        return { earlyProxyResult: !keys.includes(k) };
+      }
+    }
+
+    if (!propsKeys.has(k)) {
+      missing.push(k);
+    }
+  }
+
+  return {
+    requiredIsMissing: missing.length > 0,
+    missingKeys: missing,
+  };
+}
+/**
+ * @param forbiddenPresent - Whether forbidden keys are present
+ * @param requiredIsMissing - Whether required keys are missing
+ * @param baseDetails - The base details to log
+ */
+function displayLogs(
+  forbiddenPresent: boolean,
+  requiredIsMissing: boolean,
+  baseDetails: object,
+) {
+  if (forbiddenPresent) {
+    debugLogs(`Props validation failed: Forbidden prop key(s) present in`, {
+      ...baseDetails,
+    });
+  }
+
+  if (requiredIsMissing) {
+    debugLogs(
+      `Props validation failed: Required prop key(s) missing or invalid in`,
+      { ...baseDetails },
+    );
+  }
 }
