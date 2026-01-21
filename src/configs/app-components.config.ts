@@ -130,7 +130,7 @@ export function simpleAddButtonWithToolTipPropsInvalid(
  *
  * Used by {@link useCommandHandler}
  */
-const FETCH_PARAMS_REQUIRES = ["contentId", "apiEndpoint", "dataReshapeFn"];
+const FETCH_PARAMS_REQUIRES = ["task", "apiEndpoint", "dataReshapeFn"];
 export const fetchParamsPropsInvalid = <T extends CommandHandlerMetaData>(
   props: HandleOpeningCallbackParams<T>["metaData"],
 ) => checkPropsValidity(props!, FETCH_PARAMS_REQUIRES, []);
