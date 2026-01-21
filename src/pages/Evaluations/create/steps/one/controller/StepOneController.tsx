@@ -2,7 +2,6 @@ import { useAppStore } from "@/api/store/AppStore";
 import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { PopoverFieldWithCommands } from "@/components/Popovers/PopoverField.tsx";
-import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
 import {
   DEV_MODE,
   NO_CACHE_LOGS,
@@ -23,19 +22,13 @@ const loadingName = "load-classes";
  * @param pageId - The ID of the page.
  */
 export function StepOneController({ pageId }: StepOneControllerProps) {
-  // const { openDialog } = useDialog();
   const user = useAppStore((state) => state.user);
   const setSelectedClass = useEvaluationStepsCreationStore(
-    (state) => state.setSelectedClass
+    (state) => state.setSelectedClass,
   );
   const selectedClassName = useEvaluationStepsCreationStore(
-    (state) => state.className
+    (state) => state.className,
   );
-  // Placeholder form, replace 'any' with actual form schema
-  // const [selected, setSelected] = useState(false);
-
-  // const { onSubmit, isLoading, isLoaded, data, error, setFetchParams } =
-  // useFetch();
 
   const {
     setRef,
@@ -43,7 +36,6 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
     newItemCallback,
     openingCallback,
     resultsCallback,
-    isLoaded,
     isLoading,
     data,
     error,
@@ -51,22 +43,6 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
     form: null!,
     pageId,
   });
-
-  // /**
-  //  * Handles the addition of a new class.
-  //  *
-  //  * @description A hack is used here to simulate a 'click' effect on the non-selectable item by toggling the `inert` prop and restauring it's state with a slight delay.
-  //  *
-  //  * You can use this function to add any additional logic needed when the 'Add Class' item is clicked.
-  //  *
-  //  * @param e - The pointer event triggered on adding a class.
-  //  */
-  // const onClassAdd = async (e: PointerEvent<HTMLDivElement>) => {
-  //   openDialog(e, "class-creation", { userId: user?.userId ?? "" });
-  //   setSelected(true);
-  //   await wait(150);
-  //   setSelected(false);
-  // };
 
   useEffect(() => {
     if (isLoading) {
@@ -85,32 +61,6 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
       // Errors are handled in onError callback
     }
   }, [data, error, isLoading]);
-
-  // const handleTriggerOpening = (isOpen: boolean) => {
-  //   if (isOpen && !isLoaded && !isLoading) {
-  //     setFetchParams((prev) => ({
-  //       ...prev,
-  //       silent: true,
-  //       method: API_ENDPOINTS.GET.METHOD,
-  //       url: API_ENDPOINTS.GET.CLASSES.endPoints.ALL,
-  //       contentId: USER_ACTIVITIES.classes,
-  //       dataReshapeFn: API_ENDPOINTS.GET.CLASSES.dataReshape,
-  //     }));
-  //     onSubmit();
-  //   }
-  // };
-
-  /**
-   * Handle opening of the VerticalFieldSelect component
-   *
-   * @description When opening, fetch data based on the select's meta information
-   *
-   * @param open - Whether the select is opening
-   * @param metaData - The meta data from the popover field that was opened
-   */
-  const handleOpening = (open: boolean, metaData?: MetaDatasPopoverField) => {
-    openingCallback(open, metaData);
-  };
 
   /**
    * Handle adding a new item
@@ -150,11 +100,6 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
   const handleOnSelect = (value: string, commandItem: CommandItemType) => {
     console.log("selected value :", value, commandItem);
     setSelectedClass(JSON.parse(JSON.stringify(commandItem)));
-    // if (form.watch("degreeConfigId") !== commandItem.id) {
-    //   selectedDiplomaRef.current = commandItem;
-    //   setIsSelectedDiploma(!!commandItem);
-    //   form.setValue("degreeConfigId", commandItem.id, { shouldValidate: true });
-    // }
   };
   return (
     <PopoverFieldWithCommands
@@ -165,7 +110,7 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
       setRef={setRef}
       commandHeadings={resultsCallback()}
       observedRefs={observedRefs}
-      onOpenChange={handleOpening}
+      onOpenChange={openingCallback}
       onSelect={handleOnSelect}
       onAddNewItem={handleNewItem}
     />
