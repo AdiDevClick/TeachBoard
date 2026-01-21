@@ -22,6 +22,7 @@ import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import type {
   CommandHandlerMetaData,
+  GlobalWithInvalidSubmit,
   HandleAddNewItemParams,
   HandleOpeningCallbackParams,
   HandleSelectionCallbackParams,
@@ -42,7 +43,7 @@ import {
   useMemo,
   useRef,
 } from "react";
-import type { FieldValues, Path } from "react-hook-form";
+import type { FieldErrors, FieldValues, Path } from "react-hook-form";
 
 /**
  * Custom hook to handle command operations including data fetching, dialog management, and form submissions.
@@ -71,6 +72,7 @@ export function useCommandHandler<
     serverData,
     isLoading,
   } = useFetch<TServerData, E, TViewData>();
+
   const {
     openDialog,
     closeDialog,
@@ -177,6 +179,31 @@ export function useCommandHandler<
       ...rest,
     }));
   }
+
+  /**
+   * Handle Class Creation form submission when there are validation errors
+   *
+   * @param errors - The validation errors
+   */
+  const handleInvalidSubmit = (errors: FieldErrors<TFieldValues>) => {
+    if (DEV_MODE) {
+      const currentValues = form.getValues();
+
+      (
+        globalThis as GlobalWithInvalidSubmit<TFieldValues>
+      ).__TB_CLASS_CREATION_LAST_INVALID_SUBMIT__ = {
+        at: Date.now(),
+        keys: Object.keys(errors ?? {}),
+        values: {
+          ...currentValues,
+        },
+      };
+
+      if (!NO_CACHE_LOGS) {
+        console.debug(pageId + " invalid submit", errors);
+      }
+    }
+  };
 
   /**
    * Handle opening of the VerticalFieldSelect component
@@ -412,6 +439,7 @@ export function useCommandHandler<
     openingCallback: handleOpening,
     selectionCallback: handleSelection,
     resultsCallback: handleDataCacheUpdate,
+    invalidSubmitCallback: handleInvalidSubmit,
     openedDialogs,
     setDialogOptions,
   };

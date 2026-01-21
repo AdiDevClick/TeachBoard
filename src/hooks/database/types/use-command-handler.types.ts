@@ -124,3 +124,19 @@ export type HandleSubmitCallbackParams = {
     silent?: boolean;
   };
 };
+
+/**
+ * Type for debugging invalid submits
+ */
+export type InvalidSubmitDebug<T> = {
+  at: number;
+  keys: string[];
+  values: T;
+};
+
+/**
+ * Global type extension for storing the last invalid submit
+ */
+export type GlobalWithInvalidSubmit<T> = typeof globalThis & {
+  __TB_CLASS_CREATION_LAST_INVALID_SUBMIT__?: InvalidSubmitDebug<T>;
+};
