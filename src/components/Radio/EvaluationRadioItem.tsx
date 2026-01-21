@@ -1,21 +1,21 @@
 import withListMapper from "@/components/HOCs/withListMapper.tsx";
+import { EvaluationRadioItemDescription } from "@/components/Radio/EvaluationRadioItemDescription.tsx";
 import type { EvaluationRadioItemProps } from "@/components/Radio/types/radio.types.ts";
-import { Badge } from "@/components/ui/badge.tsx";
 import {
-  Item,
-  ItemContent,
-  ItemDescription,
-  ItemTitle,
-} from "@/components/ui/item.tsx";
+  Field,
+  FieldContent,
+  FieldLabel,
+  FieldTitle,
+} from "@/components/ui/field.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import { RadioGroupItem } from "@/components/ui/radio-group.tsx";
 import {
   debugLogs,
   evaluationRadioItemPropsInvalid,
 } from "@/configs/app-components.config.ts";
-import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
+
 import "@css/EvaluationRadio.scss";
-import type { MouseEvent } from "react";
+import { type ComponentType, type MouseEvent } from "react";
 
 /**
  * Evaluation radio item component.
@@ -30,65 +30,67 @@ import type { MouseEvent } from "react";
  *
  * @returns null if props are invalid, otherwise the rendered radio item component.
  */
-export function EvaluationRadioItem(props: EvaluationRadioItemProps) {
-  const {
-    id,
-    name,
-    subSkills,
-    description = "Sous-compétences",
-    itemClick,
-    ...rest
-  } = props;
+function withEvaluationRadioItem<T extends object>(
+  WrappedComponent: ComponentType<T>,
+) {
+  return function EvaluationRadioItem<C extends EvaluationRadioItemProps>(
+    props: C & T,
+  ) {
+    const { id, name, itemClick, ...rest } = props;
 
-  if (evaluationRadioItemPropsInvalid(props)) {
-    debugLogs("EvaluationRadioItem");
-    return null;
-  }
+    if (evaluationRadioItemPropsInvalid(props)) {
+      debugLogs("EvaluationRadioItem");
+      return null;
+    }
 
-  /**
-   * Handles click event on the radio item.
-   *
-   * @description If an itemClick() handler is provided in props, it invokes that handler
-   *
-   * @param e - Mouse event object
-   */
-  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
-    preventDefaultAndStopPropagation(e);
-    itemClick?.(e, props);
+    /**
+     * Handles click event on the radio item.
+     *
+     * @description If an itemClick() handler is provided in props, it invokes that handler
+     *
+     * @param e - Mouse event object
+     */
+    const handleClick = (e: MouseEvent<HTMLLabelElement>) => {
+      e.stopPropagation();
+      itemClick?.(e, props);
+    };
+
+    return (
+      <FieldLabel
+        htmlFor={`r-${id}`}
+        className="evaluation-radio-item"
+        onClick={handleClick}
+        {...rest}
+      >
+        <Field className="evaluation-radio-item--container">
+          <FieldContent className="evaluation-radio-item__content">
+            <FieldTitle className="evaluation-radio-item__content--title">
+              <RadioGroupItem id={`r-${id}`} value={name} />
+              <Label
+                className="evaluation-radio-item__content--title__label"
+                htmlFor={`r-${id}`}
+              >
+                {name}
+              </Label>
+            </FieldTitle>
+            <WrappedComponent {...(props as T)} />
+          </FieldContent>
+        </Field>
+      </FieldLabel>
+    );
   };
-
-  return (
-    <Item
-      key={id}
-      variant="outline"
-      className="evaluation-radio-item--container"
-      onClick={handleClick}
-      {...rest}
-    >
-      <ItemContent className="evaluation-radio-item__content">
-        <ItemTitle className="evaluation-radio-item__content--title">
-          <RadioGroupItem id={`r-${id}`} value={name} />
-          <Label
-            className="evaluation-radio-item__content--title__label"
-            htmlFor={`r-${id}`}
-          >
-            {name}
-          </Label>
-        </ItemTitle>
-        <ItemDescription className="evaluation-radio-item__content--description">
-          <Badge variant="destructive" className="destructive-badge">
-            {subSkills?.size ?? 0}
-          </Badge>
-          <Label
-            className="evaluation-radio-item__content--description__label"
-            htmlFor={`r-${id}`}
-          >
-            {description}
-          </Label>
-        </ItemDescription>
-      </ItemContent>
-    </Item>
-  );
 }
 
-export const EvaluationRadioItemList = withListMapper(EvaluationRadioItem);
+/**
+ * EvaluationRadioItem component wrapped with description.
+ */
+export const EvaluationRadioItemWithDescription = withEvaluationRadioItem(
+  EvaluationRadioItemDescription,
+);
+
+/**
+ * List of EvaluationRadioItem components.
+ */
+export const EvaluationRadioItemList = withListMapper(
+  EvaluationRadioItemWithDescription,
+);

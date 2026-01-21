@@ -2,7 +2,10 @@ import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.t
 import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import type { ClassCreationControllerProps } from "@/components/ClassCreation/types/class-creation.types.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
-import type { EvaluationRadioItemProps } from "@/components/Radio/types/radio.types.ts";
+import type {
+  EvaluationRadioItemDescriptionProps,
+  EvaluationRadioItemProps,
+} from "@/components/Radio/types/radio.types.ts";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
 import type {
   CommandHandlerMetaData,
@@ -173,6 +176,17 @@ export const evaluationRadioItemPropsInvalid = (
     EVALUATION_RADIO_ITEM_REQUIRES,
     [],
   );
+
+//                    ------------
+
+/**
+ * Validation requirements for EvaluationRadioItemDescription.
+ */
+const EVALUATION_RADIO_ITEM_DESCRIPTION_REQUIRES = ["id", "subSkills"];
+
+export const evaluationRadioItemDescriptionPropsInvalid = (
+  props: EvaluationRadioItemDescriptionProps,
+) => checkPropsValidity(props, EVALUATION_RADIO_ITEM_DESCRIPTION_REQUIRES, []);
 
 //                    ------------
 
