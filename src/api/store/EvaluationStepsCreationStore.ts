@@ -1,4 +1,5 @@
 import type {
+  SetModulesSelectionType,
   StepsCreationState,
   StudentWithPresence,
 } from "@/api/store/types/steps-creation-store.types";
@@ -19,6 +20,12 @@ const DEFAULT_VALUES: StepsCreationState = {
   className: null,
   selectedClass: null,
   modules: new UniqueSet(),
+  moduleSelection: {
+    isClicked: false,
+    selectedModuleIndex: null,
+    selectedModule: null,
+    selectedModuleSubSkills: [],
+  },
 };
 
 /**
@@ -99,6 +106,21 @@ export const useEvaluationStepsCreationStore = create(
                 };
                 state.students.set(student.id, details);
               });
+            });
+          },
+          setModuleSelection(args: SetModulesSelectionType) {
+            const { isClicked, selectedModuleIndex, selectedModule } = args;
+
+            set((state) => {
+              const selection = state.moduleSelection;
+              const { subSkills, ...moduleWithoutSubSkills } = selectedModule;
+
+              selection.isClicked = isClicked;
+              selection.selectedModuleIndex = selectedModuleIndex;
+              selection.selectedModule = moduleWithoutSubSkills;
+              selection.selectedModuleSubSkills = Array.from(
+                subSkills?.values() ?? [],
+              );
             });
           },
           getStudentsPresenceSelectionData() {

@@ -29,6 +29,18 @@ export type ClassModules = SkillsType & {
   subSkills: UniqueSet<UUID, SkillsType>;
 };
 
+export type ModulesSelectionType = {
+  isClicked: boolean;
+  selectedModuleIndex: number | null;
+  selectedModule: Omit<ClassModules, "subSkills"> | null;
+  selectedModuleSubSkills: SkillsType[];
+};
+
+export type SetModulesSelectionType = Omit<
+  ModulesSelectionType,
+  "selectedModuleSubSkills"
+> & { selectedModule: ClassModules };
+
 /**
  * State interface for Steps Creation Store.
  */
@@ -43,6 +55,7 @@ export interface StepsCreationState {
   tasks: UniqueSet<UUID, ClassTasks>;
   evaluations?: unknown[] | null;
   modules: UniqueSet<UUID, ClassModules>;
+  moduleSelection: ModulesSelectionType;
 }
 
 export type SelectedClassModulesReturn = ClassModules[];
