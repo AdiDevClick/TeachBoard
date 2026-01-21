@@ -147,14 +147,14 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     const linkedDiploma = selectedDiplomaRef.current;
     const isNewTaskTemplate = metaData?.task === "new-task-template";
 
-    if (isNewTaskTemplate && !taskModalPropsInvalid(linkedDiploma?.id)) {
-      const message =
-        "Tried to open task template modal without a selected diploma.";
-      debugLogs("[ClassCreationController] - " + message);
-      throw new Error(message);
-    }
+    if (isNewTaskTemplate) {
+      if (!linkedDiploma || taskModalPropsInvalid(linkedDiploma)) {
+        const message =
+          "Tried to open task template modal without a selected diploma.";
+        debugLogs("[ClassCreationController] - " + message);
+        throw new Error(message);
+      }
 
-    if (isNewTaskTemplate && linkedDiploma) {
       metaData.apiEndpoint =
         API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
           linkedDiploma.id,
