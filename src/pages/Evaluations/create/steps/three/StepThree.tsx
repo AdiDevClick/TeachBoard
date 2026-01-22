@@ -1,8 +1,6 @@
 import { useAppStore } from "@/api/store/AppStore.ts";
 import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
-import { EvaluationRadioItemWithoutDescriptionList } from "@/components/Radio/EvaluationRadioItem.tsx";
-import { RadioGroup } from "@/components/ui/radio-group.tsx";
 import { attendanceRecordCreationBaseControllers } from "@/data/inputs-controllers.data.ts";
 import {
   attendanceRecordCreationSchemaInstance,
@@ -10,6 +8,7 @@ import {
   type AttendanceRecordCreationInputItem,
 } from "@/models/attendance-record-creation.models.ts";
 import { StepThreeModuleSelectionController } from "@/pages/Evaluations/create/steps/three/controllers/StepThreeModuleSelectionController";
+import { StepThreeStudentsEvaluationController } from "@/pages/Evaluations/create/steps/three/controllers/StepThreeStudentsEvaluationController.tsx";
 import { StepThreeSubskillsSelectionController } from "@/pages/Evaluations/create/steps/three/controllers/StepThreeSubskillsSelectionController.tsx";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
@@ -39,7 +38,7 @@ export const stepThreeModuleSelectionCardProps = {
 
 // Subskills selection
 export const stepThreeSubskillsSelectionTitleProps = {
-  title: "Liste des sous-compétences",
+  title: "Notation des élèves",
   description: "Quelles sous-compétences évaluer ?",
 };
 export const stepThreeSubskillsSelectionCardProps = {
@@ -141,6 +140,9 @@ export function StepThree({
     console.log("SIMPLE TEST \n", e, props);
   };
 
+  /**
+   * Dispatch left content based on module selection state
+   */
   useEffect(() => {
     if (
       moduleSelectionState.isClicked &&
@@ -175,24 +177,16 @@ export function StepThree({
         // onClick={(e) => onClickHandler({ e, ...clickProps, index })}
       />
       {!moduleSelectionState.isClicked && (
-        <StepThreeModuleSelectionWithCard
-          displayFooter={false}
-          {...commonProps}
-        />
+        <ModuleSelection displayFooter={false} {...commonProps} />
       )}
       {moduleSelectionState.isClicked && (
-        <StepThreeSubskillsSelectionWithCard
-          displayFooter={false}
-          {...commonProps}
-        />
+        <StudentsEvaluation displayFooter={false} {...commonProps} />
       )}
     </>
   );
 }
 
-const StepThreeModuleSelectionWithCard = withTitledCard(
-  StepThreeModuleSelectionController,
-);
-const StepThreeSubskillsSelectionWithCard = withTitledCard(
-  StepThreeSubskillsSelectionController,
+const ModuleSelection = withTitledCard(StepThreeModuleSelectionController);
+const StudentsEvaluation = withTitledCard(
+  StepThreeStudentsEvaluationController,
 );
