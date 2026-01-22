@@ -1,0 +1,100 @@
+@use "sass:string" as string;
+@use "sass:math" as math;
+@use "sass:meta" as meta;
+@use "sass:list" as list;
+
+/**
+  * _mixins.scss
+  * Collection of reusable Sass mixins for styling.
+  */
+
+/**
+  * DEFINE A CUSTOM CSS @Property.
+  *
+  * @param {string} $variable - The name of the CSS variable (without '--').
+      => You can provide either quoted or unquoted names.
+
+  * @param {string} $syntax - The syntax for the property (e.g., '<number>', 'percentage', '<color>').
+      => You can provide either 'percentage' or '<percentage>'.
+
+  * @param {boolean} $inherits - Whether the property inherits its value - (default: true)
+  * @param {string} $initial-value - The initial value of the property.
+
+  * @example:
+
+  @include property('slider-progress', 'percentage', true, 25%);
+  @include property(slider-progress, percentage, true, 25%);
+  @include property(slider-progress, '<percentage>', true, 25%);
+    => Each of them will define the same property.
+  */
+@mixin property($variable: variable, $syntax: "<number>", $inherits: true,
+  $initial-value: 0) {
+  // ensure variable name isn't quoted
+  $name: string.unquote($variable);
+
+  // normalize syntax: accept both 'percentage' and '<percentage>' and ensure it's wrapped with <> for @property
+  @if string.index($syntax, '<')==null or string.index($syntax, '>')==null {
+    $syntax: '<#{$syntax}>';
+  }
+
+
+  @property --#{$name} {
+    syntax: $syntax;
+    inherits: $inherits;
+    initial-value: $initial-value;
+  }
+}
+
+/**
+  * DEFINE MAX WIDTH CONTENT FOR THE MAIN CONTAINER USING A CROP MARGIN
+  *
+  * @param {string} $max-width-content - The maximum width of the content area.
+  * @param {string} $width-crop - The amount to crop from each side of the element.
+  *
+  * @example:
+  * @include apply-width-crop(1200px, 16px);
+  */
+@mixin apply-width-crop($max-width-content, $width-crop) {
+  width: min($max-width-content, calc(100% - ($width-crop * 2)));
+}
+
+/**
+  * APPLY REPEATED LINEAR GRADIENT FOR SLIDER
+  *
+  * @param {string} $degree - The angle of the gradient (e.g., '90deg').
+  * @param {string} $variable - The CSS variable representing the progress (e.g., '--slider-progress').
+  * @param {list} $ticks - A list of tick positions in percentages (default: 0 25 50).
+  * @param {string} $thickness - The thickness of the tick marks (default: 1px).
+  * @param {string} $color - The color of the tick marks (default: #fff).
+  *
+  * @example:
+  * @include apply-repeated-linear-gradient-for-slider(90deg, '--slider-progress', 0 25 50, 1px, #fff);
+  */
+@mixin apply-repeated-linear-gradient-for-slider($degree, $variable, $ticks: 0 25 50, $thickness: 1px, $color: #fff) {
+
+  // build separators list (top layers first)
+  $gradients: (
+  );
+
+@each $t in $ticks {
+  $slice: linear-gradient($degree, transparent 0, transparent calc(var($variable) + ($t * 1%) - $thickness), $color calc(var($variable) + ($t * 1%) - $thickness), $color calc(var($variable) + ($t * 1%) + $thickness), transparent calc(var($variable) + ($t * 1%) + $thickness));
+  $gradients: list.append($gradients, $slice, comma);
+}
+
+// join separators and base into a single background value
+$bg: '';
+
+@for $i from 1 through list.length($gradients) {
+  @if $i ==1 {
+    $bg: list.nth($gradients, $i);
+  }
+
+  @else {
+    $bg: $bg, list.nth($gradients, $i);
+  }
+}
+
+$bg: $bg;
+
+background: $bg;
+}
