@@ -19,7 +19,7 @@ export function StepThreeSubskillsSelectionController(
   );
 
   if (stepThreeControllerPropsInvalid(props)) {
-    debugLogs("StepThreeController", props);
+    debugLogs("StepThreeSubskillsSelectionController", props);
     return null;
   }
 
