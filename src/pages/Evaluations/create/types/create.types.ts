@@ -16,16 +16,6 @@ export type LeftContentProps = {
 } & PropsWithChildren;
 
 /**
- * Types for the right content component props
- */
-export type RightContentProps = {
-  item: {
-    content?: ComponentType;
-    [key: string]: unknown;
-  };
-};
-
-/**
  * Types for the create evaluations arrow click handler props
  */
 export type CreateEvaluationArrowsClickHandlerProps = {
