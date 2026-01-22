@@ -1,5 +1,5 @@
 import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
-import "@/assets/css/Silder.scss";
+import "@/assets/css/Slider.scss";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import type { EvaluationRadioItemProps } from "@/components/Radio/types/radio.types.ts";
 import { Badge } from "@/components/ui/badge.tsx";
