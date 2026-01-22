@@ -15,8 +15,16 @@ import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconArrowLeft } from "@tabler/icons-react";
-import { useState, type MouseEvent } from "react";
+import {
+  useEffect,
+  useState,
+  type Dispatch,
+  type JSX,
+  type MouseEvent,
+  type SetStateAction,
+} from "react";
 import { useForm, type FieldValues } from "react-hook-form";
+import { useOutletContext } from "react-router-dom";
 
 // Module selection
 export const stepThreeModuleSelectionTitleProps = {
@@ -64,7 +72,8 @@ export function StepThree({
     modulesAvailable: true,
     modulesSelection: [] as string[],
   });
-
+  const [, setLeftContent] =
+    useOutletContext<[JSX.Element, Dispatch<SetStateAction<JSX.Element>>]>();
   const user = useAppStore((state) => state.user);
   const selectedClass = useEvaluationStepsCreationStore(
     (state) => state.selectedClass,
@@ -132,6 +141,29 @@ export function StepThree({
     console.log("SIMPLE TEST \n", e, props);
   };
 
+  useEffect(() => {
+    if (
+      moduleSelectionState.isClicked &&
+      moduleSelectionState.selectedModuleSubSkills.length > 0
+    ) {
+      setLeftContent(
+        <StepThreeSubskillsSelectionController
+          {...commonProps}
+          modules={moduleSelectionState.selectedModuleSubSkills}
+        />,
+      );
+    } else {
+      setLeftContent(null!);
+    }
+
+    return () => {
+      setLeftContent(null!);
+    };
+  }, [
+    moduleSelectionState.isClicked,
+    moduleSelectionState.selectedModuleSubSkills,
+  ]);
+
   return (
     <>
       <IconArrowLeft
@@ -149,18 +181,10 @@ export function StepThree({
         />
       )}
       {moduleSelectionState.isClicked && (
-        <>
-          <StepThreeSubskillsSelectionWithCard
-            displayFooter={false}
-            {...commonProps}
-          />
-          <RadioGroup>
-            <EvaluationRadioItemWithoutDescriptionList
-              items={moduleSelectionState.selectedModuleSubSkills}
-              itemClick={onClickHandlerTest}
-            />
-          </RadioGroup>
-        </>
+        <StepThreeSubskillsSelectionWithCard
+          displayFooter={false}
+          {...commonProps}
+        />
       )}
     </>
   );

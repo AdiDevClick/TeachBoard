@@ -1,11 +1,10 @@
 import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.js";
 import { Tabs } from "@/components/ui/tabs";
-import { StepTwo } from "@/pages/Evaluations/create/steps/two/StepTwo.js";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/pages/Evaluations/create/types/create.types.js";
 import type { CreateEvaluationsLoaderData } from "@/routes/routes.config.js";
 import "@css/PageContent.scss";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type JSX } from "react";
 import { Outlet, useLoaderData, useNavigate } from "react-router-dom";
 import { TabContent } from "../../../components/Tabs/TabContent.js";
 
@@ -23,6 +22,8 @@ export function CreateEvaluations() {
   const [tabValue, setTabValue] = useState<string | undefined>(
     pageDatas?.step1.name,
   );
+
+  const [leftContent, setLeftContent] = useState<JSX.Element | null>(null);
 
   /**
    * Effect to navigate to the selected tab when tabValue changes
@@ -47,6 +48,7 @@ export function CreateEvaluations() {
       setTabValue,
       tabValues,
     },
+    leftContent,
   };
 
   return (
@@ -71,7 +73,7 @@ export function CreateEvaluations() {
               index={index}
               {...tabContentPropsAndFunctions}
             >
-              <Outlet context={StepTwo} />
+              <Outlet context={[leftContent, setLeftContent]} />
             </TabContent>
           );
         }}

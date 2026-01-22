@@ -1,6 +1,6 @@
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/pages/Evaluations/create/types/create.types.ts";
 import type { CreateEvaluationsLoaderData } from "@/routes/routes.config.tsx";
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 
 type PageDataItem = keyof NonNullable<CreateEvaluationsLoaderData["pageDatas"]>;
 
@@ -16,4 +16,5 @@ export type TabContentProps = {
   index: number;
   onClick: (arg: CreateEvaluationArrowsClickHandlerProps) => void;
   clickProps: Omit<CreateEvaluationArrowsClickHandlerProps, "e" | "index">;
+  leftContent?: ReactNode;
 } & PropsWithChildren;
