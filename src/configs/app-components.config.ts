@@ -12,6 +12,7 @@ import type {
   HandleOpeningCallbackParams,
 } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { StepThreeControllerProps } from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
+import type { LeftContentProps } from "@/pages/Evaluations/create/types/create.types.ts";
 import { checkPropsValidity } from "@/utils/utils.ts";
 
 //                    ------------
@@ -42,6 +43,16 @@ const CONTROLLER_REQUIRES = ["form", "name"];
 
 export const controllerPropsInvalid = (props: Record<string, unknown>) =>
   checkPropsValidity(props, CONTROLLER_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for LeftSidePageContent.
+ */
+const LEFT_SIDE_PAGE_CONTENT_REQUIRES = ["title", "number"];
+
+export const leftSidePageContentPropsInvalid = (props: LeftContentProps) =>
+  checkPropsValidity(props, LEFT_SIDE_PAGE_CONTENT_REQUIRES, []);
 
 //                    ------------
 
