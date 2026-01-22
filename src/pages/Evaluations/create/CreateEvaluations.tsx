@@ -21,9 +21,12 @@ export function CreateEvaluations() {
   const navigate = useNavigate();
 
   const [tabValue, setTabValue] = useState<string | undefined>(
-    pageDatas?.step1.name
+    pageDatas?.step1.name,
   );
 
+  /**
+   * Effect to navigate to the selected tab when tabValue changes
+   */
   useEffect(() => {
     navigate(tabValue?.toLocaleLowerCase() ?? "", { replace: true });
   }, [tabValue]);
