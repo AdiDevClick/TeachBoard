@@ -1,0 +1,30 @@
+@use 'mixins' as *;
+
+/**
+  * Silder.scss
+  * Styles for the four-steps slider component.
+
+  By using a custom CSS property for the slider progress, we can create dynamic and visually appealing sliders that adapt to different values.
+  */
+
+@include property(slider-progress, percentage, true, 25%);
+@include property('slider-rangeColor', '<color>', true, null);
+
+.four-steps-slider {
+  height: 12px;
+  border-radius: 999px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    @include apply-repeated-linear-gradient-for-slider(90deg, --slider-progress, 0 25 50, 1px);
+    pointer-events: none;
+  }
+
+  // Modify the background color of the slider range using the custom property
+  [data-slot="slider-range"] {
+    background-color: var(--slider-rangeColor);
+  }
+}
