@@ -40,6 +40,10 @@ Cette application représente le frontend de TeachBoard, une interface pédagogi
   - [Charts](#charts)
   - [Layout (Header / Sidebar / Footer)](#layout-header--sidebar--footer)
   - [Icons](#icons)
+- [CSS & Styles](#css--styles)
+  - [Structure des fichiers CSS](#structure-des-fichiers-css)
+  - [Mixins](#mixins)
+  - [Classes utilitaires & composants CSS](#classes-utilitaires--composants-css)
 - [Architecture & conventions — MVC (Controllers) et HOCs](#architecture-mvc-hocs)
   - [Controllers (pattern MVC)](#controllers-pattern-mvc)
   - [Structure des dossiers pour une feature (pattern MVC)](#structure-des-dossiers-pour-une-feature-pattern-mvc)
@@ -736,6 +740,89 @@ const token = SESSION_TOKEN_SCHEMA.parse('2682dc7e6b3b0d08547106ebac94cee8'); //
 - Placez les schémas dans `src/api/types/...` ou `src/models/...` selon le rôle (types purs vs logique métier).
 - Ajoutez des tests unitaires (Vitest) pour couvrir les cas valides et invalides des schémas.
 
+---
+
+<a id="css--styles"></a>
+
+## CSS & Styles
+
+Cette section documente les conventions CSS du projet, la structure des fichiers, les mixins réutilisables et les classes spécifiques incluses dans le dépôt. Chaque entrée contient un **rôle**, un **exemple d'utilisation** et des **fichiers utiles**.
+
+<a id="structure-des-fichiers-css"></a>
+
+### Structure des fichiers CSS
+
+- `src/assets/css/` — emplacement pour les styles globaux, mixins et composants CSS.
+  - `_mixins.scss` — mixins réutilisables (helpers Sass).
+  - `Slider.scss` — styles pour le composant slider.
+
+**Exemple :** importer les mixins dans un fichier SCSS:
+
+```scss
+@use 'mixins' as *; // En haut du fichier
+```
+
+**Fichiers utiles :**
+- [_mixins.scss](src/assets/css/_mixins.scss) — collection de mixins (implémentation).
+- [Slider.scss](src/assets/css/Silder.scss) — styles du composant `<Slider/>`.
+
+<a id="mixins"></a>
+
+### Mixins — Liste
+
+- [`@mixin property`](src/assets/css/_mixins.scss) — Définit une propriété CSS via `@property` pour exposer des variables typées (syntax, inherits, initial-value).
+  - Exemple d'utilisation :
+  ```scss
+  @include property(slider-progress, percentage, true, 25%);
+
+  // Example: 
+  .myclass {
+    width: var(--slider-progress); // Commencera à 25%
+  }
+  ```
+
+- [`@mixin apply-width-crop`](src/assets/css/_mixins.scss) — Définit une largeur responsive limitée par un crop margin (utile pour containers avec un max-width et un padding latéral).
+  - Exemple d'utilisation :
+  ```scss
+  @include apply-width-crop(1200px, 16px);
+  ```
+
+- [`@mixin apply-repeated-linear-gradient-for-slider`](src/assets/css/_mixins.scss) — Génère un fond composé de dégradés linéaires répétés pour représenter des graduations/ticks sur un slider. Accepte angle, variable (progress), liste de ticks, épaisseur et couleur.
+  - Exemple d'utilisation :
+  ```scss
+  // Example:
+  .myclass {
+    @include apply-repeated-linear-gradient-for-slider(90deg, '--slider-progress', 0 25 50, 1px, #fff); 
+    // Cela va appliquer 3 linear-gradient tous les 25% dans un seul background
+  }
+  
+  ```
+
+<a id="classes-utilitaires--composants-css"></a>
+
+### Classes utilitaires & composants CSS
+
+- **`.four-steps-slider`** - [Slider.scss](src/assets/css/Slider.scss)
+
+  - Rôle : fournir un visuel de progression en quatre étapes avec marqueurs de tick et plage de couleur dynamique.
+  - Propriétés disponibles : 
+    - `--slider-progress` - Permet de sectionner le slider en plusieures sections (n'a pas besoin d'être modifié)
+    - `--slider-rangeColor` - Définit la couleur du range (peut être utilisé via Houdini API)
+
+  - Exemple de markup :
+  ```tsx
+  <Slider
+    step={25}
+    value={value}
+    onValueChange={setValue}
+    className="four-steps-slider"
+    style={
+      {
+        "--slider-rangeColor": rangeColor(),
+      } as CSSProperties
+    }
+  />
+  ```
 ---
 
 <h2 id="architecture-mvc-hocs"/>
