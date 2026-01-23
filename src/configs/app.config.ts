@@ -4,6 +4,8 @@
  * @description This file contains global configuration settings for the application.
  */
 
+import { mirrorProperties } from "@/utils/utils.ts";
+
 /** Preferred language for the application */
 export const LANGUAGE = "fr-FR";
 
@@ -16,18 +18,22 @@ export const NO_QUERY_LOGS = false;
 export const NO_COMPONENT_WARNING_LOGS = false;
 export const ANIMATIONS_LOGS = false;
 
+const HTTP_METHODS_LIST = [
+  "GET",
+  "POST",
+  "PUT",
+  "DELETE",
+  "PATCH",
+  "OPTIONS",
+  "HEAD",
+  "CONNECT",
+  "TRACE",
+] as const;
+
 /** Supported HTTP methods for API requests */
-export const HTTP_METHODS = {
-  GET: "GET",
-  POST: "POST",
-  PUT: "PUT",
-  DELETE: "DELETE",
-  PATCH: "PATCH",
-  OPTIONS: "OPTIONS",
-  HEAD: "HEAD",
-  CONNECT: "CONNECT",
-  TRACE: "TRACE",
-} as const;
+export const HTTP_METHODS = mirrorProperties(HTTP_METHODS_LIST) as {
+  [key in (typeof HTTP_METHODS_LIST)[number]]: key;
+};
 
 /**
  * User activities constants
