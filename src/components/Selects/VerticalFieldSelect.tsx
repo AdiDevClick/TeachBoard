@@ -111,7 +111,7 @@ export function VerticalFieldSelect({
       onOpenChange,
       onValueChange,
       handleObjectRef,
-    ]
+    ],
   );
 
   // wrap onValueChange to keep track of last clicked/selected item and expose it via the imperative handle
@@ -213,7 +213,7 @@ export function VerticalFieldSelect({
 // }
 
 function withListings<TProps extends object, TItem = unknown>(
-  Wrapped: ComponentType<TProps>
+  Wrapped: ComponentType<TProps>,
 ) {
   return function Component(props: TProps & PropsWithListings<TItem>) {
     if (listMapperContainsInvalid(props)) {
@@ -241,11 +241,11 @@ export const VerticalFieldSelectWithListings =
   withListings(VerticalFieldSelect);
 
 export const VerticalFieldSelectWithControllerAndInlineSwitch = withController(
-  withInlineItemAndSwitchSelection(VerticalFieldSelectWithListings)
+  withInlineItemAndSwitchSelection(VerticalFieldSelectWithListings),
 );
 
 export const VerticalFieldWithInlineSwitchList = withListMapper(
-  VerticalFieldSelectWithControllerAndInlineSwitch
+  VerticalFieldSelectWithControllerAndInlineSwitch,
 );
 // export const VerticalFieldSelectWithCommands =
 //   withCommands(VerticalFieldSelect);
