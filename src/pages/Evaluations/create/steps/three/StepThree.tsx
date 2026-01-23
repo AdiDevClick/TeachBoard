@@ -80,7 +80,7 @@ export function StepThree({
   const students = useEvaluationStepsCreationStore((state) => state.students);
   const tasks = useEvaluationStepsCreationStore((state) => state.tasks);
   const modules = useEvaluationStepsCreationStore(
-    (state) => state.getSelectedClassModules,
+    (state) => state.getAttendedModules,
   )();
   const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
     (state) => state.getStudentsPresenceSelectionData,
