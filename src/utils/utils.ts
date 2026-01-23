@@ -13,6 +13,17 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Build a map where each key mirrors its own name, typed from the input array.
+ */
+export function mirrorProperties(
+  properties: readonly string[] | Record<string, unknown>,
+) {
+  const keys = Array.isArray(properties) ? properties : Object.keys(properties);
+
+  return Object.fromEntries(keys.map((m) => [m, m]));
+}
+
+/**
  * Format a date range for display.
  *
  * @param from Start date
