@@ -1,17 +1,12 @@
+import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
+import type { InlineItemAndSwitchSelectionPayload } from "@/components/HOCs/types/with-inline-item-and-switch.types.ts";
 import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
 import { VerticalFieldWithInlineSwitchList } from "@/components/Selects/VerticalFieldSelect.tsx";
-import {
-  DEV_MODE,
-  NO_CACHE_LOGS,
-  NO_QUERY_LOGS,
-} from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
-import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { StepTwoControllerProps } from "@/pages/Evaluations/create/steps/two/types/step-two.types.ts";
-import { useEffect, type MouseEvent } from "react";
-import { toast } from "sonner";
+import { type MouseEvent } from "react";
 
 const loadingName = "load-attendance-record-steps";
 
@@ -32,6 +27,12 @@ export function StepTwoController({
 
   // const { onSubmit, isLoading, isLoaded, data, error, setFetchParams } =
   // useFetch();
+  const setStudentPresence = useEvaluationStepsCreationStore(
+    (state) => state.setStudentPresence,
+  );
+  const setStudentTaskAssignment = useEvaluationStepsCreationStore(
+    (state) => state.setStudentTaskAssignment,
+  );
 
   const {
     setRef,
@@ -48,54 +49,6 @@ export function StepTwoController({
     pageId,
   });
 
-  // /**
-  //  * Handles the addition of a new class.
-  //  *
-  //  * @description A hack is used here to simulate a 'click' effect on the non-selectable item by toggling the `inert` prop and restauring it's state with a slight delay.
-  //  *
-  //  * You can use this function to add any additional logic needed when the 'Add Class' item is clicked.
-  //  *
-  //  * @param e - The pointer event triggered on adding a class.
-  //  */
-  // const onClassAdd = async (e: PointerEvent<HTMLDivElement>) => {
-  //   openDialog(e, "class-creation", { userId: user?.userId ?? "" });
-  //   setSelected(true);
-  //   await wait(150);
-  //   setSelected(false);
-  // };
-
-  useEffect(() => {
-    if (isLoading) {
-      toast.loading("Chargement des classes...", { id: loadingName });
-    }
-
-    if (data || error) {
-      toast.dismiss(loadingName);
-      if (DEV_MODE && !NO_QUERY_LOGS) {
-        console.debug("useQueryOnSubmit data", data ?? error);
-      }
-      // You can handle additional side effects here if needed
-    }
-
-    if (error) {
-      // Errors are handled in onError callback
-    }
-  }, [data, error, isLoading]);
-
-  // const handleTriggerOpening = (isOpen: boolean) => {
-  //   if (isOpen && !isLoaded && !isLoading) {
-  //     setFetchParams((prev) => ({
-  //       ...prev,
-  //       silent: true,
-  //       method: API_ENDPOINTS.GET.METHOD,
-  //       url: API_ENDPOINTS.GET.CLASSES.endPoints.ALL,
-  //       contentId: USER_ACTIVITIES.classes,
-  //       dataReshapeFn: API_ENDPOINTS.GET.CLASSES.dataReshape,
-  //     }));
-  //     onSubmit();
-  //   }
-  // };
-
   /**
    * Handle opening of the VerticalFieldSelect component
    *
@@ -110,28 +63,6 @@ export function StepTwoController({
   };
 
   /**
-   * Handle adding a new item
-   *
-   * @param e - The event triggering the new item addition
-   * @param rest - Additional parameters related to the new item
-   */
-  const handleNewItem = ({ e, ...rest }: HandleAddNewItemParams) => {
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Add new item triggered", {
-        apiEndpoint: rest.apiEndpoint,
-        task: rest.task,
-      });
-    }
-
-    rest.userId = user?.userId;
-
-    newItemCallback({
-      e,
-      ...rest,
-    });
-  };
-
-  /**
    * Handle command selection from PopoverFieldWithControllerAndCommandsList
    *
    * @description Updates the selected diploma reference and selection state.
@@ -140,17 +71,8 @@ export function StepTwoController({
    * @param studentData - The details of the selected student data
    */
   const handleOnSelect = (taskId: UUID, studentData: CommandItemType) => {
-    const selectedTask = tasks?.get(taskId);
-    const selectedStudent = students?.get(studentData.id);
-
-    if (selectedStudent && selectedTask) {
-      selectedStudent.assignedTask = {
-        id: selectedTask.id,
-        name: selectedTask.name,
-      };
-    }
-
-    console.log("selected value :", taskId, studentData);
+    setStudentTaskAssignment(taskId, studentData.id);
+    console.log("selected value :", taskId, studentData, students);
   };
 
   /**
@@ -163,15 +85,10 @@ export function StepTwoController({
    */
   const handleOnSwitch = (
     e: MouseEvent<HTMLButtonElement>,
-    studentData: CommandItemType
+    studentData: InlineItemAndSwitchSelectionPayload,
   ) => {
-    const selectedItem = students?.get(studentData.id);
-
-    if (selectedItem) {
-      selectedItem.isPresent = studentData.isSelected;
-    }
-
-    console.log("selected value :", e, studentData);
+    setStudentPresence(studentData.id, studentData.isSelected);
+    console.log("selected switch :", e, studentData, students);
   };
 
   return (
