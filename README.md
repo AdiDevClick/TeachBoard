@@ -57,6 +57,7 @@ Cette application représente le frontend de TeachBoard, une interface pédagogi
       - [withIconItem](#withiconitem)
 - [Validation des props des composants](#validation-des-props-des-composants)
 - [Recettes rapides](#recettes-rapides)
+- [Utils pratiques](#utils-pratiques)
 - [Tests](#tests)
 - [Contribuer](#contribuer)
 
@@ -319,6 +320,8 @@ stubFetchRoutes({
   - Utilisez `reshapeItemToCachedData(...)` (fourni dans le fichier) pour insérer proprement un nouvel item dans les données mises en cache.
   - **Déclarez une interface TypeScript** décrivant la forme de sortie du serveur quand c'est pertinent (ex. [`ClassesFetch`](src/api/types/routes/classes.types.ts)) et utilisez-la dans les contrôleurs et composants pour garantir le typage.
   - **Utilisez un schéma OpenAPI ou GraphQL** quand il est disponible pour générer ou valider automatiquement les interfaces/DTOs afin d'assurer la conformité entre le backend et l'UI.
+
+
 
 ### RÈGLE OBLIGATOIRE — rôle du fichier `API_ENDPOINTS`
 
@@ -1999,57 +2002,132 @@ const modals = defineStrictModalsList([
     Cette fonction reçoit le nom de la modal en argument.
   
 ## Utils pratiques
-Quelques helpers réutilisables stockés dans [`src/utils/utils.ts`](/src/utils/utils.ts) :
 
-- `preventDefaultAndStopPropagation(e)` — protège vos handlers d’événement : 
-  - Il appelle `preventDefault()` et `stopPropagation()` si un `Event` est fourni. 
-  - Utile dans les callbacks qui peuvent être appelés tant depuis l’UI que de façon programmatique.
+Quelques helpers réutilisables stockés dans [`utils.ts`](src/utils/utils.ts) :
 
+#### `preventDefaultAndStopPropagation(e)`
+
+- **Objectif :** Empêcher le comportement par défaut et stopper la propagation d'un événement si présent.
+
+- **Contexte :** Evite de répéter la logique
+
+- **Exemple :**
 ```ts
 import { preventDefaultAndStopPropagation } from '@/utils/utils';
 
 function handleClick(e?: MouseEvent) {
-  // Protège contre les comportements par défaut et l’event bubbling
   preventDefaultAndStopPropagation(e);
+
+  // Same as : 
+  e.preventDefault();
+  e.stopPropagation();
+
   // logique métier
 }
 ```
 
-- `wait(duration[, message])` — une promesse pour ajouter un délai (utile en tests ou pour laisser l’UI se stabiliser).
+**Fichiers utiles :**
+- [`preventDefaultAndStopPropagation`](src/utils/utils.ts) — implémentation
 
+---
+
+#### `wait(duration: number, message = '')`
+
+- **Objectif :** Crée une promesse qui se résout après `duration` millisecondes et renvoie `message` si fourni.
+
+- **Contexte :** Utile pour des pauses contrôlées dans les tests, attendre des animations ou temporiser des opérations asynchrones sans dépendre de timers externes.
+
+- **Exemple :**
 ```ts
-import { wait } from '@/utils/utils';
-await wait(150);
+import { wait } from '@/utils/utils.ts';
+
+await wait(150); // attend 150ms
+const result = await wait(500, 'done'); // 'done' après 500ms
 ```
 
-- `handleModalOpening({ e, dialogFns, modalName })` — helper pour fermer toutes les modales ouvertes.
-  Il ouvre ensuite une nouvelle modal proprement.
-  Il prend un objet `dialogFns: { closeAllDialogs, openDialog }`.
+**Fichiers utiles :**
+- [`wait`](src/utils/utils.ts) — implémentation
+- [`modal.test.tsx`](src/tests/units/modal/modal.test.tsx) — usages en tests
+- [`useQueryOnSubmit.ts`](src/hooks/database/useQueryOnSubmit.ts) — exemple d'usage
 
+---
+
+#### `mirrorProperties(properties)`
+
+- **Objectif :** Construit un objet où chaque clé a pour valeur la même chaîne, à partir d'un tableau de chaînes ou d'un objet.
+
+- **Contexte :** Permet d'avoir une source unique de vérité pour des constantes littérales (ex. méthodes HTTP) sans répéter manuellement `KEY: "KEY"`.
+
+- **Exemple :**
+```ts
+import { mirrorProperties } from '@/utils/utils.ts';
+
+const METHODS = ['GET','POST','PUT'] as const;
+export const HTTP_METHODS = mirrorProperties(METHODS) as {
+  [K in typeof METHODS[number]]: K
+};
+
+// HTTP_METHODS.GET === 'GET'
+```
+
+**Fichiers utiles :**
+- [`mirrorProperties`](src/utils/utils.ts) — implémentation
+- [`app.config.ts`](src/configs/app.config.ts) — exemple d'utilisation
+
+---
+
+#### `checkPropsValidity(props, required, forbidden)`
+
+- **Objectif :** Vérifier la présence des clés requises et l'absence des clés interdites dans un objet `props` (retourne `true` si problème).
+
+- **Contexte :** Utilisé comme garde en début de render pour certains composants afin d'empêcher des usages invalides en développement. La fonction est informative : elle logge des détails via `debugLogs` et gère les cas de `Proxy`/`Reflect`.
+
+- **Exemple :**
+```ts
+import { checkPropsValidity } from '@/utils/utils.ts';
+
+const required = ['field', 'fieldState'];
+const forbidden = ['useCommands'];
+
+if (checkPropsValidity(props, required, forbidden)) {
+  debugLogs('NomDuComposant');
+  return null; // bloquer le rendu en dev si nécessaire
+}
+```
+
+**Fichiers utiles :**
+- [`checkPropsValidity`](src/utils/utils.ts) — implémentation
+- [`app-components.config.ts`](src/configs/app-components.config.ts) — usages et constantes de validation
+
+---
+
+#### `handleModalOpening({ e, dialogFns, modalName })`
+
+- **Objectif :** Fermer toutes les modales ouvertes, puis ouvrir proprement une nouvelle modal.
+
+- **Contexte :** Helper pratique pour s'assurer qu'une seule modal est ouverte à la fois (utilisé dans `LoginForm`, etc.).
+
+- **Exemple :**
 ```ts
 import { handleModalOpening } from '@/utils/utils';
 
-handleModalOpening({
-  e,
-  dialogFns: { closeAllDialogs, openDialog },
-  modalName: 'signup',
-});
+handleModalOpening({ e, dialogFns: { closeAllDialogs, openDialog }, modalName: 'signup' });
 ```
 
-- `dialogFns` — objet contenant `closeAllDialogs` et `openDialog`.  
-  - Ce pattern est utilisé par exemple dans [`LoginForm`](src/components/LoginForms/LoginForm.tsx) :  
-    - On passe `dialogFns: { closeAllDialogs, openDialog }` au helper `handleModalOpening`.
+**Fichiers utiles :**
+- [`handleModalOpening`](src/utils/utils.ts)
 
-- `dataReshape` / `dataReshapeFn` — fonctions de *reshaping* utilisées pour transformer le payload renvoyé par l'API avant de le stocker ou l'exposer au reste de l'application. Elles sont définies dans `API_ENDPOINTS` (ex. `API_ENDPOINTS.GET.CLASSES.dataReshape`, `API_ENDPOINTS.POST.CREATE_CLASS.dataReshape`) et sont consommées comme `dataReshapeFn` dans les contrôleurs et flows (ex. `useCommandHandler`). Voir [`src/configs/api.endpoints.config.ts`](src/configs/api.endpoints.config.ts) et les tests `src/tests/units/endpoints/api-endpoints.config.contract.test.ts`.
+---
 
-- `FixtureCreatorBase` / classes de fixtures — utilitaires pour générer des DTOs et réponses d'API factices (`ClassFixtureCreator`, `TaskFixtureCreator`, `TaskTemplateFixtureCreator`, etc.). Utilisez-les pour créer des objets testables, sérialisables et réutilisables dans vos tests ou stubs (ex. `src/tests/samples/*`). Voir : [`src/utils/FixtureCreator.ts`](src/utils/FixtureCreator.ts).
+#### Autres helpers & références rapides
 
-Ces helpers centralisent des comportements courants et évitent la duplication de logique.
-
-Exemple : s’assurer qu’une seule modal est ouverte à la fois.
+- `dialogFns` — `{ closeAllDialogs, openDialog }` (ex: `LoginForm`).
+- `dataReshape / dataReshapeFn` — fonctions de reshaping définies dans `API_ENDPOINTS` (voir `src/configs/api.endpoints.config.ts`).
+- `FixtureCreatorBase` / classes de fixtures — utilitaires pour générer DTOs factices (`src/utils/FixtureCreator.ts`).
 
 Voir `src/utils/utils.ts` pour la liste complète et les types.
 
+---
   
 ### Noms de modales disponibles
 
