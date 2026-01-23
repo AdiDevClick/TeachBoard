@@ -42,14 +42,6 @@ export function StepThreeStudentsEvaluationController(
     // });
   };
 
-  const rangeColor = () => {
-    if (value[0] === 25) return "#e53935";
-    if (value[0] === 50) return "#f9a825";
-    if (value[0] === 75) return "#7cb342";
-    if (value[0] === 100) return "#2e7d32";
-    return "#ffffff";
-  };
-
   return (
     <form id={formId} className="min-w-md">
       <ListMapper items={modules}>
@@ -62,7 +54,7 @@ export function StepThreeStudentsEvaluationController(
             className="four-steps-slider"
             style={
               {
-                "--slider-rangeColor": rangeColor(),
+                "--slider-rangeColor": rangeColor(value[0]),
               } as CSSProperties
             }
           />
@@ -70,4 +62,25 @@ export function StepThreeStudentsEvaluationController(
       </ListMapper>
     </form>
   );
+}
+
+/**
+ * Get color based on value range.
+ *
+ * @param value - The numeric value to evaluate.
+ * @returns The corresponding color as a string.
+ */
+function rangeColor(value: number) {
+  const red = "#e53935";
+  const yellow = "#f9a825";
+  const lightGreen = "#7cb342";
+  const green = "#2e7d32";
+  const white = "#ffffff";
+
+  if (value === 25) return red;
+  if (value === 50) return yellow;
+  if (value === 75) return lightGreen;
+  if (value === 100) return green;
+
+  return white;
 }
