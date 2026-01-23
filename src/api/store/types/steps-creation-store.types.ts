@@ -27,6 +27,8 @@ export type ClassTasks = {
 
 export type ClassModules = SkillsType & {
   subSkills: UniqueSet<UUID, SkillsType>;
+  tasksList: Set<ClassTasks["id"]>;
+  studentsToEvaluate?: Set<UUID>;
 };
 
 export type ModulesSelectionType = {

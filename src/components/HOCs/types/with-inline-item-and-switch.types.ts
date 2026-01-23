@@ -1,10 +1,11 @@
+import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { MouseEvent, SetStateAction } from "react";
 
 export type InlineItemAndSwitchSelectionPayload = {
-  id?: string;
+  id: UUID;
   title: string;
-  isSelected?: boolean;
-  index?: string | number;
+  isSelected: boolean;
+  index: string | number;
   setIsSelected: (selected: SetStateAction<boolean>) => void;
 };
 
@@ -15,6 +16,6 @@ export type InlineItemAndSwitchSelectionProps =
   InlineItemAndSwitchSelectionPayload & {
     onSwitchClick?: (
       e: MouseEvent<HTMLButtonElement>,
-      payload: InlineItemAndSwitchSelectionPayload
+      payload: InlineItemAndSwitchSelectionPayload,
     ) => void;
   };
