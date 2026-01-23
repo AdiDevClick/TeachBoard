@@ -3,7 +3,9 @@ import type {
   StepsCreationState,
   StudentWithPresence,
 } from "@/api/store/types/steps-creation-store.types";
+import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
+import type { SkillsType } from "@/api/types/routes/skills.types.ts";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { create } from "zustand";
@@ -62,29 +64,44 @@ export const useEvaluationStepsCreationStore = create(
                   modules: task.modules ?? [],
                 };
                 state.tasks.set(task.id, details);
-                ACTIONS.setModules(task.modules);
+                ACTIONS.setModules(task.modules, task.id);
               });
             });
           },
-          setModules(modules: ClassSummaryDto["templates"][number]["modules"]) {
+          /**
+           * @remarks In case a module is used in multiple tasks, this ensures no duplication occurs and the module is enriched with all associated task ID's.
+           *
+           * Stores the modules from a class template into the store.
+           *
+           * @param modules - The modules to set
+           * @param taskId - The task ID associated with the modules
+           */
+          setModules(
+            modules: ClassSummaryDto["templates"][number]["modules"],
+            taskId: UUID,
+          ) {
             set((state) => {
               (modules ?? []).forEach((module) => {
                 if (!module.id) return;
                 const { subSkills, ...rest } = module;
 
                 // Save or update module without subSkills first
-                state.modules.set(module.id, rest);
                 const savedModule = state.modules.get(module.id);
 
-                if (!savedModule) return;
+                if (savedModule) {
+                  savedModule.tasksList.add(taskId);
 
-                // We now have the possibility to use a hash set for subSkills
-                if (savedModule.subSkills === undefined) {
-                  savedModule.subSkills = new UniqueSet(null, subSkills);
-                } else {
                   for (const subSkill of subSkills ?? []) {
                     savedModule.subSkills.set(subSkill.id, subSkill);
                   }
+                } else {
+                  const newProperties = {
+                    ...rest,
+                    subSkills: new UniqueSet<UUID, SkillsType>(null, subSkills),
+                    tasksList: new Set([taskId]),
+                  };
+
+                  state.modules.set(module.id, newProperties);
                 }
               });
             });
@@ -108,6 +125,95 @@ export const useEvaluationStepsCreationStore = create(
               });
             });
           },
+          setStudentPresence(studentId: UUID, isPresent: boolean) {
+            set((state) => {
+              const student = state.students.get(studentId) ?? null;
+
+              if (student) {
+                student.isPresent = isPresent;
+
+                if (student.assignedTask) {
+                  ACTIONS.setStudentToModuleEvaluation(
+                    student.assignedTask.id,
+                    studentId,
+                  );
+                }
+
+                // !! IMPORTANT !! A student marked as not present should not have any assigned task or be part of module evaluations
+                if (!isPresent) {
+                  //   student.assignedTask = null;
+                  ACTIONS.clearStudentFromModuleEvaluation(studentId);
+                }
+              }
+            });
+          },
+          /**
+           * Assign a task to a student.
+           *
+           * @description Updates the student's assigned task and manages module evaluations accordingly.
+           * @param studentId - The ID of the student to assign the task to
+           * @param taskId - The ID of the task to assign
+           */
+          setStudentTaskAssignment(taskId: UUID, studentId: UUID) {
+            set((state) => {
+              const student = state.students.get(studentId) ?? null;
+              const task = state.tasks.get(taskId) ?? null;
+
+              if (student && task) {
+                student.assignedTask = { id: task.id, name: task.name };
+
+                ACTIONS.setStudentToModuleEvaluation(taskId, studentId);
+              }
+            });
+          },
+          /**
+           * Assign a student to module evaluations based on their assigned task.
+           *
+           * @remarks This is useful to ensure not to display any modules for students who are not present.
+           *
+           * @description Used when a student is marked present and assigned a task.
+           *
+           * @param taskId - The ID of the assigned task
+           * @param studentId - The ID of the student to assign
+           */
+          setStudentToModuleEvaluation(taskId: UUID, studentId: UUID) {
+            set((state) => {
+              const student = state.students.get(studentId);
+              for (const module of state.modules.values()) {
+                if (module.tasksList.has(taskId)) {
+                  if (student?.isPresent) {
+                    module.studentsToEvaluate ??= new Set<UUID>();
+                    module.studentsToEvaluate.add(studentId);
+                  } else {
+                    module.studentsToEvaluate?.delete(studentId);
+                  }
+                }
+              }
+            });
+          },
+          /**
+           * Clear a student from all module evaluations.
+           *
+           * @description Used when a student's presence is toggled off.
+           *
+           * @param studentId - The ID of the student to clear
+           */
+          clearStudentFromModuleEvaluation(studentId: UUID) {
+            set((state) => {
+              for (const module of state.modules.values()) {
+                if (module.studentsToEvaluate?.has(studentId)) {
+                  module.studentsToEvaluate?.delete(studentId);
+                }
+              }
+            });
+          },
+          /**
+           * Set the current module selection state.
+           *
+           * @param isClicked - Whether a module has been clicked
+           * @param selectedModuleIndex - The index of the selected module
+           * @param selectedModule - The selected module details
+           */
           setModuleSelection(args: SetModulesSelectionType) {
             const { isClicked, selectedModuleIndex, selectedModule } = args;
 
@@ -116,15 +222,32 @@ export const useEvaluationStepsCreationStore = create(
               const { subSkills, ...moduleWithoutSubSkills } = selectedModule;
 
               selection.isClicked = isClicked;
+
               selection.selectedModuleIndex = selectedModuleIndex;
+
               selection.selectedModule = moduleWithoutSubSkills;
+
               selection.selectedModuleSubSkills = Array.from(
                 subSkills?.values() ?? [],
               );
             });
           },
+          /**
+           * Get modules that have students assigned for evaluation.
+           *
+           * @returns Array of modules with students to evaluate.
+           */
+          getAttendedModules() {
+            return Array.from(get().modules?.values() ?? []).filter(
+              (module) => (module.studentsToEvaluate?.size ?? 0) > 0,
+            );
+          },
+          /**
+           * Get students presence selection data for UI components.
+           *
+           * @returns Array of students with presence and task assignment details.
+           */
           getStudentsPresenceSelectionData() {
-            // Makes sure the component using this data is compatible with its structure
             const values = Array.from(get().students?.values() ?? []);
 
             const students = new ObjectReshape(values || [])
@@ -143,6 +266,9 @@ export const useEvaluationStepsCreationStore = create(
               })),
             }));
           },
+          /**
+           * Get all modules of the selected class.
+           */
           getSelectedClassModules() {
             return Array.from(get().modules?.values() ?? []);
           },
