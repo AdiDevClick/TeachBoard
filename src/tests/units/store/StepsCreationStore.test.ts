@@ -1,14 +1,15 @@
-import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore";
+import {
+  DEFAULT_VALUES_STEPS_CREATION_STATE,
+  useEvaluationStepsCreationStore,
+} from "@/api/store/EvaluationStepsCreationStore";
 import { beforeEach, describe, expect, it } from "vitest";
 
 describe("StepsCreationStore - students reshape", () => {
   beforeEach(() => {
     // reset relevant parts of the store
-    useEvaluationStepsCreationStore.setState({
-      students: null,
-      tasks: null,
-      selectedClass: null,
-    });
+    useEvaluationStepsCreationStore.setState(
+      DEFAULT_VALUES_STEPS_CREATION_STATE,
+    );
   });
 
   it("getStudentsPresenceSelectionData returns mapped fields and items", () => {

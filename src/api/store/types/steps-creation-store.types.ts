@@ -38,6 +38,12 @@ export type ModulesSelectionType = {
   selectedModuleSubSkills: SkillsType[];
 };
 
+export type SubskillSelectionType = {
+  isClicked: boolean;
+  selectedSubSkillIndex: number | null;
+  selectedSubSkill: SkillsType | null;
+};
+
 export type SetModulesSelectionType = Omit<
   ModulesSelectionType,
   "selectedModuleSubSkills"
@@ -58,6 +64,7 @@ export interface StepsCreationState {
   evaluations?: unknown[] | null;
   modules: UniqueSet<UUID, ClassModules>;
   moduleSelection: ModulesSelectionType;
+  subSkillSelection: SubskillSelectionType;
 }
 
 export type SelectedClassModulesReturn = ClassModules[];

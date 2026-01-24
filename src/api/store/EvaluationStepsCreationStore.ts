@@ -2,6 +2,7 @@ import type {
   SetModulesSelectionType,
   StepsCreationState,
   StudentWithPresence,
+  SubskillSelectionType,
 } from "@/api/store/types/steps-creation-store.types";
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
@@ -12,7 +13,7 @@ import { create } from "zustand";
 import { combine, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
-const DEFAULT_VALUES: StepsCreationState = {
+export const DEFAULT_VALUES_STEPS_CREATION_STATE: StepsCreationState = {
   id: null,
   description: null,
   students: new UniqueSet(),
@@ -28,6 +29,11 @@ const DEFAULT_VALUES: StepsCreationState = {
     selectedModule: null,
     selectedModuleSubSkills: [],
   },
+  subSkillSelection: {
+    isClicked: false,
+    selectedSubSkillIndex: null,
+    selectedSubSkill: null,
+  },
 };
 
 /**
@@ -40,9 +46,9 @@ const DEFAULT_VALUES: StepsCreationState = {
 export const useEvaluationStepsCreationStore = create(
   devtools(
     immer(
-      combine(DEFAULT_VALUES, (set, get) => {
+      combine(DEFAULT_VALUES_STEPS_CREATION_STATE, (set, get) => {
         const ACTIONS = {
-          clear: () => set(() => ({ ...DEFAULT_VALUES })),
+          clear: () => set(() => ({ ...DEFAULT_VALUES_STEPS_CREATION_STATE })),
           setSelectedClass(selectedClass: ClassSummaryDto) {
             set((state) => {
               state.selectedClass = selectedClass;
@@ -56,7 +62,6 @@ export const useEvaluationStepsCreationStore = create(
           },
           setClassTasks(tasks: ClassSummaryDto["templates"]) {
             set((state) => {
-              // state.tasks ??= new UniqueSet();
               tasks.forEach((task) => {
                 const details = {
                   id: task.id,
@@ -113,7 +118,6 @@ export const useEvaluationStepsCreationStore = create(
           },
           setStudents(students: ClassSummaryDto["students"]) {
             set((state) => {
-              // state.students ??= new UniqueSet();
               students.forEach((student) => {
                 const details = {
                   id: student.id,
@@ -230,6 +234,30 @@ export const useEvaluationStepsCreationStore = create(
               selection.selectedModuleSubSkills = Array.from(
                 subSkills?.values() ?? [],
               );
+            });
+          },
+          /**
+           * Set the module selection "isClicked" state.
+           *
+           * @param isClicked - Whether a module has been clicked
+           */
+          setModuleSelectionIsClicked(isClicked: boolean) {
+            set((state) => {
+              state.moduleSelection.isClicked = isClicked;
+            });
+          },
+          /**
+           * Set the subskill selection state.
+           * @param args - The subskill selection details
+           */
+          setSubskillSelection(args: SubskillSelectionType) {
+            const { isClicked, selectedSubSkillIndex, selectedSubSkill } = args;
+            set((state) => {
+              const selection = state.subSkillSelection;
+
+              selection.isClicked = isClicked;
+              selection.selectedSubSkillIndex = selectedSubSkillIndex;
+              selection.selectedSubSkill = selectedSubSkill;
             });
           },
           /**
