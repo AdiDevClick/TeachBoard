@@ -11,7 +11,11 @@ import type {
   CommandHandlerMetaData,
   HandleOpeningCallbackParams,
 } from "@/hooks/database/types/use-command-handler.types.ts";
-import type { StepThreeControllerProps } from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
+import type {
+  StepThreeControllerProps,
+  StepThreeModuleSelectionControllerProps,
+  StepThreeSubskillsSelectionControllerProps,
+} from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
 import type { LeftContentProps } from "@/pages/Evaluations/create/types/create.types.ts";
 import { checkPropsValidity } from "@/utils/utils.ts";
 
@@ -49,7 +53,7 @@ export const controllerPropsInvalid = (props: Record<string, unknown>) =>
 /**
  * Validation requirements for LeftSidePageContent.
  */
-const LEFT_SIDE_PAGE_CONTENT_REQUIRES = ["title", "number"];
+const LEFT_SIDE_PAGE_CONTENT_REQUIRES = [{ item: ["title", "number"] }];
 
 export const leftSidePageContentPropsInvalid = (props: LeftContentProps) =>
   checkPropsValidity(props, LEFT_SIDE_PAGE_CONTENT_REQUIRES, []);
@@ -221,6 +225,8 @@ export const classCreationControllerPropsInvalid = (
   props: ClassCreationControllerProps,
 ) => checkPropsValidity(props, CLASS_CREATION_CONTROLLER_REQUIRES, []);
 
+//                    ------------
+
 /**
  * Validation requirements for StepThreeController.
  */
@@ -232,6 +238,35 @@ const STEP_THREE_CONTROLLER_REQUIRES = [
 export const stepThreeControllerPropsInvalid = (
   props: StepThreeControllerProps,
 ) => checkPropsValidity(props, STEP_THREE_CONTROLLER_REQUIRES, []);
+
+const STEP_THREE_SUBSKILLS_SELECTION_CONTROLLER_REQUIRES = [
+  ...BASE_CONTROLLERS_PROPS_REQUIRES,
+  "subSkills",
+];
+export const stepThreeSubskillsSelectionControllerPropsInvalid = (
+  props: StepThreeSubskillsSelectionControllerProps,
+) =>
+  checkPropsValidity(
+    props,
+    STEP_THREE_SUBSKILLS_SELECTION_CONTROLLER_REQUIRES,
+    [],
+  );
+
+const STEP_THREE_MODULE_SELECTION_CONTROLLER_REQUIRES = [
+  ...BASE_CONTROLLERS_PROPS_REQUIRES,
+  "modules",
+];
+
+export const stepThreeModuleSelectionControllerPropsInvalid = (
+  props: StepThreeModuleSelectionControllerProps,
+) =>
+  checkPropsValidity(
+    props,
+    STEP_THREE_MODULE_SELECTION_CONTROLLER_REQUIRES,
+    [],
+  );
+
+//                    ------------
 
 /**
  * Logs debug information for a component when in development mode.
