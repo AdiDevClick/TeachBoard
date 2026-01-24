@@ -10,6 +10,8 @@ export type EvaluationRadioItemProps = {
   id: UUID;
   name: string;
   description?: string;
+  index: number;
+  isSelected: boolean;
   itemClick?: (
     e: MouseEvent<HTMLLabelElement>,
     props: EvaluationRadioItemProps,

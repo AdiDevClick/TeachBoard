@@ -1,4 +1,7 @@
-import type { SelectedClassModulesReturn } from "@/api/store/types/steps-creation-store.types.ts";
+import type {
+  ModulesSelectionType,
+  SelectedClassModulesReturn,
+} from "@/api/store/types/steps-creation-store.types.ts";
 import type { StepThree } from "@/pages/Evaluations/create/steps/three/StepThree.tsx";
 import type { AppControllerInterface } from "@/types/AppControllerInterface.ts";
 
@@ -16,3 +19,25 @@ export type StepThreeControllerProps = AppControllerInterface & {
   tasks: unknown[];
   modules: SelectedClassModulesReturn;
 } & Omit<Parameters<typeof StepThree>[0], "modalMode">;
+
+/**
+ * Props for Step Three Module Controller.
+ *
+ * @module StepThreeModuleController
+ */
+export type StepThreeModuleSelectionControllerProps = AppControllerInterface & {
+  inputControllers?: unknown[];
+  modules: SelectedClassModulesReturn;
+} & Omit<Parameters<typeof StepThree>[0], "modalMode">;
+
+/**
+ * Props for Step Three Subskills Selection Controller.
+ *
+ * @module StepThreeSubskillsSelectionController
+ */
+export type StepThreeSubskillsSelectionControllerProps =
+  AppControllerInterface & {
+    inputControllers?: unknown[];
+    user: unknown;
+    subSkills: ModulesSelectionType["selectedModuleSubSkills"];
+  } & Omit<Parameters<typeof StepThree>[0], "modalMode">;
