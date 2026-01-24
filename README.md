@@ -9,37 +9,30 @@ Bienvenue !
 Cette application représente le frontend de TeachBoard, une interface pédagogique développée en React et TypeScript.
 
 **Table des matières :**
+- [Aperçu](#aperçu)
+- [Démo](#démo)
 - [Prérequis](#prérequis)
 - [Installation](#installation)
 - [Configuration & variables d'environnement](#configuration--variables-denvironnement)
-- [Configuration des logs](#configuration-des-logs)
 - [Commandes utiles](#commandes-utiles)
 - [Proxy API et backend](#proxy-api-et-backend)
-- [Gestion des données réseau](#gestion-des-données-réseau)
+- [Gestion des données réseau](#gestion-des-donnees-reseau)
+  - [RÈGLE OBLIGATOIRE — rôle du fichier `API_ENDPOINTS`](#role-api-endpoints)
+- [Recettes rapides](#recettes-rapides)
 - [Structure du projet (aperçu rapide)](#structure-du-projet-apercu-rapide)
 - [App Stores](#app-stores)
   - [Structure](#app-stores-structure)
   - [Liste des stores existants](#app-stores-liste-des-stores)
-  - [Comment construire un store (How To Build)](#app-stores-comment-construire-un-store)
+  - [How To Build](#app-stores-comment-construire-un-store)
+    - [Extensions Zustand](#app-stores-extensions-zustand)
     - [Types](#app-stores-types)
     - [Store](#app-stores-store)
-    - [Extensions Zustand](#app-stores-extensions-zustand)
 - [Types communs & validation](#types-communs--validation)
   - [UUID](#uuid)
   - [Email](#email)
   - [Year range](#year-range)
   - [OffsetDateTime](#offsetdatetime)
   - [SessionToken](#sessiontoken)
-- [Composants — Catalogue](#composants--catalogue)
-  - [Buttons](#buttons)
-  - [Inputs](#inputs)
-  - [Selects](#selects)
-  - [Modal](#modal)
-  - [Form components (LoginForm)](#form-components-loginform)
-  - [Lists & Data Table](#lists--data-table)
-  - [Charts](#charts)
-  - [Layout (Header / Sidebar / Footer)](#layout-header--sidebar--footer)
-  - [Icons](#icons)
 - [CSS & Styles](#css--styles)
   - [Structure des fichiers CSS](#structure-des-fichiers-css)
   - [Mixins](#mixins)
@@ -55,11 +48,44 @@ Cette application représente le frontend de TeachBoard, une interface pédagogi
       - [withListMapper](#withlistmapper)
       - [withComboBoxCommands](#withcomboboxcommands)
       - [withIconItem](#withiconitem)
+- [Composants — Catalogue](#composants--catalogue)
+  - [Buttons](#buttons)
+  - [Inputs](#inputs)
+  - [Selects](#selects)
+  - [Modal](#modal)
+  - [Form components (LoginForm)](#form-components-loginform)
+  - [Lists & Data Table](#lists--data-table)
+  - [Charts](#charts)
+  - [Layout (Header / Sidebar / Footer)](#layout-header--sidebar--footer)
+  - [Icons](#icons)
+  - [Ajouter un nouveau controller / HOC](#ajouter-un-nouveau-controller--hoc)
 - [Validation des props des composants](#validation-des-props-des-composants)
-- [Recettes rapides](#recettes-rapides)
-- [Utils pratiques](#utils-pratiques)
 - [Tests](#tests)
+  - [Commandes communes](#commandes-communes)
+  - [Environnement de test](#environnement-de-test)
+  - [Bonnes pratiques pour tester les hooks](#bonnes-pratiques-pour-tester-les-hooks)
+  - [Exemple pratique (modales)](#exemple-pratique-modales)
+  - [Fixtures de test](#fixtures-de-test)
+    - [Bonnes pratiques pour créer de nouvelles classes de fixtures personnalisées](#bonnes-pratiques-pour-créer-de-nouvelles-classes-de-fixtures-personnalisées)
+    - [Créer des fixtures](#créer-des-fixtures)
+- [Modales](#modales)
+  - [Ouvrir une modal](#ouvrir-une-modal)
+  - [Fermer une modal](#fermer-une-modal)
+  - [Autres méthodes utiles](#autres-methodes-utiles)
+  - [À savoir](#a-savoir)
+  - [Noms de modales disponibles](#noms-de-modales-disponibles)
+- [Utils pratiques](#utils-pratiques)
+  - [preventDefaultAndStopPropagation](#preventdefaultandstoppropagation)
+  - [wait](#wait-duration-number-message-)
+  - [mirrorProperties](#mirrorproperties)
+  - [checkPropsValidity](#checkpropsvalidity)
+  - [handleModalOpening](#handlemodalopening)
+  - [ObjectReshape](#objectreshape)
+  - [Autres helpers & références rapides](#autres-helpers--references-rapides)
 - [Contribuer](#contribuer)
+- [Configuration des logs](#configuration-des-logs)
+- [Débogage & Ressources utiles](#debugage--ressources-utiles)
+- [Licence & Contact](#licence--contact)
 
 
 ## Aperçu
@@ -187,6 +213,8 @@ Si l'API backend est indisponible et que vous voulez développer côté frontend
 
 Les mocks peuvent se trouver dans `/src/data` ou être intégrés dans certains hooks.
 
+<a id="gestion-des-donnees-reseau"></a>
+
 ## Gestion des données réseau
 
 Remarque : le projet utilise le proxy de développement Vite qui redirige les requêtes commençant par `/api/` vers l'API définie par la variable d'environnement `VITE_BACKEND_URL` (voir la section **Proxy API et backend**).
@@ -213,55 +241,20 @@ Ce projet centralise à la fois les **endpoints** et la **transformation des don
 - [ ] Reformulez toute transformation complexe en helpers testables et importables depuis le reshape (le reshape doit rester essentiellement déclaratif).
 
 
-  **Note :** le hook [`useFetch()`](src/hooks/database/fetches/useFetch.tsx) s'appuie sur `API_ENDPOINTS` et renvoie aux consommateurs le payload tel qu'il sort du `dataReshape` — assurez-vous que vos reshapes retournent la forme attendue par les composants ou services qui consomment ces données.
+### Tests & bonnes pratiques
+- **Tests & contrats** : ajoutez un test de contrat dans `src/tests/units/endpoints/` à chaque modification/ajout de `dataReshape`. Exemple : `src/tests/units/endpoints/api-endpoints.config.contract.test.ts`.
 
-  **Où :** dans [src/hooks/database/fetches/useFetch.tsx](src/hooks/database/fetches/useFetch.tsx) la transformation est appliquée dans le callback `onSuccess` :
+- **Bonnes pratiques :**
+  - Déclarez l'endpoint et la `dataReshape` ensemble pour garder la logique proche de la route.
+  - Gardez `dataReshape` pure et testable (retourner une valeur, éviter effets de bord).
+  - Utilisez `reshapeItemToCachedData(...)` pour insérer proprement un nouvel item dans les données mises en cache.
+  - **Déclarez une interface TypeScript** décrivant la forme de sortie du serveur quand c'est pertinent (ex. `ClassesFetch`) et utilisez-la dans les contrôleurs et composants pour garantir le typage.
+  - **Utilisez un schéma OpenAPI ou GraphQL** quand il est disponible pour générer ou valider automatiquement les interfaces/DTOs.
 
-```ts
-// 1 — Appel : on récupère le reshape depuis l'API_ENDPOINTS
-// et on le passe à `useFetch` via `setFetchParams`.
-setFetchParams({
-  url: API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
-  method: API_ENDPOINTS.POST.METHOD,
-  dataReshapeFn: API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
-});
-```
 
-```ts
-// 2 — Réception du payload serveur
-// Extrait (simplifié) de `useFetch.tsx`
-const [fetchParams, setFetchParams] = useState(defaultStateParameters);
+**Note :** le hook [`useFetch()`](src/hooks/database/fetches/useFetch.tsx) applique la fonction `dataReshape` (déclarée dans `API_ENDPOINTS`) à la réception de la réponse ; la donnée reshaped est ensuite exposée aux composants via `data`.
 
-const queryParams = useQueryOnSubmit<ResponseInterface<TServerData>, E>([
-  onSuccess: (response) => {
-    // useFetch applique automatiquement la fonction fournie (dataReshapeFn)
-    const cachingDatas = fetchParams.dataReshapeFn
-      // Spécifier une fonction dans le fetchParams
-      // va automatiquement la trigger à réception des données -
-      // Veillez donc à utiliser l'`API_ENDPOINTS` pour centraliser les fonctions
-      ? fetchParams.dataReshapeFn(response.data, rawCachedDatas, fetchParams.reshapeOptions)
-      : response.data;
-
-    // Expose la donnée reshaped aux consommateurs via `data`
-    setViewData(cachingDatas as TViewData);
-
-    // Met à jour le cache avec la structure reshaped (et / ou la nouvelle entrée pour un POST)
-    queryClient.setQueryData(cachedFetchKey ?? [contentId, params.url], cachingDatas);
-
-    // useFetch retourne `{ data: viewData }` — c'est donc `cachingDatas` qui sera lu par les composants
-  }
-]);
-```
-
-```ts
-// 3 — Exemple de traitement du reshape via la fonction
-dataReshape: (data: TasksFetch) =>
-  dataReshaper(data)
-    .assignSourceTo("items")
-    .addToRoot({ groupTitle: "Tous" })
-    .assign([["name", "value"]])
-    .newShape(),
-```
+Pour les détails d'implémentation et des exemples complets, consultez `src/hooks/database/fetches/useFetch.tsx` et la section **Recettes rapides** ci‑dessous (exemples de reshapes et d'utilisation).
 
 Exemple : RÈGLE OBLIGATOIRE
 
@@ -274,6 +267,7 @@ const updatedCache = API_ENDPOINTS.POST.CREATE_CLASS.dataReshape(createdItem, ca
 ```
 
 ## Recettes rapides
+
 Une collection de petits exemples pour aller droit au but.
 
 - Rename d'une propriété (`name` → `value`) :
@@ -300,7 +294,7 @@ setFetchParams({
 });
 ```
 
-- Stub fetch rapide (tests) :
+- `stubFetchRoutes()` (tests) :
 ```ts
 stubFetchRoutes({ 
   getRoutes: 
@@ -314,16 +308,10 @@ stubFetchRoutes({
 });
 ```
 
-- **Tests & contrats :** des tests de contrat vérifient les `dataReshape` dans [src/tests/units/endpoints/api-endpoints.config.contract.test.ts](src/tests/units/endpoints/api-endpoints.config.contract.test.ts) — ajoutez un test si vous modifiez un reshape.
-
-- **Bonnes pratiques :**
-  - Déclarez l'endpoint et la `dataReshape` ensemble pour garder la logique proche de la route.
-  - Gardez `dataReshape` pure et testable (retourner une valeur, éviter effets de bord).
-  - Utilisez `reshapeItemToCachedData(...)` (fourni dans le fichier) pour insérer proprement un nouvel item dans les données mises en cache.
-  - **Déclarez une interface TypeScript** décrivant la forme de sortie du serveur quand c'est pertinent (ex. [`ClassesFetch`](src/api/types/routes/classes.types.ts)) et utilisez-la dans les contrôleurs et composants pour garantir le typage.
-  - **Utilisez un schéma OpenAPI ou GraphQL** quand il est disponible pour générer ou valider automatiquement les interfaces/DTOs afin d'assurer la conformité entre le backend et l'UI.
+- Pour les **tests & bonnes pratiques** (contrats, reshapes, typage), voir la section dédiée plus haut dans **Gestion des données réseau** (checklist & recommandations).
 
 
+<a id="role-api-endpoints"></a>
 
 ### RÈGLE OBLIGATOIRE — rôle du fichier `API_ENDPOINTS`
 
@@ -924,9 +912,11 @@ return <FormComponent form={form} onSubmit={handleValidSubmit} />;
 
 
 <a id="liste-des-hocs-usage-dans-des-vues"></a>
+
 ### Liste des HOCs (usage dans des vues)
 
 <a id="withtitledcard"></a>
+
 #### withTitledCard — Wrapper de présentation
 - **But :** encapsuler un controller ou un composant présentational dans une Card standardisée (titre, description, actions).
 - **Vue (exemple réel) :** `ClassCreation` montre l'utilisation typique :
@@ -960,6 +950,7 @@ function ClassCreationView(props) {
 ---
 
 <a id="withcontroller"></a>
+
 #### withController — Intégration `react-hook-form`
 - **But :** simplifier l'intégration d'un composant contrôlé par `react-hook-form`.
 - **Vue (exemple d'utilisation dans une form) :**
@@ -995,6 +986,7 @@ function MyForm({ form }) {
 ---
 
 <a id="withlistmapper"></a>
+
 #### withListMapper — Mapping de listes
 - **But :** générer rapidement un renderer pour des listes à partir d'un item component.
 - **Vue (exemple d'utilisation) :**
@@ -1022,6 +1014,7 @@ return items.map(item => <Wrapped key={keyExtractor(item)} {...item} />);
 ---
 
 <a id="withcomboboxcommands"></a>
+
 #### withComboBoxCommands — Enrichissement de Combobox
 - **But :** ajouter une barre de commandes/actions à un champ combo/select.
 - **Vue (exemple d'utilisation) :**
@@ -1053,6 +1046,7 @@ function TeachersView() {
 ---
 
 <a id="withiconitem"></a>
+
 #### withIconItem — Iconographie standardisée
 - **But :** ajouter une icône configurable (position/size) à un item sans modifier son rendu interne.
 - **Vue (exemple d'utilisation) :**
@@ -1701,6 +1695,8 @@ const classSample = new ClassFixtureCreator({ degreeLevel: '2A' });
 stubFetchRoutes({ getRoutes: [["/api/classes", [classSample]]] });
 ```
 
+<a id="mock-de-payloads-pour-des-methodes-routes-http"></a>
+
 ### Mock de payloads pour des méthodes(routes) HTTP
 
 Cet utils permet de créer un payload en fonction des url qui lui sont passées
@@ -1785,8 +1781,6 @@ Fichiers utiles :
 
 ## Modales (Le projet utilise un système centralisé de modales (Dialog))
 
-
-
 Ce système est exposé via le [`<DialogProvider/>`](src/api/providers/DialogProvider.tsx).
 
 Ce provider est le point central d'ouverture, de fermeture et de gestion des états des modales.
@@ -1849,6 +1843,8 @@ const modals = defineStrictModalsList([
     - types : [`modals.types.ts`](src/pages/AllModals/types/modals.types.ts)
   - Les noms valides sont typés dans [`src/configs/app.config.ts`](src/configs/app.config.ts) (`AppModalNames`).
 
+<a id="ouvrir-une-modal"></a>
+
 ### Ouvrir une modal :
 
   Pattern A — via un bouton (recommandé pour interactions UI) :
@@ -1883,6 +1879,8 @@ const modals = defineStrictModalsList([
   - [`useDialog()`](src/hooks/contexts/useDialog.ts)
   - [`<Button/>`](src/components/ui/button.tsx)
   - context: [`DialogContext`](src/api/contexts/DialogContext.ts)
+
+<a id="fermer-une-modal"></a>
 
 ### Fermer une modal :
 
@@ -1964,14 +1962,20 @@ const modals = defineStrictModalsList([
   - [`<DialogClose/>`](src/components/ui/dialog.tsx)
   - [`<Button/>`](src/components/ui/button.tsx)
 
+<a id="autres-methodes-utiles"></a>
+
 ### Autres méthodes utiles :
+
   - [`closeAllDialogs()`](src/api/providers/DialogProvider.tsx) — ferme toutes les modales ouvertes
 
   - [`isDialogOpen()`](src/api/providers/DialogProvider.tsx)(`'login'`) — vérifie si une modal est ouverte
 
   - [`onOpenChange()`](src/components/Modal/Modal.tsx)(modalName) — callback pour gérer le changement d'état
 
+<a id="a-savoir"></a>
+
 ### À savoir :
+
   - Le composant [`<Modal/>`](src/components/Modal/Modal.tsx) gère l'historique du navigateur (pushState/replaceState).
     L'ouverture d'une modal peut ajouter `/{modalName}` à l'URL.
     Si vous avez besoin de détails sur la gestion de l'historique, consultez la section "Note — Historique" ci-dessus.
@@ -2003,11 +2007,17 @@ const modals = defineStrictModalsList([
   - Utilisez [`onOpenChange()`](src/components/Modal/Modal.tsx) si vous devez réagir au cycle d’ouverture/fermeture.
     Cette fonction reçoit le nom de la modal en argument.
   
+  
+<a id="utils-pratiques"></a>
+
 ## Utils pratiques
+
 
 Quelques helpers réutilisables stockés dans [`utils.ts`](src/utils/utils.ts) :
 
-#### `preventDefaultAndStopPropagation(e)`
+<a id="preventdefaultandstoppropagation"></a>
+
+### `preventDefaultAndStopPropagation(e)`
 
 - **Objectif :** Empêcher le comportement par défaut et stopper la propagation d'un événement si présent.
 
@@ -2032,8 +2042,10 @@ function handleClick(e?: MouseEvent) {
 - [`preventDefaultAndStopPropagation`](src/utils/utils.ts) — implémentation
 
 ---
+<a id="wait-duration-number-message-"></a>
 
-#### `wait(duration: number, message = '')`
+### `wait(duration: number, message = '')`
+
 
 - **Objectif :** Crée une promesse qui se résout après `duration` millisecondes et renvoie `message` si fourni.
 
@@ -2054,7 +2066,10 @@ const result = await wait(500, 'done'); // 'done' après 500ms
 
 ---
 
-#### `mirrorProperties(properties)`
+<a id="mirrorproperties"></a>
+
+### `mirrorProperties(properties)`
+
 
 - **Objectif :** Construit un objet où chaque clé a pour valeur la même chaîne, à partir d'un tableau de chaînes ou d'un objet.
 
@@ -2078,7 +2093,10 @@ export const HTTP_METHODS = mirrorProperties(METHODS) as {
 
 ---
 
-#### `checkPropsValidity(props, required, forbidden)`
+<a id="checkpropsvalidity"></a>
+
+### `checkPropsValidity(props, required, forbidden)`
+
 
 - **Objectif :** Vérifier la présence des clés requises et l'absence des clés interdites dans un objet `props` (retourne `true` si problème).
 
@@ -2103,7 +2121,10 @@ if (checkPropsValidity(props, required, forbidden)) {
 
 ---
 
-#### `handleModalOpening({ e, dialogFns, modalName })`
+<a id="handlemodalopening"></a>
+
+### `handleModalOpening({ e, dialogFns, modalName })`
+
 
 - **Objectif :** Fermer toutes les modales ouvertes, puis ouvrir proprement une nouvelle modal.
 
@@ -2121,7 +2142,187 @@ handleModalOpening({ e, dialogFns: { closeAllDialogs, openDialog }, modalName: '
 
 ---
 
-#### Autres helpers & références rapides
+<a id="objectreshape"></a>
+
+### `ObjectReshape<T>`
+
+- **Objectif :** Fournir un utilitaire déclaratif pour remodeler/normaliser des payloads serveur (rename, assign/assignWithFallback, group, addToRoot, selectElementsTo, addTo, etc.) et produire une **proxy dynamique** (`.newShape()`) pour lecture/accès flexible — c'est l'API canonique du projet.
+
+- **Contexte :** `ObjectReshape` est conçu pour être utilisé dans des `dataReshape` (dans `API_ENDPOINTS`) afin de composer des transformations pures et testables. Il gère la création de propriétés calculées et des chaînes de fallback pour conserver la compatibilité des données entrantes.
+
+---
+
+### Les méthodes
+
+#### `transformTuplesToGroups(groupKeyName, itemsKeyName)`
+But : Transformer un objet clé→tableau en tableau d'objets { groupKeyName, itemsKeyName }.
+
+Code :
+```ts
+const rawData = { "Bac Pro": [{ id: 1 }], "BTS": [{ id: 2 }] };
+const reshapedData = ObjectReshape(rawData).transformTuplesToGroups("groupTitle", "items").newShape();
+```
+Sortie (reshapedData) :
+```json
+[
+  { "groupTitle": "Bac Pro", "items": [{ "id": 1 }] },
+  { "groupTitle": "BTS", "items": [{ "id": 2 }] }
+]
+```
+
+---
+
+#### `assign(...) / assignWithFallback(target, sources) / static from(...).to(target)`
+But : Déclarer des mappings `target` ← `source(s)` (alias simple ou chaîne de fallback).
+
+Code simple (alias) :
+```ts
+const rawData = [{ name: "Math" }];
+const reshapedData = ObjectReshape(rawData).assign([["name","value"]]).newShape();
+// lecture : reshapedData[0].value === "Math"
+```
+Code fallback :
+```ts
+const rawData = [{ label: "Label A" }];
+const reshapedData = ObjectReshape(rawData)
+  .assign([ ObjectReshape.from("name","label","value").to("displayName") ])
+  .newShape();
+// lecture : reshapedData[0].displayName === "Label A" (essaie name → label → value)
+```
+
+---
+
+#### `createPropertyWithContentFromKeys(keys, outputKey, separator = " ")`
+But : Créer une propriété calculée qui concatène plusieurs clés source.
+
+Code :
+```ts
+const item = { degreeLevel: "Bac", degreeYear: "2024" };
+const reshapedData = ObjectReshape(item).createPropertyWithContentFromKeys(["degreeLevel","degreeYear"], "description").newShape();
+// lecture : reshapedData[0].description === "Bac 2024"
+```
+
+---
+
+#### `setProxyPropertyWithContent(key, content)`
+But : Définir une propriété proxy de valeur fixe.
+
+Code :
+```ts
+const reshapedData = ObjectReshape({}).setProxyPropertyWithContent("role","Student").newShape();
+// lecture : reshapedData[0].role === "Student"
+```
+
+---
+
+#### `assignSourceTo(key)`
+But : Envelopper la source sous une clé nommée pour transformations ultérieures.
+
+Code :
+```ts
+const items = [{ id: 1, name: "A" }];
+const built = ObjectReshape(items).assignSourceTo("items").newShape();
+// built === [ { items: [{ id:1, name:"A" }] } ]
+```
+
+---
+
+#### `addToRoot(pairs)`
+But : Ajouter des paires clé/valeur au niveau racine du shape en construction.
+
+Code :
+```ts
+const rawData = [{ id: 1 }];
+const reshapedData = ObjectReshape(rawData).addToRoot({ groupTitle: "Tous", count: 1 }).newShape();
+// lecture : reshapedData[0].groupTitle === "Tous" ; reshapedData[0].count === 1
+```
+Sortie :
+```json
+[ { "id": 1, "groupTitle": "Tous", "count": 1 } ]
+```
+
+---
+
+#### `addTo(newItem, itemsKey = "items", groupConditionKey?, groupConditionValue?)`
+But : Ajouter `newItem` à un groupe identifié (ou créer le groupe si absent).
+
+Code :
+```ts
+const groups = [ { groupTitle: "BTS", items: [{ id: 2 }] } ];
+ObjectReshape(groups).addTo({ id: 99 }, "items", "groupTitle", "BTS");
+// newShape() → [{ groupTitle: "BTS", items: [{ id: 2 }, { id: 99 }] }]
+```
+Si le groupe n'existe pas :
+```ts
+ObjectReshape([]).addTo({ id: 1 }, "items", "groupTitle", "Nouveau").newShape();
+// → [{ groupTitle: "Nouveau", items: [{ id: 1 }] }]
+```
+
+---
+
+#### `selectElementsTo(keys, to)`
+But : Construire un tableau `to` en fusionnant (dans l'ordre) propriétés primitives ou objets provenant de `keys`.
+
+Code :
+```ts
+const rawData = [{ id: "root-id", task: { id: "task-id", name: "Task" } }];
+const reshapedData = ObjectReshape(rawData).selectElementsTo(["task","id"], "items").newShape();
+// lecture : reshapedData[0].items => [ { id: "root-id", name: "Task" } ]
+```
+Note : l'ordre des `keys` est important ; les clés plus tard dans le tableau écrasent les précédentes.
+
+---
+
+#### `buildItem(item)`
+But : Appliquer mappings, computed properties et additions à un seul item (retourne un objet concret).
+
+Code :
+```ts
+const item = { name: "X", year: "2024" };
+const obj = ObjectReshape([item])
+  .assign([["name","value"]])
+  .createPropertyWithContentFromKeys(["name","year"], "label")
+  .buildItem(item);
+// obj => { name: "X", year: "2024", value: "X", label: "X 2024" }
+```
+
+---
+
+#### `newShape()`
+But : Retourner une structure Proxy (lecture dynamique qui applique mappings & computed à la volée).
+
+Code :
+```ts
+const reshapedData = ObjectReshape([{ label: "L" }]).assign([["label","display"]]).newShape();
+// reshapedData[0].display === "L"
+```
+
+> Attention : les Proxies ne sont pas sérialisables — pour obtenir un objet sérialisable, appelez `JSON.parse(JSON.stringify(...))` sur la valeur retournée par `newShape()`.
+
+---
+
+#### `rename(oldKey, newName)`
+But : Renommer une clé racine **seulement si la source est un objet (pas un tableau)**.
+
+Code :
+```ts
+const obj = { name: "Classe" };
+const reshaped = ObjectReshape(obj).rename("name","displayName").newShape();
+// reshaped => proxy where reshaped[0].displayName === "Classe"
+
+```
+
+---
+
+**Fichiers utiles :**
+- [`ObjectReshape`](src/utils/ObjectReshape.ts) — implémentation complète
+- [`api.endpoints.config.ts`](src/configs/api.endpoints.config.ts) — exemples d'utilisation
+- [`useFetch.tsx`](src/hooks/database/fetches/useFetch.tsx) — consommation des reshapes
+
+
+---
+
+### Autres helpers & références rapides
 
 - `dialogFns` — `{ closeAllDialogs, openDialog }` (ex: `LoginForm`).
 - `dataReshape / dataReshapeFn` — fonctions de reshaping définies dans `API_ENDPOINTS` (voir `src/configs/api.endpoints.config.ts`).
