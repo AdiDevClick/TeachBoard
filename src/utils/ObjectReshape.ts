@@ -14,7 +14,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    */
   #firstSourceElement: Record<string, unknown> | undefined;
   /** Stores the newly shaped item during transformation
-   * @description You can build it and retrieve it via `build()` or `newShape()`
+   * @description Retrieve it via `newShape()` (proxies are the canonical API)
    */
   #newShapedItem: Record<string, unknown> = null!;
   /** Stores the current selection during transformation */
