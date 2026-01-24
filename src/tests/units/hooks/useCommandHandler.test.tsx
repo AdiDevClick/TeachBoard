@@ -179,7 +179,7 @@ describe("useCommandHandler - basic behaviours", () => {
       {
         endpointUrl: skillApiEndpoint,
         dataReshapeFn: (d: unknown) => ({ items: [d] }),
-      }
+      },
     );
 
     // Wait until the queryClient has the cached reshaped data
@@ -196,9 +196,8 @@ describe("useCommandHandler - basic behaviours", () => {
   });
 
   test("openingCallback performs a GET and caches data", async () => {
-    const { openingCallback, resultsCallback } = await renderCommandHook(
-      skillModal
-    );
+    const { openingCallback, resultsCallback } =
+      await renderCommandHook(skillModal);
 
     const fetchDatas = {
       apiEndpoint: skillApiEndpoint,
@@ -211,8 +210,10 @@ describe("useCommandHandler - basic behaviours", () => {
     });
 
     // Trigger the opening which should initiate a GET fetch
-    // Note: intentionally omit `dataReshapeFn` to match validation logic in handleOpening
-    openingCallback(true, fetchDatas);
+    openingCallback(true, {
+      ...fetchDatas,
+      dataReshapeFn: (d: unknown) => d,
+    });
 
     // Wait until the queryClient has the cached fetched data
     const cached = await waitForCache(skillQueryKeySingle);

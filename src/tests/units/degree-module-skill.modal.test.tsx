@@ -62,11 +62,12 @@ describe("DegreeModuleSkill modal integration", () => {
     openingCallback(true, {
       task: fetchDatas.task,
       apiEndpoint: fetchDatas.apiEndpoint,
+      dataReshapeFn: fetchDatas.dataReshapeFn,
     });
 
     // Wait for cache to contain fetched items (activity-based key)
     const cached = await waitForCache(skillQueryKeySingle);
-    expect(cached).toEqual([skillFetched]);
+    expect(cached).toEqual({ items: [skillFetched] });
 
     // Now prepare dialog options for submit flow and ensure the queryKey is present
     setDialogOptions(skillModuleModal, {
