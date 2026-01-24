@@ -46,7 +46,7 @@ function withController<C extends AnyComponentLike>(Wrapped: C) {
               props.setRef?.(el, {
                 type: "controller",
                 name: name,
-                id: `${name}`,
+                id: `field-${name}`,
               });
             }}
             data-invalid={fieldState.invalid}
