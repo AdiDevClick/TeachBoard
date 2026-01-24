@@ -182,7 +182,7 @@ function findForbiddenKeys(propsKeys: Set<string>, forbiddenKeys: Set<string>) {
  */
 function probeProxyKey(
   props: Record<string, unknown>,
-  k: string,
+  k: PropertyKey,
 ): ProbeProxyResult {
   const notSupportedMessage = "Proxy or Reflect.ownKeys not supported";
   const returnDetails: ProbeProxyResult = {
@@ -196,7 +196,7 @@ function probeProxyKey(
       throw new TypeError(notSupportedMessage);
     }
 
-    const trapAvailable = Reflect.ownKeys(props).includes(k);
+    const trapAvailable = Reflect.ownKeys(props).includes(k as string | symbol);
 
     if (!trapAvailable) {
       throw new TypeError("Proxy traps not available");
@@ -229,24 +229,52 @@ function probeProxyKey(
  */
 function findMissingRequiredKeys(
   props: Record<string, unknown>,
-  requiredKeys: Set<string>,
+  requiredKeys: Set<string | Record<string, unknown>>,
   propsKeys: Set<string>,
 ) {
   const missing = new Set<string>();
   const shouldBeProxyfied = new Set<string>();
 
   for (const k of requiredKeys) {
-    const { trapAvailable, isProxyfied, unsupported } = probeProxyKey(props, k);
+    const keyIsObject =
+      typeof k === "object" && k !== null && !Array.isArray(k);
 
-    if (!trapAvailable) {
-      shouldBeProxyfied.add(k);
-      missing.add(k);
+    if (keyIsObject) {
+      for (const subKey of Object.keys(k)) {
+        if (Array.isArray(k[subKey])) {
+          const newProps = props[subKey] as Record<string, unknown> | undefined;
+
+          // !! IMPORTANT !! It's missing if the prop is not found or not an object
+          if (typeof newProps !== "object" || newProps === null) {
+            missing.add(subKey);
+            continue;
+          }
+
+          const newPropsKeys = new Set(Object.keys(newProps));
+          const arraySubKeys = k[subKey];
+
+          // !! IMPORTANT !! Recursive call -
+          //  Recurse and propagate missing information upwards
+          const nestedResult = findMissingRequiredKeys(
+            newProps,
+            new Set(arraySubKeys),
+            newPropsKeys,
+          );
+
+          if (nestedResult.requiredIsMissing) {
+            // We consider the entire nested object as missing (for simplicity in logs)
+            missing.add(subKey);
+            for (const p of nestedResult.shouldBeProxyfied) {
+              shouldBeProxyfied.add(`${subKey}.${p}`);
+            }
+          }
+        }
+      }
       continue;
     }
 
-    if (!isProxyfied && unsupported && !propsKeys.has(k)) {
-      missing.add(k);
-    }
+    // Only probe the single non-object required key we're currently iterating on
+    probeLogic(props, new Set([k]), propsKeys, missing, shouldBeProxyfied);
   }
 
   return {
@@ -255,6 +283,40 @@ function findMissingRequiredKeys(
     missingKeys: Array.from(missing),
   };
 }
+
+/**
+ * Probe logic for a set of required keys.
+ * @param props - The props object to validate
+ * @param requiredKeys - Set of required prop keys to probe
+ * @param propsKeys - Set of keys present in the props object
+ * @param missing - Set to collect missing keys
+ * @param shouldBeProxyfied - Set to collect keys that should be proxyfied
+ */
+function probeLogic(
+  props: Record<string, unknown>,
+  requiredKeys: Set<string | Record<string, unknown>>,
+  propsKeys: Set<string>,
+  missing: Set<string>,
+  shouldBeProxyfied: Set<string>,
+) {
+  for (const k of requiredKeys) {
+    const { trapAvailable, isProxyfied, unsupported } = probeProxyKey(
+      props,
+      k as PropertyKey,
+    );
+
+    if (!trapAvailable) {
+      shouldBeProxyfied.add(k as string);
+      missing.add(k as string);
+      continue;
+    }
+
+    if (!isProxyfied && unsupported && !propsKeys.has(k as string)) {
+      missing.add(k as string);
+    }
+  }
+}
+
 /**
  * @param forbiddenPresent - Whether forbidden keys are present
  * @param requiredIsMissing - Whether required keys are missing
