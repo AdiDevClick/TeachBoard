@@ -39,7 +39,7 @@ function withEvaluationRadioItem<T extends object>(
     const { id, name, itemClick, ...rest } = props;
 
     if (evaluationRadioItemPropsInvalid(props)) {
-      debugLogs("EvaluationRadioItem");
+      debugLogs("EvaluationRadioItem", props);
       return null;
     }
 
@@ -65,7 +65,7 @@ function withEvaluationRadioItem<T extends object>(
         <Field className="evaluation-radio-item--container">
           <FieldContent className="evaluation-radio-item__content">
             <FieldTitle className="evaluation-radio-item__content--title">
-              <RadioGroupItem id={`r-${id}`} value={name} />
+              <RadioGroupItem id={`r-${id}`} value={id} />
               <Label
                 className="evaluation-radio-item__content--title__label"
                 htmlFor={`r-${id}`}
