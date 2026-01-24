@@ -205,6 +205,8 @@ Ce projet centralise à la fois les **endpoints** et la **transformation des don
 
   **Cas fréquent :** si un composant attend `value` tandis que le payload fournit `name`, un reshape simple (rename) est la solution idéale pour maintenir compatibilité sans changer le backend ni le composant.
 
+  **Cas spécifique :** pour la création de templates de tâches, le reshape met à jour `shortTemplatesList` lorsque cette liste existe déjà dans le cache. En absence de liste (cache vide ou structure incomplète), le reshape continue sans erreur (voir la logique dans [API_ENDPOINTS](src/configs/api.endpoints.config.ts)).
+
 **Obligations lors d'une modification (checklist)** :
 - [ ] Si vous modifiez ou ajoutez un `dataReshape`, **ajoutez un test de contrat** (dans `src/tests/units/endpoints/`) vérifiant le reshape attendu.
 - [ ] Mettez à jour la documentation (README) et la checklist PR.
