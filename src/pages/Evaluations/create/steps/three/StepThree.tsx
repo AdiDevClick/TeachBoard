@@ -16,7 +16,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { IconArrowLeft } from "@tabler/icons-react";
 import {
   useEffect,
-  useState,
   type Dispatch,
   type JSX,
   type MouseEvent,
@@ -65,12 +64,6 @@ export function StepThree({
   inputControllers = attendanceRecordCreationBaseControllers,
   ...props
 }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
-  const [state, setState] = useState({
-    count: 0,
-    isClicked: false,
-    modulesAvailable: true,
-    modulesSelection: [] as string[],
-  });
   const [, setLeftContent] =
     useOutletContext<[JSX.Element, Dispatch<SetStateAction<JSX.Element>>]>();
   const user = useAppStore((state) => state.user);
@@ -88,6 +81,12 @@ export function StepThree({
   const moduleSelectionState = useEvaluationStepsCreationStore(
     (state) => state.moduleSelection,
   );
+  const setShowStudentsEvaluation = useEvaluationStepsCreationStore(
+    (state) => state.setModuleSelectionIsClicked,
+  );
+  const selectedSubSkill = useEvaluationStepsCreationStore(
+    (state) => state.subSkillSelection?.selectedSubSkill,
+  );
 
   const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({
     resolver: zodResolver(attendanceRecordCreationSchemaInstance([])),
@@ -103,6 +102,7 @@ export function StepThree({
 
   if (moduleSelectionState.isClicked) {
     cardProps = stepThreeSubskillsSelectionCardProps;
+    stepThreeSubskillsSelectionTitleProps.description = `Vous évaluez "${selectedSubSkill?.name}"`;
     titleProps = stepThreeSubskillsSelectionTitleProps;
   }
 
@@ -126,13 +126,7 @@ export function StepThree({
 
   const handlePreviousClick = (e: MouseEvent<SVGSVGElement>) => {
     preventDefaultAndStopPropagation(e);
-    setState({
-      ...state,
-      isClicked: !state.isClicked,
-      count: 0,
-      modulesAvailable: true,
-      modulesSelection: [],
-    });
+    setShowStudentsEvaluation(false);
   };
 
   const onClickHandlerTest = (e, props) => {
@@ -151,7 +145,7 @@ export function StepThree({
       setLeftContent(
         <StepThreeSubskillsSelectionController
           {...commonProps}
-          modules={moduleSelectionState.selectedModuleSubSkills}
+          subSkills={moduleSelectionState.selectedModuleSubSkills}
         />,
       );
     } else {
@@ -168,19 +162,21 @@ export function StepThree({
 
   return (
     <>
-      <IconArrowLeft
-        className={
-          stepThreeModuleSelectionCardProps.cardClassName + " arrow-back"
-        }
-        onClick={handlePreviousClick}
-        data-name="modules-previous"
-        // onClick={(e) => onClickHandler({ e, ...clickProps, index })}
-      />
       {!moduleSelectionState.isClicked && (
         <ModuleSelection displayFooter={false} {...commonProps} />
       )}
       {moduleSelectionState.isClicked && (
-        <StudentsEvaluation displayFooter={false} {...commonProps} />
+        <>
+          <IconArrowLeft
+            className={
+              stepThreeModuleSelectionCardProps.cardClassName + " arrow-back"
+            }
+            onClick={handlePreviousClick}
+            data-name="modules-previous"
+            // onClick={(e) => onClickHandler({ e, ...clickProps, index })}
+          />
+          <StudentsEvaluation displayFooter={false} {...commonProps} />
+        </>
       )}
     </>
   );
