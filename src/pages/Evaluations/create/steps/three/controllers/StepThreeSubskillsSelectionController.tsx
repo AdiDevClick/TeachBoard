@@ -1,47 +1,41 @@
-import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
-import { EvaluationRadioItemList } from "@/components/Radio/EvaluationRadioItem.tsx";
-import type { EvaluationRadioItemProps } from "@/components/Radio/types/radio.types.ts";
+import { EvaluationRadioItemWithoutDescriptionList } from "@/components/Radio/EvaluationRadioItem.tsx";
 import { RadioGroup } from "@/components/ui/radio-group.tsx";
 import {
   debugLogs,
-  stepThreeControllerPropsInvalid,
+  stepThreeSubskillsSelectionControllerPropsInvalid,
 } from "@/configs/app-components.config.ts";
-import type { StepThreeControllerProps } from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
-import { type MouseEvent } from "react";
+import { useStepThreeHandler } from "@/hooks/useStepThreeHandler.ts";
+import type { StepThreeSubskillsSelectionControllerProps } from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
 
+/**
+ * Step Three Subskills Selection Controller.
+ *
+ * @remarks The logic for handling sub-skill selection is managed via the useEvaluationStepsCreationStore hook.
+ *
+ * @param formId - The ID of the form
+ * @param subSkills - List of sub-skills available for selection
+ */
 export function StepThreeSubskillsSelectionController(
-  props: StepThreeControllerProps,
+  props: StepThreeSubskillsSelectionControllerProps,
 ) {
-  const { formId, modules } = props;
+  const { formId, subSkills } = props;
 
-  const setModuleSelection = useEvaluationStepsCreationStore(
-    (state) => state.setModuleSelection,
-  );
+  const { handleSubSkillChangeCallback, selectedSubSkillId } =
+    useStepThreeHandler(subSkills);
 
-  if (stepThreeControllerPropsInvalid(props)) {
+  if (stepThreeSubskillsSelectionControllerPropsInvalid(props)) {
     debugLogs("StepThreeSubskillsSelectionController", props);
     return null;
   }
 
-  const handleOnClick = (
-    e: MouseEvent<HTMLDivElement>,
-    props: EvaluationRadioItemProps,
-  ) => {
-    const selectedModule = modules[props.index];
-    console.log("Clicked item:", props);
-    console.log("event :", e);
-    console.log("module : ", selectedModule);
-    // setModuleSelection({
-    //   isClicked: true,
-    //   selectedModuleIndex: props.index,
-    //   selectedModule: selectedModule,
-    // });
-  };
-
   return (
     <form id={formId}>
-      <RadioGroup>
-        <EvaluationRadioItemList items={modules} itemClick={handleOnClick} />
+      <RadioGroup
+        value={selectedSubSkillId ?? ""}
+        defaultValue={subSkills[0]?.id ?? ""}
+        onValueChange={handleSubSkillChangeCallback}
+      >
+        <EvaluationRadioItemWithoutDescriptionList items={subSkills} />
       </RadioGroup>
     </form>
   );
