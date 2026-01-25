@@ -1,6 +1,6 @@
+import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
 import "@/assets/css/Slider.scss";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import type { EvaluationRadioItemProps } from "@/components/Radio/types/radio.types.ts";
 import { Badge } from "@/components/ui/badge.tsx";
 import { Item } from "@/components/ui/item.tsx";
 import { Slider } from "@/components/ui/slider.tsx";
@@ -9,54 +9,86 @@ import {
   stepThreeControllerPropsInvalid,
 } from "@/configs/app-components.config.ts";
 import type { StepThreeControllerProps } from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
-import { useState, type CSSProperties, type MouseEvent } from "react";
+import { useState, type CSSProperties } from "react";
 
 export function StepThreeStudentsEvaluationController(
   props: StepThreeControllerProps,
 ) {
   const { formId, students } = props;
+  const selectedSubSkill = useEvaluationStepsCreationStore(
+    (state) => state.subSkillSelection.selectedSubSkill,
+  );
+  const selectedModule = useEvaluationStepsCreationStore(
+    (state) => state.moduleSelection.selectedModule,
+  );
+  const setEvaluationForStudent = useEvaluationStepsCreationStore(
+    (state) => state.setEvaluationForStudent,
+  );
   const [value, setValue] = useState([0]);
 
   if (stepThreeControllerPropsInvalid(props)) {
     debugLogs("StepThreeStudentsEvaluationController", props);
-    // return null;
   }
 
-  const handleOnClick = (
-    e: MouseEvent<HTMLDivElement>,
-    props: EvaluationRadioItemProps,
+  /**
+   * Handles value change for a student's evaluation.
+   * 
+   * @description Updates the evaluation score for the specified student
+
+  * @param newValue - The new value array from the slider. 
+   * @param student - The student whose evaluation is being updated.
+   */
+  const handleValueChange = (
+    newValue: number[],
+    student: (typeof students)[number],
   ) => {
-    const selectedStudent = presentStudentsWithAssignedTasks[props.index];
-    console.log("Clicked item:", props);
-    console.log("event :", e);
-    console.log("student : ", selectedStudent);
-    // setModuleSelection({
-    //   isClicked: true,
-    //   selectedModuleIndex: props.index,
-    //   selectedModule: selectedModule,
-    // });
+    setEvaluationForStudent(student.id, {
+      subSkill: selectedSubSkill ?? null,
+      score: newValue[0],
+      module: selectedModule ?? null,
+    });
+    setValue(newValue);
   };
-  console.log(students);
+
   return (
     <form id={formId} className="min-w-md">
       <ListMapper items={students}>
-        {(student) => (
-          <Item className="flex flex-nowrap gap-0.1">
-            <Badge className="m-4">{student.fullName}</Badge>
-            <Slider
-              step={25}
-              value={value}
-              onValueChange={setValue}
-              className="four-steps-slider"
-              style={
-                {
-                  "--slider-rangeColor": rangeColor(value[0]),
-                } as CSSProperties
-              }
-            />
-          </Item>
-        )}
+        {(student) => {
+          let evaluation = value;
+          const moduleId = selectedModule?.id;
+          const subSkillId = selectedSubSkill?.id;
+          const studentModules = student.evaluations?.modules;
+
+          if (moduleId && subSkillId && studentModules?.has(moduleId)) {
+            const subSkill = studentModules
+              .get(moduleId)
+              ?.subSkills.get(subSkillId);
+
+            evaluation = subSkill?.score ? [subSkill.score] : value;
+          }
+          return (
+            <Item className="flex flex-nowrap gap-0.1">
+              <Badge className="m-4">{student.fullName}</Badge>
+              <Slider
+                step={25}
+                value={evaluation}
+                onValueChange={(e) => handleValueChange(e, student)}
+                className="four-steps-slider"
+                style={
+                  {
+                    "--slider-rangeColor": rangeColor(evaluation[0]),
+                  } as CSSProperties
+                }
+              />
+            </Item>
+          );
+        }}
       </ListMapper>
+      {students.length === 0 && (
+        <Badge variant={"outline"} className="mx-auto">
+          Aucuns étudiants spécifiés pour cette compétence.
+        </Badge>
+      )}
     </form>
   );
 }
