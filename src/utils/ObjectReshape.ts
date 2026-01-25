@@ -591,109 +591,286 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     return new Proxy(obj as Record<string, unknown>, handler) as unknown as T;
   }
 
+  /**
+   * A helper method to mark an object as proxied.
+   *
+   * @param target - The target object
+   * @param receiver - The proxy receiver
+   */
+  #markProxyfied(target: Record<string, unknown>, receiver: unknown) {
+    Reflect.set(target, "__isProxyfied", true, receiver);
+  }
+
+  /**
+   * Retrieves the computed value for a property if it exists.
+   *
+   * @param prop - The property name to retrieve
+   * @param target - The target object
+   * @param receiver - The proxy receiver
+   * @returns The computed value or undefined if not found
+   */
+  #getComputedValue(
+    prop: string,
+    target: Record<string, unknown>,
+    receiver: unknown,
+  ): unknown {
+    const computedFn = this.#computedProperties.get(prop);
+    if (!computedFn) return undefined;
+
+    const computedValue = computedFn(target);
+
+    this.#sendConsoleLog(
+      "GET trap called for computed prop:",
+      prop,
+      "with value:",
+      computedValue,
+    );
+
+    this.#markProxyfied(target, receiver);
+
+    return computedValue;
+  }
+
+  /**
+   * Computes the full key list for a proxied object.
+   * Includes real keys, mapped keys, and computed keys.
+   *
+   * @param target - The target object
+   * @returns All enumerable keys visible through the proxy
+   */
+  #getProxyOwnKeys(target: Record<string, unknown>): Array<string | symbol> {
+    const keys = new Set(Reflect.ownKeys(target));
+
+    // Add mapped keys
+    for (const key of this.#mappingProxies.keys()) {
+      keys.add(key);
+    }
+
+    // Add computed property keys
+    for (const key of this.#computedProperties.keys()) {
+      keys.add(key);
+    }
+
+    return Array.from(keys);
+  }
+
+  /**
+   * Resolves a property descriptor for a proxied object.
+   *
+   * @param target - The target object
+   * @param prop - Property name being inspected
+   * @returns A descriptor if resolved, otherwise undefined
+   */
+  #getProxyPropertyDescriptor(
+    target: Record<string, unknown>,
+    prop: string | symbol,
+  ): PropertyDescriptor | undefined {
+    // !! IMPORTANT !! Check if the property exists directly on the target first
+    const directDescendant = Reflect.getOwnPropertyDescriptor(target, prop);
+    if (directDescendant) {
+      return directDescendant;
+    }
+
+    // Then check for mapped properties
+    if (typeof prop === "string") {
+      const sourceKeys = this.#mappingProxies.get(prop);
+      if (sourceKeys) {
+        const resolved = this.#resolveValue(target, sourceKeys);
+        if (resolved) {
+          const desc = Reflect.getOwnPropertyDescriptor(
+            target,
+            resolved.sourceKey,
+          );
+          if (desc) {
+            this.#markProxyfied(target, target);
+            return { ...desc, enumerable: true, configurable: true };
+          }
+        }
+      }
+    }
+
+    return Reflect.getOwnPropertyDescriptor(target, prop);
+  }
+
+  /**
+   * Generic debug logger used by proxy resolution helpers.
+   *
+   * @param args - Console arguments to forward when logging is enabled
+   */
+  #sendConsoleLog(...args: unknown[]) {
+    if (DEV_MODE && !NO_PROXY_LOGS) {
+      console.debug(...args);
+    }
+  }
+
+  /**
+   * Try to return a direct property from the target (including an existing undefined value).
+   */
+  #tryGetDirectProperty(
+    target: Record<string, unknown>,
+    prop: string,
+    receiver: unknown,
+  ) {
+    if (Object.hasOwn(target, prop)) {
+      return Reflect.get(target, prop, receiver);
+    }
+    return undefined;
+  }
+
+  /**
+   * Try to return a computed property for the given prop.
+   */
+  #tryGetDirectComputed(
+    prop: string,
+    target: Record<string, unknown>,
+    receiver: unknown,
+  ) {
+    const computed = this.#getComputedValue(prop, target, receiver);
+    return computed ?? undefined;
+  }
+
+  /**
+   * Try to resolve the mapped property from actual properties on the target.
+   */
+  #tryGetMappedFromTarget(
+    prop: string,
+    target: Record<string, unknown>,
+    receiver: unknown,
+  ) {
+    const sourceKeys = this.#mappingProxies.get(prop);
+    if (!sourceKeys) return undefined;
+
+    const resolved = this.#resolveValue(target, sourceKeys);
+    if (resolved) {
+      this.#sendConsoleLog(
+        "GET trap called for mapped prop:",
+        prop,
+        "resolved to source key:",
+        resolved.sourceKey,
+        "(tried:",
+        sourceKeys.join(" -> "),
+        ") with value:",
+        resolved.value,
+      );
+      this.#markProxyfied(target, receiver);
+      return resolved.value;
+    }
+    return undefined;
+  }
+
+  /**
+   * Try to resolve the mapped property by checking if any source key is a computed property.
+   */
+  #tryGetMappedFromComputed(
+    prop: string,
+    target: Record<string, unknown>,
+    receiver: unknown,
+  ) {
+    const sourceKeys = this.#mappingProxies.get(prop);
+    if (!sourceKeys) return undefined;
+
+    for (const sourceKey of sourceKeys) {
+      const computedValue = this.#getComputedValue(sourceKey, target, receiver);
+      if (computedValue !== undefined) {
+        this.#sendConsoleLog(
+          "GET trap called for mapped prop:",
+          prop,
+          "resolved to computed source:",
+          sourceKey,
+          "with value:",
+          computedValue,
+        );
+        return computedValue;
+      }
+    }
+    return undefined;
+  }
+
+  /**
+   * Resolves a property value for a proxied object.
+   *
+   * @param target - The target object
+   * @param prop - Property name being accessed
+   * @param receiver - The proxy receiver
+   * @returns The resolved value or undefined when not found
+   */
+  #getProxyValue(
+    target: Record<string, unknown>,
+    prop: string | symbol,
+    receiver: unknown,
+  ): unknown {
+    if (typeof prop === "string") {
+      // 1) Check direct property (keeps behavior for existing undefined values)
+      const direct = this.#tryGetDirectProperty(target, prop, receiver);
+      if (direct !== undefined) return direct;
+
+      // 2) Direct computed property
+      const directComputed = this.#tryGetDirectComputed(prop, target, receiver);
+      if (directComputed !== undefined) return directComputed;
+
+      // 3) Mapped properties resolved from actual target properties
+      const mappedFromTarget = this.#tryGetMappedFromTarget(
+        prop,
+        target,
+        receiver,
+      );
+      if (mappedFromTarget !== undefined) return mappedFromTarget;
+
+      // 4) Mapped properties resolved via computed sources
+      const mappedFromComputed = this.#tryGetMappedFromComputed(
+        prop,
+        target,
+        receiver,
+      );
+      if (mappedFromComputed !== undefined) return mappedFromComputed;
+    }
+
+    return Reflect.get(target, prop, receiver);
+  }
+
+  /**
+   * Writes a property value through the proxy.
+   *
+   * @param target - The target object
+   * @param prop - Property name being written
+   * @param value - Value to write
+   * @param receiver - The proxy receiver
+   * @returns True if the assignment succeeds
+   */
+  #setProxyValue(
+    target: Record<string, unknown>,
+    prop: string | symbol,
+    value: unknown,
+    receiver: unknown,
+  ): boolean {
+    this.#sendConsoleLog(
+      "SET trap called for prop:",
+      prop,
+      "with value:",
+      value,
+    );
+
+    // Default behaviour: write directly to the target.
+    return Reflect.set(target, prop, value, receiver);
+  }
+
   #handler(): ProxyHandler<Record<string, unknown>> {
     return {
       ownKeys: (target: Record<string, unknown>) => {
-        const keys = new Set(Reflect.ownKeys(target));
-
-        // Add mapped keys
-        for (const key of this.#mappingProxies.keys()) {
-          keys.add(key);
-        }
-
-        // Add computed property keys
-        for (const key of this.#computedProperties.keys()) {
-          keys.add(key);
-        }
-
-        return Array.from(keys);
+        return this.#getProxyOwnKeys(target);
       },
       getOwnPropertyDescriptor: (
         target: Record<string, unknown>,
         prop: string | symbol,
       ) => {
-        // !! IMPORTANT !! Check if the property exists directly on the target first
-        const directDescendant = Reflect.getOwnPropertyDescriptor(target, prop);
-        if (directDescendant) {
-          return directDescendant;
-        }
-
-        // Then check for mapped properties
-        if (typeof prop === "string") {
-          const sourceKeys = this.#mappingProxies.get(prop);
-          if (sourceKeys) {
-            const resolved = this.#resolveValue(target, sourceKeys);
-            if (resolved) {
-              const desc = Reflect.getOwnPropertyDescriptor(
-                target,
-                resolved.sourceKey,
-              );
-              if (desc) {
-                Reflect.set(target, "__isProxyfied", true);
-                return { ...desc, enumerable: true, configurable: true };
-              }
-            }
-          }
-        }
-        return Reflect.getOwnPropertyDescriptor(target, prop);
+        return this.#getProxyPropertyDescriptor(target, prop);
       },
       get: (
         target: Record<string, unknown>,
         prop: string | symbol,
         receiver: unknown,
       ): unknown => {
-        if (typeof prop === "string") {
-          // !! IMPORTANT !! Check if the property exists directly on the target first
-          if (Object.hasOwn(target, prop)) {
-            return Reflect.get(target, prop, receiver);
-          }
-
-          // mappingProxies stores targetKey -> sourceKeys[]
-          const sourceKeys = this.#mappingProxies.get(prop);
-
-          if (sourceKeys) {
-            // First try to resolve from actual properties on target
-            const resolved = this.#resolveValue(target, sourceKeys);
-            if (resolved) {
-              if (DEV_MODE && !NO_PROXY_LOGS) {
-                console.debug(
-                  "GET trap called for mapped prop:",
-                  prop,
-                  "resolved to source key:",
-                  resolved.sourceKey,
-                  "(tried:",
-                  sourceKeys.join(" -> "),
-                  ") with value:",
-                  resolved.value,
-                );
-              }
-              Reflect.set(target, "__isProxyfied", true, receiver);
-              return resolved.value;
-            }
-
-            // If not found on target, check if any source key is a computed property
-            for (const sourceKey of sourceKeys) {
-              const sourceComputeFn = this.#computedProperties.get(sourceKey);
-              if (sourceComputeFn) {
-                const computedValue = sourceComputeFn(target);
-                if (DEV_MODE && !NO_PROXY_LOGS) {
-                  console.debug(
-                    "GET trap called for mapped prop:",
-                    prop,
-                    "resolved to computed source:",
-                    sourceKey,
-                    "with value:",
-                    computedValue,
-                  );
-                }
-                Reflect.set(target, "__isProxyfied", true, receiver);
-                return computedValue;
-              }
-            }
-          }
-        }
-
-        return Reflect.get(target, prop, receiver);
+        return this.#getProxyValue(target, prop, receiver);
       },
       set: (
         target: Record<string, unknown>,
@@ -701,17 +878,7 @@ export class ObjectReshape<T extends Record<string, unknown>> {
         value: unknown,
         receiver: unknown,
       ): boolean => {
-        if (DEV_MODE && !NO_PROXY_LOGS) {
-          console.log(
-            "SET EARLY trap called for prop:",
-            prop,
-            "with value:",
-            value,
-          );
-        }
-
-        // Default behaviour: write directly to the target.
-        return Reflect.set(target, prop, value, receiver);
+        return this.#setProxyValue(target, prop, value, receiver);
       },
     };
   }
