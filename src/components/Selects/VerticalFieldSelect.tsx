@@ -62,10 +62,28 @@ export function VerticalFieldSelect({
   setRef,
   observedRefs,
   id: containerId,
+  triggerProps,
   ...props
 }: VerticalSelectProps) {
-  const { onOpenChange, onValueChange, children, defaultValue, role, ...rest } =
-    props;
+  const {
+    onOpenChange,
+    onValueChange,
+    children,
+    defaultValue,
+    role,
+    task,
+    apiEndpoint,
+    dataReshapeFn,
+    placeholder,
+    field,
+    fieldState,
+    controllerMeta,
+    ...selectRootProps
+  } = props as VerticalSelectProps & {
+    field?: { name?: string };
+    fieldState?: unknown;
+    controllerMeta?: unknown;
+  };
 
   const id = useId();
   const [state, setState] = useState<VerticalFieldState>({});
@@ -75,16 +93,26 @@ export function VerticalFieldSelect({
 
   useImperativeHandle(controllerRef ?? ref, () => handleObjectRef.current);
 
-  const fieldName = (rest as unknown as { field?: { name?: string } })?.field
-    ?.name;
+  const fieldName = field?.name;
+  const metaBase = {
+    task,
+    apiEndpoint,
+    dataReshapeFn,
+    field,
+    fieldState,
+    controllerMeta,
+  };
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
       if (open) {
         handleObjectRef.current = {
           ...emptyHandle,
-          props,
-          getMeta: () => observedRefs?.get(containerId)?.meta ?? undefined,
+          props: selectRootProps,
+          getMeta: () =>
+            containerId
+              ? (observedRefs?.get(containerId)?.meta ?? undefined)
+              : undefined,
           getLastSelectedItemValue: () => lastSelectedValueRef.current,
           setLastSelectedItemValue: (value: string) => {
             lastSelectedValueRef.current = value;
@@ -104,14 +132,7 @@ export function VerticalFieldSelect({
       onOpenChange?.(open);
       // }, []);
     },
-    [
-      containerId,
-      props,
-      observedRefs,
-      onOpenChange,
-      onValueChange,
-      handleObjectRef,
-    ],
+    [containerId, selectRootProps, observedRefs, onOpenChange],
   );
 
   // wrap onValueChange to keep track of last clicked/selected item and expose it via the imperative handle
@@ -124,19 +145,22 @@ export function VerticalFieldSelect({
       getLastSelectedItemValue: () => value,
       getLastCommandValue: () => lastCommandValueRef.current,
     };
-    const allDetails = observedRefs?.get(containerId);
-    const metas = allDetails ? { ...rest, ...allDetails.meta } : { ...rest };
+    const allDetails = containerId ? observedRefs?.get(containerId) : undefined;
+    const metas = allDetails
+      ? { ...selectRootProps, ...metaBase, ...allDetails.meta }
+      : { ...selectRootProps, ...metaBase };
     onValueChange?.(value, metas);
   };
 
   return (
     <div
       id={containerId}
+      data-open={state.open}
       ref={(el) => {
         setRef?.(el, {
-          task: props?.task,
-          apiEndpoint: props?.apiEndpoint,
-          dataReshapeFn: props?.dataReshapeFn,
+          task,
+          apiEndpoint,
+          dataReshapeFn,
           name: fieldName,
           id: containerId,
         });
@@ -155,62 +179,25 @@ export function VerticalFieldSelect({
         defaultValue={defaultValue}
         onOpenChange={handleOpenChange}
         onValueChange={handleValueChange}
+        {...selectRootProps}
       >
         <SelectTrigger
           id={id}
           role={role}
-          {...rest}
-          className={cn(fullWidth ? "w-full" : "w-fit")}
+          {...triggerProps}
+          className={cn(
+            fullWidth ? "w-full" : "w-fit",
+            triggerProps?.className,
+          )}
           size="default"
         >
-          <SelectValue placeholder={props.placeholder} />
+          <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent side={side}>{children}</SelectContent>
       </Select>
     </div>
   );
 }
-
-// function withCommands(Wrapped: AnyComponentLike) {
-//   return function Component<T extends CommandsProps>(
-//     props: T & VerticalSelectProps
-//   ) {
-//     const {
-//       useCommands,
-//       children,
-//       creationButtonText,
-//       useButtonAddNew,
-//       onAddNewItem,
-//       commandHeadings,
-//       ...rest
-//     } = props;
-
-//     const apiEndpoint = props.apiEndpoint;
-//     const task = props.task;
-//     const dataReshapeFn = props.dataReshapeFn;
-
-//     return (
-//       <Wrapped {...rest}>
-//         {useCommands && (
-//           <CommandItemsForComboBox
-//             commandHeadings={commandHeadings ?? []}
-//             {...rest}
-//           />
-//         )}
-//         {useButtonAddNew && (
-//           <InertSelectItemWithIcon
-//             value={task}
-//             inertIconText={creationButtonText}
-//             onPointerDown={(e) =>
-//               onAddNewItem?.({ e, apiEndpoint, task, dataReshapeFn })
-//             }
-//           />
-//         )}
-//         {children}
-//       </Wrapped>
-//     );
-//   };
-// }
 
 function withListings<TProps extends object, TItem = unknown>(
   Wrapped: ComponentType<TProps>,
@@ -237,23 +224,18 @@ export default VerticalFieldSelect;
 export const VerticalFieldSelectWithController =
   withController(VerticalFieldSelect);
 
-export const VerticalFieldSelectWithListings =
-  withListings(VerticalFieldSelect);
+type VerticalFieldSelectListingsComponent = ComponentType<
+  VerticalSelectProps & PropsWithListings<unknown>
+>;
+
+export const VerticalFieldSelectWithListings = withListings(
+  VerticalFieldSelect,
+) as VerticalFieldSelectListingsComponent;
 
 export const VerticalFieldSelectWithControllerAndInlineSwitch = withController(
   withInlineItemAndSwitchSelection(VerticalFieldSelectWithListings),
-);
+) as ComponentType<Record<string, unknown>>;
 
 export const VerticalFieldWithInlineSwitchList = withListMapper(
   VerticalFieldSelectWithControllerAndInlineSwitch,
-);
-// export const VerticalFieldSelectWithCommands =
-//   withCommands(VerticalFieldSelect);
-
-// export const VerticalFieldSelectWithControlledCommands: ReturnType<
-//   typeof withController<typeof VerticalFieldSelectWithCommands>
-// > = withController(VerticalFieldSelectWithCommands);
-
-// export const VerticalFieldSelectWithControllerAndCommandsList: ReturnType<
-//   typeof withListMapper<typeof VerticalFieldSelectWithControlledCommands>
-// > = withListMapper(VerticalFieldSelectWithControlledCommands);
+) as ComponentType<Record<string, unknown>>;
