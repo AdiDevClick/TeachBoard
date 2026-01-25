@@ -23,6 +23,10 @@ const titleProps = {
   className: "text-center",
 };
 
+export const loginFormCardProps = {
+  card: { className: "grid gap-4" },
+};
+
 const resetPasswordButtonText = "Réinitialiser le mot de passe";
 const backToLoginLinkText = "Retour à la connexion";
 const forgotPasswordLinkText = "Mot de passe oublié ?";
@@ -85,6 +89,7 @@ function LoginForm({
       isPwForgotten,
       modalMode,
       titleProps,
+      cardProps: loginFormCardProps,
       inputControllers: inputControllersToUse,
       textToDisplay: {
         defaultText,

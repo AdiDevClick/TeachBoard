@@ -97,13 +97,15 @@ function withTitledCard<C extends object, F extends object = object>(
       modalMode = false,
       ref,
       displayFooter = true,
-      contentClassName = "",
-      cardProps: cardProps = {},
+      cardProps,
       ...rest
     } = props;
 
+    const { card = {}, content = {} } = cardProps ?? {};
+
+    // Temporary fix to allow passing className via props (Deprecated)
     if (props.className) {
-      cardProps.className = props.className;
+      card.className = props.className;
     }
 
     /**
@@ -116,13 +118,7 @@ function withTitledCard<C extends object, F extends object = object>(
     const cardId = "card-" + pageId;
 
     return (
-      <Card
-        ref={ref}
-        id={cardId}
-        data-dialog={cardId}
-        {...cardProps}
-        // style={{ justifySelf: "center" }}
-      >
+      <Card ref={ref} id={cardId} data-dialog={cardId} {...card}>
         <Title
           className="text-left"
           style={{
@@ -130,7 +126,7 @@ function withTitledCard<C extends object, F extends object = object>(
           }}
           {...titleProps}
         />
-        <CardContent className={contentClassName}>
+        <CardContent {...content}>
           <WrappedContent pageId={pageId} {...(rest as C)} />
         </CardContent>
         {displayFooter ? (

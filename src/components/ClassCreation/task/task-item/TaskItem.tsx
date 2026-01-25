@@ -57,7 +57,7 @@ export function TaskItem({
         formState: form.formState,
         formId: formId,
       },
-      cardProps: { className },
+      cardProps: { card: { className } },
       modalMode,
       titleProps,
       ...props,

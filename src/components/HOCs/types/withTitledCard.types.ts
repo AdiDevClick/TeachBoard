@@ -1,7 +1,12 @@
 import type { AppDialFooterProps } from "@/components/Footer/types/footer.types.ts";
 import type { HeaderTitleProps } from "@/components/Titles/types/titles.types.ts";
-import type { Card, CardFooter } from "@/components/ui/card.tsx";
+import type { Card, CardContent, CardFooter } from "@/components/ui/card.tsx";
 import type { ComponentProps, Ref } from "react";
+
+type CardPropsType = {
+  card: ComponentProps<typeof Card>;
+  content: ComponentProps<typeof CardContent>;
+};
 
 type BaseCardProps = {
   /** Optional page ID for the card component */
@@ -10,10 +15,8 @@ type BaseCardProps = {
   titleProps?: HeaderTitleProps;
   /** Ref to be forwarded to the Card component */
   ref?: Ref<HTMLDivElement>;
-  /** Props for customizing the Card content component*/
-  contentClassName?: string;
-  /** Additional props for the Card component */
-  cardProps?: ComponentProps<typeof Card>;
+  /** Additional props for the Card component and CardContent component */
+  cardProps?: CardPropsType;
 };
 
 /**
