@@ -13,6 +13,7 @@ import {
   debugLogs,
   evaluationRadioItemPropsInvalid,
 } from "@/configs/app-components.config.ts";
+import sanitizeDOMProps from "@/utils/props.ts";
 
 import "@css/EvaluationRadio.scss";
 import { type ComponentType, type MouseEvent } from "react";
@@ -38,6 +39,13 @@ function withEvaluationRadioItem<T extends object>(
   ) {
     const { id, name, itemClick, ...rest } = props;
 
+    const safeProps = sanitizeDOMProps(rest, [
+      "subSkills",
+      "tasksList",
+      "studentsToEvaluate",
+      "isLinkedToTasks",
+    ]);
+
     if (evaluationRadioItemPropsInvalid(props)) {
       debugLogs("EvaluationRadioItem", props);
       return null;
@@ -60,7 +68,7 @@ function withEvaluationRadioItem<T extends object>(
         htmlFor={`r-${id}`}
         className="evaluation-radio-item"
         onClick={handleClick}
-        {...rest}
+        {...safeProps}
       >
         <Field className="evaluation-radio-item--container">
           <FieldContent className="evaluation-radio-item__content">
