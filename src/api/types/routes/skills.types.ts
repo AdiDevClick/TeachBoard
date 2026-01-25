@@ -1,3 +1,4 @@
+import type { ClassTasks } from "@/api/store/types/steps-creation-store.types.ts";
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 
 export type SkillType = "MAIN" | "SUB";
@@ -27,6 +28,7 @@ export type SkillsType = {
   id: UUID;
   code: string;
   name: string;
+  isLinkedToTasks?: Set<ClassTasks["id"]>;
 };
 
 export type SkillsFormValues = {
