@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/popover.tsx";
 import type { UsePopoverCRUDProps } from "@/hooks/types/use-popover-CRUD.types.ts";
 import { usePopoverCRUD } from "@/hooks/usePopoverCRUD.ts";
+import sanitizeDOMProps from "@/utils/props.ts";
 import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
 import { CheckIcon, Pencil, RotateCcw, Trash2, XIcon } from "lucide-react";
 import { type ComponentType } from "react";
@@ -21,7 +22,8 @@ export function withPopoverCRUD<T extends object>(
   WrappedComponent: ComponentType<T>,
 ) {
   return function PopoverCRUDWrapper(props: Readonly<UsePopoverCRUDProps & T>) {
-    const { value, itemDetails } = props;
+    const { value, itemDetails, ...rest } = props;
+    const safeRest = sanitizeDOMProps(rest, ["onRemove"]);
 
     const {
       onRoleOpenChange,
@@ -42,7 +44,7 @@ export function withPopoverCRUD<T extends object>(
         }
       >
         <PopoverTrigger asChild>
-          <WrappedComponent {...(props as T)} />
+          <WrappedComponent {...(safeRest as T)} />
         </PopoverTrigger>
         <PopoverContent
           side="top"

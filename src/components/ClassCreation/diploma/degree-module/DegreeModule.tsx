@@ -59,11 +59,12 @@ function DegreeModule({
         formState: form.formState,
         formId,
       },
+      cardProps: { className },
       titleProps,
       ...props,
       form,
     }),
-    [form.formState, props]
+    [form.formState, props],
   );
 
   return <DegreeModuleWithCard {...commonProps} />;

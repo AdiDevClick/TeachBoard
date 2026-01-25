@@ -5,6 +5,7 @@ import type {
   ForwardRefExoticComponent,
   MouseEvent,
   ReactNode,
+  SyntheticEvent,
 } from "react";
 
 /**
@@ -14,7 +15,8 @@ export type PreventDefaultAndStopPropagation =
   | MouseEvent<HTMLElement | SVGElement>
   | undefined
   | null
-  | Event;
+  | Event
+  | SyntheticEvent<HTMLElement | SVGElement>;
 
 /**
  * Tag props injected by ListMapper so they stay type-safe even when the original props are never.

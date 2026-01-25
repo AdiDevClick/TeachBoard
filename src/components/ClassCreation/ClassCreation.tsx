@@ -67,6 +67,7 @@ function ClassCreation({
         formState: form.formState,
         formId,
       },
+      cardProps: { className },
       inputControllers,
       ...props,
       form,

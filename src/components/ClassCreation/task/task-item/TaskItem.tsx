@@ -57,12 +57,13 @@ export function TaskItem({
         formState: form.formState,
         formId: formId,
       },
+      cardProps: { className },
       modalMode,
       titleProps,
       ...props,
       form,
     }),
-    [form.formState, props]
+    [form.formState, props],
   );
 
   return <TaskItemWithCard {...commonProps} />;

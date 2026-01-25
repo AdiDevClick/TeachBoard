@@ -87,7 +87,7 @@ import type { ComponentProps, ComponentType } from "react";
  */
 function withTitledCard<C extends object, F extends object = object>(
   WrappedContent: ComponentType<C>,
-  WrappedFooter?: ComponentType<F>
+  WrappedFooter?: ComponentType<F>,
 ) {
   return function Component(props: WithTitledCardProps<C, F>) {
     const {
@@ -98,8 +98,13 @@ function withTitledCard<C extends object, F extends object = object>(
       ref,
       displayFooter = true,
       contentClassName = "",
+      cardProps: cardProps = {},
       ...rest
     } = props;
+
+    if (props.className) {
+      cardProps.className = props.className;
+    }
 
     /**
      * Determine the title or footer component based on modal mode
@@ -108,12 +113,14 @@ function withTitledCard<C extends object, F extends object = object>(
     const Title = modalMode ? DialogHeaderTitle : HeaderTitle;
     const FooterContent = modalMode ? AppDialFooter : AppCardFooter;
 
+    const cardId = "card-" + pageId;
+
     return (
       <Card
         ref={ref}
-        id={pageId}
-        data-dialog={pageId}
-        {...rest}
+        id={cardId}
+        data-dialog={cardId}
+        {...cardProps}
         // style={{ justifySelf: "center" }}
       >
         <Title

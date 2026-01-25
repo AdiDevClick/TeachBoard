@@ -1,7 +1,7 @@
 import type { AppDialFooterProps } from "@/components/Footer/types/footer.types.ts";
 import type { HeaderTitleProps } from "@/components/Titles/types/titles.types.ts";
-import type { CardFooter } from "@/components/ui/card.tsx";
-import type { ComponentProps } from "react";
+import type { Card, CardFooter } from "@/components/ui/card.tsx";
+import type { ComponentProps, Ref } from "react";
 
 type BaseCardProps = {
   /** Optional page ID for the card component */
@@ -9,9 +9,11 @@ type BaseCardProps = {
   /** Props for the title/header component */
   titleProps?: HeaderTitleProps;
   /** Ref to be forwarded to the Card component */
-  ref?: React.Ref<HTMLDivElement>;
+  ref?: Ref<HTMLDivElement>;
   /** Props for customizing the Card content component*/
   contentClassName?: string;
+  /** Additional props for the Card component */
+  cardProps?: ComponentProps<typeof Card>;
 };
 
 /**
@@ -20,7 +22,7 @@ type BaseCardProps = {
  */
 type ModalWithFooterProps<
   C extends object,
-  F extends object
+  F extends object,
 > = BaseCardProps & {
   modalMode: true;
   displayFooter?: true;
@@ -35,7 +37,7 @@ type ModalWithFooterProps<
  */
 type DynamicModeWithFooterProps<
   C extends object,
-  F extends object
+  F extends object,
 > = BaseCardProps & {
   modalMode: boolean;
   displayFooter?: boolean;
@@ -49,7 +51,7 @@ type DynamicModeWithFooterProps<
  */
 type CardWithOptionalFooterProps<
   C extends object,
-  F extends object
+  F extends object,
 > = BaseCardProps & {
   modalMode?: false;
   displayFooter?: boolean;

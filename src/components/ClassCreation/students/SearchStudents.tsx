@@ -51,11 +51,12 @@ function SearchStudents({
         formState: localForm.formState,
         formId,
       },
+      cardProps: { className },
       modalMode,
       titleProps,
       ...props,
     }),
-    [props, props.form, localForm]
+    [props, props.form, localForm],
   );
 
   return <SearchStudentsWithCard {...commonProps} />;

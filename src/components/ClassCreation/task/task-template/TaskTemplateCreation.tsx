@@ -57,18 +57,19 @@ function TaskTemplateCreation({
         formState: form.formState,
         formId,
       },
+      cardProps: { className },
       titleProps,
       ...props,
       form,
     }),
-    [form.formState, props]
+    [form.formState, props],
   );
 
   return <TaskTemplateCreationWithCard {...commonProps} />;
 }
 
 const TaskTemplateCreationWithCard = withTitledCard(
-  TaskTemplateCreationController
+  TaskTemplateCreationController,
 );
 
 export default TaskTemplateCreation;

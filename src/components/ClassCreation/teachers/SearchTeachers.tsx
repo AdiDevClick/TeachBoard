@@ -50,15 +50,16 @@ export function SearchPrimaryTeacher({
         formState: localForm.formState,
         formId,
       },
+      cardProps: { className },
       titleProps,
       ...props,
     }),
-    [props]
+    [props],
   );
 
   return <SearchPrimaryTeacherWithCard {...commonProps} />;
 }
 
 const SearchPrimaryTeacherWithCard = withTitledCard(
-  SearchPrimaryTeacherController
+  SearchPrimaryTeacherController,
 );

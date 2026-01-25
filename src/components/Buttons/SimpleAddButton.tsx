@@ -9,6 +9,7 @@ import {
   debugLogs,
   simpleAddButtonWithToolTipPropsInvalid,
 } from "@/configs/app-components.config.ts";
+import sanitizeDOMProps from "@/utils/props.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { PlusIcon } from "lucide-react";
 import type { MouseEvent, PointerEvent } from "react";
@@ -20,13 +21,15 @@ import type { MouseEvent, PointerEvent } from "react";
  * @param props Additional button props
  */
 export function SimpleAddButtonWithToolTip(
-  props: SimpleAddButtonWithToolTipProps
+  props: SimpleAddButtonWithToolTipProps,
 ) {
   if (simpleAddButtonWithToolTipPropsInvalid(props)) {
     debugLogs("Rendering SimpleAddButtonWithToolTip");
   }
 
   const { toolTipText, onClick: externalOnClick, ...rest } = props;
+
+  const safeRest = sanitizeDOMProps(rest, ["toolTipText"]);
 
   /**
    * Handle click event for the button.
@@ -36,7 +39,7 @@ export function SimpleAddButtonWithToolTip(
    * @param event - The mouse event triggered by clicking the button
    */
   const handleLocalClick = (
-    e: PointerEvent<HTMLButtonElement> | MouseEvent<HTMLButtonElement>
+    e: PointerEvent<HTMLButtonElement> | MouseEvent<HTMLButtonElement>,
   ) => {
     preventDefaultAndStopPropagation(e);
 
@@ -48,7 +51,7 @@ export function SimpleAddButtonWithToolTip(
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="outline" {...rest} onClick={handleLocalClick}>
+        <Button variant="outline" {...safeRest} onClick={handleLocalClick}>
           <PlusIcon />
         </Button>
       </TooltipTrigger>
