@@ -7,7 +7,6 @@ import { USER_ACTIVITIES } from "@/configs/app.config.ts";
 import { create } from "zustand";
 import { combine, devtools, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-
 const DEFAULT_VALUES: AppStore = {
   user: null,
   lastUserActivity: "none",
@@ -90,9 +89,9 @@ export const useAppStore = create(
               state.sessionSynced = currentUser ? isSynced : false;
             });
           },
-        }))
+        })),
       ),
-      { name: "app-store" }
-    )
-  )
+      { name: "app-store" },
+    ),
+  ),
 );
