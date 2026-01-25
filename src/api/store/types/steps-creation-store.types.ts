@@ -6,6 +6,14 @@ import type {
 } from "@/api/types/routes/skills.types.ts";
 import type { UniqueSet } from "@/utils/UniqueSet.ts";
 
+export type StudentEvaluationSubSkillType = { score: number } & Omit<
+  SkillsType,
+  "isLinkedToTasks"
+>;
+
+export type StudentEvaluationModuleType = {
+  subSkills: UniqueSet<UUID, StudentEvaluationSubSkillType>;
+} & Omit<SkillsType, "isLinkedToTasks">;
 /**
  * Student with presence information for Steps Creation.
  */
@@ -14,6 +22,9 @@ export type StudentWithPresence = {
   fullName: string;
   isPresent: boolean;
   assignedTask?: Pick<ClassTasks, "id" | "name"> | null;
+  evaluations?: {
+    modules: UniqueSet<UUID, StudentEvaluationModuleType>;
+  } | null;
 };
 
 /**
@@ -48,6 +59,15 @@ export type SetModulesSelectionType = Omit<
   ModulesSelectionType,
   "selectedModuleSubSkills"
 > & { selectedModule: ClassModules };
+
+/**
+ * Type for setEvaluationForStudent().
+ */
+export type EvaluationType = {
+  subSkill: SkillsType | null;
+  score: number;
+  module: Omit<ClassModules, "subSkills"> | null;
+};
 
 /**
  * State interface for Steps Creation Store.

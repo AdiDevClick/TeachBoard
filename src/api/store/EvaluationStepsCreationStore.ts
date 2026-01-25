@@ -1,8 +1,11 @@
 import {
+  addNewEvaluationScore,
   buildLinkedSubSkills,
+  updateEvaluationScore,
   upsertModuleSubSkills,
 } from "@/api/store/functions/evaluation-store.functions.ts";
 import type {
+  EvaluationType,
   SetModulesSelectionType,
   StepsCreationState,
   StudentWithPresence,
@@ -272,9 +275,67 @@ export const useEvaluationStepsCreationStore = create(
             set((state) => {
               const selection = state.subSkillSelection;
 
-              selection.isClicked = isClicked;
-              selection.selectedSubSkillIndex = selectedSubSkillIndex;
-              selection.selectedSubSkill = selectedSubSkill;
+              state.subSkillSelection = {
+                ...selection,
+                isClicked,
+                selectedSubSkillIndex,
+                selectedSubSkill,
+              };
+            });
+          },
+          /**
+           * Set evaluation for student
+           *
+           * @param studentId - The ID of the student
+           * @param evaluation - The evaluation details
+           * @remarks This function updates the evaluation score for a specific student's module and sub-skill.
+           */
+          setEvaluationForStudent(studentId: UUID, evaluation: EvaluationType) {
+            set((state) => {
+              const { subSkill, module, score } = evaluation;
+
+              if (!subSkill?.id || !module?.id || !studentId || score == null) {
+                return;
+              }
+
+              const student = state.students.get(studentId);
+              if (!student) return;
+
+              let existingStudentEvaluation = student?.evaluations;
+
+              if (!existingStudentEvaluation) {
+                existingStudentEvaluation = {
+                  modules: new UniqueSet(),
+                };
+                student.evaluations = existingStudentEvaluation;
+              }
+
+              const newSubSkillItem = {
+                id: subSkill.id,
+                name: subSkill.name,
+                code: subSkill.code,
+                score,
+              };
+
+              const modulesList = existingStudentEvaluation?.modules;
+              const existingModuleSet = modulesList.get(module.id);
+
+              if (existingModuleSet) {
+                updateEvaluationScore(
+                  existingModuleSet,
+                  newSubSkillItem,
+                  modulesList,
+                );
+              } else {
+                addNewEvaluationScore(
+                  existingStudentEvaluation,
+                  module,
+                  newSubSkillItem,
+                  modulesList,
+                );
+
+                existingStudentEvaluation.modules = modulesList;
+              }
             });
           },
           /**
