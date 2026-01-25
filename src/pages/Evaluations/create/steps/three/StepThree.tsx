@@ -75,9 +75,9 @@ export function StepThree({
   const modules = useEvaluationStepsCreationStore(
     (state) => state.getAttendedModules,
   )();
-  const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
-    (state) => state.getStudentsPresenceSelectionData,
-  )();
+  // const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
+  //   (state) => state.getStudentsPresenceSelectionData,
+  // )();
   const moduleSelectionState = useEvaluationStepsCreationStore(
     (state) => state.moduleSelection,
   );
@@ -87,6 +87,10 @@ export function StepThree({
   const selectedSubSkill = useEvaluationStepsCreationStore(
     (state) => state.subSkillSelection?.selectedSubSkill,
   );
+
+  const evaluatedStudentsForThisSubskill = useEvaluationStepsCreationStore(
+    (state) => state.getPresentStudentsWithAssignedTasks,
+  )();
 
   const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({
     resolver: zodResolver(attendanceRecordCreationSchemaInstance([])),
@@ -113,15 +117,15 @@ export function StepThree({
     formId,
     inputControllers,
     titleProps: titleProps,
-    cardProps: cardProps,
+    cardProps: { ...cardProps, className },
     ...props,
     form,
     user,
-    students,
+    students: evaluatedStudentsForThisSubskill,
     modules,
     selectedClass,
     tasks,
-    preparedStudentsTasksSelection,
+    // preparedStudentsTasksSelection,
   };
 
   const handlePreviousClick = (e: MouseEvent<SVGSVGElement>) => {
@@ -173,7 +177,6 @@ export function StepThree({
             }
             onClick={handlePreviousClick}
             data-name="modules-previous"
-            // onClick={(e) => onClickHandler({ e, ...clickProps, index })}
           />
           <StudentsEvaluation displayFooter={false} {...commonProps} />
         </>
