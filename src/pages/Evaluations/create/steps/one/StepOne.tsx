@@ -9,6 +9,13 @@ export const stepOneTitleProps = {
   className: "hidden",
 };
 
+export const stepOneCardProps = {
+  card: { className: "content__right" },
+  content: {
+    className: "right__content-container",
+  },
+};
+
 /**
  * Step One component for creating evaluations.
  *
@@ -31,63 +38,11 @@ export function StepOne({
     className,
     inputControllers,
     titleProps: stepOneTitleProps,
-    contentClassName: "right__content-container",
+    cardProps: stepOneCardProps,
     ...props,
   };
 
   return <StepOneWithCard displayFooter={false} {...commonProps} />;
-  // <Card className="content__right">
-  //   <CardContent className="right__content-container">
-  //     <PopoverFieldWithCommands
-  //       {...stepOneInputControllers[0]}
-  //       // form={form}
-  //       // id={`${pageId}-year`}
-  //       setRef={setRef}
-  //       commandHeadings={resultsCallback()}
-  //       observedRefs={observedRefs}
-  //       onOpenChange={handleOpening}
-  //       onSelect={handleOnSelect}
-  //       onAddNewItem={handleNewItem}
-  //     />
-  //     {/*<VerticalFieldSelect
-  //       className="right__content"
-  //       placeholder={placeholder}
-  //       onValueChange={(value) => {
-  //         console.log("value => ", value);
-  //       }}
-  //       label={title}
-  //       // onOpenChange={handleTriggerOpening}
-  //     >
-  //       <SelectItem
-  //         inert={selected}
-  //         value="add-class"
-  //         onPointerDown={onClassAdd}
-  //       >
-  //         {/* <SelectItemIndicator>...</SelectItemIndicator> */}
-  //     {/*} <span className="loneText">Ajouter une classe</span>
-  //         <Button
-  //           variant="ghost"
-  //           size="icon-sm"
-  //           className="rounded-full max-h-2"
-  //         >
-  //           <PlusIcon />
-  //         </Button>
-  //       </SelectItem>
-  //       {data?.items !== null &&
-  //         data?.items !== undefined &&
-  //         data?.items.length > 0 && (
-  //           <>
-  //             <SelectSeparator />
-  //             <ListMapper items={data?.items}>
-  //               <LabelledGroup ischild>
-  //                 <NonLabelledGroupItem />
-  //               </LabelledGroup>
-  //             </ListMapper>
-  //           </>
-  //         )}
-  //     </VerticalFieldSelect>*/}
-  //   </CardContent>
-  // </Card>
 }
 
 const StepOneWithCard = withTitledCard(StepOneController);
