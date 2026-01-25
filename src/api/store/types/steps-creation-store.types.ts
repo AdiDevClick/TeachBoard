@@ -22,7 +22,7 @@ export type StudentWithPresence = {
 export type ClassTasks = {
   id: UUID;
   name: string | null;
-  modules: SkillsViewDto[];
+  modules: UniqueSet<UUID, SkillsViewDto>;
 };
 
 export type ClassModules = SkillsType & {
