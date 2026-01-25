@@ -1,6 +1,7 @@
 import { useAppStore } from "@/api/store/AppStore.ts";
 import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import { Badge } from "@/components/ui/badge.tsx";
 import { attendanceRecordCreationBaseControllers } from "@/data/inputs-controllers.data.ts";
 import {
   attendanceRecordCreationSchemaInstance,
@@ -23,6 +24,7 @@ import {
 } from "react";
 import { useForm, type FieldValues } from "react-hook-form";
 import { useOutletContext } from "react-router-dom";
+import { useShallow } from "zustand/react/shallow";
 
 // Module selection
 export const stepThreeModuleSelectionTitleProps = {
@@ -31,8 +33,10 @@ export const stepThreeModuleSelectionTitleProps = {
 };
 
 export const stepThreeModuleSelectionCardProps = {
-  cardClassName: "content__right",
-  contentClassName: "right__content-container",
+  card: { className: "content__right" },
+  content: {
+    className: "right__content-container",
+  },
 };
 
 // Subskills selection
@@ -41,8 +45,10 @@ export const stepThreeSubskillsSelectionTitleProps = {
   description: "Quelles sous-compétences évaluer ?",
 };
 export const stepThreeSubskillsSelectionCardProps = {
-  cardClassName: "content__right",
-  contentClassName: "right__content-container",
+  card: { className: "content__right" },
+  content: {
+    className: "right__content-container",
+  },
 };
 
 /**
@@ -73,8 +79,8 @@ export function StepThree({
   const students = useEvaluationStepsCreationStore((state) => state.students);
   const tasks = useEvaluationStepsCreationStore((state) => state.tasks);
   const modules = useEvaluationStepsCreationStore(
-    (state) => state.getAttendedModules,
-  )();
+    useShallow((state) => state.getAttendedModules()),
+  );
   // const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
   //   (state) => state.getStudentsPresenceSelectionData,
   // )();
@@ -89,8 +95,8 @@ export function StepThree({
   );
 
   const evaluatedStudentsForThisSubskill = useEvaluationStepsCreationStore(
-    (state) => state.getPresentStudentsWithAssignedTasks,
-  )();
+    useShallow((state) => state.getPresentStudentsWithAssignedTasks()),
+  );
 
   const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({
     resolver: zodResolver(attendanceRecordCreationSchemaInstance([])),
@@ -106,8 +112,12 @@ export function StepThree({
 
   if (moduleSelectionState.isClicked) {
     cardProps = stepThreeSubskillsSelectionCardProps;
-    stepThreeSubskillsSelectionTitleProps.description = `Vous évaluez "${selectedSubSkill?.name}"`;
-    titleProps = stepThreeSubskillsSelectionTitleProps;
+    titleProps = {
+      ...stepThreeSubskillsSelectionTitleProps,
+      description: selectedSubSkill?.name
+        ? `Vous évaluez "${selectedSubSkill.name}"`
+        : stepThreeSubskillsSelectionTitleProps.description,
+    };
   }
 
   const commonProps = {
@@ -117,7 +127,7 @@ export function StepThree({
     formId,
     inputControllers,
     titleProps: titleProps,
-    cardProps: { ...cardProps, className },
+    cardProps,
     ...props,
     form,
     user,
@@ -173,12 +183,19 @@ export function StepThree({
         <>
           <IconArrowLeft
             className={
-              stepThreeModuleSelectionCardProps.cardClassName + " arrow-back"
+              stepThreeModuleSelectionCardProps.card.className + " arrow-back"
             }
             onClick={handlePreviousClick}
             data-name="modules-previous"
           />
-          <StudentsEvaluation displayFooter={false} {...commonProps} />
+          <StudentsEvaluation
+            displayFooter={false}
+            {...commonProps}
+            titleProps={{
+              ...commonProps.titleProps,
+              description: <Badge>{selectedSubSkill?.name}</Badge>,
+            }}
+          />
         </>
       )}
     </>
