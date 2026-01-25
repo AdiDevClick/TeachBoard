@@ -94,7 +94,7 @@ export function StepTwoController({
   return (
     <form id={formId} className={className}>
       <VerticalFieldWithInlineSwitchList
-        items={preparedStudentsTasksSelection()}
+        items={preparedStudentsTasksSelection}
         setRef={setRef}
         observedRefs={observedRefs}
         form={form}

@@ -23,7 +23,7 @@ import { create } from "zustand";
 import { combine, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
-export const DEFAULT_VALUES_STEPS_CREATION_STATE: StepsCreationState = {
+const createDefaultStepsCreationState = (): StepsCreationState => ({
   id: null,
   description: null,
   students: new UniqueSet(),
@@ -44,7 +44,10 @@ export const DEFAULT_VALUES_STEPS_CREATION_STATE: StepsCreationState = {
     selectedSubSkillIndex: null,
     selectedSubSkill: null,
   },
-};
+});
+
+export const DEFAULT_VALUES_STEPS_CREATION_STATE: StepsCreationState =
+  createDefaultStepsCreationState();
 
 /**
  * Persisting Steps Creation store.
@@ -56,10 +59,24 @@ export const DEFAULT_VALUES_STEPS_CREATION_STATE: StepsCreationState = {
 export const useEvaluationStepsCreationStore = create(
   devtools(
     immer(
-      combine(DEFAULT_VALUES_STEPS_CREATION_STATE, (set, get) => {
+      combine(createDefaultStepsCreationState(), (set, get) => {
         const ACTIONS = {
-          clear: () => set(() => ({ ...DEFAULT_VALUES_STEPS_CREATION_STATE })),
+          clear: (classId: UUID) => {
+            if (get().selectedClass?.id === classId) {
+              return false;
+            }
+
+            set(() => createDefaultStepsCreationState());
+
+            return true;
+          },
           setSelectedClass(selectedClass: ClassSummaryDto) {
+            let shouldClear = false;
+
+            shouldClear = ACTIONS.clear(selectedClass.id);
+
+            if (!shouldClear) return;
+
             set((state) => {
               const { id, description, evaluations, name } = selectedClass;
 
@@ -72,8 +89,18 @@ export const useEvaluationStepsCreationStore = create(
                 className: name || null,
               };
             });
+
             ACTIONS.setStudents(selectedClass.students);
             ACTIONS.setClassTasks(selectedClass.templates);
+          },
+          clearSelectedClass(classId?: UUID) {
+            set((state) => {
+              if (state.selectedClass?.id === classId) {
+                return state;
+              }
+              state.selectedClass = null;
+              state.description = null;
+            });
           },
           setClassTasks(tasks: ClassSummaryDto["templates"]) {
             set((state) => {

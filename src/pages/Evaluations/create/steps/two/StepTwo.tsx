@@ -51,7 +51,7 @@ export function StepTwo({
   const tasks = useEvaluationStepsCreationStore((state) => state.tasks);
   const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
     (state) => state.getStudentsPresenceSelectionData,
-  );
+  )();
   const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({
     resolver: zodResolver(attendanceRecordCreationSchemaInstance([])),
     mode: "onTouched",
