@@ -18,8 +18,10 @@ export const stepTwoTitleProps = {
 };
 
 export const stepTwoCardProps = {
-  cardClassName: "content__right",
-  contentClassName: "right__content-container",
+  card: { className: "content__right" },
+  content: {
+    className: "right__content-container",
+  },
 };
 
 /**
@@ -43,12 +45,12 @@ export function StepTwo({
 }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
   const user = useAppStore((state) => state.user);
   const selectedClass = useEvaluationStepsCreationStore(
-    (state) => state.selectedClass
+    (state) => state.selectedClass,
   );
   const students = useEvaluationStepsCreationStore((state) => state.students);
   const tasks = useEvaluationStepsCreationStore((state) => state.tasks);
   const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
-    (state) => state.getStudentsPresenceSelectionData
+    (state) => state.getStudentsPresenceSelectionData,
   );
   const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({
     resolver: zodResolver(attendanceRecordCreationSchemaInstance([])),
