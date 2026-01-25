@@ -2,8 +2,15 @@ import { AvatarDisplay } from "@/components/Avatar/AvatarDisplay.tsx";
 import type { CommandSelectionItemProps } from "@/components/Command/types/command.types.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { CommandItem } from "@/components/ui/command.tsx";
+import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { CheckIcon, Plus } from "lucide-react";
-import { Activity, useCallback, useState } from "react";
+import {
+  Activity,
+  useCallback,
+  useState,
+  type TouchEvent,
+  type WheelEvent,
+} from "react";
 
 /**
  * Props for CommandSelectionItem component.
@@ -20,11 +27,11 @@ export function CommandSelectionItem(props: CommandSelectionItemProps) {
     selectedValue,
     onSelect,
     avatarDisplay,
-    ...rest
+    // ...rest
   } = props;
 
   const [avatarSelection, setAvatarSelection] = useState(
-    command.isSelected || false
+    command.isSelected || false,
   );
 
   const { id, disabled, value } = command;
@@ -55,8 +62,9 @@ export function CommandSelectionItem(props: CommandSelectionItemProps) {
       id={id}
       value={value}
       disabled={disabled}
+      onTouchMove={restaureScrollBehavior}
+      onWheel={restaureScrollBehavior}
       onSelect={selectCallback}
-      {...rest}
     >
       <Activity mode={avatarDisplay ? "visible" : "hidden"}>
         <AvatarDisplay props={avatarProps}>
@@ -77,4 +85,16 @@ export function CommandSelectionItem(props: CommandSelectionItemProps) {
       </Activity>
     </CommandItem>
   );
+}
+/**
+ * Restores scroll behavior inside Command by simulating arrow key presses.
+ *
+ * !! IMPORTANT !! This is a workaround to allow scrolling within Command
+ *
+ * @param e - Scroll or Touch event
+ */
+function restaureScrollBehavior(
+  e: WheelEvent<HTMLDivElement> | TouchEvent<HTMLDivElement>,
+) {
+  preventDefaultAndStopPropagation(e);
 }
