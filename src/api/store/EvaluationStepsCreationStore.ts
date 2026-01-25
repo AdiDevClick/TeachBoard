@@ -1,3 +1,7 @@
+import {
+  buildLinkedSubSkills,
+  upsertModuleSubSkills,
+} from "@/api/store/functions/evaluation-store.functions.ts";
 import type {
   SetModulesSelectionType,
   StepsCreationState,
@@ -6,7 +10,10 @@ import type {
 } from "@/api/store/types/steps-creation-store.types";
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
-import type { SkillsType } from "@/api/types/routes/skills.types.ts";
+import type {
+  SkillsType,
+  SkillsViewDto,
+} from "@/api/types/routes/skills.types.ts";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { create } from "zustand";
@@ -51,11 +58,16 @@ export const useEvaluationStepsCreationStore = create(
           clear: () => set(() => ({ ...DEFAULT_VALUES_STEPS_CREATION_STATE })),
           setSelectedClass(selectedClass: ClassSummaryDto) {
             set((state) => {
-              state.selectedClass = selectedClass;
-              state.id = selectedClass.id || null;
-              state.description = selectedClass.description || null;
-              state.evaluations = selectedClass.evaluations || null;
-              state.className = selectedClass.name;
+              const { id, description, evaluations, name } = selectedClass;
+
+              return {
+                ...state,
+                selectedClass,
+                id: id || null,
+                description: description || null,
+                evaluations: evaluations || null,
+                className: name || null,
+              };
             });
             ACTIONS.setStudents(selectedClass.students);
             ACTIONS.setClassTasks(selectedClass.templates);
@@ -66,7 +78,10 @@ export const useEvaluationStepsCreationStore = create(
                 const details = {
                   id: task.id,
                   name: task.taskName ?? null,
-                  modules: task.modules ?? [],
+                  modules: new UniqueSet<UUID, SkillsViewDto>(
+                    null,
+                    task.modules ?? [],
+                  ),
                 };
                 state.tasks.set(task.id, details);
                 ACTIONS.setModules(task.modules, task.id);
@@ -95,14 +110,14 @@ export const useEvaluationStepsCreationStore = create(
 
                 if (savedModule) {
                   savedModule.tasksList.add(taskId);
-
-                  for (const subSkill of subSkills ?? []) {
-                    savedModule.subSkills.set(subSkill.id, subSkill);
-                  }
+                  upsertModuleSubSkills(savedModule, subSkills, taskId);
                 } else {
                   const newProperties = {
                     ...rest,
-                    subSkills: new UniqueSet<UUID, SkillsType>(null, subSkills),
+                    subSkills: new UniqueSet<UUID, SkillsType>(
+                      null,
+                      buildLinkedSubSkills(subSkills, taskId),
+                    ),
                     tasksList: new Set([taskId]),
                   };
 
@@ -183,13 +198,16 @@ export const useEvaluationStepsCreationStore = create(
           setStudentToModuleEvaluation(taskId: UUID, studentId: UUID) {
             set((state) => {
               const student = state.students.get(studentId);
+
               for (const module of state.modules.values()) {
                 if (module.tasksList.has(taskId)) {
+                  const toEvaluate = (module.studentsToEvaluate ??=
+                    new Set<UUID>());
+
                   if (student?.isPresent) {
-                    module.studentsToEvaluate ??= new Set<UUID>();
-                    module.studentsToEvaluate.add(studentId);
+                    toEvaluate.add(studentId);
                   } else {
-                    module.studentsToEvaluate?.delete(studentId);
+                    toEvaluate.delete(studentId);
                   }
                 }
               }
@@ -205,8 +223,9 @@ export const useEvaluationStepsCreationStore = create(
           clearStudentFromModuleEvaluation(studentId: UUID) {
             set((state) => {
               for (const module of state.modules.values()) {
-                if (module.studentsToEvaluate?.has(studentId)) {
-                  module.studentsToEvaluate?.delete(studentId);
+                const toEvaluate = module.studentsToEvaluate;
+                if (toEvaluate?.has(studentId)) {
+                  toEvaluate.delete(studentId);
                 }
               }
             });
@@ -225,15 +244,13 @@ export const useEvaluationStepsCreationStore = create(
               const selection = state.moduleSelection;
               const { subSkills, ...moduleWithoutSubSkills } = selectedModule;
 
-              selection.isClicked = isClicked;
-
-              selection.selectedModuleIndex = selectedModuleIndex;
-
-              selection.selectedModule = moduleWithoutSubSkills;
-
-              selection.selectedModuleSubSkills = Array.from(
-                subSkills?.values() ?? [],
-              );
+              state.moduleSelection = {
+                ...selection,
+                isClicked,
+                selectedModuleIndex,
+                selectedModule: moduleWithoutSubSkills,
+                selectedModuleSubSkills: Array.from(subSkills?.values() ?? []),
+              };
             });
           },
           /**
@@ -299,6 +316,35 @@ export const useEvaluationStepsCreationStore = create(
            */
           getSelectedClassModules() {
             return Array.from(get().modules?.values() ?? []);
+          },
+          /**
+           * Get present students with assigned tasks for the selected subskill.
+           *
+           * @returns Array of students who are present and have assigned tasks related to the selected subskill.
+           */
+          getPresentStudentsWithAssignedTasks() {
+            const selectedSubSkill = get().subSkillSelection?.selectedSubSkill;
+            const students = Array.from(get().students?.values() ?? []);
+            const modules = Array.from(get().modules?.values() ?? []);
+
+            if (!selectedSubSkill) return [];
+
+            return students.filter((student) => {
+              const { assignedTask, isPresent, id } = student;
+              return (
+                isPresent &&
+                assignedTask !== null &&
+                modules?.some(
+                  (module) =>
+                    module.subSkills.has(selectedSubSkill.id) &&
+                    module.tasksList.has(assignedTask!.id) &&
+                    module.studentsToEvaluate?.has(id) &&
+                    module.subSkills
+                      .get(selectedSubSkill.id)
+                      ?.isLinkedToTasks?.has(assignedTask!.id),
+                )
+              );
+            });
           },
         };
         return ACTIONS;
