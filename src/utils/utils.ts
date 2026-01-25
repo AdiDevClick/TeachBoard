@@ -240,36 +240,7 @@ function findMissingRequiredKeys(
       typeof k === "object" && k !== null && !Array.isArray(k);
 
     if (keyIsObject) {
-      for (const subKey of Object.keys(k)) {
-        if (Array.isArray(k[subKey])) {
-          const newProps = props[subKey] as Record<string, unknown> | undefined;
-
-          // !! IMPORTANT !! It's missing if the prop is not found or not an object
-          if (typeof newProps !== "object" || newProps === null) {
-            missing.add(subKey);
-            continue;
-          }
-
-          const newPropsKeys = new Set(Object.keys(newProps));
-          const arraySubKeys = k[subKey];
-
-          // !! IMPORTANT !! Recursive call -
-          //  Recurse and propagate missing information upwards
-          const nestedResult = findMissingRequiredKeys(
-            newProps,
-            new Set(arraySubKeys),
-            newPropsKeys,
-          );
-
-          if (nestedResult.requiredIsMissing) {
-            // We consider the entire nested object as missing (for simplicity in logs)
-            missing.add(subKey);
-            for (const p of nestedResult.shouldBeProxyfied) {
-              shouldBeProxyfied.add(`${subKey}.${p}`);
-            }
-          }
-        }
-      }
+      handleNestedRequiredKey(props, k, missing, shouldBeProxyfied);
       continue;
     }
 
@@ -282,6 +253,54 @@ function findMissingRequiredKeys(
     requiredIsMissing: missing.size > 0,
     missingKeys: Array.from(missing),
   };
+}
+
+/**
+ * Process a required key that is itself an object mapping nested keys to required sub-keys arrays.
+ * Extracted to reduce complexity in findMissingRequiredKeys.
+ *
+ * @param props - The props object to validate
+ * @param keyObj - The object describing nested required keys (e.g. { nested: ['a','b'] })
+ * @param missing - Set to collect missing keys
+ * @param shouldBeProxyfied - Set to collect keys that should be proxyfied
+ */
+function handleNestedRequiredKey(
+  props: Record<string, unknown>,
+  keyObj: Record<string, unknown>,
+  missing: Set<string>,
+  shouldBeProxyfied: Set<string>,
+) {
+  for (const subKey of Object.keys(keyObj)) {
+    let arraySubKeys = keyObj[subKey];
+
+    if (!Array.isArray(arraySubKeys)) {
+      arraySubKeys = [arraySubKeys];
+    }
+
+    const newProps = props[subKey] as Record<string, unknown> | undefined;
+
+    if (typeof newProps !== "object" || newProps === null) {
+      missing.add(subKey);
+      continue;
+    }
+
+    const newPropsKeys = new Set(Object.keys(newProps));
+
+    // Recursive call - propagate missing information upwards
+    const nestedResult = findMissingRequiredKeys(
+      newProps,
+      new Set(arraySubKeys as (string | Record<string, unknown>)[]),
+      newPropsKeys,
+    );
+
+    if (nestedResult.requiredIsMissing) {
+      // Consider the entire nested object as missing (for simplicity in logs)
+      missing.add(subKey);
+      for (const p of nestedResult.shouldBeProxyfied) {
+        shouldBeProxyfied.add(`${subKey}.${p}`);
+      }
+    }
+  }
 }
 
 /**

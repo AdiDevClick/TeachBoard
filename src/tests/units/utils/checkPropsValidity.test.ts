@@ -69,4 +69,25 @@ describe("checkPropsValidity / findMissingRequiredKeys behaviour", () => {
     };
     expect(checkPropsValidity(propsMissing, requires, [])).toBe(true);
   });
+
+  it("The expected nested structure should be OK if nested keys are strings instead of arrays", () => {
+    const requires = [
+      { item: "title", otherItem: ["numbers", "test"] },
+      "newTitle",
+    ] as string[];
+
+    const forbidden = ["imForbidden"];
+
+    const propsOk = {
+      item: { title: "t", number: 1 },
+      otherItem: { numbers: 1, test: 2 },
+      newTitle: "ok",
+    };
+    expect(checkPropsValidity(propsOk, requires, forbidden)).toBe(false);
+
+    const propsMissing = {
+      item: { number: 1 },
+    };
+    expect(checkPropsValidity(propsMissing, requires, forbidden)).toBe(true);
+  });
 });
