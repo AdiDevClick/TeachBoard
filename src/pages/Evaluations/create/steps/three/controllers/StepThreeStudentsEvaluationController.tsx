@@ -15,12 +15,8 @@ import { useState, type CSSProperties, type MouseEvent } from "react";
 export function StepThreeStudentsEvaluationController(
   props: StepThreeControllerProps,
 ) {
-  const { formId, modules } = props;
+  const { formId, students } = props;
   const [value, setValue] = useState([0]);
-
-  const setModuleSelection = useEvaluationStepsCreationStore(
-    (state) => state.setModuleSelection,
-  );
 
   if (stepThreeControllerPropsInvalid(props)) {
     debugLogs("StepThreeStudentsEvaluationController", props);
@@ -31,34 +27,36 @@ export function StepThreeStudentsEvaluationController(
     e: MouseEvent<HTMLDivElement>,
     props: EvaluationRadioItemProps,
   ) => {
-    const selectedModule = modules[props.index];
+    const selectedStudent = presentStudentsWithAssignedTasks[props.index];
     console.log("Clicked item:", props);
     console.log("event :", e);
-    console.log("module : ", selectedModule);
+    console.log("student : ", selectedStudent);
     // setModuleSelection({
     //   isClicked: true,
     //   selectedModuleIndex: props.index,
     //   selectedModule: selectedModule,
     // });
   };
-
+  console.log(students);
   return (
     <form id={formId} className="min-w-md">
-      <ListMapper items={modules}>
-        <Item className="flex flex-nowrap gap-0.1">
-          <Badge className="m-4">Test Badge</Badge>
-          <Slider
-            step={25}
-            value={value}
-            onValueChange={setValue}
-            className="four-steps-slider"
-            style={
-              {
-                "--slider-rangeColor": rangeColor(value[0]),
-              } as CSSProperties
-            }
-          />
-        </Item>
+      <ListMapper items={students}>
+        {(student) => (
+          <Item className="flex flex-nowrap gap-0.1">
+            <Badge className="m-4">{student.fullName}</Badge>
+            <Slider
+              step={25}
+              value={value}
+              onValueChange={setValue}
+              className="four-steps-slider"
+              style={
+                {
+                  "--slider-rangeColor": rangeColor(value[0]),
+                } as CSSProperties
+              }
+            />
+          </Item>
+        )}
       </ListMapper>
     </form>
   );
