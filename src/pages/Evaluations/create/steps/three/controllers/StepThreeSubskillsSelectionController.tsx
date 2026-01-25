@@ -6,6 +6,7 @@ import {
 } from "@/configs/app-components.config.ts";
 import { useStepThreeHandler } from "@/hooks/useStepThreeHandler.ts";
 import type { StepThreeSubskillsSelectionControllerProps } from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
+import { useEffect } from "react";
 
 /**
  * Step Three Subskills Selection Controller.
@@ -23,15 +24,28 @@ export function StepThreeSubskillsSelectionController(
   const { handleSubSkillChangeCallback, selectedSubSkillId } =
     useStepThreeHandler(subSkills);
 
+  /**
+   * Auto-select the first sub-skill if none is selected on initial render.
+   */
+  useEffect(() => {
+    const firstSubSkillId = subSkills[0]?.id;
+
+    if (!selectedSubSkillId && firstSubSkillId) {
+      handleSubSkillChangeCallback(firstSubSkillId);
+    }
+  }, []);
+
   if (stepThreeSubskillsSelectionControllerPropsInvalid(props)) {
     debugLogs("StepThreeSubskillsSelectionController", props);
     return null;
   }
 
+  const selectedId = selectedSubSkillId ?? subSkills[0]?.id ?? "";
+
   return (
     <form id={formId}>
       <RadioGroup
-        value={selectedSubSkillId ?? ""}
+        value={selectedId}
         defaultValue={subSkills[0]?.id ?? ""}
         onValueChange={handleSubSkillChangeCallback}
       >
