@@ -1,3 +1,4 @@
+import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
 import { EvaluationRadioItemWithoutDescriptionList } from "@/components/Radio/EvaluationRadioItem.tsx";
 import { RadioGroup } from "@/components/ui/radio-group.tsx";
 import {
@@ -6,7 +7,7 @@ import {
 } from "@/configs/app-components.config.ts";
 import { useStepThreeHandler } from "@/hooks/useStepThreeHandler.ts";
 import type { StepThreeSubskillsSelectionControllerProps } from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 /**
  * Step Three Subskills Selection Controller.
@@ -23,6 +24,12 @@ export function StepThreeSubskillsSelectionController(
 
   const { handleSubSkillChangeCallback, selectedSubSkillId } =
     useStepThreeHandler(subSkills);
+  const isThisSubSkillCompleted = useEvaluationStepsCreationStore(
+    (state) => state.isThisSubSkillCompleted,
+  );
+  const selectedModuleId = useEvaluationStepsCreationStore(
+    (state) => state.moduleSelection.selectedModule?.id ?? null,
+  );
 
   /**
    * Auto-select the first sub-skill if none is selected on initial render.
@@ -35,12 +42,24 @@ export function StepThreeSubskillsSelectionController(
     }
   }, []);
 
+  const selectedId = selectedSubSkillId ?? subSkills[0]?.id ?? "";
+  const subSkillsWithCompletion = useMemo(
+    () =>
+      subSkills.map((subSkill) => ({
+        ...subSkill,
+        isCompleted: isThisSubSkillCompleted(
+          subSkill.id,
+          selectedModuleId ?? undefined,
+        ),
+        isSelected: subSkill.id === selectedId,
+      })),
+    [isThisSubSkillCompleted, selectedId, selectedModuleId, subSkills],
+  );
+
   if (stepThreeSubskillsSelectionControllerPropsInvalid(props)) {
     debugLogs("StepThreeSubskillsSelectionController", props);
     return null;
   }
-
-  const selectedId = selectedSubSkillId ?? subSkills[0]?.id ?? "";
 
   return (
     <form id={formId}>
@@ -49,7 +68,9 @@ export function StepThreeSubskillsSelectionController(
         defaultValue={subSkills[0]?.id ?? ""}
         onValueChange={handleSubSkillChangeCallback}
       >
-        <EvaluationRadioItemWithoutDescriptionList items={subSkills} />
+        <EvaluationRadioItemWithoutDescriptionList
+          items={subSkillsWithCompletion}
+        />
       </RadioGroup>
     </form>
   );

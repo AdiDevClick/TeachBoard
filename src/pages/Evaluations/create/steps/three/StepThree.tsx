@@ -143,11 +143,6 @@ export function StepThree({
     setShowStudentsEvaluation(false);
   };
 
-  const onClickHandlerTest = (e, props) => {
-    preventDefaultAndStopPropagation(e);
-    console.log("SIMPLE TEST \n", e, props);
-  };
-
   /**
    * Dispatch left content based on module selection state
    */
