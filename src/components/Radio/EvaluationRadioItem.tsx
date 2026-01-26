@@ -1,4 +1,5 @@
 import withListMapper from "@/components/HOCs/withListMapper.tsx";
+import { Icon } from "@/components/Icons/Icon.tsx";
 import { EvaluationRadioItemDescription } from "@/components/Radio/EvaluationRadioItemDescription.tsx";
 import type { EvaluationRadioItemProps } from "@/components/Radio/types/radio.types.ts";
 import {
@@ -16,7 +17,7 @@ import {
 import sanitizeDOMProps from "@/utils/props.ts";
 
 import "@css/EvaluationRadio.scss";
-import { type ComponentType, type MouseEvent } from "react";
+import { Activity, type ComponentType, type MouseEvent } from "react";
 
 /**
  * Evaluation radio item component.
@@ -37,7 +38,7 @@ function withEvaluationRadioItem<T extends object>(
   return function EvaluationRadioItem<C extends EvaluationRadioItemProps>(
     props: C & T,
   ) {
-    const { id, name, itemClick, ...rest } = props;
+    const { id, name, itemClick, isCompleted, ...rest } = props;
 
     const safeProps = sanitizeDOMProps(rest, [
       "subSkills",
@@ -63,6 +64,13 @@ function withEvaluationRadioItem<T extends object>(
       itemClick?.(e, props);
     };
 
+    const iconStyle = isCompleted
+      ? {
+          className: "hidden",
+          "aria-hidden": true,
+        }
+      : {};
+
     return (
       <FieldLabel
         htmlFor={`r-${id}`}
@@ -73,7 +81,13 @@ function withEvaluationRadioItem<T extends object>(
         <Field className="evaluation-radio-item--container">
           <FieldContent className="evaluation-radio-item__content">
             <FieldTitle className="evaluation-radio-item__content--title">
-              <RadioGroupItem id={`r-${id}`} value={id} />
+              <Activity mode={isCompleted ? "visible" : "hidden"}>
+                <Icon
+                  iconPath="check"
+                  className="evaluation-radio-item__check-icon w-4 h-4 inline-block"
+                />
+              </Activity>
+              <RadioGroupItem {...iconStyle} id={`r-${id}`} value={id} />
               <Label
                 className="evaluation-radio-item__content--title__label"
                 htmlFor={`r-${id}`}
