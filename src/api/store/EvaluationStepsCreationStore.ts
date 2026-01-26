@@ -59,14 +59,14 @@ export const DEFAULT_VALUES_STEPS_CREATION_STATE: StepsCreationState =
 export const useEvaluationStepsCreationStore = create(
   devtools(
     immer(
-      combine(createDefaultStepsCreationState(), (set, get) => {
+      combine(DEFAULT_VALUES_STEPS_CREATION_STATE, (set, get) => {
         const ACTIONS = {
           clear: (classId: UUID) => {
             if (get().selectedClass?.id === classId) {
               return false;
             }
 
-            set(() => createDefaultStepsCreationState());
+            set(createDefaultStepsCreationState());
 
             return true;
           },
@@ -299,8 +299,19 @@ export const useEvaluationStepsCreationStore = create(
            */
           setSubskillSelection(args: SubskillSelectionType) {
             const { isClicked, selectedSubSkillIndex, selectedSubSkill } = args;
+
             set((state) => {
               const selection = state.subSkillSelection;
+
+              const mainModuleSubSkill =
+                state.moduleSelection.selectedModuleSubSkills?.find(
+                  (subSkill) => subSkill.id === selectedSubSkill.id,
+                );
+
+              // Ensure the selected subskill belongs to the selected module
+              if (!mainModuleSubSkill) {
+                return;
+              }
 
               state.subSkillSelection = {
                 ...selection,
@@ -406,16 +417,62 @@ export const useEvaluationStepsCreationStore = create(
             return Array.from(get().modules?.values() ?? []);
           },
           /**
+           * Verify if all of the students for a selected subskill from a module have been scored.
+           *
+           * @param subSkillId - The ID of the sub-skill to check
+           * @returns True if all students have been scored for the sub-skill, otherwise false.
+           */
+          isThisSubSkillCompleted(subSkillId?: UUID, moduleId?: UUID) {
+            const selectedModuleId =
+              moduleId ?? get().moduleSelection.selectedModule?.id ?? null;
+            const selectedSubSkillId =
+              subSkillId ?? get().subSkillSelection.selectedSubSkill?.id ?? null;
+
+            if (!selectedModuleId || !selectedSubSkillId) return false;
+
+            const presentStudentsWithAssignedTasks =
+              ACTIONS.getPresentStudentsWithAssignedTasks(selectedSubSkillId);
+
+            for (const student of presentStudentsWithAssignedTasks) {
+              if (!student) continue;
+
+              const hasScore = presentStudentsWithAssignedTasks.some((s) => {
+                if (s.id !== student.id) return false;
+
+                const evaluations = s.evaluations;
+
+                if (!evaluations) return false;
+
+                const moduleEvaluation = evaluations.modules.get(
+                  selectedModuleId,
+                );
+
+                const studentSelectedSubSkill = moduleEvaluation?.subSkills.get(
+                  selectedSubSkillId,
+                );
+                const score = studentSelectedSubSkill?.score;
+                return score !== undefined;
+              });
+
+              if (!hasScore) {
+                return false;
+              }
+            }
+
+            return true;
+          },
+          /**
            * Get present students with assigned tasks for the selected subskill.
            *
            * @returns Array of students who are present and have assigned tasks related to the selected subskill.
            */
-          getPresentStudentsWithAssignedTasks() {
-            const selectedSubSkill = get().subSkillSelection?.selectedSubSkill;
+          getPresentStudentsWithAssignedTasks(subSkillId?: UUID) {
+            const selectedSubSkillId =
+              subSkillId ?? get().subSkillSelection?.selectedSubSkill?.id;
             const students = Array.from(get().students?.values() ?? []);
             const modules = Array.from(get().modules?.values() ?? []);
 
-            if (!selectedSubSkill) return [];
+            if (!selectedSubSkillId) return [];
 
             return students.filter((student) => {
               const { assignedTask, isPresent, id } = student;
@@ -424,11 +481,11 @@ export const useEvaluationStepsCreationStore = create(
                 assignedTask !== null &&
                 modules?.some(
                   (module) =>
-                    module.subSkills.has(selectedSubSkill.id) &&
+                    module.subSkills.has(selectedSubSkillId) &&
                     module.tasksList.has(assignedTask!.id) &&
                     module.studentsToEvaluate?.has(id) &&
                     module.subSkills
-                      .get(selectedSubSkill.id)
+                      .get(selectedSubSkillId)
                       ?.isLinkedToTasks?.has(assignedTask!.id),
                 )
               );
