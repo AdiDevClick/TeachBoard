@@ -12,6 +12,7 @@ export type EvaluationRadioItemProps = {
   description?: string;
   index: number;
   isSelected: boolean;
+  isCompleted: boolean;
   itemClick?: (
     e: MouseEvent<HTMLLabelElement>,
     props: EvaluationRadioItemProps,
