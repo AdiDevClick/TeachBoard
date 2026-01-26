@@ -1,7 +1,8 @@
 import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { EvaluationRadioItemProps } from "@/components/Radio/types/radio.types.ts";
-import { useCallback, type MouseEvent } from "react";
+import { useCallback, useState, type MouseEvent } from "react";
+import { useShallow } from "zustand/shallow";
 export type UseStepThreeHandlerProps =
   | ReturnType<
       (typeof useEvaluationStepsCreationStore)["getState"]
@@ -34,6 +35,12 @@ export function useStepThreeHandler(
     (state) => state.subSkillSelection.selectedSubSkill?.id ?? null,
   );
 
+  const isThisSubSkillCompleted = useEvaluationStepsCreationStore(
+    useShallow((state) => state.isThisSubSkillCompleted),
+  );
+
+  const [isCompleted, setIsCompleted] = useState<boolean>(false);
+
   /**
    * Handles the change of selected module.
    *
@@ -49,6 +56,9 @@ export function useStepThreeHandler(
       }
 
       const selectedModule = findIndexById(value, modulesOrSubSkills);
+
+      const isCompleted = isThisSubSkillCompleted();
+      setIsCompleted(isCompleted);
 
       if (!selectedModule?.item) {
         return;
@@ -79,11 +89,10 @@ export function useStepThreeHandler(
 
       const selectedSubSkill = findIndexById(value, modulesOrSubSkills);
 
-      if (!selectedSubSkill) {
-        return;
-      }
+      // const isCompleted = isThisSubSkillCompleted();
+      // console.log(isCompleted);
 
-      if (!selectedSubSkill.item) {
+      if (!selectedSubSkill?.item) {
         return;
       }
 
@@ -91,6 +100,7 @@ export function useStepThreeHandler(
         isClicked: true,
         selectedSubSkillIndex: selectedSubSkill.index,
         selectedSubSkill: selectedSubSkill.item,
+        // isCompleted,
       });
     },
     [modulesOrSubSkills],
