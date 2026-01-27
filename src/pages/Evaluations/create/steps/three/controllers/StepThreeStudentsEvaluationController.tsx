@@ -28,6 +28,9 @@ export function StepThreeStudentsEvaluationController(
   const isThisSubSkillCompleted = useEvaluationStepsCreationStore(
     (state) => state.isThisSubSkillCompleted,
   );
+  const setModuleHasCompleted = useEvaluationStepsCreationStore(
+    (state) => state.setModuleHasCompleted,
+  );
   const [value, setValue] = useState([0]);
 
   if (stepThreeControllerPropsInvalid(props)) {
@@ -44,7 +47,18 @@ export function StepThreeStudentsEvaluationController(
       return;
     }
 
-    isThisSubSkillCompleted(selectedSubSkill?.id, selectedModule?.id);
+    const isCompleted = isThisSubSkillCompleted(
+      selectedSubSkill.id,
+      selectedModule.id,
+    );
+
+    if (selectedSubSkill.isCompleted !== isCompleted) {
+      setModuleHasCompleted(
+        selectedModule.id,
+        selectedSubSkill.id,
+        isCompleted,
+      );
+    }
   }, [selectedModule, selectedSubSkill, value]);
 
   /**
