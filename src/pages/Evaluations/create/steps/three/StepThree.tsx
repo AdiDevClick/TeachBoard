@@ -110,8 +110,11 @@ export function StepThree({
     }
 
     const description = selectedSubSkill?.name
-      ? `Vous évaluez "${selectedSubSkill.name}"`
+      ? <Badge>{selectedSubSkill?.name}</Badge>
       : stepThreeSubskillsSelectionTitleProps.description;
+    // const description = selectedSubSkill?.name
+    //   ? `Vous évaluez "${selectedSubSkill.name}"`
+    //   : stepThreeSubskillsSelectionTitleProps.description;
 
     return {
       ...stepThreeSubskillsSelectionCardProps,
@@ -192,13 +195,13 @@ export function StepThree({
           />
           <StudentsEvaluation
             {...commonProps}
-            card={{
-              ...commonProps.card,
-              title: {
-                ...commonProps.card.title,
-                description: <Badge>{selectedSubSkill?.name}</Badge>,
-              },
-            }}
+            // card={{
+            //   ...commonProps.card,
+            //   title: {
+            //     ...commonProps.card.title,
+            //     description: <Badge>{selectedSubSkill?.name}</Badge>,
+            //   },
+            // }}
           >
             <StudentsEvaluation.Title />
             <StudentsEvaluation.Content />
