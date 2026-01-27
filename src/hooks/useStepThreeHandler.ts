@@ -32,15 +32,28 @@ export function useStepThreeHandler(
   );
 
   const selectedSubSkillId = useEvaluationStepsCreationStore(
-    (state) => state.subSkillSelection.selectedSubSkillId ?? null,
+    (state) => state.subSkillSelection.selectedSubSkillId,
   );
 
   const isThisSubSkillCompleted = useEvaluationStepsCreationStore(
     useShallow((state) => state.isThisSubSkillCompleted),
   );
 
+  const setModuleHasCompleted = useEvaluationStepsCreationStore(
+    (state) => state.setModuleHasCompleted,
+  );
+
   const disableSubSkillsWithoutStudents = useEvaluationStepsCreationStore(
     useShallow((state) => state.disableSubSkillsWithoutStudents),
+  );
+
+  const selectedSubSkill = useEvaluationStepsCreationStore(
+    useShallow((state) =>
+      state.getSelectedSubSkill(
+        selectedSubSkillId ?? undefined,
+        selectedModuleId ?? undefined,
+      ),
+    ),
   );
 
   /**
@@ -86,12 +99,29 @@ export function useStepThreeHandler(
         return;
       }
 
-      const selectedSubSkill = findIndexById(value, modulesOrSubSkills);
+      const selectedSubSkill = findIndexById(value, modulesOrSubSkills) as {
+        index: number;
+        item: ClassModuleSubSkill;
+      } | null;
 
       if (!selectedSubSkill?.item) {
         return;
       }
-      isThisSubSkillCompleted(selectedSubSkill.item.id);
+      const isCompleted = isThisSubSkillCompleted(
+        selectedSubSkill.item.id,
+        selectedModuleId ?? undefined,
+      );
+
+      if (
+        selectedModuleId &&
+        selectedSubSkill.item.isCompleted !== isCompleted
+      ) {
+        setModuleHasCompleted(
+          selectedModuleId,
+          selectedSubSkill.item.id,
+          isCompleted,
+        );
+      }
 
       setSubskillSelection({
         isClicked: true,
@@ -99,7 +129,7 @@ export function useStepThreeHandler(
         selectedSubSkillId: selectedSubSkill.item.id,
       });
     },
-    [modulesOrSubSkills],
+    [modulesOrSubSkills, selectedModuleId],
   );
   /**
    * Handles the click on the already selected module.
@@ -134,6 +164,7 @@ export function useStepThreeHandler(
     handleModuleChangeCallback,
     handleSubSkillChangeCallback,
     handleSameModuleSelectionClickCallback,
+    selectedSubSkill,
     selectedModuleId,
     selectedSubSkillId,
     disableSubSkillsWithoutStudents,
