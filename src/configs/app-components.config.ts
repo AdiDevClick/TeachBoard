@@ -241,7 +241,6 @@ export const stepThreeControllerPropsInvalid = (
 
 const STEP_THREE_SUBSKILLS_SELECTION_CONTROLLER_REQUIRES = [
   ...BASE_CONTROLLERS_PROPS_REQUIRES,
-  "subSkills",
 ];
 export const stepThreeSubskillsSelectionControllerPropsInvalid = (
   props: StepThreeSubskillsSelectionControllerProps,
