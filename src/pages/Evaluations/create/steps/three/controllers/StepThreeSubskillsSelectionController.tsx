@@ -32,38 +32,49 @@ export function StepThreeSubskillsSelectionController(
     selectedSubSkillId,
     disableSubSkillsWithoutStudents,
     selectedModuleId,
+    selectedSubSkill,
   } = useStepThreeHandler(subSkills);
 
   /**
-   * Init
+   * INIT
    *
-   * @description - Auto-select the first sub-skill if none is selected on initial render
+   * @description Disable sub-skills without students to evaluate upon initial render.
+   */
+  useEffect(() => {
+    if (!selectedModuleId) {
+      return;
+    }
+
+    disableSubSkillsWithoutStudents(selectedModuleId);
+  }, []);
+
+  /**
+   * AUTO-SELECT FIRST SUB-SKILL
+   *
+   * @description - Auto-select the first sub-skill that is not disabled when a change happens on the sub-skills list.
    */
   useEffect(() => {
     if (!selectedModuleId || subSkills.length === 0) {
       return;
     }
 
-    // Disable sub-skill if no students are to be evaluated
-    disableSubSkillsWithoutStudents(selectedModuleId);
-
-    // Auto-select the first sub-skill if none is selected or it no longer exists
-    const firstSubSkillId = subSkills[0]?.id;
-    const hasSelectedSubSkill = subSkills.some(
-      (subSkill) => subSkill.id === selectedSubSkillId,
+    const firstActivableSubSkill = subSkills.find(
+      (subSkill) => !subSkill.isDisabled,
     );
 
-    if ((!selectedSubSkillId || !hasSelectedSubSkill) && firstSubSkillId) {
-      handleSubSkillChangeCallback(firstSubSkillId);
-    }
-  }, []);
+    const shouldSelectFirstEnabled = selectedSubSkill?.isDisabled;
 
-  const selectedId = selectedSubSkillId ?? subSkills[0]?.id ?? "";
+    if (shouldSelectFirstEnabled && firstActivableSubSkill?.id) {
+      handleSubSkillChangeCallback(firstActivableSubSkill.id);
+    }
+  }, [subSkills]);
 
   if (stepThreeSubskillsSelectionControllerPropsInvalid(props)) {
     debugLogs("StepThreeSubskillsSelectionController", props);
     return null;
   }
+
+  const selectedId = selectedSubSkillId ?? subSkills[0]?.id ?? "";
 
   return (
     <form id={formId}>
