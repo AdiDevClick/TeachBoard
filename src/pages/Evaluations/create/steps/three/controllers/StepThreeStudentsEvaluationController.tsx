@@ -9,26 +9,43 @@ import {
   stepThreeControllerPropsInvalid,
 } from "@/configs/app-components.config.ts";
 import type { StepThreeControllerProps } from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
-import { useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
+import { useShallow } from "zustand/shallow";
 
 export function StepThreeStudentsEvaluationController(
   props: StepThreeControllerProps,
 ) {
   const { formId, students } = props;
   const selectedSubSkill = useEvaluationStepsCreationStore(
-    (state) => state.subSkillSelection.selectedSubSkill,
+    useShallow((state) => state.getSelectedSubSkill()),
   );
   const selectedModule = useEvaluationStepsCreationStore(
-    (state) => state.moduleSelection.selectedModule,
+    useShallow((state) => state.getSelectedModule()),
   );
   const setEvaluationForStudent = useEvaluationStepsCreationStore(
     (state) => state.setEvaluationForStudent,
+  );
+  const isThisSubSkillCompleted = useEvaluationStepsCreationStore(
+    (state) => state.isThisSubSkillCompleted,
   );
   const [value, setValue] = useState([0]);
 
   if (stepThreeControllerPropsInvalid(props)) {
     debugLogs("StepThreeStudentsEvaluationController", props);
   }
+
+  /**
+   * Effect to check if the selected sub-skill is completed.
+   *
+   * @description - This effect runs whenever a user changes the slider value.
+   */
+  useEffect(() => {
+    if (!selectedModule || !selectedSubSkill) {
+      return;
+    }
+
+    isThisSubSkillCompleted(selectedSubSkill?.id, selectedModule?.id);
+  }, [selectedModule, selectedSubSkill, value]);
 
   /**
    * Handles value change for a student's evaluation.
