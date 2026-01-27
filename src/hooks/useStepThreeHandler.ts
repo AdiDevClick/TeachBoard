@@ -1,15 +1,15 @@
 import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
+import type {
+  ClassModuleSubSkill,
+  SelectedClassModulesReturn,
+} from "@/api/store/types/steps-creation-store.types.ts";
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { EvaluationRadioItemProps } from "@/components/Radio/types/radio.types.ts";
-import { useCallback, useState, type MouseEvent } from "react";
+import { useCallback, type MouseEvent } from "react";
 import { useShallow } from "zustand/shallow";
 export type UseStepThreeHandlerProps =
-  | ReturnType<
-      (typeof useEvaluationStepsCreationStore)["getState"]
-    >["getAttendedModules"]
-  | ReturnType<
-      (typeof useEvaluationStepsCreationStore)["getState"]
-    >["moduleSelection"]["selectedModuleSubSkills"];
+  | SelectedClassModulesReturn
+  | ClassModuleSubSkill[];
 
 /**
  * Hook to handle Step Three logic for module and sub-skill selection.
@@ -28,18 +28,20 @@ export function useStepThreeHandler(
   );
 
   const selectedModuleId = useEvaluationStepsCreationStore(
-    (state) => state.moduleSelection.selectedModule?.id ?? null,
+    (state) => state.moduleSelection.selectedModuleId ?? null,
   );
 
   const selectedSubSkillId = useEvaluationStepsCreationStore(
-    (state) => state.subSkillSelection.selectedSubSkill?.id ?? null,
+    (state) => state.subSkillSelection.selectedSubSkillId ?? null,
   );
 
   const isThisSubSkillCompleted = useEvaluationStepsCreationStore(
     useShallow((state) => state.isThisSubSkillCompleted),
   );
 
-  const [isCompleted, setIsCompleted] = useState<boolean>(false);
+  const disableSubSkillsWithoutStudents = useEvaluationStepsCreationStore(
+    useShallow((state) => state.disableSubSkillsWithoutStudents),
+  );
 
   /**
    * Handles the change of selected module.
@@ -57,9 +59,6 @@ export function useStepThreeHandler(
 
       const selectedModule = findIndexById(value, modulesOrSubSkills);
 
-      const isCompleted = isThisSubSkillCompleted();
-      setIsCompleted(isCompleted);
-
       if (!selectedModule?.item) {
         return;
       }
@@ -67,7 +66,7 @@ export function useStepThreeHandler(
       setModuleSelection({
         isClicked: true,
         selectedModuleIndex: selectedModule.index,
-        selectedModule: selectedModule.item,
+        selectedModuleId: selectedModule.item.id,
       });
     },
     [modulesOrSubSkills],
@@ -89,18 +88,15 @@ export function useStepThreeHandler(
 
       const selectedSubSkill = findIndexById(value, modulesOrSubSkills);
 
-      // const isCompleted = isThisSubSkillCompleted();
-      // console.log(isCompleted);
-
       if (!selectedSubSkill?.item) {
         return;
       }
+      isThisSubSkillCompleted(selectedSubSkill.item.id);
 
       setSubskillSelection({
         isClicked: true,
         selectedSubSkillIndex: selectedSubSkill.index,
-        selectedSubSkill: selectedSubSkill.item,
-        // isCompleted,
+        selectedSubSkillId: selectedSubSkill.item.id,
       });
     },
     [modulesOrSubSkills],
@@ -116,12 +112,13 @@ export function useStepThreeHandler(
     _e: MouseEvent<HTMLLabelElement>,
     props: EvaluationRadioItemProps,
   ) => {
-    if (!selectedModuleId || props.id !== selectedModuleId) {
+    const { id, index } = props;
+
+    if (!selectedModuleId || id !== selectedModuleId || index == null) {
       return;
     }
 
-    const selectedModuleIndex = props.index;
-    const selectedModule = modulesOrSubSkills[selectedModuleIndex];
+    const selectedModule = modulesOrSubSkills[index];
 
     if (!selectedModule) {
       return;
@@ -129,8 +126,8 @@ export function useStepThreeHandler(
 
     setModuleSelection({
       isClicked: true,
-      selectedModuleIndex,
-      selectedModule: selectedModule,
+      selectedModuleIndex: index,
+      selectedModuleId: selectedModule.id,
     });
   };
   return {
@@ -139,6 +136,7 @@ export function useStepThreeHandler(
     handleSameModuleSelectionClickCallback,
     selectedModuleId,
     selectedSubSkillId,
+    disableSubSkillsWithoutStudents,
   };
 }
 
