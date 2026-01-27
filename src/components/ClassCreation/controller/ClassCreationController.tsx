@@ -31,7 +31,14 @@ import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-
 import { useAvatarDataGenerator } from "@/hooks/useAvatarDataGenerator.ts";
 import type { ClassCreationFormSchema } from "@/models/class-creation.models.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { Activity, useEffect, useRef, useState } from "react";
+import {
+  Activity,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useWatch } from "react-hook-form";
 
 const year = new Date().getFullYear();
@@ -143,27 +150,30 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
    * @param open - Whether the select is opening
    * @param metaData - The meta data from the popover field that was opened
    */
-  const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
-    const linkedDiploma = selectedDiplomaRef.current;
-    const isNewTaskTemplate = metaData?.task === "new-task-template";
+  const handleOpening = useCallback(
+    (open: boolean, metaData?: Record<string, unknown>) => {
+      const linkedDiploma = selectedDiplomaRef.current;
+      const isNewTaskTemplate = metaData?.task === "new-task-template";
 
-    if (isNewTaskTemplate) {
-      if (!linkedDiploma || taskModalPropsInvalid(linkedDiploma)) {
-        const message =
-          "Tried to open task template modal without a selected diploma.";
-        debugLogs("[ClassCreationController] - " + message);
-        throw new Error(message);
+      if (isNewTaskTemplate) {
+        if (!linkedDiploma || taskModalPropsInvalid(linkedDiploma)) {
+          const message =
+            "Tried to open task template modal without a selected diploma.";
+          debugLogs("[ClassCreationController] - " + message);
+          throw new Error(message);
+        }
+
+        metaData.apiEndpoint =
+          API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
+            linkedDiploma.id,
+          );
+        metaData["degreeConfig"] = linkedDiploma;
       }
 
-      metaData.apiEndpoint =
-        API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
-          linkedDiploma.id,
-        );
-      metaData["degreeConfig"] = linkedDiploma;
-    }
-
-    openingCallback(open, metaData);
-  };
+      openingCallback(open, metaData);
+    },
+    [],
+  );
 
   /**
    * Handle Class Creation form submission when form is valid
@@ -211,15 +221,20 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
    * @param value - The value of the selected command item
    * @param commandItem - The details of the selected command item
    */
-  const handleOnSelect = (__value: string, commandItem: CommandItemType) => {
-    if (form.watch("degreeConfigId") !== commandItem.id) {
-      selectedDiplomaRef.current = commandItem;
-      setIsSelectedDiploma(!!commandItem);
-      form.setValue("degreeConfigId", commandItem.id, { shouldValidate: true });
-      form.setValue("tasks", [], { shouldValidate: true });
-      form.setValue("tasksValues", [], { shouldValidate: true });
-    }
-  };
+  const handleOnSelect = useCallback(
+    (__value: string, commandItem: CommandItemType) => {
+      if (form.watch("degreeConfigId") !== commandItem.id) {
+        selectedDiplomaRef.current = commandItem;
+        setIsSelectedDiploma(!!commandItem);
+        form.setValue("degreeConfigId", commandItem.id, {
+          shouldValidate: true,
+        });
+        form.setValue("tasks", [], { shouldValidate: true });
+        form.setValue("tasksValues", [], { shouldValidate: true });
+      }
+    },
+    [],
+  );
 
   /**
    * Handle adding a new item
@@ -227,50 +242,54 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
    * @param e - The event triggering the new item addition
    * @param rest - Additional parameters related to the new item
    */
-  const handleNewItem = ({ e, ...rest }: HandleAddNewItemParams) => {
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Add new item triggered", {
-        apiEndpoint: rest.apiEndpoint,
-        task: rest.task,
-        selectedDiploma: selectedDiplomaRef.current,
-        selectedStudents: form.getValues("studentsValues"),
-        selectedPrimaryTeacher: form.getValues("primaryTeacherValue"),
-      });
-    }
-    const task = rest.task;
-    rest.form = form;
+  const handleNewItem = useCallback(
+    ({ e, ...rest }: HandleAddNewItemParams) => {
+      if (DEV_MODE && !NO_CACHE_LOGS) {
+        console.log("Add new item triggered", {
+          apiEndpoint: rest.apiEndpoint,
+          task: rest.task,
+          selectedDiploma: selectedDiplomaRef.current,
+          selectedStudents: form.getValues("studentsValues"),
+          selectedPrimaryTeacher: form.getValues("primaryTeacherValue"),
+        });
+      }
+      const task = rest.task;
+      rest.form = form;
 
-    if (task === "search-students") {
-      rest.selectedStudents = form.getValues("studentsValues") ?? {};
-    }
-
-    if (task === "search-primaryteacher") {
-      rest.selectedPrimaryTeacher = form.getValues("primaryTeacherValue") ?? {};
-    }
-
-    if (task === "new-task-template" && selectedDiplomaRef.current) {
-      rest.apiEndpoint =
-        API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
-          selectedDiplomaRef.current.id,
-        );
-      rest.selectedDiploma = selectedDiplomaRef.current;
-
-      const cached = queryClient.getQueryData([task, rest.apiEndpoint]);
-
-      let data;
-      if (Array.isArray(cached)) {
-        data = cached[0];
+      if (task === "search-students") {
+        rest.selectedStudents = form.getValues("studentsValues") ?? {};
       }
 
-      rest.shortTemplatesList = data?.shortTemplatesList ?? [];
-    }
-    saveKeys([task, rest.apiEndpoint], cachedKeysRef);
+      if (task === "search-primaryteacher") {
+        rest.selectedPrimaryTeacher =
+          form.getValues("primaryTeacherValue") ?? {};
+      }
 
-    newItemCallback({
-      e,
-      ...rest,
-    });
-  };
+      if (task === "new-task-template" && selectedDiplomaRef.current) {
+        rest.apiEndpoint =
+          API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
+            selectedDiplomaRef.current.id,
+          );
+        rest.selectedDiploma = selectedDiplomaRef.current;
+
+        const cached = queryClient.getQueryData([task, rest.apiEndpoint]);
+
+        let data;
+        if (Array.isArray(cached)) {
+          data = cached[0];
+        }
+
+        rest.shortTemplatesList = data?.shortTemplatesList ?? [];
+      }
+      saveKeys([task, rest.apiEndpoint], cachedKeysRef);
+
+      newItemCallback({
+        e,
+        ...rest,
+      });
+    },
+    [],
+  );
 
   const handleOnYearSelect = (value: string) => {
     if (form.watch("schoolYear") !== value) {
@@ -278,10 +297,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     }
   };
 
-  const handleDeletingTask = (
-    taskValue: string,
-    _taskDetails?: Record<string, unknown>,
-  ) => {
+  const handleDeletingTask = (taskValue: string) => {
     const tasks = new Set(form.getValues("tasks") || []);
     tasks.delete(taskValue);
 
@@ -313,6 +329,25 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
       },
     ],
   };
+
+  const sharedCallbacksMemo = useMemo(() => {
+    const sharedCallbacks = {
+      onOpenChange: handleOpening,
+      onSelect: handleOnSelect,
+      onAddNewItem: handleNewItem,
+    };
+    const commonObsProps = {
+      setRef,
+      observedRefs,
+    };
+    const all = {
+      ...commonObsProps,
+      ...sharedCallbacks,
+    };
+
+    return { sharedCallbacks, commonObsProps, all };
+  }, [observedRefs, handleOnSelect, handleNewItem, handleOpening, setRef]);
+
   return (
     <form
       ref={(el) => setRef(el, { name: pageId, formId })}
@@ -328,12 +363,8 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
       <PopoverFieldWithControllerAndCommandsList
         items={controllers.popoverControllers}
         form={form}
-        setRef={setRef}
+        {...sharedCallbacksMemo.all}
         commandHeadings={resultsCallback()}
-        observedRefs={observedRefs}
-        onOpenChange={handleOpening}
-        onSelect={handleOnSelect}
-        onAddNewItem={handleNewItem}
       />
       <AvatarsWithLabelAndAddButtonList
         items={controllers.avatarControllers}
@@ -343,28 +374,23 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
       <Activity mode={isSelectedDiploma ? "visible" : "hidden"}>
         <ControlledDynamicTagList
           form={form}
-          setRef={setRef}
+          {...sharedCallbacksMemo.commonObsProps}
           {...controllers.dynamicListControllers}
-          observedRefs={observedRefs}
           itemList={tasksValues}
           // onRemove={handleCommandSelection}
           onRemove={handleDeletingTask}
         />
         <PopoverFieldWithCommands
           multiSelection
-          setRef={setRef}
+          {...sharedCallbacksMemo.all}
           onSelect={handleCommandSelection}
-          onOpenChange={handleOpening}
-          observedRefs={observedRefs}
-          onAddNewItem={handleNewItem}
           resetKey={form.watch("degreeConfigId")}
           commandHeadings={resultsCallback()}
           {...controllers.dynamicListControllers}
         />
       </Activity>
       <VerticalFieldSelectWithController
-        setRef={setRef}
-        observedRefs={observedRefs}
+        {...sharedCallbacksMemo.commonObsProps}
         name="schoolYear"
         form={form}
         fullWidth={false}
