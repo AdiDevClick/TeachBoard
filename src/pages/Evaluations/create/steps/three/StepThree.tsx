@@ -17,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { IconArrowLeft } from "@tabler/icons-react";
 import {
   useEffect,
+  useMemo,
   type Dispatch,
   type JSX,
   type MouseEvent,
@@ -27,25 +28,23 @@ import { useOutletContext } from "react-router-dom";
 import { useShallow } from "zustand/react/shallow";
 
 // Module selection
-export const stepThreeModuleSelectionTitleProps = {
-  title: "Liste des catégories",
-  description: "Par quoi doit-on commencer ?",
-};
-
-export const stepThreeModuleSelectionCardProps = {
+const stepThreeModuleSelectionCardProps = {
   card: { className: "content__right" },
-  title: stepThreeModuleSelectionTitleProps,
+  title: {
+    title: "Liste des catégories",
+    description: "Par quoi doit-on commencer ?",
+  },
   content: {
     className: "right__content-container",
   },
 };
 
 // Subskills selection
-export const stepThreeSubskillsSelectionTitleProps = {
+const stepThreeSubskillsSelectionTitleProps = {
   title: "Notation des élèves",
   description: "Quelles sous-compétences évaluer ?",
 };
-export const stepThreeSubskillsSelectionCardProps = {
+const stepThreeSubskillsSelectionCardProps = {
   card: { className: "content__right" },
   title: stepThreeSubskillsSelectionTitleProps,
   content: {
@@ -78,14 +77,10 @@ export function StepThree({
   const selectedClass = useEvaluationStepsCreationStore(
     (state) => state.selectedClass,
   );
-  const students = useEvaluationStepsCreationStore((state) => state.students);
   const tasks = useEvaluationStepsCreationStore((state) => state.tasks);
   const modules = useEvaluationStepsCreationStore(
     useShallow((state) => state.getAttendedModules()),
   );
-  // const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
-  //   (state) => state.getStudentsPresenceSelectionData,
-  // )();
   const moduleSelectionState = useEvaluationStepsCreationStore(
     (state) => state.moduleSelection,
   );
@@ -93,9 +88,8 @@ export function StepThree({
     (state) => state.setModuleSelectionIsClicked,
   );
   const selectedSubSkill = useEvaluationStepsCreationStore(
-    (state) => state.subSkillSelection?.selectedSubSkill,
+    useShallow((state) => state.getSelectedSubSkill()),
   );
-
   const evaluatedStudentsForThisSubskill = useEvaluationStepsCreationStore(
     useShallow((state) => state.getPresentStudentsWithAssignedTasks()),
   );
@@ -109,36 +103,53 @@ export function StepThree({
   });
 
   const formId = pageId + "-form";
-  let card = stepThreeModuleSelectionCardProps;
 
-  if (moduleSelectionState.isClicked) {
-    card = {
+  const card = useMemo(() => {
+    if (!moduleSelectionState.isClicked) {
+      return stepThreeModuleSelectionCardProps;
+    }
+
+    const description = selectedSubSkill?.name
+      ? `Vous évaluez "${selectedSubSkill.name}"`
+      : stepThreeSubskillsSelectionTitleProps.description;
+
+    return {
       ...stepThreeSubskillsSelectionCardProps,
       title: {
-        ...stepThreeSubskillsSelectionTitleProps,
-        description: selectedSubSkill?.name
-          ? `Vous évaluez "${selectedSubSkill.name}"`
-          : stepThreeSubskillsSelectionTitleProps.description,
+        ...stepThreeSubskillsSelectionCardProps.title,
+        description,
       },
     };
-  }
+  }, [moduleSelectionState.isClicked, selectedSubSkill?.name]);
 
-  const commonProps = {
-    pageId,
-    modalMode,
-    className,
-    formId,
-    inputControllers,
-    card,
-    ...props,
-    form,
-    user,
-    students: evaluatedStudentsForThisSubskill,
-    modules,
-    selectedClass,
-    tasks,
-    // preparedStudentsTasksSelection,
-  };
+  const commonProps = useMemo(
+    () => ({
+      pageId,
+      modalMode,
+      className,
+      formId,
+      inputControllers,
+      card,
+      ...props,
+      form,
+      user,
+      students: evaluatedStudentsForThisSubskill,
+      modules,
+      selectedClass: selectedClass ?? null,
+      tasks,
+    }),
+    [
+      card,
+      evaluatedStudentsForThisSubskill,
+      form,
+      inputControllers,
+      modules,
+      props,
+      selectedClass,
+      tasks,
+      user,
+    ],
+  );
 
   const handlePreviousClick = (e: MouseEvent<SVGSVGElement>) => {
     preventDefaultAndStopPropagation(e);
@@ -149,15 +160,9 @@ export function StepThree({
    * Dispatch left content based on module selection state
    */
   useEffect(() => {
-    if (
-      moduleSelectionState.isClicked &&
-      moduleSelectionState.selectedModuleSubSkills.length > 0
-    ) {
+    if (moduleSelectionState.isClicked) {
       setLeftContent(
-        <StepThreeSubskillsSelectionController
-          {...commonProps}
-          subSkills={moduleSelectionState.selectedModuleSubSkills}
-        />,
+        <StepThreeSubskillsSelectionController {...commonProps} />,
       );
     } else {
       setLeftContent(null!);
@@ -166,10 +171,7 @@ export function StepThree({
     return () => {
       setLeftContent(null!);
     };
-  }, [
-    moduleSelectionState.isClicked,
-    moduleSelectionState.selectedModuleSubSkills,
-  ]);
+  }, [moduleSelectionState.isClicked]);
 
   return (
     <>
