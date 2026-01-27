@@ -6,7 +6,9 @@
 
 import type {
   ClassModules,
+  ClassModuleSubSkill,
   EvaluationType,
+  StepsCreationState,
   StudentEvaluationModuleType,
   StudentEvaluationSubSkillType,
   StudentWithPresence,
@@ -14,6 +16,7 @@ import type {
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { SkillsType } from "@/api/types/routes/skills.types.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
+import type { WritableDraft } from "immer";
 
 /**
  * Build linked sub-skills with associated task IDs.
@@ -123,4 +126,56 @@ export function addNewEvaluationScore(
   };
 
   updateEvaluationScore(newModule, newSubSkillItem, modulesList);
+}
+
+/**
+ * Update modules in the steps creation state.
+ *
+ * @description Destinated to be used in the flow of the setState function of the store.
+ *
+ * @param state - The current steps creation state
+ * @param module - The module to update
+ * @param items - The partial items to update in the module
+ */
+export function updateModules(
+  state: WritableDraft<StepsCreationState>,
+  module: ClassModules,
+  items: Partial<ClassModules>,
+) {
+  const updatedModules = state.modules.clone(true);
+
+  updatedModules.delete(module.id).set(module.id, { ...module, ...items });
+
+  state.modules = updatedModules;
+}
+
+/**
+ * Prepare a new set of sub-skills for a module update.
+ *
+ * @important !! IMPORTANT !! This method can optionally re-order the sub-skills with the updated one being last.
+ *
+ * @param updatedSubSkill - Newly created subskill
+ * @param module - Module containing the previous subskill
+ * @param subSkills - Existing sub-skills set to update. If null, the module's sub-skills will be used.
+ * @param shouldReorder - Whether to reorder the sub-skills to place the updated one at the end.
+ *
+ * @returns The updated set of sub-skills ready for module update.
+ */
+export function preparedSubSkillsForUpdate(
+  updatedSubSkill: ClassModuleSubSkill,
+  module: ClassModules,
+  subSkills: UniqueSet<UUID, ClassModuleSubSkill> | null = null,
+  shouldReorder = false,
+) {
+  const updatedSubSkills = subSkills ?? module.subSkills.clone(true);
+
+  if (shouldReorder) {
+    updatedSubSkills
+      .delete(updatedSubSkill.id)
+      .set(updatedSubSkill.id, updatedSubSkill);
+  } else {
+    updatedSubSkills.set(updatedSubSkill.id, updatedSubSkill);
+  }
+
+  return updatedSubSkills;
 }
