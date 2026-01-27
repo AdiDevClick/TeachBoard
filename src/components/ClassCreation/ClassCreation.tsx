@@ -61,13 +61,15 @@ function ClassCreation({
       modalMode,
       className,
       formId,
-      titleProps,
-      footerProps: {
-        ...footerProps,
-        formState: form.formState,
-        formId,
+      card: {
+        card: { className },
+        title: titleProps,
+        footer: {
+          ...footerProps,
+          formState: form.formState,
+          formId,
+        },
       },
-      cardProps: { className },
       inputControllers,
       ...props,
       form,
@@ -76,7 +78,13 @@ function ClassCreation({
     }),
     [form.formState, props],
   );
-  return <ClassCreationWithCard {...commonProps} />;
+  return (
+    <ClassCreationWithCard {...commonProps}>
+      <ClassCreationWithCard.Title />
+      <ClassCreationWithCard.Content />
+      <ClassCreationWithCard.Footer />
+    </ClassCreationWithCard>
+  );
 }
 
 const ClassCreationWithCard = withTitledCard(ClassCreationController);

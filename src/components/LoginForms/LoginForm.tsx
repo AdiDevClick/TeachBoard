@@ -17,14 +17,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
-const titleProps = {
-  title: "Welcome Back !",
-  description: "Connectez-vous à votre compte TeachBoard.",
-  className: "text-center",
-};
-
 export const loginFormCardProps = {
   card: { className: "grid gap-4" },
+  title: {
+    title: "Welcome Back !",
+    description: "Connectez-vous à votre compte TeachBoard.",
+    className: "text-center",
+  },
 };
 
 const resetPasswordButtonText = "Réinitialiser le mot de passe";
@@ -88,8 +87,7 @@ function LoginForm({
       setIsPwForgotten,
       isPwForgotten,
       modalMode,
-      titleProps,
-      cardProps: loginFormCardProps,
+      card: loginFormCardProps,
       inputControllers: inputControllersToUse,
       textToDisplay: {
         defaultText,
@@ -101,7 +99,12 @@ function LoginForm({
     };
   }, [form.formState, isPwForgotten, props]);
 
-  return <LoginFormWithCard displayFooter={false} {...commonProps} />;
+  return (
+    <LoginFormWithCard {...commonProps}>
+      <LoginFormWithCard.Title />
+      <LoginFormWithCard.Content />
+    </LoginFormWithCard>
+  );
 }
 
 const LoginFormWithCard = withTitledCard(LoginFormController);

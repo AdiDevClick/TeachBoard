@@ -40,16 +40,22 @@ function EmailValidation({
     return {
       pageId,
       modalMode,
-      displayFooter: false as const,
-      titleProps: {
-        title,
-        description,
+      card: {
+        title: {
+          title,
+          description,
+        },
       },
       ...queryHooks,
     };
   }, [url, data, error]);
 
-  return <EmailValidationWithCard {...commonProps} />;
+  return (
+    <EmailValidationWithCard {...commonProps}>
+      <EmailValidationWithCard.Title />
+      <EmailValidationWithCard.Content />
+    </EmailValidationWithCard>
+  );
 }
 
 const EmailValidationWithCard = withTitledCard(EmailValidationController);

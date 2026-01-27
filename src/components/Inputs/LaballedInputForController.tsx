@@ -18,7 +18,7 @@ import type { FieldValues } from "react-hook-form";
  * @returns
  */
 export function LabelledInputForController<T extends FieldValues>(
-  props: LaballedInputForControllerProps<T>
+  props: LaballedInputForControllerProps<T>,
 ) {
   if (labelledInputContainsInvalid(props)) {
     debugLogs("LabelledInputForController");
@@ -45,7 +45,7 @@ export function LabelledInputForController<T extends FieldValues>(
 }
 
 export const ControlledLabelledInput = withController(
-  LabelledInputForController
+  LabelledInputForController,
 );
 
 export const ControlledInputList = withListMapper(ControlledLabelledInput);

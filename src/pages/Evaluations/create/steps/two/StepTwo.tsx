@@ -19,6 +19,10 @@ export const stepTwoTitleProps = {
 
 export const stepTwoCardProps = {
   card: { className: "content__right" },
+  title: {
+    title: "Liste d'élèves",
+    description: "Définir les élèves présents ainsi que leurs fonctions.",
+  },
   content: {
     className: "right__content-container",
   },
@@ -68,8 +72,7 @@ export function StepTwo({
     className,
     formId,
     inputControllers,
-    titleProps: stepTwoTitleProps,
-    cardProps: stepTwoCardProps,
+    card: stepTwoCardProps,
     ...props,
     form,
     user,
@@ -79,7 +82,12 @@ export function StepTwo({
     preparedStudentsTasksSelection,
   };
 
-  return <StepTwoWithCard displayFooter={false} {...commonProps} />;
+  return (
+    <StepTwoWithCard {...commonProps}>
+      <StepTwoWithCard.Title />
+      <StepTwoWithCard.Content />
+    </StepTwoWithCard>
+  );
 }
 
 const StepTwoWithCard = withTitledCard(StepTwoController);

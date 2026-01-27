@@ -3,14 +3,12 @@ import { stepOneInputControllers } from "@/data/inputs-controllers.data.ts";
 import type { StepOneInputItem } from "@/models/step-one.models.ts";
 import { StepOneController } from "@/pages/Evaluations/create/steps/one/controller/StepOneController.tsx";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
-export const stepOneTitleProps = {
-  // title: "Liste d'élèves",
-  // description: "Définir les élèves présents ainsi que leurs fonctions.",
-  className: "hidden",
-};
 
 export const stepOneCardProps = {
   card: { className: "content__right" },
+  title: {
+    className: "hidden",
+  },
   content: {
     className: "right__content-container",
   },
@@ -27,7 +25,7 @@ export const stepOneCardProps = {
  */
 export function StepOne({
   pageId,
-  className = "content__right",
+  className = stepOneCardProps.card.className || "content__right",
   modalMode = false,
   inputControllers = stepOneInputControllers,
   ...props
@@ -37,12 +35,16 @@ export function StepOne({
     modalMode,
     className,
     inputControllers,
-    titleProps: stepOneTitleProps,
-    cardProps: stepOneCardProps,
+    card: stepOneCardProps,
     ...props,
   };
 
-  return <StepOneWithCard displayFooter={false} {...commonProps} />;
+  return (
+    <StepOneWithCard {...commonProps}>
+      <StepOneWithCard.Title />
+      <StepOneWithCard.Content />
+    </StepOneWithCard>
+  );
 }
 
 const StepOneWithCard = withTitledCard(StepOneController);

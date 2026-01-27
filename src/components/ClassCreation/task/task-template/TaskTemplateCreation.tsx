@@ -52,20 +52,28 @@ function TaskTemplateCreation({
       formId,
       modalMode,
       className,
-      footerProps: {
-        ...footerProps,
-        formState: form.formState,
-        formId,
+      card: {
+        card: { className },
+        title: titleProps,
+        footer: {
+          ...footerProps,
+          formState: form.formState,
+          formId,
+        },
       },
-      cardProps: { className },
-      titleProps,
       ...props,
       form,
     }),
     [form.formState, props],
   );
 
-  return <TaskTemplateCreationWithCard {...commonProps} />;
+  return (
+    <TaskTemplateCreationWithCard {...commonProps}>
+      <TaskTemplateCreationWithCard.Title />
+      <TaskTemplateCreationWithCard.Content />
+      <TaskTemplateCreationWithCard.Footer />
+    </TaskTemplateCreationWithCard>
+  );
 }
 
 const TaskTemplateCreationWithCard = withTitledCard(

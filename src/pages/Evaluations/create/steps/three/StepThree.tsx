@@ -34,6 +34,7 @@ export const stepThreeModuleSelectionTitleProps = {
 
 export const stepThreeModuleSelectionCardProps = {
   card: { className: "content__right" },
+  title: stepThreeModuleSelectionTitleProps,
   content: {
     className: "right__content-container",
   },
@@ -46,6 +47,7 @@ export const stepThreeSubskillsSelectionTitleProps = {
 };
 export const stepThreeSubskillsSelectionCardProps = {
   card: { className: "content__right" },
+  title: stepThreeSubskillsSelectionTitleProps,
   content: {
     className: "right__content-container",
   },
@@ -107,16 +109,17 @@ export function StepThree({
   });
 
   const formId = pageId + "-form";
-  let cardProps = stepThreeModuleSelectionCardProps;
-  let titleProps = stepThreeModuleSelectionTitleProps;
+  let card = stepThreeModuleSelectionCardProps;
 
   if (moduleSelectionState.isClicked) {
-    cardProps = stepThreeSubskillsSelectionCardProps;
-    titleProps = {
-      ...stepThreeSubskillsSelectionTitleProps,
-      description: selectedSubSkill?.name
-        ? `Vous évaluez "${selectedSubSkill.name}"`
-        : stepThreeSubskillsSelectionTitleProps.description,
+    card = {
+      ...stepThreeSubskillsSelectionCardProps,
+      title: {
+        ...stepThreeSubskillsSelectionTitleProps,
+        description: selectedSubSkill?.name
+          ? `Vous évaluez "${selectedSubSkill.name}"`
+          : stepThreeSubskillsSelectionTitleProps.description,
+      },
     };
   }
 
@@ -126,8 +129,7 @@ export function StepThree({
     className,
     formId,
     inputControllers,
-    titleProps: titleProps,
-    cardProps,
+    card,
     ...props,
     form,
     user,
@@ -172,7 +174,10 @@ export function StepThree({
   return (
     <>
       {!moduleSelectionState.isClicked && (
-        <ModuleSelection displayFooter={false} {...commonProps} />
+        <ModuleSelection {...commonProps}>
+          <ModuleSelection.Title />
+          <ModuleSelection.Content />
+        </ModuleSelection>
       )}
       {moduleSelectionState.isClicked && (
         <>
@@ -184,13 +189,18 @@ export function StepThree({
             data-name="modules-previous"
           />
           <StudentsEvaluation
-            displayFooter={false}
             {...commonProps}
-            titleProps={{
-              ...commonProps.titleProps,
-              description: <Badge>{selectedSubSkill?.name}</Badge>,
+            card={{
+              ...commonProps.card,
+              title: {
+                ...commonProps.card.title,
+                description: <Badge>{selectedSubSkill?.name}</Badge>,
+              },
             }}
-          />
+          >
+            <StudentsEvaluation.Title />
+            <StudentsEvaluation.Content />
+          </StudentsEvaluation>
         </>
       )}
     </>

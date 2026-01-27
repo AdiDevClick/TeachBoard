@@ -11,5 +11,5 @@ export type AppDialFooterProps = {
     isValid: boolean;
   };
   /** The id of the form to be submitted */
-  formId?: string;
+  formId: string;
 } & ComponentProps<typeof DialogFooter>;
