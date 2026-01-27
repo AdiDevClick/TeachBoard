@@ -5,8 +5,10 @@ import {
   upsertModuleSubSkills,
 } from "@/api/store/functions/evaluation-store.functions.ts";
 import type {
+  ClassModules,
+  ClassModuleSubSkill,
   EvaluationType,
-  SetModulesSelectionType,
+  ModulesSelectionType,
   StepsCreationState,
   StudentWithPresence,
   SubskillSelectionType,
@@ -36,13 +38,12 @@ const createDefaultStepsCreationState = (): StepsCreationState => ({
   moduleSelection: {
     isClicked: false,
     selectedModuleIndex: null,
-    selectedModule: null,
-    selectedModuleSubSkills: [],
+    selectedModuleId: null,
   },
   subSkillSelection: {
     isClicked: false,
     selectedSubSkillIndex: null,
-    selectedSubSkill: null,
+    selectedSubSkillId: null,
   },
 });
 
@@ -70,6 +71,16 @@ export const useEvaluationStepsCreationStore = create(
 
             return true;
           },
+          /**
+           * INITIALIZE STORE ACTION
+           *
+           * Set the selected class and load its students and tasks into the store.
+           *
+           * @description This is triggered when an available class is selected for evaluation stepOne list.
+           *
+           * @param selectedClass - The class summary DTO to set as selected class
+           * @returns
+           */
           setSelectedClass(selectedClass: ClassSummaryDto) {
             let shouldClear = false;
 
@@ -190,7 +201,6 @@ export const useEvaluationStepsCreationStore = create(
 
                 // !! IMPORTANT !! A student marked as not present should not have any assigned task or be part of module evaluations
                 if (!isPresent) {
-                  //   student.assignedTask = null;
                   ACTIONS.clearStudentFromModuleEvaluation(studentId);
                 }
               }
@@ -267,19 +277,17 @@ export const useEvaluationStepsCreationStore = create(
            * @param selectedModuleIndex - The index of the selected module
            * @param selectedModule - The selected module details
            */
-          setModuleSelection(args: SetModulesSelectionType) {
-            const { isClicked, selectedModuleIndex, selectedModule } = args;
+          setModuleSelection(args: ModulesSelectionType) {
+            const { isClicked, selectedModuleIndex, selectedModuleId } = args;
 
             set((state) => {
               const selection = state.moduleSelection;
-              const { subSkills, ...moduleWithoutSubSkills } = selectedModule;
 
               state.moduleSelection = {
                 ...selection,
                 isClicked,
                 selectedModuleIndex,
-                selectedModule: moduleWithoutSubSkills,
-                selectedModuleSubSkills: Array.from(subSkills?.values() ?? []),
+                selectedModuleId,
               };
             });
           },
@@ -298,18 +306,20 @@ export const useEvaluationStepsCreationStore = create(
            * @param args - The subskill selection details
            */
           setSubskillSelection(args: SubskillSelectionType) {
-            const { isClicked, selectedSubSkillIndex, selectedSubSkill } = args;
+            const { isClicked, selectedSubSkillIndex, selectedSubSkillId } =
+              args;
 
             set((state) => {
               const selection = state.subSkillSelection;
+              const moduleId = state.moduleSelection.selectedModuleId;
+              const module = moduleId ? state.modules.get(moduleId) : null;
 
-              const mainModuleSubSkill =
-                state.moduleSelection.selectedModuleSubSkills?.find(
-                  (subSkill) => subSkill.id === selectedSubSkill.id,
-                );
+              if (!selectedSubSkillId || !module) {
+                return;
+              }
 
               // Ensure the selected subskill belongs to the selected module
-              if (!mainModuleSubSkill) {
+              if (!module.subSkills.has(selectedSubSkillId)) {
                 return;
               }
 
@@ -317,7 +327,7 @@ export const useEvaluationStepsCreationStore = create(
                 ...selection,
                 isClicked,
                 selectedSubSkillIndex,
-                selectedSubSkill,
+                selectedSubSkillId,
               };
             });
           },
@@ -329,13 +339,13 @@ export const useEvaluationStepsCreationStore = create(
            * @remarks This function updates the evaluation score for a specific student's module and sub-skill.
            */
           setEvaluationForStudent(studentId: UUID, evaluation: EvaluationType) {
+            const { subSkill, module, score } = evaluation;
+
+            if (!subSkill?.id || !module?.id || !studentId || score == null) {
+              return;
+            }
+
             set((state) => {
-              const { subSkill, module, score } = evaluation;
-
-              if (!subSkill?.id || !module?.id || !studentId || score == null) {
-                return;
-              }
-
               const student = state.students.get(studentId);
               if (!student) return;
 
@@ -374,6 +384,72 @@ export const useEvaluationStepsCreationStore = create(
 
                 existingStudentEvaluation.modules = modulesList;
               }
+            });
+          },
+          /**
+           * Disable a sub-skill if no students are to be evaluated for it.
+           *
+           * @param selectedModuleId - The ID of the selected module
+           */
+          disableSubSkillsWithoutStudents(moduleId?: UUID) {
+            if (!moduleId) return;
+            const module = get().modules.get(moduleId);
+            if (!module) return;
+
+            const subSkills = module?.subSkills;
+            if (!subSkills) return;
+
+            const values = Array.from(subSkills.values() ?? []);
+
+            set(() => {
+              values.forEach((subSkill) => {
+                const noStudentsAvailable =
+                  ACTIONS.getPresentStudentsWithAssignedTasks(subSkill.id)
+                    .length === 0;
+
+                const updatedSubSkill = {
+                  ...subSkill,
+                };
+
+                if (noStudentsAvailable) {
+                  updatedSubSkill.isDisabled = true;
+                } else {
+                  updatedSubSkill.isDisabled = false;
+                }
+
+                // !! IMPORTANT !! This will also re-order the sub-skills.
+                ACTIONS.updateSubSkills(updatedSubSkill, module, subSkills);
+              });
+            });
+          },
+          /**
+           * Update sub-skills within a module.
+           *
+           * @important !! IMPORTANT !! This method naturally re-orders the sub-skills with the updated one being last.
+           *
+           * @param updatedSubSkill - Newly created subskill
+           * @param module - Module containing the previous subskill
+           */
+          updateSubSkills(
+            updatedSubSkill: ClassModuleSubSkill,
+            module: ClassModules,
+            subSkills: UniqueSet<UUID, ClassModuleSubSkill> | null = null,
+          ) {
+            set((state) => {
+              const updatedSubSkills =
+                subSkills ?? module.subSkills.clone(true);
+
+              updatedSubSkills
+                .delete(updatedSubSkill.id)
+                .set(updatedSubSkill.id, updatedSubSkill);
+
+              const updatedModules = state.modules.clone(true);
+
+              updatedModules
+                .delete(module.id)
+                .set(module.id, { ...module, subSkills: updatedSubSkills });
+
+              state.modules = updatedModules;
             });
           },
           /**
@@ -417,41 +493,63 @@ export const useEvaluationStepsCreationStore = create(
             return Array.from(get().modules?.values() ?? []);
           },
           /**
+           * Get the currently selected module from the core store.
+           */
+          getSelectedModule() {
+            const selectedModuleId = get().moduleSelection.selectedModuleId;
+            if (!selectedModuleId) return null;
+            return get().modules.get(selectedModuleId) ?? null;
+          },
+          /**
+           * Get the sub-skills for the currently selected module.
+           */
+          getSelectedModuleSubSkills() {
+            const module = ACTIONS.getSelectedModule();
+            if (!module) return [];
+            return Array.from(module.subSkills.values());
+          },
+          /**
+           * Get the currently selected sub-skill from the core store.
+           */
+          getSelectedSubSkill() {
+            const selectedSubSkillId =
+              get().subSkillSelection.selectedSubSkillId;
+            const module = ACTIONS.getSelectedModule();
+
+            if (!module || !selectedSubSkillId) return null;
+
+            return module.subSkills.get(selectedSubSkillId) ?? null;
+          },
+          /**
            * Verify if all of the students for a selected subskill from a module have been scored.
            *
            * @param subSkillId - The ID of the sub-skill to check
            * @returns True if all students have been scored for the sub-skill, otherwise false.
            */
           isThisSubSkillCompleted(subSkillId?: UUID, moduleId?: UUID) {
+            const moduleSelection = get().moduleSelection;
             const selectedModuleId =
-              moduleId ?? get().moduleSelection.selectedModule?.id ?? null;
+              moduleId ?? moduleSelection.selectedModuleId;
             const selectedSubSkillId =
-              subSkillId ?? get().subSkillSelection.selectedSubSkill?.id ?? null;
+              subSkillId ?? get().subSkillSelection.selectedSubSkillId;
 
             if (!selectedModuleId || !selectedSubSkillId) return false;
 
-            const presentStudentsWithAssignedTasks =
+            const presentStudents =
               ACTIONS.getPresentStudentsWithAssignedTasks(selectedSubSkillId);
 
-            for (const student of presentStudentsWithAssignedTasks) {
+            for (const student of presentStudents) {
               if (!student) continue;
 
-              const hasScore = presentStudentsWithAssignedTasks.some((s) => {
-                if (s.id !== student.id) return false;
-
+              const hasScore = presentStudents.some((s) => {
                 const evaluations = s.evaluations;
+                if (s.id !== student.id || !evaluations) return false;
 
-                if (!evaluations) return false;
+                const studentSelectedSubSkill = evaluations.modules
+                  .get(selectedModuleId)
+                  ?.subSkills.get(selectedSubSkillId);
 
-                const moduleEvaluation = evaluations.modules.get(
-                  selectedModuleId,
-                );
-
-                const studentSelectedSubSkill = moduleEvaluation?.subSkills.get(
-                  selectedSubSkillId,
-                );
-                const score = studentSelectedSubSkill?.score;
-                return score !== undefined;
+                return studentSelectedSubSkill?.score !== undefined;
               });
 
               if (!hasScore) {
@@ -459,16 +557,43 @@ export const useEvaluationStepsCreationStore = create(
               }
             }
 
+            ACTIONS.setModuleHasCompletedFlag(
+              selectedModuleId,
+              selectedSubSkillId,
+            );
             return true;
           },
           /**
-           * Get present students with assigned tasks for the selected subskill.
+           * Set the completed flag for a module's sub-skill.
+           *
+           * @param moduleId - The ID of the module
+           * @param subSkillId - The ID of the sub-skill
+           */
+          setModuleHasCompletedFlag(moduleId: UUID, subSkillId: UUID) {
+            const module = get().modules.get(moduleId);
+            const subSkill = module?.subSkills.get(subSkillId);
+
+            if (!module || !subSkill || subSkill.isCompleted) return;
+
+            const updatedSubSkill = {
+              ...subSkill,
+              isCompleted: true,
+            };
+
+            ACTIONS.updateSubSkills(updatedSubSkill, module);
+          },
+          /**
+           * FOR SUBSKILLS - CONTROLLER USE ONLY
+           *
+           * Students with assigned tasks for the selected subskill.
+           *
+           * @description Student must be present
            *
            * @returns Array of students who are present and have assigned tasks related to the selected subskill.
            */
           getPresentStudentsWithAssignedTasks(subSkillId?: UUID) {
             const selectedSubSkillId =
-              subSkillId ?? get().subSkillSelection?.selectedSubSkill?.id;
+              subSkillId ?? get().subSkillSelection?.selectedSubSkillId;
             const students = Array.from(get().students?.values() ?? []);
             const modules = Array.from(get().modules?.values() ?? []);
 
