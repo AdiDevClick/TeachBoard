@@ -15,6 +15,7 @@ import {
   evaluationRadioItemPropsInvalid,
 } from "@/configs/app-components.config.ts";
 import sanitizeDOMProps from "@/utils/props.ts";
+import { cn } from "@/utils/utils.ts";
 
 import "@css/EvaluationRadio.scss";
 import { Activity, type ComponentType, type MouseEvent } from "react";
@@ -74,7 +75,9 @@ function withEvaluationRadioItem<T extends object>(
     return (
       <FieldLabel
         htmlFor={`r-${id}`}
-        className="evaluation-radio-item"
+        className={cn("evaluation-radio-item", {
+          "bg-gray-300": safeProps.isDisabled,
+        })}
         onClick={handleClick}
         {...safeProps}
       >
@@ -87,7 +90,12 @@ function withEvaluationRadioItem<T extends object>(
                   className="evaluation-radio-item__check-icon w-4 h-4 inline-block"
                 />
               </Activity>
-              <RadioGroupItem {...iconStyle} id={`r-${id}`} value={id} />
+              <RadioGroupItem
+                {...iconStyle}
+                id={`r-${id}`}
+                value={id}
+                disabled={safeProps.isDisabled}
+              />
               <Label
                 className="evaluation-radio-item__content--title__label"
                 htmlFor={`r-${id}`}
