@@ -36,8 +36,13 @@ export type ClassTasks = {
   modules: UniqueSet<UUID, SkillsViewDto>;
 };
 
+export type ClassModuleSubSkill = SkillsType & {
+  isDisabled?: boolean;
+  isCompleted?: boolean;
+};
+
 export type ClassModules = SkillsType & {
-  subSkills: UniqueSet<UUID, SkillsType>;
+  subSkills: UniqueSet<UUID, ClassModuleSubSkill>;
   tasksList: Set<ClassTasks["id"]>;
   studentsToEvaluate?: Set<UUID>;
 };
@@ -45,20 +50,14 @@ export type ClassModules = SkillsType & {
 export type ModulesSelectionType = {
   isClicked: boolean;
   selectedModuleIndex: number | null;
-  selectedModule: Omit<ClassModules, "subSkills"> | null;
-  selectedModuleSubSkills: SkillsType[];
+  selectedModuleId: UUID | null;
 };
 
 export type SubskillSelectionType = {
   isClicked: boolean;
   selectedSubSkillIndex: number | null;
-  selectedSubSkill: SkillsType | null;
+  selectedSubSkillId: UUID | null;
 };
-
-export type SetModulesSelectionType = Omit<
-  ModulesSelectionType,
-  "selectedModuleSubSkills"
-> & { selectedModule: ClassModules };
 
 /**
  * Type for setEvaluationForStudent().
