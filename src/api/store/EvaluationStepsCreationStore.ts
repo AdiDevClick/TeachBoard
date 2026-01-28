@@ -1,12 +1,12 @@
 import {
   addNewEvaluationScore,
-  buildLinkedSubSkills,
   filterSubSkillsBasedOnStudentsAvailability,
+  isSubSkillCompletedOrDisabled,
   isThisStudentAlreadyEvaluatedForThisSubSkill,
   preparedSubSkillsForUpdate,
+  setModules,
   updateEvaluationScore,
   updateModules,
-  upsertModuleSubSkills,
 } from "@/api/store/functions/evaluation-store.functions.ts";
 import type {
   ClassModuleSubSkill,
@@ -18,10 +18,7 @@ import type {
 } from "@/api/store/types/steps-creation-store.types";
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
-import type {
-  SkillsType,
-  SkillsViewDto,
-} from "@/api/types/routes/skills.types.ts";
+import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { create } from "zustand";
@@ -107,6 +104,11 @@ export const useEvaluationStepsCreationStore = create(
             ACTIONS.setStudents(selectedClass.students);
             ACTIONS.setClassTasks(selectedClass.templates);
           },
+          /**
+           * Clear the selected class from the store.
+           *
+           * @param classId - Optional class ID to check before clearing
+           */
           clearSelectedClass(classId?: UUID) {
             set((state) => {
               if (state.selectedClass?.id === classId) {
@@ -116,8 +118,17 @@ export const useEvaluationStepsCreationStore = create(
               state.description = null;
             });
           },
+          /**
+           * Set the class tasks into the store.
+           *
+           * @description Loads the tasks and their associated modules into the store.
+           *
+           * @param tasks - The class tasks to set
+           */
           setClassTasks(tasks: ClassSummaryDto["templates"]) {
             set((state) => {
+              const savedModules = state.modules;
+
               tasks.forEach((task) => {
                 const details = {
                   id: task.id,
@@ -128,45 +139,7 @@ export const useEvaluationStepsCreationStore = create(
                   ),
                 };
                 state.tasks.set(task.id, details);
-                ACTIONS.setModules(task.modules, task.id);
-              });
-            });
-          },
-          /**
-           * @remarks In case a module is used in multiple tasks, this ensures no duplication occurs and the module is enriched with all associated task ID's.
-           *
-           * Stores the modules from a class template into the store.
-           *
-           * @param modules - The modules to set
-           * @param taskId - The task ID associated with the modules
-           */
-          setModules(
-            modules: ClassSummaryDto["templates"][number]["modules"],
-            taskId: UUID,
-          ) {
-            set((state) => {
-              (modules ?? []).forEach((module) => {
-                if (!module.id) return;
-                const { subSkills, ...rest } = module;
-
-                // Save or update module without subSkills first
-                const savedModule = state.modules.get(module.id);
-
-                if (savedModule) {
-                  savedModule.tasksList.add(taskId);
-                  upsertModuleSubSkills(savedModule, subSkills, taskId);
-                } else {
-                  const newProperties = {
-                    ...rest,
-                    subSkills: new UniqueSet<UUID, SkillsType>(
-                      null,
-                      buildLinkedSubSkills(subSkills, taskId),
-                    ),
-                    tasksList: new Set([taskId]),
-                  };
-
-                  state.modules.set(module.id, newProperties);
-                }
+                setModules(task, savedModules);
               });
             });
           },
@@ -175,6 +148,13 @@ export const useEvaluationStepsCreationStore = create(
               state.diplomaName = name;
             });
           },
+          /**
+           * Set the students into the store.
+           *
+           * @description Loads the students with default presence and task assignment values.
+           *
+           * @param students - The class students to set
+           */
           setStudents(students: ClassSummaryDto["students"]) {
             set((state) => {
               students.forEach((student) => {
@@ -188,26 +168,32 @@ export const useEvaluationStepsCreationStore = create(
               });
             });
           },
+          /**
+           * Set the presence status for a student.
+           *
+           * @description Updates the presence status of the specified student and manages module evaluations(clear) accordingly.
+           *
+           * @param studentId - The ID of the student to update
+           * @param isPresent - The presence status to set
+           */
           setStudentPresence(studentId: UUID, isPresent: boolean) {
-            set((state) => {
-              const student = state.students.get(studentId) ?? null;
+            const student = get().students.get(studentId) ?? null;
 
-              if (student) {
-                student.isPresent = isPresent;
+            if (student) {
+              student.isPresent = isPresent;
 
-                if (student.assignedTask) {
-                  ACTIONS.setStudentToModuleEvaluation(
-                    student.assignedTask.id,
-                    studentId,
-                  );
-                }
-
-                // !! IMPORTANT !! A student marked as not present should not have any assigned task or be part of module evaluations
-                if (!isPresent) {
-                  ACTIONS.clearStudentFromModuleEvaluation(studentId);
-                }
+              if (student.assignedTask) {
+                ACTIONS.setStudentToModuleEvaluation(
+                  student.assignedTask.id,
+                  studentId,
+                );
               }
-            });
+
+              // !! IMPORTANT !! A student marked as not present should not have any assigned task or be part of module evaluations
+              if (!isPresent) {
+                ACTIONS.clearStudentFromModuleEvaluation(studentId);
+              }
+            }
           },
           /**
            * Assign a task to a student.
@@ -221,27 +207,33 @@ export const useEvaluationStepsCreationStore = create(
               throw new TypeError("Both taskId and studentId are required.");
             }
 
-            const student = get().students.get(studentId);
             const task = get().tasks.get(taskId);
-            const studentEvaluations = student?.evaluations;
+            set((state) => {
+              const student = state.students.get(studentId);
+              const studentEvaluations = student?.evaluations;
 
-            if (student?.assignedTask?.id === taskId) {
-              return;
-            }
-
-            // If the student has existing evaluations, remove any scores related to the previous task's modules
-            if (studentEvaluations) {
-              for (const module of task?.modules.values() ?? []) {
-                if (!module.id) continue;
-                studentEvaluations.modules.delete(module.id);
+              if (student?.assignedTask?.id === taskId) {
+                return;
               }
-            }
 
-            if (student && task) {
-              student.assignedTask = { id: task.id, name: task.name };
+              // If the student has existing evaluations, remove any scores related to the previous task's modules
+              if (studentEvaluations) {
+                for (const module of task?.modules.values() ?? []) {
+                  if (!module.id) continue;
+                  studentEvaluations.modules.delete(module.id);
+                  const mainModule = state.modules.get(module.id);
 
-              ACTIONS.setStudentToModuleEvaluation(taskId, studentId);
-            }
+                  if (mainModule?.isCompleted) {
+                    mainModule.isCompleted = false;
+                  }
+                }
+              }
+
+              if (student && task) {
+                student.assignedTask = { id: task.id, name: task.name };
+              }
+            });
+            ACTIONS.setStudentToModuleEvaluation(taskId, studentId);
           },
           /**
            * Assign a student to module evaluations based on their assigned task.
@@ -554,6 +546,27 @@ export const useEvaluationStepsCreationStore = create(
             }
 
             return true;
+          },
+          /**
+           * Check and update the completion status of all modules based on their sub-skills.
+           */
+          checkForCompletedModules() {
+            set((state) => {
+              const modules = Array.from(state.modules?.values() ?? []);
+
+              if (modules.length === 0) return;
+
+              modules.forEach((module) => {
+                const subSkillsValues = Array.from(
+                  module.subSkills.values() ?? [],
+                );
+                const completedCount = subSkillsValues.filter(
+                  isSubSkillCompletedOrDisabled,
+                ).length;
+
+                module.isCompleted = completedCount === module.subSkills.size;
+              });
+            });
           },
           /**
            * Set the completed flag for a module's sub-skill.

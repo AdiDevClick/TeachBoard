@@ -6,14 +6,12 @@ import type {
 } from "@/api/types/routes/skills.types.ts";
 import type { UniqueSet } from "@/utils/UniqueSet.ts";
 
-export type StudentEvaluationSubSkillType = { score: number } & Omit<
-  SkillsType,
-  "isLinkedToTasks"
->;
+export type StudentEvaluationSubSkillType = { score: number } & SkillsType;
 
 export type StudentEvaluationModuleType = {
   subSkills: UniqueSet<UUID, StudentEvaluationSubSkillType>;
-} & Omit<SkillsType, "isLinkedToTasks">;
+} & SkillsType;
+
 /**
  * Student with presence information for Steps Creation.
  */
@@ -36,12 +34,16 @@ export type ClassTasks = {
   modules: UniqueSet<UUID, SkillsViewDto>;
 };
 
-export type ClassModuleSubSkill = SkillsType & {
-  isDisabled?: boolean;
+type ClassModuleSubSkillBase = SkillsType & {
   isCompleted?: boolean;
+  isDisabled?: boolean;
 };
 
-export type ClassModules = SkillsType & {
+export type ClassModuleSubSkill = ClassModuleSubSkillBase & {
+  isLinkedToTasks?: Set<ClassTasks["id"]>;
+};
+
+export type ClassModules = ClassModuleSubSkillBase & {
   subSkills: UniqueSet<UUID, ClassModuleSubSkill>;
   tasksList: Set<ClassTasks["id"]>;
   studentsToEvaluate?: Set<UUID>;
@@ -61,6 +63,8 @@ export type SubskillSelectionType = {
 
 /**
  * Type for setEvaluationForStudent().
+ *
+ * @description This intentionally omits the full details for subSkill.
  */
 export type EvaluationType = {
   subSkill: SkillsType | null;

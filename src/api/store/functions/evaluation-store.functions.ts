@@ -15,6 +15,7 @@ import type {
   StudentWithPresence,
 } from "@/api/store/types/steps-creation-store.types.ts";
 import type { UUID } from "@/api/types/openapi/common.types.ts";
+import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
 import type { SkillsType } from "@/api/types/routes/skills.types.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import type { WritableDraft } from "immer";
@@ -233,4 +234,57 @@ export function isThisStudentAlreadyEvaluatedForThisSubSkill(
     ?.subSkills.get(subSkillId);
 
   return studentSelectedSubSkill?.score !== undefined;
+}
+
+/**
+ * Check if a sub-skill is completed or disabled.
+ *
+ * @param subSkill - The sub-skill to check
+ *
+ * @returns True if the sub-skill is completed or disabled, false otherwise.
+ */
+export function isSubSkillCompletedOrDisabled(subSkill?: ClassModuleSubSkill) {
+  if (!subSkill) return false;
+  const { isCompleted, isDisabled } = subSkill;
+
+  return Boolean(isCompleted) || Boolean(isDisabled);
+}
+
+/**
+ * @remarks In case a module is used in multiple tasks, this ensures no duplication occurs and the module is enriched with all associated task ID's.
+ *
+ * Stores the modules from a class template into the store.
+ *
+ * @param task - The class template task containing modules
+ * @param savedModules - The existing saved modules in the store
+ */
+export function setModules(
+  task: ClassSummaryDto["templates"][number],
+  savedModules?: WritableDraft<StepsCreationState>["modules"],
+) {
+  const { modules, id } = task;
+
+  (modules ?? []).forEach((module) => {
+    if (!module.id) return;
+    const { subSkills, ...rest } = module;
+
+    // Save or update module without subSkills first
+    const savedModule = savedModules?.get(module.id);
+
+    if (savedModule) {
+      savedModule.tasksList.add(id);
+      upsertModuleSubSkills(savedModule, subSkills, id);
+    } else {
+      const newProperties = {
+        ...rest,
+        subSkills: new UniqueSet<UUID, SkillsType>(
+          null,
+          buildLinkedSubSkills(subSkills, id),
+        ),
+        tasksList: new Set([id]),
+      };
+
+      savedModules?.set(module.id, newProperties);
+    }
+  });
 }

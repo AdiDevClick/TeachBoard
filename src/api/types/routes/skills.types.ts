@@ -28,7 +28,6 @@ export type SkillsType = {
   id: UUID;
   code: string;
   name: string;
-  isLinkedToTasks?: Set<ClassTasks["id"]>;
 };
 
 export type SkillsFormValues = {
