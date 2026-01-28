@@ -6,6 +6,7 @@ import {
 } from "@/configs/app-components.config.ts";
 import { useStepThreeHandler } from "@/hooks/useStepThreeHandler.ts";
 import type { StepThreeModuleSelectionControllerProps } from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
+import { useEffect } from "react";
 
 /**
  * Step Three Module Selection Controller.
@@ -19,11 +20,22 @@ export function StepThreeModuleSelectionController(
   props: StepThreeModuleSelectionControllerProps,
 ) {
   const { formId, modules } = props;
+
   const {
     handleModuleChangeCallback,
     handleSameModuleSelectionClickCallback,
+    checkForCompletedModules,
     selectedModuleId,
   } = useStepThreeHandler(modules);
+
+  /**
+   * INIT - CHECK FOR COMPLETED MODULES
+   *
+   * @description Check for completed modules upon initial render.
+   */
+  useEffect(() => {
+    checkForCompletedModules();
+  }, []);
 
   if (stepThreeModuleSelectionControllerPropsInvalid(props)) {
     debugLogs("StepThreeModuleSelectionController", props);
