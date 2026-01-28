@@ -84,6 +84,7 @@ export function StepThree({
   const moduleSelectionState = useEvaluationStepsCreationStore(
     (state) => state.moduleSelection,
   );
+
   const setShowStudentsEvaluation = useEvaluationStepsCreationStore(
     (state) => state.setModuleSelectionIsClicked,
   );
@@ -182,16 +183,7 @@ export function StepThree({
             onClick={handlePreviousClick}
             data-name="modules-previous"
           />
-          <StudentsEvaluation
-            {...commonProps}
-            // card={{
-            //   ...commonProps.card,
-            //   title: {
-            //     ...commonProps.card.title,
-            //     description: <Badge>{selectedSubSkill?.name}</Badge>,
-            //   },
-            // }}
-          >
+          <StudentsEvaluation {...commonProps}>
             <StudentsEvaluation.Title />
             <StudentsEvaluation.Content />
           </StudentsEvaluation>
