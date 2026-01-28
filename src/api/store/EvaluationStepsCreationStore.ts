@@ -2,6 +2,7 @@ import {
   addNewEvaluationScore,
   buildLinkedSubSkills,
   filterSubSkillsBasedOnStudentsAvailability,
+  isThisStudentAlreadyEvaluatedForThisSubSkill,
   preparedSubSkillsForUpdate,
   updateEvaluationScore,
   updateModules,
@@ -532,6 +533,8 @@ export const useEvaluationStepsCreationStore = create(
             const presentStudents =
               ACTIONS.getPresentStudentsWithAssignedTasks(selectedSubSkillId);
 
+            // This sub-skill has no students to evaluate
+            // And should be considered as isDisabled instead of completed
             if (presentStudents.length === 0) {
               return false;
             }
@@ -539,16 +542,11 @@ export const useEvaluationStepsCreationStore = create(
             for (const student of presentStudents) {
               if (!student) continue;
 
-              const hasScore = presentStudents.some((s) => {
-                const evaluations = s.evaluations;
-                if (s.id !== student.id || !evaluations) return false;
-
-                const studentSelectedSubSkill = evaluations.modules
-                  .get(selectedModuleId)
-                  ?.subSkills.get(selectedSubSkillId);
-
-                return studentSelectedSubSkill?.score !== undefined;
-              });
+              const hasScore = isThisStudentAlreadyEvaluatedForThisSubSkill(
+                student,
+                selectedModuleId,
+                selectedSubSkillId,
+              );
 
               if (!hasScore) {
                 return false;
@@ -564,7 +562,7 @@ export const useEvaluationStepsCreationStore = create(
            * @param subSkillId - The ID of the sub-skill
            * @param completed - Whether the sub-skill is completed
            */
-          setModuleHasCompleted(
+          setSubSkillHasCompleted(
             moduleId: UUID,
             subSkillId: UUID,
             completed: boolean,

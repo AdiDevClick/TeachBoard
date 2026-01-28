@@ -4,6 +4,7 @@
  * These functions handle the management of sub-skills within modules,
  */
 
+import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
 import type {
   ClassModules,
   ClassModuleSubSkill,
@@ -17,7 +18,6 @@ import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { SkillsType } from "@/api/types/routes/skills.types.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import type { WritableDraft } from "immer";
-import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
 
 /**
  * Build linked sub-skills with associated task IDs.
@@ -209,4 +209,28 @@ export function filterSubSkillsBasedOnStudentsAvailability(
   } else {
     enabled.push(newObject);
   }
+}
+
+/**
+ * Verify if a student has an evaluation for a specific sub-skill within a module.
+ *
+ * @param student - The student to check
+ * @param moduleId - The ID of the module
+ * @param subSkillId - The ID of the sub-skill
+ *
+ * @returns True if the student has an evaluation for the specified sub-skill, false otherwise.
+ */
+export function isThisStudentAlreadyEvaluatedForThisSubSkill(
+  student: StudentWithPresence,
+  moduleId: UUID,
+  subSkillId: UUID,
+): boolean {
+  const evaluations = student.evaluations;
+  if (!evaluations) return false;
+
+  const studentSelectedSubSkill = evaluations.modules
+    .get(moduleId)
+    ?.subSkills.get(subSkillId);
+
+  return studentSelectedSubSkill?.score !== undefined;
 }
