@@ -1,6 +1,7 @@
 import {
   addNewEvaluationScore,
   buildLinkedSubSkills,
+  filterSubSkillsBasedOnStudentsAvailability,
   preparedSubSkillsForUpdate,
   updateEvaluationScore,
   updateModules,
@@ -361,6 +362,13 @@ export const useEvaluationStepsCreationStore = create(
               return;
             }
 
+            const newSubSkillItem = {
+              id: subSkill.id,
+              name: subSkill.name,
+              code: subSkill.code,
+              score,
+            };
+
             set((state) => {
               const student = state.students.get(studentId);
               if (!student) return;
@@ -373,13 +381,6 @@ export const useEvaluationStepsCreationStore = create(
                 };
                 student.evaluations = existingStudentEvaluation;
               }
-
-              const newSubSkillItem = {
-                id: subSkill.id,
-                name: subSkill.name,
-                code: subSkill.code,
-                score,
-              };
 
               const modulesList = existingStudentEvaluation?.modules;
               const existingModuleSet = modulesList.get(module.id);
@@ -410,37 +411,32 @@ export const useEvaluationStepsCreationStore = create(
           disableSubSkillsWithoutStudents(moduleId?: UUID) {
             if (!moduleId) return;
             const module = get().modules.get(moduleId);
-            if (!module) return;
-
             const subSkills = module?.subSkills;
-            if (!subSkills) return;
+
+            if (!module || !subSkills) return;
 
             const values = Array.from(subSkills.values() ?? []);
 
-            const enabled: ClassModuleSubSkill[] = [];
-            const disabled: ClassModuleSubSkill[] = [];
+            const enabledSubSkills: ClassModuleSubSkill[] = [];
+            const disabledSubSkills: ClassModuleSubSkill[] = [];
 
             values.forEach((subSkill) => {
               const noStudentsAvailable =
                 ACTIONS.getPresentStudentsWithAssignedTasks(subSkill.id)
                   .length === 0;
 
-              const newObject = {
-                ...subSkill,
-                isDisabled: noStudentsAvailable,
-              };
-
-              if (noStudentsAvailable) {
-                disabled.push(newObject);
-              } else {
-                enabled.push(newObject);
-              }
+              filterSubSkillsBasedOnStudentsAvailability(
+                noStudentsAvailable,
+                subSkill,
+                disabledSubSkills,
+                enabledSubSkills,
+              );
             });
 
             set((state) => {
               const reordered = new UniqueSet<UUID, ClassModuleSubSkill>(null, [
-                ...enabled,
-                ...disabled,
+                ...enabledSubSkills,
+                ...disabledSubSkills,
               ]);
               updateModules(state, module, { subSkills: reordered });
             });
@@ -526,10 +522,8 @@ export const useEvaluationStepsCreationStore = create(
            * @returns True if all students have been scored for the sub-skill, otherwise false.
            */
           isThisSubSkillCompleted(subSkillId?: UUID, moduleId?: UUID) {
-            const moduleSelection = get().moduleSelection;
-
             const selectedModuleId =
-              moduleId ?? moduleSelection.selectedModuleId;
+              moduleId ?? get().moduleSelection.selectedModuleId;
             const selectedSubSkillId =
               subSkillId ?? get().subSkillSelection.selectedSubSkillId;
 
@@ -610,10 +604,10 @@ export const useEvaluationStepsCreationStore = create(
             const selectedSubSkillId =
               subSkillId ?? get().subSkillSelection?.selectedSubSkillId;
 
+            if (!selectedSubSkillId) return [];
+
             const students = Array.from(get().students?.values() ?? []);
             const modules = Array.from(get().modules?.values() ?? []);
-
-            if (!selectedSubSkillId) return [];
 
             return students.filter((student) => {
               const { assignedTask, isPresent, id } = student;

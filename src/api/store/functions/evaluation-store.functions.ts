@@ -17,6 +17,7 @@ import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { SkillsType } from "@/api/types/routes/skills.types.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import type { WritableDraft } from "immer";
+import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
 
 /**
  * Build linked sub-skills with associated task IDs.
@@ -178,4 +179,34 @@ export function preparedSubSkillsForUpdate(
   }
 
   return updatedSubSkills;
+}
+
+/**
+ * Filter sub-skills based on students availability.
+ *
+ * @description - This function checks if there are no students available for a given sub-skill and categorizes it into disabled or enabled arrays accordingly.
+ *
+ * {@link disableSubSkillsWithoutStudents} in {@link useEvaluationStepsCreationStore} uses this function.
+ *
+ * @param noStudentsAvailable - Whether there are no students available for the sub-skill
+ * @param subSkill - The sub-skill to process
+ * @param disabled - Array to collect disabled sub-skills
+ * @param enabled - Array to collect enabled sub-skills
+ */
+export function filterSubSkillsBasedOnStudentsAvailability(
+  noStudentsAvailable: boolean,
+  subSkill: ClassModuleSubSkill,
+  disabled: ClassModuleSubSkill[],
+  enabled: ClassModuleSubSkill[],
+) {
+  const newObject = {
+    ...subSkill,
+    isDisabled: noStudentsAvailable,
+  };
+
+  if (noStudentsAvailable) {
+    disabled.push(newObject);
+  } else {
+    enabled.push(newObject);
+  }
 }
