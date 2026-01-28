@@ -23,6 +23,7 @@ export function useStepThreeHandler(
   const setModuleSelection = useEvaluationStepsCreationStore(
     (state) => state.setModuleSelection,
   );
+
   const setSubskillSelection = useEvaluationStepsCreationStore(
     (state) => state.setSubskillSelection,
   );
@@ -30,17 +31,12 @@ export function useStepThreeHandler(
   const selectedModuleId = useEvaluationStepsCreationStore(
     (state) => state.moduleSelection.selectedModuleId ?? null,
   );
+  const checkForCompletedModules = useEvaluationStepsCreationStore(
+    (state) => state.checkForCompletedModules,
+  );
 
   const selectedSubSkillId = useEvaluationStepsCreationStore(
     (state) => state.subSkillSelection.selectedSubSkillId,
-  );
-
-  const isThisSubSkillCompleted = useEvaluationStepsCreationStore(
-    useShallow((state) => state.isThisSubSkillCompleted),
-  );
-
-  const setModuleHasCompleted = useEvaluationStepsCreationStore(
-    (state) => state.setModuleHasCompleted,
   );
 
   const disableSubSkillsWithoutStudents = useEvaluationStepsCreationStore(
@@ -82,7 +78,7 @@ export function useStepThreeHandler(
         selectedModuleId: selectedModule.item.id,
       });
     },
-    [modulesOrSubSkills],
+    [modulesOrSubSkills, selectedModuleId],
   );
   /**
    * Handles the change of selected sub-skill.
@@ -106,21 +102,6 @@ export function useStepThreeHandler(
 
       if (!selectedSubSkill?.item) {
         return;
-      }
-      const isCompleted = isThisSubSkillCompleted(
-        selectedSubSkill.item.id,
-        selectedModuleId ?? undefined,
-      );
-
-      if (
-        selectedModuleId &&
-        selectedSubSkill.item.isCompleted !== isCompleted
-      ) {
-        setModuleHasCompleted(
-          selectedModuleId,
-          selectedSubSkill.item.id,
-          isCompleted,
-        );
       }
 
       setSubskillSelection({
@@ -164,6 +145,7 @@ export function useStepThreeHandler(
     handleModuleChangeCallback,
     handleSubSkillChangeCallback,
     handleSameModuleSelectionClickCallback,
+    checkForCompletedModules,
     selectedSubSkill,
     selectedModuleId,
     selectedSubSkillId,
