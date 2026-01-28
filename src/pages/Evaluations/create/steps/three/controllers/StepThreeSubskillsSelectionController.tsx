@@ -62,19 +62,20 @@ export function StepThreeSubskillsSelectionController(
       (subSkill) => !subSkill.isDisabled,
     );
 
-    const shouldSelectFirstEnabled = selectedSubSkill?.isDisabled;
+    const shouldSelectFirstEnabled =
+      !selectedSubSkill?.id || selectedSubSkill?.isDisabled;
 
     if (shouldSelectFirstEnabled && firstActivableSubSkill?.id) {
       handleSubSkillChangeCallback(firstActivableSubSkill.id);
     }
-  }, [subSkills]);
+  }, [selectedModuleId, selectedSubSkill?.isDisabled]);
 
   if (stepThreeSubskillsSelectionControllerPropsInvalid(props)) {
     debugLogs("StepThreeSubskillsSelectionController", props);
     return null;
   }
 
-  const selectedId = selectedSubSkillId ?? subSkills[0]?.id ?? "";
+  const selectedId = selectedSubSkillId ?? subSkills[0]?.id;
 
   return (
     <form id={formId}>
@@ -86,7 +87,6 @@ export function StepThreeSubskillsSelectionController(
       <Activity mode={subSkills.length > 0 ? "visible" : "hidden"}>
         <RadioGroup
           value={selectedId}
-          defaultValue={subSkills[0]?.id ?? ""}
           onValueChange={handleSubSkillChangeCallback}
         >
           <EvaluationRadioItemWithoutDescriptionList items={subSkills} />
