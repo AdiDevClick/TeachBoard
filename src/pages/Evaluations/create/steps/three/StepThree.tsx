@@ -109,9 +109,11 @@ export function StepThree({
       return stepThreeModuleSelectionCardProps;
     }
 
-    const description = selectedSubSkill?.name
-      ? <Badge>{selectedSubSkill?.name}</Badge>
-      : stepThreeSubskillsSelectionTitleProps.description;
+    const description = selectedSubSkill?.name ? (
+      <Badge>{selectedSubSkill?.name}</Badge>
+    ) : (
+      stepThreeSubskillsSelectionTitleProps.description
+    );
     // const description = selectedSubSkill?.name
     //   ? `Vous évaluez "${selectedSubSkill.name}"`
     //   : stepThreeSubskillsSelectionTitleProps.description;
@@ -125,34 +127,21 @@ export function StepThree({
     };
   }, [moduleSelectionState.isClicked, selectedSubSkill?.name]);
 
-  const commonProps = useMemo(
-    () => ({
-      pageId,
-      modalMode,
-      className,
-      formId,
-      inputControllers,
-      card,
-      ...props,
-      form,
-      user,
-      students: evaluatedStudentsForThisSubskill,
-      modules,
-      selectedClass: selectedClass ?? null,
-      tasks,
-    }),
-    [
-      card,
-      evaluatedStudentsForThisSubskill,
-      form,
-      inputControllers,
-      modules,
-      props,
-      selectedClass,
-      tasks,
-      user,
-    ],
-  );
+  const commonProps = {
+    pageId,
+    modalMode,
+    className,
+    formId,
+    inputControllers,
+    card,
+    ...props,
+    form,
+    user,
+    students: evaluatedStudentsForThisSubskill,
+    modules,
+    selectedClass: selectedClass ?? null,
+    tasks,
+  };
 
   const handlePreviousClick = (e: MouseEvent<SVGSVGElement>) => {
     preventDefaultAndStopPropagation(e);
