@@ -1,3 +1,4 @@
+import { createStepsCreationDebugRehydrators } from "@/api/store/functions/debug.functions.ts";
 import {
   addNewEvaluationScore,
   filterSubSkillsBasedOnStudentsAvailability,
@@ -19,6 +20,7 @@ import type {
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
 import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
+import { DEV_MODE } from "@/configs/app.config.ts";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { create } from "zustand";
@@ -61,13 +63,16 @@ export const useEvaluationStepsCreationStore = create(
   devtools(
     immer(
       combine(DEFAULT_VALUES_STEPS_CREATION_STATE, (set, get) => {
+        const { ensureCollectionsInDraft, ensureCollections } =
+          createStepsCreationDebugRehydrators(get, set);
+
         const ACTIONS = {
           clear: (classId: UUID) => {
             if (get().selectedClass?.id === classId) {
               return false;
             }
 
-            set(createDefaultStepsCreationState());
+            set(createDefaultStepsCreationState(), undefined, "clearStore");
 
             return true;
           },
@@ -88,18 +93,22 @@ export const useEvaluationStepsCreationStore = create(
 
             if (!shouldClear) return;
 
-            set((state) => {
-              const { id, description, evaluations, name } = selectedClass;
+            set(
+              (state) => {
+                const { id, description, evaluations, name } = selectedClass;
 
-              return {
-                ...state,
-                selectedClass,
-                id: id || null,
-                description: description || null,
-                evaluations: evaluations || null,
-                className: name || null,
-              };
-            });
+                return {
+                  ...state,
+                  selectedClass,
+                  id: id || null,
+                  description: description || null,
+                  evaluations: evaluations || null,
+                  className: name || null,
+                };
+              },
+              undefined,
+              "setSelectedClass",
+            );
 
             ACTIONS.setStudents(selectedClass.students);
             ACTIONS.setClassTasks(selectedClass.templates);
@@ -110,13 +119,17 @@ export const useEvaluationStepsCreationStore = create(
            * @param classId - Optional class ID to check before clearing
            */
           clearSelectedClass(classId?: UUID) {
-            set((state) => {
-              if (state.selectedClass?.id === classId) {
-                return state;
-              }
-              state.selectedClass = null;
-              state.description = null;
-            });
+            set(
+              (state) => {
+                if (state.selectedClass?.id === classId) {
+                  return state;
+                }
+                state.selectedClass = null;
+                state.description = null;
+              },
+              undefined,
+              "clearSelectedClass",
+            );
           },
           /**
            * Set the class tasks into the store.
@@ -126,27 +139,36 @@ export const useEvaluationStepsCreationStore = create(
            * @param tasks - The class tasks to set
            */
           setClassTasks(tasks: ClassSummaryDto["templates"]) {
-            set((state) => {
-              const savedModules = state.modules;
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                const savedModules = state.modules;
 
-              tasks.forEach((task) => {
-                const details = {
-                  id: task.id,
-                  name: task.taskName ?? null,
-                  modules: new UniqueSet<UUID, SkillsViewDto>(
-                    null,
-                    task.modules ?? [],
-                  ),
-                };
-                state.tasks.set(task.id, details);
-                setModules(task, savedModules);
-              });
-            });
+                tasks.forEach((task) => {
+                  const details = {
+                    id: task.id,
+                    name: task.taskName ?? null,
+                    modules: new UniqueSet<UUID, SkillsViewDto>(
+                      null,
+                      task.modules ?? [],
+                    ),
+                  };
+                  state.tasks.set(task.id, details);
+                  setModules(task, savedModules);
+                });
+              },
+              undefined,
+              "setClassTasks",
+            );
           },
           setDiplomaName(name: string) {
-            set((state) => {
-              state.diplomaName = name;
-            });
+            set(
+              (state) => {
+                state.diplomaName = name;
+              },
+              undefined,
+              "setDiplomaName",
+            );
           },
           /**
            * Set the students into the store.
@@ -156,17 +178,22 @@ export const useEvaluationStepsCreationStore = create(
            * @param students - The class students to set
            */
           setStudents(students: ClassSummaryDto["students"]) {
-            set((state) => {
-              students.forEach((student) => {
-                const details = {
-                  id: student.id,
-                  fullName: student.firstName + " " + student.lastName,
-                  isPresent: false,
-                  assignedTask: null,
-                };
-                state.students.set(student.id, details);
-              });
-            });
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                students.forEach((student) => {
+                  const details = {
+                    id: student.id,
+                    fullName: student.firstName + " " + student.lastName,
+                    isPresent: false,
+                    assignedTask: null,
+                  };
+                  state.students.set(student.id, details);
+                });
+              },
+              undefined,
+              "setStudents",
+            );
           },
           /**
            * Set the presence status for a student.
@@ -177,6 +204,7 @@ export const useEvaluationStepsCreationStore = create(
            * @param isPresent - The presence status to set
            */
           setStudentPresence(studentId: UUID, isPresent: boolean) {
+            ensureCollections();
             const student = get().students.get(studentId) ?? null;
 
             if (student) {
@@ -206,34 +234,41 @@ export const useEvaluationStepsCreationStore = create(
             if (!taskId || !studentId) {
               throw new TypeError("Both taskId and studentId are required.");
             }
+            let previousTaskId: UUID | null | undefined = null;
+            ensureCollections();
+            const nextTask = get().tasks.get(taskId);
 
-            const task = get().tasks.get(taskId);
-            set((state) => {
-              const student = state.students.get(studentId);
-              const studentEvaluations = student?.evaluations;
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                const student = state.students.get(studentId);
+                previousTaskId = student?.assignedTask?.id;
 
-              if (student?.assignedTask?.id === taskId) {
-                return;
-              }
-
-              // If the student has existing evaluations, remove any scores related to the previous task's modules
-              if (studentEvaluations) {
-                for (const module of task?.modules.values() ?? []) {
-                  if (!module.id) continue;
-                  studentEvaluations.modules.delete(module.id);
-                  const mainModule = state.modules.get(module.id);
-
-                  if (mainModule?.isCompleted) {
-                    mainModule.isCompleted = false;
-                  }
+                if (!student || previousTaskId === taskId) {
+                  return;
                 }
-              }
 
-              if (student && task) {
-                student.assignedTask = { id: task.id, name: task.name };
-              }
-            });
+                const studentEvaluations = student?.evaluations;
+
+                // Clear all existing evaluations when changing tasks
+                if (studentEvaluations && previousTaskId) {
+                  student.evaluations = null;
+                }
+
+                if (nextTask) {
+                  student.assignedTask = {
+                    id: nextTask.id,
+                    name: nextTask.name,
+                  };
+                }
+              },
+              undefined,
+              "setStudentTaskAssignment",
+            );
+
+            ACTIONS.clearStudentFromModuleEvaluation(studentId);
             ACTIONS.setStudentToModuleEvaluation(taskId, studentId);
+            ACTIONS.refreshCompletionForTasks([previousTaskId!, taskId]);
           },
           /**
            * Assign a student to module evaluations based on their assigned task.
@@ -246,22 +281,27 @@ export const useEvaluationStepsCreationStore = create(
            * @param studentId - The ID of the student to assign
            */
           setStudentToModuleEvaluation(taskId: UUID, studentId: UUID) {
-            set((state) => {
-              const student = state.students.get(studentId);
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                const student = state.students.get(studentId);
 
-              for (const module of state.modules.values()) {
-                if (module.tasksList.has(taskId)) {
-                  const toEvaluate = (module.studentsToEvaluate ??=
-                    new Set<UUID>());
+                for (const module of state.modules.values()) {
+                  if (module.tasksList.has(taskId)) {
+                    const toEvaluate = (module.studentsToEvaluate ??=
+                      new Set<UUID>());
 
-                  if (student?.isPresent) {
-                    toEvaluate.add(studentId);
-                  } else {
-                    toEvaluate.delete(studentId);
+                    if (student?.isPresent) {
+                      toEvaluate.add(studentId);
+                    } else {
+                      toEvaluate.delete(studentId);
+                    }
                   }
                 }
-              }
-            });
+              },
+              undefined,
+              "setStudentToModuleEvaluation",
+            );
           },
           /**
            * Clear a student from all module evaluations.
@@ -271,14 +311,19 @@ export const useEvaluationStepsCreationStore = create(
            * @param studentId - The ID of the student to clear
            */
           clearStudentFromModuleEvaluation(studentId: UUID) {
-            set((state) => {
-              for (const module of state.modules.values()) {
-                const toEvaluate = module.studentsToEvaluate;
-                if (toEvaluate?.has(studentId)) {
-                  toEvaluate.delete(studentId);
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                for (const module of state.modules.values()) {
+                  const toEvaluate = module.studentsToEvaluate;
+                  if (toEvaluate?.has(studentId)) {
+                    toEvaluate.delete(studentId);
+                  }
                 }
-              }
-            });
+              },
+              undefined,
+              "clearStudentFromModuleEvaluation",
+            );
           },
           /**
            * Set the current module selection state.
@@ -290,16 +335,20 @@ export const useEvaluationStepsCreationStore = create(
           setModuleSelection(args: ModulesSelectionType) {
             const { isClicked, selectedModuleIndex, selectedModuleId } = args;
 
-            set((state) => {
-              const selection = state.moduleSelection;
+            set(
+              (state) => {
+                const selection = state.moduleSelection;
 
-              state.moduleSelection = {
-                ...selection,
-                isClicked,
-                selectedModuleIndex,
-                selectedModuleId,
-              };
-            });
+                state.moduleSelection = {
+                  ...selection,
+                  isClicked,
+                  selectedModuleIndex,
+                  selectedModuleId,
+                };
+              },
+              undefined,
+              "setModuleSelection",
+            );
           },
           /**
            * Set the module selection "isClicked" state.
@@ -307,9 +356,13 @@ export const useEvaluationStepsCreationStore = create(
            * @param isClicked - Whether a module has been clicked
            */
           setModuleSelectionIsClicked(isClicked: boolean) {
-            set((state) => {
-              state.moduleSelection.isClicked = isClicked;
-            });
+            set(
+              (state) => {
+                state.moduleSelection.isClicked = isClicked;
+              },
+              undefined,
+              "setModuleSelectionIsClicked",
+            );
           },
           /**
            * Set the subskill selection state.
@@ -319,27 +372,31 @@ export const useEvaluationStepsCreationStore = create(
             const { isClicked, selectedSubSkillIndex, selectedSubSkillId } =
               args;
 
-            set((state) => {
-              const selection = state.subSkillSelection;
-              const moduleId = state.moduleSelection.selectedModuleId;
-              const module = moduleId ? state.modules.get(moduleId) : null;
+            set(
+              (state) => {
+                const selection = state.subSkillSelection;
+                const moduleId = state.moduleSelection.selectedModuleId;
+                const module = moduleId ? state.modules.get(moduleId) : null;
 
-              if (!selectedSubSkillId || !module) {
-                return;
-              }
+                if (!selectedSubSkillId || !module) {
+                  return;
+                }
 
-              // Ensure the selected subskill belongs to the selected module
-              if (!module.subSkills.has(selectedSubSkillId)) {
-                return;
-              }
+                // Ensure the selected subskill belongs to the selected module
+                if (!module.subSkills.has(selectedSubSkillId)) {
+                  return;
+                }
 
-              state.subSkillSelection = {
-                ...selection,
-                isClicked,
-                selectedSubSkillIndex,
-                selectedSubSkillId,
-              };
-            });
+                state.subSkillSelection = {
+                  ...selection,
+                  isClicked,
+                  selectedSubSkillIndex,
+                  selectedSubSkillId,
+                };
+              },
+              undefined,
+              "setSubskillSelection",
+            );
           },
           /**
            * Set evaluation for student
@@ -362,39 +419,44 @@ export const useEvaluationStepsCreationStore = create(
               score,
             };
 
-            set((state) => {
-              const student = state.students.get(studentId);
-              if (!student) return;
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                const student = state.students.get(studentId);
+                if (!student) return;
 
-              let existingStudentEvaluation = student?.evaluations;
+                let existingStudentEvaluation = student?.evaluations;
 
-              if (!existingStudentEvaluation) {
-                existingStudentEvaluation = {
-                  modules: new UniqueSet(),
-                };
-                student.evaluations = existingStudentEvaluation;
-              }
+                if (!existingStudentEvaluation) {
+                  existingStudentEvaluation = {
+                    modules: new UniqueSet(),
+                  };
+                  student.evaluations = existingStudentEvaluation;
+                }
 
-              const modulesList = existingStudentEvaluation?.modules;
-              const existingModuleSet = modulesList.get(module.id);
+                const modulesList = existingStudentEvaluation?.modules;
+                const existingModuleSet = modulesList.get(module.id);
 
-              if (existingModuleSet) {
-                updateEvaluationScore(
-                  existingModuleSet,
-                  newSubSkillItem,
-                  modulesList,
-                );
-              } else {
-                addNewEvaluationScore(
-                  existingStudentEvaluation,
-                  module,
-                  newSubSkillItem,
-                  modulesList,
-                );
+                if (existingModuleSet) {
+                  updateEvaluationScore(
+                    existingModuleSet,
+                    newSubSkillItem,
+                    modulesList,
+                  );
+                } else {
+                  addNewEvaluationScore(
+                    existingStudentEvaluation,
+                    module,
+                    newSubSkillItem,
+                    modulesList,
+                  );
 
-                existingStudentEvaluation.modules = modulesList;
-              }
-            });
+                  existingStudentEvaluation.modules = modulesList;
+                }
+              },
+              undefined,
+              "setEvaluationForStudent",
+            );
           },
           /**
            * Disable a sub-skill if no students are to be evaluated for it.
@@ -403,6 +465,7 @@ export const useEvaluationStepsCreationStore = create(
            */
           disableSubSkillsWithoutStudents(moduleId?: UUID) {
             if (!moduleId) return;
+            ensureCollections();
             const module = get().modules.get(moduleId);
             const subSkills = module?.subSkills;
 
@@ -426,13 +489,18 @@ export const useEvaluationStepsCreationStore = create(
               );
             });
 
-            set((state) => {
-              const reordered = new UniqueSet<UUID, ClassModuleSubSkill>(null, [
-                ...enabledSubSkills,
-                ...disabledSubSkills,
-              ]);
-              updateModules(state, module, { subSkills: reordered });
-            });
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                const reordered = new UniqueSet<UUID, ClassModuleSubSkill>(
+                  null,
+                  [...enabledSubSkills, ...disabledSubSkills],
+                );
+                updateModules(state, module, { subSkills: reordered });
+              },
+              undefined,
+              "disableSubSkillsWithoutStudents",
+            );
           },
           /**
            * Get modules that have students assigned for evaluation.
@@ -440,6 +508,7 @@ export const useEvaluationStepsCreationStore = create(
            * @returns Array of modules with students to evaluate.
            */
           getAttendedModules() {
+            ensureCollections();
             return Array.from(get().modules?.values() ?? []).filter(
               (module) => (module.studentsToEvaluate?.size ?? 0) > 0,
             );
@@ -450,6 +519,7 @@ export const useEvaluationStepsCreationStore = create(
            * @returns Array of students with presence and task assignment details.
            */
           getStudentsPresenceSelectionData() {
+            ensureCollections();
             const values = Array.from(get().students?.values() ?? []);
 
             const students = new ObjectReshape(values || [])
@@ -472,12 +542,14 @@ export const useEvaluationStepsCreationStore = create(
            * Get all modules of the selected class.
            */
           getSelectedClassModules() {
+            ensureCollections();
             return Array.from(get().modules?.values() ?? []);
           },
           /**
            * Get the currently selected module from the core store.
            */
           getSelectedModule(moduleId?: UUID) {
+            ensureCollections();
             const selectedModuleId =
               moduleId ?? get().moduleSelection.selectedModuleId;
 
@@ -489,6 +561,7 @@ export const useEvaluationStepsCreationStore = create(
            * Get the sub-skills for the currently selected module.
            */
           getSelectedModuleSubSkills(moduleId?: UUID) {
+            ensureCollections();
             const module = ACTIONS.getSelectedModule(moduleId);
 
             if (!module) return [];
@@ -499,6 +572,7 @@ export const useEvaluationStepsCreationStore = create(
            * Get the currently selected sub-skill from the core store.
            */
           getSelectedSubSkill(subSkillId?: UUID, moduleId?: UUID) {
+            ensureCollections();
             const selectedSubSkillId =
               subSkillId ?? get().subSkillSelection.selectedSubSkillId;
 
@@ -551,21 +625,56 @@ export const useEvaluationStepsCreationStore = create(
            * Check and update the completion status of all modules based on their sub-skills.
            */
           checkForCompletedModules() {
-            set((state) => {
-              const modules = Array.from(state.modules?.values() ?? []);
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                const modules = Array.from(state.modules?.values() ?? []);
 
-              if (modules.length === 0) return;
+                if (modules.length === 0) return;
 
-              modules.forEach((module) => {
-                const subSkillsValues = Array.from(
-                  module.subSkills.values() ?? [],
-                );
-                const completedCount = subSkillsValues.filter(
-                  isSubSkillCompletedOrDisabled,
-                ).length;
+                modules.forEach((module) => {
+                  const subSkillsValues = Array.from(
+                    module.subSkills.values() ?? [],
+                  );
+                  const completedCount = subSkillsValues.filter(
+                    isSubSkillCompletedOrDisabled,
+                  ).length;
 
-                module.isCompleted = completedCount === module.subSkills.size;
-              });
+                  const isCompleted = completedCount === module.subSkills.size;
+
+                  if (module.isCompleted !== isCompleted) {
+                    updateModules(state, module, { isCompleted });
+                  }
+                });
+              },
+              undefined,
+              "checkForCompletedModules",
+            );
+          },
+          /**
+           * Recalculate sub-skill and module completion for affected tasks.
+           *
+           * @param taskIds - The task IDs that may impact module completion.
+           */
+          refreshCompletionForTasks(taskIds: Array<UUID>) {
+            ensureCollections();
+            const affectedModules = Array.from(get().modules.values()).filter(
+              (module) =>
+                taskIds.some((taskId) => module.tasksList.has(taskId)),
+            );
+
+            affectedModules.forEach((module) => {
+              for (const subSkill of module.subSkills.values()) {
+                if (!subSkill.id || !module.id) continue;
+
+                if (subSkill.isCompleted !== false) {
+                  ACTIONS.setSubSkillHasCompleted(
+                    module.id,
+                    subSkill.id,
+                    false,
+                  );
+                }
+              }
             });
           },
           /**
@@ -580,6 +689,7 @@ export const useEvaluationStepsCreationStore = create(
             subSkillId: UUID,
             completed: boolean,
           ) {
+            ensureCollections();
             const module = get().modules.get(moduleId);
             const subSkill = module?.subSkills.get(subSkillId);
 
@@ -598,9 +708,14 @@ export const useEvaluationStepsCreationStore = create(
               false,
             );
 
-            set((state) => {
-              updateModules(state, module, { subSkills: newSubskills });
-            });
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                updateModules(state, module, { subSkills: newSubskills });
+              },
+              undefined,
+              "setSubSkillHasCompleted",
+            );
           },
           /**
            * FOR SUBSKILLS - CONTROLLER USE ONLY
@@ -612,6 +727,7 @@ export const useEvaluationStepsCreationStore = create(
            * @returns Array of students who are present and have assigned tasks related to the selected subskill.
            */
           getPresentStudentsWithAssignedTasks(subSkillId?: UUID) {
+            ensureCollections();
             const selectedSubSkillId =
               subSkillId ?? get().subSkillSelection?.selectedSubSkillId;
 
@@ -641,5 +757,14 @@ export const useEvaluationStepsCreationStore = create(
         return ACTIONS;
       }),
     ),
+    {
+      // name: "evaluation-steps-creation",
+      // anonymousActionTypes: false,
+      serialize: { options: { map: true, set: true } },
+      enabled: DEV_MODE,
+      predicate: (_state, action) =>
+        !/^evalSteps\/debug\/rehydrateCollections$/.test(action?.type ?? ""),
+      store: "evalSteps",
+    },
   ),
 );
