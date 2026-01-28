@@ -28,8 +28,8 @@ export function StepThreeStudentsEvaluationController(
   const isThisSubSkillCompleted = useEvaluationStepsCreationStore(
     (state) => state.isThisSubSkillCompleted,
   );
-  const setModuleHasCompleted = useEvaluationStepsCreationStore(
-    (state) => state.setModuleHasCompleted,
+  const setSubSkillHasCompleted = useEvaluationStepsCreationStore(
+    (state) => state.setSubSkillHasCompleted,
   );
   const [value, setValue] = useState([0]);
 
@@ -53,7 +53,7 @@ export function StepThreeStudentsEvaluationController(
     );
 
     if (selectedSubSkill.isCompleted !== isCompleted) {
-      setModuleHasCompleted(
+      setSubSkillHasCompleted(
         selectedModule.id,
         selectedSubSkill.id,
         isCompleted,
