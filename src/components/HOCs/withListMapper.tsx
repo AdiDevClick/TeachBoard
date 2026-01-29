@@ -2,18 +2,19 @@ import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import type { ListMapperProps } from "@/components/Lists/types/ListsTypes.ts";
 import type {
   AnyComponentLike,
+  AnyObjectProps,
   ExtractItemType,
+  KeysOfUnion,
   MissingRequiredProps,
+  ProvidedKeyRecord,
 } from "@/utils/types/types.utils.ts";
 import type { ComponentProps, ComponentType } from "react";
 
-type KeysOfUnion<T> = T extends unknown ? keyof T : never;
-type ProvidedKeyRecord<T> = Record<KeysOfUnion<T>, unknown>;
 type ReservedListMapperKeys = "items" | "optional" | "children";
 
 type PropsType<
   Items,
-  TOptional extends Record<string, unknown> | undefined,
+  TOptional extends AnyObjectProps | undefined,
   P,
 > = Readonly<
   Pick<
@@ -35,8 +36,8 @@ type PropsType<
 
 function withListMapper<C extends AnyComponentLike>(Wrapped: C) {
   return function Component<
-    Items extends readonly unknown[] | Record<string, unknown>,
-    TOptional extends Record<string, unknown> | undefined,
+    Items extends readonly unknown[] | AnyObjectProps,
+    TOptional extends AnyObjectProps | undefined,
     P extends ComponentProps<C> = ComponentProps<C>,
   >(props: PropsType<Items, TOptional, P>) {
     const { items, optional, ...rest } = props;
