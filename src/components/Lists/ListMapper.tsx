@@ -53,7 +53,7 @@ import {
  *
  * > **Use like a Component (type safety as it's a component)**
  * > ```tsx
- * > <ListMapper components={MyListItem} items={myItems} optional={myOptionalProps}/>
+ * > <ListMapper component={MyListItem} items={myItems} optional={myOptionalProps}/>
  * ```
  */
 export function ListMapper<
@@ -88,9 +88,8 @@ export function ListMapper<
   }
 
   const isArrayInput = Array.isArray(items);
-  const itemsArray = isArrayInput
-    ? items
-    : Object.entries(items as Record<string, unknown>);
+
+  const itemsArray = isArrayInput ? items : Object.entries(items);
 
   if (!itemsArray || itemsArray.length === 0) {
     if (isWaiting) {
@@ -129,7 +128,7 @@ export function ListMapper<
     // Case B: Render function - best type safety (act as a function with params)
     if (typeof children === "function") {
       const renderFn = children as (
-        item: unknown,
+        item: TItems,
         index: number,
         optional?: TOptional,
       ) => ReactNode;
@@ -147,11 +146,8 @@ export function ListMapper<
         ...optional,
       };
 
-      const Component = children.type as ElementType;
-      const originalChildProps = (children.props ?? {}) as Record<
-        string,
-        unknown
-      >;
+      const Component = children.type;
+      const originalChildProps = children.props ?? {};
 
       return (
         <Component key={itemId} {...originalChildProps} {...injectedProps} />
