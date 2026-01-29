@@ -1,4 +1,5 @@
 import type {
+  AnyObjectProps,
   ExtractItemType,
   MergeProvided,
   MissingRequiredProps,
@@ -24,7 +25,7 @@ export type ListMapperInjectedMeta<T, TOptional = undefined> = {
  */
 export type ListMapperPartialChildrenObject<
   T,
-  TOptional = undefined
+  TOptional = undefined,
 > = ReactElement<Partial<ListMapperInjectedMeta<T, TOptional>>>;
 
 /**
@@ -37,7 +38,7 @@ export type ListMapperPartialChildrenObject<
 export type ListMapperProps<
   TItems,
   C extends ElementType,
-  TOptional extends Record<string, unknown> | undefined = undefined
+  TOptional extends AnyObjectProps | undefined = undefined,
 > =
   | ({
       /** Component mode: component receives item props automatically */
@@ -55,7 +56,7 @@ export type ListMapperProps<
       children: (
         item: ExtractItemType<TItems>,
         index: number,
-        optional: TOptional
+        optional: TOptional,
       ) => ReactNode;
     }
   | {
