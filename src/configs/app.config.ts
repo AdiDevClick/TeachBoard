@@ -83,7 +83,8 @@ export type AppModalNames =
   | "add-school-year"
   | "search-students"
   | "search-primaryteacher"
-  | "attendance-record-creation";
+  | "attendance-record-creation"
+  | "evaluation-summary";
 
 /**
  * Pages that do not require session checks

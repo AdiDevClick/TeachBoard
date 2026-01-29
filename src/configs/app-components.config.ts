@@ -6,6 +6,7 @@ import type {
   EvaluationRadioItemDescriptionProps,
   EvaluationRadioItemProps,
 } from "@/components/Radio/types/radio.types.ts";
+import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
 import type {
   CommandHandlerMetaData,
@@ -264,6 +265,18 @@ export const stepThreeModuleSelectionControllerPropsInvalid = (
     STEP_THREE_MODULE_SELECTION_CONTROLLER_REQUIRES,
     [],
   );
+
+//                    ------------
+
+/**
+ * Validation requirements for Slider component.
+ *
+ * {@link import("@/components/Sliders/EvaluationSlider.tsx").EvaluationSlider}
+ */
+const SLIDER_REQUIRES = ["evaluation", "onValueChange", "fullName"];
+
+export const evaluationSliderPropsValid = (props: EvaluationSliderProps) =>
+  checkPropsValidity(props, SLIDER_REQUIRES, []);
 
 //                    ------------
 

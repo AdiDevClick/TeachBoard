@@ -1,15 +1,13 @@
 import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
-import "@/assets/css/Slider.scss";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { EvaluationSlider } from "@/components/Sliders/EvaluationSlider.tsx";
 import { Badge } from "@/components/ui/badge.tsx";
-import { Item } from "@/components/ui/item.tsx";
-import { Slider } from "@/components/ui/slider.tsx";
 import {
   debugLogs,
   stepThreeControllerPropsInvalid,
 } from "@/configs/app-components.config.ts";
 import type { StepThreeControllerProps } from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";
 
 export function StepThreeStudentsEvaluationController(
@@ -98,20 +96,11 @@ export function StepThreeStudentsEvaluationController(
             evaluation = subSkill?.score ? [subSkill.score] : value;
           }
           return (
-            <Item className="flex flex-nowrap gap-0.1">
-              <Badge className="m-4">{student.fullName}</Badge>
-              <Slider
-                step={25}
-                value={evaluation}
-                onValueChange={(e) => handleValueChange(e, student)}
-                className="four-steps-slider"
-                style={
-                  {
-                    "--slider-rangeColor": rangeColor(evaluation[0]),
-                  } as CSSProperties
-                }
-              />
-            </Item>
+            <EvaluationSlider
+              fullName={student.fullName}
+              evaluation={evaluation}
+              onValueChange={(e) => handleValueChange(e, student)}
+            />
           );
         }}
       </ListMapper>
@@ -122,25 +111,4 @@ export function StepThreeStudentsEvaluationController(
       )}
     </form>
   );
-}
-
-/**
- * Get color based on value range.
- *
- * @param value - The numeric value to evaluate.
- * @returns The corresponding color as a string.
- */
-function rangeColor(value: number) {
-  const red = "#e53935";
-  const yellow = "#f9a825";
-  const lightGreen = "#7cb342";
-  const green = "#2e7d32";
-  const white = "#ffffff";
-
-  if (value === 25) return red;
-  if (value === 50) return yellow;
-  if (value === 75) return lightGreen;
-  if (value === 100) return green;
-
-  return white;
 }
