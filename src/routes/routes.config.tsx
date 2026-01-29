@@ -9,6 +9,7 @@ import { About } from "@/pages/About/About.tsx";
 import EmailValidation from "@/pages/Email/EmailValidation";
 import { PageError } from "@/pages/Error/PageError.tsx";
 import { CreateEvaluations } from "@/pages/Evaluations/create/CreateEvaluations.tsx";
+import { StepFour } from "@/pages/Evaluations/create/steps/four/StepFour.tsx";
 import { StepOne } from "@/pages/Evaluations/create/steps/one/StepOne";
 import { StepThree } from "@/pages/Evaluations/create/steps/three/StepThree.tsx";
 import { StepTwo } from "@/pages/Evaluations/create/steps/two/StepTwo.tsx";
@@ -116,6 +117,9 @@ export const routeChildren = [
           };
         },
       },
+      // The page is split into 2 zones :
+      // - Left zone : Description or Subskills list
+      // - Right zone : Evaluation and module selection
       {
         path: "create",
         element: <CreateEvaluations />,
@@ -162,7 +166,7 @@ export const routeChildren = [
           },
           {
             path: EvaluationPageTabsDatas.step4.name,
-            element: <StepOne title="gfgg" placeholder="gfgg" />,
+            element: <StepFour />,
             loader: async () => {
               const date = new Date().toLocaleDateString();
               return {
