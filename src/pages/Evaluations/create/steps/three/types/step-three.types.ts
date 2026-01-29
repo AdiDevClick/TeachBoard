@@ -5,9 +5,11 @@ import type {
 } from "@/api/store/types/steps-creation-store.types.ts";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
 import type { AttendanceRecordCreationFormSchema } from "@/models/attendance-record-creation.models.ts";
+import type { ShowStudentsEvaluation } from "@/pages/Evaluations/create/steps/three/components/step-three-wrappers.functions.tsx";
 import type { StepThree } from "@/pages/Evaluations/create/steps/three/StepThree.tsx";
 import type { AppControllerInterface } from "@/types/AppControllerInterface.ts";
 import type { UniqueSet } from "@/utils/UniqueSet.ts";
+import type { MouseEvent } from "react";
 import type { FieldValues } from "react-hook-form";
 
 /**
@@ -49,3 +51,13 @@ export type StepThreeSubskillsSelectionControllerProps = AppControllerInterface<
   inputControllers?: readonly unknown[];
   user: unknown;
 } & Omit<Parameters<typeof StepThree>[0], "modalMode">;
+
+export type ShowStudentsEvaluationWithPreviousArrowProps = Parameters<
+  typeof ShowStudentsEvaluation
+>[0] & {
+  onPreviousArrowClick: (value: boolean) => void;
+};
+
+export type StepThreeCommonProps =
+  | StepThreeControllerProps
+  | StepThreeModuleSelectionControllerProps;
