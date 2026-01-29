@@ -118,19 +118,10 @@ export function StepThree({
     tasks,
   } satisfies Parameters<typeof ShowStudentsEvaluation>[0];
 
-  const subskillsControllerProps = useMemo(
-    () =>
-      ({
-        pageId,
-        className,
-        formId,
-        inputControllers,
-        ...props,
-        form,
-        user,
-      }) satisfies StepThreeSubskillsSelectionControllerProps,
-    [className, form, formId, inputControllers, pageId, props, user],
-  );
+  const subskillsControllerProps = {
+    ...baseCardProps,
+    user,
+  } satisfies StepThreeSubskillsSelectionControllerProps;
 
   /**
    * Dispatch left content based on module selection state
@@ -146,6 +137,11 @@ export function StepThree({
     );
 
     setLeftContent(leftContent);
+
+    // Cleanup function to reset left content when a step changed
+    return () => {
+      setLeftContent(null!);
+    };
   }, [isModuleClicked]);
 
   return (
