@@ -21,21 +21,21 @@ export type PreventDefaultAndStopPropagation =
 /**
  * Tag props injected by ListMapper so they stay type-safe even when the original props are never.
  */
-export type SafeListMapperProp<T extends Record<string, unknown>> = {
+export type SafeListMapperProp<T extends AnyObjectProps> = {
   ischild: true;
 } & ExcludeProps<T>;
 
 /**
  * Replace every property of T with an optional never to forbid consumers from passing them.
  */
-export type ExcludeProps<T extends Record<string, unknown>> = {
+export type ExcludeProps<T extends AnyObjectProps> = {
   [K in keyof T]?: never;
 };
 /**
  * Merge two objects while defaulting non-object inputs to an empty object, avoiding conditional chains.
  */
 export type MergeProvided<T, O> = (T extends object ? T : object) &
-  (O extends Record<string, unknown> ? O : object);
+  (O extends AnyObjectProps ? O : object);
 
 /**
  * Collect keys that are required on T (not optional / undefined).
@@ -68,14 +68,13 @@ export type RemainingProps<C, Provided> = Omit<C, keyof Provided>;
 /**
  * Extract the element type from an array or the tuple [key, value] from a record.
  */
-export type ExtractItemType<TItems> =
-  TItems extends Array<infer T>
+export type ExtractItemType<Items> = Items extends readonly (infer T)[]
+  ? T
+  : Items extends readonly (infer T)[]
     ? T
-    : TItems extends readonly (infer T)[]
-      ? T
-      : TItems extends Record<string, infer T>
-        ? [string, T]
-        : never;
+    : Items extends Record<string, infer T>
+      ? [string, T]
+      : never;
 
 /**
  * Extract React element props from an element-like type.
@@ -87,7 +86,7 @@ export type ExtractPropsFromElement<T> = T extends { props: infer P }
 /**
  * Generic bag of props to use when we intentionally fall back to an open shape.
  */
-export type AnyProps = Record<string, unknown>;
+export type AnyObjectProps = Record<string, unknown>;
 
 /**
  * Strip string index signatures so only concrete string keys are preserved.
@@ -99,6 +98,9 @@ export type OwnProps<T> = {
       : K
     : never]: T[K];
 };
+
+export type KeysOfUnion<T> = T extends unknown ? keyof T : never;
+export type ProvidedKeyRecord<T> = Record<KeysOfUnion<T>, unknown>;
 
 /**
  * Union of component-like signatures (function, class, forwardRef, render prop).
