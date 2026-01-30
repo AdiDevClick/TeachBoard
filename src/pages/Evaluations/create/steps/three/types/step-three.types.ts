@@ -9,7 +9,6 @@ import type { ShowStudentsEvaluation } from "@/pages/Evaluations/create/steps/th
 import type { StepThree } from "@/pages/Evaluations/create/steps/three/StepThree.tsx";
 import type { AppControllerInterface } from "@/types/AppControllerInterface.ts";
 import type { UniqueSet } from "@/utils/UniqueSet.ts";
-import type { MouseEvent } from "react";
 import type { FieldValues } from "react-hook-form";
 
 /**

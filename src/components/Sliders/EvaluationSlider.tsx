@@ -1,4 +1,5 @@
 import "@/assets/css/Slider.scss";
+import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import { sliderRangeColor } from "@/components/Sliders/functions/sliders.functions.ts";
 import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
 import { Badge } from "@/components/ui/badge.tsx";
@@ -8,30 +9,54 @@ import {
   debugLogs,
   evaluationSliderPropsValid,
 } from "@/configs/app-components.config.ts";
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 
+/**
+ * EvaluationSlider component for evaluating students.
+ *
+ * @param value - Current evaluation value as an array of numbers.
+ * @param onValueChange - Handler for when the slider value changes.
+ * @param fullName - Full name of the student.
+ */
 export function EvaluationSlider(props: EvaluationSliderProps) {
-  if (!evaluationSliderPropsValid(props)) {
-    debugLogs("EvaluationSlider", props);
+  const { fullName, onValueChange, value, ...rest } = props;
+
+  const [internalValue, setInternalValue] = useState<number[]>(value ?? [0]);
+
+  if (evaluationSliderPropsValid(props)) {
+    debugLogs("[EvaluationSlider]", props);
     return null;
   }
 
-  const { fullName, evaluation, onValueChange } = props;
+  /**
+   * Handles value change from the slider component.
+   *
+   * @description This is mainly to sync internal state with external changes using a controlled component pattern (triggering a re-render).
+   *
+   * @param newValue - The new value array from the slider.
+   */
+  const handleValueChange = (newValue: number[]) => {
+    setInternalValue(newValue);
+    onValueChange?.(newValue, props);
+  };
 
   return (
     <Item className="flex flex-nowrap gap-0.1">
       <Badge className="m-4">{fullName}</Badge>
       <Slider
         step={25}
-        value={evaluation}
-        onValueChange={onValueChange}
+        value={internalValue}
         className="four-steps-slider"
         style={
           {
-            "--slider-rangeColor": sliderRangeColor(evaluation[0]),
+            "--slider-rangeColor": sliderRangeColor(internalValue[0]),
           } as CSSProperties
         }
+        {...rest}
+        onValueChange={handleValueChange}
       />
     </Item>
   );
 }
+
+export const EvaluationSliderList = withListMapper(EvaluationSlider);

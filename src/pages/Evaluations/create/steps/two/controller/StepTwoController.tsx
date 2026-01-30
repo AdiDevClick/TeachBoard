@@ -8,8 +8,6 @@ import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts
 import type { StepTwoControllerProps } from "@/pages/Evaluations/create/steps/two/types/step-two.types.ts";
 import { type MouseEvent } from "react";
 
-const loadingName = "load-attendance-record-steps";
-
 export function StepTwoController({
   pageId,
   form,
@@ -34,17 +32,7 @@ export function StepTwoController({
     (state) => state.setStudentTaskAssignment,
   );
 
-  const {
-    setRef,
-    observedRefs,
-    newItemCallback,
-    openingCallback,
-    resultsCallback,
-    isLoaded,
-    isLoading,
-    data,
-    error,
-  } = useCommandHandler({
+  const { setRef, observedRefs } = useCommandHandler({
     form,
     pageId,
   });
