@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { degreeCreationInputControllersYear } from "@/data/inputs-controllers.data";
+import { degreeCreationInputControllersYear } from "@/features/class-creation/components/DegreeItem/forms/degree-item-inputs";
 import {
   degreeCreated,
   degreeCreatedResponse,
@@ -32,7 +32,7 @@ setupUiTestState(null, {
       "newDegree",
       "diplomaYearController",
       "create-diploma",
-      { routeArgs: ["YEAR"] }
+      { routeArgs: ["YEAR"] },
     );
 
     diplomaYearController = res.controllers.diplomaYearController;
@@ -62,7 +62,7 @@ describe("UI flow: new-degree-item-year", () => {
         controller: diplomaYearController,
         nameArray: years,
         readyText: degreeCreationInputControllersYear[0].title,
-      }
+      },
     );
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)

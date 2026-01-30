@@ -862,7 +862,7 @@ type MyControllerProps = AppControllerInterface<
 
 - **Endpoint POST (obligatoire quand utilisé) :** Si le controller effectue un `POST` (soumission), exposez dans les props au moins : `submitRoute` et `submitDataReshapeFn`, typés (idéalement avec `typeof API_ENDPOINTS.POST.<NAME>.endpoint` et `typeof API_ENDPOINTS.POST.<NAME>.dataReshape`) afin qu'ils puissent être passés au `useCommandHandler` ou au `submitCallback`.
 
-- **Valeurs par défaut :** Il est recommandé d'initialiser `submitRoute` / `submitDataReshapeFn` depuis `API_ENDPOINTS` pour garantir la cohérence (voir exemple ci-dessous et [`ClassCreationController`](src/components/ClassCreation/controller/ClassCreationController.tsx)).
+- **Valeurs par défaut :** Il est recommandé d'initialiser `submitRoute` / `submitDataReshapeFn` depuis `API_ENDPOINTS` pour garantir la cohérence (voir exemple ci-dessous et [`ClassCreationController`](src/features/class-creation/components/main/controllers/ClassCreationController.tsx)).
 
 - **Tests & contrats :** Toute modification d'un `dataReshape` (ou ajout d'un endpoint) **doit** être accompagnée d'un test de contrat dans `src/tests/units/endpoints/` (voir `api-endpoints.config.contract.test.ts`).
 
@@ -888,7 +888,7 @@ export function MyController({
 - [`AppControllerInterface`](src/types/AppControllerInterface.ts)
 - [`useCommandHandler`](src/hooks/database/classes/useCommandHandler.ts)
 - [`API_ENDPOINTS`](src/configs/api.endpoints.config.ts)
-- [`ClassCreationController`](src/components/ClassCreation/controller/ClassCreationController.tsx)
+- [`ClassCreationController`](src/features/class-creation/components/main/controllers/ClassCreationController.tsx)
 - [`api-endpoints.config.contract.test.ts`](src/tests/units/endpoints/api-endpoints.config.contract.test.ts)
 
 **Exemple simplifié (pattern courant)**
@@ -921,7 +921,7 @@ return <FormComponent form={form} onSubmit={handleValidSubmit} />;
 - **But :** encapsuler un controller ou un composant présentational dans une Card standardisée (titre, description, actions).
 - **Vue (exemple réel) :** `ClassCreation` montre l'utilisation typique :
 ```tsx
-import { ClassCreationController } from '@/components/ClassCreation/controller/ClassCreationController.tsx';
+import { ClassCreationController } from '@/features/class-creation/components/main/controllers/ClassCreationController.tsx';
 import withTitledCard from '@/components/HOCs/withTitledCard.tsx';
 
 const ClassCreationWithCard = withTitledCard(ClassCreationController);
@@ -1221,8 +1221,8 @@ import { Icon } from '@/components/Icons/Icon';
 
 ### Fichiers utiles (exemples)
 - Controllers :
-  - [ClassCreationController](src/components/ClassCreation/controller/ClassCreationController.tsx)
-  - [DiplomaCreationController](src/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx)
+  - [ClassCreationController](src/features/class-creation/components/main/controllers/ClassCreationController.tsx)
+  - [DiplomaCreationController](src/features/class-creation/components/main/controllers/DiplomaCreationController.tsx)
 - HOCs :
   - [withController](src/components/HOCs/withController.tsx) — intégration `react-hook-form` (Controller)
   - [withListMapper](src/components/HOCs/withListMapper.tsx) — wrapper pour `ListMapper`

@@ -3,7 +3,7 @@ import {
   debugLogs,
   leftSidePageContentPropsInvalid,
 } from "@/configs/app-components.config.ts";
-import type { LeftContentProps } from "@/pages/Evaluations/create/types/create.types.ts";
+import type { LeftContentProps } from "@/features/evaluations/create/types/create.types.ts";
 import { Activity } from "react";
 
 /**

@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { taskItemInputControllers } from "@/data/inputs-controllers.data";
+import { taskItemInputControllers } from "@/features/class-creation/components/TaskItem/forms/task-item-inputs";
 import { taskCreated } from "@/tests/samples/class-creation-sample-datas";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { assertPostUpdatedCacheWithoutExtraGet } from "@/tests/test-utils/tests.functions";
@@ -24,7 +24,7 @@ setupUiTestState(null, {
     const res = await initSetup(
       "createTaskItem",
       "taskLabelController",
-      "new-task-template"
+      "new-task-template",
     );
 
     taskController = res.controllers.taskLabelController;
@@ -50,13 +50,13 @@ describe("UI flow: new-task-item", () => {
         controller: taskController,
         nameArray: tasks,
         readyText: taskItemInputControllers[0].title,
-      }
+      },
     );
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
     const getCallsBeforeCreation = countFetchCallsByUrl(
       taskController.apiEndpoint,
-      "GET"
+      "GET",
     );
 
     const fills = [

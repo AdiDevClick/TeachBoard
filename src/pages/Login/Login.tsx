@@ -1,7 +1,7 @@
-import LoginForm from "@/components/LoginForms/LoginForm.tsx";
 import { FieldDescription } from "@/components/ui/field.tsx";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
-import { inputLoginControllers } from "@/data/inputs-controllers.data";
+import { inputLoginControllers } from "@/features/login/components/main/forms/login-inputs.ts";
+import LoginForm from "@/features/login/components/main/LoginForm.tsx";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import type { LoginPageProps } from "@/pages/Login/types/login-page.types.ts";
 import {

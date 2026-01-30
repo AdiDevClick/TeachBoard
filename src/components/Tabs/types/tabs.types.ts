@@ -1,4 +1,4 @@
-import type { CreateEvaluationArrowsClickHandlerProps } from "@/pages/Evaluations/create/types/create.types.ts";
+import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types.ts";
 import type { CreateEvaluationsLoaderData } from "@/routes/routes.config.tsx";
 import type { PropsWithChildren, ReactNode } from "react";
 

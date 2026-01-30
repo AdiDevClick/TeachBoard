@@ -1,11 +1,9 @@
-import { degreeModuleTitleProps } from "@/components/ClassCreation/diploma/degree-module-skill/DegreeModuleSkill.tsx";
-import { DegreeModuleController } from "@/components/ClassCreation/diploma/degree-module/controller/DegreeModuleController";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import {
-  degreeModuleCreationInputControllers,
-  degreeSubSkillsCreationInputControllers,
-} from "@/data/inputs-controllers.data";
-import type { DegreeModuleFormSchema } from "@/models/degree-module.models";
+import { DegreeModuleController } from "@/features/class-creation/components/DegreeModule/controllers/DegreeModuleController";
+import { degreeModuleCreationInputControllers } from "@/features/class-creation/components/DegreeModule/forms/degree-module-inputs";
+import type { DegreeModuleFormSchema } from "@/features/class-creation/components/DegreeModule/models/degree-module.models";
+import { degreeModuleTitleProps } from "@/features/class-creation/components/DegreeModuleSkill/DegreeModuleSkill.tsx";
+import { degreeSubSkillsCreationInputControllers } from "@/features/class-creation/components/DegreeModuleSkill/forms/degree-module-skill-inputs";
 import { AppModals } from "@/pages/AllModals/AppModals";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import {
@@ -44,7 +42,7 @@ function DegreeModuleControllerWrapper() {
 }
 
 const skillsController = degreeModuleCreationInputControllers.find(
-  (c) => c.name === "skillList"
+  (c) => c.name === "skillList",
 )!;
 const skillQueryKey = queryKeyFor(skillsController);
 
@@ -59,7 +57,7 @@ setupUiTestState(
         getRoutes: [["/api/skills/sub", { Skills: [skillFetched] }]],
         postRoutes: [["/api/skills/sub", skillCreated]],
       }),
-  }
+  },
 );
 
 afterEach(() => {
@@ -75,13 +73,13 @@ describe("DegreeModuleSkill modal UI interaction", () => {
         controller: skillsController,
         nameArray: [skillFetched.code],
         readyText: degreeModuleTitleProps.title,
-      }
+      },
     );
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
     const getCallsBeforeCreation = countFetchCallsByUrl(
       skillsController.apiEndpoint,
-      "GET"
+      "GET",
     );
 
     // Match the stubbed POST payload/response shape

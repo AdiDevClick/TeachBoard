@@ -1,6 +1,6 @@
-import type { ClassModules } from "@/api/store/types/steps-creation-store.types.ts";
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { FieldLabel } from "@/components/ui/field.tsx";
+import type { ClassModules } from "@/features/evaluations/create/store/types/steps-creation-store.types.ts";
 import type { ComponentProps, MouseEvent } from "react";
 
 /**

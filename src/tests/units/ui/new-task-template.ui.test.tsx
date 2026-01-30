@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { taskTemplateCreationInputControllers } from "@/data/inputs-controllers.data.ts";
+import { taskTemplateCreationInputControllers } from "@/features/class-creation/components/TaskTemplateCreation/forms/task-template-inputs";
 import { diplomaFetchedSkills } from "@/tests/samples/class-creation-sample-datas";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import {
@@ -38,7 +38,7 @@ setupUiTestState(null, {
     const res = await initSetup(
       "createTaskTemplate",
       "templatesController",
-      "class-creation"
+      "class-creation",
     );
 
     sample = res.sample;
@@ -47,7 +47,7 @@ setupUiTestState(null, {
 
     templatesEndpoint =
       API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
-        sample.diplomaFetched.id
+        sample.diplomaFetched.id,
       );
 
     tasks = [sample.taskFetched.name, sample.taskFetched2.name];
@@ -78,13 +78,13 @@ describe("UI flow: new-task-template", () => {
         controller: templatesController,
         nameArray: tasks,
         readyText: rxExact(taskLabelController.label),
-      }
+      },
     );
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
     const getCallsBeforeCreation = countFetchCallsByUrl(
       templatesEndpoint,
-      "GET"
+      "GET",
     );
 
     // Fill required inputs
@@ -151,13 +151,13 @@ describe("UI flow: new-task-template", () => {
         controller: templatesController,
         nameArray: tasks,
         readyText: rxExact(taskLabelController.label),
-      }
+      },
     );
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
     const getCallsBeforeCreation = countFetchCallsByUrl(
       templatesEndpoint,
-      "GET"
+      "GET",
     );
 
     const nameLabel = rx(taskTemplateCreationInputControllers[0].title!);
@@ -187,9 +187,9 @@ describe("UI flow: new-task-template", () => {
       .poll(
         () =>
           getLastPostJsonBodyByUrl(
-            API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.endpoint
+            API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.endpoint,
           ),
-        { timeout: 2500 }
+        { timeout: 2500 },
       )
       .toMatchObject({
         name: "template",

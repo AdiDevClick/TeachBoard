@@ -1,6 +1,9 @@
-import { LoginFormController } from "@/components/LoginForms/controller/LoginFormController.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { formSchema, type LoginFormSchema } from "@/models/login.models";
+import { LoginFormController } from "@/features/login/components/main/controller/LoginFormController.tsx";
+import {
+  formSchema,
+  type LoginFormSchema,
+} from "@/features/login/components/main/models/login.models";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import {
@@ -74,7 +77,7 @@ setupUiTestState(
         postRoutes: [[API_ENDPOINTS.POST.AUTH.LOGIN.endpoint, loginResponse]],
       });
     },
-  }
+  },
 );
 
 afterEach(() => {
@@ -109,7 +112,7 @@ describe("UI flow: login form", () => {
         () => getLastPostJsonBodyByUrl(API_ENDPOINTS.POST.AUTH.LOGIN.endpoint),
         {
           timeout: 2000,
-        }
+        },
       )
       .toMatchObject({
         identifier: "test.user@example.com",

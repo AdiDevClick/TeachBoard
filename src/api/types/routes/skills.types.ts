@@ -1,4 +1,3 @@
-import type { ClassTasks } from "@/api/store/types/steps-creation-store.types.ts";
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 
 export type SkillType = "MAIN" | "SUB";
