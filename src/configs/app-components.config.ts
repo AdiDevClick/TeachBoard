@@ -273,7 +273,7 @@ export const stepThreeModuleSelectionControllerPropsInvalid = (
  *
  * {@link import("@/components/Sliders/EvaluationSlider.tsx").EvaluationSlider}
  */
-const SLIDER_REQUIRES = ["evaluation", "onValueChange", "fullName"];
+const SLIDER_REQUIRES = ["value", "onValueChange", "fullName"];
 
 export const evaluationSliderPropsValid = (props: EvaluationSliderProps) =>
   checkPropsValidity(props, SLIDER_REQUIRES, []);

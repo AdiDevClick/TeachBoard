@@ -8,8 +8,8 @@ import type { StudentWithPresence } from "@/api/store/types/steps-creation-store
 export type EvaluationSliderProps = Readonly<
   {
     /** Current evaluation value as an array of numbers */
-    evaluation: number[];
+    value: number[];
     /** Handler for when the slider value changes */
-    onValueChange: (value: number[]) => void;
-  } & Pick<StudentWithPresence, "fullName">
+    onValueChange: (value: number[], props: EvaluationSliderProps) => void;
+  } & Pick<StudentWithPresence, "fullName" | "id">
 >;
