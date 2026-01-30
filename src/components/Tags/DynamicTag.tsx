@@ -27,7 +27,7 @@ import { useEffect, useState } from "react";
  * @param itemList - The list of tag items to render
  * @returns
  */
-export function DynamicTags(props: Readonly<DynamicTagsProps>) {
+export function DynamicTags(props: DynamicTagsProps) {
   const { pageId, itemList, title, ...rest } = props;
   const scopedPageId = pageId ?? "dynamic-tag";
   const [renderItems, setRenderItems] = useState<

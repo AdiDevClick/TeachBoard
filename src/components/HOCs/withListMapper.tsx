@@ -1,50 +1,69 @@
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import type { ListMapperProps } from "@/components/Lists/types/ListsTypes.ts";
+import type {
+  ListMapperOptionalInput,
+  ListMapperOptionalValue,
+  ListMapperProvidedProps,
+} from "@/components/Lists/types/ListsTypes.ts";
 import type {
   AnyComponentLike,
   AnyObjectProps,
-  ExtractItemType,
-  KeysOfUnion,
   MissingRequiredProps,
-  ProvidedKeyRecord,
 } from "@/utils/types/types.utils.ts";
-import type { ComponentProps, ComponentType } from "react";
+import type { ComponentProps, ReactElement } from "react";
 
-type ReservedListMapperKeys = "items" | "optional" | "children";
+type PropsWithOptional<
+  Items,
+  C extends AnyComponentLike,
+  TOptional extends AnyObjectProps,
+> = PropsTypeBase<Items, C> & {
+  optional: ListMapperOptionalInput<Items, TOptional>;
+} & MissingRequiredProps<
+    ComponentProps<C>,
+    ListMapperProvidedProps<Items, ListMapperOptionalValue<TOptional>>
+  >;
+
+type PropsWithoutOptional<Items, C extends AnyComponentLike> = PropsTypeBase<
+  Items,
+  C
+> &
+  ({
+    optional?: never;
+  } & MissingRequiredProps<
+    ComponentProps<C>,
+    ListMapperProvidedProps<Items, undefined>
+  >);
 
 type PropsType<
   Items,
-  TOptional extends AnyObjectProps | undefined,
-  P,
-> = Readonly<
-  Pick<
-    ListMapperProps<Items, ComponentType<P>, TOptional>,
-    ReservedListMapperKeys
-  > &
-    Omit<P, KeysOfUnion<ExtractItemType<Items>> | "children"> &
-    Partial<
-      Pick<
-        P,
-        Extract<
-          Exclude<KeysOfUnion<ExtractItemType<Items>>, ReservedListMapperKeys>,
-          keyof P
-        >
-      >
-    > &
-    MissingRequiredProps<P, ProvidedKeyRecord<ExtractItemType<Items>>>
+  C extends AnyComponentLike,
+  TOptional extends AnyObjectProps,
+> = PropsWithOptional<Items, C, TOptional> | PropsWithoutOptional<Items, C>;
+
+type PropsTypeBase<Items, C extends AnyComponentLike> = Readonly<
+  {
+    items: Items;
+  } & Partial<Omit<ComponentProps<C>, "items" | "children">>
 >;
 
-function withListMapper<C extends AnyComponentLike>(Wrapped: C) {
+type WithListMapperComponent<C extends AnyComponentLike> = <
+  Items extends readonly unknown[] | AnyObjectProps,
+  TOptional extends AnyObjectProps = AnyObjectProps,
+>(
+  props: PropsType<Items, C, TOptional>,
+) => ReactElement | null;
+
+function withListMapper<C extends AnyComponentLike>(
+  Wrapped: C,
+): WithListMapperComponent<C> {
   return function Component<
     Items extends readonly unknown[] | AnyObjectProps,
-    TOptional extends AnyObjectProps | undefined,
-    P extends ComponentProps<C> = ComponentProps<C>,
-  >(props: PropsType<Items, TOptional, P>) {
+    TOptional extends AnyObjectProps = AnyObjectProps,
+  >(props: PropsType<Items, C, TOptional>) {
     const { items, optional, ...rest } = props;
 
     return (
       <ListMapper items={items} optional={optional}>
-        <Wrapped {...(rest as P)} />
+        <Wrapped {...(rest as ComponentProps<C>)} />
       </ListMapper>
     );
   };

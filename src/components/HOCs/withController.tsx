@@ -1,12 +1,15 @@
-import type { WrapperProps } from "@/components/Controller/types/controller.types.ts";
+import type { WrapperPropsAny } from "@/components/Controller/types/controller.types.ts";
 import { Field, FieldError } from "@/components/ui/field.tsx";
 import {
   controllerPropsInvalid,
   debugLogs,
 } from "@/configs/app-components.config.ts";
-import type { AnyComponentLike } from "@/utils/types/types.utils.ts";
-import { type ComponentProps } from "react";
-import { Controller, type FieldValues } from "react-hook-form";
+import type {
+  AnyComponentLike,
+  ComponentPropsOf,
+} from "@/utils/types/types.utils.ts";
+import type { ReactElement } from "react";
+import { Controller } from "react-hook-form";
 
 /**
  * Wrap a component with react-hook-form Controller.
@@ -27,8 +30,14 @@ import { Controller, type FieldValues } from "react-hook-form";
  * />
  * ```
  */
-function withController<C extends AnyComponentLike>(Wrapped: C) {
-  return function Component<T extends FieldValues>(props: WrapperProps<T, C>) {
+type WithControllerComponent<C extends AnyComponentLike> = (
+  props: WrapperPropsAny<C>,
+) => ReactElement | null;
+
+function withController<C extends AnyComponentLike>(
+  Wrapped: C,
+): WithControllerComponent<C> {
+  return function Component(props: WrapperPropsAny<C>) {
     if (controllerPropsInvalid(props)) {
       debugLogs("withController");
       return null;
@@ -59,7 +68,7 @@ function withController<C extends AnyComponentLike>(Wrapped: C) {
                 controllerMeta: {
                   controllerName: name,
                 },
-              } as ComponentProps<C>)}
+              } as ComponentPropsOf<C>)}
             />
             <FieldError errors={[fieldState.error]} />
           </Field>

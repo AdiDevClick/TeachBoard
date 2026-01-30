@@ -3,7 +3,7 @@ import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { diplomaCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import {
   diplomaCreationSchema,
-  type DiplomaCreationFormSchema,
+  type DiplomaCreationFormState,
   type DiplomaInputItem,
 } from "@/models/diploma-creation.models.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
@@ -34,7 +34,7 @@ function DiplomaCreation({
   inputControllers = diplomaCreationInputControllers,
   ...props
 }: Readonly<PageWithControllers<DiplomaInputItem>>) {
-  const form = useForm<DiplomaCreationFormSchema>({
+  const form = useForm<DiplomaCreationFormState>({
     resolver: zodResolver(diplomaCreationSchema),
     mode: "onTouched",
     defaultValues: {
@@ -42,6 +42,7 @@ function DiplomaCreation({
       yearId: "",
       levelId: "",
       modulesList: [],
+      modulesListDetails: [],
     },
   });
 

@@ -103,10 +103,11 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     submitDataReshapeFn,
   });
 
-  const tasksValues = useWatch({
-    control: form.control,
-    name: "tasksValues",
-  });
+  const tasksValues =
+    useWatch({
+      control: form.control,
+      name: "tasksValues",
+    }) ?? [];
 
   const cachedKeysRef = useRef<Record<string, unknown[]>>({});
   const selectedDiplomaRef = useRef<CommandItemType | null>(null);
@@ -377,7 +378,6 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
           {...sharedCallbacksMemo.commonObsProps}
           {...controllers.dynamicListControllers}
           itemList={tasksValues}
-          // onRemove={handleCommandSelection}
           onRemove={handleDeletingTask}
         />
         <PopoverFieldWithCommands
