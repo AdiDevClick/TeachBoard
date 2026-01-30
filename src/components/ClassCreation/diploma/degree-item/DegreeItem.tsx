@@ -58,19 +58,28 @@ function DegreeItem({
       formId,
       className,
       modalMode,
-      footerProps: {
-        ...footerProps,
-        formState: form.formState,
-        formId,
+      card: {
+        card: { className },
+        title: titleProps,
+        footer: {
+          ...footerProps,
+          formState: form.formState,
+          formId,
+        },
       },
-      titleProps,
       ...props,
       form,
     }),
-    [form.formState, props]
+    [form.formState, props],
   );
 
-  return <DegreeItemWithCard {...commonProps} />;
+  return (
+    <DegreeItemWithCard {...commonProps}>
+      <DegreeItemWithCard.Title />
+      <DegreeItemWithCard.Content />
+      <DegreeItemWithCard.Footer />
+    </DegreeItemWithCard>
+  );
 }
 
 const DegreeItemWithCard = withTitledCard(DegreeItemController);

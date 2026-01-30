@@ -2,6 +2,24 @@ import { ObjectReshape } from "@/utils/ObjectReshape";
 import { describe, expect, it } from "vitest";
 
 describe("ObjectReshape - API config step contracts", () => {
+  it("newShape() proxies an array data source when only assign() is used", () => {
+    const payload = [
+      { id: "1", fullName: "John Stud", isPresent: false, assignedTask: null },
+    ];
+
+    const shaped = new ObjectReshape(payload as any)
+      .assign([
+        ["fullName", "title"],
+        ["isPresent", "isSelected"],
+      ])
+      .newShape() as any;
+
+    expect(Array.isArray(shaped)).toBe(true);
+    expect(shaped[0].id).toBe("1");
+    expect(shaped[0].title).toBe("John Stud");
+    expect(shaped[0].isSelected).toBe(false);
+  });
+
   it("assignSourceTo('items') exposes the original array under root.items", () => {
     const payload = [
       { id: "1", firstName: "Alice", lastName: "Doe", img: "a.png" },
@@ -143,29 +161,23 @@ describe("ObjectReshape - API config step contracts", () => {
     expect(shapedNewGroup.map((g: any) => g.groupTitle)).toContain("BTS");
   });
 
-  it("build() materializes computed + mapped keys for caching (no proxies required)", () => {
+  it("newShape() resolves computed + mapped keys via proxy (canonical API)", () => {
     const payload = [{ firstName: "Alice", lastName: "Doe" }];
 
-    const built = new ObjectReshape(payload as any)
+    const shaped = new ObjectReshape(payload as any)
       .assignSourceTo("items")
       .addToRoot({ groupTitle: "Tous" })
-      .createPropertyWithContentFromKeys(
-        ["firstName", "lastName"],
-        "fullName",
-        " "
-      )
+      .createPropertyWithContentFromKeys([
+        "firstName",
+        "lastName",
+      ], "fullName", " ")
       .assign([["fullName", "value", "name"]])
-      .build() as any;
+      .newShape() as any;
 
-    expect(built[0].groupTitle).toBe("Tous");
-    // build() materializes computed properties (fullName) into the item
-    // but mappings that reference computed keys are not applied during build()
-    // (mapping runs before computed properties are added). Ensure computed
-    // value exists and mapping to 'value'/'name' is not present here.
-    expect(built[0].items[0]).toEqual(
-      expect.objectContaining({ fullName: "Alice Doe" })
-    );
-    expect(built[0].items[0].value).toBeUndefined();
-    expect(built[0].items[0].name).toBeUndefined();
+    expect(shaped[0].groupTitle).toBe("Tous");
+    // newShape() resolves computed properties and mappings dynamically via proxy
+    expect(shaped[0].items[0].fullName).toBe("Alice Doe");
+    expect(shaped[0].items[0].value).toBe("Alice Doe");
+    expect(shaped[0].items[0].name).toBe("Alice Doe");
   });
 });

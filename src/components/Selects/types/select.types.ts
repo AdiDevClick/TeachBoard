@@ -69,6 +69,8 @@ export type VerticalSelectProps = Omit<
   placeholder?: string;
   /** Forwarded to the SelectTrigger element */
   role?: string;
+  /** Extra props forwarded to the SelectTrigger element */
+  triggerProps?: ComponentProps<"button">;
   fullWidth?: boolean;
   className?: string;
   side?: ComponentProps<typeof SelectContent>["side"];
@@ -85,6 +87,10 @@ type LabelledGroupBaseProps<T> = {
   readonly ["0"]: string;
   readonly ["1"]: T[];
 };
+
+export type PropsWithListings<T> = {
+  items: T[];
+} & PropsWithChildren;
 
 /**
  * Props for the LabelledGroup component
@@ -109,15 +115,8 @@ export type NonLabelledGroupItemProps = {
  * Props for the SelectItemWithIcon component
  */
 export type ButtonItemWithIconProps = {
-  // value: string;
   inertIconText: ReactNode | string;
-  // modalName?: AppModalNames;
 } & PropsWithChildren;
-// export type SelectItemWithIconProps = ComponentProps<typeof SelectItem> & {
-//   value: string;
-//   selectText: ReactNode | string;
-//   modalName?: AppModalNames;
-// };
 
 export type HandleAddNewParams = {
   e: PointerEvent<HTMLDivElement>;

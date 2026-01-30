@@ -1,5 +1,9 @@
 import { DEV_MODE, NO_MUTATION_OBSERVER_LOGS } from "@/configs/app.config.ts";
-import type { MutationObserverHook } from "@/hooks/types/use-mutation-observer.types.ts";
+import type {
+  MutationObserverHook,
+  State,
+  StateData,
+} from "@/hooks/types/use-mutation-observer.types.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useCallback, useId, useRef, useState } from "react";
 
@@ -24,22 +28,14 @@ export function useMutationObserver({
   options = defaultOptions,
   onNodeReady,
 }: MutationObserverHook) {
-  const observersRef = useRef(
-    new UniqueSet<string, { observer: MutationObserver }>()
-  );
+  const observersRef = useRef(new UniqueSet<string, StateData>());
   const idCounterRef = useRef(0);
   const nodeRef = useRef<Element>(null);
   const generatedNodeId = useId();
   const hookId = useId();
 
-  const [state, setState] = useState<{
-    observedRefs: UniqueSet<
-      string,
-      { element: Element; meta?: Record<string, unknown> }
-    >;
-    observer: MutationObserver;
-  }>({
-    observedRefs: new UniqueSet(),
+  const [state, setState] = useState<State>({
+    observedRefs: observersRef.current.clone(),
     observer: null!,
   });
 
@@ -52,7 +48,7 @@ export function useMutationObserver({
     (node?: Element | null, meta?: Record<string, unknown>) => {
       if (!node) {
         const disconnectedElement = Array.from(
-          state.observedRefs.entries()
+          observersRef.current.entries(),
         ).find(([key, value]) => {
           const elem = value.element;
 
@@ -63,17 +59,8 @@ export function useMutationObserver({
 
         if (!disconnectedElement) return;
         const [key] = disconnectedElement;
-        const obs = observersRef.current.get(key);
 
-        if (obs) {
-          obs.observer.disconnect();
-          observersRef.current.delete(key);
-        }
-
-        setState((prev) => ({
-          ...prev,
-          observedRefs: prev.observedRefs.clone().delete(key),
-        }));
+        deleteRef(key);
 
         nodeRef.current = null;
         return;
@@ -89,37 +76,35 @@ export function useMutationObserver({
         idCounterRef.current = 0;
       }
 
-      const nodeKey =
-        node.id || `mo-${generatedNodeId}-${++idCounterRef.current}`;
-      if (!node.id) node.id = nodeKey;
+      const generatedNodeKey = `mo-${generatedNodeId}-${++idCounterRef.current}`;
+      if (!node.id) node.id = (meta?.id as string) ?? generatedNodeKey;
 
-      const existingObs = state.observedRefs.has(nodeKey);
+      const existingObs = observersRef.current.has(node.id);
+
       if (existingObs) {
-        const prevMeta = state.observedRefs.get(nodeKey)?.meta ?? null;
+        const prevEntry = observersRef.current.get(node.id);
+        const prevMeta = prevEntry?.meta ?? null;
         const newMeta = meta ?? null;
+
         if (prevMeta === newMeta) return;
 
         setState((prev) => {
-          try {
-            const prevStr = JSON.stringify(prevMeta);
-            const newStr = JSON.stringify(newMeta);
-            if (prevStr !== newStr) {
-              return {
-                ...prev,
-                observedRefs: prev.observedRefs
-                  .clone()
-                  .set(nodeKey, { element: node, meta }),
-              };
-            }
-          } catch {
-            // If stringifying fails, fall back to always updating the meta reference
+          const prevStr = JSON.stringify(prevMeta);
+          const newStr = JSON.stringify(newMeta);
+
+          if (prevStr !== newStr) {
+            observersRef.current.set(node.id, {
+              observer: prevEntry!.observer,
+              element: node,
+              meta,
+            });
+
             return {
               ...prev,
-              observedRefs: prev.observedRefs
-                .clone()
-                .set(nodeKey, { element: node, meta }),
+              observedRefs: observersRef.current.clone(),
             };
           }
+
           return prev;
         });
         return;
@@ -130,54 +115,96 @@ export function useMutationObserver({
       const obs = new MutationObserver(callback);
 
       obs.observe(node, options);
-      observersRef.current.set(node.id, { observer: obs });
+      observersRef.current.set(node.id, { observer: obs, element: node, meta });
 
       setState((prev) => ({
         ...prev,
-        observedRefs: prev.observedRefs
-          .clone()
-          .set(nodeKey, { element: node, meta }),
+        observedRefs: observersRef.current.clone(),
         observer: obs,
       }));
 
       if (DEV_MODE && !NO_MUTATION_OBSERVER_LOGS) {
         console.debug(
-          `useMutationObserver[${hookId}]: observed node added -> ${nodeKey}`
+          `useMutationObserver[${hookId}]: observed node added -> ${node.id}`,
         );
       }
 
       onNodeReady?.(node, meta);
     },
-    [callback, options, onNodeReady, generatedNodeId, hookId]
+    [callback, options, onNodeReady, generatedNodeId, hookId],
   );
 
+  /**
+   * Deletes the observer and reference for a given key.
+   *
+   * @param key - The key of the observed element to delete
+   */
   const deleteRef = useCallback((key: string) => {
+    const obs = observersRef.current.get(key);
+
+    if (obs) {
+      obs.observer.disconnect();
+      observersRef.current.delete(key);
+    }
+
     setState((prev) => ({
       ...prev,
-      observedRefs: prev.observedRefs.clone().delete(key),
+      observedRefs: observersRef.current.clone(),
     }));
   }, []);
 
+  /**
+   * Clears all observers and references.
+   */
   const clearRefs = useCallback(() => {
+    observersRef.current.forEach((entry, key) => {
+      entry.observer.disconnect();
+      observersRef.current.delete(key);
+    });
+
     setState((prev) => ({
       ...prev,
-      observedRefs: new UniqueSet(),
+      observedRefs: observersRef.current.clone(),
     }));
   }, []);
 
-  const findMetadata = useCallback(
-    (key: string) => {
-      return state.observedRefs.get(key)?.meta;
-    },
-    [state.observedRefs]
-  );
+  /**
+   * Find metadata for a given key.
+   *
+   * @param key - The key of the observed element
+   *
+   * @returns The metadata associated with the observed element, if any
+   */
+  const findMetadata = useCallback((key: string) => {
+    return observersRef.current.get(key)?.meta;
+  }, []);
+
+  /**
+   * Find an observed entry by its metadata id or name.
+   *
+   * @description Use this if you need to locate an observed element based on its metadata.
+   *
+   * @param idOrName - The id or name to search for in metadata
+   *
+   * @returns The observed entry if found, otherwise undefined
+   */
+  const findByMeta = useCallback((idOrName: string) => {
+    for (const [, entry] of observersRef.current.entries()) {
+      const meta = entry?.meta;
+      if (!meta) continue;
+      if ((meta.id ?? meta.name ?? "") === idOrName) return entry;
+    }
+    return undefined;
+  }, []);
 
   return {
     setRef,
     deleteRef,
     clearRefs,
     observedRefs: state.observedRefs,
+    // observedRefs: observersRef.current,
     observer: state.observer,
     findMetadata,
+    findByMeta,
   };
 }

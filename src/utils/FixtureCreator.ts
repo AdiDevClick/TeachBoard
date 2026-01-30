@@ -217,7 +217,7 @@ export class FixtureCreatorBase {
     degreeYear?: string;
     degreeField?: string;
     yearNumber?: number;
-    skills?: SkillsViewDto[];
+    modules?: SkillsViewDto[];
   }): DiplomaConfigDto {
     // Return the fixture instance (its properties are own, enumerable values)
     return new DiplomaConfigFixtureCreator(
@@ -395,7 +395,7 @@ export class TaskTemplateFixtureCreator
   declare readonly name?: string;
   declare readonly task: TaskViewDto & { id: UUID };
   declare readonly degreeConfiguration?: DiplomaConfigDto;
-  declare readonly skills?: string[];
+  declare readonly modules?: string[];
 
   /**
    * Private fields to hold the person properties
@@ -408,7 +408,7 @@ export class TaskTemplateFixtureCreator
     name?: string;
     task?: TaskDto;
     degreeConfiguration?: DiplomaConfigDto;
-    skills?: string[];
+    modules?: string[];
   }) {
     super(params?.id);
 
@@ -441,7 +441,7 @@ export class DiplomaConfigFixtureCreator
   declare readonly degreeLevel: string;
   declare readonly degreeYear: string;
   declare readonly degreeField: string;
-  declare readonly skills?: SkillsViewDto[];
+  declare readonly modules?: SkillsViewDto[];
 
   /**
    * Private fields to hold the person properties
@@ -449,7 +449,7 @@ export class DiplomaConfigFixtureCreator
   readonly #degreeLevel: string;
   readonly #degreeYear: string;
   readonly #degreeField: string;
-  readonly #skills?: SkillsViewDto[];
+  readonly #modules?: SkillsViewDto[];
 
   constructor(params?: {
     id?: UUID;
@@ -457,7 +457,7 @@ export class DiplomaConfigFixtureCreator
     degreeYear?: string;
     degreeField?: string;
     yearNumber?: number;
-    skills?: SkillsViewDto[];
+    modules?: SkillsViewDto[];
   }) {
     super(params?.id);
     this.#degreeLevel =
@@ -468,13 +468,13 @@ export class DiplomaConfigFixtureCreator
 
     this.#degreeField =
       params?.degreeField ?? this.randomHumanWord({ minLen: 5, maxLen: 14 });
-    this.#skills = params?.skills;
+    this.#modules = params?.modules;
 
     this.exposeGettersAsValues({
       degreeLevel: this.#degreeLevel,
       degreeYear: this.#degreeYear,
       degreeField: this.#degreeField,
-      skills: this.#skills,
+      modules: this.#modules,
     });
   }
 }
@@ -487,34 +487,33 @@ export class SkillsViewFixtureCreator
    * Skills view DTO (TS-only declarations). The constructor exposes runtime
    * properties as own enumerable values so they can be spread/cloned.
    */
-  declare readonly mainSkillId: UUID;
-  declare readonly mainSkillName: string;
-  declare readonly mainSkillCode: string;
+  declare readonly id: UUID;
+  declare readonly name: string;
+  declare readonly code: string;
   declare readonly subSkills: { id: UUID; code: string; name: string }[];
 
   /**
    * Private fields to hold the person properties
    */
-  readonly #mainSkillId: UUID;
-  readonly #mainSkillName: string;
-  readonly #mainSkillCode: string;
+  readonly #id: UUID;
+  readonly #name: string;
+  readonly #code: string;
   readonly #subSkills: { id: UUID; code: string; name: string }[];
 
   constructor(params?: {
-    mainSkillId?: UUID;
-    mainSkillName?: string;
-    mainSkillCode?: string;
+    id?: UUID;
+    name?: string;
+    code?: string;
     subSkills?: { id?: UUID; code?: string; name?: string }[];
   }) {
     super();
-    this.#mainSkillId = params?.mainSkillId ?? this.id;
+    this.#id = params?.id ?? this.id;
 
     const name =
-      params?.mainSkillName ?? this.randomHumanWord({ minLen: 5, maxLen: 14 });
-    this.#mainSkillName = name;
-    this.#mainSkillCode =
-      params?.mainSkillCode ??
-      `${this.codeFromName(name, 4)}_${this.randomHex(6)}`;
+      params?.name ?? this.randomHumanWord({ minLen: 5, maxLen: 14 });
+    this.#name = name;
+    this.#code =
+      params?.code ?? `${this.codeFromName(name, 4)}_${this.randomHex(6)}`;
 
     const rawSubs = params?.subSkills ?? [{}, {}];
     this.#subSkills = rawSubs.map((s) => {
@@ -528,9 +527,9 @@ export class SkillsViewFixtureCreator
     });
 
     this.exposeGettersAsValues({
-      mainSkillId: this.#mainSkillId,
-      mainSkillCode: this.#mainSkillCode,
-      mainSkillName: this.#mainSkillName,
+      id: this.#id,
+      code: this.#code,
+      name: this.#name,
       subSkills: this.#subSkills,
     });
   }

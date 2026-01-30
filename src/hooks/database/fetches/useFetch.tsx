@@ -1,3 +1,4 @@
+import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
   DEV_MODE,
@@ -6,7 +7,6 @@ import {
 } from "@/configs/app.config.ts";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
-import { useAppStore } from "@/hooks/store/AppStore.ts";
 import type { ApiError } from "@/types/AppErrorInterface";
 import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
 import { useQueryClient } from "@tanstack/react-query";

@@ -20,6 +20,7 @@ import { VerticalFieldSelectWithController } from "@/components/Selects/Vertical
 import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
+  classCreationControllerPropsInvalid,
   debugLogs,
   taskModalPropsInvalid,
 } from "@/configs/app-components.config.ts";
@@ -30,8 +31,15 @@ import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-
 import { useAvatarDataGenerator } from "@/hooks/useAvatarDataGenerator.ts";
 import type { ClassCreationFormSchema } from "@/models/class-creation.models.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { Activity, useEffect, useRef, useState } from "react";
-import { useWatch, type FieldErrors } from "react-hook-form";
+import {
+  Activity,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useWatch } from "react-hook-form";
 
 const year = new Date().getFullYear();
 const years = yearsListRange(year, 5);
@@ -49,29 +57,34 @@ const defaultSchoolYear = year + " - " + (year + 1);
  * @param form - The form object for managing form state
  * @param formId - The unique identifier for the form
  * @param props - Additional props
+ * @param submitRoute - The API endpoint for form submission
+ * @param submitDataReshapeFn - The function to reshape data before submission
  */
-export function ClassCreationController({
-  inputControllers = classCreationInputControllers,
-  pageId,
-  form,
-  formId,
-  className,
-  submitRoute = API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
-  submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
-}: ClassCreationControllerProps) {
+export function ClassCreationController(props: ClassCreationControllerProps) {
+  if (classCreationControllerPropsInvalid(props)) {
+    debugLogs("ClassCreationController", props);
+  }
+
+  const {
+    inputControllers = classCreationInputControllers,
+    pageId,
+    form,
+    formId,
+    className,
+    submitRoute = API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
+    submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
+  } = props;
+
+  // End of defensive props check
+
   const [isSelectedDiploma, setIsSelectedDiploma] = useState(false);
 
   const queryClient = useQueryClient();
   const studentsMemo = useAvatarDataGenerator(form, "studentsValues");
   const primaryTeacherMemo = useAvatarDataGenerator(
     form,
-    "primaryTeacherValue"
+    "primaryTeacherValue",
   );
-  const tasksValues =
-    useWatch({
-      control: form.control,
-      name: "tasksValues",
-    }) ?? [];
 
   const {
     setRef,
@@ -82,11 +95,17 @@ export function ClassCreationController({
     openedDialogs,
     resultsCallback,
     selectionCallback,
+    invalidSubmitCallback,
   } = useCommandHandler({
     form,
     pageId,
     submitRoute,
     submitDataReshapeFn,
+  });
+
+  const tasksValues = useWatch({
+    control: form.control,
+    name: "tasksValues",
   });
 
   const cachedKeysRef = useRef<Record<string, unknown[]>>({});
@@ -110,7 +129,7 @@ export function ClassCreationController({
       resetSelectedItemsFromCache(
         cachedKeysRef.current["search-students"],
         currentStudentsValues,
-        queryClient
+        queryClient,
       );
     }
 
@@ -118,7 +137,7 @@ export function ClassCreationController({
       resetSelectedItemsFromCache(
         cachedKeysRef.current["search-primaryteacher"],
         currentPrimaryTeacherValue,
-        queryClient
+        queryClient,
       );
     }
   }, [openedDialogs]);
@@ -131,27 +150,30 @@ export function ClassCreationController({
    * @param open - Whether the select is opening
    * @param metaData - The meta data from the popover field that was opened
    */
-  const handleOpening = (open: boolean, metaData?: Record<string, unknown>) => {
-    const linkedDiploma = selectedDiplomaRef.current;
-    const isNewTaskTemplate = metaData?.task === "new-task-template";
+  const handleOpening = useCallback(
+    (open: boolean, metaData?: Record<string, unknown>) => {
+      const linkedDiploma = selectedDiplomaRef.current;
+      const isNewTaskTemplate = metaData?.task === "new-task-template";
 
-    if (isNewTaskTemplate && !taskModalPropsInvalid(linkedDiploma?.id)) {
-      const message =
-        "Tried to open task template modal without a selected diploma.";
-      debugLogs("[ClassCreationController] - " + message);
-      throw new Error(message);
-    }
+      if (isNewTaskTemplate) {
+        if (!linkedDiploma || taskModalPropsInvalid(linkedDiploma)) {
+          const message =
+            "Tried to open task template modal without a selected diploma.";
+          debugLogs("[ClassCreationController] - " + message);
+          throw new Error(message);
+        }
 
-    if (isNewTaskTemplate && linkedDiploma) {
-      metaData.apiEndpoint =
-        API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
-          linkedDiploma.id
-        );
-      metaData["degreeConfig"] = linkedDiploma;
-    }
+        metaData.apiEndpoint =
+          API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
+            linkedDiploma.id,
+          );
+        metaData["degreeConfig"] = linkedDiploma;
+      }
 
-    openingCallback(open, metaData);
-  };
+      openingCallback(open, metaData);
+    },
+    [],
+  );
 
   /**
    * Handle Class Creation form submission when form is valid
@@ -165,43 +187,6 @@ export function ClassCreationController({
   };
 
   /**
-   * Handle Class Creation form submission when there are validation errors
-   *
-   * @param errors - The validation errors
-   */
-  const handleInvalidSubmit = (
-    errors: FieldErrors<ClassCreationFormSchema>
-  ) => {
-    if (DEV_MODE) {
-      const currentValues = form.getValues() as ClassCreationFormSchema;
-
-      type InvalidSubmitDebug = {
-        at: number;
-        keys: string[];
-        values: ClassCreationFormSchema;
-      };
-
-      type GlobalWithInvalidSubmit = typeof globalThis & {
-        __TB_CLASS_CREATION_LAST_INVALID_SUBMIT__?: InvalidSubmitDebug;
-      };
-
-      (
-        globalThis as GlobalWithInvalidSubmit
-      ).__TB_CLASS_CREATION_LAST_INVALID_SUBMIT__ = {
-        at: Date.now(),
-        keys: Object.keys(errors ?? {}),
-        values: {
-          ...currentValues,
-        },
-      };
-
-      if (!NO_CACHE_LOGS) {
-        console.debug("ClassCreation invalid submit", errors);
-      }
-    }
-  };
-
-  /**
    * Handle command selection from PopoverFieldWithCommands
    * @description Updates the form values based on selected command items.
    *
@@ -210,7 +195,7 @@ export function ClassCreationController({
    */
   const handleCommandSelection = (
     value: string,
-    commandItemDetails: CommandItemType
+    commandItemDetails: CommandItemType,
   ) => {
     const options = {
       mainFormField: "tasks",
@@ -236,15 +221,20 @@ export function ClassCreationController({
    * @param value - The value of the selected command item
    * @param commandItem - The details of the selected command item
    */
-  const handleOnSelect = (__value: string, commandItem: CommandItemType) => {
-    if (form.watch("degreeConfigId") !== commandItem.id) {
-      selectedDiplomaRef.current = commandItem;
-      setIsSelectedDiploma(!!commandItem);
-      form.setValue("degreeConfigId", commandItem.id, { shouldValidate: true });
-      form.setValue("tasks", [], { shouldValidate: true });
-      form.setValue("tasksValues", [], { shouldValidate: true });
-    }
-  };
+  const handleOnSelect = useCallback(
+    (__value: string, commandItem: CommandItemType) => {
+      if (form.watch("degreeConfigId") !== commandItem.id) {
+        selectedDiplomaRef.current = commandItem;
+        setIsSelectedDiploma(!!commandItem);
+        form.setValue("degreeConfigId", commandItem.id, {
+          shouldValidate: true,
+        });
+        form.setValue("tasks", [], { shouldValidate: true });
+        form.setValue("tasksValues", [], { shouldValidate: true });
+      }
+    },
+    [],
+  );
 
   /**
    * Handle adding a new item
@@ -252,50 +242,54 @@ export function ClassCreationController({
    * @param e - The event triggering the new item addition
    * @param rest - Additional parameters related to the new item
    */
-  const handleNewItem = ({ e, ...rest }: HandleAddNewItemParams) => {
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Add new item triggered", {
-        apiEndpoint: rest.apiEndpoint,
-        task: rest.task,
-        selectedDiploma: selectedDiplomaRef.current,
-        selectedStudents: form.getValues("studentsValues"),
-        selectedPrimaryTeacher: form.getValues("primaryTeacherValue"),
-      });
-    }
-    const task = rest.task;
-    rest.form = form;
+  const handleNewItem = useCallback(
+    ({ e, ...rest }: HandleAddNewItemParams) => {
+      if (DEV_MODE && !NO_CACHE_LOGS) {
+        console.log("Add new item triggered", {
+          apiEndpoint: rest.apiEndpoint,
+          task: rest.task,
+          selectedDiploma: selectedDiplomaRef.current,
+          selectedStudents: form.getValues("studentsValues"),
+          selectedPrimaryTeacher: form.getValues("primaryTeacherValue"),
+        });
+      }
+      const task = rest.task;
+      rest.form = form;
 
-    if (task === "search-students") {
-      rest.selectedStudents = form.getValues("studentsValues") ?? {};
-    }
-
-    if (task === "search-primaryteacher") {
-      rest.selectedPrimaryTeacher = form.getValues("primaryTeacherValue") ?? {};
-    }
-
-    if (task === "new-task-template" && selectedDiplomaRef.current) {
-      rest.apiEndpoint =
-        API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
-          selectedDiplomaRef.current.id
-        );
-      rest.selectedDiploma = selectedDiplomaRef.current;
-
-      const cached = queryClient.getQueryData([task, rest.apiEndpoint]);
-
-      let data;
-      if (Array.isArray(cached)) {
-        data = cached[0];
+      if (task === "search-students") {
+        rest.selectedStudents = form.getValues("studentsValues") ?? {};
       }
 
-      rest.shortTemplatesList = data?.shortTemplatesList ?? [];
-    }
-    saveKeys([task, rest.apiEndpoint], cachedKeysRef);
+      if (task === "search-primaryteacher") {
+        rest.selectedPrimaryTeacher =
+          form.getValues("primaryTeacherValue") ?? {};
+      }
 
-    newItemCallback({
-      e,
-      ...rest,
-    });
-  };
+      if (task === "new-task-template" && selectedDiplomaRef.current) {
+        rest.apiEndpoint =
+          API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
+            selectedDiplomaRef.current.id,
+          );
+        rest.selectedDiploma = selectedDiplomaRef.current;
+
+        const cached = queryClient.getQueryData([task, rest.apiEndpoint]);
+
+        let data;
+        if (Array.isArray(cached)) {
+          data = cached[0];
+        }
+
+        rest.shortTemplatesList = data?.shortTemplatesList ?? [];
+      }
+      saveKeys([task, rest.apiEndpoint], cachedKeysRef);
+
+      newItemCallback({
+        e,
+        ...rest,
+      });
+    },
+    [],
+  );
 
   const handleOnYearSelect = (value: string) => {
     if (form.watch("schoolYear") !== value) {
@@ -303,10 +297,7 @@ export function ClassCreationController({
     }
   };
 
-  const handleDeletingTask = (
-    taskValue: string,
-    _taskDetails?: Record<string, unknown>
-  ) => {
+  const handleDeletingTask = (taskValue: string) => {
     const tasks = new Set(form.getValues("tasks") || []);
     tasks.delete(taskValue);
 
@@ -314,7 +305,7 @@ export function ClassCreationController({
       (form.getValues("tasksValues") as Array<[string, DetailedCommandItem]>) ||
       [];
     const nextTasksValues = currentTasksValues.filter(
-      ([key]) => key !== taskValue
+      ([key]) => key !== taskValue,
     );
 
     form.setValue("tasksValues", nextTasksValues, {
@@ -338,11 +329,30 @@ export function ClassCreationController({
       },
     ],
   };
+
+  const sharedCallbacksMemo = useMemo(() => {
+    const sharedCallbacks = {
+      onOpenChange: handleOpening,
+      onSelect: handleOnSelect,
+      onAddNewItem: handleNewItem,
+    };
+    const commonObsProps = {
+      setRef,
+      observedRefs,
+    };
+    const all = {
+      ...commonObsProps,
+      ...sharedCallbacks,
+    };
+
+    return { sharedCallbacks, commonObsProps, all };
+  }, [observedRefs, handleOnSelect, handleNewItem, handleOpening, setRef]);
+
   return (
     <form
       ref={(el) => setRef(el, { name: pageId, formId })}
       id={formId}
-      onSubmit={form.handleSubmit(handleValidSubmit, handleInvalidSubmit)}
+      onSubmit={form.handleSubmit(handleValidSubmit, invalidSubmitCallback)}
       className={className}
     >
       <ControlledInputList
@@ -353,12 +363,8 @@ export function ClassCreationController({
       <PopoverFieldWithControllerAndCommandsList
         items={controllers.popoverControllers}
         form={form}
-        setRef={setRef}
+        {...sharedCallbacksMemo.all}
         commandHeadings={resultsCallback()}
-        observedRefs={observedRefs}
-        onOpenChange={handleOpening}
-        onSelect={handleOnSelect}
-        onAddNewItem={handleNewItem}
       />
       <AvatarsWithLabelAndAddButtonList
         items={controllers.avatarControllers}
@@ -368,28 +374,23 @@ export function ClassCreationController({
       <Activity mode={isSelectedDiploma ? "visible" : "hidden"}>
         <ControlledDynamicTagList
           form={form}
-          setRef={setRef}
+          {...sharedCallbacksMemo.commonObsProps}
           {...controllers.dynamicListControllers}
-          observedRefs={observedRefs}
           itemList={tasksValues}
           // onRemove={handleCommandSelection}
           onRemove={handleDeletingTask}
         />
         <PopoverFieldWithCommands
           multiSelection
-          setRef={setRef}
+          {...sharedCallbacksMemo.all}
           onSelect={handleCommandSelection}
-          onOpenChange={handleOpening}
-          observedRefs={observedRefs}
-          onAddNewItem={handleNewItem}
           resetKey={form.watch("degreeConfigId")}
           commandHeadings={resultsCallback()}
           {...controllers.dynamicListControllers}
         />
       </Activity>
       <VerticalFieldSelectWithController
-        setRef={setRef}
-        observedRefs={observedRefs}
+        {...sharedCallbacksMemo.commonObsProps}
         name="schoolYear"
         form={form}
         fullWidth={false}

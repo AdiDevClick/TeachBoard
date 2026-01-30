@@ -54,19 +54,28 @@ function DegreeModule({
       formId,
       className,
       modalMode,
-      footerProps: {
-        ...footerProps,
-        formState: form.formState,
-        formId,
+      card: {
+        card: { className },
+        title: titleProps,
+        footer: {
+          ...footerProps,
+          formState: form.formState,
+          formId,
+        },
       },
-      titleProps,
       ...props,
       form,
     }),
-    [form.formState, props]
+    [form.formState, props],
   );
 
-  return <DegreeModuleWithCard {...commonProps} />;
+  return (
+    <DegreeModuleWithCard {...commonProps}>
+      <DegreeModuleWithCard.Title />
+      <DegreeModuleWithCard.Content />
+      <DegreeModuleWithCard.Footer />
+    </DegreeModuleWithCard>
+  );
 }
 
 const DegreeModuleWithCard = withTitledCard(DegreeModuleController);

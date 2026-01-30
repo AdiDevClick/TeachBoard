@@ -1,6 +1,6 @@
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { UseCommandHandlerParams } from "@/hooks/database/types/use-command-handler.types.ts";
-import type { UseFormReturn } from "react-hook-form";
+import type { UseFormReturn, FieldValues } from "react-hook-form";
 
 type ApiEndpointType = UseCommandHandlerParams["submitRoute"];
 type DataReshapeFn = UseCommandHandlerParams["submitDataReshapeFn"];
@@ -12,9 +12,9 @@ type DataReshapeFn = UseCommandHandlerParams["submitDataReshapeFn"];
  * - TSubmitReshapeFn: optional reshape function type used on POST
  */
 export type AppControllerInterface<
-  TForm = unknown,
+  TForm extends FieldValues = FieldValues,
   TSubmitRoute = ApiEndpointType,
-  TSubmitReshapeFn = DataReshapeFn
+  TSubmitReshapeFn = DataReshapeFn,
 > = Readonly<{
   className: string;
   formId: string;

@@ -11,7 +11,7 @@ export interface DiplomaConfigDto {
   degreeLevel: string;
   degreeYear: string;
   degreeField: string;
-  skills?: SkillsViewDto[];
+  modules?: SkillsViewDto[];
 }
 
 /**

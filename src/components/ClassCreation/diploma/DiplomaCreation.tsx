@@ -41,7 +41,7 @@ function DiplomaCreation({
       diplomaFieldId: "",
       yearId: "",
       levelId: "",
-      mainSkillsList: [],
+      modulesList: [],
     },
   });
 
@@ -53,18 +53,27 @@ function DiplomaCreation({
       modalMode,
       formId,
       className,
-      titleProps,
-      footerProps: {
-        ...footerProps,
-        formState: form.formState,
-        formId,
+      card: {
+        card: { className },
+        title: titleProps,
+        footer: {
+          ...footerProps,
+          formState: form.formState,
+          formId,
+        },
       },
       inputControllers,
       ...props,
       form,
     };
   }, [form.formState, props]);
-  return <DiplomaWithCard {...commonProps} />;
+  return (
+    <DiplomaWithCard {...commonProps}>
+      <DiplomaWithCard.Title />
+      <DiplomaWithCard.Content />
+      <DiplomaWithCard.Footer />
+    </DiplomaWithCard>
+  );
 }
 
 const DiplomaWithCard = withTitledCard(DiplomaCreationController);

@@ -52,20 +52,29 @@ export function TaskItem({
       inputControllers,
       formId,
       className,
-      footerProps: {
-        ...footerProps,
-        formState: form.formState,
-        formId: formId,
+      card: {
+        card: { className },
+        title: titleProps,
+        footer: {
+          ...footerProps,
+          formState: form.formState,
+          formId: formId,
+        },
       },
       modalMode,
-      titleProps,
       ...props,
       form,
     }),
-    [form.formState, props]
+    [form.formState, props],
   );
 
-  return <TaskItemWithCard {...commonProps} />;
+  return (
+    <TaskItemWithCard {...commonProps}>
+      <TaskItemWithCard.Title />
+      <TaskItemWithCard.Content />
+      <TaskItemWithCard.Footer />
+    </TaskItemWithCard>
+  );
 }
 
 const TaskItemWithCard = withTitledCard(TaskItemController);

@@ -25,7 +25,7 @@ Button {
   background: white;
   border-radius: 10px;
   padding: 5px;
-  transition: padding 0.4s ease-in-out, box-shadow 0.3s ease-in-out;
+  transition: padding 0.4s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out;
 }
 
 form,

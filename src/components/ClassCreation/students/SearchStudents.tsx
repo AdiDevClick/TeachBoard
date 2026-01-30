@@ -46,19 +46,28 @@ function SearchStudents({
       formId,
       localForm,
       className,
-      footerProps: {
-        ...footerProps,
-        formState: localForm.formState,
-        formId,
-      },
       modalMode,
-      titleProps,
+      card: {
+        card: { className },
+        title: titleProps,
+        footer: {
+          ...footerProps,
+          formState: localForm.formState,
+          formId,
+        },
+      },
       ...props,
     }),
-    [props, props.form, localForm]
+    [props, props.form, localForm],
   );
 
-  return <SearchStudentsWithCard {...commonProps} />;
+  return (
+    <SearchStudentsWithCard {...commonProps}>
+      <SearchStudentsWithCard.Title />
+      <SearchStudentsWithCard.Content />
+      <SearchStudentsWithCard.Footer />
+    </SearchStudentsWithCard>
+  );
 }
 
 const SearchStudentsWithCard = withTitledCard(SearchStudentsController);

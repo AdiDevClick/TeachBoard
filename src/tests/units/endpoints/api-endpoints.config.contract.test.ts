@@ -334,7 +334,7 @@ describe("API_ENDPOINTS full contract", () => {
   });
 
   it("POST.CREATE_TASK_TEMPLATE reshaper maps to {id,description,value} and inserts", () => {
-    const cached = [{ groupTitle: "Tous", items: [] }];
+    const cached = [{ groupTitle: "Tous", items: [], shortTemplatesList: [] }];
 
     const shaped = API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.dataReshape(
       { id: "tt1", task: { name: "Ex 1", description: "Addition" } } as any,
@@ -350,6 +350,7 @@ describe("API_ENDPOINTS full contract", () => {
         value: "Ex 1",
       })
     );
+    expect(list[0].shortTemplatesList).toContain("Ex 1");
   });
 
   it("POST.CREATE_TASK reshaper sets value=name and inserts", () => {

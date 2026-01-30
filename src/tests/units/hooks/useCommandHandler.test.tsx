@@ -1,8 +1,8 @@
+import { useAppStore } from "@/api/store/AppStore";
 import type { SkillDto } from "@/api/types/routes/skills.types.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import type { HandleSelectionCallbackParams } from "@/hooks/database/types/use-command-handler.types.ts";
-import { useAppStore } from "@/hooks/store/AppStore.ts";
 import { renderCommandHook } from "@/tests/hooks/reusable-hooks";
 import {
   skillApiEndpoint,
@@ -179,7 +179,7 @@ describe("useCommandHandler - basic behaviours", () => {
       {
         endpointUrl: skillApiEndpoint,
         dataReshapeFn: (d: unknown) => ({ items: [d] }),
-      }
+      },
     );
 
     // Wait until the queryClient has the cached reshaped data
@@ -196,9 +196,8 @@ describe("useCommandHandler - basic behaviours", () => {
   });
 
   test("openingCallback performs a GET and caches data", async () => {
-    const { openingCallback, resultsCallback } = await renderCommandHook(
-      skillModal
-    );
+    const { openingCallback, resultsCallback } =
+      await renderCommandHook(skillModal);
 
     const fetchDatas = {
       apiEndpoint: skillApiEndpoint,
@@ -211,8 +210,10 @@ describe("useCommandHandler - basic behaviours", () => {
     });
 
     // Trigger the opening which should initiate a GET fetch
-    // Note: intentionally omit `dataReshapeFn` to match validation logic in handleOpening
-    openingCallback(true, fetchDatas);
+    openingCallback(true, {
+      ...fetchDatas,
+      dataReshapeFn: (d: unknown) => d,
+    });
 
     // Wait until the queryClient has the cached fetched data
     const cached = await waitForCache(skillQueryKeySingle);

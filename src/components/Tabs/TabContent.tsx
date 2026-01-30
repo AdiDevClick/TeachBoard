@@ -18,7 +18,7 @@ import { useSidebar } from "../ui/sidebar.tsx";
 export function TabContent({
   item,
   index,
-  children,
+  leftContent,
   ...props
 }: Readonly<TabContentProps>) {
   const { isMobile } = useSidebar();
@@ -35,12 +35,14 @@ export function TabContent({
           />
         </CardHeader>
         <CardContent className="cards-container__content">
-          <LeftSidePageContent item={leftSide} />
+          <LeftSidePageContent item={leftSide}>
+            {leftContent}
+          </LeftSidePageContent>
           <Separator
             className="content__separator"
             orientation={isMobile ? "vertical" : "horizontal"}
           />
-          {children}
+          {props.children}
         </CardContent>
         <CardFooter className="cards-container__footer">
           <IconArrowRightDashed

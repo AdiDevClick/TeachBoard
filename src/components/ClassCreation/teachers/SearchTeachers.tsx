@@ -45,20 +45,29 @@ export function SearchPrimaryTeacher({
       localForm,
       modalMode,
       className,
-      footerProps: {
-        ...footerProps,
-        formState: localForm.formState,
-        formId,
+      card: {
+        card: { className },
+        title: titleProps,
+        footer: {
+          ...footerProps,
+          formState: localForm.formState,
+          formId,
+        },
       },
-      titleProps,
       ...props,
     }),
-    [props]
+    [props],
   );
 
-  return <SearchPrimaryTeacherWithCard {...commonProps} />;
+  return (
+    <SearchPrimaryTeacherWithCard {...commonProps}>
+      <SearchPrimaryTeacherWithCard.Title />
+      <SearchPrimaryTeacherWithCard.Content />
+      <SearchPrimaryTeacherWithCard.Footer />
+    </SearchPrimaryTeacherWithCard>
+  );
 }
 
 const SearchPrimaryTeacherWithCard = withTitledCard(
-  SearchPrimaryTeacherController
+  SearchPrimaryTeacherController,
 );

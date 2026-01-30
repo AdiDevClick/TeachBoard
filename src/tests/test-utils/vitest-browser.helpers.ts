@@ -36,7 +36,7 @@ const SELECTORS = {
  */
 export function elQuery(
   container: Element | null | undefined,
-  css: string
+  css: string,
 ): HTMLElement | null {
   const loc = container ? page.elementLocator(container) : page;
   const el = loc.getByCss(css).query();
@@ -45,7 +45,7 @@ export function elQuery(
 
 export function elQueryAll(
   container: Element | null | undefined,
-  css: string
+  css: string,
 ): HTMLElement[] {
   const nodes = container
     ? page.elementLocator(container).getByCss(css).elements()
@@ -84,7 +84,7 @@ async function expectFormToHaveNoErrors(timeout = 1000) {
           .elements()
           .map((n) => n.textContent ?? "")
           .filter(Boolean),
-      { timeout }
+      { timeout },
     )
     .toEqual([]);
 }
@@ -99,7 +99,7 @@ export async function expectElementTextToMatch(
     | ReturnType<typeof page.getByLabelText>
     | any,
   pattern: RegExp | string,
-  timeout = 1000
+  timeout = 1000,
 ) {
   const patt = pattern instanceof RegExp ? pattern : rx(pattern);
   await expect
@@ -114,7 +114,7 @@ export async function expectElementTextToMatch(
  */
 export async function checkFormValidityAndSubmit(
   name: string,
-  opts?: { timeout?: number }
+  opts?: { timeout?: number },
 ) {
   const rgx = new RegExp(`^${name}$`, "i");
 
@@ -140,7 +140,7 @@ export async function submitButtonShouldBeDisabled(name: string) {
 
 export async function fillAndTab(
   target: Parameters<typeof userEvent.fill>[0],
-  value: string
+  value: string,
 ) {
   // `userEvent.fill` accepts either a Locator or a DOM Element; `expect.element`
   // expects a Locator or an HTMLElement/SVGElement, so narrow at runtime.
@@ -160,7 +160,7 @@ export async function fillAndTab(
 export async function fillAndTabEnsuringSubmitDisabled(
   submitName: string,
   target: Parameters<typeof userEvent.fill>[0],
-  value: string
+  value: string,
 ) {
   await submitButtonShouldBeDisabled(submitName);
   await fillAndTab(target, value);
@@ -175,7 +175,7 @@ export async function fillFieldsEnsuringSubmitDisabled(
   items: Array<
     | { label: string | RegExp; value: string }
     | { locator: Locator; value: string }
-  >
+  >,
 ) {
   for (const it of items) {
     const target = "locator" in it ? it.locator : page.getByLabelText(it.label);
@@ -236,10 +236,10 @@ export function stubFetchRoutes({
       }
       console.debug(
         "[stubFetchRoutes] GET default response",
-        defaultGetPayload
+        defaultGetPayload,
       );
       return okJson(defaultGetPayload);
-    })
+    }),
   );
 }
 
@@ -287,7 +287,7 @@ export function queryKeyFor(controller: {
  */
 export async function expectOpenPopoverToContain(
   items: Array<string | RegExp>,
-  timeout = 1000
+  timeout = 1000,
 ) {
   for (const it of items) {
     const pattern = it instanceof RegExp ? it : rx(it);
@@ -307,7 +307,7 @@ export async function expectOpenPopoverToContain(
 export async function openPopoverAndExpectByLabel(
   label: RegExp,
   items: Array<string | RegExp>,
-  opts?: { withinDialog?: boolean; timeout?: number }
+  opts?: { withinDialog?: boolean; timeout?: number },
 ) {
   await openPopoverByLabelText(label, { withinDialog: opts?.withinDialog });
   await expectOpenPopoverToContain(items, opts?.timeout ?? 1000);
@@ -319,7 +319,7 @@ export async function openPopoverAndExpectByLabel(
 export async function openPopoverAndExpectByTrigger(
   trigger: RegExp,
   items: Array<string | RegExp>,
-  timeout = 1000
+  timeout = 1000,
 ) {
   console.log("TRIGGER CATCHED : ", trigger);
   console.log("ITEMS CATCHED : ", items);
@@ -336,7 +336,7 @@ export function getOpenDialogContent(): HTMLElement {
 function getLastOpenOrVisible(
   openSelector: string,
   selector: string,
-  opts?: { checkOpacity?: boolean }
+  opts?: { checkOpacity?: boolean },
 ): HTMLElement | null {
   const open = elQueryAll(undefined, openSelector);
   const lastOpen = open.at(-1);
@@ -344,7 +344,7 @@ function getLastOpenOrVisible(
 
   const contents = elQueryAll(undefined, selector);
   const visible = contents.filter((el) =>
-    isElementActuallyVisible(el, { checkOpacity: opts?.checkOpacity ?? false })
+    isElementActuallyVisible(el, { checkOpacity: opts?.checkOpacity ?? false }),
   );
   return visible.at(-1) ?? null;
 }
@@ -356,7 +356,7 @@ function getLastVisibleDialogContent(): HTMLElement | null {
     SELECTORS.dialogContent,
     {
       checkOpacity: false,
-    }
+    },
   );
 }
 
@@ -366,7 +366,7 @@ export function isDialogOpen(): boolean {
 
 export async function waitForDialogState(
   expectedOpen: boolean,
-  timeout = 1000
+  timeout = 1000,
 ) {
   await expect.poll(isDialogOpen, { timeout }).toBe(expectedOpen);
 }
@@ -382,7 +382,7 @@ export async function waitForDialogState(
  */
 export async function waitForDialogAndAssertText(
   label: string | RegExp,
-  opts?: { present?: boolean; timeout?: number; withinDialog?: boolean }
+  opts?: { present?: boolean; timeout?: number; withinDialog?: boolean },
 ) {
   const timeout = opts?.timeout ?? 1000;
   const present = opts?.present ?? true;
@@ -405,13 +405,13 @@ export async function waitForDialogAndAssertText(
  */
 export async function waitForTextToBeAbsent(
   label: string | RegExp,
-  opts?: { present?: boolean; timeout?: number; withinDialog?: boolean }
+  opts?: { present?: boolean; timeout?: number; withinDialog?: boolean },
 ) {
   const timeout = opts?.timeout ?? 1000;
   const present = opts?.present ?? false;
 
   const scope = opts?.withinDialog
-    ? getLastVisibleDialogContent() ?? document.body
+    ? (getLastVisibleDialogContent() ?? document.body)
     : undefined;
   const count = () => {
     try {
@@ -431,14 +431,14 @@ export async function waitForTextToBeAbsent(
 
 export async function waitForPopoverState(
   expectedOpen: boolean,
-  timeout = 500
+  timeout = 500,
 ) {
   await expect.poll(isPopoverOpen, { timeout }).toBe(expectedOpen);
 }
 
 function isElementActuallyVisible(
   el: HTMLElement,
-  opts?: { checkOpacity?: boolean }
+  opts?: { checkOpacity?: boolean },
 ): boolean {
   if (el.hasAttribute("hidden")) return false;
 
@@ -467,13 +467,13 @@ function isElementActuallyVisible(
 function countVisibleElements(
   container: Element | null | undefined,
   selector: string,
-  opts?: { checkOpacity?: boolean }
+  opts?: { checkOpacity?: boolean },
 ): number {
   const els = container
     ? elQueryAll(container, selector)
     : elQueryAll(undefined, selector);
   return els.filter((el) =>
-    isElementActuallyVisible(el, { checkOpacity: opts?.checkOpacity ?? true })
+    isElementActuallyVisible(el, { checkOpacity: opts?.checkOpacity ?? true }),
   ).length;
 }
 
@@ -483,7 +483,7 @@ function countVisibleElements(
  */
 function getVisibleCounts(
   container: Element | null | undefined,
-  map: Record<string, string>
+  map: Record<string, string>,
 ) {
   const out: Record<string, number> = {};
   for (const [k, sel] of Object.entries(map)) {
@@ -499,7 +499,7 @@ function getVisibleCounts(
  */
 function getVisibleElementInfo(
   container: Element | null | undefined,
-  selector: string
+  selector: string,
 ) {
   const el = elQuery(container, selector);
   const visible = el
@@ -547,7 +547,7 @@ async function detectCmdkInOpenPopover(timeout = 250): Promise<boolean> {
           if (!open) return false;
           return hasCmdk(open);
         },
-        { timeout }
+        { timeout },
       )
       .toBe(true);
     return true;
@@ -558,7 +558,7 @@ async function detectCmdkInOpenPopover(timeout = 250): Promise<boolean> {
 
 async function waitForPopoverToCloseOrChange(
   previous: HTMLElement,
-  timeout = 400
+  timeout = 400,
 ) {
   await expect
     .poll(
@@ -566,7 +566,7 @@ async function waitForPopoverToCloseOrChange(
         const now = getOpenPopoverContent();
         return now === null || now !== previous;
       },
-      { timeout }
+      { timeout },
     )
     .toBe(true);
 }
@@ -605,7 +605,7 @@ async function waitForCmdkReady(timeout = 1500) {
           ? isElementActuallyVisible(empty, { checkOpacity: true })
           : false;
       },
-      { timeout }
+      { timeout },
     )
     .toBe(true);
 }
@@ -736,7 +736,7 @@ function findLabelElementScoped(label: RegExp, withinDialog?: boolean) {
 
 function getTriggerFromLabelElement(
   labelElement: HTMLLabelElement,
-  label: RegExp
+  label: RegExp,
 ): HTMLElement {
   // Prefer the built-in association instead of manual document.getElementById.
   // This works for <label for="..."> and nested controls.
@@ -759,7 +759,7 @@ function getTriggerFromLabelElement(
 
 export async function clickControlByLabelText(
   label: RegExp,
-  opts?: { withinDialog?: boolean }
+  opts?: { withinDialog?: boolean },
 ): Promise<HTMLElement> {
   setLastUiAction("clickControlByLabelText", {
     label: String(label),
@@ -778,7 +778,7 @@ export async function clickControlByLabelText(
 export async function selectCommandItemInContainer(
   container: HTMLElement,
   pattern: RegExp,
-  timeout = 500
+  timeout = 500,
 ) {
   setLastUiAction("selectCommandItemInContainer", {
     pattern: String(pattern),
@@ -797,7 +797,7 @@ export async function selectCommandItemInContainer(
         const items = getCommandItemsInContainer(container);
         return items.some((el) => pattern.test(getElementLabelText(el)));
       },
-      { timeout }
+      { timeout },
     )
     .toBe(true);
 
@@ -805,7 +805,7 @@ export async function selectCommandItemInContainer(
   const target = items.find((el) => pattern.test(getElementLabelText(el)));
   if (!target)
     throw new Error(
-      `[ui test] Command item not found for pattern: ${String(pattern)}`
+      `[ui test] Command item not found for pattern: ${String(pattern)}`,
     );
 
   const input = getCommandItem(container);
@@ -833,19 +833,19 @@ export async function selectCommandItemInContainer(
 }
 
 function getCommandItemsInContainer(
-  container: Element | null | undefined
+  container: Element | null | undefined,
 ): HTMLElement[] {
   // Most of the app uses shadcn/ui's CommandItem wrapper (data-slot="command-item"),
   // but cmdk also renders raw items with the [cmdk-item] attribute.
   // In some environments, the most stable hook is the ARIA role.
   if (!(container instanceof Element)) return [];
   return elQueryAll(container, SELECTORS.commandItems).filter((el) =>
-    isElementActuallyVisible(el)
+    isElementActuallyVisible(el),
   );
 }
 
 function getCommandItem(
-  container: Element | null | undefined
+  container: Element | null | undefined,
 ): HTMLInputElement | null {
   // Most of the app uses shadcn/ui's CommandItem wrapper (data-slot="command-item"),
   // but cmdk also renders raw items with the [cmdk-item] attribute.
@@ -863,7 +863,7 @@ async function selectItemsByPatterns(
     withinDialog?: boolean;
     timeout?: number;
     beforeEachSelect?: () => Promise<void>;
-  }
+  },
 ) {
   const findNewPopover = () => getOpenPopoverContent() ?? document.body;
 
@@ -894,7 +894,7 @@ export async function openPopoverByLabelText(
     items?: RegExp | RegExp[];
     timeout?: number;
     beforeEachSelect?: () => Promise<void>;
-  }
+  },
 ) {
   // Opens a popover by finding a label and clicking its associated control/trigger.
   // If `opts.withinDialog` is true, search will be scoped to the currently open dialog.
@@ -929,7 +929,11 @@ export async function openPopoverByLabelText(
 export async function openPopoverByLabelTextEnsuringSubmitDisabled(
   submitName: string,
   label: RegExp,
-  opts?: { withinDialog?: boolean; items?: RegExp | RegExp[]; timeout?: number }
+  opts?: {
+    withinDialog?: boolean;
+    items?: RegExp | RegExp[];
+    timeout?: number;
+  },
 ) {
   return openPopoverByLabelText(label, {
     ...opts,
@@ -945,7 +949,7 @@ export async function selectCommandItemInContainerEnsuringSubmitDisabled(
   submitName: string,
   container: HTMLElement,
   pattern: RegExp,
-  timeout = 500
+  timeout = 500,
 ) {
   await submitButtonShouldBeDisabled(submitName);
   return selectCommandItemInContainer(container, pattern, timeout);
@@ -963,7 +967,7 @@ export async function selectMultiplePopoversEnsuringSubmitDisabled(
     withinDialog?: boolean;
     timeout?: number;
     tabAfter?: boolean;
-  }>
+  }>,
 ) {
   for (const sel of selections) {
     await openPopoverByLabelTextEnsuringSubmitDisabled(submitName, sel.label, {
@@ -1000,7 +1004,7 @@ export async function openPopoverByContainerId(containerId: string) {
 }
 
 async function openPopover(
-  trigger: Parameters<typeof userEvent.click>[0] | null
+  trigger: Parameters<typeof userEvent.click>[0] | null,
 ) {
   // If it's already open (e.g. dialog opened on top), close first so we can
   // re-open and force a re-render with updated cached data.
@@ -1036,7 +1040,7 @@ export function getOpenPopoverContent(): HTMLElement | null {
     SELECTORS.popoverContent,
     {
       checkOpacity: true,
-    }
+    },
   );
 }
 
@@ -1056,7 +1060,7 @@ function getOpenPopoverCommandDebugText(): string {
     const visibleCount = countVisibleElements(
       undefined,
       SELECTORS.popoverContent,
-      { checkOpacity: true }
+      { checkOpacity: true },
     );
     const last = all.at(-1) ?? null;
     const lastVisible = last
@@ -1096,7 +1100,7 @@ function getOpenPopoverCommandDebugText(): string {
   const inputValue = inputInfo.inputValue;
 
   return `__EMPTY__ counts=${JSON.stringify(
-    counts
+    counts,
   )} inputVisible=${inputVisible} input="${inputValue}" emptyVisible=${emptyVisible} emptyText="${emptyText}"`;
 }
 

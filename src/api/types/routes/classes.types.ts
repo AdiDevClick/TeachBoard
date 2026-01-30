@@ -1,15 +1,22 @@
-import type { UUID } from "@/api/types/openapi/common.types.ts";
+import type { UUID, YearRange } from "@/api/types/openapi/common.types.ts";
+import type { StudentDto } from "@/api/types/routes/students.types.ts";
+import type { TaskTemplateDto } from "@/api/types/routes/task-templates.types.ts";
+import type { TeacherDto } from "@/api/types/routes/teachers.types.ts";
 
 /** OpenAPI: `ClassSummaryDTO` */
 export interface ClassSummaryDto {
   id: UUID;
   name: string;
   description?: string;
-  schoolYear?: string;
+  schoolYear?: YearRange;
   degreeConfigName?: string;
-  degreeLevel?: string;
-  degreeYearCode?: string;
-  degreeYearName?: string;
+  degreeLevel: string;
+  degreeYearCode: string;
+  degreeYearName: string;
+  evaluations: [];
+  primaryTeacher?: TeacherDto;
+  students: StudentDto[];
+  templates: TaskTemplateDto[];
 }
 
 /**

@@ -6,14 +6,17 @@ import {
 } from "@/data/inputs-controllers.data.ts";
 import { completeDatas } from "@/main.tsx";
 import { About } from "@/pages/About/About.tsx";
+import EmailValidation from "@/pages/Email/EmailValidation";
 import { PageError } from "@/pages/Error/PageError.tsx";
 import { CreateEvaluations } from "@/pages/Evaluations/create/CreateEvaluations.tsx";
-import { StepOne } from "@/pages/Evaluations/create/steps/StepOne.tsx";
+import { StepFour } from "@/pages/Evaluations/create/steps/four/StepFour.tsx";
+import { StepOne } from "@/pages/Evaluations/create/steps/one/StepOne";
+import { StepThree } from "@/pages/Evaluations/create/steps/three/StepThree.tsx";
+import { StepTwo } from "@/pages/Evaluations/create/steps/two/StepTwo.tsx";
 import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
 import { Login } from "@/pages/Login/Login.tsx";
 import { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
-import EmailValidation from "@/pages/Email/EmailValidation";
 import { Signup } from "@/pages/Signup/Signup";
 import { Navigate, type RouteObject } from "react-router-dom";
 type NavMenu = (typeof completeDatas.navMain.menus)[number];
@@ -114,6 +117,9 @@ export const routeChildren = [
           };
         },
       },
+      // The page is split into 2 zones :
+      // - Left zone : Description or Subskills list
+      // - Right zone : Evaluation and module selection
       {
         path: "create",
         element: <CreateEvaluations />,
@@ -130,12 +136,7 @@ export const routeChildren = [
         children: [
           {
             path: EvaluationPageTabsDatas.step1.name,
-            element: (
-              <StepOne
-                title={EvaluationPageTabsDatas.step1.rightSide.title}
-                placeholder={EvaluationPageTabsDatas.step1.rightSide.subTitle}
-              />
-            ),
+            element: <StepOne />,
             loader: async () => {
               const date = new Date().toLocaleDateString();
               return {
@@ -145,7 +146,7 @@ export const routeChildren = [
           },
           {
             path: EvaluationPageTabsDatas.step2.name,
-            element: <StepOne title="bots" placeholder="bots" />,
+            element: <StepTwo />,
             loader: async () => {
               const date = new Date().toLocaleDateString();
               return {
@@ -155,7 +156,7 @@ export const routeChildren = [
           },
           {
             path: EvaluationPageTabsDatas.step3.name,
-            element: <StepOne title="dsq" placeholder="dsq" />,
+            element: <StepThree />,
             loader: async () => {
               const date = new Date().toLocaleDateString();
               return {
@@ -165,7 +166,7 @@ export const routeChildren = [
           },
           {
             path: EvaluationPageTabsDatas.step4.name,
-            element: <StepOne title="gfgg" placeholder="gfgg" />,
+            element: <StepFour />,
             loader: async () => {
               const date = new Date().toLocaleDateString();
               return {

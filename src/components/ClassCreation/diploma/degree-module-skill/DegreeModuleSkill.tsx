@@ -54,19 +54,28 @@ export function DegreeModuleSkill({
       formId,
       className,
       modalMode,
-      footerProps: {
-        ...footerProps,
-        formState: form.formState,
-        formId,
+      card: {
+        card: { className },
+        title: degreeModuleTitleProps,
+        footer: {
+          ...footerProps,
+          formState: form.formState,
+          formId,
+        },
       },
-      titleProps: degreeModuleTitleProps,
       ...props,
       form,
     }),
-    [form.formState, props]
+    [form.formState, props],
   );
 
-  return <DegreeModuleSkillWithCard {...commonProps} />;
+  return (
+    <DegreeModuleSkillWithCard {...commonProps}>
+      <DegreeModuleSkillWithCard.Title />
+      <DegreeModuleSkillWithCard.Content />
+      <DegreeModuleSkillWithCard.Footer />
+    </DegreeModuleSkillWithCard>
+  );
 }
 
 const DegreeModuleSkillWithCard = withTitledCard(DegreeModuleSkillController);

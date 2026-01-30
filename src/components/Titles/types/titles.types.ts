@@ -1,5 +1,5 @@
 import type { CardHeader } from "@/components/ui/card.tsx";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 /** Props for the ModalTitle component */
 export type HeaderTitleProps = ComponentProps<typeof CardHeader> & {
@@ -10,5 +10,5 @@ export type HeaderTitleProps = ComponentProps<typeof CardHeader> & {
   /** Title text to render in the header */
   title?: string;
   /** Description text to render below the title */
-  description?: string;
+  description?: ReactNode;
 };

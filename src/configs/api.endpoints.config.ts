@@ -337,6 +337,14 @@ export const API_ENDPOINTS = Object.freeze({
           description: data.task.description,
           value: data.task.name,
         };
+
+        const prevShortTemplatesList = cachedDatas[0][1][0].shortTemplatesList;
+
+        cachedDatas[0][1][0].shortTemplatesList = [
+          ...prevShortTemplatesList,
+          newItem.value,
+        ];
+
         return reshapeItemToCachedData(newItem, cachedDatas, "Tous");
       },
     },

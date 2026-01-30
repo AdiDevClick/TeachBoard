@@ -2,8 +2,8 @@ import type {
   dataContext,
   dataContextUser,
 } from "@/api/providers/types/sidebar-data.provider.types";
+import type { AppStore } from "@/api/store/types/app-store.types";
 import type { UserButtonProps } from "@/components/Sidebar/footer/types/footer.types";
-import type { AppStore } from "@/hooks/store/types/store.types.ts";
 
 /**
  * User display fields for SettingsPopupProps

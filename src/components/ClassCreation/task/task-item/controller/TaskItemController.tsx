@@ -41,11 +41,9 @@ export function TaskItemController({
     });
   };
 
-  const id = formId ?? pageId + "-form";
-
   return (
     <form
-      id={id}
+      id={formId}
       className={className}
       onSubmit={form.handleSubmit(handleSubmit)}
     >

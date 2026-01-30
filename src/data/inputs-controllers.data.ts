@@ -9,6 +9,8 @@ import type { InputItem } from "@/components/Inputs/types/inputs.types";
 import type LoginForm from "@/components/LoginForms/LoginForm.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { RecoveryFormSchema } from "@/models/login.models.ts";
+import type { StepOne } from "@/pages/Evaluations/create/steps/one/StepOne.tsx";
+import type { StepTwo } from "@/pages/Evaluations/create/steps/two/StepTwo.tsx";
 import type { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
 import type { Signup } from "@/pages/Signup/Signup.tsx";
 
@@ -345,8 +347,9 @@ export const stepOneInputControllers = [
     useCommands: true,
     creationButtonText: "Créer une classe",
     useButtonAddNew: true,
+    className: "right__content",
   },
-];
+] satisfies Parameters<typeof StepOne>[0]["inputControllers"];
 
 export const diplomaCreationInputControllers = [
   {
@@ -393,7 +396,7 @@ export const diplomaCreationInputControllers = [
     apiEndpoint: API_ENDPOINTS.GET.SKILLS.endPoints.MODULES,
     dataReshapeFn: API_ENDPOINTS.GET.SKILLS.dataReshape,
     task: "new-degree-module",
-    name: "mainSkillsList",
+    name: "modulesList",
     title: "Modules",
     type: "button",
     useButtonAddNew: true,
@@ -402,3 +405,13 @@ export const diplomaCreationInputControllers = [
     placeholder: "Recherchez des modules...",
   },
 ] satisfies Parameters<typeof DiplomaCreation>[0]["inputControllers"];
+
+export const attendanceRecordCreationBaseControllers = [
+  {
+    name: "students",
+    title: "Tâches à évaluer",
+    type: "button",
+    placeholder: "Sélectionnez une tâche",
+    fullWidth: true,
+  },
+] satisfies Parameters<typeof StepTwo>[0]["inputControllers"];

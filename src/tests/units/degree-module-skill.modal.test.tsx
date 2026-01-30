@@ -1,5 +1,5 @@
+import { useAppStore } from "@/api/store/AppStore";
 import type { AppModalNames } from "@/configs/app.config.ts";
-import { useAppStore } from "@/hooks/store/AppStore";
 import { renderCommandHook } from "@/tests/hooks/reusable-hooks";
 import {
   skillApiEndpoint,
@@ -62,11 +62,12 @@ describe("DegreeModuleSkill modal integration", () => {
     openingCallback(true, {
       task: fetchDatas.task,
       apiEndpoint: fetchDatas.apiEndpoint,
+      dataReshapeFn: fetchDatas.dataReshapeFn,
     });
 
     // Wait for cache to contain fetched items (activity-based key)
     const cached = await waitForCache(skillQueryKeySingle);
-    expect(cached).toEqual([skillFetched]);
+    expect(cached).toEqual({ items: [skillFetched] });
 
     // Now prepare dialog options for submit flow and ensure the queryKey is present
     setDialogOptions(skillModuleModal, {

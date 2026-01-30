@@ -11,7 +11,7 @@ import { NavLink } from "react-router-dom";
  * @param item - The dropdown item to render.
  * @returns The rendered dropdown item.
  */
-export function Dropdown({ ...item }: Readonly<DropdownsProps>) {
+export function Dropdown(item: Readonly<DropdownsProps>) {
   if (!item) {
     throw new Error("Dropdown item data is required");
   }

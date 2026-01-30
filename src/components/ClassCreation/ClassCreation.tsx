@@ -1,6 +1,7 @@
 import { ClassCreationController } from "@/components/ClassCreation/controller/ClassCreationController.tsx";
 import type { ClassCreationProps } from "@/components/ClassCreation/types/class-creation.types.ts";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { classCreationInputControllers } from "@/data/inputs-controllers.data.ts";
 import {
   classCreationSchema,
@@ -60,19 +61,30 @@ function ClassCreation({
       modalMode,
       className,
       formId,
-      titleProps,
-      footerProps: {
-        ...footerProps,
-        formState: form.formState,
-        formId,
+      card: {
+        card: { className },
+        title: titleProps,
+        footer: {
+          ...footerProps,
+          formState: form.formState,
+          formId,
+        },
       },
       inputControllers,
       ...props,
       form,
+      submitRoute: API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
+      submitDataReshapeFn: API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
     }),
-    [form.formState, props]
+    [form.formState, props],
   );
-  return <ClassCreationWithCard {...commonProps} />;
+  return (
+    <ClassCreationWithCard {...commonProps}>
+      <ClassCreationWithCard.Title />
+      <ClassCreationWithCard.Content />
+      <ClassCreationWithCard.Footer />
+    </ClassCreationWithCard>
+  );
 }
 
 const ClassCreationWithCard = withTitledCard(ClassCreationController);

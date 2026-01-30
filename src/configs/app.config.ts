@@ -4,6 +4,8 @@
  * @description This file contains global configuration settings for the application.
  */
 
+import { mirrorProperties } from "@/utils/utils.ts";
+
 /** Preferred language for the application */
 export const LANGUAGE = "fr-FR";
 
@@ -13,20 +15,25 @@ export const NO_PROXY_LOGS = true;
 export const NO_MUTATION_OBSERVER_LOGS = true;
 export const NO_CACHE_LOGS = true;
 export const NO_QUERY_LOGS = false;
-export const NO_COMPONENT_WARNING_LOGS = true;
+export const NO_COMPONENT_WARNING_LOGS = false;
+export const ANIMATIONS_LOGS = false;
+
+const HTTP_METHODS_LIST = [
+  "GET",
+  "POST",
+  "PUT",
+  "DELETE",
+  "PATCH",
+  "OPTIONS",
+  "HEAD",
+  "CONNECT",
+  "TRACE",
+] as const;
 
 /** Supported HTTP methods for API requests */
-export const HTTP_METHODS = {
-  GET: "GET",
-  POST: "POST",
-  PUT: "PUT",
-  DELETE: "DELETE",
-  PATCH: "PATCH",
-  OPTIONS: "OPTIONS",
-  HEAD: "HEAD",
-  CONNECT: "CONNECT",
-  TRACE: "TRACE",
-} as const;
+export const HTTP_METHODS = mirrorProperties(HTTP_METHODS_LIST) as {
+  [key in (typeof HTTP_METHODS_LIST)[number]]: key;
+};
 
 /**
  * User activities constants
@@ -75,7 +82,9 @@ export type AppModalNames =
   // Used by ClassCreationController in the input - Not an actual modal
   | "add-school-year"
   | "search-students"
-  | "search-primaryteacher";
+  | "search-primaryteacher"
+  | "attendance-record-creation"
+  | "evaluation-summary";
 
 /**
  * Pages that do not require session checks

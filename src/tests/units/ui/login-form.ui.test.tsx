@@ -60,7 +60,7 @@ const loginResponse = {
   },
 };
 
-import { useAppStore } from "@/hooks/store/AppStore";
+import { useAppStore } from "@/api/store/AppStore";
 
 setupUiTestState(
   <AppTestWrapper>

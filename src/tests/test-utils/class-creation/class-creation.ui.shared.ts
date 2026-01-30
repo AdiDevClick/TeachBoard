@@ -1,5 +1,5 @@
-import { useAppStore } from "@/hooks/store/AppStore";
-import type { User } from "@/hooks/store/types/store.types";
+import { useAppStore } from "@/api/store/AppStore";
+import type { User } from "@/api/store/types/app-store.types";
 import { testQueryClient } from "@/tests/test-utils/testQueryClient";
 import type { ReactNode } from "react";
 import { beforeEach, vi } from "vitest";

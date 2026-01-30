@@ -20,17 +20,30 @@ export interface MutationObserverHook {
   onNodeReady?: (node: Element, meta?: Record<string, unknown>) => void;
 }
 
-export type SetRefFunction = (
-  node?: Element | null,
-  meta?: Record<string, unknown>
-) => void;
+type MetaType = Record<string, unknown>;
 
-export type MutationObserverEntry = {
-  element: Element;
-  meta?: Record<string, unknown>;
-};
+export type SetRefFunction = (node?: Element | null, meta?: MetaType) => void;
+
+type ObserverRef = UniqueSet<string, StateData>;
 
 export type UseMutationObserverReturn = {
   setRef?: SetRefFunction;
-  observedRefs?: UniqueSet<string, MutationObserverEntry>;
+  observedRefs?: ObserverRef;
+};
+
+/**
+ * State data for each observed element
+ */
+export type StateData = {
+  element: Element;
+  meta?: MetaType;
+  observer: MutationObserver;
+};
+
+/**
+ * State shape for useMutationObserver hook
+ */
+export type State = {
+  observedRefs: ObserverRef;
+  observer: MutationObserver;
 };

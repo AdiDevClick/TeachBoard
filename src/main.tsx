@@ -1,5 +1,6 @@
 import { DialogProvider } from "@/api/providers/DialogProvider.tsx";
 import { SidebarDataProvider } from "@/api/providers/SidebarDataProvider.tsx";
+import { useAppStore } from "@/api/store/AppStore";
 import App from "@/App.tsx";
 import { PageHeader } from "@/components/Header/PageHeader";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
@@ -10,7 +11,6 @@ import { calendarEvents } from "@/data/CalendarData.ts";
 import { sidebarDatas } from "@/data/SidebarData.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
-import { useAppStore } from "@/hooks/store/AppStore.ts";
 import { AppModals } from "@/pages/AllModals/AppModals.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
 import { routeChildren } from "@/routes/routes.config.tsx";

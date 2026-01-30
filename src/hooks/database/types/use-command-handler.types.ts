@@ -1,3 +1,4 @@
+import type { CommandSelectionItemProps } from "@/components/Command/types/command.types.ts";
 import type {
   ApiEndpointType,
   DataReshapeFn,
@@ -62,7 +63,7 @@ export interface UseCommandHandlerParams<
   TFieldValues extends FieldValues = FieldValues,
   TRoute = unknown,
   TSubmitReshapeFn = never,
-  TPageId extends AppModalNames = AppModalNames
+  TPageId extends AppModalNames = AppModalNames,
 > {
   /** Zod validated form instance */
   form: UseFormReturn<TFieldValues>;
@@ -93,9 +94,7 @@ export type HandleSelectionCallbackParams = {
     /**
      * Extra payload saved alongside the selected value.
      */
-    detailedCommandItem?: Record<string, unknown> & {
-      isSelected?: boolean;
-    };
+    detailedCommandItem?: CommandSelectionItemProps["command"];
     /** Defaults to "array" for backward compatibility with multi-selection fields. */
     validationMode?: "array" | "single";
   };
@@ -124,4 +123,20 @@ export type HandleSubmitCallbackParams = {
     reshapeOptions?: unknown;
     silent?: boolean;
   };
+};
+
+/**
+ * Type for debugging invalid submits
+ */
+export type InvalidSubmitDebug<T> = {
+  at: number;
+  keys: string[];
+  values: T;
+};
+
+/**
+ * Global type extension for storing the last invalid submit
+ */
+export type GlobalWithInvalidSubmit<T> = typeof globalThis & {
+  __TB_CLASS_CREATION_LAST_INVALID_SUBMIT__?: InvalidSubmitDebug<T>;
 };

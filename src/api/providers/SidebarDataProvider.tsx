@@ -3,6 +3,13 @@ import type { SidebarDataProviderProps } from "@/api/providers/types/sidebar-dat
 
 /**
  * Sidebar Data Provider component
+ *
+ * @remarks This is used for Compound Components that need to access sidebar data
+ *
+ * @param value - The sidebar data context value
+ * @param children - The child components
+ *
+ * @returns The Sidebar Data Provider component
  */
 export function SidebarDataProvider({
   value,

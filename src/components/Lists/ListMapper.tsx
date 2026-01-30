@@ -1,12 +1,17 @@
 import type { ListMapperProps } from "@/components/Lists/types/ListsTypes.ts";
+import { Spinner } from "@/components/ui/spinner.tsx";
 import {
   debugLogs,
   listMapperContainsInvalid,
 } from "@/configs/app-components.config.ts";
+import { wait } from "@/utils/utils.ts";
 import {
+  Activity,
   Fragment,
   isValidElement,
+  useEffect,
   useId,
+  useState,
   type ElementType,
   type ReactNode,
 } from "react";
@@ -48,17 +53,34 @@ import {
  *
  * > **Use like a Component (type safety as it's a component)**
  * > ```tsx
- * > <ListMapper components={MyListItem} items={myItems} optional={myOptionalProps}/>
+ * > <ListMapper component={MyListItem} items={myItems} optional={myOptionalProps}/>
  * ```
  */
 export function ListMapper<
   TItems extends readonly unknown[] | Record<string, unknown>,
   C extends ElementType = ElementType,
-  TOptional extends Record<string, unknown> | undefined = undefined
+  TOptional extends Record<string, unknown> | undefined = undefined,
 >(props: Readonly<ListMapperProps<TItems, C, TOptional>>) {
   const { items, optional, children, component, ...rest } = props;
 
   const id = useId();
+
+  const [isWaiting, setIsWaiting] = useState(true);
+
+  /**
+   * Loading state.
+   *
+   * @remarks If a list of items is EMPTY, the spinner will be shown for 2 seconds max.
+   *
+   * @description Makes it easier to understand that the system is loading data.
+   */
+  useEffect(() => {
+    const showLoading = async () => {
+      await wait(2000);
+      setIsWaiting(false);
+    };
+    showLoading();
+  }, []);
 
   if (listMapperContainsInvalid(props)) {
     debugLogs("ListMapper");
@@ -66,9 +88,19 @@ export function ListMapper<
   }
 
   const isArrayInput = Array.isArray(items);
-  const itemsArray = isArrayInput
-    ? items
-    : Object.entries(items as Record<string, unknown>);
+
+  const itemsArray = isArrayInput ? items : Object.entries(items);
+
+  if (!itemsArray || itemsArray.length === 0) {
+    if (isWaiting) {
+      return (
+        <Activity mode="visible">
+          <Spinner className="m-auto size-5" />
+        </Activity>
+      );
+    }
+    return null;
+  }
 
   return itemsArray.map((item, index) => {
     if (!item) {
@@ -96,9 +128,9 @@ export function ListMapper<
     // Case B: Render function - best type safety (act as a function with params)
     if (typeof children === "function") {
       const renderFn = children as (
-        item: unknown,
+        item: TItems,
         index: number,
-        optional?: TOptional
+        optional?: TOptional,
       ) => ReactNode;
 
       return (
@@ -114,11 +146,8 @@ export function ListMapper<
         ...optional,
       };
 
-      const Component = children.type as ElementType;
-      const originalChildProps = (children.props ?? {}) as Record<
-        string,
-        unknown
-      >;
+      const Component = children.type;
+      const originalChildProps = children.props ?? {};
 
       return (
         <Component key={itemId} {...originalChildProps} {...injectedProps} />

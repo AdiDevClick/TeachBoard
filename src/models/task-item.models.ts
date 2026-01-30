@@ -41,7 +41,7 @@ export const taskItemCreationSchema = z.object({
     .nonempty(data.descriptionMinLengthMessage)
     .max(data.descriptionMaxLength, data.descriptionMaxLengthMessage)
     .min(data.descriptionMinLength, data.descriptionMinLengthMessage)
-    .regex(formsRegex.serverName, {
+    .regex(formsRegex.serverDescription, {
       message: data.regexDescriptionMessage,
     })
     .trim()

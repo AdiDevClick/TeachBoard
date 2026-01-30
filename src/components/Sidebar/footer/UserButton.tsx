@@ -1,3 +1,4 @@
+import { useAppStore } from "@/api/store/AppStore";
 import { AvatarDisplay } from "@/components/Avatar/AvatarDisplay";
 import { TriggeredSettingsPopup } from "@/components/Sidebar/footer/settings_popup/TriggeredSettingsPopup.tsx";
 import type { UserButtonProps } from "@/components/Sidebar/footer/types/footer.types";
@@ -11,7 +12,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useSidebarDataContext } from "@/hooks/contexts/useSidebarDataContext.ts";
-import { useAppStore } from "@/hooks/store/AppStore.ts";
 import { IconDotsVertical } from "@tabler/icons-react";
 
 /**

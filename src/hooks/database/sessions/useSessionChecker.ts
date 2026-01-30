@@ -1,7 +1,7 @@
+import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, USER_ACTIVITIES } from "@/configs/app.config.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
-import { useAppStore } from "@/hooks/store/AppStore.ts";
 
 /**
  * Custom hook to check user session.

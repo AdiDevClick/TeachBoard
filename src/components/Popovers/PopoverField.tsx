@@ -51,7 +51,9 @@ export function PopoverField({
   const [state, setState] = useState<PopoverFieldState>({
     open: false,
     fieldName: rest?.name,
-    selectedValue: props.multiSelection ? defaultValue : undefined,
+    selectedValue: props.multiSelection
+      ? defaultValue
+      : rest.defaultValue ?? undefined,
   });
 
   // Reset selectedValue when resetKey changes

@@ -9,15 +9,38 @@ Bienvenue !
 Cette application représente le frontend de TeachBoard, une interface pédagogique développée en React et TypeScript.
 
 **Table des matières :**
+- [Aperçu](#aperçu)
+- [Démo](#démo)
 - [Prérequis](#prérequis)
 - [Installation](#installation)
 - [Configuration & variables d'environnement](#configuration--variables-denvironnement)
-- [Configuration des logs](#configuration-des-logs)
 - [Commandes utiles](#commandes-utiles)
 - [Proxy API et backend](#proxy-api-et-backend)
-- [Gestion des données réseau](#gestion-des-données-réseau)
+- [Gestion des données réseau](#gestion-des-donnees-reseau)
+  - [RÈGLE OBLIGATOIRE — rôle du fichier `API_ENDPOINTS`](#role-api-endpoints)
+- [Recettes rapides](#recettes-rapides)
 - [Structure du projet (aperçu rapide)](#structure-du-projet-apercu-rapide)
+- [App Stores](#app-stores)
+  - [Structure](#app-stores-structure)
+  - [Liste des stores existants](#app-stores-liste-des-stores)
+  - [How To Build](#app-stores-comment-construire-un-store)
+    - [Extensions Zustand](#app-stores-extensions-zustand)
+    - [Types](#app-stores-types)
+    - [Store](#app-stores-store)
+- [Types communs & validation](#types-communs--validation)
+  - [UUID](#uuid)
+  - [Email](#email)
+  - [Year range](#year-range)
+  - [OffsetDateTime](#offsetdatetime)
+  - [SessionToken](#sessiontoken)
+- [CSS & Styles](#css--styles)
+  - [Structure des fichiers CSS](#structure-des-fichiers-css)
+  - [Mixins](#mixins)
+  - [Classes utilitaires & composants CSS](#classes-utilitaires--composants-css)
 - [Architecture & conventions — MVC (Controllers) et HOCs](#architecture-mvc-hocs)
+  - [Controllers (pattern MVC)](#controllers-pattern-mvc)
+  - [Structure des dossiers pour une feature (pattern MVC)](#structure-des-dossiers-pour-une-feature-pattern-mvc)
+  - [Construction d'un controller — Conventions obligatoires](#construction-dun-controller---conventions-obligatoires)
   - [HOCs — utilité & exemples](#hocs-utilite-exemples)
     - [Liste des HOCs (usage dans des vues)](#liste-des-hocs-usage-dans-des-vues)
       - [withTitledCard](#withtitledcard)
@@ -25,10 +48,44 @@ Cette application représente le frontend de TeachBoard, une interface pédagogi
       - [withListMapper](#withlistmapper)
       - [withComboBoxCommands](#withcomboboxcommands)
       - [withIconItem](#withiconitem)
+- [Composants — Catalogue](#composants--catalogue)
+  - [Buttons](#buttons)
+  - [Inputs](#inputs)
+  - [Selects](#selects)
+  - [Modal](#modal)
+  - [Form components (LoginForm)](#form-components-loginform)
+  - [Lists & Data Table](#lists--data-table)
+  - [Charts](#charts)
+  - [Layout (Header / Sidebar / Footer)](#layout-header--sidebar--footer)
+  - [Icons](#icons)
+  - [Ajouter un nouveau controller / HOC](#ajouter-un-nouveau-controller--hoc)
 - [Validation des props des composants](#validation-des-props-des-composants)
-- [Recettes rapides](#recettes-rapides)
 - [Tests](#tests)
+  - [Commandes communes](#commandes-communes)
+  - [Environnement de test](#environnement-de-test)
+  - [Bonnes pratiques pour tester les hooks](#bonnes-pratiques-pour-tester-les-hooks)
+  - [Exemple pratique (modales)](#exemple-pratique-modales)
+  - [Fixtures de test](#fixtures-de-test)
+    - [Bonnes pratiques pour créer de nouvelles classes de fixtures personnalisées](#bonnes-pratiques-pour-créer-de-nouvelles-classes-de-fixtures-personnalisées)
+    - [Créer des fixtures](#créer-des-fixtures)
+- [Modales](#modales)
+  - [Ouvrir une modal](#ouvrir-une-modal)
+  - [Fermer une modal](#fermer-une-modal)
+  - [Autres méthodes utiles](#autres-methodes-utiles)
+  - [À savoir](#a-savoir)
+  - [Noms de modales disponibles](#noms-de-modales-disponibles)
+- [Utils pratiques](#utils-pratiques)
+  - [preventDefaultAndStopPropagation](#preventdefaultandstoppropagation)
+  - [wait](#wait-duration-number-message-)
+  - [mirrorProperties](#mirrorproperties)
+  - [checkPropsValidity](#checkpropsvalidity)
+  - [handleModalOpening](#handlemodalopening)
+  - [ObjectReshape](#objectreshape)
+  - [Autres helpers & références rapides](#autres-helpers--references-rapides)
 - [Contribuer](#contribuer)
+- [Configuration des logs](#configuration-des-logs)
+- [Débogage & Ressources utiles](#debugage--ressources-utiles)
+- [Licence & Contact](#licence--contact)
 
 
 ## Aperçu
@@ -156,6 +213,8 @@ Si l'API backend est indisponible et que vous voulez développer côté frontend
 
 Les mocks peuvent se trouver dans `/src/data` ou être intégrés dans certains hooks.
 
+<a id="gestion-des-donnees-reseau"></a>
+
 ## Gestion des données réseau
 
 Remarque : le projet utilise le proxy de développement Vite qui redirige les requêtes commençant par `/api/` vers l'API définie par la variable d'environnement `VITE_BACKEND_URL` (voir la section **Proxy API et backend**).
@@ -174,61 +233,28 @@ Ce projet centralise à la fois les **endpoints** et la **transformation des don
 
   **Cas fréquent :** si un composant attend `value` tandis que le payload fournit `name`, un reshape simple (rename) est la solution idéale pour maintenir compatibilité sans changer le backend ni le composant.
 
+  **Cas spécifique :** pour la création de templates de tâches, le reshape met à jour `shortTemplatesList` lorsque cette liste existe déjà dans le cache. En absence de liste (cache vide ou structure incomplète), le reshape continue sans erreur (voir la logique dans [API_ENDPOINTS](src/configs/api.endpoints.config.ts)).
+
 **Obligations lors d'une modification (checklist)** :
 - [ ] Si vous modifiez ou ajoutez un `dataReshape`, **ajoutez un test de contrat** (dans `src/tests/units/endpoints/`) vérifiant le reshape attendu.
 - [ ] Mettez à jour la documentation (README) et la checklist PR.
 - [ ] Reformulez toute transformation complexe en helpers testables et importables depuis le reshape (le reshape doit rester essentiellement déclaratif).
 
 
-  **Note :** le hook [`useFetch()`](src/hooks/database/fetches/useFetch.tsx) s'appuie sur `API_ENDPOINTS` et renvoie aux consommateurs le payload tel qu'il sort du `dataReshape` — assurez-vous que vos reshapes retournent la forme attendue par les composants ou services qui consomment ces données.
+### Tests & bonnes pratiques
+- **Tests & contrats** : ajoutez un test de contrat dans `src/tests/units/endpoints/` à chaque modification/ajout de `dataReshape`. Exemple : `src/tests/units/endpoints/api-endpoints.config.contract.test.ts`.
 
-  **Où :** dans [src/hooks/database/fetches/useFetch.tsx](src/hooks/database/fetches/useFetch.tsx) la transformation est appliquée dans le callback `onSuccess` :
+- **Bonnes pratiques :**
+  - Déclarez l'endpoint et la `dataReshape` ensemble pour garder la logique proche de la route.
+  - Gardez `dataReshape` pure et testable (retourner une valeur, éviter effets de bord).
+  - Utilisez `reshapeItemToCachedData(...)` pour insérer proprement un nouvel item dans les données mises en cache.
+  - **Déclarez une interface TypeScript** décrivant la forme de sortie du serveur quand c'est pertinent (ex. `ClassesFetch`) et utilisez-la dans les contrôleurs et composants pour garantir le typage.
+  - **Utilisez un schéma OpenAPI ou GraphQL** quand il est disponible pour générer ou valider automatiquement les interfaces/DTOs.
 
-```ts
-// 1 — Appel : on récupère le reshape depuis l'API_ENDPOINTS
-// et on le passe à `useFetch` via `setFetchParams`.
-setFetchParams({
-  url: API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
-  method: API_ENDPOINTS.POST.METHOD,
-  dataReshapeFn: API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
-});
-```
 
-```ts
-// 2 — Réception du payload serveur
-// Extrait (simplifié) de `useFetch.tsx`
-const [fetchParams, setFetchParams] = useState(defaultStateParameters);
+**Note :** le hook [`useFetch()`](src/hooks/database/fetches/useFetch.tsx) applique la fonction `dataReshape` (déclarée dans `API_ENDPOINTS`) à la réception de la réponse ; la donnée reshaped est ensuite exposée aux composants via `data`.
 
-const queryParams = useQueryOnSubmit<ResponseInterface<TServerData>, E>([
-  onSuccess: (response) => {
-    // useFetch applique automatiquement la fonction fournie (dataReshapeFn)
-    const cachingDatas = fetchParams.dataReshapeFn
-      // Spécifier une fonction dans le fetchParams
-      // va automatiquement la trigger à réception des données -
-      // Veillez donc à utiliser l'`API_ENDPOINTS` pour centraliser les fonctions
-      ? fetchParams.dataReshapeFn(response.data, rawCachedDatas, fetchParams.reshapeOptions)
-      : response.data;
-
-    // Expose la donnée reshaped aux consommateurs via `data`
-    setViewData(cachingDatas as TViewData);
-
-    // Met à jour le cache avec la structure reshaped (et / ou la nouvelle entrée pour un POST)
-    queryClient.setQueryData(cachedFetchKey ?? [contentId, params.url], cachingDatas);
-
-    // useFetch retourne `{ data: viewData }` — c'est donc `cachingDatas` qui sera lu par les composants
-  }
-]);
-```
-
-```ts
-// 3 — Exemple de traitement du reshape via la fonction
-dataReshape: (data: TasksFetch) =>
-  dataReshaper(data)
-    .assignSourceTo("items")
-    .addToRoot({ groupTitle: "Tous" })
-    .assign([["name", "value"]])
-    .newShape(),
-```
+Pour les détails d'implémentation et des exemples complets, consultez `src/hooks/database/fetches/useFetch.tsx` et la section **Recettes rapides** ci‑dessous (exemples de reshapes et d'utilisation).
 
 Exemple : RÈGLE OBLIGATOIRE
 
@@ -241,6 +267,7 @@ const updatedCache = API_ENDPOINTS.POST.CREATE_CLASS.dataReshape(createdItem, ca
 ```
 
 ## Recettes rapides
+
 Une collection de petits exemples pour aller droit au but.
 
 - Rename d'une propriété (`name` → `value`) :
@@ -267,7 +294,7 @@ setFetchParams({
 });
 ```
 
-- Stub fetch rapide (tests) :
+- `stubFetchRoutes()` (tests) :
 ```ts
 stubFetchRoutes({ 
   getRoutes: 
@@ -281,14 +308,10 @@ stubFetchRoutes({
 });
 ```
 
-- **Tests & contrats :** des tests de contrat vérifient les `dataReshape` dans [src/tests/units/endpoints/api-endpoints.config.contract.test.ts](src/tests/units/endpoints/api-endpoints.config.contract.test.ts) — ajoutez un test si vous modifiez un reshape.
+- Pour les **tests & bonnes pratiques** (contrats, reshapes, typage), voir la section dédiée plus haut dans **Gestion des données réseau** (checklist & recommandations).
 
-- **Bonnes pratiques :**
-  - Déclarez l'endpoint et la `dataReshape` ensemble pour garder la logique proche de la route.
-  - Gardez `dataReshape` pure et testable (retourner une valeur, éviter effets de bord).
-  - Utilisez `reshapeItemToCachedData(...)` (fourni dans le fichier) pour insérer proprement un nouvel item dans les données mises en cache.
-  - **Déclarez une interface TypeScript** décrivant la forme de sortie du serveur quand c'est pertinent (ex. [`ClassesFetch`](src/api/types/routes/classes.types.ts)) et utilisez-la dans les contrôleurs et composants pour garantir le typage.
-  - **Utilisez un schéma OpenAPI ou GraphQL** quand il est disponible pour générer ou valider automatiquement les interfaces/DTOs afin d'assurer la conformité entre le backend et l'UI.
+
+<a id="role-api-endpoints"></a>
 
 ### RÈGLE OBLIGATOIRE — rôle du fichier `API_ENDPOINTS`
 
@@ -327,6 +350,8 @@ API_ENDPOINTS.POST.CREATE_CLASS.dataReshape = (data) => {
 
 <!-- --- -->
 
+<a id="structure-du-projet-apercu-rapide"></a>
+
 ## Structure du projet (aperçu rapide)
 
 - `src/` — code source principal
@@ -338,6 +363,461 @@ API_ENDPOINTS.POST.CREATE_CLASS.dataReshape = (data) => {
   - `routes/` — configuration des routes
 
 <!-- --- -->
+
+<a id="app-stores"></a>
+
+## App Stores
+
+Le projet utilise **Zustand**.
+Cette section décrit les **conventions** et la **structure** attendues pour les stores d'application présents.
+
+<a id="app-stores-structure"></a>
+
+### Structure
+
+- `src/api/store/` — stores d'application
+  - `types/` — définitions TypeScript pour les stores
+
+<a id="app-stores-liste-des-stores"></a>
+
+### Liste des stores existants
+
+- [`AppStore.ts`](src/api/store/AppStore.ts) — store combiné / point d'export principal
+- [`AuthMemoryStore.ts`](src/api/store/AuthMemoryStore.ts) — store mémoire pour l'authentification
+- [`DiplomaCreationStore.ts`](src/api/store/DiplomaCreationStore.ts) — store pour la création de diplômes
+- [`EvaluationStepsCreationStore.ts`](src/api/store/EvaluationStepsCreationStore.ts) — store pour la création d'évaluation
+- [`selectors.ts`](src/api/store/selectors.ts) — selecteurs / helpers pour interroger les stores
+
+<a id="app-stores-comment-construire-un-store"></a>
+
+### How to build
+
+- Voir la section `Types` ci-dessous pour les conventions de fichiers de types (`<store-name>.types.ts`) et l'exemple. 
+- En complément : créez le fichier d'implémentation du store `src/api/store/<StoreName>.ts` et exposez/implémentez les actions mentionnées dans le fichier de types.
+
+<a id="app-stores-extensions-zustand"></a>
+
+#### Extensions Zustand
+
+- **Extensions utilisées :**
+  - `devtools` — intégration aux Redux DevTools, utile pour le debugging et le time-travel.
+
+    Exemple :
+    ```ts
+    import { create } from 'zustand';
+    import { devtools } from 'zustand/middleware';
+
+    export const useAppStore = create(
+      devtools((set) => ({
+        count: 0,
+        inc: () => set((s) => ({ ...s, count: s.count + 1 })),
+      }), { name: 'TeachBoardStore' })
+    );
+    ```
+
+  - `immer` — permet un style mutatif pour les mises à jour d'état tout en conservant l'immuabilité.
+
+    Exemple — Avant / Après :
+
+    Avant (sans `immer`) — pattern immuable explicite :
+    ```ts
+    import { create } from 'zustand';
+
+    export const useStore = create((set) => ({
+      items: [],
+      add: (item) => set((s) => ({ ...s, items: [...s.items, item] })),
+    }));
+    ```
+
+    Après (avec `immer`) — syntaxe mutative simplifiée :
+    ```ts
+    import { create } from 'zustand';
+    import { immer } from 'zustand/middleware/immer';
+
+    export const useStore = create(
+      immer((set) => ({
+        items: [],
+        add: (item) => set((draft) => { draft.items.push(item); }),
+      }))
+    );
+    ```
+
+    Note : `immer` réduit le boilerplate lié aux copies (spread) et rend les mises à jour plus lisibles tout en conservant l'immuabilité sous-jacente.
+
+  - `persist` — persistance du store (localStorage/sessionStorage) pour conserver l'état entre sessions.
+
+    Exemple :
+    ```ts
+    import { create } from 'zustand';
+    import { persist } from 'zustand/middleware';
+
+    export const useStore = create(
+      persist((set) => ({
+        // Tous les setters du store seront persistés
+        theme: 'light',
+        setTheme: (t) => set({ theme: t }),
+      }), { name: 'teachboard-storage' })
+    );
+    ```
+
+  - `combine` — helper qui facilite la composition d'un `state` initial typé avec les `actions` du store.
+
+    Exemple :
+    ```ts
+    import { create } from 'zustand';
+    import { combine } from 'zustand/middleware';
+
+    const DEFAULT = { count: 0 };
+    export const useStore = create(combine(DEFAULT, (set) => ({
+      inc: () => set((s) => ({ ...s, count: s.count + 1 })),
+    })));
+    ```
+
+- **Exemple combiné (pattern courant dans ce repo)** :
+
+```ts
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
+import { persist } from 'zustand/middleware';
+import { combine } from 'zustand/middleware';
+
+const DEFAULT_VALUES = { /* ... */ } as const;
+
+export const useEvaluationStepsCreationStore = create(
+  devtools(
+    immer(
+      persist(
+        combine(DEFAULT_VALUES, (set, get) => ({
+          clear: () => set(() => ({ ...DEFAULT_VALUES })),
+          // actions...
+        })),
+        { name: 'steps-creation-store' }
+      )
+    ),
+    { name: 'StepsCreationStore' }
+  )
+);
+```
+
+> Astuce : adaptez l'ordre et les options selon vos besoins (persist généralement autour du state interne, devtools en extérieur pour capturer l'historique).
+
+<a id="app-stores-store"></a>
+
+#### Store
+
+- Conventions :
+  1. **DEFAULT_VALUES — State only**
+     - Déclarez `const DEFAULT_VALUES: <StoreName>State = { ... }` (toujours typer avec l'interface *state* uniquement).
+     - Préférez des instances vides pour les collections (ex. `new UniqueSet()`) plutôt que `null` quand cela a du sens.
+
+  2. **Créer le store avec `combine(DEFAULT_VALUES, ...)`**
+     - Ex : `combine(DEFAULT_VALUES, (set, get) => { ... })`.
+     - Utilisez `DEFAULT_VALUES` pour garantir une réinitialisation cohérente via une action `clear` :
+       `clear: () => set(() => ({ ...DEFAULT_VALUES }))`.
+
+  3. **Pattern recommandé — objet `ACTIONS` explicite**
+     - À l'intérieur de `combine(...)`, créez `const ACTIONS: <StoreName>Actions = { ... }` et implémentez tous les setters / getters dedans.
+     - Retournez `ACTIONS` à la fin de `combine`.
+     - Avantages : appels internes sûrs (`ACTIONS.setX(...)`), pas de binding `this` fragile, meilleure lisibilité et testabilité.
+
+     Exemple court :
+     ```ts
+     const ACTIONS: StepsCreationActions = {
+       clear() { set(() => ({ ...DEFAULT_VALUES })); },
+       setStudents(students) { /* ... */ },
+       setSelectedClass(c) { ACTIONS.setStudents(c.students); }
+     };
+     return ACTIONS;
+     ```
+
+  4. **NE PAS UTILISER `this`**
+     - Ne pas utiliser `this` dans les setters (risque si la méthode est extraite ou passée en callback).
+     - Si vous voulez uniquement l'auto‑complétion, vous pouvez typer `get` : `(set, get: () => <StoreName>Store) => ({ ... })` et appeler `get().setX(...)`, mais `ACTIONS` reste la solution recommandée.
+
+- Raison : ce pattern rend l'implémentation prévisible (single source of truth pour les valeurs par défaut), stable (pas de binding `this`) et testable (on peut stuber/spyer `ACTIONS` dans les tests) et il évite de typer manuellement les setters 
+
+
+Exemple (extrait simplifié de `StepsCreationStore`) :
+
+```ts
+// Type the DEFAULT values with the *state* interface
+const DEFAULT_VALUES: StepsCreationState = {
+  id: null,
+  description: null,
+  students: new UniqueSet(),
+  tasks: new UniqueSet(),
+  evaluations: null,
+  diplomaName: null,
+  className: null,
+  selectedClass: null,
+};
+
+export const useEvaluationStepsCreationStore = create(
+  devtools(
+    immer(
+      combine(DEFAULT_VALUES, (set, get) => {
+        // Use a local ACTIONS object so actions can call each other safely
+        const ACTIONS = {
+          clear: () => set(() => ({ ...DEFAULT_VALUES })),
+          setSelectedClass(selectedClass: ClassSummaryDto) {
+            set((state) => {
+              state.selectedClass = selectedClass;
+              state.id = selectedClass.id || null;
+              // ...other state mapping
+            });
+
+            // Call other actions via ACTIONS (stable & testable)
+            ACTIONS.setStudents(selectedClass.students);
+            ACTIONS.setClassTasks(selectedClass.templates);
+          },
+          // ...other actions
+        };
+
+        return ACTIONS;
+      })
+    )
+  )
+);
+```
+
+
+<a id="app-stores-types"></a>
+
+#### Types
+
+- Emplacement : `src/api/store/types/`.
+- Convention :
+  - Créez un fichier de types `<store-name>.types.ts` pour chaque store.
+  - Exportez :
+    - `interface <StoreName>State` (seulement l'état, *sans* les setters),
+
+> Astuce : La création d'une `interface <StoreName>Action` n'est pas nécessaire (`Combine` gère automatiquement le typage des setters/getters).
+
+Exemple de fichier de types (convention recommandée) :
+```ts
+// src/api/store/types/steps-creation-store.types.ts
+import type { ClassSummaryDto } from '@/api/routes/classes.types.ts';
+
+export interface StepsCreationState {
+  // UUID existe et est un type commun de l'app
+  id: UUID | null;
+  description: string | null;
+  students: UniqueSet<StudentWithPresence> | null;
+  tasks: UniqueSet<Task> | null;
+  evaluations: unknown | null;
+  diplomaName: string | null;
+  className: string | null;
+  // ClassSummaryDto existe déjà dans l'app
+  selectedClass: ClassSummaryDto | null;
+}
+
+```
+
+**Checklist rapide pour une PR :**
+- [ ]  Ajouter / mettre à jour `src/api/store/<StoreName>.ts` et `src/api/store/types/<store-name>.types.ts`.
+- [ ]  Déclarer `const DEFAULT_VALUES` et typer les valeurs par défaut avec `<StoreName>State` (ex. `const DEFAULT_VALUES: StepsCreationState = {...}`).
+- [ ]  Déclarer `const ACTIONS = { ... }` dans `combine(...)` pour appeler des actions entre elles.
+- [ ]  Réutiliser les types existants quand cela est pertinent (p.ex. `ClassSummaryDto`).
+- [ ]  Mettre à jour la documentation (README) et vérifier la TOC.
+
+
+## Types communs & validation
+
+Cette section présente les **types communs** fournis par le projet (branded types + schémas Zod) et des exemples d'utilisation pour la validation runtime et le typage TypeScript.
+
+**Fichiers utiles :**
+- [`src/api/types/openapi/common.types.ts`](src/api/types/openapi/common.types.ts) — définitions et `Zod` schemas exportés (UUID, Email, YearRange, OffsetDateTime, SessionToken).
+
+### Pourquoi utiliser ces types ?
+- **Clarté** : un `Email`/`UUID` n'est pas un simple `string` — le branded type le rend explicite.
+- **Sécurité** : validez aux frontières (API / forms) avec `Zod` et transformez en type brandé avant usage.
+- **Interopérabilité** : réutilisez les mêmes schémas dans controllers, forms et tests.
+
+### Exemples d'utilisation
+
+- Valider une adresse e-mail (et obtenir le type `Email`) :
+
+```ts
+import { EMAIL_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+const email = EMAIL_SCHEMA.parse('user@example.com'); // email : Email
+```
+
+- Valider un UUID :
+
+```ts
+import { UUID_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+// id : UUID
+const id = UUID_SCHEMA.parse('123e4567-e89b-12d3-a456-426614174000'); 
+```
+
+- Utiliser le `SessionToken` dans une réponse API :
+
+```ts
+import { SESSION_TOKEN_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+const LoginResponse = z.object({
+  token: SESSION_TOKEN_SCHEMA,
+  user: UserSchema,
+});
+
+const data = LoginResponse.parse(await res.json());
+// data.token est typé `SessionToken` et validé au runtime
+```
+
+- Intégrer les schémas dans `react-hook-form` via `zodResolver` :
+
+```ts
+const form = useForm({
+  resolver: zodResolver(MyFormSchema),
+});
+```
+
+#### UUID
+
+- **But :** représenter un identifiant de ressource (UUID) comme un type *brandé* et le valider au runtime.
+
+```ts
+import { UUID_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+// Zod fournit .uuid(), le schéma du projet exporte UUID_SCHEMA (brandé)
+const id = UUID_SCHEMA.parse('123e4567-e89b-12d3-a456-426614174000'); // id : UUID
+```
+
+> Astuce : utilisez `UUID_SCHEMA` directement pour valider la réponse d'une API, ou `.uuid()` pour validations simples.
+
+#### Email
+
+- **But :** valider un e-mail et obtenir le type `Email` garantissant le format.
+
+```ts
+import { EMAIL_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+const email = EMAIL_SCHEMA.parse('user@example.com'); // email : Email
+```
+
+#### Year range
+
+- **But :** valider la chaîne `"YYYY-YYYY"` (ex: "2023-2024") et obtenir un type dédié `YearRange`.
+
+```ts
+import { YEAR_RANGE_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+const schoolYear = YEAR_RANGE_SCHEMA.parse('2023-2024'); // schoolYear : YearRange
+```
+
+#### OffsetDateTime
+
+- **But :** représenter une date/heure ISO-8601 et bénéficier d'un schéma Zod (`z.date`/`z.string().datetime()` selon l'usage).
+
+```ts
+import { OFFSET_DATE_TIME_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+const ts = OFFSET_DATE_TIME_SCHEMA.parse('2023-10-05T14:48:00.000Z'); // ts : OffsetDateTime
+```
+
+#### SessionToken
+
+- **But :** typer et valider le token de session renvoyé par le backend (format hex ou pattern du serveur).
+
+```ts
+import { SESSION_TOKEN_SCHEMA } from '@/api/types/openapi/common.types.ts';
+
+const token = SESSION_TOKEN_SCHEMA.parse('2682dc7e6b3b0d08547106ebac94cee8'); // token : SessionToken
+```
+
+### Bonnes pratiques
+- **Toujours** valider les données externes avant de les `as`-caster en branded types ; préférez les transformations (`.transform()`) ou des assertions (`assertIsUUID`).
+- Placez les schémas dans `src/api/types/...` ou `src/models/...` selon le rôle (types purs vs logique métier).
+- Ajoutez des tests unitaires (Vitest) pour couvrir les cas valides et invalides des schémas.
+
+---
+
+<a id="css--styles"></a>
+
+## CSS & Styles
+
+Cette section documente les conventions CSS du projet, la structure des fichiers, les mixins réutilisables et les classes spécifiques incluses dans le dépôt. Chaque entrée contient un **rôle**, un **exemple d'utilisation** et des **fichiers utiles**.
+
+<a id="structure-des-fichiers-css"></a>
+
+### Structure des fichiers CSS
+
+- `src/assets/css/` — emplacement pour les styles globaux, mixins et composants CSS.
+  - `_mixins.scss` — mixins réutilisables (helpers Sass).
+  - `Slider.scss` — styles pour le composant slider.
+
+**Exemple :** importer les mixins dans un fichier SCSS:
+
+```scss
+@use 'mixins' as *; // En haut du fichier
+```
+
+**Fichiers utiles :**
+- [_mixins.scss](src/assets/css/_mixins.scss) — collection de mixins (implémentation).
+- [Slider.scss](src/assets/css/Silder.scss) — styles du composant `<Slider/>`.
+
+<a id="mixins"></a>
+
+### Mixins — Liste
+
+- [`@mixin property`](src/assets/css/_mixins.scss) — Définit une propriété CSS via `@property` pour exposer des variables typées (syntax, inherits, initial-value).
+  - Exemple d'utilisation :
+  ```scss
+  @include property(slider-progress, percentage, true, 25%);
+
+  // Example: 
+  .myclass {
+    width: var(--slider-progress); // Commencera à 25%
+  }
+  ```
+
+- [`@mixin apply-width-crop`](src/assets/css/_mixins.scss) — Définit une largeur responsive limitée par un crop margin (utile pour containers avec un max-width et un padding latéral).
+  - Exemple d'utilisation :
+  ```scss
+  @include apply-width-crop(1200px, 16px);
+  ```
+
+- [`@mixin apply-repeated-linear-gradient-for-slider`](src/assets/css/_mixins.scss) — Génère un fond composé de dégradés linéaires répétés pour représenter des graduations/ticks sur un slider. Accepte angle, variable (progress), liste de ticks, épaisseur et couleur.
+  - Exemple d'utilisation :
+  ```scss
+  // Example:
+  .myclass {
+    @include apply-repeated-linear-gradient-for-slider(90deg, '--slider-progress', 0 25 50, 1px, #fff); 
+    // Cela va appliquer 3 linear-gradient tous les 25% dans un seul background
+  }
+  
+  ```
+
+<a id="classes-utilitaires--composants-css"></a>
+
+### Classes utilitaires & composants CSS
+
+- **`.four-steps-slider`** - [Slider.scss](src/assets/css/Slider.scss)
+
+  - Rôle : fournir un visuel de progression en quatre étapes avec marqueurs de tick et plage de couleur dynamique.
+  - Propriétés disponibles : 
+    - `--slider-progress` - Permet de sectionner le slider en plusieures sections (n'a pas besoin d'être modifié)
+    - `--slider-rangeColor` - Définit la couleur du range (peut être utilisé via Houdini API)
+
+  - Exemple de markup :
+  ```tsx
+  <Slider
+    step={25}
+    value={value}
+    onValueChange={setValue}
+    className="four-steps-slider"
+    style={
+      {
+        "--slider-rangeColor": rangeColor(),
+      } as CSSProperties
+    }
+  />
+  ```
+---
+
 <h2 id="architecture-mvc-hocs"/>
 
 ## Architecture & conventions — MVC (Controllers) et HOCs
@@ -345,37 +825,81 @@ API_ENDPOINTS.POST.CREATE_CLASS.dataReshape = (data) => {
 Cette section décrit les **conventions d'architecture** utilisées dans le projet pour séparer la logique métier (Controllers) et la présentation (Composants), ainsi que l'usage des **Higher-Order Components (HOCs)** pour les petits patterns réutilisables de layout ou d'intégration.
 
 ### Controllers (pattern MVC)
-- **Emplacement:** chaque feature peut contenir un dossier `controller/` près du composant (ex. `src/components/ClassCreation/controller/ClassCreationController.tsx`).
 - **Rôle:** orchestrer le flux (appel d'API via `useFetch`/`useCommandHandler`, gestion du formulaire, manipulation du cache React Query, callbacks, side-effects). Ne doit pas rendre des éléments purement présentiels complexes — déléguez le rendu aux composants enfants.
 - **Bonnes pratiques :**
   - Garder la logique (fetching, transformation, orchestration) dans le controller.
   - Utiliser des hooks partagés (`useCommandHandler`, `useFetch`, etc.) pour standardiser les interactions réseau.
+    - `useCommandHandler` expose déjà toute la logique de fetching, opening, selection etc... que demande un formulaire et est donc un hook très pratique à prioriser.
   - Exposer des props simples et typés au composant présentational (ex. `ClassCreationController` expose `form` et handlers, et rend `<ControlledInputList/>`, `<PopoverFieldWithCommands/>` etc.).
   - Tester les controllers via des tests unitaires simulant les hooks et le store (Vitest + stubs).
 
-**Exemple simplifié (pattern courant)**
-```tsx
-// Dans un controller
-const handleValidSubmit = (values: FormSchema) => submitCallback(values, { method: 'POST' });
-
-return <FormComponent form={form} onSubmit={handleValidSubmit} />;
-```
+<a id="structure-des-dossiers-pour-une-feature-pattern-mvc"></a>
 
 ### Structure des dossiers pour une feature (pattern MVC)
 Voici la convention de structure (format demandé : `dossier > controller/types/functions/le-composant`) :
 
 - `src/components/<Feature>/` — dossier de la feature
-  - `controller/` — orchestration (fetchs, soumissions, cache, side-effects)
+  - `controller/` — orchestration (fetchs, soumissions, cache, side-effects) — voir [Controllers (pattern MVC)](#controllers-pattern-mvc) pour les principes et bonnes pratiques.
   - `types/` — interfaces et types TypeScript (props, DTOs, responses)
   - `functions/` — helpers et fonctions pures (reshapers, transformateurs, utilitaires)
   - `<Feature>.tsx` — composant présentational (UI, rendu, props)
 
-- **Bonnes pratiques :**
-  - `controller` contient la logique métier et les effets de bord ; `functions` doit rester purement fonctionnel et testable.
-  - Nommez clairement : `XController.tsx`, `x.types.ts`, `x.helpers.ts`.
-  - Ajoutez des tests unitaires pour les fichiers dans `functions/` et pour le `controller` (stubs pour les hooks); testez l'UI des composants via des tests d'intégration si nécessaire.
-  - Évitez d'écrire des appels réseau ou side-effects dans `types/` ou `functions/`.
+> Note : Les bonnes pratiques détaillées (typage, tests, exposition des endpoints POST) sont documentées dans la section **Controllers (pattern MVC)** et dans **Construction d'un controller — Conventions obligatoires**.
 
+
+
+### Construction d'un controller — Conventions obligatoires
+
+- **Typage :** Les props du controller **doivent** utiliser `AppControllerInterface` en passant le schéma du formulaire. Exemple de signature :
+
+```ts
+type MyControllerProps = AppControllerInterface<
+  MyFormSchema,
+  typeof API_ENDPOINTS.POST.CREATE_X.endpoint,
+  typeof API_ENDPOINTS.POST.CREATE_X.dataReshape
+>;
+```
+
+- **Endpoint POST (obligatoire quand utilisé) :** Si le controller effectue un `POST` (soumission), exposez dans les props au moins : `submitRoute` et `submitDataReshapeFn`, typés (idéalement avec `typeof API_ENDPOINTS.POST.<NAME>.endpoint` et `typeof API_ENDPOINTS.POST.<NAME>.dataReshape`) afin qu'ils puissent être passés au `useCommandHandler` ou au `submitCallback`.
+
+- **Valeurs par défaut :** Il est recommandé d'initialiser `submitRoute` / `submitDataReshapeFn` depuis `API_ENDPOINTS` pour garantir la cohérence (voir exemple ci-dessous et [`ClassCreationController`](src/components/ClassCreation/controller/ClassCreationController.tsx)).
+
+- **Tests & contrats :** Toute modification d'un `dataReshape` (ou ajout d'un endpoint) **doit** être accompagnée d'un test de contrat dans `src/tests/units/endpoints/` (voir `api-endpoints.config.contract.test.ts`).
+
+**Exemple (pattern courant)**
+
+```ts
+export function MyController({
+  form,
+  pageId,
+  submitRoute = API_ENDPOINTS.POST.CREATE_X.endpoint,
+  submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_X.dataReshape,
+}: MyControllerProps) {
+  const { submitCallback } = useCommandHandler({ form, pageId, submitRoute, submitDataReshapeFn });
+
+  const handleValidSubmit = (values: MyFormSchema) =>
+    submitCallback(values, { method: HTTP_METHODS.POST });
+
+  return <FormComponent form={form} onSubmit={form.handleSubmit(handleValidSubmit)} />;
+}
+```
+
+**Fichiers utiles :**
+- [`AppControllerInterface`](src/types/AppControllerInterface.ts)
+- [`useCommandHandler`](src/hooks/database/classes/useCommandHandler.ts)
+- [`API_ENDPOINTS`](src/configs/api.endpoints.config.ts)
+- [`ClassCreationController`](src/components/ClassCreation/controller/ClassCreationController.tsx)
+- [`api-endpoints.config.contract.test.ts`](src/tests/units/endpoints/api-endpoints.config.contract.test.ts)
+
+**Exemple simplifié (pattern courant)**
+```tsx
+// Dans un controller
+import { HTTP_METHODS } from "@/configs/app.config.ts";
+
+const handleValidSubmit = (values: FormSchema) => submitCallback(values, { method: HTTP_METHODS.POST });
+
+return <FormComponent form={form} onSubmit={handleValidSubmit} />;
+```
 
 
 <h3 id="hocs-utilite-exemples"/>
@@ -388,9 +912,11 @@ Voici la convention de structure (format demandé : `dossier > controller/types/
 
 
 <a id="liste-des-hocs-usage-dans-des-vues"></a>
+
 ### Liste des HOCs (usage dans des vues)
 
 <a id="withtitledcard"></a>
+
 #### withTitledCard — Wrapper de présentation
 - **But :** encapsuler un controller ou un composant présentational dans une Card standardisée (titre, description, actions).
 - **Vue (exemple réel) :** `ClassCreation` montre l'utilisation typique :
@@ -424,6 +950,7 @@ function ClassCreationView(props) {
 ---
 
 <a id="withcontroller"></a>
+
 #### withController — Intégration `react-hook-form`
 - **But :** simplifier l'intégration d'un composant contrôlé par `react-hook-form`.
 - **Vue (exemple d'utilisation dans une form) :**
@@ -459,6 +986,7 @@ function MyForm({ form }) {
 ---
 
 <a id="withlistmapper"></a>
+
 #### withListMapper — Mapping de listes
 - **But :** générer rapidement un renderer pour des listes à partir d'un item component.
 - **Vue (exemple d'utilisation) :**
@@ -486,6 +1014,7 @@ return items.map(item => <Wrapped key={keyExtractor(item)} {...item} />);
 ---
 
 <a id="withcomboboxcommands"></a>
+
 #### withComboBoxCommands — Enrichissement de Combobox
 - **But :** ajouter une barre de commandes/actions à un champ combo/select.
 - **Vue (exemple d'utilisation) :**
@@ -517,6 +1046,7 @@ function TeachersView() {
 ---
 
 <a id="withiconitem"></a>
+
 #### withIconItem — Iconographie standardisée
 - **But :** ajouter une icône configurable (position/size) à un item sans modifier son rendu interne.
 - **Vue (exemple d'utilisation) :**
@@ -546,6 +1076,149 @@ function Sidebar() {
 > **Note :** Ces HOCs restent légers et orientés présentation. Pour la logique métier lourde, préférez un `controller` ou un service dédié.
 
 
+## Composants — Catalogue
+
+Une vue d'ensemble des composants réutilisables fournis par le projet, avec un exemple d'usage (look), les patterns d'utilisation (A / B / C) et un lien vers leur emplacement.
+
+> Note : les exemples ci-dessous sont des snippets usage (prêts à copier/coller) — ils servent à se faire une idée rapide du rendu et de l'API du composant.
+
+---
+
+### Buttons
+- **Look / example**:
+```tsx
+import { LoginButton } from '@/components/Buttons/LoginButton';
+import { SimpleAddButtonWithToolTip } from '@/components/Buttons/SimpleAddButton';
+
+<LoginButton name="Sign in with Google" path="/icons/google.svg" url="/auth/google" />
+<SimpleAddButtonWithToolTip toolTipText="Ajouter" onClick={() => {}} />
+```
+- **Patterns**: Pattern A — Standalone buttons; Pattern B — Buttons with tooltip / extra handler
+- **Emplacement**: `src/components/Buttons/` (`LoginButton.tsx`, `SimpleAddButton.tsx`)
+
+---
+
+### Inputs
+- **Look / example**:
+```tsx
+import { ControlledLabelledInput } from '@/components/Inputs/LaballedInputForController';
+
+<ControlledLabelledInput form={form} name="email" title="Adresse e-mail" />
+```
+- **Patterns**: Pattern A — Controlled input via `withController`; Pattern B — list mapping via `withListMapper` (`ControlledInputList`)
+- **Emplacement**: `src/components/Inputs/LaballedInputForController.tsx`
+
+---
+
+### Selects
+- **Look / example**:
+```tsx
+import VerticalFieldSelect from '@/components/Selects/VerticalFieldSelect';
+
+<VerticalFieldSelect label="Tâche" placeholder="Choisir...">
+  <SelectItem value="task1">Task 1</SelectItem>
+</VerticalFieldSelect>
+
+// with controller
+<VerticalFieldSelectWithController form={form} name="taskId" />
+```
+- **Patterns**: Pattern A — plain `VerticalFieldSelect`; Pattern B — `VerticalFieldSelectWithController` (react-hook-form); Pattern C — Extended with commands / add-new buttons
+- **Emplacement**: `src/components/Selects/` (`VerticalFieldSelect.tsx`)
+
+---
+
+### Modal
+- **Look / example**:
+```tsx
+// register in AppModals
+{
+  modalName: 'login',
+  type: Modal,
+  modalContent: LoginForm,
+  contentProps: { inputControllers: inputLoginControllers }
+}
+
+// open programmatically
+openDialog(null, 'login');
+```
+- **Patterns**: Pattern A — modal content = controller wrapped (ex: `LoginForm`); Pattern B — `ModalWithSimpleAlert`
+- **Emplacement**: `src/components/Modal/`, `src/pages/AllModals/AppModals.tsx`
+
+---
+
+### Form components (LoginForm)
+- **Look / example**:
+```tsx
+import LoginForm from '@/components/LoginForms/LoginForm';
+
+<LoginForm />
+```
+- **Patterns**: Pattern A — use as page component; Pattern B — used as modal content (`modalMode = true`)
+- **Emplacement**: `src/components/LoginForms/LoginForm.tsx` (+ `controller/LoginFormController.tsx`)
+
+---
+
+### Lists & Data Table
+- **Look / example**:
+```tsx
+import DataTable from '@/components/data-table';
+
+<DataTable columns={columns} rows={rows} />
+```
+- **Patterns**: Pattern A — with default renderer; Pattern B — override renderers / custom item components
+- **Emplacement**: `src/components/data-table.tsx`, `src/components/Lists/`
+
+---
+
+### Charts
+- **Look / example**:
+```tsx
+import ChartAreaInteractive from '@/components/chart-area-interactive';
+
+<ChartAreaInteractive data={chartData} />
+```
+- **Patterns**: Pattern A — standalone visualization component
+- **Emplacement**: `src/components/chart-area-interactive.tsx`
+
+---
+
+### Layout (Header / Sidebar / Footer)
+- **Look / example**:
+```tsx
+import Header from '@/components/Header';
+import Sidebar from '@/components/Sidebar';
+import Footer from '@/components/Footer';
+
+<Header />
+<Sidebar />
+<Footer />
+```
+- **Patterns**: used in page layout; header accepts actions/menus, sidebar contains navigation list
+- **Emplacement**: `src/components/Header/`, `src/components/Sidebar/`, `src/components/Footer/`
+
+---
+
+### Icons
+- **Look / example**:
+```tsx
+import { Icon } from '@/components/Icons/Icon';
+
+<Icon iconPath="/icons/user.svg" />
+```
+- **Patterns**: use `Icon` as presentational atom; prefer using icon components where required
+- **Emplacement**: `src/components/Icons/` 
+
+---
+
+### Notes & Contribuer
+- Si tu ajoutes un nouveau composant :
+  - place-le sous `src/components/<Name>/` ;
+  - export le composant principal dans un fichier index si utile ;
+  - documente l'exemple d'usage dans cette section (snippet, patterns et emplacement) ;
+  - ajoute un test unit / snapshot si le composant est complexe.
+
+---
+
 ### Fichiers utiles (exemples)
 - Controllers :
   - [ClassCreationController](src/components/ClassCreation/controller/ClassCreationController.tsx)
@@ -562,6 +1235,112 @@ function Sidebar() {
 - Pour un nouveau HOC : ajoutez-le sous `src/components/HOCs/` et documentez l'usage (exemple et cas d'usage). Ajoutez des tests pour vérifier le comportement du HOC et un exemple d'intégration.
 
 > Note : cette convention facilite la testabilité, la réutilisation et la séparation des responsabilités.
+
+---
+
+#### Créer un controller proprement — typage des `inputControllers`, schéma et rôle centralisateur
+
+Voici une checklist et des exemples concrets pour garantir la cohérence des controllers et des vues :
+
+- **Déclarer les `inputControllers` typés et réutilisables**
+
+  - Définissez toujours une constante itérable exportée pour les contrôleurs d'entrée et **assurez-vous** qu'elle *satisfies* le type attendu par le composant/vues. Cela protège contre les régressions lors de la création du formulaire.
+
+  ```ts
+  // Ex: src/data/inputs-controllers.data.ts
+  export const attendanceRecordCreationBaseControllers = [
+    {
+      name: "students",
+      title: "Tâche",
+      type: "button",
+      placeholder: "Sélectionnez une tâche",
+      fullWidth: true,
+    },
+  ] satisfies Parameters<typeof StepTwo>[0]["inputControllers"];
+  ```
+  
+  - Cette variable permet de construire les données reçu par un composant du controlleur.
+
+   ```ts
+  <VerticalFieldSelectWithController
+    {...inputController[0]}
+    setRef={setRef}
+    observedRefs={observedRefs}
+    form={form}
+    id={`${pageId}-${inputController.name}`}
+
+    // C'est comme avoir : 
+    // name="students"
+    // fullWidth
+    // placeholder={"Sélectionnez une tâche"}
+    // title: "Tâche"
+  >
+  ```
+
+- **Typage de la vue / du controller**
+
+  - La vue ou le controller doit être typée avec `PageWithControllers<YourInputItemType>`. Exemple d'utilisation dans `StepTwo` :
+
+  ```ts
+  export function StepTwo({
+    pageId = "attendance-record-creation",
+    modalMode = false,
+    className = "grid gap-4 max-w-2xl mx-auto",
+    inputControllers = [],
+    ...props
+  }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
+    // ...
+  }
+  ```
+
+  - Cette déclaration garantit que `inputControllers` est du bon format et que la vue expose l'API attendue (form, handlers, etc.).
+
+- **Typage de l'InputItem**
+
+  - Pour une input list qui peut impliquer des fetchs (sélection depuis l'API, `apiEndpoint`/`dataReshapeFn`), utilisez le type `FetchingInputItem<TSchema>` :
+
+  ```ts
+  export type AttendanceRecordCreationInputItem =
+    FetchingInputItem<AttendanceRecordCreationFormSchema>;
+  ```
+
+  - Pour des inputs statiques simples, préférez `InputItem<TSchema>`. L'important est d'être **cohérent** et d'expliquer quand utiliser `FetchingInputItem` vs `InputItem` (fetching behaviour, présence d'`apiEndpoint`, etc.).
+
+- **Créer et exporter le schéma (Zod)**
+
+  - Placez le schéma dans `src/models/…` et exposez une factory si le schéma dépend du contexte (ex: `availableTaskIds`). Exemple simplifié :
+
+  ```ts
+  // src/models/attendance-record-creation.models.ts
+  const attendanceRecordCreationSchema = (data, availableTaskIds: string[] = []) =>
+    z.object({/* ... */});
+
+  export const attendanceRecordCreationSchemaInstance = (availableTaskIds: string[] = []) =>
+    attendanceRecordCreationSchema(dataField, availableTaskIds);
+  ```
+
+  - Utilisez `zodResolver(schemaInstance)` dans `useForm` pour garder le form validé côté client :
+
+  ```ts
+  const form = useForm<AttendanceRecordCreationFormSchema>({
+    resolver: zodResolver(attendanceRecordCreationSchemaInstance(user.availableTaskIds || [])),
+    mode: "onTouched",
+    defaultValues: { students: [] },
+  });
+  ```
+
+- **Rôle centralisateur de l'`inputController`**
+
+  - L'`inputController` sert **à la fois** d'assurance de typage (garantie que la forme du champ correspond aux props attendues par le composant) et de **centralisation** des métadonnées nécessaires au rendu (labels, placeholder, `apiEndpoint`, `dataReshapeFn`, `task`, flags `useButtonAddNew`, etc.).
+
+- **Bonnes pratiques rapides**
+  - Exportez les controllers depuis `src/data/inputs-controllers.data.ts` et utilisez `satisfies Parameters<typeof Component>[0]["inputControllers"]` pour la sécurité de type.
+  - Choisissez `InputItem` pour des entrées statiques et `FetchingInputItem` pour les entrées basées sur fetchs; documentez le choix dans le fichier du controller.
+  - Mettez le schéma Zod dans `src/models/…` et exposez une factory si le schéma a des dépendances runtime (ex: `availableTaskIds`).
+  - Testez les reshapes et les controllers via des tests unitaires ciblés (Vitest) et ajoutez des contrats pour les reshapers si nécessaire.
+
+---
+
 
 <!-- --- -->
 <h2 id="validation-des-props-des-composants"/>
@@ -763,7 +1542,7 @@ Cette section décrit les classes utilitaires utilisées pour générer des fixt
   - Quoi : config diplôme (degreeLevel, degreeYear, degreeField, skills).
 
 - [`SkillsViewFixtureCreator`](src/utils/FixtureCreator.ts)
-  - Quoi : vue modules/skills (mainSkill + subSkills).
+  - Quoi : vue modules/skills (module + subSkills).
 
 - [`PersonFixtureCreatorBase`](src/utils/FixtureCreator.ts), [`StudentFixtureCreator`](src/utils/FixtureCreator.ts), [`TeacherFixtureCreator`](src/utils/FixtureCreator.ts)
   - Quoi : personnes (firstName, lastName, email).
@@ -916,6 +1695,8 @@ const classSample = new ClassFixtureCreator({ degreeLevel: '2A' });
 stubFetchRoutes({ getRoutes: [["/api/classes", [classSample]]] });
 ```
 
+<a id="mock-de-payloads-pour-des-methodes-routes-http"></a>
+
 ### Mock de payloads pour des méthodes(routes) HTTP
 
 Cet utils permet de créer un payload en fonction des url qui lui sont passées
@@ -1000,8 +1781,6 @@ Fichiers utiles :
 
 ## Modales (Le projet utilise un système centralisé de modales (Dialog))
 
-
-
 Ce système est exposé via le [`<DialogProvider/>`](src/api/providers/DialogProvider.tsx).
 
 Ce provider est le point central d'ouverture, de fermeture et de gestion des états des modales.
@@ -1064,6 +1843,8 @@ const modals = defineStrictModalsList([
     - types : [`modals.types.ts`](src/pages/AllModals/types/modals.types.ts)
   - Les noms valides sont typés dans [`src/configs/app.config.ts`](src/configs/app.config.ts) (`AppModalNames`).
 
+<a id="ouvrir-une-modal"></a>
+
 ### Ouvrir une modal :
 
   Pattern A — via un bouton (recommandé pour interactions UI) :
@@ -1098,6 +1879,8 @@ const modals = defineStrictModalsList([
   - [`useDialog()`](src/hooks/contexts/useDialog.ts)
   - [`<Button/>`](src/components/ui/button.tsx)
   - context: [`DialogContext`](src/api/contexts/DialogContext.ts)
+
+<a id="fermer-une-modal"></a>
 
 ### Fermer une modal :
 
@@ -1179,14 +1962,20 @@ const modals = defineStrictModalsList([
   - [`<DialogClose/>`](src/components/ui/dialog.tsx)
   - [`<Button/>`](src/components/ui/button.tsx)
 
+<a id="autres-methodes-utiles"></a>
+
 ### Autres méthodes utiles :
+
   - [`closeAllDialogs()`](src/api/providers/DialogProvider.tsx) — ferme toutes les modales ouvertes
 
   - [`isDialogOpen()`](src/api/providers/DialogProvider.tsx)(`'login'`) — vérifie si une modal est ouverte
 
   - [`onOpenChange()`](src/components/Modal/Modal.tsx)(modalName) — callback pour gérer le changement d'état
 
+<a id="a-savoir"></a>
+
 ### À savoir :
+
   - Le composant [`<Modal/>`](src/components/Modal/Modal.tsx) gère l'historique du navigateur (pushState/replaceState).
     L'ouverture d'une modal peut ajouter `/{modalName}` à l'URL.
     Si vous avez besoin de détails sur la gestion de l'historique, consultez la section "Note — Historique" ci-dessus.
@@ -1218,58 +2007,330 @@ const modals = defineStrictModalsList([
   - Utilisez [`onOpenChange()`](src/components/Modal/Modal.tsx) si vous devez réagir au cycle d’ouverture/fermeture.
     Cette fonction reçoit le nom de la modal en argument.
   
+  
+<a id="utils-pratiques"></a>
+
 ## Utils pratiques
-Quelques helpers réutilisables stockés dans [`src/utils/utils.ts`](/src/utils/utils.ts) :
 
-- `preventDefaultAndStopPropagation(e)` — protège vos handlers d’événement : 
-  - Il appelle `preventDefault()` et `stopPropagation()` si un `Event` est fourni. 
-  - Utile dans les callbacks qui peuvent être appelés tant depuis l’UI que de façon programmatique.
 
+Quelques helpers réutilisables stockés dans [`utils.ts`](src/utils/utils.ts) :
+
+<a id="preventdefaultandstoppropagation"></a>
+
+### `preventDefaultAndStopPropagation(e)`
+
+- **Objectif :** Empêcher le comportement par défaut et stopper la propagation d'un événement si présent.
+
+- **Contexte :** Evite de répéter la logique
+
+- **Exemple :**
 ```ts
 import { preventDefaultAndStopPropagation } from '@/utils/utils';
 
 function handleClick(e?: MouseEvent) {
-  // Protège contre les comportements par défaut et l’event bubbling
   preventDefaultAndStopPropagation(e);
+
+  // Same as : 
+  e.preventDefault();
+  e.stopPropagation();
+
   // logique métier
 }
 ```
 
-- `wait(duration[, message])` — une promesse pour ajouter un délai (utile en tests ou pour laisser l’UI se stabiliser).
+**Fichiers utiles :**
+- [`preventDefaultAndStopPropagation`](src/utils/utils.ts) — implémentation
 
+---
+<a id="wait-duration-number-message-"></a>
+
+### `wait(duration: number, message = '')`
+
+
+- **Objectif :** Crée une promesse qui se résout après `duration` millisecondes et renvoie `message` si fourni.
+
+- **Contexte :** Utile pour des pauses contrôlées dans les tests, attendre des animations ou temporiser des opérations asynchrones sans dépendre de timers externes.
+
+- **Exemple :**
 ```ts
-import { wait } from '@/utils/utils';
-await wait(150);
+import { wait } from '@/utils/utils.ts';
+
+await wait(150); // attend 150ms
+const result = await wait(500, 'done'); // 'done' après 500ms
 ```
 
-- `handleModalOpening({ e, dialogFns, modalName })` — helper pour fermer toutes les modales ouvertes.
-  Il ouvre ensuite une nouvelle modal proprement.
-  Il prend un objet `dialogFns: { closeAllDialogs, openDialog }`.
+**Fichiers utiles :**
+- [`wait`](src/utils/utils.ts) — implémentation
+- [`modal.test.tsx`](src/tests/units/modal/modal.test.tsx) — usages en tests
+- [`useQueryOnSubmit.ts`](src/hooks/database/useQueryOnSubmit.ts) — exemple d'usage
 
+---
+
+<a id="mirrorproperties"></a>
+
+### `mirrorProperties(properties)`
+
+
+- **Objectif :** Construit un objet où chaque clé a pour valeur la même chaîne, à partir d'un tableau de chaînes ou d'un objet.
+
+- **Contexte :** Permet d'avoir une source unique de vérité pour des constantes littérales (ex. méthodes HTTP) sans répéter manuellement `KEY: "KEY"`.
+
+- **Exemple :**
+```ts
+import { mirrorProperties } from '@/utils/utils.ts';
+
+const METHODS = ['GET','POST','PUT'] as const;
+export const HTTP_METHODS = mirrorProperties(METHODS) as {
+  [K in typeof METHODS[number]]: K
+};
+
+// HTTP_METHODS.GET === 'GET'
+```
+
+**Fichiers utiles :**
+- [`mirrorProperties`](src/utils/utils.ts) — implémentation
+- [`app.config.ts`](src/configs/app.config.ts) — exemple d'utilisation
+
+---
+
+<a id="checkpropsvalidity"></a>
+
+### `checkPropsValidity(props, required, forbidden)`
+
+
+- **Objectif :** Vérifier la présence des clés requises et l'absence des clés interdites dans un objet `props` (retourne `true` si problème).
+
+- **Contexte :** Utilisé comme garde en début de render pour certains composants afin d'empêcher des usages invalides en développement. La fonction est informative : elle logge des détails via `debugLogs` et gère les cas de `Proxy`/`Reflect`.
+
+- **Exemple :**
+```ts
+import { checkPropsValidity } from '@/utils/utils.ts';
+
+const required = ['field', 'fieldState'];
+const forbidden = ['useCommands'];
+
+if (checkPropsValidity(props, required, forbidden)) {
+  debugLogs('NomDuComposant');
+  return null; // bloquer le rendu en dev si nécessaire
+}
+```
+
+**Fichiers utiles :**
+- [`checkPropsValidity`](src/utils/utils.ts) — implémentation
+- [`app-components.config.ts`](src/configs/app-components.config.ts) — usages et constantes de validation
+
+---
+
+<a id="handlemodalopening"></a>
+
+### `handleModalOpening({ e, dialogFns, modalName })`
+
+
+- **Objectif :** Fermer toutes les modales ouvertes, puis ouvrir proprement une nouvelle modal.
+
+- **Contexte :** Helper pratique pour s'assurer qu'une seule modal est ouverte à la fois (utilisé dans `LoginForm`, etc.).
+
+- **Exemple :**
 ```ts
 import { handleModalOpening } from '@/utils/utils';
 
-handleModalOpening({
-  e,
-  dialogFns: { closeAllDialogs, openDialog },
-  modalName: 'signup',
-});
+handleModalOpening({ e, dialogFns: { closeAllDialogs, openDialog }, modalName: 'signup' });
 ```
 
-- `dialogFns` — objet contenant `closeAllDialogs` et `openDialog`.  
-  - Ce pattern est utilisé par exemple dans [`LoginForm`](src/components/LoginForms/LoginForm.tsx) :  
-    - On passe `dialogFns: { closeAllDialogs, openDialog }` au helper `handleModalOpening`.
+**Fichiers utiles :**
+- [`handleModalOpening`](src/utils/utils.ts)
 
-- `dataReshape` / `dataReshapeFn` — fonctions de *reshaping* utilisées pour transformer le payload renvoyé par l'API avant de le stocker ou l'exposer au reste de l'application. Elles sont définies dans `API_ENDPOINTS` (ex. `API_ENDPOINTS.GET.CLASSES.dataReshape`, `API_ENDPOINTS.POST.CREATE_CLASS.dataReshape`) et sont consommées comme `dataReshapeFn` dans les contrôleurs et flows (ex. `useCommandHandler`). Voir [`src/configs/api.endpoints.config.ts`](src/configs/api.endpoints.config.ts) et les tests `src/tests/units/endpoints/api-endpoints.config.contract.test.ts`.
+---
 
-- `FixtureCreatorBase` / classes de fixtures — utilitaires pour générer des DTOs et réponses d'API factices (`ClassFixtureCreator`, `TaskFixtureCreator`, `TaskTemplateFixtureCreator`, etc.). Utilisez-les pour créer des objets testables, sérialisables et réutilisables dans vos tests ou stubs (ex. `src/tests/samples/*`). Voir : [`src/utils/FixtureCreator.ts`](src/utils/FixtureCreator.ts).
+<a id="objectreshape"></a>
 
-Ces helpers centralisent des comportements courants et évitent la duplication de logique.
+### `ObjectReshape<T>`
 
-Exemple : s’assurer qu’une seule modal est ouverte à la fois.
+- **Objectif :** Fournir un utilitaire déclaratif pour remodeler/normaliser des payloads serveur (rename, assign/assignWithFallback, group, addToRoot, selectElementsTo, addTo, etc.) et produire une **proxy dynamique** (`.newShape()`) pour lecture/accès flexible — c'est l'API canonique du projet.
+
+- **Contexte :** `ObjectReshape` est conçu pour être utilisé dans des `dataReshape` (dans `API_ENDPOINTS`) afin de composer des transformations pures et testables. Il gère la création de propriétés calculées et des chaînes de fallback pour conserver la compatibilité des données entrantes.
+
+---
+
+### Les méthodes
+
+#### `transformTuplesToGroups(groupKeyName, itemsKeyName)`
+But : Transformer un objet clé→tableau en tableau d'objets { groupKeyName, itemsKeyName }.
+
+Code :
+```ts
+const rawData = { "Bac Pro": [{ id: 1 }], "BTS": [{ id: 2 }] };
+const reshapedData = ObjectReshape(rawData).transformTuplesToGroups("groupTitle", "items").newShape();
+```
+Sortie (reshapedData) :
+```json
+[
+  { "groupTitle": "Bac Pro", "items": [{ "id": 1 }] },
+  { "groupTitle": "BTS", "items": [{ "id": 2 }] }
+]
+```
+
+---
+
+#### `assign(...) / assignWithFallback(target, sources) / static from(...).to(target)`
+But : Déclarer des mappings `target` ← `source(s)` (alias simple ou chaîne de fallback).
+
+Code simple (alias) :
+```ts
+const rawData = [{ name: "Math" }];
+const reshapedData = ObjectReshape(rawData).assign([["name","value"]]).newShape();
+// lecture : reshapedData[0].value === "Math"
+```
+Code fallback :
+```ts
+const rawData = [{ label: "Label A" }];
+const reshapedData = ObjectReshape(rawData)
+  .assign([ ObjectReshape.from("name","label","value").to("displayName") ])
+  .newShape();
+// lecture : reshapedData[0].displayName === "Label A" (essaie name → label → value)
+```
+
+---
+
+#### `createPropertyWithContentFromKeys(keys, outputKey, separator = " ")`
+But : Créer une propriété calculée qui concatène plusieurs clés source.
+
+Code :
+```ts
+const item = { degreeLevel: "Bac", degreeYear: "2024" };
+const reshapedData = ObjectReshape(item).createPropertyWithContentFromKeys(["degreeLevel","degreeYear"], "description").newShape();
+// lecture : reshapedData[0].description === "Bac 2024"
+```
+
+---
+
+#### `setProxyPropertyWithContent(key, content)`
+But : Définir une propriété proxy de valeur fixe.
+
+Code :
+```ts
+const reshapedData = ObjectReshape({}).setProxyPropertyWithContent("role","Student").newShape();
+// lecture : reshapedData[0].role === "Student"
+```
+
+---
+
+#### `assignSourceTo(key)`
+But : Envelopper la source sous une clé nommée pour transformations ultérieures.
+
+Code :
+```ts
+const items = [{ id: 1, name: "A" }];
+const built = ObjectReshape(items).assignSourceTo("items").newShape();
+// built === [ { items: [{ id:1, name:"A" }] } ]
+```
+
+---
+
+#### `addToRoot(pairs)`
+But : Ajouter des paires clé/valeur au niveau racine du shape en construction.
+
+Code :
+```ts
+const rawData = [{ id: 1 }];
+const reshapedData = ObjectReshape(rawData).addToRoot({ groupTitle: "Tous", count: 1 }).newShape();
+// lecture : reshapedData[0].groupTitle === "Tous" ; reshapedData[0].count === 1
+```
+Sortie :
+```json
+[ { "id": 1, "groupTitle": "Tous", "count": 1 } ]
+```
+
+---
+
+#### `addTo(newItem, itemsKey = "items", groupConditionKey?, groupConditionValue?)`
+But : Ajouter `newItem` à un groupe identifié (ou créer le groupe si absent).
+
+Code :
+```ts
+const groups = [ { groupTitle: "BTS", items: [{ id: 2 }] } ];
+ObjectReshape(groups).addTo({ id: 99 }, "items", "groupTitle", "BTS");
+// newShape() → [{ groupTitle: "BTS", items: [{ id: 2 }, { id: 99 }] }]
+```
+Si le groupe n'existe pas :
+```ts
+ObjectReshape([]).addTo({ id: 1 }, "items", "groupTitle", "Nouveau").newShape();
+// → [{ groupTitle: "Nouveau", items: [{ id: 1 }] }]
+```
+
+---
+
+#### `selectElementsTo(keys, to)`
+But : Construire un tableau `to` en fusionnant (dans l'ordre) propriétés primitives ou objets provenant de `keys`.
+
+Code :
+```ts
+const rawData = [{ id: "root-id", task: { id: "task-id", name: "Task" } }];
+const reshapedData = ObjectReshape(rawData).selectElementsTo(["task","id"], "items").newShape();
+// lecture : reshapedData[0].items => [ { id: "root-id", name: "Task" } ]
+```
+Note : l'ordre des `keys` est important ; les clés plus tard dans le tableau écrasent les précédentes.
+
+---
+
+#### `buildItem(item)`
+But : Appliquer mappings, computed properties et additions à un seul item (retourne un objet concret).
+
+Code :
+```ts
+const item = { name: "X", year: "2024" };
+const obj = ObjectReshape([item])
+  .assign([["name","value"]])
+  .createPropertyWithContentFromKeys(["name","year"], "label")
+  .buildItem(item);
+// obj => { name: "X", year: "2024", value: "X", label: "X 2024" }
+```
+
+---
+
+#### `newShape()`
+But : Retourner une structure Proxy (lecture dynamique qui applique mappings & computed à la volée).
+
+Code :
+```ts
+const reshapedData = ObjectReshape([{ label: "L" }]).assign([["label","display"]]).newShape();
+// reshapedData[0].display === "L"
+```
+
+> Attention : les Proxies ne sont pas sérialisables — pour obtenir un objet sérialisable, appelez `JSON.parse(JSON.stringify(...))` sur la valeur retournée par `newShape()`.
+
+---
+
+#### `rename(oldKey, newName)`
+But : Renommer une clé racine **seulement si la source est un objet (pas un tableau)**.
+
+Code :
+```ts
+const obj = { name: "Classe" };
+const reshaped = ObjectReshape(obj).rename("name","displayName").newShape();
+// reshaped => proxy where reshaped[0].displayName === "Classe"
+
+```
+
+---
+
+**Fichiers utiles :**
+- [`ObjectReshape`](src/utils/ObjectReshape.ts) — implémentation complète
+- [`api.endpoints.config.ts`](src/configs/api.endpoints.config.ts) — exemples d'utilisation
+- [`useFetch.tsx`](src/hooks/database/fetches/useFetch.tsx) — consommation des reshapes
+
+
+---
+
+### Autres helpers & références rapides
+
+- `dialogFns` — `{ closeAllDialogs, openDialog }` (ex: `LoginForm`).
+- `dataReshape / dataReshapeFn` — fonctions de reshaping définies dans `API_ENDPOINTS` (voir `src/configs/api.endpoints.config.ts`).
+- `FixtureCreatorBase` / classes de fixtures — utilitaires pour générer DTOs factices (`src/utils/FixtureCreator.ts`).
 
 Voir `src/utils/utils.ts` pour la liste complète et les types.
 
+---
   
 ### Noms de modales disponibles
 

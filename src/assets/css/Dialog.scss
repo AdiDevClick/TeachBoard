@@ -17,6 +17,19 @@
   padding: 0;
   border: none;
   background: transparent;
+  max-block-size: 850px;
+  // block-size: max-content;
+  transition: max-block-size 0.3s ease;
+
+  & [data-slot="card-content"] {
+    overflow: auto;
+    max-block-size: 650px;
+    transition: max-block-size 0.3s ease;
+
+    * {
+      transition: 0.3s ease;
+    }
+  }
 
   &--login,
   &--signup,
@@ -30,4 +43,47 @@
     max-width: 350px;
   }
 
+}
+
+@keyframes dialog-tag-enter {
+  from {
+    max-block-size: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    max-block-size: 64px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dialog-tag-close {
+  from {
+    max-block-size: 64px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    max-block-size: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.dialog__content [data-slot="item-group"] {
+  & [data-slot="item-actions"].opened {
+    animation: dialog-tag-enter 0.4s ease;
+  }
+
+  & [data-slot="item-actions"].closed {
+    // opacity: 0;
+    animation: dialog-tag-close 0.4s ease forwards;
+  }
+
+  will-change: max-block-size,
+  opacity,
+  transform;
 }

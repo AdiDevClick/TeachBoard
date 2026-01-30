@@ -18,7 +18,7 @@ import type { FieldValues } from "react-hook-form";
  * @returns
  */
 export function LabelledInputForController<T extends FieldValues>(
-  props: LaballedInputForControllerProps<T>
+  props: LaballedInputForControllerProps<T>,
 ) {
   if (labelledInputContainsInvalid(props)) {
     debugLogs("LabelledInputForController");
@@ -26,26 +26,29 @@ export function LabelledInputForController<T extends FieldValues>(
   }
 
   const { name, title, field, fieldState, ...rest } = props;
+  const safeProps = sanitizeDOMProps(rest, ["form"]) as Omit<
+    InputHTMLAttributes<HTMLInputElement>,
+    "form"
+  >;
+
+  const labelName = name ?? field.name ?? "input-is-not-named";
 
   return (
     <>
-      <Label htmlFor={name ?? field.name}>{title}</Label>
+      <Label htmlFor={labelName}>{title}</Label>
       <Input
         required
-        {...(sanitizeDOMProps(rest, ["form"]) as Omit<
-          InputHTMLAttributes<HTMLInputElement>,
-          "form"
-        >)}
+        {...safeProps}
         {...field}
-        id={name ?? field.name ?? "input-is-not-named"}
-        aria-invalid={fieldState.invalid ?? false}
+        id={labelName}
+        aria-invalid={fieldState.invalid}
       />
     </>
   );
 }
 
 export const ControlledLabelledInput = withController(
-  LabelledInputForController
+  LabelledInputForController,
 );
 
 export const ControlledInputList = withListMapper(ControlledLabelledInput);

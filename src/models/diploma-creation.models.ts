@@ -32,7 +32,7 @@ const diplomaSchema = (data: typeof fieldData) => {
       .uuid(data.schoolLevelValidUuidMessage)
       .trim()
       .nonempty(data.schoolLevelRequiredMessage),
-    mainSkillsList: z
+    modulesList: z
       .array(
         z
           .string()

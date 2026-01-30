@@ -1,5 +1,11 @@
 import withController from "@/components/HOCs/withController.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { withPopoverCRUD } from "@/components/Popovers/PopoverCRUD.tsx";
+import type {
+  DynamicTagProps,
+  DynamicTagsProps,
+  DynamicTagsState,
+} from "@/components/Tags/types/tags.types";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Item,
@@ -8,304 +14,101 @@ import {
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item.tsx";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover.tsx";
-import type {
-  DynamicTagItemDetails,
-  DynamicTagProps,
-  DynamicTagState,
-} from "@/components/Tags/types.ts";
-import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
-import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
-import { CheckIcon, Pencil, RotateCcw, Trash2, XIcon } from "lucide-react";
-import { useState, type PointerEvent } from "react";
+import { UniqueSet } from "@/utils/UniqueSet.ts";
+import { useEffect, useState } from "react";
 
-const defaultState: DynamicTagState = {
-  selected: false,
-  role: "",
-  isEditing: false,
-  isEdited: false,
-  prevText: "",
-  newText: "",
-  selectedText: "",
-  itemDetails: undefined,
-};
-
-export function DynamicTag(props: Readonly<DynamicTagProps>) {
-  const [state, setState] = useState<DynamicTagState>(defaultState);
-
-  const { pageId, onRemove, itemList, title, ...rest } = props;
+/**
+ * DynamicTags Component
+ *
+ * @description Renders a list of dynamic tags with support for adding and removing tags.
+ *
+ * @param title - The title of the tag group
+ * @param pageId - The unique identifier for the page or component instance
+ * @param itemList - The list of tag items to render
+ * @returns
+ */
+export function DynamicTags(props: Readonly<DynamicTagsProps>) {
+  const { pageId, itemList, title, ...rest } = props;
   const scopedPageId = pageId ?? "dynamic-tag";
+  const [renderItems, setRenderItems] = useState<
+    UniqueSet<string, DynamicTagsState>
+  >(new UniqueSet());
 
-  const handleOnDelete = (e: PointerEvent<HTMLButtonElement>) => {
-    preventDefaultAndStopPropagation(e);
-    console.log("Delete role:", state.role);
-    console.log("The rest : ", rest);
-    console.log("all the props : ", props);
-    onRemove?.(state.role, state.itemDetails);
-    setState(defaultState);
-  };
+  /**
+   * Synchronize renderItems with itemList prop
+   *
+   * @description This effect updates the renderItems state whenever the itemList prop changes.
+   * It ensures that new items are added, and items that are no longer present are marked for exit animation.
+   */
+  useEffect(() => {
+    setRenderItems((prev) => {
+      const next = new UniqueSet<string, DynamicTagsState>();
+      const seen = new Set<string>();
 
-  const handleOnEdit = (e: PointerEvent<HTMLButtonElement>) => {
-    preventDefaultAndStopPropagation(e);
-    const roleId = e.currentTarget.id.split("-")[0];
-    const editable = document.getElementById(roleId);
-    if (!editable) return;
-    editable.focus();
-    editable.dataset.isEditing = "true";
-    editable.style.setProperty("user-select", "text");
-    editable.style.setProperty("-webkit-user-modify", "read-write");
-    const newRange = new Range();
+      const incomingEntries = Array.isArray(itemList)
+        ? itemList
+        : Object.entries(itemList ?? {});
 
-    const selection = globalThis.getSelection();
-    newRange.selectNodeContents(editable);
+      for (const [key] of incomingEntries) {
+        seen.add(key);
+        const existing = next.get(key);
 
-    selection?.focusNode;
-    selection?.removeAllRanges();
-    selection?.addRange(newRange);
-
-    setState((prev) => ({
-      ...prev,
-      isEditing: true,
-      prevText: roleId,
-      selected: true,
-      role: roleId,
-    }));
-  };
-
-  const handleOnValidate = (e: PointerEvent<HTMLButtonElement>) => {
-    preventDefaultAndStopPropagation(e);
-    const role = e.currentTarget.id.split("-")[0];
-    console.log("Validate role edit:", state.role);
-    if (role === state.role) {
-      // cleanup editable state on validate
-      const editable = document.getElementById(role);
-      if (editable) {
-        // editable.removeAttribute("contenteditable");
-        // editable.removeAttribute("data-is-editing");
-        editable.removeAttribute("style");
-        const selection = globalThis.getSelection();
-        selection?.removeAllRanges();
-      }
-      setState(defaultState);
-    }
-  };
-
-  const onRoleOpenChange = (
-    open: boolean,
-    role: string,
-    details?: DynamicTagItemDetails
-  ) => {
-    if (state.isEditing) return;
-    console.log("openChange");
-    setState(
-      open
-        ? {
-            selected: true,
-            role,
-            isEditing: false,
-            prevText: "",
-            newText: "",
-            selectedText: "",
-            isEdited: false,
-            itemDetails: details,
-          }
-        : defaultState
-    );
-  };
-
-  const handleOnTextEdited = (e: PointerEvent<HTMLButtonElement>) => {
-    preventDefaultAndStopPropagation(e);
-    const buttonEl = e.currentTarget;
-    const newText = buttonEl.textContent ?? "";
-
-    console.log(
-      "Text edited for role:",
-      buttonEl.id,
-      "New text:",
-      newText,
-      state
-    );
-
-    setState((prev) => ({
-      ...prev,
-      newText,
-      isEdited: true,
-      isEditing: false,
-    }));
-
-    // cleanup contenteditable & attributes
-    buttonEl.removeAttribute("style");
-    // buttonEl.removeAttribute("contenteditable");
-    // buttonEl.removeAttribute("data-is-editing");
-  };
-
-  const handleFocus = (e: PointerEvent<HTMLButtonElement>) => {
-    // preventDefaultAndStopPropagation(e);
-    const editable = e.currentTarget;
-    const roleId = editable.id;
-    editable.focus();
-    editable.dispatchEvent(new KeyboardEvent("keyup", { key: "arrowRight" }));
-    editable.addEventListener(
-      "keyup",
-      (event) => {
-        console.log(event);
-        preventDefaultAndStopPropagation(event);
-        if (event.key === "arrowRight" || event.key === "arrowLeft") {
-          event.target.focus();
-          const selection = window.getSelection();
-          if (!selection) return;
-          const range = document.createRange();
-          range.selectNodeContents(editable);
-          selection.removeAllRanges();
-          selection.addRange(range);
+        if (next.has(key) && !existing?.isExiting) {
+          continue;
         }
-      },
-      { once: true }
-    );
+
+        const nextEntry = {
+          ...existing,
+          isExiting: false,
+        } as DynamicTagsState;
+
+        next.set(key, nextEntry);
+      }
+
+      for (const [key, existing] of prev.entries()) {
+        if (!seen.has(key) && !existing?.isExiting) {
+          next.set(key, {
+            ...existing,
+            isExiting: true,
+          });
+        }
+      }
+
+      return next;
+    });
+  }, [itemList]);
+
+  /**
+   * Handle exit complete for a tag
+   *
+   * @description When a tag's exit animation is complete, remove it from the renderItems set and wait for React to re-render
+   *
+   * @param value - The value of the tag that has completed its exit animation
+   */
+  const handleExitComplete = (value: string) => {
+    setRenderItems((prev) => {
+      if (!prev.has(value)) return prev;
+      const next = prev.clone();
+      next.delete(value);
+      return next;
+    });
   };
-
-  const handleOnCancel = (e: PointerEvent<HTMLButtonElement>) => {
-    preventDefaultAndStopPropagation(e);
-    setState((prev) => ({
-      ...prev,
-      isEditing: false,
-      isEdited: false,
-      newText: "",
-      prevText: "",
-    }));
-  };
-
-  // const handleOnTextEdited = (e: PointerEvent<HTMLButtonElement>) => {
-  //   preventDefaultAndStopPropagation(e);
-  //   const buttonEl = e.currentTarget;
-  //   const newText = buttonEl.textContent ?? "";
-
-  //   console.log(
-  //     "Text edited for role:",
-  //     buttonEl.id,
-  //     "New text:",
-  //     newText,
-  //     state
-  //   );
-
-  //   setState((prev) => ({
-  //     ...prev,
-  //     newText,
-  //     isEdited: true,
-  //     isEditing: false,
-  //   }));
-
-  //   // cleanup contenteditable & attributes
-  //   buttonEl.removeAttribute("style");
-  //   // buttonEl.removeAttribute("contenteditable");
-  //   // buttonEl.removeAttribute("data-is-editing");
-  // };
 
   return (
     <ItemGroup id={`${scopedPageId}-roles`} className="grid gap-2">
       <ItemTitle>{title}</ItemTitle>
       <Item variant={"default"} className="p-0">
         <ItemContent className="flex-row flex-wrap gap-2">
-          <ListMapper items={itemList}>
-            {([value, itemDetails]) => {
-              const valueStr = String(value);
-              return (
-                <ItemActions key={valueStr} className="relative">
-                  <Popover
-                    open={state.selected && state.role === valueStr}
-                    onOpenChange={(open) =>
-                      onRoleOpenChange(open, valueStr, itemDetails)
-                    }
-                  >
-                    <PopoverTrigger asChild>
-                      <Button
-                        // onBlur={handleOnTextEdited}
-                        // onFocus={handleOnTextEdit}
-                        // onClick={handleFocus}
-                        data-is-editing={
-                          state.isEditing && state.role === valueStr
-                        }
-                        id={valueStr}
-                        size="sm"
-                        variant="outline"
-                        contentEditable={
-                          state.isEditing && state.role === valueStr
-                        }
-                      >
-                        {valueStr}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent
-                      side="top"
-                      align="center"
-                      sideOffset={8}
-                      className="p-0.5 w-auto max-h-min-content"
-                    >
-                      {state.isEditing && state.role === value ? (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            id={valueStr + "-validate"}
-                            onClick={handleOnValidate}
-                            aria-label={`Valider ${valueStr}`}
-                          >
-                            <CheckIcon className="size-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            id={valueStr + "-cancel"}
-                            onClick={handleOnCancel}
-                            aria-label={`Annuler ${valueStr}`}
-                          >
-                            <RotateCcw className="size-4" />
-                          </Button>
-                        </>
-                      ) : (
-                        state.role === valueStr && (
-                          <>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={handleOnEdit}
-                              id={valueStr + "-edit"}
-                              aria-label={`Modifier ${valueStr}`}
-                            >
-                              <Pencil className="size-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={handleOnDelete}
-                              id={valueStr + "-delete"}
-                              aria-label={`Supprimer ${valueStr}`}
-                            >
-                              <Trash2 className="size-4" />
-                            </Button>
-                            <PopoverClose asChild>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                id={value + "-close"}
-                                aria-label={`Fermer ${value}`}
-                              >
-                                <XIcon className="size-4" />
-                              </Button>
-                            </PopoverClose>
-                          </>
-                        )
-                      )}
-                      <PopoverArrow className="fill-popover" />
-                    </PopoverContent>
-                  </Popover>
-                </ItemActions>
-              );
-            }}
+          <ListMapper items={Array.from(renderItems.entries())}>
+            {([value, itemDetails]) => (
+              <DynamicTag
+                key={value}
+                value={value}
+                itemDetails={itemDetails}
+                onExitComplete={handleExitComplete}
+                {...rest}
+              />
+            )}
           </ListMapper>
         </ItemContent>
       </Item>
@@ -313,4 +116,58 @@ export function DynamicTag(props: Readonly<DynamicTagProps>) {
   );
 }
 
-export const ControlledDynamicTagList = withController(DynamicTag);
+/**
+ * DynamicTag Component
+ *
+ * @description Renders a single dynamic tag with popover CRUD functionality.
+ *
+ * @param value - The value of the tag
+ * @param itemDetails - Additional details for the tag
+ * @param isExiting - Whether the tag is in the process of exiting
+ * @param onExitComplete - Callback when exit animation is complete
+ */
+function DynamicTag(props: DynamicTagProps) {
+  const { onRemove, value, itemDetails, onExitComplete, ...rest } = props;
+  const valueStr = value ?? "Dynamic-Tag(untitled)";
+  const itemId = itemDetails?.id;
+
+  /**
+   * Handle animation end to notify parent that exit animation is complete
+   */
+  const handleAnimationEnd = () => {
+    if (itemDetails?.isExiting) {
+      onExitComplete?.(valueStr);
+    }
+  };
+
+  return (
+    <ItemActions
+      className={itemDetails?.isExiting ? "closed" : "opened"}
+      onAnimationEnd={handleAnimationEnd}
+      id={itemId}
+      data-role-id={valueStr}
+      ref={(el) => {
+        rest.setRef?.(el, {
+          type: "tag",
+          name: itemId,
+          id: itemId,
+        });
+      }}
+    >
+      <ButtonWithPopoverCRUD
+        id={valueStr}
+        size="sm"
+        variant="outline"
+        onRemove={onRemove}
+        value={valueStr}
+        itemDetails={itemDetails}
+      >
+        {valueStr}
+      </ButtonWithPopoverCRUD>
+    </ItemActions>
+  );
+}
+
+const ButtonWithPopoverCRUD = withPopoverCRUD(Button);
+
+export const ControlledDynamicTagList = withController(DynamicTags);

@@ -65,6 +65,13 @@
       .content__right {
         place-self: center;
         min-width: 40%;
+        grid-column: 3;
+        grid-row: 1;
+
+        &.arrow-back {
+          min-width: unset;
+          justify-self: left;
+        }
 
         .right__content-container {
           display: grid;
