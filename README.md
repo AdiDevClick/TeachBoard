@@ -355,12 +355,26 @@ API_ENDPOINTS.POST.CREATE_CLASS.dataReshape = (data) => {
 ## Structure du projet (aperçu rapide)
 
 - `src/` — code source principal
-  - `components/` — composants réutilisables
-  - `pages/` — pages de l'application (login, home, evaluations, etc.)
-  - `api/` — abstraction des appels API
-  - `assets/` — images, icônes, styles
-  - `hooks/` — hooks personnalisés
-  - `routes/` — configuration des routes
+  - `App.tsx`, `main.tsx` — point d'entrée et montage de l'application
+  - `api/` — clients API, contexts, providers et stores
+    - `contexts/`, `providers/`, `store/`, `types/`
+  - `assets/` — styles et ressources (css, icons, images)
+    - `css/`, `icons/`, `images/`
+  - `components/` — composants réutilisables et sous-dossiers (Buttons, Inputs, Modal, Lists, HOCs, etc.)
+  - `configs/` — constantes et configurations centrales (`api.endpoints.config.ts`, `app.config.ts`, ...)
+  - `data/` — données statiques, fixtures et exemples (`*.json`, sample data)
+  - `features/` — features organisées par domaine (ex. `class-creation`, `evaluations`, `login`)
+  - `hooks/` — hooks réutilisables (incl. `hooks/database/` pour fetchs)
+  - `models/` — schémas et factories (Zod, modèles de forms)
+  - `pages/` — pages / vues (Home, Login, Evaluations, ...)
+  - `routes/` — configuration des routes (`routes.config.tsx`)
+  - `tests/` — tests unitaires / intégration / e2e, helpers et samples
+    - `components/`, `units/`, `e2e/`, `test-utils/`, `samples/`
+  - `types/` — types partagés et interfaces (`AppControllerInterface.ts`, etc.)
+  - `utils/` — helpers et outils (ObjectReshape, FixtureCreator, utilities)
+  - `tools/` — scripts et utilitaires de développement (ex. `generate-launch`)
+
+> Remarque : cette structure reflète la disposition actuelle du dépôt — privilégiez `features/` pour la logique métier, `components/` pour les éléments UI réutilisables, et `utils/`/`types/` pour les helpers et types communs.
 
 <!-- --- -->
 
