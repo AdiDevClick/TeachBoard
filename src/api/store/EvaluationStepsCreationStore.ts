@@ -539,6 +539,33 @@ export const useEvaluationStepsCreationStore = create(
             }));
           },
           /**
+           * Get the evaluation score for a student for a specific sub-skill.
+           */
+          getStudentScoreForSubSkill(
+            studentId: UUID,
+            subSkillId: UUID | undefined,
+            moduleId: UUID | undefined,
+          ): number[] {
+            ensureCollections();
+
+            if (!moduleId || !subSkillId) return [0];
+
+            const student = get().students?.get(studentId);
+            const studentEvaluations = student?.evaluations;
+            const moduleEvaluation = studentEvaluations?.modules.get(moduleId);
+
+            if (!studentEvaluations || !moduleEvaluation) return [0];
+
+            const subSkillEvaluation =
+              moduleEvaluation.subSkills.get(subSkillId);
+
+            if (subSkillEvaluation?.score) {
+              return [subSkillEvaluation.score];
+            }
+
+            return [0];
+          },
+          /**
            * Get all modules of the selected class.
            */
           getSelectedClassModules() {
