@@ -3,13 +3,11 @@ import type {
   DataReshapeFn,
 } from "@/components/Inputs/types/inputs.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import {
-  classCreationInputControllers,
-  degreeModuleCreationInputControllers,
-  diplomaCreationInputControllers,
-  stepOneInputControllers,
-  taskTemplateCreationInputControllers,
-} from "@/data/inputs-controllers.data";
+import { degreeModuleCreationInputControllers } from "@/features/class-creation/components/DegreeModule/forms/degree-module-inputs";
+import { diplomaCreationInputControllers } from "@/features/class-creation/components/DiplomaCreation/forms/diploma-creation-inputs";
+import { taskTemplateCreationInputControllers } from "@/features/class-creation/components/TaskTemplateCreation/forms/task-template-inputs";
+import { classCreationInputControllers } from "@/features/class-creation/index.ts";
+import { stepOneInputControllers } from "@/features/evaluations/create/steps/one/forms/step-one-inputs.ts";
 import {
   classCreated,
   classFetched,
@@ -94,14 +92,14 @@ type StubRoutesSpec = {
 
 function buildFetchStubs(
   spec: StubRoutesSpec,
-  ctx: StubRouteCtx
+  ctx: StubRouteCtx,
 ): {
   getRoutes: Array<[string, unknown]>;
   postRoutes: Array<[string, unknown]>;
 } {
   const dynamicEndpointPrefix = (
     endpointFn: (arg: string) => string,
-    placeholder = "__DYNAMIC_ARG__"
+    placeholder = "__DYNAMIC_ARG__",
   ): string => endpointFn(placeholder).replace(placeholder, "");
 
   const resolveUrl = (url: StubUrlSpec): string => {
@@ -114,7 +112,7 @@ function buildFetchStubs(
     if (typeof apiEndpoint === "function") {
       if (url.mode === "prefix") return dynamicEndpointPrefix(apiEndpoint);
       throw new Error(
-        "[useAppFixtures] controller apiEndpoint is dynamic for stub"
+        "[useAppFixtures] controller apiEndpoint is dynamic for stub",
       );
     }
 
@@ -237,7 +235,7 @@ const controllersConfig: Array<ControllersConfig<ControllerLike>> = [
 ];
 
 const routes = (
-  controllers: Record<string, ControllerLike>
+  controllers: Record<string, ControllerLike>,
 ): Record<string, StubRoutesSpec> =>
   ({
     createDiploma: {
@@ -482,10 +480,10 @@ const routes = (
         },
       ],
     },
-  } as const);
+  }) as const;
 
 function extractControllers(
-  configs: Array<ControllersConfig<ControllerLike>>
+  configs: Array<ControllersConfig<ControllerLike>>,
 ): Record<string, ControllerLike> {
   const result: Record<string, ControllerLike> = {};
 
@@ -501,7 +499,7 @@ function extractControllers(
 
 function controllerByName<T extends ControllerLike>(
   list: readonly T[],
-  name: string
+  name: string,
 ): T {
   const found = list.find((c) => c.name === name);
   if (!found) throw new Error(`[useAppFixtures] controller not found: ${name}`);
@@ -563,7 +561,7 @@ export function useAppFixtures() {
       };
 
       const installFetchStubs: InstallFetchStubs = (
-        postResponse = sample.degreeCreatedResponse
+        postResponse = sample.degreeCreatedResponse,
       ) =>
         stubFetchRoutes({
           getRoutes: [[String(controller.apiEndpoint), payload]],
@@ -582,7 +580,7 @@ export function useAppFixtures() {
       const post = POSTEndpoints.CREATE_DIPLOMA;
 
       const installFetchStubs: InstallFetchStubs = (
-        postResponse = sample.diplomaCreated
+        postResponse = sample.diplomaCreated,
       ) =>
         stubFetchRoutes(
           buildFetchStubs(routeSpecs.createDiploma, {
@@ -590,7 +588,7 @@ export function useAppFixtures() {
             sample,
             post,
             postResponse,
-          })
+          }),
         );
 
       return {
@@ -611,7 +609,7 @@ export function useAppFixtures() {
       const post = POSTEndpoints.CREATE_TASK;
 
       const installFetchStubs: InstallFetchStubs = (
-        postResponse = sample.taskCreated
+        postResponse = sample.taskCreated,
       ) =>
         stubFetchRoutes(
           buildFetchStubs(routeSpecs.createTaskItem, {
@@ -619,7 +617,7 @@ export function useAppFixtures() {
             sample,
             post,
             postResponse,
-          })
+          }),
         );
 
       return {
@@ -634,7 +632,7 @@ export function useAppFixtures() {
       const post = POSTEndpoints.CREATE_TASK_TEMPLATE;
 
       const installFetchStubs: InstallFetchStubs = (
-        postResponse = sample.taskTemplateCreated
+        postResponse = sample.taskTemplateCreated,
       ) =>
         stubFetchRoutes(
           buildFetchStubs(routeSpecs.createTaskTemplate, {
@@ -642,7 +640,7 @@ export function useAppFixtures() {
             sample,
             post,
             postResponse,
-          })
+          }),
         );
 
       return {
@@ -670,7 +668,7 @@ export function useAppFixtures() {
             sample,
             post,
             postResponse: createClassPostResponse,
-          })
+          }),
         );
 
       return {

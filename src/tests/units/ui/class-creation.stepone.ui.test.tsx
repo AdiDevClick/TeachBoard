@@ -1,4 +1,4 @@
-import { taskTemplateCreationInputControllers } from "@/data/inputs-controllers.data";
+import { taskTemplateCreationInputControllers } from "@/features/class-creation/components/TaskTemplateCreation/forms/task-template-inputs";
 import {
   classCreated,
   classFetched,
@@ -96,7 +96,7 @@ function data(
   controllers: ControllersForCreate,
   labeler: Ctx["labeler"],
   classesQueryKey: readonly unknown[],
-  createClassPostEndpoint: string
+  createClassPostEndpoint: string,
 ): RunCreateFlowArgs {
   return {
     controllers,
@@ -121,7 +121,7 @@ setupUiTestState(null, {
       "createClassStepOne",
       "classesController",
       "class-creation",
-      { routeArgs: [] }
+      { routeArgs: [] },
     );
     const { getRoutes } = res;
     const {
@@ -154,13 +154,13 @@ setupUiTestState(null, {
       },
       labeler,
       classesQueryKey,
-      createClassPostEndpoint
+      createClassPostEndpoint,
     );
 
     const taskTemplateIdByName = Object.fromEntries(
       (res.sample.taskTemplateFetch.taskTemplates ?? []).map(
-        (tpl: TaskTemplateDto) => [tpl.task.name, tpl.id]
-      )
+        (tpl: TaskTemplateDto) => [tpl.task.name, tpl.id],
+      ),
     );
 
     // Ensure the test selects at least 3 templates during creation to reflect the multi-select feature
@@ -301,7 +301,7 @@ describe("UI flow: class-creation (StepOne list)", () => {
     // Open student search dialog and select a student using shared helper.
     await openStudentSearchAndSelect(
       ctx.studentsController,
-      ctx.flowArgs.studentName
+      ctx.flowArgs.studentName,
     );
 
     // Re-open and prepare modal using helper to reduce duplication
@@ -319,7 +319,7 @@ describe("UI flow: class-creation (StepOne list)", () => {
     await clickControlAndWaitForDialog(
       controllerLabelRegex(ctx.studentsController),
       /Recherche d'étudiants/i,
-      { withinDialog: true, timeout: 2000 }
+      { withinDialog: true, timeout: 2000 },
     );
 
     await submitButtonShouldBeDisabled("Ajouter");

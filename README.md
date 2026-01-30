@@ -355,12 +355,26 @@ API_ENDPOINTS.POST.CREATE_CLASS.dataReshape = (data) => {
 ## Structure du projet (aperçu rapide)
 
 - `src/` — code source principal
-  - `components/` — composants réutilisables
-  - `pages/` — pages de l'application (login, home, evaluations, etc.)
-  - `api/` — abstraction des appels API
-  - `assets/` — images, icônes, styles
-  - `hooks/` — hooks personnalisés
-  - `routes/` — configuration des routes
+  - `App.tsx`, `main.tsx` — point d'entrée et montage de l'application
+  - `api/` — clients API, contexts, providers et stores
+    - `contexts/`, `providers/`, `store/`, `types/`
+  - `assets/` — styles et ressources (css, icons, images)
+    - `css/`, `icons/`, `images/`
+  - `components/` — composants réutilisables et sous-dossiers (Buttons, Inputs, Modal, Lists, HOCs, etc.)
+  - `configs/` — constantes et configurations centrales (`api.endpoints.config.ts`, `app.config.ts`, ...)
+  - `data/` — données statiques, fixtures et exemples (`*.json`, sample data)
+  - `features/` — features organisées par domaine (ex. `class-creation`, `evaluations`, `login`)
+  - `hooks/` — hooks réutilisables (incl. `hooks/database/` pour fetchs)
+  - `models/` — schémas et factories (Zod, modèles de forms)
+  - `pages/` — pages / vues (Home, Login, Evaluations, ...)
+  - `routes/` — configuration des routes (`routes.config.tsx`)
+  - `tests/` — tests unitaires / intégration / e2e, helpers et samples
+    - `components/`, `units/`, `e2e/`, `test-utils/`, `samples/`
+  - `types/` — types partagés et interfaces (`AppControllerInterface.ts`, etc.)
+  - `utils/` — helpers et outils (ObjectReshape, FixtureCreator, utilities)
+  - `tools/` — scripts et utilitaires de développement (ex. `generate-launch`)
+
+> Remarque : cette structure reflète la disposition actuelle du dépôt — privilégiez `features/` pour la logique métier, `components/` pour les éléments UI réutilisables, et `utils/`/`types/` pour les helpers et types communs.
 
 <!-- --- -->
 
@@ -862,7 +876,7 @@ type MyControllerProps = AppControllerInterface<
 
 - **Endpoint POST (obligatoire quand utilisé) :** Si le controller effectue un `POST` (soumission), exposez dans les props au moins : `submitRoute` et `submitDataReshapeFn`, typés (idéalement avec `typeof API_ENDPOINTS.POST.<NAME>.endpoint` et `typeof API_ENDPOINTS.POST.<NAME>.dataReshape`) afin qu'ils puissent être passés au `useCommandHandler` ou au `submitCallback`.
 
-- **Valeurs par défaut :** Il est recommandé d'initialiser `submitRoute` / `submitDataReshapeFn` depuis `API_ENDPOINTS` pour garantir la cohérence (voir exemple ci-dessous et [`ClassCreationController`](src/components/ClassCreation/controller/ClassCreationController.tsx)).
+- **Valeurs par défaut :** Il est recommandé d'initialiser `submitRoute` / `submitDataReshapeFn` depuis `API_ENDPOINTS` pour garantir la cohérence (voir exemple ci-dessous et [`ClassCreationController`](src/features/class-creation/components/main/controllers/ClassCreationController.tsx)).
 
 - **Tests & contrats :** Toute modification d'un `dataReshape` (ou ajout d'un endpoint) **doit** être accompagnée d'un test de contrat dans `src/tests/units/endpoints/` (voir `api-endpoints.config.contract.test.ts`).
 
@@ -888,7 +902,7 @@ export function MyController({
 - [`AppControllerInterface`](src/types/AppControllerInterface.ts)
 - [`useCommandHandler`](src/hooks/database/classes/useCommandHandler.ts)
 - [`API_ENDPOINTS`](src/configs/api.endpoints.config.ts)
-- [`ClassCreationController`](src/components/ClassCreation/controller/ClassCreationController.tsx)
+- [`ClassCreationController`](src/features/class-creation/components/main/controllers/ClassCreationController.tsx)
 - [`api-endpoints.config.contract.test.ts`](src/tests/units/endpoints/api-endpoints.config.contract.test.ts)
 
 **Exemple simplifié (pattern courant)**
@@ -921,7 +935,7 @@ return <FormComponent form={form} onSubmit={handleValidSubmit} />;
 - **But :** encapsuler un controller ou un composant présentational dans une Card standardisée (titre, description, actions).
 - **Vue (exemple réel) :** `ClassCreation` montre l'utilisation typique :
 ```tsx
-import { ClassCreationController } from '@/components/ClassCreation/controller/ClassCreationController.tsx';
+import { ClassCreationController } from '@/features/class-creation/components/main/controllers/ClassCreationController.tsx';
 import withTitledCard from '@/components/HOCs/withTitledCard.tsx';
 
 const ClassCreationWithCard = withTitledCard(ClassCreationController);
@@ -1221,8 +1235,8 @@ import { Icon } from '@/components/Icons/Icon';
 
 ### Fichiers utiles (exemples)
 - Controllers :
-  - [ClassCreationController](src/components/ClassCreation/controller/ClassCreationController.tsx)
-  - [DiplomaCreationController](src/components/ClassCreation/diploma/controller/DiplomaCreationController.tsx)
+  - [ClassCreationController](src/features/class-creation/components/main/controllers/ClassCreationController.tsx)
+  - [DiplomaCreationController](src/features/class-creation/components/main/controllers/DiplomaCreationController.tsx)
 - HOCs :
   - [withController](src/components/HOCs/withController.tsx) — intégration `react-hook-form` (Controller)
   - [withListMapper](src/components/HOCs/withListMapper.tsx) — wrapper pour `ListMapper`

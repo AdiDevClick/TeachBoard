@@ -1,3 +1,5 @@
+import type { UUID } from "@/api/types/openapi/common.types.ts";
+import { DEV_MODE } from "@/configs/app.config.ts";
 import type {
   ClassModules,
   ClassModuleSubSkill,
@@ -5,9 +7,7 @@ import type {
   StepsCreationState,
   StudentEvaluationModuleType,
   StudentWithPresence,
-} from "@/api/store/types/steps-creation-store.types";
-import type { UUID } from "@/api/types/openapi/common.types.ts";
-import { DEV_MODE } from "@/configs/app.config.ts";
+} from "@/features/evaluations/create/store/types/steps-creation-store.types";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 
 type SetFn = (

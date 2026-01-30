@@ -1,4 +1,4 @@
-import type { ClassCreationExtendedFormSchema } from "@/components/ClassCreation/types/class-creation.types.ts";
+import type { ClassCreationExtendedFormSchema } from "@/features/class-creation/index.ts";
 import { useMemo } from "react";
 import { useWatch, type FieldPath, type UseFormReturn } from "react-hook-form";
 
@@ -15,7 +15,7 @@ export function useAvatarDataGenerator(
   formPropertyToWatch: Extract<
     FieldPath<ClassCreationExtendedFormSchema>,
     "studentsValues" | "primaryTeacherValue"
-  >
+  >,
 ) {
   const watchedData = useWatch({
     control: form.control,
@@ -36,7 +36,7 @@ export function useAvatarDataGenerator(
             (details.lastName?.slice(0, 1).toUpperCase() || ""),
         };
       }),
-    [watchedData]
+    [watchedData],
   );
 
   return dataMemo;

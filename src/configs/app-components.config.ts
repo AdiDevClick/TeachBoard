@@ -1,6 +1,5 @@
 import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.ts";
 import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
-import type { ClassCreationControllerProps } from "@/components/ClassCreation/types/class-creation.types.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import type {
   EvaluationRadioItemDescriptionProps,
@@ -8,16 +7,17 @@ import type {
 } from "@/components/Radio/types/radio.types.ts";
 import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
-import type {
-  CommandHandlerMetaData,
-  HandleOpeningCallbackParams,
-} from "@/hooks/database/types/use-command-handler.types.ts";
+import type { ClassCreationControllerProps } from "@/features/class-creation/class-creation.index.ts";
 import type {
   StepThreeControllerProps,
   StepThreeModuleSelectionControllerProps,
   StepThreeSubskillsSelectionControllerProps,
-} from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
-import type { LeftContentProps } from "@/pages/Evaluations/create/types/create.types.ts";
+} from "@/features/evaluations/create/steps/three/types/step-three.types.ts";
+import type { LeftContentProps } from "@/features/evaluations/create/types/create.types.ts";
+import type {
+  CommandHandlerMetaData,
+  HandleOpeningCallbackParams,
+} from "@/hooks/database/types/use-command-handler.types.ts";
 import { checkPropsValidity } from "@/utils/utils.ts";
 
 //                    ------------

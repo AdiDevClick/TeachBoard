@@ -1,18 +1,18 @@
 import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas.tsx";
 import {
-  inputLoginControllers,
   inputSignupControllers,
   passwordCreationInputControllers,
 } from "@/data/inputs-controllers.data.ts";
+import { CreateEvaluations } from "@/features/evaluations/create/CreateEvaluations.tsx";
+import { StepFour } from "@/features/evaluations/create/steps/four/StepFour.tsx";
+import { StepOne } from "@/features/evaluations/create/steps/one/StepOne";
+import { StepThree } from "@/features/evaluations/create/steps/three/StepThree.tsx";
+import { StepTwo } from "@/features/evaluations/create/steps/two/StepTwo.tsx";
+import { inputLoginControllers } from "@/features/login/components/main/forms/login-inputs.ts";
 import { completeDatas } from "@/main.tsx";
 import { About } from "@/pages/About/About.tsx";
 import EmailValidation from "@/pages/Email/EmailValidation";
 import { PageError } from "@/pages/Error/PageError.tsx";
-import { CreateEvaluations } from "@/pages/Evaluations/create/CreateEvaluations.tsx";
-import { StepFour } from "@/pages/Evaluations/create/steps/four/StepFour.tsx";
-import { StepOne } from "@/pages/Evaluations/create/steps/one/StepOne";
-import { StepThree } from "@/pages/Evaluations/create/steps/three/StepThree.tsx";
-import { StepTwo } from "@/pages/Evaluations/create/steps/two/StepTwo.tsx";
 import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
 import { Login } from "@/pages/Login/Login.tsx";

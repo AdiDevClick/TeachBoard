@@ -1,7 +1,7 @@
 import {
   DEFAULT_VALUES_STEPS_CREATION_STATE,
   useEvaluationStepsCreationStore,
-} from "@/api/store/EvaluationStepsCreationStore";
+} from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
 import { beforeEach, describe, expect, it } from "vitest";
 
 describe("StepsCreationStore - students reshape", () => {

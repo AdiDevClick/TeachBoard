@@ -1,23 +1,23 @@
-import ClassCreation from "@/components/ClassCreation/ClassCreation.tsx";
-import DegreeItem from "@/components/ClassCreation/diploma/degree-item/DegreeItem";
-import DegreeModuleSkill from "@/components/ClassCreation/diploma/degree-module-skill/DegreeModuleSkill.tsx";
-import DegreeModule from "@/components/ClassCreation/diploma/degree-module/DegreeModule.tsx";
-import DiplomaCreation from "@/components/ClassCreation/diploma/DiplomaCreation.tsx";
-import SearchStudents from "@/components/ClassCreation/students/SearchStudents.tsx";
-import TaskItem from "@/components/ClassCreation/task/task-item/TaskItem";
-import TaskTemplateCreation from "@/components/ClassCreation/task/task-template/TaskTemplateCreation";
-import { SearchPrimaryTeacher } from "@/components/ClassCreation/teachers/SearchTeachers.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import LoginForm from "@/components/LoginForms/LoginForm.tsx";
 import { Modal, ModalWithSimpleAlert } from "@/components/Modal/Modal.tsx";
+import { inputSignupControllers } from "@/data/inputs-controllers.data.ts";
+import DegreeItem from "@/features/class-creation/components/DegreeItem/DegreeItem";
 import {
   degreeCreationInputControllersDegree,
   degreeCreationInputControllersField,
   degreeCreationInputControllersYear,
-  diplomaCreationInputControllers,
-  inputLoginControllers,
-  inputSignupControllers,
-} from "@/data/inputs-controllers.data.ts";
+} from "@/features/class-creation/components/DegreeItem/forms/degree-item-inputs";
+import DegreeModule from "@/features/class-creation/components/DegreeModule/DegreeModule.tsx";
+import DegreeModuleSkill from "@/features/class-creation/components/DegreeModuleSkill/DegreeModuleSkill.tsx";
+import DiplomaCreation from "@/features/class-creation/components/DiplomaCreation/DiplomaCreation.tsx";
+import { diplomaCreationInputControllers } from "@/features/class-creation/components/DiplomaCreation/forms/diploma-creation-inputs";
+import ClassCreation from "@/features/class-creation/components/main/ClassCreation.tsx";
+import SearchStudents from "@/features/class-creation/components/SearchStudents/SearchStudents.tsx";
+import { SearchPrimaryTeacher } from "@/features/class-creation/components/SearchTeachers/SearchTeachers.tsx";
+import TaskItem from "@/features/class-creation/components/TaskItem/TaskItem";
+import TaskTemplateCreation from "@/features/class-creation/components/TaskTemplateCreation/TaskTemplateCreation";
+import { inputLoginControllers } from "@/features/login/components/main/forms/login-inputs.ts";
+import LoginForm from "@/features/login/components/main/LoginForm.tsx";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import {
   defineStrictModalsList,

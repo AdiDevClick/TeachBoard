@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { classCreationInputControllers } from "@/data/inputs-controllers.data.ts";
+import { classCreationInputControllers } from "@/features/class-creation/components/main/forms/class-creation-inputs";
 
 import { describe, expect, it } from "vitest";
 
@@ -11,7 +11,7 @@ describe("API_ENDPOINTS contract for class creation", () => {
   it("classCreationInputControllers are wired with apiEndpoint/dataReshapeFn when required", () => {
     // Diploma select (commands + add new)
     const diploma = classCreationInputControllers.find(
-      (c) => c.name === "degreeConfigId"
+      (c) => c.name === "degreeConfigId",
     );
     expect(diploma).toBeTruthy();
     expect(diploma?.useCommands).toBe(true);
@@ -20,7 +20,7 @@ describe("API_ENDPOINTS contract for class creation", () => {
 
     // Students search button
     const students = classCreationInputControllers.find(
-      (c) => c.name === "students"
+      (c) => c.name === "students",
     );
     expect(students).toBeTruthy();
     expect(students?.apiEndpoint).toBeTruthy();
@@ -28,7 +28,7 @@ describe("API_ENDPOINTS contract for class creation", () => {
 
     // Primary teacher button
     const teacher = classCreationInputControllers.find(
-      (c) => c.name === "primaryTeacherId"
+      (c) => c.name === "primaryTeacherId",
     );
     expect(teacher).toBeTruthy();
     expect(teacher?.apiEndpoint).toBeTruthy();
@@ -88,10 +88,10 @@ describe("API_ENDPOINTS contract for class creation", () => {
     ];
 
     const shapedStudents = API_ENDPOINTS.GET.STUDENTS.dataReshape(
-      studentsPayload as any
+      studentsPayload as any,
     );
     const shapedTeachers = API_ENDPOINTS.GET.TEACHERS.dataReshape(
-      teachersPayload as any
+      teachersPayload as any,
     );
 
     const student = (shapedStudents as any)[0].items?.[0];
@@ -119,7 +119,7 @@ describe("API_ENDPOINTS contract for class creation", () => {
     };
 
     const shaped = API_ENDPOINTS.GET.TASKSTEMPLATES.dataReshape(
-      taskTemplatesPayload as any
+      taskTemplatesPayload as any,
     );
 
     expect(Array.isArray(shaped)).toBe(true);

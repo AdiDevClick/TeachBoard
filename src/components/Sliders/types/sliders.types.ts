@@ -1,4 +1,4 @@
-import type { StudentWithPresence } from "@/api/store/types/steps-creation-store.types.ts";
+import type { StudentWithPresence } from "@/features/evaluations/create/store/types/steps-creation-store.types.ts";
 
 /**
  * Props for EvaluationSlider component.

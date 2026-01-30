@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { degreeCreationInputControllersField } from "@/data/inputs-controllers.data";
+import { degreeCreationInputControllersField } from "@/features/class-creation/components/DegreeItem/forms/degree-item-inputs";
 import {
   degreeCreated,
   degreeCreatedResponse,
@@ -31,7 +31,7 @@ setupUiTestState(null, {
       "newDegree",
       "diplomaFieldController",
       "create-diploma",
-      { routeArgs: ["FIELD"] }
+      { routeArgs: ["FIELD"] },
     );
 
     diplomaFieldController = res.controllers.diplomaFieldController;
@@ -57,13 +57,13 @@ describe("UI flow: new-degree-item-field", () => {
         controller: diplomaFieldController,
         nameArray: fields,
         readyText: degreeCreationInputControllersField[0].title,
-      }
+      },
     );
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
     const getCallsBeforeCreation = countFetchCallsByUrl(
       diplomaFieldController.apiEndpoint,
-      "GET"
+      "GET",
     );
 
     // Fill fields
@@ -94,7 +94,7 @@ describe("UI flow: new-degree-item-field", () => {
     // Ensure modal is closed and the modal title is absent
     await waitForDialogAndAssertText(
       /Création d'un nouveau domaine \/ métier/i,
-      { present: false }
+      { present: false },
     );
 
     await assertPostUpdatedCacheWithoutExtraGet({

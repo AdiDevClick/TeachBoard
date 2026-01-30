@@ -1,5 +1,5 @@
-import { SearchPrimaryTeacherController } from "@/components/ClassCreation/teachers/controller/SearchTeachersController.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import { SearchPrimaryTeacherController } from "@/features/class-creation/components/SearchTeachers/controllers/SearchTeachersController.tsx";
 import { teacherFetched } from "@/tests/samples/class-creation-sample-datas";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { rx, stubFetchRoutes } from "@/tests/test-utils/vitest-browser.helpers";
@@ -41,7 +41,7 @@ setupUiTestState(
         getRoutes: [[API_ENDPOINTS.GET.TEACHERS.endpoint, [teacherFetched]]],
         defaultGetPayload: [],
       }),
-  }
+  },
 );
 
 afterEach(() => vi.unstubAllGlobals());

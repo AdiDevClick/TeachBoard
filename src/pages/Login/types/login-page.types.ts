@@ -1,4 +1,4 @@
-import LoginForm from "@/components/LoginForms/LoginForm.tsx";
+import LoginForm from "@/features/login/components/main/LoginForm.tsx";
 
 /**
  * Login Component Props

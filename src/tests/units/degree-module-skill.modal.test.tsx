@@ -82,7 +82,7 @@ describe("DegreeModuleSkill modal integration", () => {
       {
         endpointUrl: fetchDatas.apiEndpoint,
         dataReshapeFn: (d: unknown) => ({ items: [d] }),
-      }
+      },
     );
 
     const newCached = await waitForCache(fetchDatas.queryKey);
@@ -96,7 +96,8 @@ describe("DegreeModuleSkill modal integration", () => {
   });
 
   test("form validation works via zod schema", async () => {
-    const moduleSkill = await import("@/models/degree-module-skill.model.ts");
+    const moduleSkill =
+      await import("@/features/class-creation/components/DegreeModuleSkill/models/degree-module-skill.model");
 
     // Invalid payload
     const invalid = { name: "", code: "" };
