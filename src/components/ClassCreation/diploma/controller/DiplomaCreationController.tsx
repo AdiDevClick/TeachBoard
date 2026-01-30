@@ -1,5 +1,6 @@
 import { switchFields } from "@/components/ClassCreation/diploma/functions/diploma.functions.ts";
 import type { DiplomaCreationControllerProps } from "@/components/ClassCreation/diploma/types/diploma-creation.types.ts";
+import type { CommandSelectionItemProps } from "@/components/Command/types/command.types.ts";
 import {
   PopoverFieldWithCommands,
   PopoverFieldWithControllerAndCommandsList,
@@ -8,7 +9,9 @@ import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { HTTP_METHODS } from "@/configs/app.config.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
-import type { DiplomaCreationFormSchema } from "@/models/diploma-creation.models.ts";
+import type {
+  DiplomaCreationFormState,
+} from "@/models/diploma-creation.models.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWatch } from "react-hook-form";
 
@@ -48,17 +51,17 @@ export function DiplomaCreationController({
   });
   const queryClient = useQueryClient();
   const currentSkills =
-    useWatch({
+    useWatch<DiplomaCreationFormState, "modulesListDetails">({
       control: form.control,
-      name: "modulesListDetails" as never,
-    }) || []; 
+      name: "modulesListDetails",
+    }) || [];
 
   /**
    * Handle form submission
    *
    * @param variables - form variables
    */
-  const handleSubmit = (variables: DiplomaCreationFormSchema) => {
+  const handleSubmit = (variables: DiplomaCreationFormState) => {
     submitCallback(variables, {
       method: HTTP_METHODS.POST,
     });
@@ -66,7 +69,7 @@ export function DiplomaCreationController({
 
   const handleSelection = (
     value: string,
-    taskDetails?: Record<string, unknown>
+    taskDetails?: CommandSelectionItemProps["command"],
   ) => {
     const options = {
       mainFormField: "modulesList",

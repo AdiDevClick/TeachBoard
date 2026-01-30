@@ -1,4 +1,5 @@
 import type { FetchingInputItem } from "@/components/Inputs/types/inputs.types.ts";
+import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types.ts";
 import { formsRegex } from "@/configs/formsRegex.config.ts";
 import z from "zod";
 
@@ -38,7 +39,7 @@ const diplomaSchema = (data: typeof fieldData) => {
           .string()
           .regex(formsRegex.skillId, data.arrayItemRegexMessage)
           .trim()
-          .toUpperCase()
+          .toUpperCase(),
       )
       .min(data.minArrayLength, data.minArrayLengthMessage)
       .max(data.maxArrayLength, data.maxArrayLengthExceededMessage)
@@ -47,6 +48,10 @@ const diplomaSchema = (data: typeof fieldData) => {
 };
 
 export type DiplomaCreationFormSchema = z.infer<typeof diplomaCreationSchema>;
+
+export type DiplomaCreationFormState = DiplomaCreationFormSchema & {
+  modulesListDetails?: DynamicTagsItemList;
+};
 
 export type DiplomaInputItem = FetchingInputItem<DiplomaCreationFormSchema>;
 

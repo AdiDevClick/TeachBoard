@@ -53,7 +53,7 @@ export function PopoverField({
     fieldName: rest?.name,
     selectedValue: props.multiSelection
       ? defaultValue
-      : rest.defaultValue ?? undefined,
+      : (rest.defaultValue ?? undefined),
   });
 
   // Reset selectedValue when resetKey changes
@@ -81,7 +81,7 @@ export function PopoverField({
       rest?.dataReshapeFn,
       state.fieldName,
       containerId,
-    ]
+    ],
   );
 
   /**
@@ -117,12 +117,12 @@ export function PopoverField({
       setState((prev) => ({ ...prev, open: isOpen }));
       onOpenChange?.(isOpen, memoizedMeta);
     },
-    [onOpenChange, memoizedMeta]
+    [onOpenChange, memoizedMeta],
   );
 
   const selectValue = props.multiSelection
     ? placeholder
-    : state.selectedValue ?? placeholder;
+    : (state.selectedValue ?? placeholder);
 
   return (
     <div
@@ -147,7 +147,7 @@ export function PopoverField({
               fullWidth ? "w-full" : "w-fit",
               state.selectedValue
                 ? "font-normal"
-                : "text-muted-foreground font-normal"
+                : "text-muted-foreground font-normal",
             )}
           >
             {selectValue}
@@ -174,9 +174,9 @@ export const PopoverFieldWithController = withController(PopoverField);
 export const PopoverFieldWithCommands = withComboBoxCommands(PopoverField);
 
 export const PopoverFieldWithControlledCommands = withController(
-  PopoverFieldWithCommands
+  PopoverFieldWithCommands,
 );
 
 export const PopoverFieldWithControllerAndCommandsList = withListMapper(
-  PopoverFieldWithControlledCommands
+  PopoverFieldWithControlledCommands,
 );

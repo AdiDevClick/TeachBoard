@@ -3,8 +3,10 @@ import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-obser
 import type {
   AnyComponentLike,
   ComponentPropsOf,
+  OwnProps,
+  RequiredKeys,
 } from "@/utils/types/types.utils.ts";
-import type { ComponentProps, ComponentPropsWithRef } from "react";
+import type { ComponentPropsWithRef } from "react";
 import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -18,8 +20,12 @@ export type AppControllerProps<T extends FieldValues> = {
  * It provides the `name` and `form` props while forwarding the
  * wrapped component's props, excluding injected props like `field` and `fieldState`.
  */
-export type WrapperProps<T extends FieldValues, C> = AppControllerProps<T> &
+export type WrapperProps<
+  T extends FieldValues,
+  C extends AnyComponentLike,
+> = AppControllerProps<T> &
   Omit<ComponentPropsOf<C>, "field" | "fieldState" | "ref"> &
+  RequiredWrappedProps<C> &
   Omit<ComponentPropsWithRef<"div">, "onSelect"> & {
     /**
      * Optional callback invoked when a controlled popover/select opens or closes.
@@ -36,6 +42,15 @@ export type WrapperProps<T extends FieldValues, C> = AppControllerProps<T> &
 export type WrapperPropsAny<C extends AnyComponentLike = AnyComponentLike> =
   // intentionally accept any form instance type to reduce HOC friction in JSX
   AppControllerProps<any> &
-    Omit<ComponentProps<C>, "field" | "fieldState" | "ref"> &
+    Omit<ComponentPropsOf<C>, "field" | "fieldState" | "ref"> &
+    RequiredWrappedProps<C> &
     Omit<ComponentPropsWithRef<"div">, "onSelect"> &
     UseMutationObserverReturn;
+
+type RequiredWrappedProps<C extends AnyComponentLike> = Pick<
+  OwnProps<ComponentPropsOf<C>>,
+  Exclude<
+    RequiredKeys<OwnProps<ComponentPropsOf<C>>>,
+    "field" | "fieldState" | "controllerMeta"
+  >
+>;

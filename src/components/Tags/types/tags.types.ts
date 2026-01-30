@@ -25,11 +25,13 @@ export type DynamicTagsSetters = {
   };
 };
 
-export type DynamicTagsProps = DynamicTagsSetters & {
-  pageId?: string;
-  title?: string;
-  itemList: DynamicTagsItemList;
-} & Record<string, unknown>;
+export type DynamicTagsProps = Readonly<
+  DynamicTagsSetters & {
+    pageId?: string;
+    title?: string;
+    itemList: DynamicTagsItemList;
+  } & Record<string, unknown>
+>;
 
 export type DynamicTagState = {
   selected: boolean;

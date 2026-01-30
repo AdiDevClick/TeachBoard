@@ -1,13 +1,13 @@
 import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import { EvaluationSlider } from "@/components/Sliders/EvaluationSlider.tsx";
+import { EvaluationSliderList } from "@/components/Sliders/EvaluationSlider.tsx";
+import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
 import { Badge } from "@/components/ui/badge.tsx";
 import {
   debugLogs,
   stepThreeControllerPropsInvalid,
 } from "@/configs/app-components.config.ts";
 import type { StepThreeControllerProps } from "@/pages/Evaluations/create/steps/three/types/step-three.types.ts";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
 
 export function StepThreeStudentsEvaluationController(
@@ -29,7 +29,10 @@ export function StepThreeStudentsEvaluationController(
   const setSubSkillHasCompleted = useEvaluationStepsCreationStore(
     (state) => state.setSubSkillHasCompleted,
   );
-  const [value, setValue] = useState([0]);
+
+  const scoreValue = useEvaluationStepsCreationStore(
+    useShallow((state) => state.getStudentScoreForSubSkill),
+  );
 
   if (stepThreeControllerPropsInvalid(props)) {
     debugLogs("StepThreeStudentsEvaluationController", props);
@@ -57,53 +60,61 @@ export function StepThreeStudentsEvaluationController(
         isCompleted,
       );
     }
-  }, [selectedModule, selectedSubSkill, value]);
+  }, [selectedModule, selectedSubSkill]);
 
   /**
    * Handles value change for a student's evaluation.
-   * 
+   *
    * @description Updates the evaluation score for the specified student
-
-  * @param newValue - The new value array from the slider. 
+   * @param newValue - The new value array from the slider.
    * @param student - The student whose evaluation is being updated.
    */
   const handleValueChange = (
     newValue: number[],
-    student: (typeof students)[number],
+    student: EvaluationSliderProps,
   ) => {
+    if (!student.id) {
+      return;
+    }
+
     setEvaluationForStudent(student.id, {
-      subSkill: selectedSubSkill ?? null,
+      subSkill: selectedSubSkill,
       score: newValue[0],
-      module: selectedModule ?? null,
+      module: selectedModule,
     });
-    setValue(newValue);
   };
 
   return (
     <form id={formId} className="min-w-md">
-      <ListMapper items={students}>
+      <EvaluationSliderList
+        items={students}
+        optional={(student) => {
+          return {
+            value: scoreValue(
+              student.id,
+              selectedSubSkill?.id,
+              selectedModule?.id,
+            ),
+          };
+        }}
+        onValueChange={handleValueChange}
+      />
+      {/* <ListMapper items={students}>
         {(student) => {
-          let evaluation = value;
-          const moduleId = selectedModule?.id;
-          const subSkillId = selectedSubSkill?.id;
-          const studentModules = student.evaluations?.modules;
-
-          if (moduleId && subSkillId && studentModules?.has(moduleId)) {
-            const subSkill = studentModules
-              .get(moduleId)
-              ?.subSkills.get(subSkillId);
-
-            evaluation = subSkill?.score ? [subSkill.score] : value;
-          }
           return (
             <EvaluationSlider
-              fullName={student.fullName}
-              evaluation={evaluation}
-              onValueChange={(e) => handleValueChange(e, student)}
+              key={student.id}
+              {...student}
+              value={scoreValue(
+                student.id,
+                selectedSubSkill?.id,
+                selectedModule?.id,
+              )}
+              onValueChange={handleValueChange}
             />
           );
         }}
-      </ListMapper>
+      </ListMapper> */}
       {students.length === 0 && (
         <Badge variant={"outline"} className="mx-auto">
           Aucuns étudiants spécifiés pour cette compétence.

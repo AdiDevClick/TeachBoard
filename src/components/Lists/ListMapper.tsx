@@ -1,9 +1,16 @@
-import type { ListMapperProps } from "@/components/Lists/types/ListsTypes.ts";
+import type {
+  ListMapperOptionalValue,
+  ListMapperProps,
+} from "@/components/Lists/types/ListsTypes.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import {
   debugLogs,
   listMapperContainsInvalid,
 } from "@/configs/app-components.config.ts";
+import type {
+  AnyObjectProps,
+  ExtractItemType,
+} from "@/utils/types/types.utils.ts";
 import { wait } from "@/utils/utils.ts";
 import {
   Activity,
@@ -57,10 +64,11 @@ import {
  * ```
  */
 export function ListMapper<
-  TItems extends readonly unknown[] | Record<string, unknown>,
+  TItems extends readonly unknown[] | AnyObjectProps,
+  TOptionalInput = undefined,
   C extends ElementType = ElementType,
-  TOptional extends Record<string, unknown> | undefined = undefined,
->(props: Readonly<ListMapperProps<TItems, C, TOptional>>) {
+  TChildProps extends AnyObjectProps = AnyObjectProps,
+>(props: Readonly<ListMapperProps<TItems, C, TOptionalInput, TChildProps>>) {
   const { items, optional, children, component, ...rest } = props;
 
   const id = useId();
@@ -122,28 +130,38 @@ export function ListMapper<
     if (component) {
       const Component = component;
 
-      return <Component key={itemId} {...item} {...optional} {...rest} />;
+      const injectedOptional = retrieveOptional(optional, item, index);
+
+      return (
+        <Component key={itemId} {...item} {...injectedOptional} {...rest} />
+      );
     }
 
     // Case B: Render function - best type safety (act as a function with params)
     if (typeof children === "function") {
       const renderFn = children as (
-        item: TItems,
+        item: ExtractItemType<TItems>,
         index: number,
-        optional?: TOptional,
+        optional?: TOptionalInput | ListMapperOptionalValue<TOptionalInput>,
       ) => ReactNode;
 
+      const injectedOptional = retrieveOptional(optional, item, index);
+
       return (
-        <Fragment key={itemId}>{renderFn(item, index, optional)}</Fragment>
+        <Fragment key={itemId}>
+          {renderFn(item, index, injectedOptional)}
+        </Fragment>
       );
     }
 
     // Case C: ReactElement - render its type with injected props
     if (isValidElement(children)) {
+      const injectedOptional = retrieveOptional(optional, item, index);
+
       const injectedProps = {
         ...item,
         index: index,
-        ...optional,
+        ...injectedOptional,
       };
 
       const Component = children.type;
@@ -156,4 +174,18 @@ export function ListMapper<
 
     return null;
   });
+}
+
+function retrieveOptional<TItems, TOptional>(
+  optional: TOptional | ((item: TItems, index: number) => TOptional),
+  item: TItems,
+  index: number,
+): TOptional {
+  if (typeof optional === "function") {
+    return (optional as (item: TItems, index: number) => TOptional)(
+      item,
+      index,
+    );
+  }
+  return optional;
 }
