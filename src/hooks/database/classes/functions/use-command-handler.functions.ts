@@ -2,9 +2,15 @@ import type { CommandSelectionItemProps } from "@/components/Command/types/comma
 import { ANIMATIONS_LOGS, DEV_MODE } from "@/configs/app.config.ts";
 import type { UniqueSet } from "@/utils/UniqueSet.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
-import type { FieldValues, Path, PathValue } from "react-hook-form";
+import type {
+  FieldValues,
+  Path,
+  PathValue,
+  UseFormReturn,
+} from "react-hook-form";
 
-/** * Set form values after animation completes
+/**
+ * Set form values after animation completes
  *
  * @param mainFormField - The main form field to set
  * @param secondaryFormField - The secondary form field to set
@@ -12,36 +18,29 @@ import type { FieldValues, Path, PathValue } from "react-hook-form";
  * @param values - The values to set
  * @param form - The react-hook-form instance managing the form state
  */
-export function setValuesAfterAnimation(
-  mainFormField: Path<FieldValues>,
-  secondaryFormField: Path<FieldValues>,
+export function setValuesAfterAnimation<TFieldValues extends FieldValues>(
+  mainFormField: Path<TFieldValues>,
+  secondaryFormField: Path<TFieldValues>,
   retrievedFormField: UniqueSet<string, CommandSelectionItemProps["command"]>,
-  values: unknown,
-  form: FieldValues,
+  values: PathValue<TFieldValues, Path<TFieldValues>>,
+  form: UseFormReturn<TFieldValues>,
 ) {
   if (mainFormField) {
-    form.setValue(
-      mainFormField,
-      values as PathValue<FieldValues, Path<FieldValues>>,
-      {
-        shouldValidate: true,
-      },
-    );
+    form.setValue(mainFormField, values, {
+      shouldValidate: true,
+    });
   }
 
   if (secondaryFormField) {
-    form.setValue(
-      secondaryFormField,
-      Array.from(retrievedFormField.entries()) as PathValue<
-        FieldValues,
-        Path<FieldValues>
-      >,
-      {
-        shouldValidate: false,
-        shouldDirty: false,
-        shouldTouch: false,
-      },
-    );
+    const secondaryValues = Array.from(
+      retrievedFormField.entries(),
+    ) as PathValue<TFieldValues, Path<TFieldValues>>;
+
+    form.setValue(secondaryFormField, secondaryValues, {
+      shouldValidate: false,
+      shouldDirty: false,
+      shouldTouch: false,
+    });
   }
 }
 

@@ -4,7 +4,6 @@
  * These functions handle the management of sub-skills within modules,
  */
 
-import { useEvaluationStepsCreationStore } from "@/api/store/EvaluationStepsCreationStore.ts";
 import type {
   ClassModules,
   ClassModuleSubSkill,

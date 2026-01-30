@@ -84,6 +84,7 @@ export type AppModalNames =
   | "search-students"
   | "search-primaryteacher"
   | "attendance-record-creation"
+  | "evaluation-step-one"
   | "evaluation-summary";
 
 /**

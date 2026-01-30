@@ -9,7 +9,7 @@ import { usePopoverCRUD } from "@/hooks/usePopoverCRUD.ts";
 import sanitizeDOMProps from "@/utils/props.ts";
 import { PopoverArrow, PopoverClose } from "@radix-ui/react-popover";
 import { CheckIcon, Pencil, RotateCcw, Trash2, XIcon } from "lucide-react";
-import { type ComponentType } from "react";
+import { type ComponentProps, type ComponentType } from "react";
 
 /**
  * Higher-Order Component to wrap a component with Popover CRUD functionality.
@@ -105,6 +105,6 @@ export function withPopoverCRUD<T extends object>(
   };
 }
 
-function DefaultButton(props) {
+function DefaultButton(props: ComponentProps<typeof Button>) {
   return <Button size="sm" variant="ghost" {...props} />;
 }

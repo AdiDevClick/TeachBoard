@@ -2,6 +2,10 @@ import type {
   CommandSelectionItemProps,
   HeadingType,
 } from "@/components/Command/types/command.types.ts";
+import type {
+  ApiEndpointType,
+  DataReshapeFn,
+} from "@/components/Inputs/types/inputs.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
   debugLogs,
@@ -43,7 +47,12 @@ import {
   useMemo,
   useRef,
 } from "react";
-import type { FieldErrors, FieldValues, Path } from "react-hook-form";
+import type {
+  FieldErrors,
+  FieldValues,
+  Path,
+  PathValue,
+} from "react-hook-form";
 
 /**
  * Custom hook to handle command operations including data fetching, dialog management, and form submissions.
@@ -131,7 +140,9 @@ export function useCommandHandler<
     variables: HandleSubmitCallbackParams["variables"],
     submitOpts?: HandleSubmitCallbackParams["submitOpts"],
   ) {
-    const options = dialogOptions(pageId);
+    const options = dialogOptions(pageId) as
+      | (CommandHandlerMetaData & { queryKey?: FetchParams["cachedFetchKey"] })
+      | undefined;
     const {
       dataReshapeFn,
       endpointUrl,
@@ -146,8 +157,9 @@ export function useCommandHandler<
 
     // For non-GET methods, override with provided endpoint and reshaper
     if (method !== "GET") {
-      reshapeFn = dataReshapeFn ?? params.submitDataReshapeFn;
-      endpointUrlFinal = endpointUrl ?? params.submitRoute;
+      reshapeFn =
+        dataReshapeFn ?? (params.submitDataReshapeFn as DataReshapeFn);
+      endpointUrlFinal = endpointUrl ?? (params.submitRoute as ApiEndpointType);
     }
 
     // Store variables for deferred submission
@@ -170,7 +182,7 @@ export function useCommandHandler<
 
     setFetchParams((prev) => ({
       ...prev,
-      url: endpointUrlFinal,
+      url: typeof endpointUrlFinal === "string" ? endpointUrlFinal : prev.url,
       cachedFetchKey: options?.queryKey,
       method: API_ENDPOINTS.POST.METHOD,
       contentId: pageId as FetchParams["contentId"],
@@ -316,7 +328,7 @@ export function useCommandHandler<
         mainFormField,
         secondaryFormField,
         retrievedFormField,
-        values,
+        values as PathValue<TFieldValues, Path<TFieldValues>>,
         form,
       );
     },
