@@ -1,3 +1,9 @@
+import {
+  contentLeft,
+  contentLeftDescription,
+  contentLeftNumber,
+  contentLeftTitle,
+} from "@/assets/css/EvaluationPage.module.scss";
 import { CardDescription, CardTitle } from "@/components/ui/card.tsx";
 import {
   debugLogs,
@@ -27,11 +33,11 @@ export function LeftSidePageContent(props: Readonly<LeftContentProps>) {
   } = props;
 
   return (
-    <div className="content__left">
-      <CardTitle className="content__left--number">{number}.</CardTitle>
-      <CardTitle className="content__left--title">{title}</CardTitle>
+    <div className={contentLeft}>
+      <CardTitle className={contentLeftNumber}>{number}.</CardTitle>
+      <CardTitle className={contentLeftTitle}>{title}</CardTitle>
       <Activity mode={props.children ? "hidden" : "visible"}>
-        <CardDescription className="content__left--description">
+        <CardDescription className={contentLeftDescription}>
           {description}
         </CardDescription>
       </Activity>

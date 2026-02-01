@@ -29,8 +29,9 @@ export function HeaderTitle({
   title = headerTitle,
   description = headerDescription,
   id = "login-header",
+  displayChildrenOnly = false,
   ...props
-}: Readonly<HeaderTitleProps>) {
+}: HeaderTitleProps) {
   const ids = useId();
   return (
     <CardHeader
@@ -38,8 +39,13 @@ export function HeaderTitle({
       className={cn("text-center", className)}
       {...props}
     >
-      <CardTitle className="text-xl">{title}</CardTitle>
-      <CardDescription>{description}</CardDescription>
+      {!displayChildrenOnly && (
+        <>
+          <CardTitle className="text-xl">{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
+        </>
+      )}
+      {props.children}
     </CardHeader>
   );
 }
@@ -65,17 +71,23 @@ export function DialogHeaderTitle({
   title = headerTitle,
   description = headerDescription,
   id = "login-header-dialog",
-  ...rest
-}: Readonly<HeaderTitleProps>) {
+  displayChildrenOnly = false,
+  ...props
+}: HeaderTitleProps) {
   const ids = useId();
   return (
     <DialogHeader
       id={id + ids}
-      className={cn("text-center", rest.className)}
-      {...rest}
+      className={cn("text-center", props.className)}
+      {...props}
     >
-      <DialogTitle className="text-xl">{title}</DialogTitle>
-      <DialogDescription>{description}</DialogDescription>
+      {!displayChildrenOnly && (
+        <>
+          <DialogTitle className="text-xl">{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </>
+      )}
+      {props.children}
     </DialogHeader>
   );
 }

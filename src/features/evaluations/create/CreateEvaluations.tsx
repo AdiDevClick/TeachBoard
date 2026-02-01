@@ -1,12 +1,11 @@
 import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs.tsx";
-import { ListMapper } from "@/components/Lists/ListMapper.js";
 import { Tabs } from "@/components/ui/tabs";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types.js";
 import type { CreateEvaluationsLoaderData } from "@/routes/routes.config.js";
 import "@css/PageContent.scss";
 import { useEffect, useState, type JSX } from "react";
 import { Outlet, useLoaderData, useNavigate } from "react-router-dom";
-import { TabContent } from "../../../components/Tabs/TabContent.js";
+import { TabContentList } from "../../../components/Tabs/TabContent.js";
 
 const tabValues: string[] = [];
 
@@ -40,6 +39,8 @@ export function CreateEvaluations() {
    * Props for TabContent components
    *
    * @description index needs to be passed for arrow navigation
+   *
+   * @remarks This also contains leftContent state to be passed to each TabContent
    */
   const tabContentPropsAndFunctions = {
     onClick: handleOnArrowClick,
@@ -62,22 +63,16 @@ export function CreateEvaluations() {
         value={tabValue}
         onValueChange={setTabValue}
       />
-      <ListMapper items={pageDatas}>
-        {([key, item], index) => {
+      <TabContentList
+        items={Object.values(pageDatas)}
+        optional={(item) => {
           tabValues.push(item.name);
 
-          return (
-            <TabContent
-              key={key}
-              item={item}
-              index={index}
-              {...tabContentPropsAndFunctions}
-            >
-              <Outlet context={[leftContent, setLeftContent]} />
-            </TabContent>
-          );
+          return { ...tabContentPropsAndFunctions };
         }}
-      </ListMapper>
+      >
+        <Outlet context={[leftContent, setLeftContent]} />
+      </TabContentList>
     </Tabs>
   );
 }

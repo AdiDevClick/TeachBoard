@@ -16,7 +16,7 @@ import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
  */
 export function StepOne({
   pageId = "evaluation-step-one",
-  className = STEP_ONE_CARD_PROPS.card.className || "content__right",
+  className = STEP_ONE_CARD_PROPS.card.className,
   modalMode = false,
   inputControllers = stepOneInputControllers,
   ...props

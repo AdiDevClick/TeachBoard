@@ -18,7 +18,7 @@ export function AppDialFooter({
   formState,
   formId,
   ...props
-}: Readonly<AppDialFooterProps>) {
+}: AppDialFooterProps) {
   const { isValid } = formState;
   const cancelTextValue = cancelText || "Annuler";
   const submitTextValue = submitText || "Créer";
@@ -47,7 +47,7 @@ export function AppDialFooter({
  * @param props - Props for the CardFooter component.
  */
 export function AppCardFooter(
-  props: Readonly<ComponentProps<typeof CardFooter>>
+  props: Readonly<ComponentProps<typeof CardFooter>>,
 ) {
   return <CardFooter {...props}>{props.children}</CardFooter>;
 }

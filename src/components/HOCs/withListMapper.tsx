@@ -1,15 +1,15 @@
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import type {
+  ListMapperInjectedProps,
   ListMapperOptionalInput,
   ListMapperOptionalValue,
-  ListMapperProvidedProps,
 } from "@/components/Lists/types/ListsTypes.ts";
 import type {
   AnyComponentLike,
   AnyObjectProps,
   MissingRequiredProps,
 } from "@/utils/types/types.utils.ts";
-import type { ComponentProps, ReactElement } from "react";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
 
 type PropsWithOptional<
   Items,
@@ -19,7 +19,7 @@ type PropsWithOptional<
   optional: ListMapperOptionalInput<Items, TOptional>;
 } & MissingRequiredProps<
     ComponentProps<C>,
-    ListMapperProvidedProps<Items, ListMapperOptionalValue<TOptional>>
+    ListMapperInjectedProps<Items, ListMapperOptionalValue<TOptional>>
   >;
 
 type PropsWithoutOptional<Items, C extends AnyComponentLike> = PropsTypeBase<
@@ -30,7 +30,7 @@ type PropsWithoutOptional<Items, C extends AnyComponentLike> = PropsTypeBase<
     optional?: never;
   } & MissingRequiredProps<
     ComponentProps<C>,
-    ListMapperProvidedProps<Items, undefined>
+    ListMapperInjectedProps<Items, undefined>
   >);
 
 type PropsType<
@@ -42,7 +42,8 @@ type PropsType<
 type PropsTypeBase<Items, C extends AnyComponentLike> = Readonly<
   {
     items: Items;
-  } & Partial<Omit<ComponentProps<C>, "items" | "children">>
+    children?: ReactNode;
+  } & Partial<Omit<ComponentProps<C>, "items">>
 >;
 
 type WithListMapperComponent<C extends AnyComponentLike> = <
