@@ -40,6 +40,10 @@ import { type ComponentProps, type ComponentType } from "react";
  * @property {Component.Card} - A placeholder typed to match the Card component type (no default UI).
  * @property {Component.Content} - By default, renders CardContent wrapping the WrappedContent component. Props are shallow-merged with the configured content props if you provide any.
  *
+ * @remarks The content is a CardContent because it does not matter if it's a modal or not - the content area is always the same and wrapped by a <Card/>.
+ *
+ * @remarks This HOC is strictly for layout purposes and should not contain any business logic.
+ *
  * Notes:
  * - The view-card config may contain `card`, `title`, `content` and `footer` objects.
  *   Each slot shallow-merges its runtime props with the corresponding config object.
@@ -110,7 +114,9 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
           paddingInline: `calc(var(--spacing) * 6)`,
         }}
         {...titleProps}
-      />
+      >
+        {props.children}
+      </DynamicTitle>
     );
   };
 
@@ -122,8 +128,8 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
   Component.Footer = function Footer(
     props: AppDialFooterProps | ComponentProps<typeof CardFooter>,
   ) {
-    const { footer, modalMode } = useViewCardContext();
-    const footerProps = footer ? { ...footer, ...props } : props;
+    const { footer = {}, modalMode } = useViewCardContext();
+    const footerProps = { ...footer, ...props };
 
     if (!footer) {
       return null;
@@ -150,12 +156,13 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
   Component.Content = function Content(
     props: ComponentProps<typeof CardContent>,
   ) {
-    const { content, pageId, rest } = useViewCardContext();
-    const contentProps = content ? { ...content, ...props } : props;
+    const { content = {}, pageId, rest } = useViewCardContext();
+    const contentProps = { ...content, ...props };
 
     return (
       <CardContent {...contentProps}>
         <WrappedContent pageId={pageId} {...(rest as C)} />
+        {props.children}
       </CardContent>
     );
   };

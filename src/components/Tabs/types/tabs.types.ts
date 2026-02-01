@@ -11,10 +11,20 @@ type PageData = NonNullable<
 /**
  * Types for TabContent component props
  */
-export type TabContentProps = {
-  item: PageData;
-  index: number;
-  onClick: (arg: CreateEvaluationArrowsClickHandlerProps) => void;
-  clickProps: Omit<CreateEvaluationArrowsClickHandlerProps, "e" | "index">;
+export type TabContentProps = Readonly<
+  Pick<PageData, "name" | "leftSide"> & {
+    index: number;
+    onClick: (arg: CreateEvaluationArrowsClickHandlerProps) => void;
+    clickProps: Omit<CreateEvaluationArrowsClickHandlerProps, "e" | "index">;
+    leftContent?: ReactNode;
+  } & PropsWithChildren
+>;
+
+/**
+ * Types for LeftSide component props
+ */
+export type LeftSideProps = Readonly<{
+  leftSide: TabContentProps["leftSide"];
   leftContent?: ReactNode;
-} & PropsWithChildren;
+  isMobile: boolean;
+}>;
