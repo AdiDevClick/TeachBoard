@@ -9,6 +9,7 @@
     "module": "ESNext",
     "types": ["vite/client"],
     "skipLibCheck": true,
+    // "esModuleInterop": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -31,17 +32,31 @@
     "baseUrl": "./src",
     "paths": {
       "@/*": ["./*"],
-      "@assets/*": ["assets/*"],
       "@css/*": ["assets/css/*"],
+      "@assets/*": ["assets/*"],
       "@images/*": ["assets/images/*"],
       "@icons/*": ["assets/icons/*"],
       "@data/*": ["data/*"],
       "@utils/*": ["utils/*"],
       "@hooks/*": ["hooks/*"],
-      "@components/*": ["components/*"]
-    }
+      "@components/*": ["components/*"],
+      "@ui/*": ["components/ui/*"]
+    },
+
+    /* Plugins */
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules",
+        "options": {
+          "customMatcher": "\\.module\\.(css|scss|sass)$",
+          "include": ["src/**/*.module.scss"],
+          "classnameTransform": "camelCaseOnly",
+          "namedExports": true
+        }
+      }
+    ]
   },
-  "include": ["src"]
+  "include": ["src"],
   // "include": ["src/**/*"],
-  // "exclude": ["node_modules"]
+  "exclude": ["node_modules"]
 }

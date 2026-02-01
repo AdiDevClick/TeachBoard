@@ -1,9 +1,14 @@
+import {
+  contentRight,
+  contentRightContainer,
+} from "@/assets/css/EvaluationPage.module.scss";
+
 export const STEP_ONE_CARD_PROPS = {
-  card: { className: "content__right" },
+  card: { className: contentRight },
   title: {
     className: "hidden",
   },
   content: {
-    className: "right__content-container",
+    className: contentRightContainer,
   },
 };
