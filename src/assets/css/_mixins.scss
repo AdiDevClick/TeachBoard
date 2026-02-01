@@ -2,6 +2,7 @@
 @use "sass:math" as math;
 @use "sass:meta" as meta;
 @use "sass:list" as list;
+@use "sass:map" as map;
 
 /**
   * _mixins.scss
@@ -97,4 +98,86 @@ $bg: '';
 $bg: $bg;
 
 background: $bg;
+}
+
+/**
+  * REGISTER A BEM CLASS AS AN ALIAS
+  * @param {string} $key - The alias key to register.
+  * @example:
+  * @include register-alias('leftNumber');
+  */
+@mixin register-alias($currentSelector, $key, $bem-prefix, $alias-map: ()) {
+  // ex current selector: ".evaluation-page__content--container"
+  $sel: $currentSelector;
+  // get substring after the first dot (handles selectors like ":global .evaluation-page--container")
+  $dot-pos: string.index($sel, ".");
+
+  @if $dot-pos ==null {
+    $sel-name: $sel;
+  }
+
+  @else {
+    $sel-name: string.slice($sel, $dot-pos + 1);
+  }
+
+  // We need to extract the relative fragment after the BEM prefix (or it will not work properly and display "evaluation-pageevaluation-page__content--container")
+
+  // compute the relative fragment after the BEM prefix
+  $start-pos: string.length($bem-prefix) + 1;
+  // start at first char after prefix
+  $relative: string.slice($sel-name, $start-pos);
+
+  // store as a single-item list (so it's compatible with existing $alias-map structure)
+  $alias-map: map.merge($alias-map, ($key: (
+        $relative))) !global;
+}
+
+/**
+  * CREATE EXPORT ALIASES FOR EASIER JS USAGE
+  *
+  * @param {string} $bem-prefix - The BEM prefix for the class names.
+  * @param {map} $alias-map - A map of alias names to target class names.
+  *
+  * @example:
+  * $alias-map: (
+  *   alias1: target-class-1,
+  *   alias2: target-class-2,
+  * );
+  * @include create-export-aliases($bem-prefix, $alias-map);
+  */
+@mixin create-export-aliases($bem-prefix, $alias-map) {
+
+  /* Aliases for easier JS usage (exported as simple keys) */
+  @each $alias, $segments in $alias-map {
+    $bem-class: $bem-prefix;
+
+    @each $seg in $segments {
+      $bem-class: #{$bem-class}#{$seg};
+    }
+
+    .#{$alias} {
+      composes: #{$bem-class};
+    }
+  }
+
+}
+
+/**
+ * CREATE EXPORT MAPPINGS FOR CSS MODULES (:export)
+ * Emits simple key: 'bem-class'; lines which can be injected inside a `:export {}` block.
+ * Example usage:
+ * :export { @include create-export-alias-exports($bem-prefix, $alias-map); }
+ */
+@mixin create-export-alias-exports($bem-prefix, $alias-map) {
+  @each $alias, $segments in $alias-map {
+    $bem-class: $bem-prefix;
+
+    @each $seg in $segments {
+      $bem-class: #{$bem-class}#{$seg};
+    }
+
+    // output a simple mapping line for :export
+    // note: the caller must place this mixin inside a `:export {}` block
+    #{$alias}: #{$bem-class};
+  }
 }

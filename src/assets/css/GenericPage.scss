@@ -1,23 +1,33 @@
 /**
  * Generic Styles for Pages containing a card centered in the page
  */
-.generic-page-container {
-  --localSpacing: calc(var(--spacing) * 6);
-  --iconSpacing: calc(var(--spacing) * 4);
-  --paddingMinusPageHeaderSize: var(--page-header-height);
+.generic-page {
+  &--container {
+    --localSpacing: calc(var(--spacing) * 6);
+    --iconSpacing: calc(var(--spacing) * 4);
+    --paddingMinusPageHeaderSize: var(--page-header-height);
 
-  background-color: var(--muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--localSpacing);
-  // min-height: 100svh;
-  padding: var(--localSpacing);
-  overflow: hidden;
-  min-height: max-content;
-  height: 100%;
+    background-color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--localSpacing);
+    // min-height: 100svh;
+    padding: var(--localSpacing);
+    overflow: hidden;
+    min-height: max-content;
+    height: 100%;
 
-  .generic-page__content {
+    @media screen and (min-width: 48rem) {
+      padding: calc(var(--spacing) * 10);
+    }
+
+    @media screen and (max-width: 48rem) {
+      padding-bottom: var(--paddingMinusPageHeaderSize);
+    }
+  }
+
+  &__content {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -25,7 +35,7 @@
     max-width: var(--container-sm);
   }
 
-  .generic-page__logo {
+  &__logo {
     display: flex;
     align-items: center;
     align-self: center;
@@ -47,13 +57,5 @@
       width: var(--iconSpacing);
       height: var(--iconSpacing);
     }
-  }
-
-  @media screen and (min-width: 48rem) {
-    padding: calc(var(--spacing) * 10);
-  }
-
-  @media screen and (max-width: 48rem) {
-    padding-bottom: var(--paddingMinusPageHeaderSize);
   }
 }
