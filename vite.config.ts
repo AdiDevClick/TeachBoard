@@ -54,6 +54,7 @@ export default function viteConfig({ mode }: ConfigEnv) {
       alias: {
         "@": path.resolve(__dirname, mainPath),
         "@css": path.resolve(__dirname, `${assetsPath}/css`),
+        "@modules": path.resolve(__dirname, `${assetsPath}/css/*.module.scss`),
         "@assets": path.resolve(__dirname, assetsPath),
         "@components": path.resolve(__dirname, `${mainPath}/components`),
         "@hooks": path.resolve(__dirname, `${mainPath}/hooks`),
@@ -88,10 +89,25 @@ export default function viteConfig({ mode }: ConfigEnv) {
       },
     },
     css: {
+      preprocessorOptions: {
+        scss: {
+          // additionalData: `@use "@/modules" as common;`,
+          importer(...args) {
+            if (args[0] !== "@/modules") {
+              return;
+            }
+
+            return {
+              file: `${path.resolve(__dirname, "./src/assets/css")}`,
+            };
+          },
+        },
+      },
       modules: {
         exportGlobals: false,
         localsConvention: "camelCaseOnly",
         generateScopedName: generateScopedName,
+        //   // globalModulePaths: [/global\.scss$/],
       },
     },
   });
