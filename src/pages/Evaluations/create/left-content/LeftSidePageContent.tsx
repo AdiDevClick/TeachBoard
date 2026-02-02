@@ -1,8 +1,8 @@
 import {
-  contentLeft,
-  contentLeftDescription,
-  contentLeftNumber,
-  contentLeftTitle,
+  contentLeftSide,
+  contentLeftSideDescription,
+  contentLeftSideNumber,
+  contentLeftSideTitle,
 } from "@/assets/css/EvaluationPage.module.scss";
 import { CardDescription, CardTitle } from "@/components/ui/card.tsx";
 import {
@@ -33,11 +33,11 @@ export function LeftSidePageContent(props: Readonly<LeftContentProps>) {
   } = props;
 
   return (
-    <div className={contentLeft}>
-      <CardTitle className={contentLeftNumber}>{number}.</CardTitle>
-      <CardTitle className={contentLeftTitle}>{title}</CardTitle>
+    <div className={contentLeftSide}>
+      <CardTitle className={contentLeftSideNumber}>{number}.</CardTitle>
+      <CardTitle className={contentLeftSideTitle}>{title}</CardTitle>
       <Activity mode={props.children ? "hidden" : "visible"}>
-        <CardDescription className={contentLeftDescription}>
+        <CardDescription className={contentLeftSideDescription}>
           {description}
         </CardDescription>
       </Activity>
