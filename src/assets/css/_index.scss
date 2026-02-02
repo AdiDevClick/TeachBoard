@@ -1,3 +1,15 @@
-.global-test {
-  color: blue;
+/**
+  * Make sure the card content has a max height -
+  * With smooth animation when content size changes
+  *
+  * All child elements will also have smooth transitions
+  */
+.card-content-max-height-with-animation {
+  overflow: auto;
+  max-block-size: 650px;
+  transition: max-block-size 0.3s ease;
+
+  * {
+    transition: 0.3s ease;
+  }
 }
