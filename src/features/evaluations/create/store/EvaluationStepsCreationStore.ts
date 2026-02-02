@@ -744,6 +744,19 @@ export const useEvaluationStepsCreationStore = create(
               "setSubSkillHasCompleted",
             );
           },
+          getAllNonPresentStudents() {
+            ensureCollections();
+            const students = get().students;
+            const studentsArray = new Set();
+
+            students.forEach((element) => {
+              if (!element.isPresent) {
+                studentsArray.add(element.fullName);
+              }
+            });
+
+            return studentsArray;
+          },
           /**
            * FOR SUBSKILLS - CONTROLLER USE ONLY
            *
