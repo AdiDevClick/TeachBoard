@@ -11,6 +11,7 @@ export type DynamicItemTuple = readonly [string, DynamicTagItemDetails];
 
 export type DynamicTagProps = PopoverItem & {
   onExitComplete?: (value: string) => void;
+  displayCRUD?: boolean;
 } & DynamicTagsSetters;
 
 export type DynamicTagsItemList =
@@ -30,7 +31,7 @@ export type DynamicTagsProps = Readonly<
     pageId?: string;
     title?: string;
     itemList: DynamicTagsItemList;
-  } & Record<string, unknown>
+  } & DynamicTagProps
 >;
 
 export type DynamicTagState = {

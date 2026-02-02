@@ -227,6 +227,7 @@ export function TaskTemplateCreationController({
       />
       <DynamicTags
         {...controllers.dynamicTagsControllers}
+        displayCRUD={false}
         itemList={diplomaDatas.tagData}
       />
       <PopoverFieldWithControllerAndCommandsList

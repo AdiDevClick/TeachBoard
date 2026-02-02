@@ -1,5 +1,5 @@
 import withController from "@/components/HOCs/withController.tsx";
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import withListMapper from "@/components/HOCs/withListMapper";
 import { withPopoverCRUD } from "@/components/Popovers/PopoverCRUD.tsx";
 import type {
   DynamicTagProps,
@@ -99,17 +99,17 @@ export function DynamicTags(props: DynamicTagsProps) {
       <ItemTitle>{title}</ItemTitle>
       <Item variant={"default"} className="p-0">
         <ItemContent className="flex-row flex-wrap gap-2">
-          <ListMapper items={Array.from(renderItems.entries())}>
-            {([value, itemDetails]) => (
-              <DynamicTag
-                key={value}
-                value={value}
-                itemDetails={itemDetails}
-                onExitComplete={handleExitComplete}
-                {...rest}
-              />
-            )}
-          </ListMapper>
+          <DynamicTagList
+            items={Array.from(renderItems.entries())}
+            optional={([value, itemDetails]) => {
+              return {
+                value,
+                itemDetails,
+              };
+            }}
+            onExitComplete={handleExitComplete}
+            {...rest}
+          />
         </ItemContent>
       </Item>
     </ItemGroup>
@@ -127,7 +127,14 @@ export function DynamicTags(props: DynamicTagsProps) {
  * @param onExitComplete - Callback when exit animation is complete
  */
 function DynamicTag(props: DynamicTagProps) {
-  const { onRemove, value, itemDetails, onExitComplete, ...rest } = props;
+  const {
+    onRemove,
+    value,
+    itemDetails,
+    displayCRUD = true,
+    onExitComplete,
+    ...rest
+  } = props;
   const valueStr = value ?? "Dynamic-Tag(untitled)";
   const itemId = itemDetails?.id;
 
@@ -154,20 +161,27 @@ function DynamicTag(props: DynamicTagProps) {
         });
       }}
     >
-      <ButtonWithPopoverCRUD
-        id={valueStr}
-        size="sm"
-        variant="outline"
-        onRemove={onRemove}
-        value={valueStr}
-        itemDetails={itemDetails}
-      >
-        {valueStr}
-      </ButtonWithPopoverCRUD>
+      {displayCRUD && (
+        <ButtonWithPopoverCRUD
+          id={valueStr}
+          size="sm"
+          variant="outline"
+          onRemove={onRemove}
+          value={valueStr}
+          itemDetails={itemDetails}
+        >
+          {valueStr}
+        </ButtonWithPopoverCRUD>
+      )}
+      {!displayCRUD && (
+        <Button size="sm" variant="outline">
+          {valueStr}
+        </Button>
+      )}
     </ItemActions>
   );
 }
-
+const DynamicTagList = withListMapper(DynamicTag);
 const ButtonWithPopoverCRUD = withPopoverCRUD(Button);
 
 export const ControlledDynamicTagList = withController(DynamicTags);

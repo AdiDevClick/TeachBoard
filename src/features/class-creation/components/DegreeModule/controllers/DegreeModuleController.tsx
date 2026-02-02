@@ -8,6 +8,7 @@ import { degreeModuleCreationInputControllers } from "@/features/class-creation/
 import type { DegreeModuleControllerProps } from "@/features/class-creation/components/DegreeModule/types/degree-module.types.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
+import { useMemo } from "react";
 import { useWatch } from "react-hook-form";
 
 /**
@@ -86,6 +87,14 @@ export function DegreeModuleController({
     controlledInputsList: inputControllers.slice(0, 2),
   };
 
+  const sharedCallbacksMemo = useMemo(() => {
+    const commonObsProps = {
+      setRef,
+      observedRefs,
+    };
+    return { commonObsProps };
+  }, [setRef, observedRefs]);
+
   return (
     <form
       id={formId}
@@ -93,24 +102,21 @@ export function DegreeModuleController({
       onSubmit={form.handleSubmit(handleSubmit)}
     >
       <ControlledInputList
+        {...sharedCallbacksMemo.commonObsProps}
         items={controllers.controlledInputsList}
         form={form}
-        setRef={setRef}
-        observedRefs={observedRefs}
       />
       <ControlledDynamicTagList
         form={form}
-        setRef={setRef}
         {...controllers.dynamicTagsList}
-        observedRefs={observedRefs}
+        {...sharedCallbacksMemo.commonObsProps}
         itemList={currentSkills}
       />
       <PopoverFieldWithCommands
         multiSelection
-        setRef={setRef}
+        {...sharedCallbacksMemo.commonObsProps}
         onSelect={handleCommandSelection}
         onOpenChange={openingCallback}
-        observedRefs={observedRefs}
         onAddNewItem={newItemCallback}
         commandHeadings={resultsCallback()}
         {...controllers.dynamicTagsList}
