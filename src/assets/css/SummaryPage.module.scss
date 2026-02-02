@@ -1,0 +1,39 @@
+@use 'mixins' as *;
+@use "index" as *;
+
+/**
+ * Styles for the Summary Page component.
+ */
+
+/* Make sure the card can extends to 80% of the right space */
+*:is([data-slot="card"]) {
+
+  & [data-slot="card-content"]> :has([data-slot="accordion"]) {
+    max-width: 80%;
+    width: 100%;
+    @extend .card-content-max-height-with-animation;
+  }
+
+}
+
+
+/**
+ * Main - Summary Page styles
+ */
+.summary-page {
+
+  &__content {
+
+    [data-slot="accordion-item"] {
+      margin-inline: auto;
+      max-inline-size: 100%;
+      transition: max-inline-size 0.3s ease-in-out;
+      will-change: max-inline-size;
+
+      &[data-state="closed"] {
+        max-inline-size: calc(100% - 30%);
+      }
+
+    }
+  }
+}
