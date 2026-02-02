@@ -17,6 +17,14 @@ Button {
 
 }
 
+/**
+ * Apply a blur effect to the dialog overlay background
+ */
+[data-slot="dialog-overlay"] {
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
 /* Only highlight the group when it's focused or has an open trigger, but NOT when a descendant is explicitly in editing mode */
 :is([role="group"], [data-slot="field"], [data-slot="item-group"], [data-slot="select-group"]):not(:has([data-is-editing="true"])):is(:has([aria-expanded="true"]), :has([data-state="open"]), :has(*:focus-visible)) {
   // :is([role="group"], [data-slot="field"], [data-slot="field-group"], [data-slot="item-group"], [data-slot="select-group"]):not(:has([data-is-editing="true"])):is(:has([aria-expanded="true"]), :has([data-state="open"]), :has(*:focus-visible)) {
@@ -70,15 +78,3 @@ form,
     animation: logo-spin infinite 20s linear;
   }
 }
-
-/* .card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-} */
-
-// .error-page {
-//   color: red;
-// }
