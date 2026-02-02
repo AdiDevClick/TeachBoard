@@ -10,12 +10,14 @@ import type {
   LeftSideProps,
   TabContentProps,
 } from "@/components/Tabs/types/tabs.types";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useSidebar } from "@/components/ui/sidebar";
 import { TabsContent } from "@/components/ui/tabs";
 import { LeftSidePageContent } from "@/pages/Evaluations/create/left-content/LeftSidePageContent";
 import withTitledCard from "@components/HOCs/withTitledCard.tsx";
 import { IconArrowLeft, IconArrowRightDashed } from "@tabler/icons-react";
+import type { MouseEvent } from "react";
 
 /**
  * Tab content component for evaluation creation page.
@@ -37,8 +39,8 @@ export function TabContent(props: TabContentProps) {
   } = props;
 
   const { isMobile } = useSidebar();
-  // DEBUG: inspect style keys exported by the module (temporary)
-  const clickHandler = (e: React.MouseEvent<SVGElement, MouseEvent>) => {
+
+  const clickHandler = (e: MouseEvent<HTMLButtonElement>) => {
     onClickHandler({ e, ...clickProps, index });
   };
 
@@ -60,15 +62,31 @@ export function TabContent(props: TabContentProps) {
 
   return (
     <TabsContent value={tabName} className={evaluationPageContainer}>
-      <TabView {...commonProps}>
-        <TabView.Title>
-          <IconArrowLeft onClick={clickHandler} data-name="step-previous" />
-        </TabView.Title>
-        <TabView.Content>{props.children}</TabView.Content>
-        <TabView.Footer>
-          <IconArrowRightDashed onClick={clickHandler} data-name="next-step" />
-        </TabView.Footer>
-      </TabView>
+      <View {...commonProps}>
+        <View.Title className="header">
+          <Button
+            className="left-arrow"
+            onClick={clickHandler}
+            data-name="step-previous"
+            type="button"
+            aria-label="Previous step"
+          >
+            <IconArrowLeft />
+          </Button>
+        </View.Title>
+        <View.Content>{props.children}</View.Content>
+        <View.Footer>
+          <Button
+            className="right-arrow"
+            onClick={clickHandler}
+            data-name="next-step"
+            type="button"
+            aria-label="Next step"
+          >
+            <IconArrowRightDashed />
+          </Button>
+        </View.Footer>
+      </View>
     </TabsContent>
   );
 }
@@ -87,6 +105,6 @@ function LeftSide(props: LeftSideProps) {
   );
 }
 
-const TabView = withTitledCard(LeftSide);
+const View = withTitledCard(LeftSide);
 
 export const TabContentList = withListMapper(TabContent);
