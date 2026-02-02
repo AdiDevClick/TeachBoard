@@ -7,7 +7,59 @@
 .page__content-container {
   height: 100%;
   border: 1px solid var(--border);
+  border-right: none;
+  border-left-width: 7px;
+  border-bottom: none;
   border-radius: 10px;
   padding-bottom: 10px;
   margin-bottom: 5px;
+  transition: transform 0.3s ease, border-left-width 0.3s ease-in-out;
+
+  &:has(.left-arrow:hover, .header:hover) {
+    border-left-width: 15px;
+  }
+
+  &:has(.right-arrow:hover) {
+    // border-left-width: 0;
+  }
+
+  .left-arrow,
+  .right-arrow,
+  .header {
+    position: relative;
+    transition: all 0.5s ease;
+  }
+
+  :is(.left-arrow, .right-arrow)::after {
+    content: "";
+    position: absolute;
+    margin: 14px;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.06);
+    opacity: 0;
+    transform: scale(0.98);
+    transition: all 0.5s ease, opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  :is(.left-arrow, .right-arrow):hover::after,
+  :is(.left-arrow, .right-arrow):focus::after {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+
+  :is(.left-arrow, .right-arrow, .header):hover {
+    cursor: pointer;
+    transition: transform 0.3s ease allow-discrete, color 0.3s ease;
+
+    :not(.header) & {
+      transform: scale(1.1) translateX(-10px);
+
+      // color: var(--primary);
+      &:is(.right-arrow) {
+        transform: scale(1.1) translateX(10px);
+      }
+    }
+  }
+
 }
