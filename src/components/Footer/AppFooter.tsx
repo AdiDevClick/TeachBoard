@@ -22,7 +22,7 @@ export function AppDialFooter({
   displaySubmitButton = true,
   ...props
 }: AppDialFooterProps) {
-  const { isValid } = formState;
+  const isValid = formState?.isValid ?? true;
   const cancelTextValue = cancelText || "Annuler";
   const submitTextValue = submitText || "Créer";
 

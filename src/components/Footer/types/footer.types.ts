@@ -8,11 +8,11 @@ export type AppDialFooterProps = Readonly<
     /** An object containing text for the submit button */
     submitText?: string;
     /** The form state object to determine if the form is valid */
-    formState: {
+    formState?: {
       isValid: boolean;
     };
     /** The id of the form to be submitted */
-    formId: string;
+    formId?: string;
     /** Whether to display the submit button */
     displaySubmitButton?: boolean;
   } & ComponentProps<typeof DialogFooter>
