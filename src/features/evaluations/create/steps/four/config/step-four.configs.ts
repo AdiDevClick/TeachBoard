@@ -1,6 +1,12 @@
+import {
+  contentRightSide,
+  contentRightSideContainer,
+  footer,
+} from "@/assets/css/EvaluationPage.module.scss";
+
 // Summary
 export const STEP_FOUR_CARD_PROPS = {
-  card: { className: "content__right" },
+  card: { className: contentRightSide },
   title: {
     title: "Récapitulatif de l'évaluation",
     description: new Date().toLocaleDateString("fr-FR", {
@@ -10,6 +16,7 @@ export const STEP_FOUR_CARD_PROPS = {
     }),
   },
   content: {
-    className: "right__content-container",
+    className: contentRightSideContainer,
   },
+  footer: { className: footer },
 };

@@ -85,6 +85,7 @@ function ShowSummary(commonProps: ComponentProps<typeof Summary>) {
     <Summary {...commonProps}>
       <Summary.Title />
       <Summary.Content />
+      <Summary.Footer />
     </Summary>
   );
 }
