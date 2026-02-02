@@ -1,17 +1,10 @@
+import withTitledCard from "@/components/HOCs/withTitledCard";
 import type {
   ModalProps,
   ModalState,
   WithSimpleAlertProps,
 } from "@/components/Modal/types/modal.types.ts";
-import { DialogHeaderTitle } from "@/components/Titles/ModalTitle.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import { Card } from "@/components/ui/card.tsx";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-} from "@/components/ui/dialog.tsx";
+import { Dialog, DialogContent } from "@/components/ui/dialog.tsx";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useUserEventListener } from "@/hooks/events/useUserEventListener";
 import { wait } from "@/utils/utils.ts";
@@ -339,29 +332,37 @@ function withSimpleAlert(WrappedComponent: ComponentType<ModalProps>) {
     headerDescription,
     ref,
     ...rest
-  }: WithSimpleAlertProps) => (
-    <WrappedComponent
-      {...rest}
-      modalContent={
-        <Card
-          id={rest.modalName ? `${rest.modalName}-card` : undefined}
-          ref={ref}
-        >
-          <DialogHeaderTitle
-            className="text-center!"
-            title={headerTitle}
-            description={headerDescription}
-          />
-          <DialogFooter>
-            <DialogClose asChild className="m-auto">
-              <Button variant="outline">Ok</Button>
-            </DialogClose>
-          </DialogFooter>
-        </Card>
-      }
-    />
-  );
+  }: WithSimpleAlertProps) => {
+    const card = {
+      pageId: rest.modalName ?? "simple-alert",
+      modalMode: true,
+      ref,
+      title: {
+        className: "text-center!",
+        title: headerTitle,
+        description: headerDescription,
+      },
+      footer: {
+        cancelText: "Ok",
+        displaySubmitButton: false,
+      },
+    };
+
+    return (
+      <WrappedComponent
+        {...rest}
+        modalContent={
+          <SimpleAlert {...card}>
+            <SimpleAlert.Title />
+            <SimpleAlert.Footer />
+          </SimpleAlert>
+        }
+      />
+    );
+  };
 }
+
+const SimpleAlert = withTitledCard(null!);
 
 /**
  * Higher-order component to create a simple alert modal
