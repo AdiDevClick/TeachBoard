@@ -3,37 +3,16 @@
 /**
  * Styles for the Evaluation Page component.
  */
-$bem-prefix: evaluation-page;
-$alias-map: (
-  // container: (),
-  // content: (),
-  // mainContent: (),
-  // left: (),
-  // leftNumber: (),
-  // leftTitle: (),
-  // leftDescription: (),
-  // separator: (),
-  // right: (),
-  // rightContent: (),
-  // footer: (),
-);
-
-
-
 .evaluation-page {
+
   &--container {
-
-    // :local .evaluationPageContainer 
-    // @include register-alias(#{&}, evaluationPageContainer, $bem-prefix, $alias-map);
     --gap-spacing: calc(var(--spacing) * 6);
-    height: 100%;
 
+    height: 100%;
   }
 
   &--content {
     &--container {
-      // :local .evaluationPageContentContainer {
-      // @include register-alias(#{&}, evaluationPageContentContainer, $bem-prefix, $alias-map);
       display: flex;
       flex-direction: row;
       justify-self: center;
@@ -41,57 +20,47 @@ $alias-map: (
       height: 100%;
       box-shadow: none;
       border: none;
-      border-left: 7px solid;
 
+      background: none;
+      // border-left: 7px solid;
 
       &__header {}
 
-
-      // &__content {
       .content {
-
-        // @include register-alias(#{&}, content, $bem-prefix, $alias-map);
-
         display: grid;
         grid-template-columns: 1.5fr 0fr 3fr;
         gap: var(--gap-spacing);
         width: 100%;
         align-items: center;
 
+        padding-left: 0;
+
         @media screen and (max-width: 768px) {
           grid-template-columns: 1fr;
           grid-template-rows: 1fr 0fr 1fr;
         }
 
-        &__left {
-          // :local .contentLeft {
-          // @include register-alias(#{&}, contentLeft, $bem-prefix, $alias-map);
+        &__left-side {
           display: grid;
           gap: var(--gap-spacing);
           width: 100%;
 
           &--number {
-            // @include register-alias(#{&}, contentLeftNumber, $bem-prefix, $alias-map);
             font-size: calc(var(--text-xl) * 3);
             font-weight: bold;
           }
 
           &--title {
-            // @include register-alias(#{&}, contentLeftTitle, $bem-prefix, $alias-map);
             margin-bottom: var(--gap-spacing);
             font-weight: bold;
           }
 
           &--description {
-            // @include register-alias(#{&}, contentLeftDescription, $bem-prefix, $alias-map);
             font-size: var(--text-md);
-            // }
           }
         }
 
-        &--separator {
-          // :local .contentSeparator {
-          // @include register-alias(#{&}, contentSeparator, $bem-prefix, $alias-map);
+        &__separator {
           height: 50%;
           width: 1px;
           margin: auto;
@@ -102,17 +71,19 @@ $alias-map: (
           }
         }
 
-        &__right {
-          // :local .contentRight {
-          // @include register-alias(#{&}, contentRight, $bem-prefix, $alias-map);
+        &__right-side,
+        .arrow-back {
           place-self: center;
           min-width: 40%;
           grid-column: 3;
           grid-row: 1;
 
+          &.arrow-back {
+            min-width: unset;
+            justify-self: left;
+          }
+
           &--container {
-            // :local .contentRightContainer {
-            // @include register-alias(#{&}, contentRightContainer, $bem-prefix, $alias-map);
             display: grid;
             gap: var(--gap-spacing);
 
@@ -120,42 +91,13 @@ $alias-map: (
               display: grid;
               gap: calc(var(--spacing) * 3);
             }
-
-            &.arrow-back {
-              min-width: unset;
-              justify-self: left;
-            }
-
-            // }
-
-            // }
-
-            // }
-            // }
           }
-
-          // }
-
         }
       }
 
       .footer {
-        // &__footer {
-        // :local .footer {
-
-        // @include register-alias(#{&}, footer, $bem-prefix, $alias-map);
         padding-left: 0;
       }
     }
-
-    // }
-
   }
-
 }
-
-
-// @include create-export-aliases($bem-prefix, $alias-map);
-// :export {
-//   @include create-export-alias-exports($bem-prefix, $alias-map);
-// }
