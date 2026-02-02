@@ -13,5 +13,7 @@ export type AppDialFooterProps = Readonly<
     };
     /** The id of the form to be submitted */
     formId: string;
+    /** Whether to display the submit button */
+    displaySubmitButton?: boolean;
   } & ComponentProps<typeof DialogFooter>
 >;
