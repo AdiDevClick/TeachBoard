@@ -1,6 +1,7 @@
 import { useAppStore } from "@/api/store/AppStore";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { attendanceRecordCreationBaseControllers } from "@/features/evaluations/create/steps/three/forms/step-two-inputs.ts";
+import { STEP_TWO_CARD_PROPS } from "@/features/evaluations/create/steps/two/config/step-two.configs";
 import { StepTwoController } from "@/features/evaluations/create/steps/two/controller/StepTwoController.tsx";
 import {
   attendanceRecordCreationSchemaInstance,
@@ -11,22 +12,6 @@ import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/s
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type FieldValues } from "react-hook-form";
-
-export const stepTwoTitleProps = {
-  title: "Liste d'élèves",
-  description: "Définir les élèves présents ainsi que leurs fonctions.",
-};
-
-export const stepTwoCardProps = {
-  card: { className: "content__right" },
-  title: {
-    title: "Liste d'élèves",
-    description: "Définir les élèves présents ainsi que leurs fonctions.",
-  },
-  content: {
-    className: "right__content-container",
-  },
-};
 
 /**
  * Step Two component for creating attendance records.
@@ -42,8 +27,7 @@ export const stepTwoCardProps = {
 export function StepTwo({
   pageId = "attendance-record-creation",
   modalMode = false,
-  className = "content__right",
-  // className = "grid gap-4 max-w-2xl mx-auto",
+  className = STEP_TWO_CARD_PROPS.card.className,
   inputControllers = attendanceRecordCreationBaseControllers,
   ...props
 }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
@@ -72,7 +56,7 @@ export function StepTwo({
     className,
     formId,
     inputControllers,
-    card: stepTwoCardProps,
+    card: STEP_TWO_CARD_PROPS,
     ...props,
     form,
     user,

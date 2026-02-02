@@ -51,7 +51,7 @@ import { useOutletContext } from "react-router-dom";
 export function StepThree({
   pageId = "attendance-record-creation",
   modalMode = false,
-  className = "content__right",
+  className = STEP_THREE_MODULE_SELECTION_CARD_PROPS.card.className,
   inputControllers = attendanceRecordCreationBaseControllers,
   ...props
 }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
@@ -166,7 +166,7 @@ function ShowStudentsEvaluationWithPreviousArrow(
     <>
       <IconArrowLeft
         className={
-          STEP_THREE_MODULE_SELECTION_CARD_PROPS.card.className + " arrow-back"
+          STEP_THREE_SUBSKILLS_SELECTION_CARD_PROPS.arrowBack.className
         }
         onClick={(e) => handlePreviousClick(e, displayModules)}
         data-name="modules-previous"

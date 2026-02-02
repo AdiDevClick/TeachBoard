@@ -4,12 +4,13 @@ import {
 } from "@/assets/css/EvaluationPage.module.scss";
 
 /**
- * Configuration for Step One of the evaluation creation process.
+ * Configuration for Step Two of the evaluation creation process.
  */
-export const STEP_ONE_CARD_PROPS = {
+export const STEP_TWO_CARD_PROPS = {
   card: { className: contentRightSide },
   title: {
-    className: "hidden",
+    title: "Liste d'élèves",
+    description: "Définir les élèves présents ainsi que leurs fonctions.",
   },
   content: {
     className: contentRightSideContainer,
