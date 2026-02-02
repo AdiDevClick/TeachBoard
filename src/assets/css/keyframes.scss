@@ -29,3 +29,31 @@
     transform: translateY(-10px);
   }
 }
+
+@keyframes dialog-tag-enter {
+  from {
+    max-block-size: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    max-block-size: 64px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dialog-tag-close {
+  from {
+    max-block-size: 64px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    max-block-size: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
