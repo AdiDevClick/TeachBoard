@@ -10,20 +10,23 @@
  * Business logic should be implemented in the wrapped components or their parent containers.
  */
 
+import type {
+  FooterProps,
+  TitleProps,
+} from "@/api/contexts/types/context.types";
 import { ViewCardProvider } from "@/api/providers/ViewCardProvider.tsx";
 import {
   AppCardFooter,
   AppDialFooter,
 } from "@/components/Footer/AppFooter.tsx";
-import type { AppDialFooterProps } from "@/components/Footer/types/footer.types.ts";
+import type { AppDialFooterProps } from "@/components/Footer/types/footer.types";
 import type { WithTitledCardProps } from "@/components/HOCs/types/withTitledCard.types.ts";
 import {
   DialogHeaderTitle,
   HeaderTitle,
 } from "@/components/Titles/ModalTitle.tsx";
-import type { HeaderTitleProps } from "@/components/Titles/types/titles.types.ts";
-import type { CardFooter } from "@/components/ui/card.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
+import { Separator } from "@/components/ui/separator";
 import { useViewCardContext } from "@/hooks/contexts/useViewCardContext.ts";
 import { type ComponentProps, type ComponentType } from "react";
 
@@ -101,22 +104,29 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
    *
    * @param props - Props for the title component.
    */
-  Component.Title = function Title(props: HeaderTitleProps) {
+  Component.Title = function Title(props: TitleProps) {
     const { title, modalMode } = useViewCardContext();
 
     const DynamicTitle = modalMode ? DialogHeaderTitle : HeaderTitle;
     const titleProps = title ? { ...title, ...props } : props;
 
     return (
-      <DynamicTitle
-        className="text-left"
-        style={{
-          paddingInline: `calc(var(--spacing) * 6)`,
-        }}
-        {...titleProps}
-      >
-        {props.children}
-      </DynamicTitle>
+      <>
+        <DynamicTitle
+          className="text-left"
+          style={{
+            paddingInline: `calc(var(--spacing) * 6)`,
+          }}
+          {...titleProps}
+        >
+          {props.children}
+        </DynamicTitle>
+        <Separator
+          className="mx-auto my-2 max-w-1/3"
+          orientation="horizontal"
+          {...titleProps.separator}
+        />
+      </>
     );
   };
 
@@ -125,25 +135,27 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
    *
    * @param props - Props for the footer component, either AppDialFooterProps or CardFooter props.
    */
-  Component.Footer = function Footer(
-    props: AppDialFooterProps | ComponentProps<typeof CardFooter>,
-  ) {
+  Component.Footer = function Footer(props: FooterProps) {
     const { footer = {}, modalMode } = useViewCardContext();
     const footerProps = { ...footer, ...props };
 
-    if (!footer) {
-      return null;
-    }
-
-    if (modalMode) {
-      return (
-        <AppDialFooter {...(footerProps as AppDialFooterProps)}>
-          {props.children}
-        </AppDialFooter>
-      );
-    }
-
-    return <AppCardFooter {...footerProps}>{props.children}</AppCardFooter>;
+    return (
+      <>
+        <Separator
+          className="mx-auto my-2 max-w-1/3"
+          orientation="horizontal"
+          {...footerProps.separator}
+        />
+        {modalMode && (
+          <AppDialFooter {...(footerProps as AppDialFooterProps)}>
+            {props.children}
+          </AppDialFooter>
+        )}
+        {!modalMode && (
+          <AppCardFooter {...footerProps}>{props.children}</AppCardFooter>
+        )}
+      </>
+    );
   };
 
   const CardSlot = (() => null) as ComponentType<ComponentProps<typeof Card>>;
