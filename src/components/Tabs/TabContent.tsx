@@ -19,6 +19,25 @@ import withTitledCard from "@components/HOCs/withTitledCard.tsx";
 import { IconArrowLeft, IconArrowRightDashed } from "@tabler/icons-react";
 import type { MouseEvent } from "react";
 
+const hideSeparator = {
+  className: "hidden",
+};
+
+const cardProps = {
+  title: {
+    displayChildrenOnly: true,
+    separator: hideSeparator,
+  },
+  card: {
+    className: evaluationPageContentContainer,
+  },
+  content: { className: content },
+  footer: {
+    className: footer,
+    separator: hideSeparator,
+  },
+};
+
 /**
  * Tab content component for evaluation creation page.
  *
@@ -50,14 +69,7 @@ export function TabContent(props: TabContentProps) {
     leftSide,
     isMobile,
     leftContent,
-    card: {
-      title: { displayChildrenOnly: true },
-      card: {
-        className: evaluationPageContentContainer,
-      },
-      content: { className: content },
-      footer: { className: footer },
-    },
+    card: cardProps,
   };
 
   return (
