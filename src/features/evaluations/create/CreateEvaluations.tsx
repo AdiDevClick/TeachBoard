@@ -1,11 +1,11 @@
 import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs.tsx";
+import { TabContentList } from "@/components/Tabs/TabContent";
 import { Tabs } from "@/components/ui/tabs";
-import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types.js";
-import type { CreateEvaluationsLoaderData } from "@/routes/routes.config.js";
+import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types";
+import type { CreateEvaluationsLoaderData } from "@/routes/types/routes-config.types";
 import "@css/PageContent.scss";
 import { useEffect, useState, type JSX } from "react";
 import { Outlet, useLoaderData, useNavigate } from "react-router-dom";
-import { TabContentList } from "../../../components/Tabs/TabContent.js";
 
 const tabValues: string[] = [];
 
