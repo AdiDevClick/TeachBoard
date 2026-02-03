@@ -1,5 +1,5 @@
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types.ts";
-import type { CreateEvaluationsLoaderData } from "@/routes/routes.config.tsx";
+import type { CreateEvaluationsLoaderData } from "@/routes/types/routes-config.types";
 import type { PropsWithChildren, ReactNode } from "react";
 
 type PageDataItem = keyof NonNullable<CreateEvaluationsLoaderData["pageDatas"]>;
