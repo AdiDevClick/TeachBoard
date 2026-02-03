@@ -8,9 +8,6 @@ import {
  */
 export const STEP_ONE_CARD_PROPS = {
   card: { className: contentRightSide },
-  title: {
-    className: "hidden",
-  },
   content: {
     className: contentRightSideContainer,
   },

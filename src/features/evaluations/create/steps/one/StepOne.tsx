@@ -32,7 +32,6 @@ export function StepOne({
 
   return (
     <StepOneWithCard {...commonProps}>
-      <StepOneWithCard.Title />
       <StepOneWithCard.Content />
     </StepOneWithCard>
   );
