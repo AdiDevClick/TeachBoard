@@ -12,11 +12,17 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { CardDescription } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { ItemTitle } from "@/components/ui/item";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
+import type { ComponentProps } from "react";
 import { useShallow } from "zustand/shallow";
 
-export function StepFourController({ pageId, form, inputControllers }) {
+type StepFourControllerProps = {
+  pageId: string;
+  form: ComponentProps<typeof ControlledDynamicTagList>["form"];
+};
+
+export function StepFourController({ pageId, form }: StepFourControllerProps) {
   const modules = useEvaluationStepsCreationStore(
     useShallow((state) => state.getAttendedModules()),
   );
@@ -33,6 +39,12 @@ export function StepFourController({ pageId, form, inputControllers }) {
     useShallow((state) => state.getAllNonPresentStudents()),
   );
 
+  let studentsPresence = Array.from(nonPresentStudents.entries());
+
+  if (studentsPresence.length === 0) {
+    studentsPresence = [["Aucun", {}]];
+  }
+
   return (
     <>
       <CardDescription>{"Les modules"}</CardDescription>
@@ -44,7 +56,6 @@ export function StepFourController({ pageId, form, inputControllers }) {
       >
         <ListMapper items={modules}>
           {(module) => {
-            console.log("THE CALLED module", module);
             return (
               <AccordionItem value={module.id}>
                 <AccordionTrigger>{module.name}</AccordionTrigger>
@@ -53,8 +64,12 @@ export function StepFourController({ pageId, form, inputControllers }) {
                     {(subSkill) => {
                       if (subSkill.isCompleted && !subSkill.isDisabled) {
                         return (
-                          <div key={subSkill.id} id={subSkill.id}>
-                            <Label>{subSkill.name}</Label>
+                          <div
+                            key={subSkill.id}
+                            id={subSkill.id}
+                            className=" m-auto max-w-5/6"
+                          >
+                            <ItemTitle>{subSkill.name}</ItemTitle>
                             <EvaluationSliderList
                               items={evaluatedStudentsForThisSubskill(
                                 subSkill.id,
@@ -66,9 +81,9 @@ export function StepFourController({ pageId, form, inputControllers }) {
                                     subSkill?.id,
                                     module?.id,
                                   ),
-                                  inert: true,
                                 };
                               }}
+                              inert
                               // onValueChange={handleValueChange}
                             />
                           </div>
@@ -199,8 +214,8 @@ export function StepFourController({ pageId, form, inputControllers }) {
         // {...controllers.dynamicListControllers}
         name="step-four-controller"
         pageId={pageId}
-        title={"Elèves absents"}
-        itemList={Array.from(nonPresentStudents.entries())}
+        title={"Elèves absents aujourd'hui"}
+        itemList={studentsPresence}
         inert
         displayCRUD={false}
         // onRemove={handleDeletingTask}
