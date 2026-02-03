@@ -1,6 +1,7 @@
 import type { AppDialFooterProps } from "@/components/Footer/types/footer.types.ts";
 import type { HeaderTitleProps } from "@/components/Titles/types/titles.types.ts";
 import type { Card, CardContent, CardFooter } from "@/components/ui/card.tsx";
+import type { Separator } from "@/components/ui/separator";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { UniqueSet } from "@/utils/UniqueSet.ts";
 import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
@@ -45,11 +46,21 @@ export type DialogContextType = {
 export type ViewCardContextType =
   | {
       card?: ComponentProps<typeof Card>;
-      title?: HeaderTitleProps;
+      title?: TitleProps;
       content?: ComponentProps<typeof CardContent>;
-      footer?: AppDialFooterProps | ComponentProps<typeof CardFooter>;
+      footer?: FooterProps;
       modalMode?: boolean;
       pageId?: string;
       rest?: Record<string, unknown>;
     }
   | undefined;
+
+export type FooterProps = (
+  | AppDialFooterProps
+  | ComponentProps<typeof CardFooter>
+) &
+  SeparatorType;
+
+export type TitleProps = HeaderTitleProps & SeparatorType;
+
+type SeparatorType = { separator?: ComponentProps<typeof Separator> };
