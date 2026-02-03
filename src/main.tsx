@@ -13,7 +13,7 @@ import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
 import { AppModals } from "@/pages/AllModals/AppModals.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
-import { routeChildren } from "@/routes/routes.config.tsx";
+import { ROUTES_CHILDREN } from "@/routes/routes.config";
 import type { RootProps } from "@/types/MainTypes";
 import "@css/MainContainer.scss";
 import "@css/Toaster.scss";
@@ -44,14 +44,14 @@ export const completeDatas = {
 /**
  * Application router configuration
  *
- * @description !! IMPORTANT !! Routes object is imported from {@link routeChildren}
+ * @description !! IMPORTANT !! Routes object is imported from {@link ROUTES_CHILDREN}
  */
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
     errorElement: <Root contentType="error" />,
-    children: routeChildren,
+    children: ROUTES_CHILDREN,
   },
 ]);
 
@@ -68,7 +68,7 @@ createRoot(document.getElementById("root")!).render(
         />
       </QueryClientProvider>
     </DialogProvider>
-  </StrictMode>
+  </StrictMode>,
 );
 
 /**
@@ -95,7 +95,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
     // const userExists = user !== null;
     const path = location.pathname;
     const doesContainNoSessionPage = NO_SESSIONS_CHECK_PAGES.some((page) =>
-      path.startsWith(page)
+      path.startsWith(page),
     );
 
     const lastActivityWasLogout = lastUserActivity === "logout";
