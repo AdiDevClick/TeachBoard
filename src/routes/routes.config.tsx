@@ -19,18 +19,16 @@ import { Login } from "@/pages/Login/Login.tsx";
 import { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
 import { Signup } from "@/pages/Signup/Signup";
 import { Navigate, type RouteObject } from "react-router-dom";
-type NavMenu = (typeof completeDatas.navMain.menus)[number];
 
-export type Loadertype<LDatas, PDatas> = {
-  loaderData?: LDatas;
-  pageTitle: string;
-  pageDatas?: PDatas;
-};
+const DATE = new Date().toLocaleDateString();
+const EVALUATION_PAGE_TITLE = "Evaluation - " + DATE;
 
-export type CreateEvaluationsLoaderData = Loadertype<
-  NavMenu,
-  typeof EvaluationPageTabsDatas
->;
+const EVALUATION_ELEMENTS = [
+  { path: EvaluationPageTabsDatas.step1.name, element: <StepOne /> },
+  { path: EvaluationPageTabsDatas.step2.name, element: <StepTwo /> },
+  { path: EvaluationPageTabsDatas.step3.name, element: <StepThree /> },
+  { path: EvaluationPageTabsDatas.step4.name, element: <StepFour /> },
+] as const;
 
 /**
  * Application route children configuration.
@@ -45,7 +43,7 @@ export type CreateEvaluationsLoaderData = Loadertype<
  *
  * Routes are used in the main application router configuration (see ./src/main.tsx).
  */
-export const routeChildren = [
+export const ROUTES_CHILDREN = [
   {
     index: true,
     element: <Home />,
@@ -124,57 +122,21 @@ export const routeChildren = [
         path: "create",
         element: <CreateEvaluations />,
         loader: async () => {
-          const date = new Date().toLocaleDateString();
           setDocumentTitle(completeDatas.navMain.menus[0].title);
 
           return {
-            pageTitle: "Evaluation - " + date,
+            pageTitle: EVALUATION_PAGE_TITLE,
             loaderData: completeDatas.navMain.menus[0],
             pageDatas: EvaluationPageTabsDatas,
           };
         },
-        children: [
-          {
-            path: EvaluationPageTabsDatas.step1.name,
-            element: <StepOne />,
-            loader: async () => {
-              const date = new Date().toLocaleDateString();
-              return {
-                pageTitle: "Evaluation - " + date,
-              };
-            },
-          },
-          {
-            path: EvaluationPageTabsDatas.step2.name,
-            element: <StepTwo />,
-            loader: async () => {
-              const date = new Date().toLocaleDateString();
-              return {
-                pageTitle: "Evaluation - " + date,
-              };
-            },
-          },
-          {
-            path: EvaluationPageTabsDatas.step3.name,
-            element: <StepThree />,
-            loader: async () => {
-              const date = new Date().toLocaleDateString();
-              return {
-                pageTitle: "Evaluation - " + date,
-              };
-            },
-          },
-          {
-            path: EvaluationPageTabsDatas.step4.name,
-            element: <StepFour />,
-            loader: async () => {
-              const date = new Date().toLocaleDateString();
-              return {
-                pageTitle: "Evaluation - " + date,
-              };
-            },
-          },
-        ],
+        children: EVALUATION_ELEMENTS.map((elem) => ({
+          path: elem.path,
+          element: elem.element,
+          loader: async () => ({
+            pageTitle: EVALUATION_PAGE_TITLE,
+          }),
+        })),
       },
     ],
   },
