@@ -1,11 +1,9 @@
 import {
-  content,
   contentSeparator,
   evaluationPageContainer,
-  evaluationPageContentContainer,
-  footer,
 } from "@/assets/css/EvaluationPage.module.scss";
 import withListMapper from "@/components/HOCs/withListMapper.tsx";
+import { TAB_CONTENT_VIEW_CARD_PROPS } from "@/components/Tabs/config/tab-content.configs";
 import type {
   LeftSideProps,
   TabContentProps,
@@ -18,25 +16,6 @@ import { LeftSidePageContent } from "@/pages/Evaluations/create/left-content/Lef
 import withTitledCard from "@components/HOCs/withTitledCard.tsx";
 import { IconArrowLeft, IconArrowRightDashed } from "@tabler/icons-react";
 import type { MouseEvent } from "react";
-
-const hideSeparator = {
-  className: "hidden",
-};
-
-const cardProps = {
-  title: {
-    displayChildrenOnly: true,
-    separator: hideSeparator,
-  },
-  card: {
-    className: evaluationPageContentContainer,
-  },
-  content: { className: content },
-  footer: {
-    className: footer,
-    separator: hideSeparator,
-  },
-};
 
 /**
  * Tab content component for evaluation creation page.
@@ -69,7 +48,7 @@ export function TabContent(props: TabContentProps) {
     leftSide,
     isMobile,
     leftContent,
-    card: cardProps,
+    card: TAB_CONTENT_VIEW_CARD_PROPS,
   };
 
   return (
