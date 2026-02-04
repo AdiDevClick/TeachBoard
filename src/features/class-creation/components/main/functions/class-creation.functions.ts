@@ -1,9 +1,9 @@
+import type { CommandItemType } from "@/components/Command/types/command.types.ts";
+import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import type {
   CreateDisabledGroupParams,
   HandleDiplomaChangeParams,
-} from "@/features/class-creation/components/types/class-creation.types.ts";
-import type { CommandItemType } from "@/components/Command/types/command.types.ts";
-import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
+} from "@/features/class-creation";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
 
@@ -59,7 +59,7 @@ export function resetSelectedItemsFromCache(
     | Record<string, unknown>
     | Array<unknown>
     | Map<string, unknown>,
-  queryClient: QueryClient
+  queryClient: QueryClient,
 ) {
   if (!queryKey) return;
   const cachedData = queryClient.getQueryData(queryKey);
@@ -70,7 +70,7 @@ export function resetSelectedItemsFromCache(
     console.log("[Reset DATA] Cached data structure:", cachedData);
     console.log(
       "[Reset DATA] Items type:",
-      cachedData[0].items.constructor.name
+      cachedData[0].items.constructor.name,
     );
     console.log("[Reset DATA] Items to reset:", selectedItems);
   }
@@ -199,7 +199,7 @@ export function handleDiplomaChange({
  */
 export function saveKeys(
   keys: readonly unknown[],
-  ref: { current: Record<string, readonly unknown[]> }
+  ref: { current: Record<string, readonly unknown[]> },
 ) {
   const key = String(keys[0]);
   ref.current = { ...ref.current, [key]: keys };
@@ -214,7 +214,7 @@ export function saveKeys(
  */
 export function yearsListRange(
   year: number,
-  range: number
+  range: number,
 ): { name: string; id: string }[] {
   const startYear = year - range;
   const endYear = year + range;
