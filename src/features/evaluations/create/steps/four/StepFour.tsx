@@ -1,5 +1,6 @@
 import { useAppStore } from "@/api/store/AppStore.ts";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import { Button } from "@/components/ui/button";
 import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState.ts";
 import { STEP_FOUR_CARD_PROPS } from "@/features/evaluations/create/steps/four/config/step-four.configs.ts";
 import { StepFourController } from "@/features/evaluations/create/steps/four/controller/StepFourController.tsx";
@@ -81,11 +82,23 @@ export function StepFour({
  * Convenient function to show students evaluation component
  */
 function ShowSummary(commonProps: ComponentProps<typeof Summary>) {
+  const formId = commonProps.formId;
+  const isValid = commonProps.form?.formState?.isValid;
   return (
     <Summary {...commonProps}>
       <Summary.Title />
       <Summary.Content />
-      <Summary.Footer />
+      <Summary.Footer>
+        <Button
+          variant="outline"
+          className="mx-auto mr-6"
+          type="submit"
+          disabled={!isValid}
+          form={formId}
+        >
+          {"Enregistrer"}
+        </Button>
+      </Summary.Footer>
     </Summary>
   );
 }
