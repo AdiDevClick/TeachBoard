@@ -1,9 +1,9 @@
 import type { PopoverItem } from "@/hooks/types/use-popover-CRUD.types.ts";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 
 export type DynamicTagItemDetails = {
   id: string;
-  [key: string]: unknown;
-};
+} & AnyObjectProps;
 
 export type DynamicTagsState = DynamicTagItemDetails & { isExiting?: boolean };
 
