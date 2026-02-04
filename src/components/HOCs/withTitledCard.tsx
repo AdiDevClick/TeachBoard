@@ -81,10 +81,7 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
     const cardId = "card-" + pageId;
 
     const contextValue = {
-      card: viewCard?.card,
-      title: viewCard?.title,
-      content: viewCard?.content,
-      footer: viewCard?.footer,
+      ...viewCard,
       modalMode,
       pageId,
       rest,
