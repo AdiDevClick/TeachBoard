@@ -30,4 +30,9 @@ export const formsRegex = {
   viewYearRange: /^\d{4} - \d{4}$/,
   serverYearRange: /^\d{4}-\d{4}$/,
   serverSessionToken: /^[0-9a-f]{32}$/i,
+  // Date in ISO 8601 format with timezone information
+  // YYYY-MM-DDTHH:MM:SS.sssZ or YYYY-MM-DDTHH:MM:SS+HH:MM
+  // ex: 2025-10-30T19:04:03.128+01:00
+  dateISOTest:
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?([+-]\d{2}:\d{2}|Z)$/,
 };
