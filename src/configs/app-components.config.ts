@@ -2,10 +2,18 @@ import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.t
 import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import type {
+  LabelledInputForControllerProps,
+  LabelledInputProps,
+} from "@/components/Inputs/types/inputs.types";
+import type {
   EvaluationRadioItemDescriptionProps,
   EvaluationRadioItemProps,
 } from "@/components/Radio/types/radio.types.ts";
 import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
+import type {
+  LabelledTextAreaForControllerProps,
+  LabelledTextAreaProps,
+} from "@/components/TextAreas/types/textareas.types";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
 import type { ClassCreationControllerProps } from "@/features/class-creation/class-creation.index.ts";
 import type {
@@ -18,23 +26,70 @@ import type {
   CommandHandlerMetaData,
   HandleOpeningCallbackParams,
 } from "@/hooks/database/types/use-command-handler.types.ts";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 import { checkPropsValidity } from "@/utils/utils.ts";
+import type { FieldValues } from "react-hook-form";
 
 //                    ------------
 
 /**
- * Validates props for LaballedInputForController component.
+ * Validates props for LabelledInputForController component.
  *
- * {@link import("@/components/Inputs/LaballedInputForController.tsx").LabelledInputForController }
+ * {@link import("@/components/Inputs/LabelledInput.tsx").LabelledInput }
  */
 const LABELLED_INPUT_SHOULD_NOT_ACCEPT = ["useCommands", "creationButtonText"];
-const LABELLED_INPUT_REQUIRES = ["field", "fieldState"];
+const LABELLED_INPUT_REQUIRES = ["name"];
 
-export const labelledInputContainsInvalid = (props: Record<string, unknown>) =>
+export const labelledInputContainsInvalid = (props: LabelledInputProps) =>
   checkPropsValidity(
-    props,
+    props as unknown as AnyObjectProps,
     LABELLED_INPUT_REQUIRES,
     LABELLED_INPUT_SHOULD_NOT_ACCEPT,
+  );
+
+//                    ------------
+
+/**
+ * Validates props for LabelledInputForController component.
+ *
+ * {@link import("@/components/Inputs/LabelledInputForController.tsx").LabelledInputForController }
+ */
+const LABELLED_INPUT_FOR_CONTROLLER_REQUIRES = ["field", "fieldState"];
+export const labelledInputForControllerContainsInvalid = (
+  props: LabelledInputForControllerProps<FieldValues>,
+) => checkPropsValidity(props, LABELLED_INPUT_FOR_CONTROLLER_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for LabelledTextAreaForController component.
+ *
+ * {@link import("@/components/Inputs/LabelledTextAreaForController.tsx").LabelledTextAreaForController }
+ */
+const LABELLED_TEXTAREA_REQUIRES = ["name", "title"];
+
+export const labelledTextAreaContainsInvalid = (props: LabelledTextAreaProps) =>
+  checkPropsValidity(
+    props as unknown as AnyObjectProps,
+    LABELLED_TEXTAREA_REQUIRES,
+    [],
+  );
+
+//                    ------------
+
+/**
+ * Validation requirements for LabelledTextAreaForController component.
+ *
+ * {@link import("@/components/TextAreas/LabelledTextArea.tsx").LabelledTextAreaForController }
+ */
+const LABELLED_TEXTAREA_FOR_CONTROLLER_REQUIRES = ["field", "fieldState"];
+export const labelledTextAreaForControllerContainsInvalid = (
+  props: LabelledTextAreaForControllerProps<FieldValues>,
+) =>
+  checkPropsValidity(
+    props as unknown as AnyObjectProps,
+    LABELLED_TEXTAREA_FOR_CONTROLLER_REQUIRES,
+    [],
   );
 
 //                    ------------
@@ -46,7 +101,7 @@ export const labelledInputContainsInvalid = (props: Record<string, unknown>) =>
  */
 const CONTROLLER_REQUIRES = ["form", "name"];
 
-export const controllerPropsInvalid = (props: Record<string, unknown>) =>
+export const controllerPropsInvalid = (props: AnyObjectProps) =>
   checkPropsValidity(props, CONTROLLER_REQUIRES, []);
 
 //                    ------------
@@ -68,7 +123,7 @@ export const leftSidePageContentPropsInvalid = (props: LeftContentProps) =>
  */
 const LIST_MAPPER_REQUIRES = ["items"];
 
-export const listMapperContainsInvalid = (props: Record<string, unknown>) =>
+export const listMapperContainsInvalid = (props: AnyObjectProps) =>
   checkPropsValidity(props, LIST_MAPPER_REQUIRES, []);
 
 //                    ------------
@@ -80,7 +135,7 @@ export const listMapperContainsInvalid = (props: Record<string, unknown>) =>
  */
 const LOGIN_BUTTON_REQUIRES = ["name", "path"];
 
-export const loginButtonContainsInvalid = (props: Record<string, unknown>) =>
+export const loginButtonContainsInvalid = (props: AnyObjectProps) =>
   checkPropsValidity(props, LOGIN_BUTTON_REQUIRES, []);
 
 //                    ------------
@@ -91,7 +146,7 @@ export const loginButtonContainsInvalid = (props: Record<string, unknown>) =>
  */
 const MENU_BUTTON_REQUIRES = ["item"];
 
-export const menuButtonContainsInvalid = (props: Record<string, unknown>) =>
+export const menuButtonContainsInvalid = (props: AnyObjectProps) =>
   checkPropsValidity(props, MENU_BUTTON_REQUIRES, []);
 
 //                    ------------
@@ -104,15 +159,14 @@ const COMMAND_GROUP_REQUIRES = ["items", "groupTitle"];
 const COMMAND_ITEM_REQUIRES = ["id", "value"];
 const COMMAND_SELECTION_REQUIRES = ["id"];
 
-export const commandGroupContainsInvalid = (props: Record<string, unknown>) =>
+export const commandGroupContainsInvalid = (props: AnyObjectProps) =>
   checkPropsValidity(props, COMMAND_GROUP_REQUIRES, []);
 
-export const commandItemContainsInvalid = (props: Record<string, unknown>) =>
+export const commandItemContainsInvalid = (props: AnyObjectProps) =>
   checkPropsValidity(props, COMMAND_ITEM_REQUIRES, []);
 
-export const commandSelectionDoesNotContainId = (
-  props: Record<string, unknown>,
-) => checkPropsValidity(props, COMMAND_SELECTION_REQUIRES, []);
+export const commandSelectionDoesNotContainId = (props: AnyObjectProps) =>
+  checkPropsValidity(props, COMMAND_SELECTION_REQUIRES, []);
 
 //                    ------------
 
@@ -174,7 +228,7 @@ export const taskModalPropsInvalid = (props: Pick<CommandItemType, "id">) =>
 const INLINE_ITEM_AND_SWITCH_SELECTION_REQUIRES = ["title"];
 
 export const inlineItemAndSwitchSelectionPropsInvalid = (
-  props: Record<string, unknown>,
+  props: AnyObjectProps,
 ) => checkPropsValidity(props, INLINE_ITEM_AND_SWITCH_SELECTION_REQUIRES, []);
 
 //                    ------------
@@ -185,13 +239,8 @@ export const inlineItemAndSwitchSelectionPropsInvalid = (
 const EVALUATION_RADIO_ITEM_REQUIRES = ["id", "name"];
 
 export const evaluationRadioItemPropsInvalid = (
-  props: EvaluationRadioItemProps,
-) =>
-  checkPropsValidity(
-    props as unknown as Record<string, unknown>,
-    EVALUATION_RADIO_ITEM_REQUIRES,
-    [],
-  );
+  props: EvaluationRadioItemProps & AnyObjectProps,
+) => checkPropsValidity(props, EVALUATION_RADIO_ITEM_REQUIRES, []);
 
 //                    ------------
 
