@@ -37,7 +37,9 @@ export function LabelledInput(props: LabelledInputProps) {
 
   return (
     <>
-      <Label htmlFor={labelName}>{title}</Label>
+      <Label className={title ? "" : "hidden"} htmlFor={labelName}>
+        {title}
+      </Label>
       <Input required {...safeProps} id={labelName} />
     </>
   );
