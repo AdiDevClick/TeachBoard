@@ -40,7 +40,7 @@ function TaskTemplateCreation({
       description: "",
       taskId: "",
       degreeConfigId: "",
-      skills: [],
+      modules: [],
     },
   });
   const formId = pageId + "-form";
