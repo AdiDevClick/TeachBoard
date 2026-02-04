@@ -2,14 +2,15 @@ import { useAppStore } from "@/api/store/AppStore.ts";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { Button } from "@/components/ui/button";
 import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState.ts";
-import { STEP_FOUR_CARD_PROPS } from "@/features/evaluations/create/steps/four/config/step-four.configs.ts";
-import { StepFourController } from "@/features/evaluations/create/steps/four/controller/StepFourController.tsx";
-import { attendanceRecordCreationBaseControllers } from "@/features/evaluations/create/steps/three/forms/step-two-inputs.ts";
 import {
-  attendanceRecordCreationSchemaInstance,
-  type AttendanceRecordCreationFormSchema,
-  type AttendanceRecordCreationInputItem,
-} from "@/features/evaluations/create/steps/two/models/attendance-record-creation.models";
+  STEP_FOUR_CARD_PROPS,
+  STEP_FOUR_INPUT_CONTROLLERS,
+} from "@/features/evaluations/create/steps/four/config/step-four.configs.ts";
+import { StepFourController } from "@/features/evaluations/create/steps/four/controller/StepFourController.tsx";
+import {
+  type StepFourSchema,
+  stepFourInputSchema,
+} from "@/features/evaluations/create/steps/four/models/step-four.models";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -18,8 +19,8 @@ import {
   type JSX,
   type SetStateAction,
 } from "react";
-import { useForm, type FieldValues } from "react-hook-form";
-import { useOutletContext } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { useLoaderData, useOutletContext } from "react-router-dom";
 
 /**
  * STEP FOUR - Summary and Confirmation Component
@@ -38,9 +39,10 @@ export function StepFour({
   pageId = "evaluation-summary",
   modalMode = false,
   className = "content__right",
-  inputControllers = attendanceRecordCreationBaseControllers,
+  inputControllers = STEP_FOUR_INPUT_CONTROLLERS,
   ...props
-}: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
+}: Readonly<PageWithControllers<typeof STEP_FOUR_INPUT_CONTROLLERS>>) {
+  const loaderData = useLoaderData();
   const [, setLeftContent] =
     useOutletContext<[JSX.Element, Dispatch<SetStateAction<JSX.Element>>]>();
   const user = useAppStore((state) => state.user);
@@ -54,17 +56,24 @@ export function StepFour({
     evaluatedStudentsForThisSubskill,
   } = useStepThreeState();
 
-  const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({
-    resolver: zodResolver(attendanceRecordCreationSchemaInstance([])),
+  const form = useForm<StepFourSchema>({
+    resolver: zodResolver(stepFourInputSchema),
     mode: "onTouched",
     defaultValues: {
-      students: [],
+      userId: user?.userId,
+      title: loaderData.pageTitle,
+      evaluations: [],
+      overallScore: 0,
+      absence: ["none"],
+      comments: "",
+      evaluationDate: new Date().toISOString(),
     },
   });
 
   const formId = pageId + "-form";
 
   const baseCardProps = {
+    user: user?.userId,
     pageId,
     modalMode,
     className,
