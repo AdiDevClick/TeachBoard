@@ -106,7 +106,7 @@ export function TaskTemplateCreationController({
         return cachedData ?? (data as HeadingType[] | undefined);
       }
 
-      const isFetchedSkills = keys[0] === "new-task-skill";
+      const isFetchedSkills = keys[0] === "new-task-module";
       const isFetchedTasks = keys[0] === "new-task-item";
       const currentDiplomaId = diplomaDatas.diploma?.id;
 
