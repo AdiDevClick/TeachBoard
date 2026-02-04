@@ -228,21 +228,21 @@ export const useEvaluationStepsCreationStore = create(
            * Set the average score for a student.
            *
            * @param studentId - The ID of the student
-           * @param averageScore - The average score to set
+           * @param overallScore - The overall score to set
            *
            * @note This score can be overwritten by the teacher and will be saved as is.
            */
-          setStudentAverageScore(studentId: UUID, averageScore: number) {
+          setStudentOverallScore(studentId: UUID, overallScore: number) {
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
                 const student = state.students.get(studentId);
                 if (student) {
-                  student.averageScore = averageScore;
+                  student.overallScore = overallScore;
                 }
               },
               undefined,
-              "setStudentAverageScore",
+              "setStudentOverallScore",
             );
           },
           /**
