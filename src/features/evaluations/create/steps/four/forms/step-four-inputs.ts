@@ -1,5 +1,5 @@
 import { summaryPageContent } from "@/assets/css/SummaryPage.module.scss";
-import type { StepFour } from "@/features/evaluations/create/steps/four/StepFour";
+import type { StepFourInputItem } from "@/features/evaluations/create/steps/four/models/step-four.models";
 
 export const STEP_FOUR_OBSERVATIONS_INPUT_CONTROLLERS = [
   {
@@ -9,7 +9,7 @@ export const STEP_FOUR_OBSERVATIONS_INPUT_CONTROLLERS = [
     placeholder: "Notes sur la classe...",
     required: false,
   },
-] satisfies Parameters<typeof StepFour>[0]["inputControllers"];
+] satisfies StepFourInputItem[];
 
 export const STEP_FOUR_ABSENCE_INPUT_CONTROLLERS = [
   {
@@ -19,7 +19,7 @@ export const STEP_FOUR_ABSENCE_INPUT_CONTROLLERS = [
     placeholder: "Aucun",
     required: true,
   },
-] satisfies Parameters<typeof StepFour>[0]["inputControllers"];
+] satisfies StepFourInputItem[];
 
 export const STEP_FOUR_SCORES_AVERAGES_INPUT_CONTROLLERS = [
   {
@@ -29,7 +29,7 @@ export const STEP_FOUR_SCORES_AVERAGES_INPUT_CONTROLLERS = [
     description: "Moyenne générale des notes pour chaque élève évalué(e)",
     required: true,
   },
-] satisfies Parameters<typeof StepFour>[0]["inputControllers"];
+] satisfies StepFourInputItem[];
 
 export const STEP_FOUR_MODULES_INPUT_CONTROLLERS = [
   {
@@ -41,4 +41,4 @@ export const STEP_FOUR_MODULES_INPUT_CONTROLLERS = [
     description: "Moyenne générale des notes pour chaque élève évalué(e)",
     required: true,
   },
-] satisfies Parameters<typeof StepFour>[0]["inputControllers"];
+] satisfies StepFourInputItem[];
