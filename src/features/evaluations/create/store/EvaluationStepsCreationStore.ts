@@ -237,7 +237,8 @@ export const useEvaluationStepsCreationStore = create(
               (state) => {
                 ensureCollectionsInDraft(state);
                 const student = state.students.get(studentId);
-                if (student) {
+
+                if (student && student.overallScore !== overallScore) {
                   student.overallScore = overallScore;
                 }
               },
