@@ -43,12 +43,13 @@ function withController<C extends AnyComponentLike>(
       return null;
     }
 
-    const { name, form, ...restProps } = props;
+    const { name, form, defaultValue, ...restProps } = props;
 
     return (
       <Controller
         name={name}
         control={form.control}
+        defaultValue={defaultValue}
         render={({ field, fieldState }) => (
           <Field
             ref={(el) => {
