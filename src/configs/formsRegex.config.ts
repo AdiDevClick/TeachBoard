@@ -9,7 +9,7 @@ export const formsRegex = {
   // are used server-side and for client-side immediate sanitization.
   // Accept commas, ampersand (&) and parentheses () in names as well.
   serverName: /^[\p{L}\p{M}0-9 ._'&,()/-]{1,100}$/u,
-  serverDescription: /^[\p{L}\p{M}0-9 ._'&,()/-]{1,500}$/u,
+  serverDescription: /^[\p{L}\p{M}0-9 ._'&",()/-]{0,500}$/u,
 
   // Client-side patterns (for immediate input sanitization)
   allowedCharsNameRemove: /[^\p{L}\p{M}0-9 ._'&,()-]/gu,
