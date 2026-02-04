@@ -222,7 +222,7 @@ const controllersConfig: Array<ControllersConfig<ControllerLike>> = [
   },
   {
     controllerName: taskTemplateCreationInputControllers,
-    outputNames: { taskLabelController: "taskId", skillsController: "skills" },
+    outputNames: { taskLabelController: "taskId", skillsController: "modules" },
   },
   {
     controllerName: degreeModuleCreationInputControllers,

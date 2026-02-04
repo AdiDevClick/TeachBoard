@@ -25,7 +25,7 @@ export const taskTemplateModal: AppModalNames = "new-task-template";
 export const classCreationModal: AppModalNames = "class-creation";
 
 // Generic command-handler samples (kept here as single source of truth)
-export const skillModal: AppModalNames = "new-task-skill";
+export const moduleModal: AppModalNames = "new-task-module";
 export const skillModuleModal: AppModalNames = "new-degree-module-skill";
 export const skillFetchActivity = USER_ACTIVITIES.fetchModulesSkills;
 export const skillApiEndpoint = "/api/skills" as const;
@@ -132,7 +132,7 @@ export const taskTemplateFetch = new TaskTemplatesFetchFixtureCreator({
 export const taskTemplateCreated = new CreateTaskTemplateResponseFixtureCreator(
   {
     task: taskCreated,
-  }
+  },
 );
 
 export const classFetched = new ClassFixtureCreator({
