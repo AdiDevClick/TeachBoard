@@ -167,7 +167,7 @@ export function TaskTemplateCreationController({
   ) => {
     const isTask = Object.hasOwn(commandItemDetails, "description");
     if (isTask) {
-      if (!commandSelectionDoesNotContainId(commandItemDetails)) {
+      if (commandSelectionDoesNotContainId(commandItemDetails)) {
         debugLogs(
           `TaskTemplateCreationController Selected task item has no ID, selection ignored`,
           commandItemDetails,
