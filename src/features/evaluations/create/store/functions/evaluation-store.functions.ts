@@ -287,3 +287,33 @@ export function setModules(
     }
   });
 }
+
+/**
+ * Calculate the average score for a student across all evaluated sub-skills.
+ *
+ * @param student - The student entry containing evaluations
+ * @returns The average score of the student
+ */
+export const getStudentAverageScore = (
+  student: StudentWithPresence,
+): number => {
+  const studentEvaluations = student.evaluations;
+
+  if (!studentEvaluations) {
+    return 0;
+  }
+
+  let totalScore = 0;
+  let scoreCount = 0;
+
+  for (const module of studentEvaluations.modules.values()) {
+    for (const subSkill of module.subSkills.values()) {
+      if (typeof subSkill.score === "number") {
+        totalScore += subSkill.score;
+        scoreCount += 1;
+      }
+    }
+  }
+
+  return scoreCount > 0 ? totalScore / scoreCount : 0;
+};
