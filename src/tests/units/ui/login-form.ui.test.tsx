@@ -1,9 +1,6 @@
+import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { LoginFormController } from "@/features/login/components/main/controller/LoginFormController.tsx";
-import {
-  formSchema,
-  type LoginFormSchema,
-} from "@/features/login/components/main/models/login.models";
+import LoginForm from "@/features/login/components/main/LoginForm";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import {
@@ -14,41 +11,8 @@ import {
   stubFetchRoutes,
   submitButtonShouldBeDisabled,
 } from "@/tests/test-utils/vitest-browser.helpers";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { page } from "vitest/browser";
-
-let loginForm: any = null;
-
-function LoginFormControllerWrapper({
-  isPwForgotten = false,
-}: {
-  isPwForgotten?: boolean;
-}) {
-  const form = useForm<LoginFormSchema>({
-    defaultValues: { identifier: "", password: "" },
-    mode: "onChange",
-    resolver: zodResolver(formSchema),
-  });
-  loginForm = form;
-
-  const textToDisplay = {
-    defaultText: "Mot de passe oublié ?",
-    pwForgottenLinkTo: "/pw-recovery",
-    buttonText: isPwForgotten ? "Envoyer" : "Se connecter",
-  };
-
-  return (
-    <LoginFormController
-      pageId="login"
-      formId="login-form"
-      form={form}
-      isPwForgotten={isPwForgotten}
-      textToDisplay={textToDisplay}
-    />
-  );
-}
 
 const loginResponse = {
   session: "SESSION_TOKEN",
@@ -63,11 +27,9 @@ const loginResponse = {
   },
 };
 
-import { useAppStore } from "@/api/store/AppStore";
-
 setupUiTestState(
   <AppTestWrapper>
-    <LoginFormControllerWrapper />
+    <LoginForm />
   </AppTestWrapper>,
   {
     beforeEach: () => {
@@ -103,8 +65,7 @@ describe("UI flow: login form", () => {
       { label: rx("Mot de passe"), value: "supersecret" },
     ]);
 
-    // Trigger validation (some environments need an explicit trigger) and submit
-    await loginForm.trigger();
+    // Check validation passes and submit
     await checkFormValidityAndSubmit("Se connecter");
 
     await expect

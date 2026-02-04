@@ -9,7 +9,7 @@ import {
   skillCreated,
   skillFetchActivity,
   skillFetched,
-  skillModal,
+  moduleModal,
   skillModuleModal,
   skillQueryKey,
   skillQueryKeySingle,
@@ -197,7 +197,7 @@ describe("useCommandHandler - basic behaviours", () => {
 
   test("openingCallback performs a GET and caches data", async () => {
     const { openingCallback, resultsCallback } =
-      await renderCommandHook(skillModal);
+      await renderCommandHook(moduleModal);
 
     const fetchDatas = {
       apiEndpoint: skillApiEndpoint,
