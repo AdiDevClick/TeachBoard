@@ -225,6 +225,27 @@ export const useEvaluationStepsCreationStore = create(
             }
           },
           /**
+           * Set the average score for a student.
+           *
+           * @param studentId - The ID of the student
+           * @param averageScore - The average score to set
+           *
+           * @note This score can be overwritten by the teacher and will be saved as is.
+           */
+          setStudentAverageScore(studentId: UUID, averageScore: number) {
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                const student = state.students.get(studentId);
+                if (student) {
+                  student.averageScore = averageScore;
+                }
+              },
+              undefined,
+              "setStudentAverageScore",
+            );
+          },
+          /**
            * Assign a task to a student.
            *
            * @description Updates the student's assigned task and manages module evaluations accordingly.
