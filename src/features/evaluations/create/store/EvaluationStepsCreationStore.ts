@@ -6,6 +6,7 @@ import { DEV_MODE } from "@/configs/app.config.ts";
 import {
   addNewEvaluationScore,
   filterSubSkillsBasedOnStudentsAvailability,
+  getStudentAverageScore,
   isSubSkillCompletedOrDisabled,
   isThisStudentAlreadyEvaluatedForThisSubSkill,
   preparedSubSkillsForUpdate,
@@ -610,6 +611,29 @@ export const useEvaluationStepsCreationStore = create(
             return module.subSkills.get(selectedSubSkillId) ?? null;
           },
           /**
+           * Get all students' scores for average calculation.
+           */
+          getAllStudentsAverageScores() {
+            ensureCollections();
+            const students = get().students;
+            const scores = new UniqueSet<
+              UUID,
+              { name: string; score: number }
+            >();
+
+            for (const student of students.values()) {
+              if (!student.isPresent) continue;
+
+              const averageScore = getStudentAverageScore(student);
+              scores.set(student.id, {
+                name: student.fullName,
+                score: averageScore,
+              });
+            }
+
+            return scores;
+          },
+          /**
            * Verify if all of the students for a selected subskill from a module have been scored.
            *
            * @param subSkillId - The ID of the sub-skill to check
@@ -744,14 +768,21 @@ export const useEvaluationStepsCreationStore = create(
               "setSubSkillHasCompleted",
             );
           },
+          /**
+           * Get all non-present students.
+           *
+           * @description Used in Step Four summary to list non-present students.
+           *
+           * @returns A UniqueSet of non-present students with their full names.
+           */
           getAllNonPresentStudents() {
             ensureCollections();
             const students = get().students;
-            const studentsArray = new Set();
+            const studentsArray = new UniqueSet();
 
-            students.forEach((element) => {
-              if (!element.isPresent) {
-                studentsArray.add(element.fullName);
+            students.forEach((student) => {
+              if (!student.isPresent) {
+                studentsArray.set(student.id, [student.fullName]);
               }
             });
 
