@@ -1,4 +1,8 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import {
+  TASK_TEMPLATE_FOOTER,
+  TASK_TEMPLATE_TITLE,
+} from "@/features/class-creation/components/TaskTemplateCreation/config/task-template-creation.configs";
 import { TaskTemplateCreationController } from "@/features/class-creation/components/TaskTemplateCreation/controllers/TaskTemplateCreationController";
 import {
   type TaskTemplateCreationFormSchema,
@@ -10,13 +14,6 @@ import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
-
-const titleProps = {
-  title: "Création de nouvelles tâches",
-  description: "Ces tâches pourront être associées aux modules de compétences.",
-};
-
-const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
 
 /**
  * TaskTemplateCreation Component
@@ -54,9 +51,9 @@ function TaskTemplateCreation({
       className,
       card: {
         card: { className },
-        title: titleProps,
+        title: TASK_TEMPLATE_TITLE,
         footer: {
-          ...footerProps,
+          ...TASK_TEMPLATE_FOOTER,
           formState: form.formState,
           formId,
         },
