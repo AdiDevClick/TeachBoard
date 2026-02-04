@@ -23,7 +23,8 @@
   padding: 0;
   border: none;
   background: transparent;
-  max-block-size: 850px;
+  max-block-size: max-content;
+  // max-block-size: 850px;
   // block-size: max-content;
   transition: max-block-size 0.3s ease;
 
