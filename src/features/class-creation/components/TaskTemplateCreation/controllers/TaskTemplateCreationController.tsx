@@ -24,7 +24,10 @@ import {
   updateValues,
 } from "@/features/class-creation/components/TaskTemplateCreation/functions/task-template.functions.ts";
 import type { TaskTemplateCreationFormSchema } from "@/features/class-creation/components/TaskTemplateCreation/models/class-task-template.models";
-import type { TaskTemplateCreationControllerProps } from "@/features/class-creation/components/TaskTemplateCreation/types/task-template-creation.types.ts";
+import type {
+  TaskTemplateCreationControllerProps,
+  TaskTemplateCreationDialogOptions,
+} from "@/features/class-creation/components/TaskTemplateCreation/types/task-template-creation.types.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
@@ -67,17 +70,23 @@ export function TaskTemplateCreationController({
   });
   const queryClient = useQueryClient();
   const savedSkills = useRef<ReturnType<typeof createTaskTemplateView>>(null!);
-  const dialogData = dialogOptions(pageId);
+  const dialogData = dialogOptions(pageId) as
+    | TaskTemplateCreationDialogOptions
+    | undefined;
+
   const diplomaDatas = useMemo(() => {
     const selectedDiploma = dialogData?.selectedDiploma ?? null;
     const newTagSet = new UniqueSet();
+
     const diplomaTag = selectedDiploma
       ? `${selectedDiploma?.degreeField} - ${selectedDiploma?.degreeLevel} ${selectedDiploma?.degreeYear}`
       : "Aucun diplôme sélectionné";
     newTagSet.set(diplomaTag, []);
+
     if (DEV_MODE && !NO_CACHE_LOGS) {
       console.log("Selected diploma => : ", selectedDiploma);
     }
+
     return {
       diploma: selectedDiploma,
       shortTemplatesList: dialogData?.shortTemplatesList ?? [],
@@ -98,17 +107,19 @@ export function TaskTemplateCreationController({
     (keys: string[]): HeadingType[] | undefined => {
       const cachedData = queryClient.getQueryData<HeadingType[]>(keys ?? []);
       if (!data && cachedData === undefined && keys[0] === "none") return;
+
       if (DEV_MODE && !NO_CACHE_LOGS) {
         console.log("Cached data for ", keys, " is ", cachedData);
       }
 
-      if (!openedDialogs.includes(pageId)) {
+      const currentDiplomaId = diplomaDatas.diploma?.id;
+
+      if (!openedDialogs.includes(pageId) || !currentDiplomaId) {
         return cachedData ?? (data as HeadingType[] | undefined);
       }
 
       const isFetchedSkills = keys[0] === "new-task-module";
       const isFetchedTasks = keys[0] === "new-task-item";
-      const currentDiplomaId = diplomaDatas.diploma?.id;
 
       const isDiplomaChanged = handleDiplomaChange({
         currentId: currentDiplomaId,
@@ -121,7 +132,7 @@ export function TaskTemplateCreationController({
         return data as HeadingType[] | undefined;
       }
 
-      if (isFetchedSkills) {
+      if (isFetchedSkills && diplomaDatas.diploma) {
         return fetchSkillsData(diplomaDatas.diploma, savedSkills);
       }
 
@@ -129,6 +140,7 @@ export function TaskTemplateCreationController({
         if (cachedData === undefined) {
           return data as HeadingType[] | undefined;
         }
+
         return fetchTasksData(
           cachedData,
           diplomaDatas,
@@ -223,7 +235,6 @@ export function TaskTemplateCreationController({
         form={form}
         setRef={setRef}
         observedRefs={observedRefs}
-        onOpenChange={openingCallback}
       />
       <DynamicTags
         {...controllers.dynamicTagsControllers}
