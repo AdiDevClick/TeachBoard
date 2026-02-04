@@ -1,13 +1,8 @@
+import type { Input } from "@/components/ui/input";
 import type { AppModalNames } from "@/configs/app.config.ts";
-import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
-import type { ComponentPropsWithRef, HTMLInputTypeAttribute } from "react";
-import type {
-  ControllerFieldState,
-  ControllerRenderProps,
-  FieldValues,
-  Path,
-  UseFormReturn,
-} from "react-hook-form";
+import type { FieldTypes } from "@/types/MainTypes";
+import type { ComponentProps, HTMLInputTypeAttribute } from "react";
+import type { FieldValues, Path } from "react-hook-form";
 
 /**
  * Type representing an input item for forms.
@@ -29,7 +24,7 @@ type BaseInputItem<T> = {
  * Input item requires either a title or a label (for components that only render labels).
  */
 export type InputItem<T> =
-  | (BaseInputItem<T> & { title: string; label?: string })
+  | (BaseInputItem<T> & { title: string; label?: string; description?: string })
   | (BaseInputItem<T> & { title?: string; label: string });
 
 export type ApiEndpointType = string | ((id: number | string) => string);
@@ -71,36 +66,13 @@ export type FetchingInputItem<T> =
   | CommandInputItem<T>
   | NonCommandFetchingInputItem<T>;
 
-/** Props for the Inputs component */
-export type ControlledInputsProps<T extends FieldValues> = {
-  items: InputItem<T>[];
-  form: UseFormReturn<T>;
-} & ComponentPropsWithRef<"div">;
-
-type LaballedInputStandAloneProps<T extends FieldValues> = InputItem<T>;
-
-type HOCLaballedInputProps<T extends FieldValues> = InputItem<T> & {
-  form: UseFormReturn<T>;
-};
-
-type HOCLaballedInputWithMapperProps<T extends FieldValues> =
-  SafeListMapperProp<InputItem<T>> & {
-    form: UseFormReturn<T>;
-  };
-
 /**
  * Props for the LaballedInputForController component
- *
- * @description This type allows for three different usage scenarios:
- * 1. Standalone usage with explicit `field` and `fieldState` props.
- * 2. Usage with a Higher-Order Component (HOC) where input item props are passed directly.
- * 3. Usage with a HOC in conjunction with a ListMapper, where input item props are provided via the mapper.
  */
-export type LaballedInputForControllerProps<T extends FieldValues> = (
-  | HOCLaballedInputWithMapperProps<T>
-  | HOCLaballedInputProps<T>
-  | LaballedInputStandAloneProps<T>
-) & {
-  field: ControllerRenderProps<T, Path<T>>;
-  fieldState: ControllerFieldState;
-} & Omit<ComponentPropsWithRef<"input">, "form">;
+export type LabelledInputForControllerProps<T extends FieldValues> =
+  FieldTypes<T>;
+
+/**
+ * HOC component type that wraps a component with react-hook-form Controller.
+ */
+export type LabelledInputProps = ComponentProps<typeof Input>;
