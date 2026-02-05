@@ -174,7 +174,7 @@ function DynamicTag(props: DynamicTagProps) {
         </ButtonWithPopoverCRUD>
       )}
       {!displayCRUD && (
-        <Button size="sm" variant="outline">
+        <Button type="button" size="sm" variant="outline">
           {valueStr}
         </Button>
       )}
