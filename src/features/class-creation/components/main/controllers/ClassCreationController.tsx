@@ -294,12 +294,6 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     [],
   );
 
-  const handleOnYearSelect = (value: string) => {
-    if (form.watch("schoolYear") !== value) {
-      form.setValue("schoolYear", value, { shouldValidate: true });
-    }
-  };
-
   const handleDeletingTask = (taskValue: string) => {
     const tasks = new Set(form.getValues("tasks") || []);
     tasks.delete(taskValue);
@@ -400,7 +394,6 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
         defaultValue={defaultSchoolYear}
         label="Année scolaire"
         id={`${pageId}-schoolYear`}
-        onValueChange={handleOnYearSelect}
       >
         <ListMapper items={years}>
           <NonLabelledGroupItem />
