@@ -64,12 +64,25 @@ const stepFourSchema = (data: typeof fieldData) =>
       .refine((value) => value[0] !== "none", data.absenceInvalidMessage)
       .describe("List of absent students during the evaluation"),
     overallScore: z
-      .number(data.scoreAverageInvalidTypeMessage)
-      .min(0, data.scoreAverageInvalidMinMessage)
-      .max(20, data.scoreAverageInvalidMaxMessage)
-      .describe(
-        "Average score of the student - It can be overwritten by the teacher and will be saved as is",
-      ),
+      .record(
+        z.string(data.scoreAverageInvalidTypeMessage),
+        z.preprocess(
+          (val) => {
+            if (typeof val === "string") {
+              const trimmed = val.trim();
+              if (trimmed === "") return 0;
+              const n = Number(trimmed);
+              return Number.isNaN(n) ? val : n;
+            }
+            return val;
+          },
+          z
+            .number()
+            .min(0, data.scoreAverageInvalidMinMessage)
+            .max(20, data.scoreAverageInvalidMaxMessage),
+        ),
+      )
+      .describe("Average score per student (map) or single average value"),
     // }),
     // overallScore: z
     //   .array(
@@ -91,7 +104,11 @@ const stepFourSchema = (data: typeof fieldData) =>
       z.object({
         id: z.uuid(),
         isPresent: z.boolean(),
-        overallScore: z.number().optional(),
+        overallScore: z
+          .number()
+          .min(0, data.scoreAverageInvalidMinMessage)
+          .max(20, data.scoreAverageInvalidMaxMessage)
+          .optional(),
         assignedTask: z
           .object({
             id: z.uuid(),
