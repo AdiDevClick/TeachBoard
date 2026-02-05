@@ -1,3 +1,4 @@
+import { rightContent } from "@/assets/css/EvaluationPage.module.scss";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { StepOne } from "@/features/evaluations/create/steps/one/StepOne.tsx";
 
@@ -13,6 +14,6 @@ export const stepOneInputControllers = [
     useCommands: true,
     creationButtonText: "Créer une classe",
     useButtonAddNew: true,
-    className: "right__content",
+    className: rightContent,
   },
 ] satisfies Parameters<typeof StepOne>[0]["inputControllers"];
