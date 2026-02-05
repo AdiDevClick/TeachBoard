@@ -4,6 +4,7 @@ import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem.tsx";
 import type {
+  ForControllerVerticalFieldSelectProps,
   PropsWithListings,
   VerticalFieldState,
   VerticalRefSetters,
@@ -27,12 +28,11 @@ import {
   useImperativeHandle,
   useRef,
   useState,
-  type ComponentProps,
   type ComponentType,
 } from "react";
 
 const emptyHandle: VerticalRefSetters = {
-  props: {} as ComponentProps<typeof Select>,
+  props: {},
   getMeta: () => undefined,
   getLastSelectedItemValue: () => null,
   setLastSelectedItemValue: (value: string) => value,
@@ -51,6 +51,7 @@ const emptyHandle: VerticalRefSetters = {
  * @param children - Allow consumers to pass SelectItem / SelectGroup etc... to be rendered inside the select field
  * @param props - Additional props for the Select component
  */
+
 export function VerticalFieldSelect({
   ref,
   controllerRef,
@@ -75,15 +76,9 @@ export function VerticalFieldSelect({
     apiEndpoint,
     dataReshapeFn,
     placeholder,
-    field,
-    fieldState,
     controllerMeta,
     ...selectRootProps
-  } = props as VerticalSelectProps & {
-    field?: { name?: string };
-    fieldState?: unknown;
-    controllerMeta?: unknown;
-  };
+  } = props;
 
   const id = useId();
   const [state, setState] = useState<VerticalFieldState>({});
@@ -93,13 +88,11 @@ export function VerticalFieldSelect({
 
   useImperativeHandle(controllerRef ?? ref, () => handleObjectRef.current);
 
-  const fieldName = field?.name;
+  const fieldName = controllerMeta?.controllerName;
   const metaBase = {
     task,
     apiEndpoint,
     dataReshapeFn,
-    field,
-    fieldState,
     controllerMeta,
   };
 
@@ -199,21 +192,21 @@ export function VerticalFieldSelect({
   );
 }
 
-function withListings<TProps extends object, TItem = unknown>(
-  Wrapped: ComponentType<TProps>,
-) {
-  return function Component(props: TProps & PropsWithListings<TItem>) {
+function withListings<C extends object>(Wrapped: ComponentType<C>) {
+  return function Component(props: C & PropsWithListings<unknown>) {
     if (listMapperContainsInvalid(props)) {
       debugLogs("withListings for VerticalFieldSelect");
-      return <Wrapped {...(props as TProps)}>{props.children}</Wrapped>;
+      const { children, ...rest } = props;
+
+      return <Wrapped {...(rest as C)}>{children}</Wrapped>;
     }
-    const { items, ...rest } = props;
+    const { items, children, ...rest } = props;
     return (
-      <Wrapped {...(rest as TProps)}>
+      <Wrapped {...(rest as C)}>
         <ListMapper items={items}>
           <NonLabelledGroupItem />
         </ListMapper>
-        {props.children}
+        {children}
       </Wrapped>
     );
   };
@@ -221,21 +214,41 @@ function withListings<TProps extends object, TItem = unknown>(
 
 export default VerticalFieldSelect;
 
-export const VerticalFieldSelectWithController =
-  withController(VerticalFieldSelect);
+function forController<P>(WrapperComponent: ComponentType<P>) {
+  return function Component(props: P & ForControllerVerticalFieldSelectProps) {
+    const { field, fieldState, ...rest } = props;
+    const { onValueChange, ...restProps } = rest;
 
-type VerticalFieldSelectListingsComponent = ComponentType<
-  VerticalSelectProps & PropsWithListings<unknown>
->;
+    const handleValueChange = (value: string, ...args: unknown[]) => {
+      field.onChange(value);
+      onValueChange?.(value, ...args);
+    };
 
-export const VerticalFieldSelectWithListings = withListings(
-  VerticalFieldSelect,
-) as VerticalFieldSelectListingsComponent;
+    return (
+      <WrapperComponent
+        {...(restProps as P)}
+        value={field.value}
+        onValueChange={handleValueChange}
+        aria-invalid={fieldState.invalid}
+        controllerMeta={{ controllerName: field.name }}
+      />
+    );
+  };
+}
+
+const VerticalFieldSelectForController = forController(VerticalFieldSelect);
+
+export const VerticalFieldSelectWithController = withController(
+  VerticalFieldSelectForController,
+);
+export const VerticalFieldSelectWithListings =
+  withListings(VerticalFieldSelect);
 
 export const VerticalFieldSelectWithControllerAndInlineSwitch = withController(
-  withInlineItemAndSwitchSelection(VerticalFieldSelectWithListings),
-) as ComponentType<Record<string, unknown>>;
-
+  forController(
+    withInlineItemAndSwitchSelection(VerticalFieldSelectWithListings),
+  ),
+);
 export const VerticalFieldWithInlineSwitchList = withListMapper(
   VerticalFieldSelectWithControllerAndInlineSwitch,
-) as ComponentType<Record<string, unknown>>;
+);
