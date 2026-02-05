@@ -1,4 +1,5 @@
 import { useAppStore } from "@/api/store/AppStore.ts";
+import { rightContent } from "@/assets/css/EvaluationPage.module.scss";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { Button } from "@/components/ui/button";
 import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState.ts";
@@ -38,7 +39,7 @@ import { useLoaderData, useOutletContext } from "react-router-dom";
 export function StepFour({
   pageId = "evaluation-summary",
   modalMode = false,
-  className = "content__right",
+  className = rightContent,
   inputControllers = STEP_FOUR_INPUT_CONTROLLERS,
   ...props
 }: Readonly<PageWithControllers<typeof STEP_FOUR_INPUT_CONTROLLERS>>) {
