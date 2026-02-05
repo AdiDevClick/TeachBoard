@@ -25,9 +25,16 @@ import { useShallow } from "zustand/shallow";
 type StepFourControllerProps = {
   pageId: string;
   form: ComponentProps<typeof ControlledDynamicTagList>["form"];
+  className: string;
+  formId: string;
 };
 
-export function StepFourController({ pageId, form }: StepFourControllerProps) {
+export function StepFourController({
+  pageId,
+  form,
+  formId,
+  className,
+}: StepFourControllerProps) {
   const modules = useEvaluationStepsCreationStore(
     useShallow((state) => state.getAttendedModules()),
   );
@@ -122,54 +129,59 @@ export function StepFourController({ pageId, form }: StepFourControllerProps) {
           </ListMapper>
         )}
       </Accordion>
-      <Item>
-        <ItemContent>
-          <ItemTitle>{"Note globale des élèves"}</ItemTitle>
-          <ItemDescription>
-            {"Moyenne générale des notes pour chaque élève évalué(e)."}
-          </ItemDescription>
-          {allStudentsAverageScores.size < 1 && (
-            <Item>
-              <Badge variant="outline" className="mx-auto">
-                {"Aucun élève évalué"}
-              </Badge>
-            </Item>
-          )}
-          {allStudentsAverageScores.size > 0 && (
-            <LabelledScoreInputList
-              items={Array.from(allStudentsAverageScores.entries())}
-              form={form}
-              optional={(tuple) => {
-                return {
-                  id: tuple[0],
-                  item: tuple[1],
-                };
-              }}
-            />
-          )}
-        </ItemContent>
-      </Item>
-      {/* <Item> */}
-      <ControlledDynamicTagList
-        form={form}
-        // {...sharedCallbacksMemo.commonObsProps}
-        // {...controllers.dynamicListControllers}
-        name="absence"
-        pageId={pageId}
-        title={"Elèves absents aujourd'hui"}
-        itemList={presenceMemo}
-        inert
-        displayCRUD={false}
-        // onRemove={handleDeletingTask}
-      />
-      {/* </Item> */}
-      {/* <Item> */}
-      <ControlledLabelledTextArea
-        form={form}
-        name="comments"
-        title="Commentaires"
-      />
-      {/* </Item> */}
+      <form
+        id={formId}
+        className={className}
+      >
+        <Item>
+          <ItemContent>
+            <ItemTitle>{"Note globale des élèves"}</ItemTitle>
+            <ItemDescription>
+              {"Moyenne générale des notes pour chaque élève évalué(e)."}
+            </ItemDescription>
+            {allStudentsAverageScores.size < 1 && (
+              <Item>
+                <Badge variant="outline" className="mx-auto">
+                  {"Aucun élève évalué"}
+                </Badge>
+              </Item>
+            )}
+            {allStudentsAverageScores.size > 0 && (
+              <LabelledScoreInputList
+                items={Array.from(allStudentsAverageScores.entries())}
+                form={form}
+                optional={(tuple) => {
+                  return {
+                    id: tuple[0],
+                    item: tuple[1],
+                  };
+                }}
+              />
+            )}
+          </ItemContent>
+        </Item>
+        {/* <Item> */}
+        <ControlledDynamicTagList
+          form={form}
+          // {...sharedCallbacksMemo.commonObsProps}
+          // {...controllers.dynamicListControllers}
+          name="absence"
+          pageId={pageId}
+          title={"Elèves absents aujourd'hui"}
+          itemList={presenceMemo}
+          inert
+          displayCRUD={false}
+          // onRemove={handleDeletingTask}
+        />
+        {/* </Item> */}
+        {/* <Item> */}
+        <ControlledLabelledTextArea
+          form={form}
+          name="comments"
+          title="Commentaires"
+        />
+        {/* </Item> */}
+      </form>
     </>
   );
 }
