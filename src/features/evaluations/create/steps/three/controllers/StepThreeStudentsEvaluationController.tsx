@@ -30,7 +30,7 @@ const defaultState = {
 export function StepThreeStudentsEvaluationController(
   props: StepThreeControllerProps,
 ) {
-  const { formId, students } = props;
+  const { formId, students, className } = props;
   const selectedSubSkill = useEvaluationStepsCreationStore(
     useShallow((state) => state.getSelectedSubSkill()),
   );
@@ -115,7 +115,7 @@ export function StepThreeStudentsEvaluationController(
   }, [selectedModule, selectedSubSkill, newValue]);
 
   return (
-    <form id={formId} className="min-w-md">
+    <form id={formId} className={className}>
       <EvaluationSliderList
         items={students}
         optional={(student) => {
