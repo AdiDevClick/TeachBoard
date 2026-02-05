@@ -1,4 +1,5 @@
 import { useAppStore } from "@/api/store/AppStore";
+import { rightContent } from "@/assets/css/EvaluationPage.module.scss";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { attendanceRecordCreationBaseControllers } from "@/features/evaluations/create/steps/three/forms/step-two-inputs.ts";
 import { STEP_TWO_CARD_PROPS } from "@/features/evaluations/create/steps/two/config/step-two.configs";
@@ -27,7 +28,7 @@ import { useForm, type FieldValues } from "react-hook-form";
 export function StepTwo({
   pageId = "attendance-record-creation",
   modalMode = false,
-  className = STEP_TWO_CARD_PROPS.card.className,
+  className = rightContent,
   inputControllers = attendanceRecordCreationBaseControllers,
   ...props
 }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
