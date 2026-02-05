@@ -30,6 +30,7 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
     control: form.control,
     name: watchId,
     compute: (score) => {
+      console.log(score, watchId);
       setStudentOverallScore(id, score);
     },
   });
@@ -44,6 +45,9 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
         className="col-start-8 col-end-9 text-center p-0"
         name={watchId}
         form={form}
+        type="number"
+        min={0}
+        max={20}
         defaultValue={item.score / 5}
       />
       <p className="col-start-9">{"/20"}</p>
