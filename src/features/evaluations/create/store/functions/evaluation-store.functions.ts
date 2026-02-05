@@ -143,7 +143,7 @@ export function updateModules(
   module: ClassModules,
   items: Partial<ClassModules>,
 ) {
-  const updatedModules = state.modules.clone(true);
+  const updatedModules = state.modules.clone();
 
   updatedModules.delete(module.id).set(module.id, { ...module, ...items });
 
