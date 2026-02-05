@@ -58,6 +58,7 @@ Cette application représente le frontend de TeachBoard, une interface pédagogi
   - [Charts](#charts)
   - [Layout (Header / Sidebar / Footer)](#layout-header--sidebar--footer)
   - [Icons](#icons)
+  - [Conventions Shadcn](#conventions-shadcn)
   - [Ajouter un nouveau controller / HOC](#ajouter-un-nouveau-controller--hoc)
 - [Validation des props des composants](#validation-des-props-des-composants)
 - [Tests](#tests)
@@ -1097,6 +1098,21 @@ Une vue d'ensemble des composants réutilisables fournis par le projet, avec un 
 > Note : les exemples ci-dessous sont des snippets usage (prêts à copier/coller) — ils servent à se faire une idée rapide du rendu et de l'API du composant.
 
 ---
+
+### Conventions Shadcn
+- **Objectif :** Empêcher la modification directe des composants générés par `shadcn/ui` afin d'éviter des conflits et régressions lors des mises à jour.
+
+- **Contexte :** Les fichiers générés par `shadcn` (via `components.json`) peuvent être régénérés lors d'une mise à jour de la configuration. Modifier ces fichiers en local mène fréquemment à des conflits lors de la synchronisation avec la version upstream.
+
+- **Comment :**
+  1. Ne modifiez jamais directement les fichiers fournis ou générés par `shadcn/ui`.
+  2. Créez un *wrapper* local (p.ex. `src/components/ui/SelectWrapper.tsx` ou `src/components/wrappers/`) qui utilise le composant shadcn et applique les ajustements (styles, props, logique). 
+  3. Documentez le wrapper (README + tests unitaires) et remplacez l'usage du composant original par le wrapper dans l'app.
+  4. Pour des corrections upstream, ouvrez une issue/PR sur le dépôt `shadcn` et préférez une solution upstream permanente.
+
+**Fichiers utiles :**
+- `components.json` — configuration shadcn utilisée pour générer les composants.
+- `src/components/ui/select.tsx` — exemple d'adaptation locale.
 
 ### Buttons
 - **Look / example**:
