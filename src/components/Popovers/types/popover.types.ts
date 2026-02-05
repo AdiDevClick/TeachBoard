@@ -76,9 +76,7 @@ export type PopoverFieldState = {
   fieldName?: string;
 };
 
-export type ForControllerPopoverProps = FieldTypes<FieldValues> &
-  Pick<PopoverSelectionProps, "multiSelection"> &
-  Pick<PopoverCommandProps, "onSelect">;
+export type ForControllerPopoverProps = FieldTypes<FieldValues>;
 
 export type MetaDatasPopoverField = CommandHandlerMetaData & {
   name?: string;
