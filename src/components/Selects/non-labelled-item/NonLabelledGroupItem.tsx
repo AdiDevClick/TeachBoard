@@ -9,7 +9,7 @@ import { SelectItem } from "@/components/ui/select.tsx";
  * @param item - The item object containing entityTypeName, id, and name.
  */
 export function NonLabelledGroupItem(
-  item: Readonly<NonLabelledGroupItemProps>
+  item: Readonly<NonLabelledGroupItemProps>,
 ) {
   const { id, name } = item;
 
@@ -17,5 +17,12 @@ export function NonLabelledGroupItem(
     return <div>Loading item...</div>;
   }
 
-  return <SelectItem value={id}>{name}</SelectItem>;
+  return (
+    <SelectItem
+      className="[&>span:last-child]:block [&>span:last-child]:overflow-hidden [&>span:last-child]:text-ellipsis truncate"
+      value={id}
+    >
+      {name}
+    </SelectItem>
+  );
 }
