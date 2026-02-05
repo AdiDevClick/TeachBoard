@@ -3,6 +3,7 @@ import withComboBoxCommands from "@/components/HOCs/withComboBoxCommands";
 import withController from "@/components/HOCs/withController.tsx";
 import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import type {
+  ForControllerPopoverProps,
   PopoverFieldProps,
   PopoverFieldState,
 } from "@/components/Popovers/types/popover.types.ts";
@@ -15,7 +16,14 @@ import {
 } from "@/components/ui/popover.tsx";
 import { cn } from "@/utils/utils.ts";
 import { LucideChevronDown } from "lucide-react";
-import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+  type ComponentType,
+} from "react";
 
 const defaultValue = new Set<string>();
 
@@ -44,7 +52,7 @@ export function PopoverField({
   resetKey,
   ...props
 }: PopoverFieldProps) {
-  const { onOpenChange, children, role, ...rest } = props;
+  const { onOpenChange, children, role, multiSelection, ...rest } = props;
 
   const id = useId();
 
@@ -56,17 +64,23 @@ export function PopoverField({
       : (rest.defaultValue ?? undefined),
   });
 
-  // Reset selectedValue when resetKey changes
+  /**
+   * Reset selected value when resetKey changes
+   */
   useEffect(() => {
     if (resetKey !== undefined) {
       setState((prev) => ({
         ...prev,
-        selectedValue: props.multiSelection ? defaultValue : undefined,
+        selectedValue: multiSelection ? defaultValue : undefined,
       }));
     }
-  }, [resetKey, props.multiSelection]);
+  }, [resetKey, multiSelection]);
 
-  // Meta data for this field instance
+  /**
+   * Memoize meta data to avoid unnecessary re-renders of PopoverFieldProvider and its consumers when unrelated props change.
+   *
+   * @description This is used to enrich the each selection.
+   */
   const memoizedMeta = useMemo(
     () => ({
       task: rest?.task ?? "none",
@@ -89,20 +103,21 @@ export function PopoverField({
    *
    * !! IMPORTANT !! This function is passed to the PopoverFieldProvider to be used in CommandItems.
    */
-  const setSelectedValueCallback = useCallback((value: string) => {
-    if (props.multiSelection) {
+  const setSelectedValueCallback = useCallback((nextValue: string) => {
+    if (multiSelection) {
       setState((prev) => {
         const newSet = new Set(prev.selectedValue);
-        if (newSet.has(value)) {
-          newSet.delete(value);
+        if (newSet.has(nextValue)) {
+          newSet.delete(nextValue);
         } else {
-          newSet.add(value);
+          newSet.add(nextValue);
         }
         return { ...prev, selectedValue: newSet };
       });
-    } else {
-      setState((prev) => ({ ...prev, selectedValue: value, open: false }));
+      return;
     }
+
+    setState((prev) => ({ ...prev, selectedValue: nextValue, open: false }));
   }, []);
 
   /**
@@ -167,14 +182,35 @@ export function PopoverField({
   );
 }
 
+/**
+ * Higher-order component to pre-configure PopoverField for use with react-hook-form controllers.
+ */
+function forController<P>(WrapperComponent: ComponentType<P>) {
+  return function Component(props: P & ForControllerPopoverProps) {
+    const { field, fieldState, ...rest } = props;
+
+    return (
+      <WrapperComponent
+        {...(rest as P)}
+        name={field.name}
+        aria-invalid={fieldState.invalid}
+      />
+    );
+  };
+}
+
 export default PopoverField;
 
-export const PopoverFieldWithController = withController(PopoverField);
+const PopoverFieldForController = forController(PopoverField);
+
+export const PopoverFieldWithController = withController(
+  PopoverFieldForController,
+);
 
 export const PopoverFieldWithCommands = withComboBoxCommands(PopoverField);
 
 export const PopoverFieldWithControlledCommands = withController(
-  PopoverFieldWithCommands,
+  forController(PopoverFieldWithCommands),
 );
 
 export const PopoverFieldWithControllerAndCommandsList = withListMapper(
