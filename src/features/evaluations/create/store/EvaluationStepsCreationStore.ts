@@ -232,7 +232,7 @@ export const useEvaluationStepsCreationStore = create(
            *
            * @note This score can be overwritten by the teacher and will be saved as is.
            */
-          setStudentOverallScore(studentId: UUID, overallScore: number) {
+          setStudentOverallScore(studentId: UUID, overallScore: number | null) {
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
@@ -552,8 +552,9 @@ export const useEvaluationStepsCreationStore = create(
               ])
               .newShape() as StudentWithPresence[];
 
-            return students.map((student) => ({
+            return students.map((student, index) => ({
               ...student,
+              name: `students.${index}.taskId`,
               defaultValue: student.assignedTask?.id ?? undefined,
               items: Array.from(get().tasks?.values() ?? []).map((task) => ({
                 id: task.id,
