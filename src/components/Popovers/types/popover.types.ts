@@ -9,27 +9,17 @@ import type {
 import type { VerticalSelectProps } from "@/components/Selects/types/select.types.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { CommandHandlerMetaData } from "@/hooks/database/types/use-command-handler.types.ts";
+import type { FieldTypes } from "@/types/MainTypes";
 import type { BivariantCallback } from "@/utils/types/types.utils.ts";
 import type { ButtonProps } from "react-day-picker";
+import type { FieldValues } from "react-hook-form";
 
-/** Props spécifiques au PopoverField */
-export type PopoverFieldProps = Omit<
+export type PopoverBaseProps = Omit<
   VerticalSelectProps,
-  "side" | "onOpenChange" | "onSelect"
+  "side" | "onOpenChange" | "onSelect" | "onValueChange" | "value"
 > & {
   side?: "top" | "bottom" | "left" | "right";
-  /**
-   * Callback invoked when a command item is selected.
-   * Bivariant to allow passing richer item subtypes (e.g. DetailedCommandItem).
-   */
-  onSelect?: BivariantCallback<
-    (value: string, commandItem: CommandItemType) => void
-  >;
-  /** Headings provided to Command items when using command lists */
-  commandHeadings?: HeadingType[];
   role?: ButtonProps["role"];
-  /** Allows multiple selections inside the popover list items if set to true */
-  multiSelection?: boolean;
   /** Optional API endpoint - reuse shared type from inputs */
   apiEndpoint?: ApiEndpointType;
   /** Optional data reshape function - reuse shared type from inputs */
@@ -41,11 +31,54 @@ export type PopoverFieldProps = Omit<
   resetKey?: string | number;
 };
 
+export type PopoverSingleValue = string | undefined;
+
+export type PopoverMultiValue = string[] | Set<string> | undefined;
+
+export type PopoverSelectionValue = PopoverSingleValue | PopoverMultiValue;
+
+export type PopoverSingleSelectionProps = {
+  multiSelection?: false;
+  value?: string;
+  onValueChange?: (value: PopoverSelectionValue, ...args: unknown[]) => void;
+};
+
+export type PopoverMultiSelectionProps = {
+  multiSelection: true;
+  value?: string[] | Set<string>;
+  onValueChange?: (value: PopoverSelectionValue, ...args: unknown[]) => void;
+};
+
+export type PopoverSelectionProps =
+  | PopoverSingleSelectionProps
+  | PopoverMultiSelectionProps;
+
+export type PopoverCommandProps = {
+  /**
+   * Callback invoked when a command item is selected.
+   * Bivariant to allow passing richer item subtypes (e.g. DetailedCommandItem).
+   */
+  onSelect?: BivariantCallback<
+    (value: string, commandItem: CommandItemType) => void
+  >;
+  /** Headings provided to Command items when using command lists */
+  commandHeadings?: HeadingType[];
+};
+
+/** Props spécifiques au PopoverField */
+export type PopoverFieldProps = PopoverBaseProps &
+  PopoverSelectionProps &
+  PopoverCommandProps;
+
 export type PopoverFieldState = {
   open: boolean;
-  selectedValue?: Set<string> | string;
+  selectedValue?: PopoverSelectionValue;
   fieldName?: string;
 };
+
+export type ForControllerPopoverProps = FieldTypes<FieldValues> &
+  Pick<PopoverSelectionProps, "multiSelection"> &
+  Pick<PopoverCommandProps, "onSelect">;
 
 export type MetaDatasPopoverField = CommandHandlerMetaData & {
   name?: string;
