@@ -70,7 +70,6 @@ export function VerticalFieldSelect({
     onOpenChange,
     onValueChange,
     children,
-    defaultValue,
     role,
     task,
     apiEndpoint,
@@ -169,7 +168,6 @@ export function VerticalFieldSelect({
       <Select
         // open={state.open}
         // value={props?.onSelect}
-        defaultValue={defaultValue}
         onOpenChange={handleOpenChange}
         onValueChange={handleValueChange}
         {...selectRootProps}
@@ -181,12 +179,18 @@ export function VerticalFieldSelect({
           className={cn(
             fullWidth ? "w-full" : "w-fit",
             triggerProps?.className,
+            "max-w-70.5 [&_[data-slot=select-value]]:block [&_[data-slot=select-value]]:truncate",
           )}
           size="default"
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent side={side}>{children}</SelectContent>
+        <SelectContent
+          side={side}
+          className="w-[var(--radix-select-trigger-width)]"
+        >
+          {children}
+        </SelectContent>
       </Select>
     </div>
   );
@@ -227,7 +231,7 @@ function forController<P>(WrapperComponent: ComponentType<P>) {
     return (
       <WrapperComponent
         {...(restProps as P)}
-        value={field.value}
+        value={field.value ?? ""}
         onValueChange={handleValueChange}
         aria-invalid={fieldState.invalid}
         controllerMeta={{ controllerName: field.name }}
