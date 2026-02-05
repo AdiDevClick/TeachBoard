@@ -83,23 +83,6 @@ const stepFourSchema = (data: typeof fieldData) =>
         ),
       )
       .describe("Average score per student (map) or single average value"),
-    // }),
-    // overallScore: z
-    //   .array(
-    //     z.object({
-    //       studentId: z
-    //         .uuid(data.UUIDValidMessage)
-    //         .describe("Unique identifier for the student"),
-    //       value: z
-    //         .number(data.scoreAverageInvalidTypeMessage)
-    //         .min(0, data.scoreAverageInvalidMinMessage)
-    //         .max(20, data.scoreAverageInvalidMaxMessage)
-    //         .describe(
-    //           "Average score of the student - It can be overwritten by the teacher and will be saved as is",
-    //         ),
-    //     }),
-    //   )
-    // .describe("Average scores for each evaluated student"),
     evaluations: z.array(
       z.object({
         id: z.uuid(),
