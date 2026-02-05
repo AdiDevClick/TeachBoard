@@ -4,6 +4,10 @@
  * The inner part of a page.
  * It will have a border around the area and will allow the content to fully use the height of the page.
  */
+
+$arrow-size: 20px;
+$hidden-size: 3rem;
+
 .page__content-container {
   height: 100%;
   border: 1px solid var(--border);
@@ -12,7 +16,8 @@
   border-bottom: none;
   border-radius: 10px;
   padding-bottom: 10px;
-  margin-bottom: 5px;
+  margin-bottom: 0.5rem;
+  margin-right: 1rem;
   transition: transform 0.3s ease, border-left-width 0.3s ease-in-out;
 
   &:has(.left-arrow:hover, .header:hover) {
@@ -26,6 +31,7 @@
   .left-arrow,
   .right-arrow,
   .header {
+    justify-content: center;
     position: relative;
     transition: all 0.5s ease;
     // background: rgba(49, 5, 5, 0.06);
@@ -34,7 +40,7 @@
   :is(.left-arrow, .right-arrow)::after {
     content: "";
     position: absolute;
-    padding: 20px;
+    padding: $arrow-size;
     border-radius: 8px;
     background: rgba(0, 0, 0, 0.06);
     opacity: 0;
@@ -55,30 +61,34 @@
     :not(.header) & {
 
       &:is(.right-arrow, .left-arrow) {
-        height: 20px;
-        width: 20px;
+        height: 1rem;
+        width: 1rem;
+        // height: 20px;
+        // width: 20px;
 
         &::before {
           content: "";
           position: absolute;
-          height: 70px;
-          width: 70px;
+          height: $hidden-size;
+          width: $hidden-size;
         }
 
         &:is(.left-arrow) {
           &::before {
-            left: 100%;
+            // left: 100%;
+            // background-color: red;
+
           }
 
-          transform: scale(1.1) translateX(-10px);
+          transform: scale(1.1) translateX(-20px);
         }
 
         &:is(.right-arrow) {
           &::before {
-            right: 100%;
+            // background-color: blue;
           }
 
-          transform: scale(1.1) translateX(10px);
+          transform: scale(1.1) translateX(15px);
         }
       }
 
