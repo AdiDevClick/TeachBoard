@@ -2,12 +2,9 @@ import type {
   ApiEndpointType,
   DataReshapeFn,
 } from "@/components/Inputs/types/inputs.types.ts";
-import type {
-  Select,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select.tsx";
+import type { SelectContent, SelectItem } from "@/components/ui/select.tsx";
 import type { AppModalNames } from "@/configs/app.config.ts";
+import type { FieldTypes } from "@/types/MainTypes";
 import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
 import type { UniqueSet } from "@/utils/UniqueSet";
 import type {
@@ -19,6 +16,7 @@ import type {
   Ref,
   SetStateAction,
 } from "react";
+import type { FieldValues } from "react-hook-form";
 
 /** State type for VerticalFieldSelect */
 export type VerticalFieldState = {
@@ -27,9 +25,21 @@ export type VerticalFieldState = {
   command?: boolean;
 };
 
+export type SelectRootProps = {
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+  onOpenChange?: (open: boolean) => void;
+  open?: boolean;
+  disabled?: boolean;
+  required?: boolean;
+  name?: string;
+  dir?: "ltr" | "rtl";
+};
+
 export type VerticalRefSetters = {
   /** Underlying props for the select */
-  props: ComponentProps<typeof Select>;
+  props: SelectRootProps;
   /** Metadatas from the component and wrapped HOCs (eg: task, apiEndpoint, name, id, etc.) */
   getMeta: () => Record<string, unknown> | undefined;
   /** Last selected item value (may be undefined) */
@@ -47,21 +57,20 @@ export type VerticalRefSetters = {
   /** Set the vertical field state */
   setVerticalState?: Dispatch<SetStateAction<VerticalFieldState>>;
 };
+type ControllerMeta = { controllerName?: string };
 
 /**
  * Props for the VerticalFieldSelect component
  * {@link VerticalFieldSelect}
  */
-export type VerticalSelectProps = Omit<
-  ComponentProps<typeof Select>,
-  "form" | "onValueChange"
-> & {
+export type VerticalSelectProps = Omit<SelectRootProps, "onValueChange"> & {
   ref?: Ref<VerticalRefSetters>;
   controllerRef?: Ref<VerticalRefSetters>;
   observedRefs?: UniqueSet<
     string,
     { element: Element; meta?: Record<string, unknown> }
   >;
+  controllerMeta?: ControllerMeta;
   task?: AppModalNames;
   dataReshapeFn?: DataReshapeFn;
   apiEndpoint?: ApiEndpointType;
@@ -91,6 +100,9 @@ type LabelledGroupBaseProps<T> = {
 export type PropsWithListings<T> = {
   items: T[];
 } & PropsWithChildren;
+
+export type ForControllerVerticalFieldSelectProps = FieldTypes<FieldValues> &
+  Pick<VerticalSelectProps, "onValueChange">;
 
 /**
  * Props for the LabelledGroup component
