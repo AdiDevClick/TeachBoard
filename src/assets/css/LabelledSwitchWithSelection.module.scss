@@ -1,0 +1,27 @@
+/**
+  * This file contains the styles for the LabelledSwitchWithSelection component.
+  */
+.labelled-switch-with-selection {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1.5rem;
+  transition: all 0.3s ease;
+  padding: 0;
+
+  .label {
+    grid-column: 1;
+    width: 100%;
+    // min-width: 0;
+  }
+
+  .central-switch {
+    grid-column: 2;
+    place-items: end;
+  }
+
+  .content {
+    grid-column: 3;
+    justify-self: end;
+    white-space: nowrap;
+  }
+}
