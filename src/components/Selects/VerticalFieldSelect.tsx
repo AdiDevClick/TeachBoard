@@ -76,6 +76,7 @@ export function VerticalFieldSelect({
     dataReshapeFn,
     placeholder,
     controllerMeta,
+    name,
     ...selectRootProps
   } = props;
 
@@ -87,7 +88,6 @@ export function VerticalFieldSelect({
 
   useImperativeHandle(controllerRef ?? ref, () => handleObjectRef.current);
 
-  const fieldName = controllerMeta?.controllerName;
   const metaBase = {
     task,
     apiEndpoint,
@@ -153,7 +153,7 @@ export function VerticalFieldSelect({
           task,
           apiEndpoint,
           dataReshapeFn,
-          name: fieldName,
+          name,
           id: containerId,
         });
       }}
@@ -234,7 +234,6 @@ function forController<P>(WrapperComponent: ComponentType<P>) {
         value={field.value ?? ""}
         onValueChange={handleValueChange}
         aria-invalid={fieldState.invalid}
-        controllerMeta={{ controllerName: field.name }}
       />
     );
   };
