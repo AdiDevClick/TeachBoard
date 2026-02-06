@@ -71,7 +71,7 @@ export function StepFourController({
     form.setValue("absence", studentsPresenceIds);
 
     return studentsPresence;
-  }, [nonPresentStudents]);
+  }, [nonPresentStudents, form]);
 
   return (
     <>
@@ -129,10 +129,7 @@ export function StepFourController({
           </ListMapper>
         )}
       </Accordion>
-      <form
-        id={formId}
-        className={className}
-      >
+      <form id={formId} className={className}>
         <Item>
           <ItemContent>
             <ItemTitle>{"Note globale des élèves"}</ItemTitle>
