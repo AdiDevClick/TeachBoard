@@ -83,8 +83,9 @@ export type AppModalNames =
   | "add-school-year"
   | "search-students"
   | "search-primaryteacher"
-  | "attendance-record-creation"
-  | "evaluation-step-one"
+  | "evaluation-class-selection"
+  | "evaluation-attendance"
+  | "evaluation-module-selection"
   | "evaluation-summary";
 
 /**
