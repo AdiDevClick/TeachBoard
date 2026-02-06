@@ -90,9 +90,7 @@ export function withInlineItemAndSwitchSelection<T extends object>(
         <ItemActions className={centralSwitch}>
           <Switch onClick={handleSwitchClick} checked={isSelected} />
         </ItemActions>
-        <ItemContent className={content}>
-          <Wrapped {...props} disabled={!isSelected} />
-        </ItemContent>
+        <Wrapped {...props} className={content} disabled={!isSelected} />
       </Item>
     );
   };
