@@ -1,6 +1,10 @@
 import { useAppStore } from "@/api/store/AppStore.ts";
-import { Badge } from "@/components/ui/badge.tsx";
 import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState.ts";
+import {
+  DescriptionChange,
+  HandleLeftContentChange,
+  ShowStudentsEvaluationWithPreviousArrow,
+} from "@/features/evaluations/create/steps/three/components/step-three-functionnal-wrappers.functions";
 import {
   ShowModuleSelection,
   ShowStudentsEvaluation,
@@ -10,13 +14,8 @@ import {
   STEP_THREE_SUBSKILLS_SELECTION_CARD_PROPS,
   STEP_THREE_SUBSKILLS_SELECTION_TITLE_PROPS,
 } from "@/features/evaluations/create/steps/three/config/step-three.configs.ts";
-import { StepThreeSubskillsSelectionController } from "@/features/evaluations/create/steps/three/controllers/StepThreeSubskillsSelectionController.tsx";
 import { attendanceRecordCreationBaseControllers } from "@/features/evaluations/create/steps/three/forms/step-two-inputs.ts";
-import { handlePreviousClick } from "@/features/evaluations/create/steps/three/functions/step-three.functions.ts";
-import type {
-  ShowStudentsEvaluationWithPreviousArrowProps,
-  StepThreeSubskillsSelectionControllerProps,
-} from "@/features/evaluations/create/steps/three/types/step-three.types.ts";
+import type { StepThreeSubskillsSelectionControllerProps } from "@/features/evaluations/create/steps/three/types/step-three.types.ts";
 import {
   attendanceRecordCreationSchemaInstance,
   type AttendanceRecordCreationFormSchema,
@@ -24,9 +23,9 @@ import {
 } from "@/features/evaluations/create/steps/two/models/attendance-record-creation.models";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IconArrowLeft } from "@tabler/icons-react";
 import {
   useEffect,
+  useEffectEvent,
   useMemo,
   type Dispatch,
   type JSX,
@@ -49,7 +48,7 @@ import { useOutletContext } from "react-router-dom";
  * @returns The Step Three component wrapped in a titled card.
  */
 export function StepThree({
-  pageId = "attendance-record-creation",
+  pageId = "evaluation-module-selection",
   modalMode = false,
   className = STEP_THREE_MODULE_SELECTION_CARD_PROPS.card.className,
   inputControllers = attendanceRecordCreationBaseControllers,
@@ -88,7 +87,7 @@ export function StepThree({
       ...STEP_THREE_SUBSKILLS_SELECTION_CARD_PROPS,
       title: {
         ...STEP_THREE_SUBSKILLS_SELECTION_TITLE_PROPS,
-        description: descriptionChange(selectedSubSkill),
+        description: DescriptionChange(selectedSubSkill),
       },
     };
   }, [isModuleClicked, selectedSubSkill]);
@@ -123,15 +122,10 @@ export function StepThree({
     user,
   } satisfies StepThreeSubskillsSelectionControllerProps;
 
-  /**
-   * Dispatch left content based on module selection state
-   *
-   * @description This will update the context for left content on the parent component
-   */
-  useEffect(() => {
+  const isModuleClickedTrigger = useEffectEvent(() => {
     if (!setLeftContent) return;
 
-    const leftContent = handleLeftContentChange(
+    const leftContent = HandleLeftContentChange(
       subskillsControllerProps,
       isModuleClicked,
     );
@@ -142,6 +136,15 @@ export function StepThree({
     return () => {
       setLeftContent(null!);
     };
+  });
+
+  /**
+   * Dispatch left content based on module selection state
+   *
+   * @description This will update the context for left content on the parent component
+   */
+  useEffect(() => {
+    isModuleClickedTrigger();
   }, [isModuleClicked]);
 
   return (
@@ -155,58 +158,4 @@ export function StepThree({
       )}
     </>
   );
-}
-
-function ShowStudentsEvaluationWithPreviousArrow(
-  props: ShowStudentsEvaluationWithPreviousArrowProps,
-) {
-  const { onPreviousArrowClick: displayModules, ...commonProps } = props;
-
-  return (
-    <>
-      <IconArrowLeft
-        className={
-          STEP_THREE_SUBSKILLS_SELECTION_CARD_PROPS.arrowBack.className
-        }
-        onClick={(e) => handlePreviousClick(e, displayModules)}
-        data-name="modules-previous"
-      />
-      <ShowStudentsEvaluation {...commonProps} />
-    </>
-  );
-}
-
-/**
- * Handle left content change based on module selection state
- *
- * @param commonProps - Common props for Step Three components
- * @param isModuleClicked - Whether the module selection is clicked
- *
- * @returns The left content JSX element
- */
-function handleLeftContentChange(
-  commonProps: StepThreeSubskillsSelectionControllerProps,
-  isModuleClicked: boolean,
-) {
-  if (isModuleClicked) {
-    return <StepThreeSubskillsSelectionController {...commonProps} />;
-  }
-
-  return null!;
-}
-
-/**
- * Change description based on selected sub-skill
- *
- * @param selectedSubSkill - The currently selected sub-skill.
- * @returns A JSX element representing the description.
- */
-function descriptionChange(selectedSubSkill?: { name?: string } | null) {
-  const { name } = selectedSubSkill || {};
-
-  if (name) {
-    return <Badge>{name}</Badge>;
-  }
-
-  return STEP_THREE_SUBSKILLS_SELECTION_TITLE_PROPS.description;
 }
