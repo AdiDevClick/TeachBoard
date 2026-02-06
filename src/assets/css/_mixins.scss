@@ -181,3 +181,37 @@ background: $bg;
     #{$alias}: #{$bem-class};
   }
 }
+
+/**
+ * MEDIA QUERY MIXIN
+ * Usage: @include for-size(mobile) { ... }
+ 
+ * Supported sizes: mobile, tablet, smalltablet, desktop
+ */
+@mixin for-size($media) {
+  @if $media ==mobile {
+    @media (max-width: 576px) {
+      @content;
+    }
+  }
+
+  @else if $media ==tablet {
+    @media (max-width: 967px) {
+      // @media (max-width: 768px) {
+      @content;
+    }
+  }
+
+  @else if $media ==smalltablet {
+    @media (max-width: 768px) {
+      // @media (max-width: 768px) {
+      @content;
+    }
+  }
+
+  @else if $media ==desktop {
+    @media (min-width: 1024px) {
+      @content;
+    }
+  }
+}
