@@ -1,3 +1,11 @@
+import {
+  evaluationRadioGroupContent,
+  evaluationRadioGroupContentContainer,
+  item,
+  itemTitle,
+  itemTitleIcon,
+  itemTitleLabel,
+} from "@/assets/css/EvaluationRadio.module.scss";
 import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import { Icon } from "@/components/Icons/Icon.tsx";
 import { EvaluationRadioItemDescription } from "@/components/Radio/EvaluationRadioItemDescription.tsx";
@@ -16,8 +24,6 @@ import {
 } from "@/configs/app-components.config.ts";
 import sanitizeDOMProps from "@/utils/props.ts";
 import { cn } from "@/utils/utils.ts";
-
-import "@css/EvaluationRadio.scss";
 import { Activity, type ComponentType, type MouseEvent } from "react";
 
 /**
@@ -75,20 +81,17 @@ function withEvaluationRadioItem<T extends object>(
     return (
       <FieldLabel
         htmlFor={`r-${id}`}
-        className={cn("evaluation-radio-item", {
+        className={cn(evaluationRadioGroupContent, {
           "bg-gray-300": safeProps.isDisabled,
         })}
         onClick={handleClick}
         {...safeProps}
       >
-        <Field className="evaluation-radio-item--container">
-          <FieldContent className="evaluation-radio-item__content">
-            <FieldTitle className="evaluation-radio-item__content--title">
+        <Field className={evaluationRadioGroupContentContainer}>
+          <FieldContent className={item}>
+            <FieldTitle className={itemTitle}>
               <Activity mode={isCompleted ? "visible" : "hidden"}>
-                <Icon
-                  iconPath="check"
-                  className="evaluation-radio-item__check-icon w-4 h-4 inline-block"
-                />
+                <Icon iconPath="check" className={itemTitleIcon} />
               </Activity>
               <RadioGroupItem
                 {...iconStyle}
@@ -96,10 +99,7 @@ function withEvaluationRadioItem<T extends object>(
                 value={id}
                 disabled={safeProps.isDisabled}
               />
-              <Label
-                className="evaluation-radio-item__content--title__label"
-                htmlFor={`r-${id}`}
-              >
+              <Label className={itemTitleLabel} htmlFor={`r-${id}`}>
                 {name}
               </Label>
             </FieldTitle>

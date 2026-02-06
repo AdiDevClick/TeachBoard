@@ -1,10 +1,15 @@
+import {
+  itemDescription,
+  itemDescriptionDestructiveBadge,
+  itemDescriptionLabel,
+} from "@/assets/css/EvaluationRadio.module.scss";
 import type { EvaluationRadioItemDescriptionProps } from "@/components/Radio/types/radio.types.ts";
 import { Badge } from "@/components/ui/badge.tsx";
 import { FieldDescription } from "@/components/ui/field.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import {
-  evaluationRadioItemDescriptionPropsInvalid,
   debugLogs,
+  evaluationRadioItemDescriptionPropsInvalid,
 } from "@/configs/app-components.config.ts";
 
 /**
@@ -27,14 +32,11 @@ export function EvaluationRadioItemDescription(
   const { id, subSkills, description = "Sous-compétences" } = props;
 
   return (
-    <FieldDescription className="evaluation-radio-item__content--description">
-      <Badge variant="destructive" className="destructive-badge">
+    <FieldDescription className={itemDescription}>
+      <Badge variant="destructive" className={itemDescriptionDestructiveBadge}>
         {subSkills.size ?? 0}
       </Badge>
-      <Label
-        className="evaluation-radio-item__content--description__label"
-        htmlFor={`r-${id}`}
-      >
+      <Label className={itemDescriptionLabel} htmlFor={`r-${id}`}>
         {description}
       </Label>
     </FieldDescription>
