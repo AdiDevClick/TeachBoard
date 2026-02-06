@@ -8,21 +8,26 @@ import tseslint from "typescript-eslint";
 
 export default defineConfig([
   ...pluginQuery.configs["flat/recommended"],
+  ...tseslint.configs.recommended,
   globalIgnores(["dist"]),
   {
     files: ["**/*.{ts,tsx}"],
-    extends: [
-      // "plugin:@tanstack/query/recommended",
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs["recommended-latest"],
-      reactRefresh.configs.vite,
-    ],
+    plugins: {
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
+    },
     languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        sourceType: "module",
+      },
       ecmaVersion: 2020,
       globals: globals.browser,
     },
     rules: {
+      ...js.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      ...reactRefresh.configs.vite.rules,
       // Enforce 2 spaces indentation and forbid tabs
       indent: ["error", 2, { SwitchCase: 1 }],
       "no-tabs": "error",
