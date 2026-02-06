@@ -1,0 +1,82 @@
+@use 'mixins' as *;
+
+/**
+  * Styles for the EvaluationRadio component.
+  */
+
+:global(#card-evaluation-module-selection) {
+  width: clamp(400px, 80%, 800px);
+
+  @include for-size("tablet") {
+    width: 100%;
+  }
+}
+
+.evaluation-radio-group {
+
+  &--container {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  &__content {
+    width: 100%;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    & *:hover {
+      cursor: pointer;
+
+      background-color: var(--accent);
+      color: var(--accent-foreground);
+
+      .item__title {
+        &__label {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    &--container {
+      width: 100%;
+
+      .item {
+        width: 100%;
+        transition: opacity 0.5s ease;
+
+        &__title {
+          min-width: 100%;
+
+          &__label {
+            width: 100%;
+          }
+
+          &__icon {
+            display: inline-block;
+            width: calc(var(--spacing) * 4);
+            height: calc(var(--spacing) * 4);
+          }
+        }
+
+        &__description {
+          display: flex;
+
+          &__destructive-badge {
+            width: calc(var(--spacing) * 4.5);
+            height: calc(var(--spacing) * 4.5);
+            align-items: center;
+            border-radius: 50%;
+            margin-right: calc(var(--spacing) * 2);
+          }
+
+          &__label {
+            font-weight: var(--font-weight-normal);
+          }
+
+        }
+
+      }
+    }
+  }
+}
