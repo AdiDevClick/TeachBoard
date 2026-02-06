@@ -1,11 +1,17 @@
+@use "mixins" as *;
+
 /**
   * This file contains the styles for the LabelledSwitchWithSelection component.
   */
+
+$animation-duration: 700ms;
+$content-max-length: 30ch;
+
 .labelled-switch-with-selection {
+
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto minmax($content-max-length, auto);
   gap: 1.5rem;
-  transition: all 0.3s ease;
   padding: 0;
 
   .label {
@@ -19,8 +25,57 @@
   }
 
   .content {
+
+    --select-trigger-collapsed: 6ch;
+    --select-trigger-expanded: 30ch;
+    --select-trigger-max: var(--select-trigger-collapsed);
+
     grid-column: 3;
+    max-inline-size: $content-max-length;
     justify-self: end;
-    white-space: nowrap;
+
+    /* Animation @mount - From right to left */
+    button {
+      -webkit-user-select: none;
+      user-select: none;
+      transition: inline-size $animation-duration ease, transform 0.25s ease, opacity 0.6s ease;
+      inline-size: var(--select-trigger-max);
+      max-inline-size: 100%;
+
+      &:hover,
+      &:focus,
+      &:active {
+        transform: scale(1.01);
+      }
+
+      &:not([data-placeholder]) {
+        --select-trigger-max: var(--select-trigger-expanded);
+      }
+
+      &[data-placeholder] {
+        --select-trigger-max: calc((var(--select-trigger-collapsed) + 20ch));
+
+        @starting-style {
+          inline-size: var(--select-trigger-expanded);
+        }
+      }
+
+      @starting-style {
+        inline-size: var(--select-trigger-collapsed);
+      }
+
+      /* Animate text after @mount is done :
+       - From left to right
+       - Mount with left to right if it's a placeholder */
+      >span {
+        transition: width $animation-duration ease $animation-duration;
+        width: 100%;
+
+        @starting-style {
+          width: 0ch;
+        }
+      }
+
+    }
   }
 }
