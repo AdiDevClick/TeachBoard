@@ -4,6 +4,9 @@
   * to allow for a cleaner and more integrated layout.
   */
 .main-app-container {
+  max-block-size: 100vh;
+  overflow: hidden;
+
   margin: 0;
   box-shadow: none;
   background: none;
