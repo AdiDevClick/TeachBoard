@@ -9,9 +9,9 @@ import {
   PopoverFieldWithCommands,
   PopoverFieldWithControllerAndCommandsList,
 } from "@/components/Popovers/PopoverField.tsx";
+import { VerticalFieldSelectWithController } from "@/components/Selects/exports/vertical-field-select.exports";
 import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem.tsx";
-import { VerticalFieldSelectWithController } from "@/components/Selects/VerticalFieldSelect.tsx";
-import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
+import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
   classCreationControllerPropsInvalid,
@@ -37,6 +37,7 @@ import {
   Activity,
   useCallback,
   useEffect,
+  useEffectEvent,
   useMemo,
   useRef,
   useState,
@@ -114,12 +115,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
   const cachedKeysRef = useRef<Record<string, unknown[]>>({});
   const selectedDiplomaRef = useRef<CommandItemType | null>(null);
 
-  /**
-   * Handle modal close behavior
-   *
-   * @description Detects when the modal closes and resets the students & primary teacher selections  from the cache
-   */
-  useEffect(() => {
+  const resetDialogCache = useEffectEvent(() => {
     const isModalOpen = openedDialogs.includes(pageId);
 
     if (isModalOpen) return;
@@ -143,6 +139,15 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
         queryClient,
       );
     }
+  });
+
+  /**
+   * Handle modal close behavior
+   *
+   * @description Detects when the modal closes and resets the students & primary teacher selections  from the cache
+   */
+  useEffect(() => {
+    resetDialogCache();
   }, [openedDialogs]);
 
   /**
@@ -175,7 +180,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
 
       openingCallback(open, metaData);
     },
-    [],
+    [openingCallback],
   );
 
   /**
@@ -228,7 +233,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     (__value: string, commandItem: CommandItemType) => {
       if (form.watch("degreeConfigId") !== commandItem.id) {
         selectedDiplomaRef.current = commandItem;
-        setIsSelectedDiploma(!!commandItem);
+        setIsSelectedDiploma(Boolean(commandItem));
         form.setValue("degreeConfigId", commandItem.id, {
           shouldValidate: true,
         });
@@ -236,7 +241,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
         form.setValue("tasksValues", [], { shouldValidate: true });
       }
     },
-    [],
+    [form],
   );
 
   /**
@@ -291,7 +296,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
         ...rest,
       });
     },
-    [],
+    [form, queryClient, newItemCallback],
   );
 
   const handleDeletingTask = (taskValue: string) => {
@@ -326,7 +331,6 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
       },
     ],
   };
-
   const sharedCallbacksMemo = useMemo(() => {
     const sharedCallbacks = {
       onOpenChange: handleOpening,

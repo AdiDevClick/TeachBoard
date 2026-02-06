@@ -1,11 +1,4 @@
-import withController from "@/components/HOCs/withController.tsx";
-import { withInlineItemAndSwitchSelection } from "@/components/HOCs/withInlineItemAndSwitchSelection.tsx";
-import withListMapper from "@/components/HOCs/withListMapper.tsx";
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem.tsx";
 import type {
-  ForControllerVerticalFieldSelectProps,
-  PropsWithListings,
   VerticalFieldState,
   VerticalRefSetters,
   VerticalSelectProps,
@@ -17,10 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  debugLogs,
-  listMapperContainsInvalid,
-} from "@/configs/app-components.config.ts";
 import { cn } from "@/utils/utils";
 import {
   useCallback,
@@ -28,7 +17,6 @@ import {
   useImperativeHandle,
   useRef,
   useState,
-  type ComponentType,
 } from "react";
 
 const emptyHandle: VerticalRefSetters = {
@@ -196,62 +184,4 @@ export function VerticalFieldSelect({
   );
 }
 
-function withListings<C extends object>(Wrapped: ComponentType<C>) {
-  return function Component(props: C & PropsWithListings<unknown>) {
-    if (listMapperContainsInvalid(props)) {
-      debugLogs("withListings for VerticalFieldSelect");
-      const { children, ...rest } = props;
-
-      return <Wrapped {...(rest as C)}>{children}</Wrapped>;
-    }
-    const { items, children, ...rest } = props;
-    return (
-      <Wrapped {...(rest as C)}>
-        <ListMapper items={items}>
-          <NonLabelledGroupItem />
-        </ListMapper>
-        {children}
-      </Wrapped>
-    );
-  };
-}
-
 export default VerticalFieldSelect;
-
-function forController<P>(WrapperComponent: ComponentType<P>) {
-  return function Component(props: P & ForControllerVerticalFieldSelectProps) {
-    const { field, fieldState, ...rest } = props;
-    const { onValueChange, ...restProps } = rest;
-
-    const handleValueChange = (value: string, ...args: unknown[]) => {
-      field.onChange(value);
-      onValueChange?.(value, ...args);
-    };
-
-    return (
-      <WrapperComponent
-        {...(restProps as P)}
-        value={field.value ?? ""}
-        onValueChange={handleValueChange}
-        aria-invalid={fieldState.invalid}
-      />
-    );
-  };
-}
-
-const VerticalFieldSelectForController = forController(VerticalFieldSelect);
-
-export const VerticalFieldSelectWithController = withController(
-  VerticalFieldSelectForController,
-);
-export const VerticalFieldSelectWithListings =
-  withListings(VerticalFieldSelect);
-
-export const VerticalFieldSelectWithControllerAndInlineSwitch = withController(
-  forController(
-    withInlineItemAndSwitchSelection(VerticalFieldSelectWithListings),
-  ),
-);
-export const VerticalFieldWithInlineSwitchList = withListMapper(
-  VerticalFieldSelectWithControllerAndInlineSwitch,
-);

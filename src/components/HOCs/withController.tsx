@@ -8,7 +8,6 @@ import type {
   AnyComponentLike,
   ComponentPropsOf,
 } from "@/utils/types/types.utils.ts";
-import type { ReactElement } from "react";
 import { Controller } from "react-hook-form";
 
 /**
@@ -30,13 +29,7 @@ import { Controller } from "react-hook-form";
  * />
  * ```
  */
-type WithControllerComponent<C extends AnyComponentLike> = (
-  props: WrapperPropsAny<C>,
-) => ReactElement | null;
-
-function withController<C extends AnyComponentLike>(
-  Wrapped: C,
-): WithControllerComponent<C> {
+function withController<C extends AnyComponentLike>(Wrapped: C) {
   return function Component(props: WrapperPropsAny<C>) {
     if (controllerPropsInvalid(props)) {
       debugLogs("withController");

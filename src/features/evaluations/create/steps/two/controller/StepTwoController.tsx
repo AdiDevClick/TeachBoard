@@ -2,7 +2,7 @@ import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import type { InlineItemAndSwitchSelectionPayload } from "@/components/HOCs/types/with-inline-item-and-switch.types.ts";
 import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
-import { VerticalFieldWithInlineSwitchList } from "@/components/Selects/VerticalFieldSelect.tsx";
+import { VerticalFieldWithInlineSwitchList } from "@/components/Selects/exports/vertical-field-select.exports";
 import type { StepTwoControllerProps } from "@/features/evaluations/create/steps/two/types/step-two.types.ts";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";

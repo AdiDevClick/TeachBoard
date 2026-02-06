@@ -3,7 +3,7 @@ import {
   PopoverFieldWithCommands,
   PopoverFieldWithControllerAndCommandsList,
 } from "@/components/Popovers/PopoverField.tsx";
-import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
+import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { HTTP_METHODS } from "@/configs/app.config.ts";
 import { switchFields } from "@/features/class-creation/components/DiplomaCreation/functions/diploma.functions.ts";

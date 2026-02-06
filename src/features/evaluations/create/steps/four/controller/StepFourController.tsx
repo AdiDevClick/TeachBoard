@@ -1,7 +1,7 @@
 import { summaryPageContent } from "@/assets/css/SummaryPage.module.scss";
 import { ListMapper } from "@/components/Lists/ListMapper";
 import { EvaluationSliderList } from "@/components/Sliders/EvaluationSlider";
-import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag";
+import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
 import { ControlledLabelledTextArea } from "@/components/TextAreas/LabelledTextArea";
 import {
   Accordion,
