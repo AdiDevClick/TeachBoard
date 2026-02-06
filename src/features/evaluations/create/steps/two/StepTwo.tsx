@@ -26,7 +26,7 @@ import { useForm, type FieldValues } from "react-hook-form";
  * @returns The Step Two component wrapped in a titled card.
  */
 export function StepTwo({
-  pageId = "attendance-record-creation",
+  pageId = "evaluation-attendance",
   modalMode = false,
   className = rightContent,
   inputControllers = attendanceRecordCreationBaseControllers,
