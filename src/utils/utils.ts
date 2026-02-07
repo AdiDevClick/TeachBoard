@@ -350,10 +350,7 @@ function isPropertyKey(
   return typeof key === "string" || typeof key === "symbol";
 }
 
-function hasRequiredKey(
-  props: Record<string, unknown>,
-  key: string | symbol,
-) {
+function hasRequiredKey(props: Record<string, unknown>, key: string | symbol) {
   return key in props || Object.hasOwn(props, key);
 }
 
