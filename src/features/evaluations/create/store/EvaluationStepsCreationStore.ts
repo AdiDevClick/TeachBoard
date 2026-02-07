@@ -22,6 +22,7 @@ import type {
   StudentWithPresence,
   SubskillSelectionType,
 } from "@/features/evaluations/create/store/types/steps-creation-store.types";
+import type { NonLabelledGroupItemProps } from "@/components/Selects/types/select.types";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { create } from "zustand";
@@ -541,7 +542,7 @@ export const useEvaluationStepsCreationStore = create(
            *
            * @returns Array of students with presence and task assignment details.
            */
-          getStudentsPresenceSelectionData() {
+          getStudentsPresenceSelectionData(): NonLabelledGroupItemProps[] {
             ensureCollections();
             const values = Array.from(get().students?.values() ?? []);
 
