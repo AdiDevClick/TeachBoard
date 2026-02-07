@@ -121,7 +121,7 @@ export type LabelledGroupProps<T = Record<string, unknown>> =
  * Props for the NonLabelledGroupItem component
  */
 export type NonLabelledGroupItemProps = Readonly<{
-  id?: UUID | string;
+  id: UUID | string;
   name: string;
 }>;
 

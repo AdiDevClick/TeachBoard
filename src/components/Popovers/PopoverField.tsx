@@ -1,6 +1,5 @@
 import { PopoverFieldProvider } from "@/api/providers/Popover.provider.tsx";
 import type {
-  ForControllerPopoverProps,
   PopoverFieldProps,
   PopoverFieldState,
 } from "@/components/Popovers/types/popover.types.ts";
@@ -13,14 +12,7 @@ import {
 } from "@/components/ui/popover.tsx";
 import { cn } from "@/utils/utils.ts";
 import { LucideChevronDown } from "lucide-react";
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useMemo,
-  useState,
-  type ComponentType,
-} from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 
 const defaultValue = new Set<string>();
 
@@ -182,23 +174,6 @@ export function PopoverField({
       </Popover>
     </div>
   );
-}
-
-/**
- * Higher-order component to pre-configure PopoverField for use with react-hook-form controllers.
- */
-export function ForController<P>(WrapperComponent: ComponentType<P>) {
-  return function Component(props: P & ForControllerPopoverProps) {
-    const { field, fieldState, ...rest } = props;
-
-    return (
-      <WrapperComponent
-        {...(rest as P)}
-        name={field.name}
-        aria-invalid={fieldState.invalid}
-      />
-    );
-  };
 }
 
 export default PopoverField;
