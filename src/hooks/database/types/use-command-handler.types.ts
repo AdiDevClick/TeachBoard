@@ -8,32 +8,32 @@ import type {
   DataReshapeFn,
 } from "@/types/AppInputControllerInterface";
 import type { MouseEvent, PointerEvent } from "react";
-import type { FieldValues, UseFormReturn } from "react-hook-form";
+import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
 import type { FormMethod } from "react-router-dom";
 
 type IsNever<T> = [T] extends [never] ? true : false;
 
 type InferServerDataFromRoute<TRoute> = TRoute extends {
-  dataReshape: (data: infer TData, ...args: infer _Args) => unknown;
+  dataReshape: (_data: infer TData, ..._args: infer _Args) => unknown;
 }
   ? TData
   : unknown;
 
 type InferViewDataFromRoute<TRoute> = TRoute extends {
-  dataReshape: (...args: infer _Args) => infer TView;
+  dataReshape: (..._args: infer _Args) => infer TView;
 }
   ? TView
   : unknown;
 
 type InferServerDataFromReshapeFn<TFn> = TFn extends (
-  data: infer TData,
-  ...args: infer _Args
+  _data: infer TData,
+  ..._args: infer _Args
 ) => unknown
   ? TData
   : unknown;
 
 type InferViewDataFromReshapeFn<TFn> = TFn extends (
-  ...args: infer _Args
+  ..._args: infer _Args
 ) => infer TView
   ? TView
   : unknown;
@@ -92,11 +92,13 @@ export type HandleAddNewItemParams = {
 /**
  * Parameters for the handleSelectionCallback function
  */
-export type HandleSelectionCallbackParams = {
+export type HandleSelectionCallbackParams<
+  TFieldValues extends FieldValues = FieldValues,
+> = {
   value: string;
   options: {
-    mainFormField?: string;
-    secondaryFormField?: string;
+    mainFormField: Path<TFieldValues>;
+    secondaryFormField?: Path<TFieldValues>;
     /**
      * Extra payload saved alongside the selected value.
      */
