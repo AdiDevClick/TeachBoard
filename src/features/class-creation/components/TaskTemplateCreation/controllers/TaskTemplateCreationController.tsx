@@ -2,7 +2,7 @@ import type {
   CommandItemType,
   HeadingType,
 } from "@/components/Command/types/command.types.ts";
-import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
 import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/exports/popover-field.exports";
 import { DynamicTags } from "@/components/Tags/DynamicTags";
 import type { DynamicTagItemDetails } from "@/components/Tags/types/tags.types";

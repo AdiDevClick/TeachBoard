@@ -1,5 +1,5 @@
-import type { InputItem } from "@/components/Inputs/types/inputs.types";
 import type { pwCreationSchema } from "@/models/password-creation.models.ts";
+import type { InputItem } from "@/types/AppInputControllerInterface";
 import type z from "zod";
 
 /**

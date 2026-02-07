@@ -2,7 +2,7 @@ import { summaryPageContent } from "@/assets/css/SummaryPage.module.scss";
 import { ListMapper } from "@/components/Lists/ListMapper";
 import { EvaluationSliderList } from "@/components/Sliders/EvaluationSlider";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
-import { ControlledLabelledTextArea } from "@/components/TextAreas/LabelledTextArea";
+import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/labelled-textarea";
 import {
   Accordion,
   AccordionContent,
@@ -17,7 +17,7 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@/components/ui/item";
-import { LabelledScoreInputList } from "@/features/evaluations/create/components/Score/LabelledScoreInput";
+import { LabelledScoreInputList } from "@/features/evaluations/create/components/Score/exports/labelled-score-input.exports";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
 import { useMemo, type ComponentProps } from "react";
 import { useShallow } from "zustand/shallow";

@@ -1,5 +1,5 @@
 import { useAuthMemoryStore } from "@/api/store/AuthMemoryStore";
-import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
 import { HeaderTitle } from "@/components/Titles/ModalTitle.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";

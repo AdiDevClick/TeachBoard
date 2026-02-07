@@ -12,7 +12,6 @@ import {
 import { taskTemplateCreationInputControllers } from "@/features/class-creation/index.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 
 /**
@@ -42,27 +41,24 @@ function TaskTemplateCreation({
   });
   const formId = pageId + "-form";
 
-  const commonProps = useMemo(
-    () => ({
-      pageId,
-      inputControllers,
-      formId,
-      modalMode,
-      className,
-      card: {
-        card: { className },
-        title: TASK_TEMPLATE_TITLE,
-        footer: {
-          ...TASK_TEMPLATE_FOOTER,
-          formState: form.formState,
-          formId,
-        },
+  const commonProps = {
+    pageId,
+    inputControllers,
+    formId,
+    modalMode,
+    className,
+    card: {
+      card: { className },
+      title: TASK_TEMPLATE_TITLE,
+      footer: {
+        ...TASK_TEMPLATE_FOOTER,
+        formState: form.formState,
+        formId,
       },
-      ...props,
-      form,
-    }),
-    [form.formState, props],
-  );
+    },
+    ...props,
+    form,
+  };
 
   return (
     <TaskTemplateCreationWithCard {...commonProps}>

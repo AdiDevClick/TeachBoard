@@ -1,7 +1,7 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { LoginButton } from "@/components/Buttons/LoginButton.tsx";
 import { AppFieldDescriptionWithLink } from "@/components/Fields/AppFieldDescriptionWithLink.tsx";
-import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Field, FieldGroup, FieldSeparator } from "@/components/ui/field.tsx";

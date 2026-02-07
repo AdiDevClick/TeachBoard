@@ -3,7 +3,7 @@ import type {
   DetailedCommandItem,
 } from "@/components/Command/types/command.types.ts";
 import { AvatarsWithLabelAndAddButtonList } from "@/components/Form/AvatarListWithLabelAndAddButton.tsx";
-import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
 import {
   PopoverFieldWithCommands,
   PopoverFieldWithControllerAndCommandsList,

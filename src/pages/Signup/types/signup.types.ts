@@ -1,6 +1,6 @@
-import type { InputItem } from "@/components/Inputs/types/inputs.types";
 import type { useSignupValidation } from "@/hooks/database/signup/email-validation/useSignupValidation.ts";
 import type { signupSchema } from "@/models/signup.models.ts";
+import type { InputItem } from "@/types/AppInputControllerInterface";
 import type z from "zod";
 
 export type SignupFormSchema = z.infer<typeof signupSchema>;

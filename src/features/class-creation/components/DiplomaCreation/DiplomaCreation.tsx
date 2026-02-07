@@ -8,7 +8,6 @@ import {
 import { diplomaCreationInputControllers } from "@/features/class-creation/index.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 
 const titleProps = {
@@ -48,26 +47,25 @@ function DiplomaCreation({
 
   const formId = pageId + "-form";
 
-  const commonProps = useMemo(() => {
-    return {
-      pageId,
-      modalMode,
-      formId,
-      className,
-      card: {
-        card: { className },
-        title: titleProps,
-        footer: {
-          ...footerProps,
-          formState: form.formState,
-          formId,
-        },
+  const commonProps = {
+    pageId,
+    modalMode,
+    formId,
+    className,
+    card: {
+      card: { className },
+      title: titleProps,
+      footer: {
+        ...footerProps,
+        formState: form.formState,
+        formId,
       },
-      inputControllers,
-      ...props,
-      form,
-    };
-  }, [form.formState, props]);
+    },
+    inputControllers,
+    ...props,
+    form,
+  };
+
   return (
     <DiplomaWithCard {...commonProps}>
       <DiplomaWithCard.Title />

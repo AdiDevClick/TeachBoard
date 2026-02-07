@@ -1,4 +1,4 @@
-import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
 import {
   DialogHeaderTitle,
   HeaderTitle,

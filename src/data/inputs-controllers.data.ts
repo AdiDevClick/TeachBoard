@@ -1,7 +1,7 @@
-import type { InputItem } from "@/components/Inputs/types/inputs.types";
 import type { RecoveryFormSchema } from "@/features/login/components/main/models/login.models";
 import type { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
 import type { Signup } from "@/pages/Signup/Signup.tsx";
+import type { InputItem } from "@/types/AppInputControllerInterface";
 
 /**
  * Input controllers for forms components.

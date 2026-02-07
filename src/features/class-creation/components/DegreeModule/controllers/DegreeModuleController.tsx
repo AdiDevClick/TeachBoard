@@ -1,5 +1,5 @@
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
-import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
 import { PopoverFieldWithCommands } from "@/components/Popovers/exports/popover-field.exports";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
