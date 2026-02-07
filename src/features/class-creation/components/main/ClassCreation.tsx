@@ -13,7 +13,6 @@ import {
   type ClassCreationFormSchema,
 } from "@/features/class-creation/index.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 
 /**
@@ -47,29 +46,27 @@ function ClassCreation({
   });
   const formId = pageId + "-form";
 
-  const commonProps = useMemo(
-    () => ({
-      pageId,
-      modalMode,
-      className,
-      formId,
-      card: {
-        card: { className },
-        title: TITLE_PROPS,
-        footer: {
-          ...FOOTER_PROPS,
-          formState: form.formState,
-          formId,
-        },
+  const commonProps = {
+    pageId,
+    modalMode,
+    className,
+    formId,
+    card: {
+      card: { className },
+      title: TITLE_PROPS,
+      footer: {
+        ...FOOTER_PROPS,
+        formState: form.formState,
+        formId,
       },
-      inputControllers,
-      ...props,
-      form,
-      submitRoute: API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
-      submitDataReshapeFn: API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
-    }),
-    [form.formState, props],
-  );
+    },
+    inputControllers,
+    ...props,
+    form,
+    submitRoute: API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
+    submitDataReshapeFn: API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
+  };
+
   return (
     <ClassCreationWithCard {...commonProps}>
       <ClassCreationWithCard.Title />
