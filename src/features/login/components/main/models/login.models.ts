@@ -1,6 +1,6 @@
-import type { InputItem } from "@/components/Inputs/types/inputs.types.ts";
 import { formsRegex } from "@/configs/formsRegex.config.ts";
 import type { pwRecoverySchema } from "@/models/pw-recovery.model.ts";
+import type { InputItem } from "@/types/AppInputControllerInterface";
 import z from "zod";
 
 /** Validation schema for the login form */

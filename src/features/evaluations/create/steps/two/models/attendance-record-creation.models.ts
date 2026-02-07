@@ -1,4 +1,4 @@
-import type { FetchingInputItem } from "@/components/Inputs/types/inputs.types.ts";
+import type { FetchingInputItem } from "@/types/AppInputControllerInterface";
 import z from "zod";
 
 const attendance = {

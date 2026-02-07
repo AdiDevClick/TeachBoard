@@ -2,10 +2,6 @@ import type {
   CommandSelectionItemProps,
   HeadingType,
 } from "@/components/Command/types/command.types.ts";
-import type {
-  ApiEndpointType,
-  DataReshapeFn,
-} from "@/components/Inputs/types/inputs.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
   debugLogs,
@@ -37,6 +33,10 @@ import type {
 } from "@/hooks/database/types/use-command-handler.types.ts";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import type { ApiError } from "@/types/AppErrorInterface";
+import type {
+  ApiEndpointType,
+  DataReshapeFn,
+} from "@/types/AppInputControllerInterface";
 import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useQueryClient } from "@tanstack/react-query";

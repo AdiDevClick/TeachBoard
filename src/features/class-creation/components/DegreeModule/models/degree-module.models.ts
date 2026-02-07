@@ -1,5 +1,5 @@
-import type { FetchingInputItem } from "@/components/Inputs/types/inputs.types.ts";
 import { formsRegex } from "@/configs/formsRegex.config.ts";
+import type { FetchingInputItem } from "@/types/AppInputControllerInterface";
 import z from "zod";
 
 const fieldData = {
@@ -54,10 +54,10 @@ const moduleCreationSchema = (data: typeof fieldData) => {
           .string()
           .regex(
             formsRegex.noSpecialCharsWithTwoCharMin,
-            data.arrayItemRegexMessage
+            data.arrayItemRegexMessage,
           )
           .trim()
-          .toUpperCase()
+          .toUpperCase(),
       )
       .min(data.minArrayLength, data.minArrayLengthMessage)
       .max(data.maxArrayLength, data.maxArrayLengthExceededMessage)

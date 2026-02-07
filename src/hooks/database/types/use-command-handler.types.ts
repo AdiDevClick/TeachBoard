@@ -1,12 +1,12 @@
 import type { UUID } from "@/api/types/openapi/common.types";
 import type { CommandSelectionItemProps } from "@/components/Command/types/command.types.ts";
-import type {
-  ApiEndpointType,
-  DataReshapeFn,
-} from "@/components/Inputs/types/inputs.types.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
+import type {
+  AppInputControllerMeta,
+  DataReshapeFn,
+} from "@/types/AppInputControllerInterface";
 import type { MouseEvent, PointerEvent } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 import type { FormMethod } from "react-router-dom";
@@ -51,11 +51,8 @@ export type InferViewData<TRoute, TSubmitReshapeFn> =
 /**
  * Shared metadata shape passed around by command controllers.
  */
-export type CommandHandlerMetaData = Record<string, unknown> & {
-  task?: AppModalNames;
-  apiEndpoint?: ApiEndpointType;
-  dataReshapeFn?: DataReshapeFn;
-};
+export type CommandHandlerMetaData = Record<string, unknown> &
+  AppInputControllerMeta;
 
 /**
  * Shared metadata shape with common field identifiers.

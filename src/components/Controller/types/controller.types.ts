@@ -1,4 +1,3 @@
-import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
 import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types.ts";
 import type {
   AnyComponentLike,

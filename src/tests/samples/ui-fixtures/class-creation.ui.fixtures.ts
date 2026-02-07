@@ -1,7 +1,3 @@
-import type {
-  ApiEndpointType,
-  DataReshapeFn,
-} from "@/components/Inputs/types/inputs.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { degreeModuleCreationInputControllers } from "@/features/class-creation/components/DegreeModule/forms/degree-module-inputs";
 import { diplomaCreationInputControllers } from "@/features/class-creation/components/DiplomaCreation/forms/diploma-creation-inputs";
@@ -33,6 +29,10 @@ import {
   taskTemplateFetch,
 } from "@/tests/samples/class-creation-sample-datas";
 import { stubFetchRoutes } from "@/tests/test-utils/vitest-browser.helpers";
+import type {
+  ApiEndpointType,
+  DataReshapeFn,
+} from "@/types/AppInputControllerInterface";
 
 type ControllerLike = {
   name?: string;

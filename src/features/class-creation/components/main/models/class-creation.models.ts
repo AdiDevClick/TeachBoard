@@ -1,5 +1,5 @@
-import type { FetchingInputItem } from "@/components/Inputs/types/inputs.types.ts";
 import { formsRegex } from "@/configs/formsRegex.config.ts";
+import type { FetchingInputItem } from "@/types/AppInputControllerInterface";
 import { z } from "zod";
 
 export type ClassCreationFormSchema = z.infer<typeof classCreationSchema>;
@@ -30,17 +30,17 @@ export const classCreationSchema = z.object({
     .nonempty("Une année scolaire est requise.")
     .refine(
       (value) => formsRegex.viewYearRange.test(value),
-      "Le format de l'année scolaire doit être AAAA - AAAA."
+      "Le format de l'année scolaire doit être AAAA - AAAA.",
     )
     .transform((value) =>
       value
         .split(" - ")
         .map((s) => s.trim())
-        .join("-")
+        .join("-"),
     )
     .refine(
       (value) => formsRegex.serverYearRange.test(value),
-      "Le format de l'année scolaire doit être AAAA-AAAA."
+      "Le format de l'année scolaire doit être AAAA-AAAA.",
     ),
   degreeConfigId: z
     .uuid("L'identifiant de configuration de diplôme doit être un UUID valide.")
@@ -55,9 +55,9 @@ export const classCreationSchema = z.object({
     .pipe(
       z
         .uuid(
-          "L'identifiant de l'enseignant principal doit être un UUID valide."
+          "L'identifiant de l'enseignant principal doit être un UUID valide.",
         )
-        .optional()
+        .optional(),
     ),
   tasks: z
     .array(z.uuid("L'identifiant de la tâche doit être un UUID valide."))

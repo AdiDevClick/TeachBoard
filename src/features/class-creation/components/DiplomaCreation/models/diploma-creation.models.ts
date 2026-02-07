@@ -1,6 +1,6 @@
-import type { FetchingInputItem } from "@/components/Inputs/types/inputs.types.ts";
 import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types.ts";
 import { formsRegex } from "@/configs/formsRegex.config.ts";
+import type { FetchingInputItem } from "@/types/AppInputControllerInterface";
 import z from "zod";
 
 const fieldData = {
