@@ -96,12 +96,12 @@ export type VerticalSelectProps = Omit<SelectRootProps, "onValueChange"> & {
   className?: string;
   side?: ComponentProps<typeof SelectContent>["side"];
   setRef?: (node?: Element | null, meta?: VerticalSelectMetaData) => void;
-  id?: UUID;
+  id?: UUID | string;
   /**
    * Allow value-change handlers that accept extra args.
    * The underlying Select will still call it with a single `value`.
    */
-  onValueChange?: (id: UUID, meta?: VerticalSelectMetaData) => void;
+  onValueChange?: (value: string, meta?: VerticalSelectMetaData) => void;
 } & PropsWithChildren;
 
 type LabelledGroupBaseProps<T> = {
@@ -131,7 +131,7 @@ export type LabelledGroupProps<T = Record<string, unknown>> =
  * Props for the NonLabelledGroupItem component
  */
 export type NonLabelledGroupItemProps = Readonly<{
-  id: UUID;
+  id?: UUID | string;
   name: string;
 }>;
 
