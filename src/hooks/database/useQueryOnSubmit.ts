@@ -52,7 +52,7 @@ const mutationOptions = <
         bodyVariables: variables,
         method,
         url,
-        abortController: abortController,
+        abortController,
         headers,
       };
       return onFetch<S, E>(fetchArgs);
@@ -146,16 +146,14 @@ export function useQueryOnSubmit<
 
         return await mutateAsync(variables);
       } catch (err) {
-        const caught = err as Error;
-        const message = caught.message;
-
-        if (message === "Request completed") {
-          const cause = caught.cause as FetchJSONSuccess<S> | undefined;
-          return cause?.success;
-        }
-
+        //   const caught = err as Error;
+        //   const message = caught.message;
+        //   if (message === "Request completed") {
+        //     const cause = caught.cause as FetchJSONSuccess<S> | undefined;
+        //     return cause?.success;
+        //   }
         if (DEV_MODE && !NO_QUERY_LOGS) {
-          console.debug("useQueryOnSubmit mutation rejected", err);
+          console.error("useQueryOnSubmit mutation rejected", err);
         }
 
         return err;
@@ -191,17 +189,19 @@ async function onFetch<
 }: FetchArgs): Promise<FetchJSONSuccess<TSuccess>> {
   const { bodyVariables, method, url, abortController, headers } = fetchArgs;
 
-  if (abortController?.signal.aborted) {
-    const reason = abortController.signal.reason;
+  try {
+    if (abortController?.signal.aborted) {
+      const reason = abortController.signal.reason;
 
-    if (reason) {
-      throw reason;
+      throw new Error("Request aborted", {
+        cause: {
+          status: 499,
+          error: "Client Closed Request",
+          message: reason ?? "The request was aborted by the client.",
+        },
+      });
     }
 
-    throw new Error("Request aborted");
-  }
-
-  try {
     const response = await fetchJSON<TSuccess, TError>(getUrl(url), {
       method: method,
       json: bodyVariables,
@@ -212,6 +212,7 @@ async function onFetch<
     if (!response.ok || response === undefined) {
       const status = response.status;
       const message = getErrorMessage(status, response, retry);
+
       throw new Error(message, {
         cause: { ...response },
       });
