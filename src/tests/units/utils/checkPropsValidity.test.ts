@@ -90,4 +90,31 @@ describe("checkPropsValidity / findMissingRequiredKeys behaviour", () => {
     };
     expect(checkPropsValidity(propsMissing, requires, forbidden)).toBe(true);
   });
+
+  it("Nested requirement fails when property is an array of objects", () => {
+    const props = {
+      items: [{ id: "1", name: "Alice" }],
+    } as unknown as Record<string, unknown>;
+
+    const nestedRequirement = [
+      { items: ["id", "name"] },
+    ] as unknown as string[];
+
+    const result = checkPropsValidity(props, nestedRequirement as any, []);
+
+    // Expect validation to fail (true) because nested requirement expects an object, not an array
+    expect(result).toBe(true);
+  });
+
+  it("Top-level items requirement passes when items is present", () => {
+    const props = {
+      items: [{ id: "1", name: "Alice" }],
+    } as unknown as Record<string, unknown>;
+
+    const topLevelRequirement = ["items"];
+
+    const result = checkPropsValidity(props, topLevelRequirement, []);
+
+    expect(result).toBe(false);
+  });
 });
