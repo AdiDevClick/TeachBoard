@@ -35,9 +35,28 @@ export function useMutationObserver({
   const hookId = useId();
 
   const [state, setState] = useState<State>({
-    observedRefs: observersRef.current.clone(),
+    observedRefs: new UniqueSet<string, StateData>(),
     observer: null!,
   });
+
+  /**
+   * Deletes the observer and reference for a given key.
+   *
+   * @param key - The key of the observed element to delete
+   */
+  const deleteRef = useCallback((key: string) => {
+    const obs = observersRef.current.get(key);
+
+    if (obs) {
+      obs.observer.disconnect();
+      observersRef.current.delete(key);
+    }
+
+    setState((prev) => ({
+      ...prev,
+      observedRefs: observersRef.current.clone(),
+    }));
+  }, []);
 
   /**
    * Automatically called when the setRef is set on an element as a ref.
@@ -133,25 +152,6 @@ export function useMutationObserver({
     },
     [callback, options, onNodeReady, generatedNodeId, hookId],
   );
-
-  /**
-   * Deletes the observer and reference for a given key.
-   *
-   * @param key - The key of the observed element to delete
-   */
-  const deleteRef = useCallback((key: string) => {
-    const obs = observersRef.current.get(key);
-
-    if (obs) {
-      obs.observer.disconnect();
-      observersRef.current.delete(key);
-    }
-
-    setState((prev) => ({
-      ...prev,
-      observedRefs: observersRef.current.clone(),
-    }));
-  }, []);
 
   /**
    * Clears all observers and references.
