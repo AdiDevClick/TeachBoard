@@ -1,7 +1,4 @@
 import { PopoverFieldProvider } from "@/api/providers/Popover.provider.tsx";
-import withComboBoxCommands from "@/components/HOCs/withComboBoxCommands";
-import withController from "@/components/HOCs/withController.tsx";
-import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import type {
   ForControllerPopoverProps,
   PopoverFieldProps,
@@ -68,11 +65,15 @@ export function PopoverField({
    * Reset selected value when resetKey changes
    */
   useEffect(() => {
-    if (resetKey !== undefined) {
+    function resetSelectedValue() {
       setState((prev) => ({
         ...prev,
         selectedValue: multiSelection ? defaultValue : undefined,
       }));
+    }
+
+    if (resetKey !== undefined) {
+      resetSelectedValue();
     }
   }, [resetKey, multiSelection]);
 
@@ -103,7 +104,7 @@ export function PopoverField({
    *
    * !! IMPORTANT !! This function is passed to the PopoverFieldProvider to be used in CommandItems.
    */
-  const setSelectedValueCallback = useCallback((nextValue: string) => {
+  const setSelectedValueCallback = (nextValue: string) => {
     if (multiSelection) {
       setState((prev) => {
         const newSet = new Set(prev.selectedValue);
@@ -118,7 +119,7 @@ export function PopoverField({
     }
 
     setState((prev) => ({ ...prev, selectedValue: nextValue, open: false }));
-  }, []);
+  };
 
   /**
    * Handle open state changes
@@ -154,6 +155,7 @@ export function PopoverField({
       <Popover open={state.open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <Button
+            type="button"
             id={id}
             variant="outline"
             role={role}
@@ -185,7 +187,7 @@ export function PopoverField({
 /**
  * Higher-order component to pre-configure PopoverField for use with react-hook-form controllers.
  */
-function forController<P>(WrapperComponent: ComponentType<P>) {
+export function ForController<P>(WrapperComponent: ComponentType<P>) {
   return function Component(props: P & ForControllerPopoverProps) {
     const { field, fieldState, ...rest } = props;
 
@@ -200,19 +202,3 @@ function forController<P>(WrapperComponent: ComponentType<P>) {
 }
 
 export default PopoverField;
-
-const PopoverFieldForController = forController(PopoverField);
-
-export const PopoverFieldWithController = withController(
-  PopoverFieldForController,
-);
-
-export const PopoverFieldWithCommands = withComboBoxCommands(PopoverField);
-
-export const PopoverFieldWithControlledCommands = withController(
-  forController(PopoverFieldWithCommands),
-);
-
-export const PopoverFieldWithControllerAndCommandsList = withListMapper(
-  PopoverFieldWithControlledCommands,
-);

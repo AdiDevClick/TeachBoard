@@ -8,7 +8,7 @@ import type {
 } from "@/components/Inputs/types/inputs.types.ts";
 import type { VerticalSelectProps } from "@/components/Selects/types/select.types.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
-import type { CommandHandlerMetaData } from "@/hooks/database/types/use-command-handler.types.ts";
+import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { FieldTypes } from "@/types/MainTypes";
 import type { BivariantCallback } from "@/utils/types/types.utils.ts";
 import type { ButtonProps } from "react-day-picker";
@@ -78,7 +78,4 @@ export type PopoverFieldState = {
 
 export type ForControllerPopoverProps = FieldTypes<FieldValues>;
 
-export type MetaDatasPopoverField = CommandHandlerMetaData & {
-  name?: string;
-  id?: string;
-};
+export type MetaDatasPopoverField = CommandHandlerFieldMeta;

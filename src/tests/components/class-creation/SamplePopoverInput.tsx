@@ -1,6 +1,6 @@
 import { useAppStore } from "@/api/store/AppStore";
 import type { CommandItemType } from "@/components/Command/types/command.types";
-import { PopoverFieldWithCommands } from "@/components/Popovers/PopoverField";
+import { PopoverFieldWithCommands } from "@/components/Popovers/exports/popover-field.exports";
 import type { AppModalNames } from "@/configs/app.config";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import { useForm } from "react-hook-form";
@@ -57,7 +57,7 @@ export function SamplePopoverInput({
     apiEndpoint:
       typeof controller.apiEndpoint === "function" && selectedDiploma?.id
         ? (controller.apiEndpoint as (id: string) => unknown)(
-            selectedDiploma.id
+            selectedDiploma.id,
           )
         : controller.apiEndpoint,
   };
