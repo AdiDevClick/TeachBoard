@@ -392,12 +392,7 @@ export function useCommandHandler<
     }
   }, [isLoaded, error, data, form, pageId]);
 
-  /**
-   * Effect to FETCH or SUBMIT data when fetchParams change
-   *
-   * @description Triggers when fetchParams are updated with {@link handleOpening}
-   */
-  useEffect(() => {
+  const triggerSubmit = useEffectEvent((fetchParams: FetchParams) => {
     if (isLoading || hasStartedCreation.current) return;
 
     if (postVariables.current) {
@@ -406,8 +401,7 @@ export function useCommandHandler<
       onSubmit(postVariables.current);
     } else {
       // FETCH only
-
-      const { shouldNotFetch, isInitialFetchParams } =
+      const { keys, shouldNotFetch, isInitialFetchParams } =
         resolvedReturnCases(fetchParams);
 
       if (shouldNotFetch || isInitialFetchParams) {
@@ -421,6 +415,15 @@ export function useCommandHandler<
         onSubmit();
       }
     }
+  });
+
+  /**
+   * Effect to FETCH or SUBMIT data when fetchParams change
+   *
+   * @description Triggers when fetchParams are updated with {@link handleOpening}
+   */
+  useEffect(() => {
+    triggerSubmit(fetchParams);
   }, [fetchParams]);
 
   return {
@@ -462,16 +465,19 @@ export function useCommandHandler<
  * @return An object containing flags for pure cache abort, whether to fetch, and if the fetchParams are in their initial state.
  */
 function resolvedReturnCases(fetchParams: FetchParams) {
-  const abortReason = fetchParams.abortController?.signal.reason;
+  const { contentId, url, abortController } = fetchParams;
+  const keys = [contentId, url];
+
+  const abortReason = abortController?.signal.reason;
   const isPureCacheAbort = abortReason?.includes(
     "Pure cache - No API fetch for this command",
   );
-  const keys = [fetchParams.contentId, fetchParams.url];
-  const shouldNotFetch = fetchParams.url === "none" || isPureCacheAbort;
+  const shouldNotFetch = url === "none" || isPureCacheAbort;
   const isInitialFetchParams = keys[1] === "" && keys[0] === "none";
 
   return {
     shouldNotFetch,
     isInitialFetchParams,
+    keys,
   };
 }
