@@ -1,3 +1,4 @@
+import type { UUID } from "@/api/types/openapi/common.types";
 import type { CommandSelectionItemProps } from "@/components/Command/types/command.types.ts";
 import type {
   ApiEndpointType,
@@ -54,6 +55,14 @@ export type CommandHandlerMetaData = Record<string, unknown> & {
   task?: AppModalNames;
   apiEndpoint?: ApiEndpointType;
   dataReshapeFn?: DataReshapeFn;
+};
+
+/**
+ * Shared metadata shape with common field identifiers.
+ */
+export type CommandHandlerFieldMeta = CommandHandlerMetaData & {
+  name?: string;
+  id?: UUID;
 };
 
 /**
