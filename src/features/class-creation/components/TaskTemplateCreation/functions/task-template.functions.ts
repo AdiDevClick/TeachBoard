@@ -3,19 +3,7 @@ import type {
   SkillsFormValues,
   SkillsViewDto,
 } from "@/api/types/routes/skills.types.ts";
-import type {
-  CommandItemType,
-  HeadingType,
-} from "@/components/Command/types/command.types.ts";
-import type { FetchSkillsDataParams } from "@/features/class-creation/components/TaskTemplateCreation/types/task-template-creation.types.ts";
-import type {
-  DiplomaTaskContext,
-  MutableRef,
-} from "@/features/class-creation/components/types/class-creation.types.ts";
-import {
-  createDisabledGroup,
-  handleDiplomaChange,
-} from "@/features/class-creation/index.ts";
+import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 
 /**
  * Create a new Map() of form values based on selected command item details
@@ -84,59 +72,4 @@ export function createTaskTemplateView(modules?: SkillsViewDto[]) {
       })),
     };
   });
-}
-
-/**
- * Fetch and reshape task data based on cached data and diploma information
- *
- * @param cachedData - The cached task template data
- * @param diplomaDatasParam - The diploma data parameter
- * @param currentDiplomaId - The current diploma ID
- * @param isDiplomaChanged - Flag indicating if the diploma has changed
- * @returns The reshaped task template data with disabled groups if applicable
- */
-export function fetchTasksData(
-  cachedData: HeadingType[],
-  diplomaDatas: DiplomaTaskContext,
-  currentDiplomaId: UUID,
-  isDiplomaChanged: ReturnType<typeof handleDiplomaChange>,
-  itemToDisplay: MutableRef<ReturnType<typeof createDisabledGroup>>,
-  activeDiplomaIdRef: MutableRef<UUID>,
-) {
-  if (!Array.isArray(cachedData)) return undefined;
-  let dataCopy = itemToDisplay.current;
-  let viewShouldBeUpdated = false;
-
-  if (dataCopy !== null) {
-    viewShouldBeUpdated =
-      dataCopy[0].items.length !== cachedData[0].items.length;
-  }
-
-  if (dataCopy === null || isDiplomaChanged || viewShouldBeUpdated) {
-    dataCopy = createDisabledGroup({
-      dataCopy,
-      cachedData,
-      diplomaDatas,
-      currentDiplomaId,
-      activeDiplomaIdRef,
-    });
-    itemToDisplay.current = dataCopy;
-  }
-  return dataCopy;
-}
-
-/**
- * Fetch and reshape skills data based on diploma information
- *
- * @param diploma - The diploma data containing skills
- * @param savedSkills - A ref object to store and retrieve cached skills view
- * @returns The cached or newly created skills view
- */
-export function fetchSkillsData(
-  diploma: FetchSkillsDataParams["diploma"],
-  savedSkills: FetchSkillsDataParams["savedSkills"],
-) {
-  if (!diploma) return undefined;
-  savedSkills.current ??= createTaskTemplateView(diploma.modules);
-  return savedSkills.current;
 }
