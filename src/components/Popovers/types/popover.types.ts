@@ -2,12 +2,7 @@ import type {
   CommandItemType,
   HeadingType,
 } from "@/components/Command/types/command.types.ts";
-import type {
-  ApiEndpointType,
-  DataReshapeFn,
-} from "@/components/Inputs/types/inputs.types.ts";
 import type { VerticalSelectProps } from "@/components/Selects/types/select.types.ts";
-import type { AppModalNames } from "@/configs/app.config.ts";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { FieldTypes } from "@/types/MainTypes";
 import type { BivariantCallback } from "@/utils/types/types.utils.ts";
@@ -20,12 +15,6 @@ export type PopoverBaseProps = Omit<
 > & {
   side?: "top" | "bottom" | "left" | "right";
   role?: ButtonProps["role"];
-  /** Optional API endpoint - reuse shared type from inputs */
-  apiEndpoint?: ApiEndpointType;
-  /** Optional data reshape function - reuse shared type from inputs */
-  dataReshapeFn?: DataReshapeFn;
-  /** Optional typed metadata passed when opening */
-  task?: AppModalNames;
   onOpenChange?: (open: boolean, meta?: MetaDatasPopoverField) => void;
   /** When this key changes, the selectedValue state will be reset */
   resetKey?: string | number;

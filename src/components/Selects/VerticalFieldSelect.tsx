@@ -1,3 +1,4 @@
+import { UUID_SCHEMA } from "@/api/types/openapi/common.types";
 import type {
   VerticalFieldState,
   VerticalRefSetters,
@@ -45,7 +46,6 @@ export function VerticalFieldSelect({
   ref,
   controllerRef,
   label,
-  // placeholder,
   fullWidth = true,
   className,
   side = "bottom",
@@ -70,6 +70,7 @@ export function VerticalFieldSelect({
   } = props;
 
   const id = useId();
+
   const [state, setState] = useState<VerticalFieldState>({});
   const lastSelectedValueRef = useRef<string>(null);
   const lastCommandValueRef = useRef<string>(null);
@@ -111,7 +112,6 @@ export function VerticalFieldSelect({
       }
 
       onOpenChange?.(open);
-      // }, []);
     },
     [containerId, selectRootProps, observedRefs, onOpenChange],
   );
@@ -138,12 +138,13 @@ export function VerticalFieldSelect({
       id={containerId}
       data-open={state.open}
       ref={(el) => {
+        const parsedId = UUID_SCHEMA.safeParse(containerId);
         setRef?.(el, {
           task,
           apiEndpoint,
           dataReshapeFn,
           name,
-          id: containerId,
+          id: parsedId.success ? parsedId.data : undefined,
         });
       }}
       className={cn("flex flex-col items-start gap-2", className)}

@@ -1,14 +1,10 @@
 import type { UUID } from "@/api/types/openapi/common.types";
-import type {
-  ApiEndpointType,
-  DataReshapeFn,
-} from "@/components/Inputs/types/inputs.types.ts";
 import type { SelectContent, SelectItem } from "@/components/ui/select.tsx";
-import type { AppModalNames } from "@/configs/app.config.ts";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types.ts";
+import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types";
+import type { AppInputControllerMeta } from "@/types/AppInputControllerInterface";
 import type { FieldTypes } from "@/types/MainTypes";
 import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
-import type { UniqueSet } from "@/utils/UniqueSet";
 import type {
   ComponentProps,
   Dispatch,
@@ -78,14 +74,7 @@ export type VerticalSelectMetaData = CommandHandlerFieldMeta &
 export type VerticalSelectProps = Omit<SelectRootProps, "onValueChange"> & {
   ref?: Ref<VerticalRefSetters>;
   controllerRef?: Ref<VerticalRefSetters>;
-  observedRefs?: UniqueSet<
-    string,
-    { element: Element; meta?: VerticalSelectMetaData }
-  >;
   controllerMeta?: ControllerMeta;
-  task?: AppModalNames;
-  dataReshapeFn?: DataReshapeFn;
-  apiEndpoint?: ApiEndpointType;
   label?: ReactNode;
   placeholder?: string;
   /** Forwarded to the SelectTrigger element */
@@ -95,14 +84,15 @@ export type VerticalSelectProps = Omit<SelectRootProps, "onValueChange"> & {
   fullWidth?: boolean;
   className?: string;
   side?: ComponentProps<typeof SelectContent>["side"];
-  setRef?: (node?: Element | null, meta?: VerticalSelectMetaData) => void;
   id?: UUID | string;
   /**
    * Allow value-change handlers that accept extra args.
    * The underlying Select will still call it with a single `value`.
    */
   onValueChange?: (value: string, meta?: VerticalSelectMetaData) => void;
-} & PropsWithChildren;
+} & AppInputControllerMeta &
+  UseMutationObserverReturn &
+  PropsWithChildren;
 
 type LabelledGroupBaseProps<T> = {
   readonly ["0"]: string;
