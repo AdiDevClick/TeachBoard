@@ -11,6 +11,12 @@ export default defineConfig([
   ...tseslint.configs.recommended,
   globalIgnores(["dist"]),
   {
+    files: ["**/*.{js,cjs,mjs}"],
+    rules: {
+      ...js.configs.recommended.rules,
+    },
+  },
+  {
     files: ["**/*.{ts,tsx}"],
     plugins: {
       "react-hooks": reactHooks,
@@ -25,9 +31,13 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      ...js.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
       ...reactRefresh.configs.vite.rules,
+      "no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+      "@typescript-eslint/no-unused-vars": "off",
       // Enforce 2 spaces indentation and forbid tabs
       indent: ["error", 2, { SwitchCase: 1 }],
       "no-tabs": "error",
