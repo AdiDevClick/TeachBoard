@@ -4,7 +4,7 @@ import {
   type FetchJSONError,
   type FetchJSONSuccess,
 } from "@/api/types/api.types";
-import { DEV_MODE } from "@/configs/app.config.ts";
+import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
 import type {
   FetchArgs,
   MutationVariables,
@@ -24,9 +24,9 @@ import { toast } from "sonner";
  */
 const mutationOptions = <
   S extends ResponseInterface<unknown>,
-  E extends ApiError
+  E extends ApiError,
 >(
-  queryKeysArr: QueryKeyDescriptor<S, E>
+  queryKeysArr: QueryKeyDescriptor<S, E>,
 ): UseMutationOptions<
   FetchJSONSuccess<S>,
   FetchJSONError<E>,
@@ -99,7 +99,7 @@ const mutationOptions = <
  */
 export function useQueryOnSubmit<
   S extends ResponseInterface<unknown>,
-  E extends ApiError
+  E extends ApiError,
 >(queryKeysArr: QueryKeyDescriptor<S, E>) {
   const { reset } = useQueryErrorResetBoundary();
   const abortControllerRef = useRef(new AbortController());
@@ -118,7 +118,7 @@ export function useQueryOnSubmit<
   // Memoize mutation options to prevent observer recreation on every render
   const options = useMemo(
     () => mutationOptions<S, E>(queryKeysArr),
-    [queryKeysArr]
+    [queryKeysArr],
   );
 
   const { mutateAsync, data, isPending, error } = useMutation(options);
@@ -135,13 +135,15 @@ export function useQueryOnSubmit<
       try {
         if (localState.error !== null)
           setLocalState({ success: null, error: null });
-        if (DEV_MODE) {
+
+        if (DEV_MODE && !NO_QUERY_LOGS) {
           console.debug("useQueryOnSubmit executing mutation", {
             key: queryKeysArr?.[0],
             url: queryKeysArr?.[1]?.url,
             method: queryKeysArr?.[1]?.method,
           });
         }
+
         return await mutateAsync(variables);
       } catch (err) {
         const caught = err as Error;
@@ -152,14 +154,14 @@ export function useQueryOnSubmit<
           return cause?.success;
         }
 
-        if (DEV_MODE) {
+        if (DEV_MODE && !NO_QUERY_LOGS) {
           console.debug("useQueryOnSubmit mutation rejected", err);
         }
 
         return err;
       }
     },
-    [mutateAsync, localState.error, queryKeysArr]
+    [mutateAsync, localState.error, queryKeysArr],
   );
 
   return {
@@ -181,7 +183,7 @@ export function useQueryOnSubmit<
  */
 async function onFetch<
   TSuccess extends ResponseInterface<unknown>,
-  TError extends ApiError
+  TError extends ApiError,
 >({
   timeout = 1000,
   retry = 3,
@@ -245,7 +247,7 @@ async function onFetch<
  */
 function onQuerySuccess<TSuccess extends ResponseInterface<unknown>>(
   response: FetchJSONSuccess<TSuccess>,
-  querySuccessDescription?: string
+  querySuccessDescription?: string,
 ) {
   const successMessage = response.success ?? undefined;
   toast(successMessage ?? "Success", {
@@ -278,7 +280,7 @@ function onQueryError<TError extends ApiError>(error: FetchJSONError<TError>) {
 function getUrl(url?: string): string {
   if (!url || url === null) {
     throw new Error(
-      "Missing url in query descriptor passed to useQueryOnSubmit."
+      "Missing url in query descriptor passed to useQueryOnSubmit.",
     );
   }
 
