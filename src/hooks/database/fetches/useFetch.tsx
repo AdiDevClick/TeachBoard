@@ -38,12 +38,12 @@ const defaultStateParameters: FetchParams = {
  * @description Cached data is stored using React Query under the keys `[contentId, url]`.
  * Data reshaping can be applied using a provided function before caching.
  *
- * @see {@link api.endpoints.config.ts} for predefined API endpoints and their configurations and how to use the reshaper.
+ * @see {@link API_ENDPOINTS} for predefined API endpoints and their configurations and how to use the reshaper.
  * @see {@link FetchParams} for the structure of fetch parameters.
  * @see {@link useQueryOnSubmit} for query handling on fetch submission.
  * @see {@link useAppStore} for accessing global app state like user activity and navigation.
  *
- * @remarks This hook handles user activity tracking and redirects to login on 403 errors.
+ * @remarks !! IMPORTANT !! This hook handles user activity tracking and redirects to login on 403 errors.
  *
  * @param fetchParams - The parameters for the fetch operation
  * @param setFetchParams - A function to set the fetch parameters
@@ -57,7 +57,7 @@ const defaultStateParameters: FetchParams = {
 export function useFetch<
   TServerData = Record<string, unknown>,
   E extends ApiError = ApiError,
-  TViewData = unknown
+  TViewData = unknown,
 >() {
   const [fetchParams, setFetchParams] = useState(defaultStateParameters);
   const [viewData, setViewData] = useState<TViewData | undefined>(undefined);
@@ -73,7 +73,6 @@ export function useFetch<
     ...params
   } = fetchParams;
 
-  // Note: cast to the appropriate QueryKeyDescriptor so generics flow into useQueryOnSubmit
   const queryParams = useQueryOnSubmit<ResponseInterface<TServerData>, E>([
     contentId,
     {
@@ -93,7 +92,7 @@ export function useFetch<
           ? fetchParams.dataReshapeFn(
               response.data,
               rawCachedDatas,
-              fetchParams.reshapeOptions
+              fetchParams.reshapeOptions,
             )
           : response.data;
 
@@ -106,7 +105,7 @@ export function useFetch<
             "rawCachedDatas:",
             rawCachedDatas,
             "reshapedResult:",
-            cachingDatas
+            cachingDatas,
           );
         }
         // Also expose reshaped data directly to consumers.
@@ -132,13 +131,14 @@ export function useFetch<
           [fetchParams.contentId, `${fetchParams.url}:meta`],
           {
             ...fetchParams,
-          }
+          },
         );
       },
       onError: (error) => {
         setLastUserActivity(contentId);
         errorCallback?.(error);
 
+        // !! IMPORTANT !! Handle forbidden error by navigating to login page
         navigateOnForbiddenError(error.status, navigate);
       },
     },
@@ -165,7 +165,7 @@ export function useFetch<
  */
 function navigateOnForbiddenError(
   status: number,
-  navigate: ReturnType<typeof useNavigate>
+  navigate: ReturnType<typeof useNavigate>,
 ) {
   if (status === 403) {
     navigate("/login", { replace: true });
