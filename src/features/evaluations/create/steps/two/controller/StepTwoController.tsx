@@ -1,11 +1,12 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
-import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import type { InlineItemAndSwitchSelectionPayload } from "@/components/HOCs/types/with-inline-item-and-switch.types.ts";
 import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
 import { VerticalFieldWithInlineSwitchList } from "@/components/Selects/exports/vertical-field-select.exports";
+import type { VerticalSelectMetaData } from "@/components/Selects/types/select.types.ts";
 import type { StepTwoControllerProps } from "@/features/evaluations/create/steps/two/types/step-two.types.ts";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
+import { preventDefaultAndStopPropagation } from "@/utils/utils";
 import { type MouseEvent } from "react";
 
 export function StepTwoController({
@@ -58,9 +59,11 @@ export function StepTwoController({
    * @param id - The value of the selected command item
    * @param studentData - The details of the selected student data
    */
-  const handleOnSelect = (taskId: UUID, studentData: CommandItemType) => {
-    setStudentTaskAssignment(taskId, studentData.id);
-    console.log("selected value :", taskId, studentData, students);
+  const handleOnSelect = (taskId: UUID, meta?: VerticalSelectMetaData) => {
+    const studentId = meta?.id;
+    if (!studentId) return;
+
+    setStudentTaskAssignment(taskId, studentId);
   };
 
   /**
@@ -75,9 +78,14 @@ export function StepTwoController({
     e: MouseEvent<HTMLButtonElement>,
     studentData: InlineItemAndSwitchSelectionPayload,
   ) => {
+    preventDefaultAndStopPropagation(e);
     setStudentPresence(studentData.id, studentData.isSelected);
-    console.log("selected switch :", e, studentData, students);
   };
+
+  // Avoid passing a raw `id: string | undefined` from controllers because the
+  // select component expects a branded `UUID` type; exclude `id` when spreading.
+  const firstInputController = inputControllers[0];
+  const { id, ...firstInputControllerProps } = firstInputController ?? {};
 
   return (
     <form id={formId} className={className}>
