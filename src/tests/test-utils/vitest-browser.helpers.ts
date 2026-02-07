@@ -907,7 +907,7 @@ export async function openPopoverByLabelText(
   const labelElement = findLabelElementScoped(label, opts?.withinDialog);
   if (!labelElement) throw new TypeError(`Popover label not found: ${label}`);
   const trigger = getTriggerFromLabelElement(labelElement, label);
-  await openPopover(trigger);
+  await openPopover(trigger, opts?.timeout ?? 500);
 
   // If no items to select, we're done.
   if (!opts?.items) return;
@@ -1005,6 +1005,7 @@ export async function openPopoverByContainerId(containerId: string) {
 
 async function openPopover(
   trigger: Parameters<typeof userEvent.click>[0] | null,
+  timeout = 500,
 ) {
   // If it's already open (e.g. dialog opened on top), close first so we can
   // re-open and force a re-render with updated cached data.
@@ -1013,7 +1014,7 @@ async function openPopover(
   if (!trigger) throw new TypeError("Popover trigger not found");
 
   await userEvent.click(trigger);
-  await waitForPopoverState(true, 500);
+  await waitForPopoverState(true, timeout);
 
   // In tests, cmdk's input value can persist across open/close cycles and
   // filter out all items in the next popover. Also, cmdk content may mount a
