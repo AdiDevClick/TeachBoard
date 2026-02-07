@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/popover.tsx";
 import { cn } from "@/utils/utils.ts";
 import { LucideChevronDown } from "lucide-react";
-import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 
 const defaultValue = new Set<string>();
 
@@ -120,13 +120,10 @@ export function PopoverField({
    *
    * @param isOpen - Whether the popover is open or not
    */
-  const handleOpenChange = useCallback(
-    (isOpen: boolean) => {
-      setState((prev) => ({ ...prev, open: isOpen }));
-      onOpenChange?.(isOpen, memoizedMeta);
-    },
-    [onOpenChange, memoizedMeta],
-  );
+  const handleOpenChange = (isOpen: boolean) => {
+    setState((prev) => ({ ...prev, open: isOpen }));
+    onOpenChange?.(isOpen, memoizedMeta);
+  };
 
   const selectValue = props.multiSelection
     ? placeholder
