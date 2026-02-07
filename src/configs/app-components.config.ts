@@ -9,6 +9,7 @@ import type {
   EvaluationRadioItemDescriptionProps,
   EvaluationRadioItemProps,
 } from "@/components/Radio/types/radio.types.ts";
+import type { NonLabelledGroupItemProps } from "@/components/Selects/types/select.types";
 import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
 import type {
   LabelledTextAreaForControllerProps,
@@ -330,13 +331,34 @@ export const evaluationSliderPropsValid = (props: EvaluationSliderProps) =>
 //                    ------------
 
 /**
+ * Validation requirements for the VerticalField's helper WithListings
+ */
+const WITH_LISTINGS_REQUIRES = ["items"];
+
+export const withListingsPropsInvalid = (props: AnyObjectProps) =>
+  checkPropsValidity(props, WITH_LISTINGS_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for NonLabelledGroupItem.
+ */
+const NON_LABELLED_GROUP_ITEM_REQUIRES = ["id", "name"];
+
+export const nonLabelledGroupItemPropsInvalid = (
+  props: NonLabelledGroupItemProps,
+) => checkPropsValidity(props, NON_LABELLED_GROUP_ITEM_REQUIRES, []);
+
+//                    ------------
+
+/**
  * Logs debug information for a component when in development mode.
  *
  * @param componentName - The name of the component for logging purposes.
  */
 export function debugLogs(componentName: string, details?: unknown) {
   if (DEV_MODE && !NO_COMPONENT_WARNING_LOGS) {
-    console.debug(
+    console.error(
       `[${componentName}] - Invalid props detected. Please check the component configuration.`,
       details,
     );
