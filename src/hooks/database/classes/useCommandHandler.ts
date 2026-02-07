@@ -37,14 +37,13 @@ import type {
   ApiEndpointType,
   DataReshapeFn,
 } from "@/types/AppInputControllerInterface";
-import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   startTransition,
   useCallback,
   useEffect,
-  useMemo,
+  useEffectEvent,
   useRef,
 } from "react";
 import type {
@@ -97,13 +96,6 @@ export function useCommandHandler<
   const hasStartedCreation = useRef(false);
   const postVariables = useRef<MutationVariables>(null);
 
-  const currentQueryCacheAndKey = useMemo(() => {
-    const key = [fetchParams.contentId, fetchParams.url];
-    return {
-      cacheKey: key,
-    };
-  }, [fetchParams]);
-
   /**
    * Handle adding a new item/feature
    *
@@ -112,23 +104,20 @@ export function useCommandHandler<
    * @param e - The event that triggered the addition
    * @param rest - Additional parameters for the new item to pass to the dialog as options
    */
-  const handleAddNewItem = useCallback(
-    ({ e, ...rest }: HandleAddNewItemParams) => {
-      if (DEV_MODE && !NO_CACHE_LOGS) {
-        console.log("Add new item triggered", {
-          ...rest,
-        });
-      }
-
-      const task = rest.task ?? pageId;
-
-      openDialog(e, task, {
+  const handleAddNewItem = ({ e, ...rest }: HandleAddNewItemParams) => {
+    if (DEV_MODE && !NO_CACHE_LOGS) {
+      console.log("Add new item triggered", {
         ...rest,
-        queryKey: [task, rest.apiEndpoint],
       });
-    },
-    [],
-  );
+    }
+
+    const task = rest.task ?? pageId;
+
+    openDialog(e, task, {
+      ...rest,
+      queryKey: [task, rest.apiEndpoint],
+    });
+  };
 
   /**
    * Handle form submission
@@ -182,12 +171,12 @@ export function useCommandHandler<
 
     setFetchParams((prev) => ({
       ...prev,
-      url: typeof endpointUrlFinal === "string" ? endpointUrlFinal : prev.url,
+      url: endpointUrlFinal ?? "none",
       cachedFetchKey: options?.queryKey,
       method: API_ENDPOINTS.POST.METHOD,
-      contentId: pageId as FetchParams["contentId"],
-      // contentId: options?.task ?? pageId,
+      contentId: pageId,
       dataReshapeFn: reshapeFn,
+      abortController: new AbortController(),
       ...rest,
     }));
   }
@@ -225,51 +214,54 @@ export function useCommandHandler<
    * @param open - Whether the select is opening
    * @param metaData - The meta data from the popover field that was opened
    */
-  const handleOpening = useCallback(
-    (
-      open: boolean,
-      metaData?: HandleOpeningCallbackParams<TMeta>["metaData"],
-    ) => {
-      if (!open) return;
+  const handleOpening = (
+    open: boolean,
+    metaData?: HandleOpeningCallbackParams<TMeta>["metaData"],
+  ) => {
+    if (!open) return;
 
-      const task = metaData?.task as FetchParams["contentId"];
-      const apiEndpoint = metaData?.apiEndpoint;
-      const dataReshapeFn = metaData?.dataReshapeFn;
-      const silent = metaData?.silent;
+    const task = metaData?.task as FetchParams["contentId"];
+    const apiEndpoint = metaData?.apiEndpoint ?? "none";
+    const dataReshapeFn = metaData?.dataReshapeFn;
+    let silent = metaData?.silent;
+    const controller = new AbortController();
+    // Fail fast when a command/modal expects an endpoint but none is provided.
+    // This catches regressions where inputControllers drift from API_ENDPOINTS.
+    if (fetchParamsPropsInvalid<TMeta>(metaData)) {
+      const message = `[useCommandHandler] Missing fetchParams for task "${String(
+        task,
+      )}". Ensure the related input controller is wired to API_ENDPOINTS.*.endPoint(s).`;
 
-      // Fail fast when a command/modal expects an endpoint but none is provided.
-      // This catches regressions where inputControllers drift from API_ENDPOINTS.
-      if (fetchParamsPropsInvalid<TMeta>(metaData)) {
-        const message = `[useCommandHandler] Missing fetchParams for task "${String(
-          task,
-        )}". Ensure the related input controller is wired to API_ENDPOINTS.*.endPoint(s).`;
+      debugLogs(message);
+      throw new Error(message);
+    }
+    // Ensure apiEndpoint is present and correspond to a known input
+    // const found = inputControllers.find(
+    //   (input: (typeof inputControllers)[number]) =>
+    //     input.task === task && input.apiEndpoint === apiEndpoint
+    // );
+    // if (!found) return;
 
-        debugLogs(message);
-        throw new Error(message);
-      }
-      // Ensure apiEndpoint is present and correspond to a known input
-      // const found = inputControllers.find(
-      //   (input: (typeof inputControllers)[number]) =>
-      //     input.task === task && input.apiEndpoint === apiEndpoint
-      // );
-      // if (!found) return;
+    if (DEV_MODE && !NO_CACHE_LOGS) {
+      console.debug("handleOpening callback in CommandHandler", metaData);
+    }
 
-      if (DEV_MODE && !NO_CACHE_LOGS) {
-        console.debug("handleOpening callback in CommandHandler", metaData);
-      }
+    if (apiEndpoint === "none") {
+      controller.abort("Pure cache - No API fetch for this command");
+      silent = true;
+    }
 
-      setFetchParams(
-        (prev): FetchParams => ({
-          ...prev,
-          dataReshapeFn: dataReshapeFn ?? prev.dataReshapeFn,
-          url: (apiEndpoint ?? prev.url) as string,
-          contentId: task ?? prev.contentId,
-          silent,
-        }),
-      );
-    },
-    [],
-  );
+    setFetchParams((prev): FetchParams => {
+      return {
+        ...prev,
+        dataReshapeFn: dataReshapeFn ?? prev.dataReshapeFn,
+        url: String(apiEndpoint),
+        contentId: task,
+        abortController: controller,
+        silent,
+      };
+    });
+  };
 
   /**
    * Handle selection from command list
@@ -286,54 +278,53 @@ export function useCommandHandler<
    * @param value - Selected value
    * @param options - Options containing form field names and detailed command item
    */
-  const handleSelection = useCallback(
-    (
-      value: HandleSelectionCallbackParams["value"],
-      options: HandleSelectionCallbackParams["options"],
-    ) => {
-      const mainFormField = options.mainFormField as Path<TFieldValues>;
-      const secondaryFormField =
-        options.secondaryFormField as Path<TFieldValues>;
-      const detailedCommandItem = options.detailedCommandItem;
-      const isSelected = detailedCommandItem?.isSelected;
-      const validationMode = options.validationMode ?? "array";
+  const handleSelection = (
+    value: HandleSelectionCallbackParams<TFieldValues>["value"],
+    options: HandleSelectionCallbackParams<TFieldValues>["options"],
+  ) => {
+    const {
+      mainFormField,
+      secondaryFormField,
+      detailedCommandItem,
+      validationMode = "array",
+    } = options;
 
-      if (DEV_MODE && !NO_CACHE_LOGS) {
-        console.debug("Command selected:", {
-          mainFormField,
-          secondaryFormField,
-          value,
-          detailedCommandItem,
-        });
-      }
+    const isSelected = detailedCommandItem?.isSelected;
 
-      // Use secondaryFormField if provided (this is the detailed data one), otherwise fallback to mainFormField
-      const retrievedFormField = new UniqueSet<
-        string,
-        CommandSelectionItemProps["command"]
-      >(null, form.getValues(secondaryFormField ?? mainFormField) || []);
-
-      if (retrievedFormField.has(value) || isSelected === false) {
-        retrievedFormField.delete(value);
-      } else {
-        if (validationMode === "single") {
-          retrievedFormField.clear();
-        }
-        retrievedFormField.set(value, detailedCommandItem);
-      }
-
-      const values = retrieveValuesByMode(validationMode, retrievedFormField);
-
-      setValuesAfterAnimation(
+    if (DEV_MODE && !NO_CACHE_LOGS) {
+      console.debug("Command selected:", {
         mainFormField,
         secondaryFormField,
-        retrievedFormField,
-        values as PathValue<TFieldValues, Path<TFieldValues>>,
-        form,
-      );
-    },
-    [],
-  );
+        value,
+        detailedCommandItem,
+      });
+    }
+
+    // Use secondaryFormField if provided (this is the detailed data one), otherwise fallback to mainFormField
+    const retrievedFormField = new UniqueSet<
+      string,
+      CommandSelectionItemProps["command"]
+    >(null, form.getValues(secondaryFormField ?? mainFormField) || []);
+
+    if (retrievedFormField.has(value) || isSelected === false) {
+      retrievedFormField.delete(value);
+    } else {
+      if (validationMode === "single") {
+        retrievedFormField.clear();
+      }
+      retrievedFormField.set(value, detailedCommandItem);
+    }
+
+    const values = retrieveValuesByMode(validationMode, retrievedFormField);
+
+    setValuesAfterAnimation(
+      mainFormField,
+      secondaryFormField as Path<TFieldValues>,
+      retrievedFormField,
+      values as PathValue<TFieldValues, Path<TFieldValues>>,
+      form,
+    );
+  };
 
   /**
    * Handle data cache update
@@ -354,22 +345,25 @@ export function useCommandHandler<
      />
     * ```
    */
-  const handleDataCacheUpdate = useCallback((): HeadingType[] | undefined => {
-    const cachedData = queryClient.getQueryData<HeadingType[]>(
-      currentQueryCacheAndKey.cacheKey,
-    );
+  const handleDataCacheUpdate = useCallback(() => {
+    const cacheKey = fetchParams.cachedFetchKey ?? [
+      fetchParams.contentId,
+      fetchParams.url,
+    ];
+    const cachedData = queryClient.getQueryData<HeadingType[]>(cacheKey);
 
     if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log(
-        "Cached data for ",
-        currentQueryCacheAndKey.cacheKey,
-        " is ",
-        cachedData,
-      );
+      console.log("Cached data for ", cacheKey, " is ", cachedData);
     }
 
-    return (cachedData ?? data) as HeadingType[] | undefined;
-  }, [currentQueryCacheAndKey.cacheKey, queryClient, data]);
+    return cachedData ?? data;
+  }, [queryClient, data, fetchParams]);
+
+  const afterAnimationClose = useEffectEvent(() => {
+    startTransition(async () => {
+      closeDialog(null, pageId);
+    });
+  });
 
   /**
    * Handle form results
@@ -393,12 +387,10 @@ export function useCommandHandler<
         // which causes "Cannot update a component while rendering" warnings.
         // For navigation flows (like login), the form will be unmounted anyway.
         // For dialog flows, the dialog closing will handle the form state.
-        startTransition(async () => {
-          closeDialog(null, pageId);
-        });
+        afterAnimationClose();
       }
     }
-  }, [isLoaded, error, data, form]);
+  }, [isLoaded, error, data, form, pageId]);
 
   /**
    * Effect to FETCH or SUBMIT data when fetchParams change
@@ -414,10 +406,13 @@ export function useCommandHandler<
       onSubmit(postVariables.current);
     } else {
       // FETCH only
-      const keys = [fetchParams.contentId, fetchParams.url];
 
-      // Avoid FetchParams initial state fetch
-      if (keys[1] === "" && keys[0] === "none") return;
+      const { shouldNotFetch, isInitialFetchParams } =
+        resolvedReturnCases(fetchParams);
+
+      if (shouldNotFetch || isInitialFetchParams) {
+        return;
+      }
 
       const cachedData = queryClient.getQueryData(keys);
 
@@ -434,7 +429,7 @@ export function useCommandHandler<
     data,
 
     // Raw server response and payload (typed per `route` when provided)
-    response: response as ResponseInterface<TServerData> | undefined,
+    response,
     serverData,
     isLoading,
     error,
@@ -454,5 +449,29 @@ export function useCommandHandler<
     invalidSubmitCallback: handleInvalidSubmit,
     openedDialogs,
     setDialogOptions,
+  };
+}
+
+/**
+ * Handle return cases for data fetching based on fetchParams
+ *
+ * @description This allows to centralize some return cases
+ *
+ * @param fetchParams - The parameters for the fetch operation, including URL, contentId, and abortController.
+ *
+ * @return An object containing flags for pure cache abort, whether to fetch, and if the fetchParams are in their initial state.
+ */
+function resolvedReturnCases(fetchParams: FetchParams) {
+  const abortReason = fetchParams.abortController?.signal.reason;
+  const isPureCacheAbort = abortReason?.includes(
+    "Pure cache - No API fetch for this command",
+  );
+  const keys = [fetchParams.contentId, fetchParams.url];
+  const shouldNotFetch = fetchParams.url === "none" || isPureCacheAbort;
+  const isInitialFetchParams = keys[1] === "" && keys[0] === "none";
+
+  return {
+    shouldNotFetch,
+    isInitialFetchParams,
   };
 }
