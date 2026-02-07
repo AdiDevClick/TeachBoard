@@ -4,13 +4,12 @@ import type {
 } from "@/components/Command/types/command.types.ts";
 import { AvatarsWithLabelAndAddButtonList } from "@/components/Form/AvatarListWithLabelAndAddButton.tsx";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import {
   PopoverFieldWithCommands,
   PopoverFieldWithControllerAndCommandsList,
 } from "@/components/Popovers/exports/popover-field.exports";
 import { VerticalFieldSelectWithController } from "@/components/Selects/exports/vertical-field-select.exports";
-import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem.tsx";
+import { NonLabelledGroupItemList } from "@/components/Selects/non-labelled-item/exports/non-labelled-item-exports";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
@@ -399,9 +398,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
         label="Année scolaire"
         id={`${pageId}-schoolYear`}
       >
-        <ListMapper items={years}>
-          <NonLabelledGroupItem />
-        </ListMapper>
+        <NonLabelledGroupItemList items={years} />
       </VerticalFieldSelectWithController>
     </form>
   );
