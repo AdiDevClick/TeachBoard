@@ -171,10 +171,10 @@ export function useCommandHandler<
 
     setFetchParams((prev) => ({
       ...prev,
-      url: endpointUrlFinal ?? "none",
+      url: String(endpointUrlFinal ?? "none"),
       cachedFetchKey: options?.queryKey,
       method: API_ENDPOINTS.POST.METHOD,
-      contentId: pageId,
+      contentId: pageId as FetchParams["contentId"],
       dataReshapeFn: reshapeFn,
       abortController: new AbortController(),
       ...rest,
