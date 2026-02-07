@@ -131,11 +131,10 @@ export function StepThree({
     );
 
     setLeftContent(leftContent);
+  });
 
-    // Cleanup function to reset left content when a step changed
-    return () => {
-      setLeftContent(null!);
-    };
+  const onReturn = useEffectEvent(() => {
+    setLeftContent(null!);
   });
 
   /**
@@ -145,6 +144,8 @@ export function StepThree({
    */
   useEffect(() => {
     isModuleClickedTrigger();
+
+    return () => onReturn();
   }, [isModuleClicked]);
 
   return (
