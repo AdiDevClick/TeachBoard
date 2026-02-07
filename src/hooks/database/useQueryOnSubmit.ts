@@ -146,12 +146,6 @@ export function useQueryOnSubmit<
 
         return await mutateAsync(variables);
       } catch (err) {
-        //   const caught = err as Error;
-        //   const message = caught.message;
-        //   if (message === "Request completed") {
-        //     const cause = caught.cause as FetchJSONSuccess<S> | undefined;
-        //     return cause?.success;
-        //   }
         if (DEV_MODE && !NO_QUERY_LOGS) {
           console.error("useQueryOnSubmit mutation rejected", err);
         }
@@ -267,9 +261,6 @@ function onQuerySuccess<TSuccess extends ResponseInterface<unknown>>(
  */
 function onQueryError<TError extends ApiError>(error: FetchJSONError<TError>) {
   toast.error(error.message ?? error.error);
-  // toast.error(error.error ?? error.message, {
-  //   style: { zIndex: 10000 + 1 },
-  // });
 }
 
 /**
