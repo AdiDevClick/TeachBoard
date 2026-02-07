@@ -93,13 +93,6 @@ export function TaskTemplateCreationController({
    * @param keys - The query keys used to retrieve cached data
    * @returns The reshaped cached data or the original data if not found
    */
-  const isHeadingList = (value: unknown): value is HeadingType[] =>
-    Array.isArray(value);
-
-  const resolveCachedOrData = (cachedData: HeadingType[] | undefined) => {
-    if (cachedData !== undefined) return cachedData;
-    return isHeadingList(data) ? data : undefined;
-  };
 
   const resultsCallback = (keys: string[]): HeadingType[] | undefined => {
     const cachedData = queryClient.getQueryData<HeadingType[]>(keys ?? []);
@@ -110,16 +103,14 @@ export function TaskTemplateCreationController({
     }
 
     const currentDiplomaId = diplomaDatas.diploma?.id;
-    const resolvedData = resolveCachedOrData(cachedData);
-
-    if (!openedDialogs.includes(pageId) || !currentDiplomaId) {
-      return resolvedData;
-    }
+    const resolvedData = resolveCachedOrData(cachedData, data);
 
     const isFetchedSkills = keys[0] === "new-task-module";
     const isFetchedTasks = keys[0] === "new-task-item";
 
-    if (cachedData === undefined && !isFetchedSkills) {
+    const isFreshData = cachedData === undefined && !isFetchedSkills;
+
+    if (!openedDialogs.includes(pageId) || !currentDiplomaId || isFreshData) {
       return resolvedData;
     }
 
@@ -245,3 +236,14 @@ export function TaskTemplateCreationController({
     </form>
   );
 }
+
+const isHeadingList = (value: unknown): value is HeadingType[] =>
+  Array.isArray(value);
+
+const resolveCachedOrData = (
+  cachedData: HeadingType[] | undefined,
+  data: unknown,
+) => {
+  if (cachedData !== undefined) return cachedData;
+  return isHeadingList(data) ? data : undefined;
+};
