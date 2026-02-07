@@ -1,5 +1,5 @@
 import type { UUID } from "@/api/types/openapi/common.types";
-import type { ControlledLabelledInput } from "@/components/Inputs/LaballedInputForController";
+import type { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input";
 import type { ComponentProps } from "react";
 
 type ScoreItem = {
