@@ -24,7 +24,7 @@ type MetaType = Record<string, unknown>;
 
 export type SetRefFunction = (node?: Element | null, meta?: MetaType) => void;
 
-type ObserverRef = UniqueSet<string, StateData>;
+export type ObserverRef = UniqueSet<string, StateData>;
 
 export type UseMutationObserverReturn = {
   setRef?: SetRefFunction;
