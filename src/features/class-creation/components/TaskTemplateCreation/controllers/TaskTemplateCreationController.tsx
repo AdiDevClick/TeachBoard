@@ -1,26 +1,20 @@
-import type { UUID } from "@/api/types/openapi/common.types.ts";
-
 import type {
   CommandItemType,
   HeadingType,
 } from "@/components/Command/types/command.types.ts";
 import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
-import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/PopoverField.tsx";
-import { DynamicTags } from "@/components/Tags/DynamicTag.tsx";
+import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/exports/popover-field.exports";
+import { DynamicTags } from "@/components/Tags/DynamicTags";
+import type { DynamicTagItemDetails } from "@/components/Tags/types/tags.types";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
   commandSelectionDoesNotContainId,
   debugLogs,
 } from "@/configs/app-components.config.ts";
 import { DEV_MODE, HTTP_METHODS, NO_CACHE_LOGS } from "@/configs/app.config.ts";
-import {
-  createDisabledGroup,
-  handleDiplomaChange,
-} from "@/features/class-creation/components/main/functions/class-creation.functions.ts";
+import { createDisabledGroup } from "@/features/class-creation/components/main/functions/class-creation.functions.ts";
 import {
   createTaskTemplateView,
-  fetchSkillsData,
-  fetchTasksData,
   updateValues,
 } from "@/features/class-creation/components/TaskTemplateCreation/functions/task-template.functions.ts";
 import type { TaskTemplateCreationFormSchema } from "@/features/class-creation/components/TaskTemplateCreation/models/class-task-template.models";
@@ -32,7 +26,7 @@ import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo, useRef } from "react";
+import { useMemo } from "react";
 
 /**
  * Controller component for creating task templates.
@@ -69,19 +63,18 @@ export function TaskTemplateCreationController({
     submitDataReshapeFn,
   });
   const queryClient = useQueryClient();
-  const savedSkills = useRef<ReturnType<typeof createTaskTemplateView>>(null!);
   const dialogData = dialogOptions(pageId) as
     | TaskTemplateCreationDialogOptions
     | undefined;
 
   const diplomaDatas = useMemo(() => {
     const selectedDiploma = dialogData?.selectedDiploma ?? null;
-    const newTagSet = new UniqueSet();
+    const newTagSet = new UniqueSet<string, DynamicTagItemDetails>();
 
     const diplomaTag = selectedDiploma
       ? `${selectedDiploma?.degreeField} - ${selectedDiploma?.degreeLevel} ${selectedDiploma?.degreeYear}`
       : "Aucun diplôme sélectionné";
-    newTagSet.set(diplomaTag, []);
+    newTagSet.set(diplomaTag, { id: diplomaTag });
 
     if (DEV_MODE && !NO_CACHE_LOGS) {
       console.log("Selected diploma => : ", selectedDiploma);
@@ -94,67 +87,65 @@ export function TaskTemplateCreationController({
     };
   }, [dialogData]);
 
-  const itemToDisplay = useRef<ReturnType<typeof createDisabledGroup>>(null!);
-  const activeDiplomaIdRef = useRef<UUID>(null!);
-
   /**
    * Callback to reshape and retrieve cached data based on query keys.
    *
    * @param keys - The query keys used to retrieve cached data
    * @returns The reshaped cached data or the original data if not found
    */
-  const resultsCallback = useCallback(
-    (keys: string[]): HeadingType[] | undefined => {
-      const cachedData = queryClient.getQueryData<HeadingType[]>(keys ?? []);
-      if (!data && cachedData === undefined && keys[0] === "none") return;
+  const isHeadingList = (value: unknown): value is HeadingType[] =>
+    Array.isArray(value);
 
-      if (DEV_MODE && !NO_CACHE_LOGS) {
-        console.log("Cached data for ", keys, " is ", cachedData);
+  const resolveCachedOrData = (cachedData: HeadingType[] | undefined) => {
+    if (cachedData !== undefined) return cachedData;
+    return isHeadingList(data) ? data : undefined;
+  };
+
+  const resultsCallback = (keys: string[]): HeadingType[] | undefined => {
+    const cachedData = queryClient.getQueryData<HeadingType[]>(keys ?? []);
+    if (!data && cachedData === undefined && keys[0] === "none") return;
+
+    if (DEV_MODE && !NO_CACHE_LOGS) {
+      console.error("Cached data for ", keys, " is ", cachedData);
+    }
+
+    const currentDiplomaId = diplomaDatas.diploma?.id;
+    const resolvedData = resolveCachedOrData(cachedData);
+
+    if (!openedDialogs.includes(pageId) || !currentDiplomaId) {
+      return resolvedData;
+    }
+
+    const isFetchedSkills = keys[0] === "new-task-module";
+    const isFetchedTasks = keys[0] === "new-task-item";
+
+    if (cachedData === undefined && !isFetchedSkills) {
+      return resolvedData;
+    }
+
+    if (isFetchedSkills && diplomaDatas.diploma) {
+      return createTaskTemplateView(diplomaDatas.diploma.modules);
+    }
+
+    if (isFetchedTasks) {
+      if (!cachedData) {
+        return resolvedData;
       }
 
-      const currentDiplomaId = diplomaDatas.diploma?.id;
-
-      if (!openedDialogs.includes(pageId) || !currentDiplomaId) {
-        return cachedData ?? (data as HeadingType[] | undefined);
-      }
-
-      const isFetchedSkills = keys[0] === "new-task-module";
-      const isFetchedTasks = keys[0] === "new-task-item";
-
-      const isDiplomaChanged = handleDiplomaChange({
-        currentId: currentDiplomaId,
-        activeDiplomaIdRef,
-        savedSkills,
-        itemToDisplay,
+      return createDisabledGroup({
+        dataCopy: cachedData,
+        cachedData,
+        diplomaDatas,
       });
+    }
 
-      if (cachedData === undefined && !isFetchedSkills) {
-        return data as HeadingType[] | undefined;
-      }
+    return cachedData;
+  };
 
-      if (isFetchedSkills && diplomaDatas.diploma) {
-        return fetchSkillsData(diplomaDatas.diploma, savedSkills);
-      }
-
-      if (isFetchedTasks) {
-        if (cachedData === undefined) {
-          return data as HeadingType[] | undefined;
-        }
-
-        return fetchTasksData(
-          cachedData,
-          diplomaDatas,
-          currentDiplomaId,
-          isDiplomaChanged,
-          itemToDisplay,
-          activeDiplomaIdRef,
-        );
-      }
-
-      return cachedData;
-    },
-    [data, diplomaDatas, openedDialogs, pageId, queryClient],
-  );
+  const computedCommandHeadings = resultsCallback([
+    fetchParams.contentId,
+    fetchParams.url,
+  ]);
 
   /**
    * Handle form submission
@@ -249,10 +240,7 @@ export function TaskTemplateCreationController({
         onOpenChange={openingCallback}
         observedRefs={observedRefs}
         onAddNewItem={newItemCallback}
-        commandHeadings={resultsCallback([
-          fetchParams.contentId,
-          fetchParams.url,
-        ])}
+        commandHeadings={computedCommandHeadings}
       />
     </form>
   );
