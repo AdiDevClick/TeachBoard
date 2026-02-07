@@ -8,7 +8,7 @@ import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import {
   PopoverFieldWithCommands,
   PopoverFieldWithControllerAndCommandsList,
-} from "@/components/Popovers/PopoverField.tsx";
+} from "@/components/Popovers/exports/popover-field.exports";
 import { VerticalFieldSelectWithController } from "@/components/Selects/exports/vertical-field-select.exports";
 import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem.tsx";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
