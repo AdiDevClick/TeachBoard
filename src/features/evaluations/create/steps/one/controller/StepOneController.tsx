@@ -1,6 +1,6 @@
 import { useAppStore } from "@/api/store/AppStore";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
-import { PopoverFieldWithCommands } from "@/components/Popovers/PopoverField.tsx";
+import { PopoverFieldWithCommands } from "@/components/Popovers/exports/popover-field.exports";
 import {
   DEV_MODE,
   NO_CACHE_LOGS,
