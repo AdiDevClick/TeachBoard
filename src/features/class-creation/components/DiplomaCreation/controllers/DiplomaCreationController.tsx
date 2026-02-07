@@ -2,7 +2,7 @@ import type { CommandSelectionItemProps } from "@/components/Command/types/comma
 import {
   PopoverFieldWithCommands,
   PopoverFieldWithControllerAndCommandsList,
-} from "@/components/Popovers/PopoverField.tsx";
+} from "@/components/Popovers/exports/popover-field.exports";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { HTTP_METHODS } from "@/configs/app.config.ts";
