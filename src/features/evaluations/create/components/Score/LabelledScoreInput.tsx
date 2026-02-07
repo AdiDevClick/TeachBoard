@@ -1,5 +1,4 @@
-import withListMapper from "@/components/HOCs/withListMapper";
-import { ControlledLabelledInput } from "@/components/Inputs/LaballedInputForController";
+import { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input";
 import { Badge } from "@/components/ui/badge";
 import type { LabelledScoreInputProps } from "@/features/evaluations/create/components/Score/types/score-types";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
@@ -53,5 +52,3 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
     </div>
   );
 }
-
-export const LabelledScoreInputList = withListMapper(LabelledScoreInput);
