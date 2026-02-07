@@ -70,7 +70,7 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
    */
   const handleNewItem = ({ e, ...rest }: HandleAddNewItemParams) => {
     if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Add new item triggered", {
+      console.debug("Add new item triggered", {
         apiEndpoint: rest.apiEndpoint,
         task: rest.task,
       });
@@ -83,11 +83,6 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
       ...rest,
     });
   };
-  useEffect(() => {
-    if (selectedClassName) {
-      console.log("The selected parsed : ", selectedClassName);
-    }
-  }, [selectedClassName]);
 
   /**
    * Handle command selection from PopoverFieldWithControllerAndCommandsList
@@ -98,14 +93,11 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
    * @param commandItem - The details of the selected command item
    */
   const handleOnSelect = (value: string, commandItem: CommandItemType) => {
-    console.log("selected value :", value, commandItem);
     setSelectedClass(JSON.parse(JSON.stringify(commandItem)));
   };
   return (
     <PopoverFieldWithCommands
       {...stepOneInputControllers[0]}
-      // form={form}
-      // id={`${pageId}-year`}
       defaultValue={selectedClassName ?? stepOneInputControllers[0].placeholder}
       setRef={setRef}
       commandHeadings={resultsCallback()}
