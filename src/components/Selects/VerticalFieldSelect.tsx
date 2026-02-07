@@ -1,6 +1,7 @@
 import type {
   VerticalFieldState,
   VerticalRefSetters,
+  VerticalSelectMetaData,
   VerticalSelectProps,
 } from "@/components/Selects/types/select.types.ts";
 import { Label } from "@/components/ui/label";
@@ -76,7 +77,7 @@ export function VerticalFieldSelect({
 
   useImperativeHandle(controllerRef ?? ref, () => handleObjectRef.current);
 
-  const metaBase = {
+  const metaBase: VerticalSelectMetaData = {
     task,
     apiEndpoint,
     dataReshapeFn,

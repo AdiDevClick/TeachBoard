@@ -1,12 +1,14 @@
-import { ListMapper } from "@/components/Lists/ListMapper";
-import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem";
+import type { UUID } from "@/api/types/openapi/common.types";
+import { NonLabelledGroupItemList } from "@/components/Selects/non-labelled-item/exports/non-labelled-item-exports";
 import type {
   ForControllerVerticalFieldSelectProps,
+  NonLabelledGroupItemProps,
   PropsWithListings,
+  VerticalSelectMetaData,
 } from "@/components/Selects/types/select.types";
 import {
   debugLogs,
-  listMapperContainsInvalid,
+  withListingsPropsInvalid,
 } from "@/configs/app-components.config";
 import type { ComponentType } from "react";
 
@@ -27,9 +29,9 @@ export function ForController<P>(WrapperComponent: ComponentType<P>) {
     const { field, fieldState, ...rest } = props;
     const { onValueChange, ...restProps } = rest;
 
-    const handleValueChange = (value: string, ...args: unknown[]) => {
+    const handleValueChange = (value: UUID, meta?: VerticalSelectMetaData) => {
       field.onChange(value);
-      onValueChange?.(value, ...args);
+      onValueChange?.(value, meta);
     };
 
     return (
@@ -54,19 +56,25 @@ export function ForController<P>(WrapperComponent: ComponentType<P>) {
  * @returns
  */
 export function WithListings<C extends object>(Wrapped: ComponentType<C>) {
-  return function Component(props: C & PropsWithListings<unknown>) {
-    if (listMapperContainsInvalid(props)) {
-      debugLogs("withListings for VerticalFieldSelect");
-      const { children, ...rest } = props;
+  return function Component(
+    props: C & PropsWithListings<NonLabelledGroupItemProps>,
+  ) {
+    if (withListingsPropsInvalid(props)) {
+      debugLogs(
+        "[WithListings for VerticalFieldSelect] - invalid items provided",
+        {
+          items: props.items,
+        },
+      );
 
-      return <Wrapped {...(rest as C)}>{children}</Wrapped>;
+      return <Wrapped {...(props as C)}>{props.children}</Wrapped>;
     }
+
     const { items, children, ...rest } = props;
+
     return (
       <Wrapped {...(rest as C)}>
-        <ListMapper items={items}>
-          <NonLabelledGroupItem />
-        </ListMapper>
+        <NonLabelledGroupItemList items={items} />
         {children}
       </Wrapped>
     );
