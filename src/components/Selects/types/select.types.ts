@@ -1,9 +1,11 @@
+import type { UUID } from "@/api/types/openapi/common.types";
 import type {
   ApiEndpointType,
   DataReshapeFn,
 } from "@/components/Inputs/types/inputs.types.ts";
 import type { SelectContent, SelectItem } from "@/components/ui/select.tsx";
 import type { AppModalNames } from "@/configs/app.config.ts";
+import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { FieldTypes } from "@/types/MainTypes";
 import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
 import type { UniqueSet } from "@/utils/UniqueSet";
@@ -41,7 +43,7 @@ export type VerticalRefSetters = {
   /** Underlying props for the select */
   props: SelectRootProps;
   /** Metadatas from the component and wrapped HOCs (eg: task, apiEndpoint, name, id, etc.) */
-  getMeta: () => Record<string, unknown> | undefined;
+  getMeta: () => VerticalSelectMetaData | undefined;
   /** Last selected item value (may be undefined) */
   getLastSelectedItemValue: () => unknown;
   /** Set the last selected item value */
@@ -60,6 +62,16 @@ export type VerticalRefSetters = {
 type ControllerMeta = { controllerName?: string };
 
 /**
+ * EXTERNAL HANDLER - VERTICAL FIELD SELECT
+ *
+ * @description Enriched metadata passed to external handlers so you can have all the necessary information to handle the select's opening and selection logic in one place.
+ */
+export type VerticalSelectMetaData = CommandHandlerFieldMeta &
+  Partial<Omit<SelectRootProps, "onValueChange">> & {
+    controllerMeta?: ControllerMeta;
+  };
+
+/**
  * Props for the VerticalFieldSelect component
  * {@link VerticalFieldSelect}
  */
@@ -68,7 +80,7 @@ export type VerticalSelectProps = Omit<SelectRootProps, "onValueChange"> & {
   controllerRef?: Ref<VerticalRefSetters>;
   observedRefs?: UniqueSet<
     string,
-    { element: Element; meta?: Record<string, unknown> }
+    { element: Element; meta?: VerticalSelectMetaData }
   >;
   controllerMeta?: ControllerMeta;
   task?: AppModalNames;
@@ -83,13 +95,13 @@ export type VerticalSelectProps = Omit<SelectRootProps, "onValueChange"> & {
   fullWidth?: boolean;
   className?: string;
   side?: ComponentProps<typeof SelectContent>["side"];
-  setRef?: (node?: Element | null, meta?: Record<string, unknown>) => void;
-  id?: string;
+  setRef?: (node?: Element | null, meta?: VerticalSelectMetaData) => void;
+  id?: UUID;
   /**
    * Allow value-change handlers that accept extra args.
    * The underlying Select will still call it with a single `value`.
    */
-  onValueChange?: (value: string, ...args: unknown[]) => void;
+  onValueChange?: (id: UUID, meta?: VerticalSelectMetaData) => void;
 } & PropsWithChildren;
 
 type LabelledGroupBaseProps<T> = {
@@ -118,10 +130,10 @@ export type LabelledGroupProps<T = Record<string, unknown>> =
 /**
  * Props for the NonLabelledGroupItem component
  */
-export type NonLabelledGroupItemProps = {
-  id?: string;
-  name?: string;
-};
+export type NonLabelledGroupItemProps = Readonly<{
+  id: UUID;
+  name: string;
+}>;
 
 /**
  * Props for the SelectItemWithIcon component
