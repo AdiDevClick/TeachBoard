@@ -1,20 +1,14 @@
 import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.ts";
 import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
-import type {
-  LabelledInputForControllerProps,
-  LabelledInputProps,
-} from "@/components/Inputs/types/inputs.types";
+import type { LabelledInputProps } from "@/components/Inputs/types/inputs.types";
 import type {
   EvaluationRadioItemDescriptionProps,
   EvaluationRadioItemProps,
 } from "@/components/Radio/types/radio.types.ts";
 import type { NonLabelledGroupItemProps } from "@/components/Selects/types/select.types";
 import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
-import type {
-  LabelledTextAreaForControllerProps,
-  LabelledTextAreaProps,
-} from "@/components/TextAreas/types/textareas.types";
+import type { LabelledTextAreaProps } from "@/components/TextAreas/types/textareas.types";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
 import type { ClassCreationControllerProps } from "@/features/class-creation/class-creation.index.ts";
 import type {
@@ -53,12 +47,11 @@ export const labelledInputContainsInvalid = (props: LabelledInputProps) =>
 /**
  * Validates props for LabelledInputForController component.
  *
- * {@link import("@/components/Inputs/LabelledInputForController.tsx").LabelledInputForController }
+ * {@link import("@/components/HOCs/forController.tsx").forController }
  */
-const LABELLED_INPUT_FOR_CONTROLLER_REQUIRES = ["field", "fieldState"];
-export const labelledInputForControllerContainsInvalid = (
-  props: LabelledInputForControllerProps<FieldValues>,
-) => checkPropsValidity(props, LABELLED_INPUT_FOR_CONTROLLER_REQUIRES, []);
+const FOR_CONTROLLER_REQUIRES = ["field", "fieldState"];
+export const forControllerContainsInvalid = (props: FieldValues) =>
+  checkPropsValidity(props, FOR_CONTROLLER_REQUIRES, []);
 
 //                    ------------
 
@@ -73,23 +66,6 @@ export const labelledTextAreaContainsInvalid = (props: LabelledTextAreaProps) =>
   checkPropsValidity(
     props as unknown as AnyObjectProps,
     LABELLED_TEXTAREA_REQUIRES,
-    [],
-  );
-
-//                    ------------
-
-/**
- * Validation requirements for LabelledTextAreaForController component.
- *
- * {@link import("@/components/TextAreas/LabelledTextArea.tsx").LabelledTextAreaForController }
- */
-const LABELLED_TEXTAREA_FOR_CONTROLLER_REQUIRES = ["field", "fieldState"];
-export const labelledTextAreaForControllerContainsInvalid = (
-  props: LabelledTextAreaForControllerProps<FieldValues>,
-) =>
-  checkPropsValidity(
-    props as unknown as AnyObjectProps,
-    LABELLED_TEXTAREA_FOR_CONTROLLER_REQUIRES,
     [],
   );
 
