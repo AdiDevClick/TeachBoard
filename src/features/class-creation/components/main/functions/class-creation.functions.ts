@@ -126,13 +126,9 @@ export function createDisabledGroup({
   dataCopy,
   cachedData,
   diplomaDatas,
-  currentDiplomaId,
-  activeDiplomaIdRef,
 }: CreateDisabledGroupParams) {
   // Create a deep copy to avoid mutating the React Query cache
   dataCopy = JSON.parse(JSON.stringify(cachedData));
-  activeDiplomaIdRef.current = currentDiplomaId;
-
   // Move already-used tasks into a disabled group
   const disabledSet = new UniqueSet();
   const filteredItems = cachedData[0].items.filter((item) => {

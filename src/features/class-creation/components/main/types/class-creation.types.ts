@@ -63,8 +63,6 @@ export type CreateDisabledGroupParams = {
   dataCopy: HeadingType[];
   cachedData: HeadingType[];
   diplomaDatas: DiplomaTaskContext;
-  currentDiplomaId: UUID;
-  activeDiplomaIdRef: MutableRef<UUID>;
 };
 
 /**
