@@ -63,4 +63,6 @@ export type FooterProps = (
 
 export type TitleProps = HeaderTitleProps & SeparatorType;
 
-type SeparatorType = { separator?: ComponentProps<typeof Separator> };
+type SeparatorType = {
+  separator?: ComponentProps<typeof Separator> & { displaySeparator?: boolean };
+};
