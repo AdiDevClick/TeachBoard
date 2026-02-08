@@ -29,7 +29,7 @@ export type SafeListMapperProp<T extends AnyObjectProps> = {
  * Replace every property of T with an optional never to forbid consumers from passing them.
  */
 export type ExcludeProps<T extends AnyObjectProps> = {
-  [_K in keyof T]?: never;
+  [K in keyof T]?: never;
 };
 /**
  * Merge two objects while defaulting non-object inputs to an empty object, avoiding conditional chains.
