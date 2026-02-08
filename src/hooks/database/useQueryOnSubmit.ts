@@ -228,7 +228,6 @@ async function onFetch<
         timeout: timeout * 2,
       });
     }
-
     throw errorCause;
   }
 }
