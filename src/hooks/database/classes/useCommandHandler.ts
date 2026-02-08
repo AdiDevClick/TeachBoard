@@ -359,6 +359,9 @@ export function useCommandHandler<
     return cachedData ?? data;
   }, [queryClient, data, fetchParams]);
 
+  /**
+   * RESULTS - Handle dialog closing after successful submission
+   */
   const afterAnimationClose = useEffectEvent(() => {
     startTransition(async () => {
       closeDialog(null, pageId);
@@ -366,12 +369,12 @@ export function useCommandHandler<
   });
 
   /**
-   * Handle form results
+   * RESULTS - Handle form results
    *
    * @description Close dialog on success and reset form
    */
   useEffect(() => {
-    const isSubmition = postVariables.current !== null;
+    const isSubmission = postVariables.current !== null;
     if (data || error) {
       hasStartedCreation.current = false;
     }
@@ -380,7 +383,7 @@ export function useCommandHandler<
       if (DEV_MODE && !NO_QUERY_LOGS) {
         console.debug(pageId, " created:", data);
       }
-      if (isSubmition) {
+      if (isSubmission) {
         postVariables.current = null;
         // NOTE: form.reset() is intentionally NOT called here.
         // The setRef callback in useMutationObserver calls setState during render,
@@ -390,8 +393,11 @@ export function useCommandHandler<
         afterAnimationClose();
       }
     }
-  }, [isLoaded, error, data, form, pageId]);
+  }, [isLoaded, error, data, pageId]);
 
+  /**
+   * FETCH / SUBMIT - Trigger submission or fetching when fetchParams are set
+   */
   const triggerSubmit = useEffectEvent((fetchParams: FetchParams) => {
     if (isLoading || hasStartedCreation.current) return;
 
@@ -418,7 +424,7 @@ export function useCommandHandler<
   });
 
   /**
-   * Effect to FETCH or SUBMIT data when fetchParams change
+   * FETCH / SUBMIT - Effect when fetchParams change
    *
    * @description Triggers when fetchParams are updated with {@link handleOpening}
    */
