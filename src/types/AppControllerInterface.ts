@@ -11,15 +11,15 @@ type DataReshapeFn = UseCommandHandlerParams["submitDataReshapeFn"];
  * - TPageId: the page/modal id (string literal or union)
  * - TSubmitReshapeFn: optional reshape function type used on POST
  */
-export type AppControllerInterface<
+export interface AppControllerInterface<
   TForm extends FieldValues = FieldValues,
   TSubmitRoute = ApiEndpointType,
   TSubmitReshapeFn = DataReshapeFn,
-> = Readonly<{
+>  {
   className: string;
   formId: string;
   form: UseFormReturn<TForm>;
   pageId: AppModalNames;
   submitRoute?: TSubmitRoute;
   submitDataReshapeFn?: TSubmitReshapeFn;
-}>;
+};
