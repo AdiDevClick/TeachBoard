@@ -1,4 +1,8 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import {
+  SEARCH_STUDENTS_TITLE,
+  SEARCH_STUDENTS_FOOTER,
+} from "@/features/class-creation/components/SearchStudents/config/search-students.configs";
 import { SearchStudentsController } from "@/features/class-creation/components/SearchStudents/controllers/SearchStudentsController.tsx";
 import {
   type SearchStudentsFormSchema,
@@ -6,16 +10,7 @@ import {
 } from "@/features/class-creation/components/SearchStudents/models/search-students.models";
 import type { SearchStudentsProps } from "@/features/class-creation/components/SearchStudents/types/search-students.types.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
-
-const titleProps = {
-  title: "Recherche d'étudiants",
-  description:
-    "Recherchez et sélectionnez des étudiants pour les ajouter à la classe.",
-};
-
-const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
 
 /**
  * SearchStudents Component
@@ -40,27 +35,24 @@ function SearchStudents({
 
   const formId = pageId + "-form";
 
-  const commonProps = useMemo(
-    () => ({
-      pageId,
-      formId,
-      localForm,
-      className,
-      modalMode,
-      ...props,
-      form: props.form as UseFormReturn<any>,
-      card: {
-        card: { className },
-        title: titleProps,
-        footer: {
-          ...footerProps,
-          formState: localForm.formState,
-          formId,
-        },
+  const commonProps = {
+    pageId,
+    formId,
+    localForm,
+    className,
+    modalMode,
+    ...props,
+    form: props.form as UseFormReturn<any>,
+    card: {
+      card: { className },
+      title: SEARCH_STUDENTS_TITLE,
+      footer: {
+        ...SEARCH_STUDENTS_FOOTER,
+        formState: localForm.formState,
+        formId,
       },
-    }),
-    [props, props.form, localForm],
-  );
+    },
+  };
 
   return (
     <SearchStudentsWithCard {...commonProps}>

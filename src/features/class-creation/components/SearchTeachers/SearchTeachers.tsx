@@ -1,4 +1,8 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import {
+  SEARCH_TEACHERS_FOOTER,
+  SEARCH_TEACHERS_TITLE,
+} from "@/features/class-creation/components/SearchTeachers/config/search-teachers.configs";
 import { SearchPrimaryTeacherController } from "@/features/class-creation/components/SearchTeachers/controllers/SearchTeachersController.tsx";
 import {
   type SearchPrimaryTeacherFormSchema,
@@ -6,16 +10,7 @@ import {
 } from "@/features/class-creation/components/SearchTeachers/models/search-teachers.models";
 import type { SearchPrimaryTeacherProps } from "@/features/class-creation/components/SearchTeachers/types/search-teachers.types.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
 import { useForm, type UseFormReturn } from "react-hook-form";
-
-const titleProps = {
-  title: "Recherche de professeurs",
-  description:
-    "Recherchez et sélectionnez un professeur principal pour la classe.",
-};
-
-const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
 
 /**
  * SearchTeachers Component
@@ -38,27 +33,24 @@ export function SearchPrimaryTeacher({
   });
   const formId = pageId + "-form";
 
-  const commonProps = useMemo(
-    () => ({
-      pageId,
-      formId,
-      localForm,
-      modalMode,
-      className,
-      ...props,
-      form: props.form as UseFormReturn<any>,
-      card: {
-        card: { className },
-        title: titleProps,
-        footer: {
-          ...footerProps,
-          formState: localForm.formState,
-          formId,
-        },
+  const commonProps = {
+    pageId,
+    formId,
+    localForm,
+    modalMode,
+    className,
+    ...props,
+    form: props.form as UseFormReturn<any>,
+    card: {
+      card: { className },
+      title: SEARCH_TEACHERS_TITLE,
+      footer: {
+        ...SEARCH_TEACHERS_FOOTER,
+        formState: localForm.formState,
+        formId,
       },
-    }),
-    [props],
-  );
+    },
+  };
 
   return (
     <SearchPrimaryTeacherWithCard {...commonProps}>

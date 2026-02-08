@@ -5,7 +5,7 @@ import type { SearchPrimaryTeacherControllerProps } from "@/features/class-creat
 import { resetSelectedItemsFromCache } from "@/features/class-creation/index.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 
 /**
  * Controller for searching and selecting primary teachers.
@@ -43,44 +43,40 @@ export function SearchPrimaryTeacherController({
    * @param value - The value of the selected command item
    * @param commandItemDetails - The details of the selected command item
    */
-  const handleOnSelect = useCallback(
-    (_value: string, commandItemDetails: CommandItemType) => {
-      if (commandItemDetails.id === undefined || commandItemDetails.id === null)
-        return;
+  const handleOnSelect = (
+    _value: string,
+    commandItemDetails: CommandItemType,
+  ) => {
+    if (commandItemDetails.id === undefined || commandItemDetails.id === null)
+      return;
 
-      const teacherId = commandItemDetails.id;
-      const currentTeacherId = form!.getValues("primaryTeacherId");
+    const teacherId = commandItemDetails.id;
+    const currentTeacherId = form.getValues("primaryTeacherId");
 
-      // Deselect the previous teacher in cache if there was one
-      if (currentTeacherId && currentTeacherId !== teacherId) {
-        const previousTeacherValue =
-          form!.getValues("primaryTeacherValue") ?? [];
-
-        resetSelectedItemsFromCache(
-          ["search-primaryteacher", API_ENDPOINTS.GET.TEACHERS.endpoint],
-          previousTeacherValue,
-          queryClient,
-        );
-      }
-
-      selectionCallback(teacherId, {
-        mainFormField: "primaryTeacherId",
-        secondaryFormField: "primaryTeacherValue",
-        detailedCommandItem: commandItemDetails,
-        validationMode: "single",
-      });
-
-      // Sync the dialog-local form (reactivity)
-      localForm.setValue(
-        "primaryTeacherId",
-        form!.getValues("primaryTeacherId") as string,
-        { shouldValidate: true },
+    // Deselect the previous teacher in cache if there was one
+    if (currentTeacherId && currentTeacherId !== teacherId) {
+      const previousTeacherValue = form.getValues("primaryTeacherValue") ?? [];
+      resetSelectedItemsFromCache(
+        ["search-primaryteacher", API_ENDPOINTS.GET.TEACHERS.endpoint],
+        previousTeacherValue,
+        queryClient,
       );
+    }
 
-      closeDialog(null, pageId);
-    },
-    [],
-  );
+    selectionCallback(teacherId, {
+      mainFormField: "primaryTeacherId",
+      secondaryFormField: "primaryTeacherValue",
+      detailedCommandItem: commandItemDetails,
+      validationMode: "single",
+    });
+
+    // Sync the dialog-local form (reactivity)
+    localForm.setValue("primaryTeacherId", form.getValues("primaryTeacherId"), {
+      shouldValidate: true,
+    });
+
+    closeDialog(null, pageId);
+  };
 
   /**
    * Initial fetch setup

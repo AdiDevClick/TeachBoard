@@ -4,7 +4,7 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import type { SearchStudentsControllerProps } from "@/features/class-creation/components/SearchStudents/types/search-students.types.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 
 /**
  * Controller for searching and selecting students.
@@ -38,36 +38,33 @@ export function SearchStudentsController({
    * @param value - The value of the selected command item
    * @param commandItemDetails - The details of the selected command item
    */
-  const handleOnSelect = useCallback(
-    (_value: string, commandItemDetails: CommandItemType) => {
-      if (
-        commandItemDetails.id === undefined ||
-        commandItemDetails.id === null
-      ) {
-        if (DEV_MODE && !NO_CACHE_LOGS) {
-          console.warn(
-            "Selected command item has no ID, selection ignored:",
-            commandItemDetails,
-          );
-        }
-        return;
+  const handleOnSelect = (
+    _value: string,
+    commandItemDetails: CommandItemType,
+  ) => {
+    if (commandItemDetails.id === undefined || commandItemDetails.id === null) {
+      if (DEV_MODE && !NO_CACHE_LOGS) {
+        console.warn(
+          "Selected command item has no ID, selection ignored:",
+          commandItemDetails,
+        );
       }
+      return;
+    }
 
-      const newValue = commandItemDetails.id;
-      const options = {
-        mainFormField: "students",
-        secondaryFormField: "studentsValues",
-        detailedCommandItem: commandItemDetails,
-      };
-      selectionCallback(newValue, options);
+    const newValue = commandItemDetails.id;
+    const options = {
+      mainFormField: "students",
+      secondaryFormField: "studentsValues",
+      detailedCommandItem: commandItemDetails,
+    };
+    selectionCallback(newValue, options);
 
-      localForm.setValue("students", form?.getValues("students") || [], {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
-    },
-    [],
-  );
+    localForm.setValue("students", form?.getValues("students") || [], {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
 
   const handleSubmit = () => {
     closeDialog(null, pageId);

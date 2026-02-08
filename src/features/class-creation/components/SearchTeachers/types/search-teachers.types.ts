@@ -1,6 +1,6 @@
+import type { ClassCreationExtendedFormSchema } from "@/features/class-creation";
 import type { SearchPrimaryTeacherFormSchema } from "@/features/class-creation/components/SearchTeachers/models/search-teachers.models";
 import type { SearchPrimaryTeacher } from "@/features/class-creation/components/SearchTeachers/SearchTeachers.tsx";
-import type { ClassCreationExtendedFormSchema } from "@/features/class-creation/components/types/class-creation.types.ts";
 import type { AppControllerInterface } from "@/types/AppControllerInterface.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import type { UseFormReturn } from "react-hook-form";
