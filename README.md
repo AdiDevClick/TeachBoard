@@ -53,7 +53,7 @@ Cette application représente le frontend de TeachBoard, une interface pédagogi
   - [Inputs](#inputs)
   - [Selects](#selects)
   - [Modal](#modal)
-  - [Form components (LoginForm)](#form-components-loginform)
+  - [Form components (LoginView)](#form-components-loginform)
   - [Lists & Data Table](#lists--data-table)
   - [Charts](#charts)
   - [Layout (Header / Sidebar / Footer)](#layout-header--sidebar--footer)
@@ -1164,27 +1164,27 @@ import VerticalFieldSelect from '@/components/Selects/VerticalFieldSelect';
 {
   modalName: 'login',
   type: Modal,
-  modalContent: LoginForm,
+  modalContent: LoginView,
   contentProps: { inputControllers: inputLoginControllers }
 }
 
 // open programmatically
 openDialog(null, 'login');
 ```
-- **Patterns**: Pattern A — modal content = controller wrapped (ex: `LoginForm`); Pattern B — `ModalWithSimpleAlert`
+- **Patterns**: Pattern A — modal content = controller wrapped (ex: `LoginView`); Pattern B — `ModalWithSimpleAlert`
 - **Emplacement**: `src/components/Modal/`, `src/pages/AllModals/AppModals.tsx`
 
 ---
 
-### Form components (LoginForm)
+### Form components (LoginView)
 - **Look / example**:
 ```tsx
-import LoginForm from '@/components/LoginForms/LoginForm';
+import LoginView from '@/components/LoginForms/LoginView';
 
-<LoginForm />
+<LoginView />
 ```
 - **Patterns**: Pattern A — use as page component; Pattern B — used as modal content (`modalMode = true`)
-- **Emplacement**: `src/components/LoginForms/LoginForm.tsx` (+ `controller/LoginFormController.tsx`)
+- **Emplacement**: `src/components/LoginForms/LoginView.tsx` (+ `controller/LoginFormController.tsx`)
 
 ---
 
@@ -1838,7 +1838,7 @@ const modals = defineStrictModalsList([
   {
     modalName: "login",
     type: Modal,
-    modalContent: LoginForm,
+    modalContent: LoginView,
     contentProps: {
       inputControllers: inputLoginControllers,
       modalMode: true,
@@ -2158,7 +2158,7 @@ if (checkPropsValidity(props, required, forbidden)) {
 
 - **Objectif :** Fermer toutes les modales ouvertes, puis ouvrir proprement une nouvelle modal.
 
-- **Contexte :** Helper pratique pour s'assurer qu'une seule modal est ouverte à la fois (utilisé dans `LoginForm`, etc.).
+- **Contexte :** Helper pratique pour s'assurer qu'une seule modal est ouverte à la fois (utilisé dans `LoginView`, etc.).
 
 - **Exemple :**
 ```ts
@@ -2354,7 +2354,7 @@ const reshaped = ObjectReshape(obj).rename("name","displayName").newShape();
 
 ### Autres helpers & références rapides
 
-- `dialogFns` — `{ closeAllDialogs, openDialog }` (ex: `LoginForm`).
+- `dialogFns` — `{ closeAllDialogs, openDialog }` (ex: `LoginView`).
 - `dataReshape / dataReshapeFn` — fonctions de reshaping définies dans `API_ENDPOINTS` (voir `src/configs/api.endpoints.config.ts`).
 - `FixtureCreatorBase` / classes de fixtures — utilitaires pour générer DTOs factices (`src/utils/FixtureCreator.ts`).
 

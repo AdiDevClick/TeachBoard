@@ -3,12 +3,12 @@ import {
   inputSignupControllers,
   passwordCreationInputControllers,
 } from "@/data/inputs-controllers.data.ts";
+import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
 import { CreateEvaluations } from "@/features/evaluations/create/CreateEvaluations.tsx";
 import { StepFour } from "@/features/evaluations/create/steps/four/StepFour.tsx";
 import { StepOne } from "@/features/evaluations/create/steps/one/StepOne";
 import { StepThree } from "@/features/evaluations/create/steps/three/StepThree.tsx";
 import { StepTwo } from "@/features/evaluations/create/steps/two/StepTwo.tsx";
-import { inputLoginControllers } from "@/features/login/components/main/forms/login-inputs.ts";
 import { completeDatas } from "@/main.tsx";
 import { About } from "@/pages/About/About.tsx";
 import EmailValidation from "@/pages/Email/EmailValidation";

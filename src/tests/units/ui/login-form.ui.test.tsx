@@ -1,6 +1,6 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import LoginForm from "@/features/login/components/main/LoginForm";
+import LoginView from "@/features/auth/components/login/LoginView";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import {
@@ -29,7 +29,7 @@ const loginResponse = {
 
 setupUiTestState(
   <AppTestWrapper>
-    <LoginForm />
+    <LoginView />
   </AppTestWrapper>,
   {
     beforeEach: () => {

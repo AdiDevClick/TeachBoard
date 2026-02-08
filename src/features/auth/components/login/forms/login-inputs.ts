@@ -1,4 +1,4 @@
-import type LoginForm from "@/features/login/components/main/LoginForm.tsx";
+import type LoginView from "@/features/auth/components/login/LoginView";
 
 /** Login page controllers  */
 export const inputLoginControllers = [
@@ -16,4 +16,4 @@ export const inputLoginControllers = [
     placeholder: "********",
     autoComplete: "current-password",
   },
-] satisfies Parameters<typeof LoginForm>[0]["inputControllers"];
+] satisfies Parameters<typeof LoginView>[0]["inputControllers"];

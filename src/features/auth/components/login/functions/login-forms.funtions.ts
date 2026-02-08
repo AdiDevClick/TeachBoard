@@ -1,4 +1,4 @@
-import type { HandleRecoverPasswordClickParams } from "@/features/login/components/main/types/login-forms.types.ts";
+import type { HandleRecoverPasswordClickParams } from "@/features/auth/components/login/types/login-forms.types";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 
 /**
