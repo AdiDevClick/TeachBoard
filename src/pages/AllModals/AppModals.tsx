@@ -71,7 +71,7 @@ const modals = defineStrictModalsList([
       isNavigationModal: false,
       headerTitle: "Demande envoyée",
       headerDescription:
-        "Vérifiez votre boîte mail pour réinitialiser votre mot de passe.",
+        "Un email a été envoyé. Vérifiez votre boîte mail pour réinitialiser votre mot de passe.",
     },
   },
   {
