@@ -20,7 +20,7 @@ import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { MouseEvent } from "react";
 import { useState } from "react";
-import { useForm, useFormState } from "react-hook-form";
+import { useForm, useFormState, type UseFormReturn } from "react-hook-form";
 
 const resetPasswordButtonText = "Réinitialiser le mot de passe";
 const backToLoginLinkText = "Retour à la connexion";
@@ -47,9 +47,8 @@ function LoginView({
 }: Readonly<PageWithControllers<LoginInputItem>>) {
   const [isPwForgotten, setIsPwForgotten] = useState(false);
 
-  const schemaToUse = isPwForgotten ? pwRecoverySchema : formSchema;
-  const form = useForm<LoginFormSchema | RecoveryFormSchema>({
-    resolver: zodResolver(schemaToUse),
+  const loginForm = useForm<LoginFormSchema>({
+    resolver: zodResolver(formSchema),
     mode: "all",
     defaultValues: {
       identifier: "",
@@ -57,19 +56,13 @@ function LoginView({
     },
   });
 
-  let defaultText = forgotPasswordLinkText;
-  let pwForgottenLinkTo = "/forgot-password";
-  let buttonText = "Se connecter";
-  let inputControllersToUse = inputControllers;
-  let formId = pageId + "-form";
-
-  if (isPwForgotten) {
-    defaultText = backToLoginLinkText;
-    pwForgottenLinkTo = loginLinkTo;
-    buttonText = resetPasswordButtonText;
-    inputControllersToUse = passwordRecoveryInputControllers;
-    formId = formId + "-pw-recovery";
-  }
+  const recoveryForm = useForm<RecoveryFormSchema>({
+    resolver: zodResolver(pwRecoverySchema),
+    mode: "all",
+    defaultValues: {
+      identifier: "",
+    },
+  });
 
   function handleTogglePwForgotten(e?: MouseEvent) {
     e?.preventDefault?.();
@@ -82,48 +75,59 @@ function LoginView({
     // }
   }
 
-  const commonProps = {
+  const sharedProps = {
     pageId,
-    formId,
     className,
     modalMode,
-    form,
     setIsPwForgotten,
     isPwForgotten,
-    inputControllers: inputControllersToUse,
     card: LOGIN_CARD,
-    textToDisplay: {
-      defaultText,
-      pwForgottenLinkTo,
-      buttonText,
-    },
     onClick: handleTogglePwForgotten,
-    // provide defaults for required controller props so consumers that don't
-    // pass them explicitly won't trigger a missing-props type error
-    // (LoginFormController expects GETendPoint and POSTendPoint)
-    // submitRoute: "",
-    // submitDataReshapeFn: (data: unknown) => data,
     ...props,
+  };
+
+  const loginProps = {
+    ...sharedProps,
+    formId: `${pageId}-form`,
+    form: loginForm,
+    inputControllers,
+    textToDisplay: {
+      defaultText: forgotPasswordLinkText,
+      pwForgottenLinkTo: "/forgot-password",
+      buttonText: "Se connecter",
+    },
+  };
+
+  const recoveryProps = {
+    ...sharedProps,
+    formId: `${pageId}-form-pw-recovery`,
+    form: recoveryForm,
+    inputControllers: passwordRecoveryInputControllers,
+    textToDisplay: {
+      defaultText: backToLoginLinkText,
+      pwForgottenLinkTo: loginLinkTo,
+      buttonText: resetPasswordButtonText,
+    },
   };
 
   return (
     <>
-      {isPwForgotten && <PwForgottenController {...commonProps} />}
-      {!isPwForgotten && <LoginForm {...commonProps} />}
+      {isPwForgotten && <PwForgotten {...recoveryProps} />}
+      {!isPwForgotten && <LoginForm {...loginProps} />}
     </>
   );
 }
 
 const LoginForm = withStyledForm(LoginFormController);
+const PwForgotten = withStyledForm(PwForgottenController);
 
 export default LoginView;
 
-export type FooterFieldsProps = Pick<
-  WithStyledFormProps,
-  "form" | "formId" | "textToDisplay"
-> & {
-  onClick?: (_e?: MouseEvent) => void;
-};
+export type FooterFieldsProps<TFormValues extends Record<string, unknown>> = {
+  form: UseFormReturn<TFormValues>;
+} & Pick<WithStyledFormProps, "formId" | "textToDisplay"> & {
+    onClick?: (e?: MouseEvent) => void;
+  };
 
 /**
  * Footer fields component for the login form, including the submit button and a link to toggle between login and password recovery modes.
@@ -133,13 +137,13 @@ export type FooterFieldsProps = Pick<
  * @param textToDisplay - An object containing text for the button and link, allowing for dynamic display based on the current mode (login or password recovery).
  * @param onClick - Optional click handler for the link, allowing for custom behavior when toggling between modes.
  */
-export function FooterFields({
+export function FooterFields<TFormValues extends Record<string, unknown>>({
   form,
   formId,
   textToDisplay,
   onClick,
-}: FooterFieldsProps) {
-  const { isValid } = useFormState({ control: form.control });
+}: FooterFieldsProps<TFormValues>) {
+  const { isValid } = useFormState<TFormValues>({ control: form.control });
   return (
     <Field>
       <Button type="submit" disabled={!isValid} form={formId}>
@@ -150,7 +154,7 @@ export function FooterFields({
         linkTo="/signup"
         onClick={onClick}
       >
-        Vous n'avez pas de compte ?{" "}
+        {"Vous n'avez pas de compte ? "}
       </AppFieldDescriptionWithLink>
     </Field>
   );
