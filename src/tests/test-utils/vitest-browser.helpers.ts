@@ -1,11 +1,13 @@
 import { expect, vi } from "vitest";
 import { locators, page, userEvent, type Locator } from "vitest/browser";
 
+/* eslint-disable no-unused-vars */
 declare module "vitest/browser" {
   interface LocatorSelectors {
     getByCss(css: string): Locator;
   }
 }
+/* eslint-enable no-unused-vars */
 
 locators.extend({
   getByCss(css: string) {
@@ -71,7 +73,7 @@ function setLastUiAction(action: string, details?: Record<string, unknown>) {
   } satisfies UiLastAction;
 }
 
-function getLastUiAction(): UiLastAction | null {
+function _getLastUiAction(): UiLastAction | null {
   return (globalThis as GlobalWithUiLastAction).__TB_UI_LAST_ACTION__ ?? null;
 }
 

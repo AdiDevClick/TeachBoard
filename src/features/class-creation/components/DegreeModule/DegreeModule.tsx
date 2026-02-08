@@ -1,4 +1,8 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import {
+  DEGREE_MODULE_CARD_TITLE,
+  DEGREE_MODULE_FOOTER_PROPS,
+} from "@/features/class-creation/components/DegreeModule/config/degree-module.configs";
 import { DegreeModuleController } from "@/features/class-creation/components/DegreeModule/controllers/DegreeModuleController.tsx";
 import { degreeModuleCreationInputControllers } from "@/features/class-creation/components/DegreeModule/forms/degree-module-inputs";
 import {
@@ -9,13 +13,6 @@ import {
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-
-const titleProps = {
-  title: "Création de nouveaux modules de compétences",
-  description: "Ces modules pourront être associés aux diplômes.",
-};
-
-const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
 
 /**
  * View component for creating a new degree skill.
@@ -54,9 +51,9 @@ function DegreeModule({
     modalMode,
     card: {
       card: { className },
-      title: titleProps,
+      title: DEGREE_MODULE_CARD_TITLE,
       footer: {
-        ...footerProps,
+        ...DEGREE_MODULE_FOOTER_PROPS,
         formState: form.formState,
         formId,
       },

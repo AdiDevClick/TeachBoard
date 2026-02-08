@@ -9,8 +9,8 @@ import type { MouseEvent } from "react";
  */
 export function handlePreviousClick(
   e: MouseEvent<SVGSVGElement>,
-  displayEvaluations?: (value: boolean) => void,
+  displayEvaluations?: (_value: boolean) => void,
 ) {
   preventDefaultAndStopPropagation(e);
   displayEvaluations?.(false);
-}
+} 

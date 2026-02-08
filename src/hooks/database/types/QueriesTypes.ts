@@ -75,11 +75,11 @@ export type QueryKeyDescriptor<S, E> = [
     abortController?: AbortController;
     successDescription?: string;
     silent?: boolean;
-    onSuccess?: (data: FetchJSONSuccess<S>) => void;
-    onError?: (error: FetchJSONError<E>) => void;
+    onSuccess?: (_data: FetchJSONSuccess<S>) => void;
+    onError?: (_error: FetchJSONError<E>) => void;
     reset?: () => void;
     localState?: (
-      state: {
+      _state: {
         error: FetchJSONError<E> | null;
         success: FetchJSONSuccess<S> | null;
       } & Record<string, unknown>

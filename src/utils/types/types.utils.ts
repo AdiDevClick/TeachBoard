@@ -175,5 +175,5 @@ export type ProbeProxyResult = {
   unsupported?: boolean;
 };
 
-type GenericSuccess<T extends ResponseInterface> = T;
-type GenericError<T extends ApiError> = T;
+type _GenericSuccess<T extends ResponseInterface> = T;
+type _GenericError<T extends ApiError> = T;

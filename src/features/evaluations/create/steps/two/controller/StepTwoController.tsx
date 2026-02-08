@@ -16,11 +16,11 @@ export function StepTwoController({
   formId,
   className,
   inputControllers = [],
-  user,
+  user: _user,
   preparedStudentsTasksSelection,
-  students,
-  selectedClass,
-  tasks,
+  students: _students,
+  selectedClass: _selectedClass,
+  tasks: _tasks,
 }: StepTwoControllerProps) {
   // Placeholder form, replace 'any' with actual form schema
   // const [selected, setSelected] = useState(false);

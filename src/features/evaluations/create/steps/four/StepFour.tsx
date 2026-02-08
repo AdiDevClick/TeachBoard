@@ -44,17 +44,17 @@ export function StepFour({
   ...props
 }: Readonly<PageWithControllers<typeof STEP_FOUR_INPUT_CONTROLLERS>>) {
   const loaderData = useLoaderData();
-  const [, setLeftContent] =
+  const [, _setLeftContent] =
     useOutletContext<[JSX.Element, Dispatch<SetStateAction<JSX.Element>>]>();
   const user = useAppStore((state) => state.user);
   const {
-    selectedClass,
-    tasks,
-    modules,
-    moduleSelectionState,
-    setShowStudentsEvaluation,
-    selectedSubSkill,
-    evaluatedStudentsForThisSubskill,
+    selectedClass: _selectedClass,
+    tasks: _tasks,
+    modules: _modules,
+    moduleSelectionState: _moduleSelectionState,
+    setShowStudentsEvaluation: _setShowStudentsEvaluation,
+    selectedSubSkill: _selectedSubSkill,
+    evaluatedStudentsForThisSubskill: _evaluatedStudentsForThisSubskill,
   } = useStepThreeState();
 
   const form = useForm<StepFourSchema>({

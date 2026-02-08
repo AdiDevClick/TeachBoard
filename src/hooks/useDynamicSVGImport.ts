@@ -14,7 +14,7 @@ const icons = import.meta.glob("/src/assets/icons/*.svg", {
  */
 export function useDynamicSVGImport({
   iconPath,
-  options = {},
+  _options = {},
 }: UseDynamicSVGImportTypes) {
   const [SvgIcon, setSvgIcon] = useState<
     ComponentType<SVGProps<SVGSVGElement>>

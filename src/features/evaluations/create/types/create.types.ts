@@ -22,6 +22,6 @@ export type CreateEvaluationArrowsClickHandlerProps = {
   e: MouseEvent<SVGElement | HTMLButtonElement>;
   index: number;
   arrayLength: number;
-  setTabValue: (v: string | undefined) => void;
+  setTabValue: (_v: string | undefined) => void;
   tabValues: string[];
 };

@@ -54,7 +54,7 @@ export type StepThreeSubskillsSelectionControllerProps = AppControllerInterface<
 export type ShowStudentsEvaluationWithPreviousArrowProps = Parameters<
   typeof ShowStudentsEvaluation
 >[0] & {
-  onPreviousArrowClick: (value: boolean) => void;
+  onPreviousArrowClick: (_value: boolean) => void;
 };
 
 export type StepThreeCommonProps =

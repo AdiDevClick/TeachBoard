@@ -1,4 +1,8 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import {
+  DIPLOMA_CREATION_CARD_FOOTER_PROPS,
+  DIPLOMA_CREATION_CARD_TITLE,
+} from "@/features/class-creation/components/DiplomaCreation/config/diploma-creation.configs";
 import { DiplomaCreationController } from "@/features/class-creation/components/DiplomaCreation/controllers/DiplomaCreationController.tsx";
 import {
   diplomaCreationSchema,
@@ -9,16 +13,6 @@ import { diplomaCreationInputControllers } from "@/features/class-creation/index
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-
-const titleProps = {
-  title: "Création de diplômes ou certifications",
-  description:
-    "Ajoutez des compétences en lien avec la certification et l'année scolaire pour vos élèves.",
-};
-
-const footerProps = {
-  submitText: "Créer le diplôme",
-};
 
 /**
  *
@@ -54,9 +48,9 @@ function DiplomaCreation({
     className,
     card: {
       card: { className },
-      title: titleProps,
+      title: DIPLOMA_CREATION_CARD_TITLE,
       footer: {
-        ...footerProps,
+        ...DIPLOMA_CREATION_CARD_FOOTER_PROPS,
         formState: form.formState,
         formId,
       },

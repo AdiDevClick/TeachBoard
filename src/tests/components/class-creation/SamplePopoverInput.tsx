@@ -23,7 +23,7 @@ export function SamplePopoverInput({
   readonly pageId: AppModalNames;
   // Intentionally loose typing: inputControllers are heterogeneous and already validated in app code.
   readonly controller: Record<string, unknown>;
-  readonly onSelect?: (value: string, commandItem: CommandItemType) => void;
+  readonly onSelect?: (_value: string, _commandItem: CommandItemType) => void;
   readonly options?: Record<string, unknown>;
 }) {
   const form = useForm({ defaultValues: {} });
@@ -56,7 +56,7 @@ export function SamplePopoverInput({
     ...controller,
     apiEndpoint:
       typeof controller.apiEndpoint === "function" && selectedDiploma?.id
-        ? (controller.apiEndpoint as (id: string) => unknown)(
+        ? (controller.apiEndpoint as (_id: string) => unknown)(
             selectedDiploma.id,
           )
         : controller.apiEndpoint,

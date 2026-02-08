@@ -89,7 +89,7 @@ type Ctx = {
   labels: { name: RegExp; value: string }[];
   tasksNames: string[];
   taskTemplateIdByName: Record<string, string>;
-  installCreateClassStubs: (postResponse: unknown) => void;
+  installCreateClassStubs: (_postResponse: unknown) => void;
 };
 
 function data(
@@ -203,9 +203,9 @@ setupUiTestState(null, {
       labels,
       tasksNames,
       taskTemplateIdByName,
-      installCreateClassStubs: (postResponse: unknown) =>
+      installCreateClassStubs: (_postResponse: unknown) =>
         getRoutes
-          .createClassStepOne({ createClassPostResponse: postResponse })
+          .createClassStepOne({ createClassPostResponse: _postResponse })
           .installFetchStubs(),
     } satisfies Ctx;
   },

@@ -23,13 +23,13 @@ export function setupUiTestState(
         // Replace with no-op implementations for the test environment.
         const nav = globalThis as typeof globalThis & {
           location: Location & {
-            assign: (url: string | URL) => void;
-            replace: (url: string | URL) => void;
+            assign: (_url: string | URL) => void;
+            replace: (_url: string | URL) => void;
           };
           open: (
-            url?: string | URL,
-            target?: string,
-            features?: string
+            _url?: string | URL,
+            _target?: string,
+            _features?: string
           ) => Window | null;
         };
 

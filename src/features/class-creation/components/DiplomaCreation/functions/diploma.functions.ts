@@ -1,10 +1,14 @@
 /**
+ * @fileoverview This file contains utility functions for the DiplomaCreation component.
+ */
+
+/**
  * Verify the input type and return the corresponding field name
  *
  * @param fieldName
  */
 export function switchFields(
-  fieldName: string
+  fieldName: string,
 ): "diplomaFieldId" | "yearId" | "levelId" {
   switch (fieldName) {
     case "FIELD":

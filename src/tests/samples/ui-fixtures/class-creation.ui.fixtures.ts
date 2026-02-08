@@ -49,7 +49,7 @@ type ControllersConfig<T extends ControllerLike> = {
   outputNames: Record<string, string>;
 };
 
-type InstallFetchStubs = (postResponse?: unknown) => void;
+type InstallFetchStubs = (_postResponse?: unknown) => void;
 
 type StubRouteCtx = {
   controllers: Record<string, ControllerLike>;
@@ -67,7 +67,7 @@ type StubControllerUrlSpec = {
 type StubUrlSpec =
   | string
   | StubControllerUrlSpec
-  | ((ctx: StubRouteCtx) => string);
+  | ((_ctx: StubRouteCtx) => string);
 
 type StubResponseValue =
   | Record<string, unknown>
@@ -78,7 +78,7 @@ type StubResponseValue =
   | null
   | undefined;
 
-type StubResponseSpec = StubResponseValue | ((ctx: StubRouteCtx) => unknown);
+type StubResponseSpec = StubResponseValue | ((_ctx: StubRouteCtx) => unknown);
 
 type StubRouteSpec = {
   url: StubUrlSpec;
@@ -98,7 +98,7 @@ function buildFetchStubs(
   postRoutes: Array<[string, unknown]>;
 } {
   const dynamicEndpointPrefix = (
-    endpointFn: (arg: string) => string,
+    endpointFn: (_arg: string) => string,
     placeholder = "__DYNAMIC_ARG__",
   ): string => endpointFn(placeholder).replace(placeholder, "");
 

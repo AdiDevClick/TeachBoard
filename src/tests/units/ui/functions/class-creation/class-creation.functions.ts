@@ -58,7 +58,7 @@ import { render, renderHook } from "vitest-browser-react";
 
 type FixtureLike = {
   controllers: Record<string, InputControllerLike>;
-  installFetchStubs?: (postResponse?: unknown) => void;
+  installFetchStubs?: (_postResponse?: unknown) => void;
   sample: ReturnType<typeof useAppFixtures>["sample"];
   post?: unknown;
 };
