@@ -10,6 +10,7 @@ import type { NonLabelledGroupItemProps } from "@/components/Selects/types/selec
 import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
 import type { LabelledTextAreaProps } from "@/components/TextAreas/types/textareas.types";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
+import type { LoginFormControllerProps } from "@/features/auth/components/login/types/login-forms.types";
 import type { ClassCreationControllerProps } from "@/features/class-creation/class-creation.index.ts";
 import type {
   StepThreeControllerProps,
@@ -252,6 +253,22 @@ export const classCreationControllerPropsInvalid = (
   props: ClassCreationControllerProps,
 ) => checkPropsValidity(props, CLASS_CREATION_CONTROLLER_REQUIRES, []);
 
+//                    ------------
+
+/**
+ * Validation requirements for Login Form Controller.
+ *
+ * {@link import("@/features/auth/components/login/controller/LoginFormController.tsx").LoginFormController}
+ */
+const LOGIN_FORM_CONTROLLER_REQUIRES = [
+  ...BASE_CONTROLLERS_PROPS_REQUIRES,
+  "setIsPwForgotten",
+  "isPwForgotten",
+];
+
+export const loginFormControllerPropsInvalid = (
+  props: LoginFormControllerProps,
+) => checkPropsValidity(props, LOGIN_FORM_CONTROLLER_REQUIRES, []);
 //                    ------------
 
 /**
