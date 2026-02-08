@@ -1,5 +1,6 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { passwordRecoveryInputControllers } from "@/data/inputs-controllers.data.ts";
+import { LOGIN_CARD } from "@/features/login/components/main/config/login.configs";
 import { LoginFormController } from "@/features/login/components/main/controller/LoginFormController.tsx";
 import { inputLoginControllers } from "@/features/login/components/main/forms/login-inputs.ts";
 
@@ -12,26 +13,13 @@ import {
 import { pwRecoverySchema } from "@/models/pw-recovery.model.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-
-export const loginFormCardProps = {
-  card: { className: "grid gap-4" },
-  title: {
-    title: "Welcome Back !",
-    description: "Connectez-vous à votre compte TeachBoard.",
-    className: "text-center",
-  },
-};
 
 const resetPasswordButtonText = "Réinitialiser le mot de passe";
 const backToLoginLinkText = "Retour à la connexion";
 const forgotPasswordLinkText = "Mot de passe oublié ?";
 const loginLinkTo = "/login";
-
-let defaultText = forgotPasswordLinkText;
-let pwForgottenLinkTo = "/forgot-password";
-let buttonText = "Se connecter";
 
 /**
  * View component for the login form.
@@ -43,7 +31,6 @@ let buttonText = "Se connecter";
  * @param modalMode - Whether the component is in modal mode.
  * @param className - Additional class names for the component.
  * @param props - Additional props.
- * @returns
  */
 function LoginForm({
   pageId = "login",
@@ -55,7 +42,6 @@ function LoginForm({
   const [isPwForgotten, setIsPwForgotten] = useState(false);
 
   const schemaToUse = isPwForgotten ? pwRecoverySchema : formSchema;
-
   const form = useForm<LoginFormSchema | RecoveryFormSchema>({
     resolver: zodResolver(schemaToUse),
     mode: "all",
@@ -65,8 +51,10 @@ function LoginForm({
     },
   });
 
+  let defaultText = forgotPasswordLinkText;
+  let pwForgottenLinkTo = "/forgot-password";
+  let buttonText = "Se connecter";
   let inputControllersToUse = inputControllers;
-  defaultText = forgotPasswordLinkText;
 
   if (isPwForgotten) {
     defaultText = backToLoginLinkText;
@@ -77,25 +65,23 @@ function LoginForm({
 
   const formId = pageId + "-form";
 
-  const commonProps = useMemo(() => {
-    return {
-      pageId,
-      formId,
-      className,
-      setIsPwForgotten,
-      isPwForgotten,
-      modalMode,
-      card: loginFormCardProps,
-      inputControllers: inputControllersToUse,
-      textToDisplay: {
-        defaultText,
-        pwForgottenLinkTo,
-        buttonText,
-      },
-      ...props,
-      form,
-    };
-  }, [form.formState, isPwForgotten, props]);
+  const commonProps = {
+    pageId,
+    formId,
+    className,
+    modalMode,
+    form,
+    setIsPwForgotten,
+    isPwForgotten,
+    inputControllers: inputControllersToUse,
+    card: LOGIN_CARD,
+    textToDisplay: {
+      defaultText,
+      pwForgottenLinkTo,
+      buttonText,
+    },
+    ...props,
+  };
 
   return (
     <LoginFormWithCard {...commonProps}>
