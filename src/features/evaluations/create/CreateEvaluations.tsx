@@ -4,7 +4,7 @@ import { Tabs } from "@/components/ui/tabs";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types";
 import type { CreateEvaluationsLoaderData } from "@/routes/types/routes-config.types";
 import "@css/PageContent.scss";
-import { useEffect, useState, type JSX } from "react";
+import { useEffect, useEffectEvent, useState, type JSX } from "react";
 import { Outlet, useLoaderData, useNavigate } from "react-router-dom";
 
 const tabValues: string[] = [];
@@ -24,11 +24,15 @@ export function CreateEvaluations() {
 
   const [leftContent, setLeftContent] = useState<JSX.Element | null>(null);
 
+  const trigerNavigation = useEffectEvent((tabValue: string | undefined) => {
+    navigate(tabValue?.toLocaleLowerCase() ?? "", { replace: true });
+  });
+
   /**
    * Effect to navigate to the selected tab when tabValue changes
    */
   useEffect(() => {
-    navigate(tabValue?.toLocaleLowerCase() ?? "", { replace: true });
+    trigerNavigation(tabValue);
   }, [tabValue]);
 
   if (!pageDatas) {
