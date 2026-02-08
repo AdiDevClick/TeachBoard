@@ -50,7 +50,7 @@ type WithListMapperComponent<C extends AnyComponentLike> = <
   Items extends readonly unknown[] | AnyObjectProps,
   TOptional extends AnyObjectProps = AnyObjectProps,
 >(
-  props: PropsType<Items, C, TOptional>,
+  _props: PropsType<Items, C, TOptional>,
 ) => ReactElement | null;
 
 function withListMapper<C extends AnyComponentLike>(
