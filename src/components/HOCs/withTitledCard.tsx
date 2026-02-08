@@ -19,8 +19,7 @@ import {
   AppCardFooter,
   AppDialFooter,
 } from "@/components/Footer/AppFooter.tsx";
-import type { AppDialFooterProps } from "@/components/Footer/types/footer.types";
-import type { WithTitledCardProps } from "@/components/HOCs/types/withTitledCard.types.ts";
+import type { WithTitledCardProps } from "@/components/HOCs/types/with-titled-card.types";
 import {
   DialogHeaderTitle,
   HeaderTitle,
@@ -102,10 +101,12 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
    * @param props - Props for the title component.
    */
   Component.Title = function Title(props: TitleProps) {
-    const { title, modalMode } = useViewCardContext();
+    const { title = {}, modalMode } = useViewCardContext();
+    const { separator = {}, ...titleProps } = { ...title, ...props };
 
     const DynamicTitle = modalMode ? DialogHeaderTitle : HeaderTitle;
-    const titleProps = title ? { ...title, ...props } : props;
+
+    const { displaySeparator = true, ...separatorProps } = separator;
 
     return (
       <>
@@ -118,11 +119,13 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
         >
           {props.children}
         </DynamicTitle>
-        <Separator
-          className="mx-auto my-2 max-w-1/3"
-          orientation="horizontal"
-          {...titleProps.separator}
-        />
+        {displaySeparator && (
+          <Separator
+            className="mx-auto my-2 max-w-1/3"
+            orientation="horizontal"
+            {...separatorProps}
+          />
+        )}
       </>
     );
   };
@@ -134,19 +137,21 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
    */
   Component.Footer = function Footer(props: FooterProps) {
     const { footer = {}, modalMode } = useViewCardContext();
-    const footerProps = { ...footer, ...props };
+    const { separator = {}, ...footerProps } = { ...footer, ...props };
+
+    const { displaySeparator = true, ...separatorProps } = separator;
 
     return (
       <>
-        <Separator
-          className="mx-auto my-2 max-w-1/3"
-          orientation="horizontal"
-          {...footerProps.separator}
-        />
+        {displaySeparator && (
+          <Separator
+            className="mx-auto my-2 max-w-1/3"
+            orientation="horizontal"
+            {...separatorProps}
+          />
+        )}
         {modalMode && (
-          <AppDialFooter {...(footerProps as AppDialFooterProps)}>
-            {props.children}
-          </AppDialFooter>
+          <AppDialFooter {...footerProps}>{props.children}</AppDialFooter>
         )}
         {!modalMode && (
           <AppCardFooter {...footerProps}>{props.children}</AppCardFooter>
