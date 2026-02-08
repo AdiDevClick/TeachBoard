@@ -20,6 +20,7 @@ export function AppDialFooter({
   formState,
   formId,
   displaySubmitButton = true,
+  displayCancelButton = true,
   ...props
 }: AppDialFooterProps) {
   const isValid = formState?.isValid ?? true;
@@ -28,9 +29,11 @@ export function AppDialFooter({
 
   return (
     <DialogFooter {...props}>
-      <DialogClose asChild className="justify-end">
-        <Button variant="outline">{cancelTextValue}</Button>
-      </DialogClose>
+      {displayCancelButton && (
+        <DialogClose asChild className="justify-end">
+          <Button variant="outline">{cancelTextValue}</Button>
+        </DialogClose>
+      )}
       {displaySubmitButton && (
         <Button
           variant="outline"
@@ -42,6 +45,7 @@ export function AppDialFooter({
           {submitTextValue}
         </Button>
       )}
+      {props.children}
     </DialogFooter>
   );
 }
