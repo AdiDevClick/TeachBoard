@@ -2,7 +2,6 @@ import { useAppStore } from "@/api/store/AppStore.ts";
 import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState.ts";
 import {
   DescriptionChange,
-  HandleLeftContentChange,
   ShowStudentsEvaluationWithPreviousArrow,
 } from "@/features/evaluations/create/steps/three/components/step-three-functionnal-wrappers.functions";
 import {
@@ -15,6 +14,7 @@ import {
   STEP_THREE_SUBSKILLS_SELECTION_TITLE_PROPS,
 } from "@/features/evaluations/create/steps/three/config/step-three.configs.ts";
 import { attendanceRecordCreationBaseControllers } from "@/features/evaluations/create/steps/three/forms/step-two-inputs.ts";
+import { useStepThree } from "@/features/evaluations/create/steps/three/hooks/useStepThree";
 import type { StepThreeSubskillsSelectionControllerProps } from "@/features/evaluations/create/steps/three/types/step-three.types.ts";
 import {
   attendanceRecordCreationSchemaInstance,
@@ -23,16 +23,8 @@ import {
 } from "@/features/evaluations/create/steps/two/models/attendance-record-creation.models";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  useEffect,
-  useEffectEvent,
-  useMemo,
-  type Dispatch,
-  type JSX,
-  type SetStateAction,
-} from "react";
+import { useMemo } from "react";
 import { useForm, type FieldValues } from "react-hook-form";
-import { useOutletContext } from "react-router-dom";
 
 /**
  * STEP THREE - Evaluation
@@ -54,8 +46,6 @@ export function StepThree({
   inputControllers = attendanceRecordCreationBaseControllers,
   ...props
 }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
-  const [, setLeftContent] =
-    useOutletContext<[JSX.Element, Dispatch<SetStateAction<JSX.Element>>]>();
   const user = useAppStore((state) => state.user);
   const {
     selectedClass,
@@ -75,7 +65,6 @@ export function StepThree({
     },
   });
 
-  const formId = pageId + "-form";
   const isModuleClicked = moduleSelectionState.isClicked;
 
   const card = useMemo(() => {
@@ -96,7 +85,7 @@ export function StepThree({
     pageId,
     modalMode,
     className,
-    formId,
+    formId: pageId + "-form",
     inputControllers,
     card,
     ...props,
@@ -122,42 +111,10 @@ export function StepThree({
     user,
   } satisfies StepThreeSubskillsSelectionControllerProps;
 
-  /**
-   * DISPATCH - Display students evaluation on module click
-   *
-   * @description This will update the context for left content on the parent component
-   */
-  const isModuleClickedTrigger = useEffectEvent(() => {
-    if (!setLeftContent) return;
-
-    const leftContent = HandleLeftContentChange(
-      subskillsControllerProps,
-      isModuleClicked,
-    );
-
-    setLeftContent(leftContent);
+  useStepThree({
+    subskillsControllerProps,
+    isModuleClicked,
   });
-
-  /**
-   * CLEANUP - Reset left content
-   *
-   * @description This makes sure the subskills selection is empty on other pages than students evaluation
-   */
-  const onReturn = useEffectEvent(() => {
-    setLeftContent(null!);
-  });
-
-  /**
-   * DISPATCH -
-   *
-   * @description Each time a change occurs on module click
-   */
-  useEffect(() => {
-    isModuleClickedTrigger();
-
-    // CLEANUP
-    return () => onReturn();
-  }, [isModuleClicked]);
 
   return (
     <>
