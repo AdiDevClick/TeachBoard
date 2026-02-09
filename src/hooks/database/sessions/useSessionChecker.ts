@@ -1,6 +1,10 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { DEV_MODE, USER_ACTIVITIES } from "@/configs/app.config.ts";
+import {
+  DEV_MODE,
+  NO_SESSION_CHECK_LOGS,
+  USER_ACTIVITIES,
+} from "@/configs/app.config.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
 
 /**
@@ -10,7 +14,7 @@ import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
  */
 export function useSessionChecker() {
   const clearUserStateOnError = useAppStore(
-    (state) => state.clearUserStateOnError
+    (state) => state.clearUserStateOnError,
   );
   const updateSession = useAppStore((state) => state.updateSession);
   return useQueryOnSubmit([
@@ -22,14 +26,17 @@ export function useSessionChecker() {
       silent: true,
       onSuccess: (data) => {
         updateSession(true, USER_ACTIVITIES.sessionCheck);
-        if (DEV_MODE) {
+        if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
           console.debug("Session Check onSuccess:", data);
         }
       },
       onError: (error) => {
         clearUserStateOnError();
-        if (DEV_MODE) {
-          console.error("Session Check onError:", error);
+        if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
+          console.error(
+            "Session Check onError - This triggers a redirection to login page by the useQueryOnSubmit :",
+            error,
+          );
         }
       },
     },
