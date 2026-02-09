@@ -1,8 +1,6 @@
 import { LoginButtonList } from "@/components/Buttons/exports/buttons.exports";
-import { AppFieldDescriptionWithLink } from "@/components/Fields/AppFieldDescriptionWithLink.tsx";
 import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
 import { Field, FieldGroup, FieldSeparator } from "@/components/ui/field.tsx";
-import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
   debugLogs,
   loginFormControllerPropsInvalid,
@@ -11,7 +9,6 @@ import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
 import { loginButtonsSvgs } from "@/configs/social.config.ts";
 import type { LoginFormControllerProps } from "@/features/auth/components/login/controller/types/login-form-controller.types";
 import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
-import { handleRecoverPasswordClick } from "@/features/auth/components/login/functions/login-forms.funtions";
 import { useAppForm } from "@/features/auth/hooks/useAppForm";
 import { useEffect, useEffectEvent, useRef } from "react";
 import { toast } from "sonner";
@@ -37,15 +34,12 @@ export function LoginFormController(props: LoginFormControllerProps) {
   }
 
   const {
-    setIsPwForgotten,
-    submitDataReshapeFn = API_ENDPOINTS.POST.AUTH.LOGIN.dataReshape,
-    submitRoute = API_ENDPOINTS.POST.AUTH.LOGIN.endpoint,
-    isPwForgotten,
+    submitDataReshapeFn,
+    submitRoute,
     form,
     formId,
     className,
     pageId,
-    textToDisplay,
     inputControllers = inputLoginControllers,
   } = props;
 
@@ -114,19 +108,6 @@ export function LoginFormController(props: LoginFormControllerProps) {
           Ou continuez avec
         </FieldSeparator>
         <ControlledInputList items={inputControllers} form={form} />
-        <AppFieldDescriptionWithLink
-          className="text-left"
-          onClick={(e) =>
-            handleRecoverPasswordClick({
-              e,
-              isPwForgotten,
-              setIsPwForgotten,
-              form,
-            })
-          }
-          linkText={textToDisplay.defaultText}
-          linkTo={textToDisplay.pwForgottenLinkTo}
-        />
       </FieldGroup>
     </form>
   );

@@ -1,8 +1,6 @@
 import { LoginButtonList } from "@/components/Buttons/exports/buttons.exports";
-import { AppFieldDescriptionWithLink } from "@/components/Fields/AppFieldDescriptionWithLink.tsx";
 import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
 import { Field, FieldGroup, FieldSeparator } from "@/components/ui/field.tsx";
-import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
   debugLogs,
   loginFormControllerPropsInvalid,
@@ -10,7 +8,6 @@ import {
 import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
 import { loginButtonsSvgs } from "@/configs/social.config.ts";
 import { passwordRecoveryInputControllers } from "@/data/inputs-controllers.data";
-import { handleRecoverPasswordClick } from "@/features/auth/components/login/functions/login-forms.funtions";
 import type { PwForgottenControllerProps } from "@/features/auth/components/pw-forgotten/controller/types/pw-forgotten-controller.types";
 import { useAppForm } from "@/features/auth/hooks/useAppForm";
 import { useEffect, useEffectEvent, useRef } from "react";
@@ -20,29 +17,23 @@ import { useEffect, useEffectEvent, useRef } from "react";
  *
  * @param className - Additional class names for the component
  * @param inputControllers - Array of input controller objects
- * @param textToDisplay - Object containing text to display for the "forgot password" link
- * @param setIsPwForgotten - Function to toggle the password forgotten state
  * @param submitDataReshapeFn - Function to reshape the form data before submitting (optional)
  * @param submitRoute - API endpoint to submit the form data to (optional)
- * @param isPwForgotten - Boolean indicating whether the password forgotten form is currently displayed
  * @param form - The form instance from react-hook-form
  * @param formId - The ID of the form
  */
 export function PwForgottenController(props: PwForgottenControllerProps) {
-  if (loginFormControllerPropsInvalid(props)) {
+  if (loginFormControllerPropsInvalid(props as any)) {
     debugLogs("PwForgottenControllerProps", props);
   }
 
   const {
-    setIsPwForgotten,
-    submitDataReshapeFn = API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.dataReshape,
-    submitRoute = API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.endpoint,
-    isPwForgotten,
+    submitDataReshapeFn,
+    submitRoute,
     form,
     formId,
     className,
     pageId,
-    textToDisplay,
     inputControllers = passwordRecoveryInputControllers,
   } = props;
 
@@ -52,6 +43,7 @@ export function PwForgottenController(props: PwForgottenControllerProps) {
     resetFormAndTriggerNavigation,
     newItemCallback,
     onSubmit,
+    closeDialog,
   } = useAppForm({
     form,
     pageId,
@@ -67,6 +59,7 @@ export function PwForgottenController(props: PwForgottenControllerProps) {
    */
   const triggerNavigation = useEffectEvent(() => {
     resetFormAndTriggerNavigation();
+    closeDialog(null, pageId);
   });
 
   /**
@@ -114,19 +107,6 @@ export function PwForgottenController(props: PwForgottenControllerProps) {
           Ou continuez avec
         </FieldSeparator>
         <ControlledInputList items={inputControllers} form={form} />
-        <AppFieldDescriptionWithLink
-          className="text-left"
-          onClick={(e) =>
-            handleRecoverPasswordClick({
-              e,
-              isPwForgotten,
-              setIsPwForgotten,
-              form,
-            })
-          }
-          linkText={textToDisplay.defaultText}
-          linkTo={textToDisplay.pwForgottenLinkTo}
-        />
       </FieldGroup>
     </form>
   );
