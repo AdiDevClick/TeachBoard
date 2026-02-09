@@ -2,6 +2,7 @@ import { createStepsCreationDebugRehydrators } from "@/api/store/functions/debug
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
 import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
+import type { NonLabelledGroupItemProps } from "@/components/Selects/types/select.types";
 import { DEV_MODE } from "@/configs/app.config.ts";
 import {
   addNewEvaluationScore,
@@ -22,7 +23,6 @@ import type {
   StudentWithPresence,
   SubskillSelectionType,
 } from "@/features/evaluations/create/store/types/steps-creation-store.types";
-import type { NonLabelledGroupItemProps } from "@/components/Selects/types/select.types";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { create } from "zustand";

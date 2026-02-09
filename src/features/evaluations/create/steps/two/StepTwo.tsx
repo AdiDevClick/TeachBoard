@@ -60,7 +60,7 @@ export function StepTwo({
     card: STEP_TWO_CARD_PROPS,
     ...props,
     form,
-    user,
+    user: user ?? undefined,
     students,
     selectedClass,
     tasks,

@@ -251,16 +251,14 @@ export function useCommandHandler<
       silent = true;
     }
 
-    setFetchParams((prev): FetchParams => {
-      return {
-        ...prev,
-        dataReshapeFn: dataReshapeFn ?? prev.dataReshapeFn,
-        url: String(apiEndpoint),
-        contentId: task,
-        abortController: controller,
-        silent,
-      };
-    });
+    setFetchParams((prev) => ({
+      ...prev,
+      dataReshapeFn: dataReshapeFn ?? prev.dataReshapeFn,
+      url: String(apiEndpoint),
+      contentId: task,
+      abortController: controller,
+      silent,
+    }));
   };
 
   /**
@@ -345,18 +343,18 @@ export function useCommandHandler<
      />
     * ```
    */
-  const handleDataCacheUpdate = useCallback(() => {
+  const handleDataCacheUpdate = useCallback((): HeadingType[] => {
     const cacheKey = fetchParams.cachedFetchKey ?? [
       fetchParams.contentId,
       fetchParams.url,
     ];
-    const cachedData = queryClient.getQueryData<HeadingType[]>(cacheKey);
+    const cachedData = queryClient.getQueryData(cacheKey);
 
     if (DEV_MODE && !NO_CACHE_LOGS) {
       console.log("Cached data for ", cacheKey, " is ", cachedData);
     }
 
-    return cachedData ?? data;
+    return (cachedData ?? data) as HeadingType[];
   }, [queryClient, data, fetchParams]);
 
   /**

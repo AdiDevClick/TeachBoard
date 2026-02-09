@@ -1,15 +1,9 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { EvaluationRadioItemProps } from "@/components/Radio/types/radio.types.ts";
-import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore.ts";
-import type {
-  ClassModuleSubSkill,
-  SelectedClassModulesReturn,
-} from "@/features/evaluations/create/store/types/steps-creation-store.types.ts";
-import { useCallback, type MouseEvent } from "react";
-import { useShallow } from "zustand/shallow";
-export type UseStepThreeHandlerProps =
-  | SelectedClassModulesReturn
-  | ClassModuleSubSkill[];
+import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
+import type { UseStepThreeHandlerProps } from "@/features/evaluations/create/steps/three/types/step-three.types";
+import type { ClassModuleSubSkill } from "@/features/evaluations/create/store/types/steps-creation-store.types.ts";
+import { type MouseEvent } from "react";
 
 /**
  * Hook to handle Step Three logic for module and sub-skill selection.
@@ -20,37 +14,15 @@ export type UseStepThreeHandlerProps =
 export function useStepThreeHandler(
   modulesOrSubSkills: UseStepThreeHandlerProps,
 ) {
-  const setModuleSelection = useEvaluationStepsCreationStore(
-    (state) => state.setModuleSelection,
-  );
-
-  const setSubskillSelection = useEvaluationStepsCreationStore(
-    (state) => state.setSubskillSelection,
-  );
-
-  const selectedModuleId = useEvaluationStepsCreationStore(
-    (state) => state.moduleSelection.selectedModuleId ?? null,
-  );
-  const checkForCompletedModules = useEvaluationStepsCreationStore(
-    (state) => state.checkForCompletedModules,
-  );
-
-  const selectedSubSkillId = useEvaluationStepsCreationStore(
-    (state) => state.subSkillSelection.selectedSubSkillId,
-  );
-
-  const disableSubSkillsWithoutStudents = useEvaluationStepsCreationStore(
-    useShallow((state) => state.disableSubSkillsWithoutStudents),
-  );
-
-  const selectedSubSkill = useEvaluationStepsCreationStore(
-    useShallow((state) =>
-      state.getSelectedSubSkill(
-        selectedSubSkillId ?? undefined,
-        selectedModuleId ?? undefined,
-      ),
-    ),
-  );
+  const {
+    setModuleSelection,
+    setSubskillSelection,
+    selectedModuleId,
+    checkForCompletedModules,
+    selectedSubSkill,
+    selectedSubSkillId,
+    disableSubSkillsWithoutStudents,
+  } = useStepThreeState();
 
   /**
    * Handles the change of selected module.
@@ -60,26 +32,24 @@ export function useStepThreeHandler(
    *
    * @param value - The UUID of the selected module
    */
-  const handleModuleChangeCallback = useCallback(
-    (value: UUID) => {
-      if (!value) {
-        return;
-      }
+  const handleModuleChangeCallback = (value: UUID) => {
+    if (!value) {
+      return;
+    }
 
-      const selectedModule = findIndexById(value, modulesOrSubSkills);
+    const selectedModule = findIndexById(value, modulesOrSubSkills);
 
-      if (!selectedModule?.item) {
-        return;
-      }
+    if (!selectedModule?.item) {
+      return;
+    }
 
-      setModuleSelection({
-        isClicked: true,
-        selectedModuleIndex: selectedModule.index,
-        selectedModuleId: selectedModule.item.id,
-      });
-    },
-    [modulesOrSubSkills, selectedModuleId],
-  );
+    setModuleSelection({
+      isClicked: true,
+      selectedModuleIndex: selectedModule.index,
+      selectedModuleId: selectedModule.item.id,
+    });
+  };
+
   /**
    * Handles the change of selected sub-skill.
    *
@@ -89,29 +59,27 @@ export function useStepThreeHandler(
    *
    * @param value - The UUID of the selected sub-skill
    */
-  const handleSubSkillChangeCallback = useCallback(
-    (value: UUID) => {
-      if (!value) {
-        return;
-      }
+  const handleSubSkillChangeCallback = (value: UUID) => {
+    if (!value) {
+      return;
+    }
 
-      const selectedSubSkill = findIndexById(value, modulesOrSubSkills) as {
-        index: number;
-        item: ClassModuleSubSkill;
-      } | null;
+    const selectedSubSkill = findIndexById(value, modulesOrSubSkills) as {
+      index: number;
+      item: ClassModuleSubSkill;
+    } | null;
 
-      if (!selectedSubSkill?.item) {
-        return;
-      }
+    if (!selectedSubSkill?.item) {
+      return;
+    }
 
-      setSubskillSelection({
-        isClicked: true,
-        selectedSubSkillIndex: selectedSubSkill.index,
-        selectedSubSkillId: selectedSubSkill.item.id,
-      });
-    },
-    [modulesOrSubSkills, selectedModuleId],
-  );
+    setSubskillSelection({
+      isClicked: true,
+      selectedSubSkillIndex: selectedSubSkill.index,
+      selectedSubSkillId: selectedSubSkill.item.id,
+    });
+  };
+
   /**
    * Handles the click on the already selected module.
    *

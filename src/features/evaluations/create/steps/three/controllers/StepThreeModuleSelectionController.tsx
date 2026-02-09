@@ -29,6 +29,11 @@ export function StepThreeModuleSelectionController(
     selectedModuleId,
   } = useStepThreeHandler(modules);
 
+  /**
+   * INIT - CHECKER
+   *
+   * @description This is used to check for completed modules upon initial render.
+   */
   const initChecker = useEffectEvent(() => {
     checkForCompletedModules();
   });
@@ -50,7 +55,7 @@ export function StepThreeModuleSelectionController(
   return (
     <form id={formId}>
       <RadioGroup
-        value={selectedModuleId ?? ""}
+        value={selectedModuleId}
         onValueChange={handleModuleChangeCallback}
         className={evaluationRadioGroupContainer}
       >

@@ -5,11 +5,10 @@ import {
   debugLogs,
   stepThreeSubskillsSelectionControllerPropsInvalid,
 } from "@/configs/app-components.config.ts";
-import { useStepThreeHandler } from "@/features/evaluations/create/hooks/useStepThreeHandler.ts";
+import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
+import { useSubSkillsSelection } from "@/features/evaluations/create/steps/three/hooks/useSubSkillsSelection";
 import type { StepThreeSubskillsSelectionControllerProps } from "@/features/evaluations/create/steps/three/types/step-three.types.ts";
-import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore.ts";
-import { Activity, useEffect } from "react";
-import { useShallow } from "zustand/shallow";
+import { Activity } from "react";
 
 /**
  * Step Three Subskills Selection Controller.
@@ -21,60 +20,17 @@ import { useShallow } from "zustand/shallow";
 export function StepThreeSubskillsSelectionController(
   props: StepThreeSubskillsSelectionControllerProps,
 ) {
-  const { formId } = props;
+  const { subSkills } = useStepThreeState();
 
-  const subSkills = useEvaluationStepsCreationStore(
-    useShallow((state) => state.getSelectedModuleSubSkills()),
-  );
-
-  const {
-    handleSubSkillChangeCallback,
-    selectedSubSkillId,
-    disableSubSkillsWithoutStudents,
-    selectedModuleId,
-    selectedSubSkill,
-  } = useStepThreeHandler(subSkills);
-
-  /**
-   * INIT
-   *
-   * @description Disable sub-skills without students to evaluate upon initial render.
-   */
-  useEffect(() => {
-    if (!selectedModuleId) {
-      return;
-    }
-
-    disableSubSkillsWithoutStudents(selectedModuleId);
-  }, []);
-
-  /**
-   * AUTO-SELECT FIRST SUB-SKILL
-   *
-   * @description - Auto-select the first sub-skill that is not disabled when a change happens on the sub-skills list.
-   */
-  useEffect(() => {
-    if (!selectedModuleId || subSkills.length === 0) {
-      return;
-    }
-
-    const firstActivableSubSkill = subSkills.find(
-      (subSkill) => !subSkill.isDisabled,
-    );
-
-    const shouldSelectFirstEnabled =
-      !selectedSubSkill?.id || selectedSubSkill?.isDisabled;
-
-    if (shouldSelectFirstEnabled && firstActivableSubSkill?.id) {
-      handleSubSkillChangeCallback(firstActivableSubSkill.id);
-    }
-  }, [selectedModuleId, selectedSubSkill?.isDisabled]);
+  const { handleSubSkillChangeCallback, selectedSubSkillId } =
+    useSubSkillsSelection(subSkills);
 
   if (stepThreeSubskillsSelectionControllerPropsInvalid(props)) {
     debugLogs("StepThreeSubskillsSelectionController", props);
     return null;
   }
 
+  const { formId } = props;
   const selectedId = selectedSubSkillId ?? subSkills[0]?.id;
 
   return (

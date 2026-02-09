@@ -122,6 +122,11 @@ export function StepThree({
     user,
   } satisfies StepThreeSubskillsSelectionControllerProps;
 
+  /**
+   * DISPATCH - Display students evaluation on module click
+   *
+   * @description This will update the context for left content on the parent component
+   */
   const isModuleClickedTrigger = useEffectEvent(() => {
     if (!setLeftContent) return;
 
@@ -133,18 +138,24 @@ export function StepThree({
     setLeftContent(leftContent);
   });
 
+  /**
+   * CLEANUP - Reset left content
+   *
+   * @description This makes sure the subskills selection is empty on other pages than students evaluation
+   */
   const onReturn = useEffectEvent(() => {
     setLeftContent(null!);
   });
 
   /**
-   * Dispatch left content based on module selection state
+   * DISPATCH -
    *
-   * @description This will update the context for left content on the parent component
+   * @description Each time a change occurs on module click
    */
   useEffect(() => {
     isModuleClickedTrigger();
 
+    // CLEANUP
     return () => onReturn();
   }, [isModuleClicked]);
 

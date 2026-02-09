@@ -3,6 +3,7 @@ import type { ShowStudentsEvaluation } from "@/features/evaluations/create/steps
 import type { StepThree } from "@/features/evaluations/create/steps/three/StepThree.tsx";
 import type { AttendanceRecordCreationFormSchema } from "@/features/evaluations/create/steps/two/models/attendance-record-creation.models";
 import type {
+  ClassModuleSubSkill,
   ClassTasks,
   SelectedClassModulesReturn,
   StudentWithPresence,
@@ -60,3 +61,6 @@ export type ShowStudentsEvaluationWithPreviousArrowProps = Parameters<
 export type StepThreeCommonProps =
   | StepThreeControllerProps
   | StepThreeModuleSelectionControllerProps;
+export type UseStepThreeHandlerProps =
+  | SelectedClassModulesReturn
+  | ClassModuleSubSkill[];

@@ -1,14 +1,14 @@
 import {
+  arrowBack,
   contentRightSide,
   contentRightSideContainer,
-  arrowBack,
 } from "@/assets/css/EvaluationPage.module.scss";
 
 // Module selection
 export const STEP_THREE_MODULE_SELECTION_CARD_PROPS = {
   card: { className: contentRightSide },
   title: {
-    title: "Liste des catégories",
+    title: "Liste des modules",
     description: "Par quoi doit-on commencer ?",
   },
   content: {

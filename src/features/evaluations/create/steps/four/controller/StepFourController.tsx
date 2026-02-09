@@ -1,6 +1,6 @@
 import { summaryPageContent } from "@/assets/css/SummaryPage.module.scss";
 import { ListMapper } from "@/components/Lists/ListMapper";
-import { EvaluationSliderList } from "@/components/Sliders/EvaluationSlider";
+import { EvaluationSliderList } from "@/components/Sliders/exports/sliders.exports";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
 import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/labelled-textarea";
 import {
