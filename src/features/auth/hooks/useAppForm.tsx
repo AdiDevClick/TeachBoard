@@ -1,13 +1,13 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { useSidebar } from "@/components/ui/sidebar";
-import { HTTP_METHODS } from "@/configs/app.config";
+import { HTTP_METHODS, ifThisPageIsInRedirectList } from "@/configs/app.config";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import type { AppControllerInterface } from "@/types/AppControllerInterface";
 import type { DataReshapeFn } from "@/types/AppInputControllerInterface";
 import { wait } from "@/utils/utils";
 import { startTransition, useEffect } from "react";
 import type { FieldValues } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const toastId = "login-loading";
@@ -34,6 +34,7 @@ export function useAppForm<T extends FieldValues = FieldValues>({
   submitDataReshapeFn,
 }: UseAppFormProps<T>) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { open, setOpen } = useSidebar();
 
   const { submitCallback, ...rest } = useCommandHandler({
@@ -51,9 +52,13 @@ export function useAppForm<T extends FieldValues = FieldValues>({
     // !! IMPORTANT !! - Use startTransition to avoid blocking UI updates
     startTransition(() => {
       if (!open) setOpen(true);
-      form.reset();
+      // form.reset();
     });
 
+    if (!ifThisPageIsInRedirectList(location.pathname)) {
+      // If the current page is in the no-redirect list, just reset the form without navigating
+      return;
+    }
     navigate("/", { replace: true });
   };
 
