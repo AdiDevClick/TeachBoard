@@ -231,7 +231,7 @@ export const evaluationRadioItemPropsInvalid = (
 const DROPDOWN_REQUIRES = ["title"];
 
 export const dropdownPropsInvalid = (props: DropdownsProps) =>
-  checkPropsValidity(props, DROPDOWN_REQUIRES, []);
+  checkPropsValidity(props as any, DROPDOWN_REQUIRES, []);
 
 //                    ------------
 
