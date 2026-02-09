@@ -247,7 +247,6 @@ function onQuerySuccess<TSuccess extends ResponseInterface<unknown>>(
   toast(successMessage ?? "Success", {
     description: querySuccessDescription,
     position: "top-right",
-    // style: { zIndex: 10000 },
   });
 }
 
