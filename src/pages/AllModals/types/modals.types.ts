@@ -5,77 +5,61 @@ import type {
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type {
   AnyComponentLike,
-  ComponentLike,
   ContentPropsFor,
   EnsureContentList,
 } from "@/utils/types/types.utils.ts";
 import type { ComponentType } from "react";
 
-type SimpleAlertRequiredProps = Pick<
-  WithSimpleAlertProps,
-  "headerTitle" | "headerDescription"
->;
+type StandardModalProps = Omit<ModalProps, "modalName" | "modalContent">;
 
-type StandardModalProps = Partial<Omit<ModalProps, "modalName">>;
+type SimpleAlertModalProps = Omit<WithSimpleAlertProps, "modalName">;
 
-type SimpleAlertModalProps = SimpleAlertRequiredProps &
-  Partial<
-    Omit<
-      WithSimpleAlertProps,
-      "modalName" | "headerTitle" | "headerDescription"
-    >
-  >;
-
-export type StandardModalConfig<
-  Name = AppModalNames,
-  TComponent extends ComponentLike<unknown> = AnyComponentLike
-> = {
-  modalName: Name;
-  id?: string;
+export type StandardModalConfig<T extends AnyComponentLike> = {
   type: ComponentType<ModalProps>;
-  modalContent: TComponent;
+  modalContent: T;
   modalProps?: StandardModalProps;
-  contentProps: ContentPropsFor<TComponent>;
+  contentProps: ContentPropsFor<T>;
 };
 
 /**
  * WithSimpleAlert wrapper config (returns a prewired modal without a modalContent prop)
  */
-export type SimpleAlertConfig<Name = AppModalNames> = {
-  modalName: Name;
-  id?: string;
+export type SimpleAlertConfig = {
   type: ComponentType<WithSimpleAlertProps>;
   modalProps: SimpleAlertModalProps;
   contentProps?: never;
   modalContent?: never;
 };
 
-export type AppModal = StandardModalConfig | SimpleAlertConfig;
+export type AppModal<T extends ComponentType = AnyComponentLike> = {
+  modalName: AppModalNames;
+  id?: string;
+} & (StandardModalConfig<T> | SimpleAlertConfig);
 
 type StrictModalsList<T extends readonly AppModal[]> = EnsureContentList<
   T,
   "contentProps"
 >;
 
-export function defineModalsList(modals: readonly AppModal[]): AppModal[] {
-  return [...modals];
+export function defineModalsList<T extends AppModal[]>(modals: T): T {
+  return modals;
 }
 
-export function defineStrictModalsList<const T extends readonly AppModal[]>(
-  modals: StrictModalsList<T>
-): AppModal[] {
-  return [...modals];
+export function defineStrictModalsList<T extends readonly AppModal[]>(
+  modals: StrictModalsList<T>,
+): T {
+  return modals;
 }
 
 export function isStandardModal(
-  modal: AppModal
-): modal is StandardModalConfig<AppModalNames, AnyComponentLike> {
+  modal: AppModal,
+): modal is AppModal & StandardModalConfig<AnyComponentLike> {
   return "modalContent" in modal;
 }
 
 export function isSimpleAlertModal(
-  modal: AppModal
-): modal is SimpleAlertConfig<AppModalNames> {
+  modal: AppModal,
+): modal is AppModal & SimpleAlertConfig {
   return !("modalContent" in modal);
 }
 

@@ -43,7 +43,6 @@ const modals = defineStrictModalsList([
     modalContent: LoginView,
     contentProps: {
       inputControllers: inputLoginControllers,
-      modalMode: true,
     },
   },
   {
@@ -69,32 +68,21 @@ const modals = defineStrictModalsList([
     type: ModalWithSimpleAlert,
     modalProps: {
       isNavigationModal: false,
-      headerTitle: "Demande envoyée",
+      headerTitle: "Email envoyé",
       headerDescription:
         "Un email a été envoyé. Vérifiez votre boîte mail pour réinitialiser votre mot de passe.",
     },
   },
   {
     modalName: "class-creation",
-    type: Modal,
     modalContent: ClassCreation,
-    modalProps: {
-      isNavigationModal: false,
-    },
-    contentProps: {
-      modalMode: true,
-    },
+    ...baseNonNavigationalProps,
   },
   {
     modalName: "create-diploma",
     modalContent: DiplomaCreation,
     ...baseNonNavigationalProps,
-    modalProps: {
-      isNavigationModal: false,
-      className: "max-w-2",
-    },
     contentProps: {
-      modalMode: true,
       pageId: "create-diploma",
       inputControllers: diplomaCreationInputControllers,
     },

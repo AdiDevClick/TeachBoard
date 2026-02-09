@@ -1,3 +1,4 @@
+import type { AppModal } from "@/pages/AllModals/types/modals.types";
 import type { ApiError } from "@/types/AppErrorInterface.ts";
 import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
 import type {
@@ -108,7 +109,7 @@ export type ProvidedKeyRecord<T> = Record<KeysOfUnion<T>, unknown>;
 export type ComponentLike<P = unknown> =
   | ComponentType<P>
   | ForwardRefExoticComponent<P>
-  | ((props: P) => ReactNode);
+  | BivariantCallback<(props: P) => ReactNode>;
 
 /**
  * Make a function type bivariant in its parameters.
@@ -144,7 +145,7 @@ export type EnsureContentList<
  */
 export const createEnsureContentList =
   <PropName extends string>() =>
-  <const T extends readonly unknown[]>(list: EnsureContentList<T, PropName>) =>
+  <const T extends readonly AppModal[]>(list: EnsureContentList<T, PropName>) =>
     list;
 
 /**
