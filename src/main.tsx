@@ -6,9 +6,8 @@ import { PageHeader } from "@/components/Header/PageHeader";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { Toaster } from "@/components/ui/sonner";
-import { DEV_MODE, NO_SESSIONS_CHECK_PAGES } from "@/configs/app.config.ts";
-import { calendarEvents } from "@/data/CalendarData.ts";
-import { sidebarDatas } from "@/data/SidebarData.ts";
+import { DEV_MODE, doesContainNoSessionPage } from "@/configs/app.config.ts";
+import { COMPLETE_SIDEBAR_DATAS } from "@/configs/main.configs";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
 import { AppModals } from "@/pages/AllModals/AppModals.tsx";
@@ -18,7 +17,12 @@ import type { RootProps } from "@/types/MainTypes";
 import "@css/MainContainer.scss";
 import "@css/Toaster.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { StrictMode, useEffect, type CSSProperties } from "react";
+import {
+  StrictMode,
+  useEffect,
+  useEffectEvent,
+  type CSSProperties,
+} from "react";
 import { createRoot } from "react-dom/client";
 import {
   createBrowserRouter,
@@ -28,18 +32,6 @@ import {
 } from "react-router-dom";
 
 const queryClient = new QueryClient();
-
-/**
- * Complete sidebar data including calendar events
- *
- * @description This object merges the static sidebar data with
- * dynamic calendar events to provide a comprehensive data set
- * for the sidebar navigation.
- */
-export const completeDatas = {
-  ...sidebarDatas,
-  calendarEvents: calendarEvents,
-};
 
 /**
  * Application router configuration
@@ -88,34 +80,73 @@ export function Root({ contentType }: Readonly<RootProps>) {
   const location = useLocation();
   const { data, isLoading, onSubmit, isLoaded, error } = useSessionChecker();
 
+  const triggerSessionCheck = useEffectEvent(() => {
+    onSubmit();
+  });
+
+  /**
+   * Show login modal to user when no active session is found
+   *
+   * @description This is a gentle reminder for users to log in without redirecting them away from the current page, providing a smoother user experience.
+   *
+   * @remark !!! IMPORTANT !! Keep in mind that this approach assumes the users will interact with the login modal when it appears or they may continue exploring the site.
+   *
+   * @important Please, use the useSessionChecker hook in your critical components and ensure a check before fetching as the server will immediately return an error uppon invalid session, which will force trigger a redirection to the login page.
+   */
+  const showLoginModalToUser = useEffectEvent(() => {
+    if (location.pathname === "/login") return;
+
+    if (DEV_MODE) {
+      console.debug(
+        "No active session found. A dialog has been opened for login.",
+      );
+    }
+    console.log(
+      "Il ouvre la modale de login sur cette location : ",
+      location.pathname,
+    );
+    openDialog(null, "login");
+    // navigate("/login", { replace: true });
+  });
+
   /**
    * Automatically check session on app load unless the last user activity was a logout
    */
   useEffect(() => {
     // const userExists = user !== null;
     const path = location.pathname;
-    const doesContainNoSessionPage = NO_SESSIONS_CHECK_PAGES.some((page) =>
-      path.startsWith(page),
-    );
 
+    const isPublicPage = doesContainNoSessionPage(path);
     const lastActivityWasLogout = lastUserActivity === "logout";
-    const doNotCheckSession =
-      isLoaded ||
-      lastActivityWasLogout ||
-      sessionSynced ||
-      doesContainNoSessionPage;
-    // const shouldCheckSession = userExists && !doNotCheckSession;
 
-    // const doNotCheckSession =
-    //   isLoaded ||
-    //   lastActivityWasLogout ||
-    //   sessionSynced ||
-    //   path === "/login" ||
-    //   path.startsWith("/signup");
-
-    if (doNotCheckSession) return;
-    onSubmit();
-  }, [isLoaded, lastUserActivity, sessionSynced]);
+    switch (true) {
+      case lastActivityWasLogout && isPublicPage:
+      case isPublicPage:
+        if (DEV_MODE) {
+          console.debug(
+            "Current page is public. No session check needed.",
+            path,
+          );
+        }
+        break;
+      case sessionSynced:
+        if (DEV_MODE) {
+          console.debug(
+            "Session is already synced. No session check needed.",
+            path,
+          );
+        }
+        break;
+      default:
+        if (DEV_MODE) {
+          console.debug(
+            "Checking session on app load...",
+            path,
+          );
+        }
+        triggerSessionCheck();
+    }
+  }, [isLoaded, lastUserActivity, sessionSynced, location.pathname]);
 
   useEffect(() => {
     if (isLoading) {
@@ -131,7 +162,8 @@ export function Root({ contentType }: Readonly<RootProps>) {
     }
 
     if (error && !isLoading) {
-      openDialog(null, "login");
+      showLoginModalToUser();
+
       if (DEV_MODE) {
         console.error("Session Check Error:", error);
       }
@@ -149,12 +181,16 @@ export function Root({ contentType }: Readonly<RootProps>) {
       }
       className="sidebar-wrapper"
     >
-      <SidebarDataProvider value={completeDatas}>
+      <SidebarDataProvider value={COMPLETE_SIDEBAR_DATAS}>
         <AppSidebar variant="inset" />
         <SidebarInset className="main-app-container">
           <PageHeader />
           <App>
-            {errorContent ? <PageError /> : <Outlet context={completeDatas} />}
+            {errorContent ? (
+              <PageError />
+            ) : (
+              <Outlet context={COMPLETE_SIDEBAR_DATAS} />
+            )}
           </App>
         </SidebarInset>
       </SidebarDataProvider>
