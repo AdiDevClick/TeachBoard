@@ -1,7 +1,10 @@
+import { AppFieldDescriptionWithLink } from "@/components/Fields/AppFieldDescriptionWithLink";
 import type { WithStyledFormProps } from "@/components/HOCs/types/with-styled-form.types";
 import withTitledCard from "@/components/HOCs/withTitledCard";
-import { FooterFields } from "@/features/auth/components/login/LoginView";
+import { handleRecoverPasswordClick } from "@/features/auth/components/login/functions/login-forms.funtions";
+import { FooterFields } from "@/features/auth/components/main/components/Footers/FooterFields";
 import type { AnyComponentLike } from "@/utils/types/types.utils";
+import type { ComponentProps } from "react";
 
 /**
  * Higher-Order Component that wraps a given component with a styled card layout, including a title, content, and footer.
@@ -11,13 +14,30 @@ import type { AnyComponentLike } from "@/utils/types/types.utils";
  * @param Component
  */
 export function withStyledForm<T extends AnyComponentLike>(Component: T) {
-  return function FormComponent(props: WithStyledFormProps & T) {
+  return function FormComponent(props: WithStyledFormProps<ComponentProps<T>>) {
     const Wrapped = withTitledCard(Component);
+
+    const { textToDisplay, isPwForgotten, setIsPwForgotten, form, formId } =
+      props;
 
     return (
       <Wrapped {...props}>
         <Wrapped.Title />
-        <Wrapped.Content />
+        <Wrapped.Content>
+          <AppFieldDescriptionWithLink
+            className="text-left pt-6"
+            onClick={(e) =>
+              handleRecoverPasswordClick({
+                e,
+                isPwForgotten,
+                setIsPwForgotten,
+                form,
+              })
+            }
+            linkText={textToDisplay.defaultText}
+            linkTo={textToDisplay.pwForgottenLinkTo}
+          />
+        </Wrapped.Content>
         <Wrapped.Footer
           displaySubmitButton={false}
           displayCancelButton={false}
@@ -25,10 +45,10 @@ export function withStyledForm<T extends AnyComponentLike>(Component: T) {
           className="px-6"
         >
           <FooterFields
-            form={props.form}
-            formId={props.formId}
-            textToDisplay={props.textToDisplay}
-            onClick={props.onClick}
+            form={form}
+            formId={formId}
+            textToDisplay={textToDisplay}
+            pageId={props.pageId}
           />
         </Wrapped.Footer>
       </Wrapped>
