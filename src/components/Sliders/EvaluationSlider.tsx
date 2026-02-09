@@ -1,5 +1,4 @@
 import "@/assets/css/Slider.scss";
-import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import { sliderRangeColor } from "@/components/Sliders/functions/sliders.functions.ts";
 import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
 import { Badge } from "@/components/ui/badge.tsx";
@@ -9,7 +8,7 @@ import {
   debugLogs,
   evaluationSliderPropsValid,
 } from "@/configs/app-components.config.ts";
-import { useState, type CSSProperties } from "react";
+import { useEffect, useEffectEvent, useState, type CSSProperties } from "react";
 
 /**
  * EvaluationSlider component for evaluating students.
@@ -23,11 +22,6 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
 
   const [internalValue, setInternalValue] = useState<number[]>(value ?? [0]);
 
-  if (evaluationSliderPropsValid(props)) {
-    debugLogs("[EvaluationSlider]", props);
-    return null;
-  }
-
   /**
    * Handles value change from the slider component.
    *
@@ -36,9 +30,32 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
    * @param newValue - The new value array from the slider.
    */
   const handleValueChange = (newValue: number[]) => {
-    setInternalValue(newValue);
+    setInternalValue(newValue ?? internalValue);
     onValueChange?.(newValue, props);
   };
+
+  /**
+   * SYNC - External changes with internal state
+   *
+   * @description Make sure each slider is tided to its own value and not others sliders
+   */
+  const triggerExternalChange = useEffectEvent((value: number[]) => {
+    setInternalValue(value ?? internalValue);
+  });
+
+  /**
+   * SYNC - Internal state with external changes
+   *
+   * @description  Each time the value changes
+   */
+  useEffect(() => {
+    triggerExternalChange(value);
+  }, [value]);
+
+  if (evaluationSliderPropsValid(props)) {
+    debugLogs("[EvaluationSlider]", props);
+    return null;
+  }
 
   return (
     <Item className="flex flex-nowrap gap-0.1">
@@ -58,5 +75,3 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
     </Item>
   );
 }
-
-export const EvaluationSliderList = withListMapper(EvaluationSlider);
