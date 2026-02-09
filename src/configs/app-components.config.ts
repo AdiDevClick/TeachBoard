@@ -1,6 +1,7 @@
 import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.ts";
 import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
+import type { DropdownsProps } from "@/components/Dropdowns/types/dropdowns.types";
 import type { LabelledInputProps } from "@/components/Inputs/types/inputs.types";
 import type {
   EvaluationRadioItemDescriptionProps,
@@ -10,7 +11,7 @@ import type { NonLabelledGroupItemProps } from "@/components/Selects/types/selec
 import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
 import type { LabelledTextAreaProps } from "@/components/TextAreas/types/textareas.types";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
-import type { LoginFormControllerProps } from "@/features/auth/components/login/types/login-forms.types";
+import type { LoginFormControllerProps } from "@/features/auth/components/login/controller/types/login-form-controller.types";
 import type { ClassCreationControllerProps } from "@/features/class-creation/class-creation.index.ts";
 import type {
   StepThreeControllerProps,
@@ -219,6 +220,18 @@ const EVALUATION_RADIO_ITEM_REQUIRES = ["id", "name"];
 export const evaluationRadioItemPropsInvalid = (
   props: EvaluationRadioItemProps & AnyObjectProps,
 ) => checkPropsValidity(props, EVALUATION_RADIO_ITEM_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for Dropdown.
+ *
+ * {@link import("@/components/Dropdowns/Dropdown.tsx").Dropdown}
+ */
+const DROPDOWN_REQUIRES = ["title"];
+
+export const dropdownPropsInvalid = (props: DropdownsProps) =>
+  checkPropsValidity(props, DROPDOWN_REQUIRES, []);
 
 //                    ------------
 
