@@ -47,9 +47,9 @@ export function Login({
         </Link>
         <LoginView inputControllers={inputControllers} />
         <FieldDescription className="px-6 text-center">
-          En cliquant sur "Se connecter", vous acceptez nos{" "}
-          <Link to="#">Conditions d'utilisation</Link> et{" "}
-          <Link to="#">Politique de confidentialité</Link>.
+          {'En cliquant sur "Se connecter", vous acceptez nos '}
+          <Link to="#">{`Conditions d'utilisation`}</Link> et{" "}
+          <Link to="#">{`Politique de confidentialité`}</Link>.
         </FieldDescription>
       </div>
     </div>

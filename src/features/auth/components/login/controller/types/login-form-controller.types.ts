@@ -3,7 +3,6 @@ import type LoginView from "@/features/auth/components/login/LoginView";
 import type { LoginFormSchema } from "@/features/auth/components/login/models/login.models";
 import type { ForgottenPw } from "@/features/auth/types/auth-types";
 import type { AppControllerInterface } from "@/types/AppControllerInterface";
-import type { FieldValues } from "react-hook-form";
 /**
  * @filedescription Types for the LoginFormController component, which handles the logic for the login form in the authentication flow.
  */
@@ -11,11 +10,9 @@ import type { FieldValues } from "react-hook-form";
 /**
  * Props for the LoginFormController component.
  */
-export type LoginFormControllerProps<
-  TForm extends FieldValues = LoginFormSchema,
-> = Readonly<
+export type LoginFormControllerProps = Readonly<
   AppControllerInterface<
-    TForm,
+    LoginFormSchema,
     typeof API_ENDPOINTS.POST.AUTH.LOGIN.endpoint,
     typeof API_ENDPOINTS.POST.AUTH.LOGIN.dataReshape
   > &

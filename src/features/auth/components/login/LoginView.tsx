@@ -20,7 +20,7 @@ import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { MouseEvent } from "react";
 import { useState } from "react";
-import { useForm, useFormState, type UseFormReturn } from "react-hook-form";
+import { useForm, useFormState, type FieldValues } from "react-hook-form";
 
 const resetPasswordButtonText = "Réinitialiser le mot de passe";
 const backToLoginLinkText = "Retour à la connexion";
@@ -101,6 +101,7 @@ function LoginView({
   const recoveryProps = {
     ...sharedProps,
     formId: `${pageId}-form-pw-recovery`,
+    // widen the form type so it matches the HOC's expected UseFormReturn<FieldValues>-like signature
     form: recoveryForm,
     inputControllers: passwordRecoveryInputControllers,
     textToDisplay: {
@@ -120,14 +121,15 @@ function LoginView({
 
 const LoginForm = withStyledForm(LoginFormController);
 const PwForgotten = withStyledForm(PwForgottenController);
-    
+
 export default LoginView;
 
-export type FooterFieldsProps<TFormValues extends Record<string, unknown>> = {
-  form: UseFormReturn<TFormValues>;
-} & Pick<WithStyledFormProps, "formId" | "textToDisplay"> & {
-    onClick?: (e?: MouseEvent) => void;
-  };
+export type FooterFieldsProps<TFormValues extends FieldValues> = Pick<
+  WithStyledFormProps<TFormValues>,
+  "form" | "formId" | "textToDisplay"
+> & {
+  onClick?: (e?: MouseEvent) => void;
+};
 
 /**
  * Footer fields component for the login form, including the submit button and a link to toggle between login and password recovery modes.

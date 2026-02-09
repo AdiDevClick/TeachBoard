@@ -14,7 +14,7 @@ import type { FieldValues, UseFormReturn } from "react-hook-form";
  */
 type LoginViewProps = Parameters<typeof LoginView>[0];
 
-export type WithStyledFormProps<T extends FieldValues = FieldValues> = Readonly<
+export type WithStyledFormProps<T extends FieldValues> = Readonly<
   {
     formId: string;
     form: UseFormReturn<T>;
