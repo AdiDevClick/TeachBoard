@@ -6,7 +6,11 @@ import { PageHeader } from "@/components/Header/PageHeader";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { Toaster } from "@/components/ui/sonner";
-import { DEV_MODE, doesContainNoSessionPage } from "@/configs/app.config.ts";
+import {
+  DEV_MODE,
+  doesContainNoSessionPage,
+  NO_SESSION_CHECK_LOGS,
+} from "@/configs/app.config.ts";
 import { COMPLETE_SIDEBAR_DATAS } from "@/configs/main.configs";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
@@ -101,19 +105,13 @@ export function Root({ contentType }: Readonly<RootProps>) {
         "No active session found. A dialog has been opened for login.",
       );
     }
-    console.log(
-      "Il ouvre la modale de login sur cette location : ",
-      location.pathname,
-    );
     openDialog(null, "login");
-    // navigate("/login", { replace: true });
   });
 
   /**
    * Automatically check session on app load unless the last user activity was a logout
    */
   useEffect(() => {
-    // const userExists = user !== null;
     const path = location.pathname;
 
     const isPublicPage = doesContainNoSessionPage(path);
@@ -122,7 +120,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
     switch (true) {
       case lastActivityWasLogout && isPublicPage:
       case isPublicPage:
-        if (DEV_MODE) {
+        if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
           console.debug(
             "Current page is public. No session check needed.",
             path,
@@ -130,7 +128,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
         }
         break;
       case sessionSynced:
-        if (DEV_MODE) {
+        if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
           console.debug(
             "Session is already synced. No session check needed.",
             path,
@@ -138,11 +136,8 @@ export function Root({ contentType }: Readonly<RootProps>) {
         }
         break;
       default:
-        if (DEV_MODE) {
-          console.debug(
-            "Checking session on app load...",
-            path,
-          );
+        if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
+          console.debug("Checking session on app load...", path);
         }
         triggerSessionCheck();
     }
@@ -150,13 +145,13 @@ export function Root({ contentType }: Readonly<RootProps>) {
 
   useEffect(() => {
     if (isLoading) {
-      if (DEV_MODE) {
+      if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
         console.debug("Session Check Loading...");
       }
     }
 
     if (data) {
-      if (DEV_MODE) {
+      if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
         console.debug("Session Check Data:", data);
       }
     }
@@ -164,7 +159,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
     if (error && !isLoading) {
       showLoginModalToUser();
 
-      if (DEV_MODE) {
+      if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
         console.error("Session Check Error:", error);
       }
     }
