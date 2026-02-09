@@ -14,9 +14,10 @@ export const DEV_MODE = import.meta.env.DEV;
 export const NO_PROXY_LOGS = true;
 export const NO_MUTATION_OBSERVER_LOGS = true;
 export const NO_CACHE_LOGS = true;
-export const NO_QUERY_LOGS = false;
-export const NO_COMPONENT_WARNING_LOGS = false;
+export const NO_QUERY_LOGS = true;
+export const NO_COMPONENT_WARNING_LOGS = true;
 export const ANIMATIONS_LOGS = false;
+export const NO_SESSION_CHECK_LOGS = true;
 
 const HTTP_METHODS_LIST = [
   "GET",
@@ -93,13 +94,49 @@ export type AppModalNames =
  *
  * @description List of routes where session checks are bypassed.
  */
-export const NO_SESSIONS_CHECK_PAGES = [
+const NO_SESSIONS_CHECK_PAGES = [
+  "/",
   "/login",
+  "/logout",
   "/signup",
   "/error",
   "/password-creation",
   "/forgot-password",
-];
+] as const;
+
+/**
+ * Check if the given path is in the list of pages that do not require session checks.
+ *
+ * @param path - The current path to check against the no-session-check list.
+ * @returns - True if the path is in the no-session-check list, false otherwise.
+ */
+export const doesContainNoSessionPage = (path: string) => {
+  return NO_SESSIONS_CHECK_PAGES.some((page) => {
+    if (page === "/" && path === "/") {
+      return true;
+    }
+
+    if (page !== "/") return path.startsWith(page);
+  });
+};
+
+const REDIRECT_AFTER_LOGIN_PAGES_LIST = [
+  "/login",
+  "/signup",
+  "/logout",
+] as const;
+
+/**
+ * Check if the given path is in the list of pages that should trigger a redirect after login.
+ *
+ * @param path - The current path to check against the redirect list.
+ * @returns - True if the path is in the redirect list, false otherwise.
+ */
+export const ifThisPageIsInRedirectList = (path: string) => {
+  return REDIRECT_AFTER_LOGIN_PAGES_LIST.some(
+    (page) => page === path || path.startsWith(page),
+  );
+};
 
 export const APP_REDIRECT_TIMEOUT = 1500;
 export const APP_REDIRECT_TIMEOUT_SUCCESS = 500;
