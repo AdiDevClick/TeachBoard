@@ -1,8 +1,4 @@
-import { AppFieldDescriptionWithLink } from "@/components/Fields/AppFieldDescriptionWithLink";
-import type { WithStyledFormProps } from "@/components/HOCs/types/with-styled-form.types";
 import { withStyledForm } from "@/components/HOCs/withStyledForm";
-import { Button } from "@/components/ui/button";
-import { Field } from "@/components/ui/field";
 import { passwordRecoveryInputControllers } from "@/data/inputs-controllers.data.ts";
 import { LOGIN_CARD } from "@/features/auth/components/login/config/login.configs";
 import { LoginFormController } from "@/features/auth/components/login/controller/LoginFormController";
@@ -20,7 +16,7 @@ import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { MouseEvent } from "react";
 import { useState } from "react";
-import { useForm, useFormState, type FieldValues } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 const resetPasswordButtonText = "Réinitialiser le mot de passe";
 const backToLoginLinkText = "Retour à la connexion";
@@ -101,7 +97,6 @@ function LoginView({
   const recoveryProps = {
     ...sharedProps,
     formId: `${pageId}-form-pw-recovery`,
-    // widen the form type so it matches the HOC's expected UseFormReturn<FieldValues>-like signature
     form: recoveryForm,
     inputControllers: passwordRecoveryInputControllers,
     textToDisplay: {
@@ -123,41 +118,3 @@ const LoginForm = withStyledForm(LoginFormController);
 const PwForgotten = withStyledForm(PwForgottenController);
 
 export default LoginView;
-
-export type FooterFieldsProps<TFormValues extends FieldValues> = Pick<
-  WithStyledFormProps<TFormValues>,
-  "form" | "formId" | "textToDisplay"
-> & {
-  onClick?: (e?: MouseEvent) => void;
-};
-
-/**
- * Footer fields component for the login form, including the submit button and a link to toggle between login and password recovery modes.
- *
- * @param form - The form object returned by the useForm hook, containing methods and state for managing the form.
- * @param formId - The ID of the form, used to associate the submit button with the form.
- * @param textToDisplay - An object containing text for the button and link, allowing for dynamic display based on the current mode (login or password recovery).
- * @param onClick - Optional click handler for the link, allowing for custom behavior when toggling between modes.
- */
-export function FooterFields<TFormValues extends Record<string, unknown>>({
-  form,
-  formId,
-  textToDisplay,
-  onClick,
-}: FooterFieldsProps<TFormValues>) {
-  const { isValid } = useFormState<TFormValues>({ control: form.control });
-  return (
-    <Field>
-      <Button type="submit" disabled={!isValid} form={formId}>
-        {textToDisplay.buttonText}
-      </Button>
-      <AppFieldDescriptionWithLink
-        linkText="Inscrivez-vous ici"
-        linkTo="/signup"
-        onClick={onClick}
-      >
-        {"Vous n'avez pas de compte ? "}
-      </AppFieldDescriptionWithLink>
-    </Field>
-  );
-}
