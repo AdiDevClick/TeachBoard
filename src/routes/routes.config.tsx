@@ -1,3 +1,4 @@
+import { COMPLETE_SIDEBAR_DATAS } from "@/configs/main.configs";
 import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas.tsx";
 import {
   inputSignupControllers,
@@ -9,7 +10,6 @@ import { StepFour } from "@/features/evaluations/create/steps/four/StepFour.tsx"
 import { StepOne } from "@/features/evaluations/create/steps/one/StepOne";
 import { StepThree } from "@/features/evaluations/create/steps/three/StepThree.tsx";
 import { StepTwo } from "@/features/evaluations/create/steps/two/StepTwo.tsx";
-import { completeDatas } from "@/main.tsx";
 import { About } from "@/pages/About/About.tsx";
 import EmailValidation from "@/pages/Email/EmailValidation";
 import { PageError } from "@/pages/Error/PageError.tsx";
@@ -37,7 +37,7 @@ const EVALUATION_ELEMENTS = [
  * @description Each route object defines a path, element, and optional loader.
  * The loader functions set the document title and return necessary data for each route.
  *
- * @see {@link completeDatas} for sidebar and navigation data.
+ * @see {@link COMPLETE_SIDEBAR_DATAS} for sidebar and navigation data.
  * @see {@link EvaluationPageTabsDatas} for evaluation page tab data.
  * @see {@link setDocumentTitle} for setting the document title based on the route.
  *
@@ -48,10 +48,10 @@ export const ROUTES_CHILDREN = [
     index: true,
     element: <Home />,
     loader: async () => {
-      setDocumentTitle(completeDatas.sidebarHeader.tooltip);
+      setDocumentTitle(COMPLETE_SIDEBAR_DATAS.sidebarHeader.tooltip);
 
       return {
-        loaderData: completeDatas.sidebarHeader,
+        loaderData: COMPLETE_SIDEBAR_DATAS.sidebarHeader,
         pageTitle: "Dashboard",
       };
     },
@@ -107,11 +107,11 @@ export const ROUTES_CHILDREN = [
         index: true,
         element: <Evaluations />,
         loader: async () => {
-          setDocumentTitle(completeDatas.navMain.menus[2].title);
+          setDocumentTitle(COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title);
 
           return {
-            pageTitle: completeDatas.navMain.menus[2].title,
-            loaderData: completeDatas.navMain.menus[2],
+            pageTitle: COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title,
+            loaderData: COMPLETE_SIDEBAR_DATAS.navMain.menus[2],
           };
         },
       },
@@ -122,11 +122,11 @@ export const ROUTES_CHILDREN = [
         path: "create",
         element: <CreateEvaluations />,
         loader: async () => {
-          setDocumentTitle(completeDatas.navMain.menus[0].title);
+          setDocumentTitle(COMPLETE_SIDEBAR_DATAS.navMain.menus[0].title);
 
           return {
             pageTitle: EVALUATION_PAGE_TITLE,
-            loaderData: completeDatas.navMain.menus[0],
+            loaderData: COMPLETE_SIDEBAR_DATAS.navMain.menus[0],
             pageDatas: EvaluationPageTabsDatas,
           };
         },
@@ -139,6 +139,10 @@ export const ROUTES_CHILDREN = [
         })),
       },
     ],
+  },
+  {
+    path: "logout",
+    element: <Navigate to={"/"} />,
   },
   {
     path: "error",
