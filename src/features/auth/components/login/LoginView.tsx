@@ -120,7 +120,7 @@ function LoginView({
 
 const LoginForm = withStyledForm(LoginFormController);
 const PwForgotten = withStyledForm(PwForgottenController);
-
+    
 export default LoginView;
 
 export type FooterFieldsProps<TFormValues extends Record<string, unknown>> = {
