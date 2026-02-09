@@ -1,20 +1,23 @@
 import { withStyledForm } from "@/components/HOCs/withStyledForm";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import { passwordRecoveryInputControllers } from "@/data/inputs-controllers.data.ts";
 import { LOGIN_CARD } from "@/features/auth/components/login/config/login.configs";
 import { LoginFormController } from "@/features/auth/components/login/controller/LoginFormController";
 import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
 
 import {
-  formSchema,
+  loginFormSchema,
   type LoginFormSchema,
   type LoginInputItem,
-  type RecoveryFormSchema,
 } from "@/features/auth/components/login/models/login.models";
 import { PwForgottenController } from "@/features/auth/components/pw-forgotten/controller/PwForgottenController";
-import { pwRecoverySchema } from "@/models/pw-recovery.model.ts";
+import {
+  pwRecoveryFormSchema,
+  type PwRecoveryFormSchema,
+} from "@/models/pw-recovery.model";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { MouseEvent } from "react";
+import type { ComponentProps, MouseEvent } from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -44,7 +47,7 @@ function LoginView({
   const [isPwForgotten, setIsPwForgotten] = useState(false);
 
   const loginForm = useForm<LoginFormSchema>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(loginFormSchema),
     mode: "all",
     defaultValues: {
       identifier: "",
@@ -52,8 +55,8 @@ function LoginView({
     },
   });
 
-  const recoveryForm = useForm<RecoveryFormSchema>({
-    resolver: zodResolver(pwRecoverySchema),
+  const recoveryForm = useForm<PwRecoveryFormSchema>({
+    resolver: zodResolver(pwRecoveryFormSchema),
     mode: "all",
     defaultValues: {
       identifier: "",
@@ -63,12 +66,6 @@ function LoginView({
   function handleTogglePwForgotten(e?: MouseEvent) {
     e?.preventDefault?.();
     setIsPwForgotten((prev) => !prev);
-    // onClick={() =>
-    //   handleOnOpen({
-    //     e,
-    //     task: "signup",
-    //   })
-    // }
   }
 
   const sharedProps = {
@@ -92,7 +89,9 @@ function LoginView({
       pwForgottenLinkTo: "/forgot-password",
       buttonText: "Se connecter",
     },
-  };
+    submitDataReshapeFn: API_ENDPOINTS.POST.AUTH.LOGIN.dataReshape,
+    submitRoute: API_ENDPOINTS.POST.AUTH.LOGIN.endpoint,
+  } satisfies ComponentProps<typeof LoginForm>;
 
   const recoveryProps = {
     ...sharedProps,
@@ -104,7 +103,9 @@ function LoginView({
       pwForgottenLinkTo: loginLinkTo,
       buttonText: resetPasswordButtonText,
     },
-  };
+    submitDataReshapeFn: API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.dataReshape,
+    submitRoute: API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.endpoint,
+  } satisfies ComponentProps<typeof PwForgotten>;
 
   return (
     <>
