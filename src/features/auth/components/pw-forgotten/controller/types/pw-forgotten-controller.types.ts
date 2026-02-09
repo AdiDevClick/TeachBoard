@@ -4,8 +4,7 @@
 
 import type { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import type LoginView from "@/features/auth/components/login/LoginView";
-import type { RecoveryFormSchema } from "@/features/auth/components/login/models/login.models";
-import type { ForgottenPw } from "@/features/auth/types/auth-types";
+import type { PwRecoveryFormSchema } from "@/models/pw-recovery.model";
 import type { AppControllerInterface } from "@/types/AppControllerInterface";
 
 /**
@@ -17,10 +16,9 @@ import type { AppControllerInterface } from "@/types/AppControllerInterface";
  */
 export type PwForgottenControllerProps = Readonly<
   AppControllerInterface<
-    RecoveryFormSchema,
+    PwRecoveryFormSchema,
     typeof API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.endpoint,
     typeof API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.dataReshape
   > &
-    Omit<Parameters<typeof LoginView>[0], "modalMode"> &
-    ForgottenPw
+    Omit<Parameters<typeof LoginView>[0], "modalMode">
 >;

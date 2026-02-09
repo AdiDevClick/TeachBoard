@@ -2,6 +2,8 @@ import type { ViewCardContextType } from "@/api/contexts/types/context.types.ts"
 import type { PropsWithChildren, Ref } from "react";
 
 type BaseCardProps = {
+  /** Optional ID for the card component */
+  id?: string;
   /**  page ID for the card component */
   pageId: string;
   /** Ref to be forwarded to the Card component */

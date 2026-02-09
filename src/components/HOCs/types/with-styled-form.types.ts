@@ -3,21 +3,16 @@
  */
 
 import type { WithTitledCardProps } from "@/components/HOCs/types/with-titled-card.types";
-import type LoginView from "@/features/auth/components/login/LoginView";
-import type { ForgottenPwAndDefaultLinkTexts } from "@/features/auth/types/auth-types";
-import type { FieldValues, UseFormReturn } from "react-hook-form";
+import type { ForgottenPw } from "@/features/auth/types/auth-types";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 
 /**
  * Type definition for the props accepted by the withStyledForm HOC.
  *
- * @remarks This type extends the props of the LoginView component and adds specific props for form handling and display.
+ * @remarks This type extends the props of the wrapped component and adds
+ *          specific props for form handling and display.
  */
-type LoginViewProps = Parameters<typeof LoginView>[0];
-
-export type WithStyledFormProps<T extends FieldValues> = Readonly<
-  {
-    formId: string;
-    form: UseFormReturn<T>;
-  } & ForgottenPwAndDefaultLinkTexts &
-    WithTitledCardProps<LoginViewProps>
+// export type WithStyledFormProps<C extends object> = Readonly<
+export type WithStyledFormProps<C extends AnyObjectProps> = Readonly<
+  ForgottenPw & WithTitledCardProps<C>
 >;
