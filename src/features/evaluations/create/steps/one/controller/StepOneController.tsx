@@ -92,7 +92,7 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
    * @param value - The value of the selected command item
    * @param commandItem - The details of the selected command item
    */
-  const handleOnSelect = (value: string, commandItem: CommandItemType) => {
+  const handleOnSelect = (_value: string, commandItem: CommandItemType) => {
     setSelectedClass(JSON.parse(JSON.stringify(commandItem)));
   };
   return (
