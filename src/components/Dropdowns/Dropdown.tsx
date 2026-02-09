@@ -1,9 +1,13 @@
-import type { DropdownsProps } from "@/components/Dropdowns/types/DropdownsTypes.ts";
+import type { DropdownsProps } from "@/components/Dropdowns/types/dropdowns.types";
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu.tsx";
-import { Activity } from "react";
+import {
+  debugLogs,
+  dropdownPropsInvalid,
+} from "@/configs/app-components.config";
+import { Activity, type MouseEvent } from "react";
 import { NavLink } from "react-router-dom";
 
 /**
@@ -12,19 +16,21 @@ import { NavLink } from "react-router-dom";
  * @returns The rendered dropdown item.
  */
 export function Dropdown(item: Readonly<DropdownsProps>) {
-  if (!item) {
+  if (dropdownPropsInvalid(item)) {
+    debugLogs("Dropdown", item);
     throw new Error("Dropdown item data is required");
   }
 
   const {
-    title,
+    title = "untitled",
     icon: Icon,
     divider,
-    url,
+    url = "#",
     isLoggedIn,
     isActivated,
     displayWhenConnected,
     showToUserWhenNotConnected,
+    onClick: externalClick,
     ...rest
   } = item;
 
@@ -35,18 +41,27 @@ export function Dropdown(item: Readonly<DropdownsProps>) {
 
   const isUrlActive = itemVisible && itemIsActive;
 
+  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
+    if (isUrlActive) {
+      externalClick?.({ e, title, url });
+    } else {
+      e.preventDefault();
+    }
+  };
+
   return (
     <>
       {divider && <DropdownMenuSeparator />}
       <Activity mode={itemVisible ? "visible" : "hidden"}>
-        <NavLink to={isUrlActive ? url ?? "#" : "#"} replace={true}>
+        <NavLink to={isUrlActive ? url : "#"} replace={true}>
           <DropdownMenuItem
             className="menu__item"
             {...rest}
             disabled={!itemIsActive}
+            onClick={handleClick}
           >
             {Icon && <Icon />}
-            {title ?? "untitled"}
+            {title}
           </DropdownMenuItem>
         </NavLink>
       </Activity>

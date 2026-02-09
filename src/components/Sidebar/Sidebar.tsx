@@ -1,3 +1,4 @@
+import type { DropDownItemClickDetails } from "@/components/Dropdowns/types/dropdowns.types";
 import SidebarCalendar from "@/components/Sidebar/calendar/SidebarCalendar.tsx";
 import { UserButton } from "@/components/Sidebar/footer/UserButton.tsx";
 import GroupSeparator from "@/components/Sidebar/group_separator/GroupSeparator.tsx";
@@ -13,8 +14,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useUserLogout } from "@/hooks/database/logout/useUserLogout.ts";
-import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
-import { Activity, type MouseEvent } from "react";
+import { Activity } from "react";
 
 /**
  * Full App Sidebar component
@@ -25,12 +25,10 @@ export function AppSidebar({ ...props }: SidebarProps) {
   const { state } = useSidebar();
   const onSubmit = useUserLogout().onSubmit;
 
-  const handleOnFooterButtonsClick = (e: MouseEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
-    const parentElement = target.parentElement as HTMLAnchorElement;
+  const handleOnUserMenuClick = (arg?: DropDownItemClickDetails) => {
+    const { url } = arg ?? {};
 
-    if (parentElement?.href.includes("/logout")) {
-      preventDefaultAndStopPropagation(e);
+    if (url === "/logout") {
       onSubmit();
     }
   };
@@ -53,7 +51,7 @@ export function AppSidebar({ ...props }: SidebarProps) {
         <SecondaryNavigation className="pb-5" />
       </SidebarContent>
       <SidebarFooter>
-        <UserButton handleOnFooterButtonsClick={handleOnFooterButtonsClick} />
+        <UserButton onClick={handleOnUserMenuClick} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
