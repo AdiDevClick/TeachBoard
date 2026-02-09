@@ -74,10 +74,11 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
       ref,
       card: viewCard,
       children,
+      id,
       ...rest
     } = props;
 
-    const cardId = "card-" + pageId;
+    const cardId = id ?? "card-" + pageId;
 
     const contextValue = {
       ...viewCard,
