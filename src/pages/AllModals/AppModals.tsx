@@ -43,6 +43,7 @@ const modals = defineStrictModalsList([
     modalContent: LoginView,
     contentProps: {
       inputControllers: inputLoginControllers,
+      modalMode: true,
     },
   },
   {
