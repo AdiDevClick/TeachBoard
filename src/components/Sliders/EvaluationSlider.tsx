@@ -8,6 +8,11 @@ import {
   debugLogs,
   evaluationSliderPropsValid,
 } from "@/configs/app-components.config.ts";
+import {
+  evaluationStudentBadge,
+  evaluationStudentContainer,
+  evaluationStudentSlider,
+} from "@css/EvaluationStudent.module.scss";
 import { useEffect, useEffectEvent, useState, type CSSProperties } from "react";
 
 /**
@@ -58,12 +63,12 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
   }
 
   return (
-    <Item className="flex flex-nowrap gap-0.1">
-      <Badge className="m-4">{fullName}</Badge>
+    <Item className={evaluationStudentContainer}>
+      <Badge className={evaluationStudentBadge}>{fullName}</Badge>
       <Slider
         step={25}
         value={internalValue}
-        className="four-steps-slider"
+        className={evaluationStudentSlider}
         style={
           {
             "--slider-rangeColor": sliderRangeColor(internalValue[0]),
