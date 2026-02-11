@@ -5,7 +5,7 @@
   */
 
 :global(#card-evaluation-module-selection) {
-  width: clamp(400px, 80%, 800px);
+  width: clamp(400px, 60%, 800px);
 
   @include for-size("tablet") {
     width: 100%;
