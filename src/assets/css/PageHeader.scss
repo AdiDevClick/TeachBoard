@@ -1,3 +1,5 @@
+@use "mixins" as *;
+
 /**
  * Styles for the Page Header component
  */
@@ -10,12 +12,8 @@
   padding-left: 0 !important;
   flex-shrink: 0;
 
-  &:is(:where(.group\/sidebar-wrapper):has(*[data-collapsible="icon"]) *) {
-    height: calc(var(--spacing) * 12);
-  }
-
   .page__sidebar-trigger {
-    margin-left: calc(var(--spacing) * -1);
+    inset: 0;
 
     &--separator {
       margin-inline: var(--app-overall-gap);
@@ -33,7 +31,7 @@
     gap: var(--app-overall-gap);
     padding-inline: calc(var(--spacing) * 3);
 
-    @media screen and (min-width: 1024px) {
+    @include for-size(desktop) {
       padding-inline: calc(var(--spacing) * 6);
     }
   }
@@ -42,7 +40,7 @@
   .header__breadcrumb-separator {
     display: none;
 
-    @media screen and (width >=48rem) {
+    @include for-size(above-smalltablet) {
       display: block;
     }
   }
@@ -53,7 +51,7 @@
 
     .actions__button {
 
-      @media screen and (max-width: 640px) {
+      @include for-size(smalltablet) {
         display: none;
       }
     }
