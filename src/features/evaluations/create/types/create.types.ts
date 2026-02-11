@@ -2,6 +2,7 @@
  * Types for the create evaluations page
  */
 
+import type { useSidebar } from "@/components/ui/sidebar";
 import type { MouseEvent, PropsWithChildren } from "react";
 
 /**
@@ -24,4 +25,4 @@ export type CreateEvaluationArrowsClickHandlerProps = {
   arrayLength: number;
   setTabValue: (_v: string | undefined) => void;
   tabValues: string[];
-};
+} & ReturnType<typeof useSidebar>;
