@@ -36,10 +36,10 @@ export function TabContent(props: TabContentProps) {
     clickProps,
   } = props;
 
-  const { isMobile } = useSidebar();
+  const { isMobile, setOpen, open } = useSidebar();
 
   const clickHandler = (e: MouseEvent<HTMLButtonElement>) => {
-    onClickHandler({ e, ...clickProps, index });
+    onClickHandler({ e, ...clickProps, index, setOpen, open });
   };
 
   const commonProps = {
@@ -97,5 +97,3 @@ function LeftSide(props: LeftSideProps) {
 }
 
 const View = withTitledCard(LeftSide);
-
-export const TabContentList = withListMapper(TabContent);
