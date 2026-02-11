@@ -1,5 +1,5 @@
 import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs.tsx";
-import { TabContentList } from "@/components/Tabs/TabContent";
+import { TabContentList } from "@/components/Tabs/exports/tab-content.exports";
 import { Tabs } from "@/components/ui/tabs";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types";
 import type { CreateEvaluationsLoaderData } from "@/routes/types/routes-config.types";
@@ -92,7 +92,8 @@ function handleOnArrowClick({
   ...clickProps
 }: CreateEvaluationArrowsClickHandlerProps) {
   e.preventDefault();
-  const { index, arrayLength, setTabValue, tabValues } = clickProps;
+  const { index, arrayLength, setTabValue, tabValues, setOpen, open } =
+    clickProps;
   let newIndex = 0;
 
   const currentStep = e.currentTarget.dataset.name;
@@ -104,6 +105,9 @@ function handleOnArrowClick({
   }
 
   if (currentStep === "next-step" && isNextAllowed) {
+    if (open) {
+      setOpen(false);
+    }
     newIndex = index + 1;
   }
 
