@@ -2,10 +2,13 @@
   * Styles for the navigation tabs component.
   */
 .nav-tabs-container {
+  $transform : calc(var(--nav-tabs-height) / 2 * -1);
+  --nav-tabs-translate-y: $transform;
   position: relative;
   display: flex;
-  transform: translateY(-20px);
+  transform: translateY($transform);
   flex-wrap: wrap;
+  height: var(--nav-tabs-height);
 
   @media screen and (max-width: 768px) {
     background: var(--background);
