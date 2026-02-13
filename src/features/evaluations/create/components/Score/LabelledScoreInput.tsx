@@ -1,5 +1,6 @@
 import { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input";
 import { Badge } from "@/components/ui/badge";
+import { Item } from "@/components/ui/item";
 import type { LabelledScoreInputProps } from "@/features/evaluations/create/components/Score/types/score-types";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
 import { formatParseFloat } from "@/utils/utils";
@@ -41,7 +42,7 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
   });
 
   return (
-    <div className={labelledScoreInput}>
+    <Item className={labelledScoreInput}>
       <Badge className={labelledScoreInputBadge}>{item.name}</Badge>
       <p className={labelledScoreInputText}>{"Moyenne : "}</p>
       <div className={labelledScoreInputInput}>
@@ -55,6 +56,6 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
         />
         <p>{"/20"}</p>
       </div>
-    </div>
+    </Item>
   );
 }
