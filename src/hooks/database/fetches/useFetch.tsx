@@ -11,7 +11,7 @@ import type { ApiError } from "@/types/AppErrorInterface";
 import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const defaultStateParameters: FetchParams = {
@@ -62,7 +62,9 @@ export function useFetch<
   const [fetchParams, setFetchParams] = useState(defaultStateParameters);
   const [viewData, setViewData] = useState<TViewData | undefined>(undefined);
   const setLastUserActivity = useAppStore((state) => state.setLastUserActivity);
+  const lastUserActivity = useAppStore((state) => state.lastUserActivity);
   const navigate = useNavigate();
+  const location = useLocation().pathname;
   const queryClient = useQueryClient();
 
   const {
@@ -78,7 +80,13 @@ export function useFetch<
     {
       ...params,
       onSuccess: (response) => {
-        setLastUserActivity(contentId);
+        console.log(lastUserActivity);
+        setLastUserActivity(contentId, {
+          url: location,
+          endpoint: params.url,
+          method: params.method,
+          type: "fetch",
+        });
         successCallback?.(response);
 
         const cachedKey = cachedFetchKey ?? [contentId, params.url];
@@ -135,7 +143,12 @@ export function useFetch<
         );
       },
       onError: (error) => {
-        setLastUserActivity(contentId);
+        setLastUserActivity(contentId, {
+          url: location,
+          endpoint: params.url,
+          method: params.method,
+          type: "fetch",
+        });
         errorCallback?.(error);
 
         // !! IMPORTANT !! Handle forbidden error by navigating to login page
