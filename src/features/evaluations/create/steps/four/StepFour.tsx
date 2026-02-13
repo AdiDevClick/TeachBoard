@@ -18,6 +18,7 @@ import {
   type ComponentProps,
   type Dispatch,
   type JSX,
+  type ReactNode,
   type SetStateAction,
 } from "react";
 import { useForm } from "react-hook-form";
@@ -44,18 +45,8 @@ export function StepFour({
   ...props
 }: Readonly<PageWithControllers<typeof STEP_FOUR_INPUT_CONTROLLERS>>) {
   const loaderData = useLoaderData();
-  const [, _setLeftContent] =
-    useOutletContext<[JSX.Element, Dispatch<SetStateAction<JSX.Element>>]>();
+  useOutletContext<[JSX.Element, Dispatch<SetStateAction<ReactNode>>]>();
   const user = useAppStore((state) => state.user);
-  const {
-    selectedClass: _selectedClass,
-    tasks: _tasks,
-    modules: _modules,
-    moduleSelectionState: _moduleSelectionState,
-    setShowStudentsEvaluation: _setShowStudentsEvaluation,
-    selectedSubSkill: _selectedSubSkill,
-    evaluatedStudentsForThisSubskill: _evaluatedStudentsForThisSubskill,
-  } = useStepThreeState();
 
   const form = useForm<StepFourSchema>({
     resolver: zodResolver(stepFourInputSchema),
@@ -71,14 +62,12 @@ export function StepFour({
     },
   });
 
-  const formId = pageId + "-form";
-
   const baseCardProps = {
     user: user?.userId,
     pageId,
     modalMode,
     className,
-    formId,
+    formId: pageId + "-form",
     inputControllers,
     card: STEP_FOUR_CARD_PROPS,
     ...props,
