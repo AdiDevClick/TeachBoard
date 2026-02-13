@@ -6,6 +6,7 @@ import { TAB_CONTENT_VIEW_CARD_PROPS } from "@/components/Tabs/config/tab-conten
 import type {
   LeftSideProps,
   TabContentProps,
+  TriggerButtonInteractivityArgs,
 } from "@/components/Tabs/types/tabs.types";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -15,7 +16,7 @@ import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/s
 import { LeftSidePageContent } from "@/pages/Evaluations/create/left-content/LeftSidePageContent";
 import withTitledCard from "@components/HOCs/withTitledCard.tsx";
 import { IconArrowLeft, IconArrowRightDashed } from "@tabler/icons-react";
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useEffectEvent, useState, type MouseEvent } from "react";
 import { useShallow } from "zustand/shallow";
 
 /**
@@ -57,32 +58,73 @@ export function TabContent(props: TabContentProps) {
   const { isMobile, setOpen, open } = useSidebar();
   const [disableNext, setDisableNext] = useState(true);
 
-  // Effect to disable next button if not all modules are completed when on the last step
+  /**
+   * BUTTONS INTERACTIVITY - CHECKER
+   *
+   * @description Cchecks the conditions to enable or disable the next button based on the current tab and the state of the evaluation creation process.
+   */
+  const triggerButtonInteractivity = useEffectEvent(
+    (args: TriggerButtonInteractivityArgs) => {
+      const {
+        tabName,
+        selectedClass,
+        modules,
+        areAllModulesCompleted,
+        moduleSelectionState,
+      } = args;
+
+      switch (tabName) {
+        case "Classe":
+          if (selectedClass?.id) {
+            setDisableNext(false);
+          }
+          return;
+        case "Elèves":
+          if (modules.length > 0) {
+            setDisableNext(false);
+          }
+          return;
+        case "Evaluation":
+          if (!areAllModulesCompleted && !moduleSelectionState.isClicked) {
+            setDisableNext(true);
+            return;
+          }
+          setDisableNext(false);
+          return;
+        default:
+          setDisableNext(true);
+      }
+    },
+  );
+
+  /**
+   * BUTTONS INTERACTIVITY - INIT & UPDATE
+   *
+   * @description Each time one of the dependencies change
+   */
   useEffect(() => {
-    console.log(tabName, modules.length, disableNext, areAllModulesCompleted);
-    if (tabName === "Classe" && selectedClass?.id) {
-      return setDisableNext(false);
-    }
+    triggerButtonInteractivity({
+      tabName,
+      selectedClass: selectedClass ?? undefined,
+      modules,
+      areAllModulesCompleted,
+      moduleSelectionState,
+    });
+  }, [
+    tabName,
+    selectedClass,
+    modules,
+    areAllModulesCompleted,
+    moduleSelectionState,
+  ]);
 
-    if (tabName === "Elèves" && modules.length > 0) {
-      return setDisableNext(false);
-    }
-
-    if (
-      tabName === "Evaluation" &&
-      !moduleSelectionState.isClicked &&
-      !areAllModulesCompleted
-    ) {
-      return setDisableNext(true);
-    }
-
-    if (tabName === "Evaluation") {
-      return setDisableNext(false);
-    }
-
-    setDisableNext(true);
-  }, [tabName, selectedClass, areAllModulesCompleted, modules]);
-
+  /**
+   * BUTTONS INTERACTIVITY - HANDLER
+   * 
+   * @description The data-set is read to identify which button is clicked (previous or next).
+   * 
+   * @param e - The event to check
+   */
   const clickHandler = (e: MouseEvent<HTMLButtonElement>) => {
     const currentStep = e.currentTarget.dataset.name;
 
