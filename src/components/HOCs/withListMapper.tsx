@@ -45,7 +45,6 @@ type PropsTypeBase<Items, C extends AnyComponentLike> = Readonly<
     children?: ReactNode;
   } & Partial<Omit<ComponentProps<C>, "items">>
 >;
-
 type WithListMapperComponent<C extends AnyComponentLike> = <
   Items extends readonly unknown[] | AnyObjectProps,
   TOptional extends AnyObjectProps = AnyObjectProps,
