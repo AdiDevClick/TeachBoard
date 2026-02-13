@@ -10,7 +10,7 @@
     flex-wrap: nowrap;
     gap: var(--gap);
     justify-content: space-between;
-    padding: 6px
+    padding: var(--gap);
   }
 
   &__badge {
