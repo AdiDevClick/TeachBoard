@@ -25,16 +25,11 @@ export function forController<P>(WrapperComponent: ComponentType<P>) {
 
     const { field, fieldState, ...rest } = props;
 
-    // const handleValueChange = (value: UUID, meta?: VerticalSelectMetaData) => {
-    //       field.onChange(value);
-    //       onValueChange?.(value, meta);
-    //     };
-
     return (
       <WrapperComponent
         {...(rest as P)}
         {...field}
-        // value={field.value ?? ""}
+        value={field.value ?? ""}
         // onValueChange={handleValueChange}
         // name={field.name} // NOTE: name is already included in {...field}, but can be explicitly passed if needed by the popover component
         aria-invalid={fieldState.invalid}
