@@ -1,5 +1,7 @@
 import type { UUID } from "@/api/types/openapi/common.types";
 import type { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input";
+import type { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
+import type { StepFourController } from "@/features/evaluations/create/steps/four/controller/StepFourController";
 import type { ComponentProps } from "react";
 
 type ScoreItem = {
@@ -19,4 +21,12 @@ export type LabelledScoreInputProps = Readonly<{
    * The react-hook-form instance used to manage the form state for the score input.
    */
   form: ComponentProps<typeof ControlledLabelledInput>["form"];
+}>;
+
+/**
+ * Props for the AverageFields component, which displays the average scores of students in an evaluation.
+ */
+export type AverageFieldsProps = Readonly<{
+  form: Parameters<typeof StepFourController>[0]["form"];
+  students: ReturnType<typeof useStepThreeState>["allStudentsAverageScores"];
 }>;
