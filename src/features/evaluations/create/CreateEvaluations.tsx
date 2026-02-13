@@ -1,4 +1,4 @@
-import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs.tsx";
+import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs";
 import { TabContentList } from "@/components/Tabs/exports/tab-content.exports";
 import { Tabs } from "@/components/ui/tabs";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types";
