@@ -13,6 +13,17 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Format a number to a fixed number of decimal places and parse it back to a float.
+ *
+ * @param value - The number to format and parse.
+ * @param decimals - The number of decimal places to format to (default is 2).
+ * @returns The formatted number as a float.
+ */
+export function formatParseFloat(value: number, decimals = 2): number {
+  return Number.parseFloat(value.toFixed(decimals));
+}
+
+/**
  * Build a map where each key mirrors its own name, typed from the input array.
  */
 export function mirrorProperties(
