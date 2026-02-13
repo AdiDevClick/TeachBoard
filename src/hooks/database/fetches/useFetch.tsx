@@ -80,7 +80,6 @@ export function useFetch<
     {
       ...params,
       onSuccess: (response) => {
-        console.log(lastUserActivity);
         setLastUserActivity(contentId, {
           url: location,
           endpoint: params.url,
