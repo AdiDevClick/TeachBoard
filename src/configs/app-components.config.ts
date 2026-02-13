@@ -25,6 +25,7 @@ import type {
 } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { AnyObjectProps } from "@/utils/types/types.utils";
 import { checkPropsValidity } from "@/utils/utils.ts";
+import type { AccordionItemProps } from "@radix-ui/react-accordion";
 import type { FieldValues } from "react-hook-form";
 
 //                    ------------
@@ -43,6 +44,37 @@ export const labelledInputContainsInvalid = (props: LabelledInputProps) =>
     LABELLED_INPUT_REQUIRES,
     LABELLED_INPUT_SHOULD_NOT_ACCEPT,
   );
+
+//                    ------------
+
+/**
+ * Validation requirements for ListMapper component.
+ *
+ * {@link import("@/components/Lists/ListMapper.tsx").ListMapper }
+ */
+const SUBSKILLS_WITH_STUDENTS_REQUIRES = [
+  "storeGetter",
+  "module",
+  "valueGetter",
+  "index",
+  "isCompleted",
+  "isDisabled",
+];
+
+export const subSkillWithStudentsPropsInvalid = (props: AnyObjectProps) =>
+  checkPropsValidity(props, SUBSKILLS_WITH_STUDENTS_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for withAccordionItem HOC.
+ *
+ * {@link import("@/features/evaluations/create/components/HOCs/withAccordionItem.tsx").withAccordionItem }
+ */
+const WITH_ACCORDION_ITEM_REQUIRES = ["value", "name"];
+
+export const withAccordionItemPropsInvalid = (props: AccordionItemProps) =>
+  checkPropsValidity(props as any, WITH_ACCORDION_ITEM_REQUIRES, []);
 
 //                    ------------
 
