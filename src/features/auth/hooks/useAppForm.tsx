@@ -45,6 +45,7 @@ export function useAppForm<T extends FieldValues = FieldValues>({
   });
   const { response, error, isLoading } = rest;
   const login = useAppStore((state) => state.login);
+  const lastActivity = useAppStore((state) => state.lastUserActivity);
 
   const resetFormAndTriggerNavigation = async () => {
     await wait(50);
@@ -59,7 +60,9 @@ export function useAppForm<T extends FieldValues = FieldValues>({
       // If the current page is in the no-redirect list, just reset the form without navigating
       return;
     }
-    navigate("/", { replace: true });
+    const previousUrl = lastActivity?.values().next().value?.previousUrl;
+
+    navigate(previousUrl || "/", { replace: true });
   };
 
   /**
@@ -68,7 +71,7 @@ export function useAppForm<T extends FieldValues = FieldValues>({
    * @param variables - The form data to be submitted, which can be either LoginFormSchema or RecoveryFormSchema.
    */
   const onSubmit = (variables: T) => {
-    submitCallback(variables as Record<string, unknown>, {
+    submitCallback(variables, {
       method: HTTP_METHODS.POST,
       endpointUrl: String(submitRoute),
       dataReshapeFn: submitDataReshapeFn,
