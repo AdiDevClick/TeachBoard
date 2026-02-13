@@ -9,6 +9,7 @@ import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/s
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils";
 import { type MouseEvent } from "react";
+import { useShallow } from "zustand/shallow";
 
 export function StepTwoController({
   pageId,
@@ -17,7 +18,6 @@ export function StepTwoController({
   className,
   inputControllers = [],
   user: _user,
-  preparedStudentsTasksSelection,
   students: _students,
   selectedClass: _selectedClass,
   tasks: _tasks,
@@ -27,6 +27,11 @@ export function StepTwoController({
 
   // const { onSubmit, isLoading, isLoaded, data, error, setFetchParams } =
   // useFetch();
+
+  const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
+    useShallow((state) => state.getStudentsPresenceSelectionData),
+  )();
+
   const setStudentPresence = useEvaluationStepsCreationStore(
     (state) => state.setStudentPresence,
   );

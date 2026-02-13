@@ -12,6 +12,7 @@ import {
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useEffectEvent } from "react";
 import { useForm, type FieldValues } from "react-hook-form";
 
 /**
@@ -38,9 +39,11 @@ export function StepTwo({
   );
   const students = useEvaluationStepsCreationStore((state) => state.students);
   const tasks = useEvaluationStepsCreationStore((state) => state.tasks);
-  const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
-    (state) => state.getStudentsPresenceSelectionData,
-  )();
+  const moduleSelectionState = useEvaluationStepsCreationStore(
+    (state) => state.moduleSelection,
+  );
+  const { setModuleSelection } = useEvaluationStepsCreationStore();
+
   const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({
     resolver: zodResolver(attendanceRecordCreationSchemaInstance([])),
     mode: "onTouched",
@@ -49,13 +52,35 @@ export function StepTwo({
     },
   });
 
-  const formId = pageId + "-form";
+  /**
+   * INIT - CHECKER
+   *
+   * @description If any module was selected before, reset the selection to avoid confusion for the user
+   */
+  const resetClickStatus = useEffectEvent(() => {
+    if (moduleSelectionState.isClicked) {
+      setModuleSelection({
+        isClicked: false,
+        selectedModuleId: null,
+        selectedModuleIndex: null,
+      });
+    }
+  });
+
+  /**
+   * INIT - VERIFY
+   *
+   * @description Each time with we arrive on this step
+   */
+  useEffect(() => {
+    resetClickStatus();
+  }, [moduleSelectionState.isClicked]);
 
   const commonProps = {
     pageId,
     modalMode,
     className,
-    formId,
+    formId: pageId + "-form",
     inputControllers,
     card: STEP_TWO_CARD_PROPS,
     ...props,
@@ -64,7 +89,6 @@ export function StepTwo({
     students,
     selectedClass,
     tasks,
-    preparedStudentsTasksSelection,
   };
 
   return (
