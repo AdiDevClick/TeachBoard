@@ -47,6 +47,8 @@ export type ClassModuleSubSkill = ClassModuleSubSkillBase & {
 export type ClassModules = ClassModuleSubSkillBase & {
   subSkills: UniqueSet<UUID, ClassModuleSubSkill>;
   tasksList: Set<ClassTasks["id"]>;
+  /** optional - Can be created by the object reshape */
+  value?: string;
   studentsToEvaluate?: Set<UUID>;
 };
 
