@@ -1,25 +1,16 @@
 import { summaryPageContent } from "@/assets/css/SummaryPage.module.scss";
-import { ListMapper } from "@/components/Lists/ListMapper";
-import { EvaluationSliderList } from "@/components/Sliders/exports/sliders.exports";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
 import type { DynamicItemTuple } from "@/components/Tags/types/tags.types";
 import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/labelled-textarea";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { CardDescription } from "@/components/ui/card";
-import {
-  Item,
-  ItemContent,
-  ItemDescription,
-  ItemTitle,
-} from "@/components/ui/item";
-import { LabelledScoreInputList } from "@/features/evaluations/create/components/Score/exports/labelled-score-input.exports";
+import { Item } from "@/components/ui/item";
+import { ACCORDION_CONFIGS } from "@/features/evaluations/create/components/Accordion/config/accordion.configs";
+import { AccordionItemWithSubSkillWithStudentsList } from "@/features/evaluations/create/components/Accordion/exports/accordion.export";
+import { AverageFields } from "@/features/evaluations/create/components/Score/AverageFields";
 import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
+import type { ClassModules } from "@/features/evaluations/create/store/types/steps-creation-store.types";
 import { useMemo, type ComponentProps } from "react";
 
 type StepFourControllerProps = Readonly<{
@@ -75,102 +66,50 @@ export function StepFourController({
     return studentsPresence;
   }, [nonPresentStudents, form]);
 
+  /**
+   * Prepares the optional prop for the AccordionItem, which includes the list of sub-skills and the module information.
+   *
+   * @param module -
+   * @returns
+   */
+  const modulesOptional = (module: ClassModules) => ({
+    items: Array.from(module.subSkills.values()),
+    module,
+    value: module?.value ?? module.id,
+  });
+
   return (
     <>
-      <CardDescription>{"Les modules"}</CardDescription>
+      <CardDescription>{ACCORDION_CONFIGS.title}</CardDescription>
       <Accordion type="single" collapsible className={summaryPageContent}>
         {modules.length < 1 && (
           <Item>
             <Badge variant="outline" className="mx-auto">
-              {"Aucun module n'a été évalué"}
+              {ACCORDION_CONFIGS.noModulesText}
             </Badge>
           </Item>
         )}
         {modules.length > 0 && (
-          <ListMapper items={modules}>
-            {(module) => {
-              return (
-                <AccordionItem key={module.id} value={module.id}>
-                  <AccordionTrigger>{module.name}</AccordionTrigger>
-                  <AccordionContent>
-                    <ListMapper items={Array.from(module.subSkills.values())}>
-                      {(subSkill) => {
-                        if (subSkill.isCompleted && !subSkill.isDisabled) {
-                          return (
-                            <div
-                              key={subSkill.id}
-                              // id={subSkill.id}
-                              className=" m-auto max-w-5/6"
-                            >
-                              <ItemTitle>{subSkill.name}</ItemTitle>
-                              <EvaluationSliderList
-                                items={getEvaluatedStudentsForSubSkill(
-                                  subSkill.id,
-                                  module.id,
-                                )}
-                                optional={(student) => {
-                                  const value = scoreValue(
-                                    student.id,
-                                    subSkill.id,
-                                    module.id,
-                                  );
-                                  return { value };
-                                }}
-                                inert
-                              />
-                            </div>
-                          );
-                        }
-                      }}
-                    </ListMapper>
-                  </AccordionContent>
-                </AccordionItem>
-              );
-            }}
-          </ListMapper>
+          <AccordionItemWithSubSkillWithStudentsList
+            items={modules}
+            optional={modulesOptional as unknown as ClassModules}
+            color1={ACCORDION_CONFIGS.color1}
+            color2={ACCORDION_CONFIGS.color2}
+            storeGetter={getEvaluatedStudentsForSubSkill}
+            valueGetter={scoreValue}
+          />
         )}
       </Accordion>
       <form id={formId} className={className}>
-        <Item>
-          <ItemContent>
-            <ItemTitle>{"Note globale des élèves"}</ItemTitle>
-            <ItemDescription>
-              {"Moyenne générale des notes pour chaque élève évalué(e)."}
-            </ItemDescription>
-            {allStudentsAverageScores.size < 1 && (
-              <Item>
-                <Badge variant="outline" className="mx-auto">
-                  {"Aucun élève évalué"}
-                </Badge>
-              </Item>
-            )}
-            <ItemContent className="m-6">
-              {allStudentsAverageScores.size > 0 && (
-                <LabelledScoreInputList
-                  items={Array.from(allStudentsAverageScores.entries())}
-                  form={form}
-                  optional={(tuple) => {
-                    return {
-                      id: tuple[0],
-                      item: tuple[1],
-                    };
-                  }}
-                />
-              )}
-            </ItemContent>
-          </ItemContent>
-        </Item>
+        <AverageFields form={form} students={allStudentsAverageScores} />
         <ControlledDynamicTagList
           form={form}
-          // {...sharedCallbacksMemo.commonObsProps}
-          // {...controllers.dynamicListControllers}
           name="absence"
           pageId={pageId}
           title={"Elèves absents aujourd'hui"}
           itemList={presenceMemo}
           inert
           displayCRUD={false}
-          // onRemove={handleDeletingTask}
         />
         <ControlledLabelledTextArea
           form={form}
