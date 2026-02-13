@@ -6,6 +6,7 @@ import {
   USER_ACTIVITIES,
 } from "@/configs/app.config.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
+import { useLocation } from "react-router-dom";
 
 /**
  * Custom hook to check user session.
@@ -17,6 +18,9 @@ export function useSessionChecker() {
     (state) => state.clearUserStateOnError,
   );
   const updateSession = useAppStore((state) => state.updateSession);
+
+  const location = useLocation().pathname;
+
   return useQueryOnSubmit([
     USER_ACTIVITIES.sessionCheck,
     {
@@ -25,7 +29,7 @@ export function useSessionChecker() {
       successDescription: "Session checked successfully.",
       silent: true,
       onSuccess: (data) => {
-        updateSession(true, USER_ACTIVITIES.sessionCheck);
+        updateSession(true, USER_ACTIVITIES.sessionCheck, { url: location });
         if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
           console.debug("Session Check onSuccess:", data);
         }
