@@ -2,6 +2,7 @@ import { summaryPageContent } from "@/assets/css/SummaryPage.module.scss";
 import { ListMapper } from "@/components/Lists/ListMapper";
 import { EvaluationSliderList } from "@/components/Sliders/exports/sliders.exports";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
+import type { DynamicItemTuple } from "@/components/Tags/types/tags.types";
 import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/labelled-textarea";
 import {
   Accordion,
@@ -18,16 +19,15 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { LabelledScoreInputList } from "@/features/evaluations/create/components/Score/exports/labelled-score-input.exports";
-import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
+import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
 import { useMemo, type ComponentProps } from "react";
-import { useShallow } from "zustand/shallow";
 
-type StepFourControllerProps = {
+type StepFourControllerProps = Readonly<{
   pageId: string;
   form: ComponentProps<typeof ControlledDynamicTagList>["form"];
   className: string;
   formId: string;
-};
+}>;
 
 export function StepFourController({
   pageId,
@@ -35,25 +35,13 @@ export function StepFourController({
   formId,
   className,
 }: StepFourControllerProps) {
-  const modules = useEvaluationStepsCreationStore(
-    useShallow((state) => state.getAttendedModules()),
-  );
-
-  const getStudentScoreForSubSkill = useEvaluationStepsCreationStore(
-    useShallow((state) => state.getStudentScoreForSubSkill),
-  );
-
-  const evaluatedStudentsForThisSubskill = useEvaluationStepsCreationStore(
-    useShallow((state) => state.getPresentStudentsWithAssignedTasks),
-  );
-
-  const nonPresentStudents = useEvaluationStepsCreationStore(
-    useShallow((state) => state.getAllNonPresentStudents()),
-  );
-
-  const allStudentsAverageScores = useEvaluationStepsCreationStore(
-    useShallow((state) => state.getAllStudentsAverageScores()),
-  );
+  const {
+    scoreValue,
+    nonPresentStudents,
+    allStudentsAverageScores,
+    modules,
+    getEvaluatedStudentsForSubSkill,
+  } = useStepThreeState();
 
   /**
    * Generates a list of absent students names to display
@@ -61,10 +49,24 @@ export function StepFourController({
    * @description Saves ids instead of names in the form for validation.
    */
   const presenceMemo = useMemo(() => {
-    let studentsPresence = Array.from(nonPresentStudents.values());
+    let studentsPresence: DynamicItemTuple[] = Array.from(
+      nonPresentStudents.entries(),
+    ).map(([studentId, studentValues]) => {
+      const firstValue = Array.isArray(studentValues)
+        ? studentValues[0]
+        : undefined;
+
+      const studentName = typeof firstValue === "string" ? firstValue : "";
+
+      const normalizedStudentId =
+        typeof studentId === "string" ? studentId : String(studentId);
+
+      return [studentName, { id: normalizedStudentId }];
+    });
+
     let studentsPresenceIds = Array.from(nonPresentStudents.keys());
     if (studentsPresence.length === 0) {
-      studentsPresence = [["Aucun", {}]];
+      studentsPresence = [["Aucun", { id: "none" }]];
       studentsPresenceIds = ["none"];
     }
 
@@ -93,21 +95,21 @@ export function StepFourController({
                   <AccordionContent>
                     <ListMapper items={Array.from(module.subSkills.values())}>
                       {(subSkill) => {
-                        console.log("jai trigger un render de subskills");
                         if (subSkill.isCompleted && !subSkill.isDisabled) {
                           return (
                             <div
                               key={subSkill.id}
-                              id={subSkill.id}
+                              // id={subSkill.id}
                               className=" m-auto max-w-5/6"
                             >
                               <ItemTitle>{subSkill.name}</ItemTitle>
                               <EvaluationSliderList
-                                items={evaluatedStudentsForThisSubskill(
+                                items={getEvaluatedStudentsForSubSkill(
                                   subSkill.id,
+                                  module.id,
                                 )}
                                 optional={(student) => {
-                                  const value = getStudentScoreForSubSkill(
+                                  const value = scoreValue(
                                     student.id,
                                     subSkill.id,
                                     module.id,
@@ -115,7 +117,6 @@ export function StepFourController({
                                   return { value };
                                 }}
                                 inert
-                                // onValueChange={handleValueChange}
                               />
                             </div>
                           );
@@ -143,21 +144,22 @@ export function StepFourController({
                 </Badge>
               </Item>
             )}
-            {allStudentsAverageScores.size > 0 && (
-              <LabelledScoreInputList
-                items={Array.from(allStudentsAverageScores.entries())}
-                form={form}
-                optional={(tuple) => {
-                  return {
-                    id: tuple[0],
-                    item: tuple[1],
-                  };
-                }}
-              />
-            )}
+            <ItemContent className="m-6">
+              {allStudentsAverageScores.size > 0 && (
+                <LabelledScoreInputList
+                  items={Array.from(allStudentsAverageScores.entries())}
+                  form={form}
+                  optional={(tuple) => {
+                    return {
+                      id: tuple[0],
+                      item: tuple[1],
+                    };
+                  }}
+                />
+              )}
+            </ItemContent>
           </ItemContent>
         </Item>
-        {/* <Item> */}
         <ControlledDynamicTagList
           form={form}
           // {...sharedCallbacksMemo.commonObsProps}
@@ -170,14 +172,11 @@ export function StepFourController({
           displayCRUD={false}
           // onRemove={handleDeletingTask}
         />
-        {/* </Item> */}
-        {/* <Item> */}
         <ControlledLabelledTextArea
           form={form}
           name="comments"
           title="Commentaires"
         />
-        {/* </Item> */}
       </form>
     </>
   );
