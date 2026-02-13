@@ -2,6 +2,13 @@ import { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-in
 import { Badge } from "@/components/ui/badge";
 import type { LabelledScoreInputProps } from "@/features/evaluations/create/components/Score/types/score-types";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
+import { formatParseFloat } from "@/utils/utils";
+import {
+  labelledScoreInput,
+  labelledScoreInputBadge,
+  labelledScoreInputInput,
+  labelledScoreInputText,
+} from "@css/LabelledScoreInput.module.scss";
 import { useWatch } from "react-hook-form";
 import { useShallow } from "zustand/shallow";
 
@@ -34,21 +41,20 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
   });
 
   return (
-    <div className="grid grid-cols-9 gap-2 justify-items-center items-center">
-      <Badge className="m-4 justify-self-start col-start-1 col-end-6">
-        {item.name}
-      </Badge>
-      <p className="col-start-6 col-end-8">{"Moyenne : "}</p>
-      <ControlledLabelledInput
-        className="col-start-8 col-end-9 text-center p-0"
-        name={watchId}
-        form={form}
-        type="number"
-        min={0}
-        max={20}
-        defaultValue={item.score / 5}
-      />
-      <p className="col-start-9">{"/20"}</p>
+    <div className={labelledScoreInput}>
+      <Badge className={labelledScoreInputBadge}>{item.name}</Badge>
+      <p className={labelledScoreInputText}>{"Moyenne : "}</p>
+      <div className={labelledScoreInputInput}>
+        <ControlledLabelledInput
+          name={watchId}
+          form={form}
+          type="number"
+          min={0}
+          max={20}
+          defaultValue={formatParseFloat(item.score / 5)}
+        />
+        <p>{"/20"}</p>
+      </div>
     </div>
   );
 }
