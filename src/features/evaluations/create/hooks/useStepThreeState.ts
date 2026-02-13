@@ -48,7 +48,16 @@ export function useStepThreeState() {
   );
 
   const evaluatedStudentsForThisSubskill = useEvaluationStepsCreationStore(
-    useShallow((state) => state.getPresentStudentsWithAssignedTasks()),
+    useShallow((state) =>
+      state.getPresentStudentsWithAssignedTasks(
+        state.subSkillSelection.selectedSubSkillId ?? undefined,
+        state.moduleSelection.selectedModuleId ?? undefined,
+      ),
+    ),
+  );
+
+  const getEvaluatedStudentsForSubSkill = useEvaluationStepsCreationStore(
+    (state) => state.getPresentStudentsWithAssignedTasks,
   );
 
   const disableSubSkillsWithoutStudents = useEvaluationStepsCreationStore(
@@ -72,6 +81,14 @@ export function useStepThreeState() {
     ),
   );
 
+  const nonPresentStudents = useEvaluationStepsCreationStore(
+    useShallow((state) => state.getAllNonPresentStudents()),
+  );
+
+  const allStudentsAverageScores = useEvaluationStepsCreationStore(
+    useShallow((state) => state.getAllStudentsAverageScores()),
+  );
+
   return {
     selectedClass,
     tasks,
@@ -81,6 +98,7 @@ export function useStepThreeState() {
     selectedSubSkill,
     selectedModule,
     evaluatedStudentsForThisSubskill,
+    getEvaluatedStudentsForSubSkill,
     setModuleSelection,
     setSubskillSelection,
     selectedModuleId,
@@ -92,5 +110,7 @@ export function useStepThreeState() {
     setEvaluationForStudent,
     setSubSkillHasCompleted,
     isThisSubSkillCompleted,
+    nonPresentStudents,
+    allStudentsAverageScores,
   };
 }
