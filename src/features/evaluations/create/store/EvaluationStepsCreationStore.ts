@@ -660,7 +660,9 @@ export const useEvaluationStepsCreationStore = create(
           /**
            * Verify if all of the students for a selected subskill from a module have been scored.
            *
-           * @param subSkillId - The ID of the sub-skill to check
+           * @param subSkillId - The ID of the sub-skill to check (optional, if not provided it will use the currently selected sub-skill in the store)
+           * @param moduleId - The ID of the module to check (optional, if not provided it will use the currently selected module in the store)
+           *
            * @returns True if all students have been scored for the sub-skill, otherwise false.
            */
           isThisSubSkillCompleted(subSkillId?: UUID, moduleId?: UUID) {
@@ -671,8 +673,10 @@ export const useEvaluationStepsCreationStore = create(
 
             if (!selectedModuleId || !selectedSubSkillId) return false;
 
-            const presentStudents =
-              ACTIONS.getPresentStudentsWithAssignedTasks(selectedSubSkillId);
+            const presentStudents = ACTIONS.getPresentStudentsWithAssignedTasks(
+              selectedSubSkillId,
+              selectedModuleId,
+            );
 
             // This sub-skill has no students to evaluate
             // And should be considered as isDisabled instead of completed
@@ -813,23 +817,48 @@ export const useEvaluationStepsCreationStore = create(
             return studentsArray;
           },
           /**
+           * Verify that all modules are completed (or disabled) before allowing finalization of the evaluation.
+           *
+           * @returns True if all modules are completed or disabled, otherwise false.
+           */
+          areAllModulesCompleted() {
+            ensureCollections();
+            const attendedModules = ACTIONS.getAttendedModules();
+
+            return attendedModules.every((module) => module.isCompleted);
+          },
+          /**
            * FOR SUBSKILLS - CONTROLLER USE ONLY
            *
            * Students with assigned tasks for the selected subskill.
            *
            * @description Student must be present
            *
+           * @param subSkillId - The ID of the selected sub-skill (optional, if not provided it will use the currently selected sub-skill in the store)
+           * @param moduleId - The ID of the selected module (optional, if not provided it will use the currently selected module in the store)
+           *
            * @returns Array of students who are present and have assigned tasks related to the selected subskill.
            */
-          getPresentStudentsWithAssignedTasks(subSkillId?: UUID) {
+          getPresentStudentsWithAssignedTasks(
+            subSkillId?: UUID,
+            moduleId?: UUID,
+          ) {
             ensureCollections();
             const selectedSubSkillId =
               subSkillId ?? get().subSkillSelection?.selectedSubSkillId;
+            const selectedModuleId =
+              moduleId ?? get().moduleSelection?.selectedModuleId;
 
             if (!selectedSubSkillId) return [];
 
             const students = Array.from(get().students?.values() ?? []);
-            const modules = Array.from(get().modules?.values() ?? []);
+            const selectedModule = selectedModuleId
+              ? get().modules?.get(selectedModuleId)
+              : null;
+
+            const modules = selectedModule
+              ? [selectedModule]
+              : Array.from(get().modules?.values() ?? []);
 
             return students.filter((student) => {
               const { assignedTask, isPresent, id } = student;
