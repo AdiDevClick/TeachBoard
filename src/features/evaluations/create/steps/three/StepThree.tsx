@@ -1,9 +1,6 @@
 import { useAppStore } from "@/api/store/AppStore.ts";
 import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState.ts";
-import {
-  DescriptionChange,
-  ShowStudentsEvaluationWithPreviousArrow,
-} from "@/features/evaluations/create/steps/three/components/step-three-functionnal-wrappers.functions";
+import { DescriptionChange } from "@/features/evaluations/create/steps/three/components/step-three-functionnal-wrappers.functions";
 import {
   ShowModuleSelection,
   ShowStudentsEvaluation,
@@ -23,7 +20,6 @@ import {
 } from "@/features/evaluations/create/steps/two/models/attendance-record-creation.models";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
 import { useForm, type FieldValues } from "react-hook-form";
 
 /**
@@ -52,7 +48,6 @@ export function StepThree({
     tasks,
     modules,
     moduleSelectionState,
-    setShowStudentsEvaluation: displayModules,
     selectedSubSkill,
     evaluatedStudentsForThisSubskill,
   } = useStepThreeState();
@@ -67,7 +62,7 @@ export function StepThree({
 
   const isModuleClicked = moduleSelectionState.isClicked;
 
-  const card = useMemo(() => {
+  const card = () => {
     if (!isModuleClicked) {
       return STEP_THREE_MODULE_SELECTION_CARD_PROPS;
     }
@@ -76,10 +71,10 @@ export function StepThree({
       ...STEP_THREE_SUBSKILLS_SELECTION_CARD_PROPS,
       title: {
         ...STEP_THREE_SUBSKILLS_SELECTION_TITLE_PROPS,
-        description: DescriptionChange(selectedSubSkill),
+        description: DescriptionChange(selectedSubSkill ?? {}),
       },
     };
-  }, [isModuleClicked, selectedSubSkill]);
+  };
 
   const baseCardProps = {
     pageId,
@@ -87,7 +82,7 @@ export function StepThree({
     className,
     formId: pageId + "-form",
     inputControllers,
-    card,
+    card: card(),
     ...props,
     form,
   };
@@ -120,10 +115,7 @@ export function StepThree({
     <>
       {!isModuleClicked && <ShowModuleSelection {...moduleSelectionProps} />}
       {isModuleClicked && (
-        <ShowStudentsEvaluationWithPreviousArrow
-          {...studentsEvaluationProps}
-          onPreviousArrowClick={displayModules}
-        />
+        <ShowStudentsEvaluation {...studentsEvaluationProps} />
       )}
     </>
   );

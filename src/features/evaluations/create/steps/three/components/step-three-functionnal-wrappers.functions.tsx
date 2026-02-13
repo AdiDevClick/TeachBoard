@@ -1,35 +1,7 @@
-import { Badge } from "@/components/ui/badge";
-import { ShowStudentsEvaluation } from "@/features/evaluations/create/steps/three/components/step-three-wrappers.functions";
-import {
-  STEP_THREE_SUBSKILLS_SELECTION_CARD_PROPS,
-  STEP_THREE_SUBSKILLS_SELECTION_TITLE_PROPS,
-} from "@/features/evaluations/create/steps/three/config/step-three.configs";
+import type { DescriptionChangeProps } from "@/features/evaluations/create/steps/three/components/types/wrappers-functions.types";
+import { STEP_THREE_SUBSKILLS_SELECTION_TITLE_PROPS } from "@/features/evaluations/create/steps/three/config/step-three.configs";
 import { StepThreeSubskillsSelectionController } from "@/features/evaluations/create/steps/three/controllers/StepThreeSubskillsSelectionController";
-import { handlePreviousClick } from "@/features/evaluations/create/steps/three/functions/step-three.functions";
-import type {
-  ShowStudentsEvaluationWithPreviousArrowProps,
-  StepThreeSubskillsSelectionControllerProps,
-} from "@/features/evaluations/create/steps/three/types/step-three.types";
-import { IconArrowAutofitLeft } from "@tabler/icons-react";
-
-export function ShowStudentsEvaluationWithPreviousArrow(
-  props: ShowStudentsEvaluationWithPreviousArrowProps,
-) {
-  const { onPreviousArrowClick: displayModules, ...commonProps } = props;
-
-  return (
-    <>
-      <IconArrowAutofitLeft
-        className={
-          STEP_THREE_SUBSKILLS_SELECTION_CARD_PROPS.arrowBack.className
-        }
-        onClick={(e) => handlePreviousClick(e, displayModules)}
-        data-name="modules-previous"
-      />
-      <ShowStudentsEvaluation {...commonProps} />
-    </>
-  );
-}
+import type { StepThreeSubskillsSelectionControllerProps } from "@/features/evaluations/create/steps/three/types/step-three.types";
 
 /**
  * Handle left content change based on module selection state
@@ -56,12 +28,12 @@ export function HandleLeftContentChange(
  * @param selectedSubSkill - The currently selected sub-skill.
  * @returns A JSX element representing the description.
  */
-export function DescriptionChange(selectedSubSkill?: { name?: string } | null) {
+export function DescriptionChange(selectedSubSkill: DescriptionChangeProps) {
   const { name } = selectedSubSkill || {};
 
-  if (name) {
-    return <Badge>{name}</Badge>;
-  }
+  // if (name) {
+  //   return <Badge>{name}</Badge>;
+  // }
 
-  return STEP_THREE_SUBSKILLS_SELECTION_TITLE_PROPS.description;
+  return name ?? STEP_THREE_SUBSKILLS_SELECTION_TITLE_PROPS.description;
 }
