@@ -9,11 +9,12 @@ $arrow-size: 20px;
 $hidden-size: 3rem;
 
 .page__content-container {
+  position: relative;
   height: 100%;
   border: 1px solid var(--border);
   border-right: none;
   border-left-width: 7px;
-  border-bottom: none;
+  // border-bottom: none;
   border-radius: 10px;
   padding-bottom: var(--bottom-padding);
   margin-bottom: var(--bottom-margin);
@@ -31,6 +32,7 @@ $hidden-size: 3rem;
   .left-arrow,
   .right-arrow,
   .header {
+
     // avoid any scrolling issues
     position: sticky;
     top: 0;
@@ -39,6 +41,11 @@ $hidden-size: 3rem;
     position: relative;
     transition: all 0.5s ease;
     // background: rgba(49, 5, 5, 0.06);
+
+    .left-arrow {
+      top: 15%;
+    }
+
   }
 
   :is(.left-arrow, .right-arrow)::after {

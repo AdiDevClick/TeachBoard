@@ -1,16 +1,22 @@
+@use "mixins" as *;
+
 /**
   * Styles for the navigation tabs component.
   */
 .nav-tabs-container {
+  z-index: 10;
   $transform : calc(var(--nav-tabs-height) / 2 * -1);
   --nav-tabs-translate-y: $transform;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   transform: translateY($transform);
   flex-wrap: wrap;
   height: var(--nav-tabs-height);
 
-  @media screen and (max-width: 768px) {
+  @include for-size(smalltablet) {
     background: var(--background);
   }
 

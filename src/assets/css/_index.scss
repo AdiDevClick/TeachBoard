@@ -35,6 +35,8 @@
   --hover-scale-active: 0.95;
 }
 
+$borders: calc(1px * 2);
+
 /**
   * Global variables for the page
   *   - Top of the page (e.g, breadcrumbs)
@@ -68,6 +70,6 @@
   // Combined top offset for pages that need remaining height
   --page-top-offset: calc(var(--calculated-title-space) + var(--page-header-height));
 
-
-  --content-offset: calc(var(--page-top-offset) + var(--nav-tabs-height) + var(--bottom-margin) + var(--gap) + 1px);
+  --content-offset: calc(var(--page-top-offset) + var(--bottom-margin) + #{$borders});
+  // --content-offset: calc(var(--page-top-offset) + var(--nav-tabs-height) + var(--bottom-margin) + var(--gap) + 1px);
 }
