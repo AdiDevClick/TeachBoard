@@ -2,7 +2,6 @@ import {
   contentSeparator,
   evaluationPageContainer,
 } from "@/assets/css/EvaluationPage.module.scss";
-import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import { TAB_CONTENT_VIEW_CARD_PROPS } from "@/components/Tabs/config/tab-content.configs";
 import type {
   LeftSideProps,
@@ -12,10 +11,12 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useSidebar } from "@/components/ui/sidebar";
 import { TabsContent } from "@/components/ui/tabs";
+import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
 import { LeftSidePageContent } from "@/pages/Evaluations/create/left-content/LeftSidePageContent";
 import withTitledCard from "@components/HOCs/withTitledCard.tsx";
 import { IconArrowLeft, IconArrowRightDashed } from "@tabler/icons-react";
-import type { MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
+import { useShallow } from "zustand/shallow";
 
 /**
  * Tab content component for evaluation creation page.
@@ -36,9 +37,65 @@ export function TabContent(props: TabContentProps) {
     clickProps,
   } = props;
 
+  const areAllModulesCompleted = useEvaluationStepsCreationStore(
+    useShallow((state) => state.areAllModulesCompleted()),
+  );
+  const selectedClass = useEvaluationStepsCreationStore(
+    (state) => state.selectedClass,
+  );
+  const modules = useEvaluationStepsCreationStore(
+    useShallow((state) => state.getAttendedModules()),
+  );
+  const setModuleSelectionIsClicked = useEvaluationStepsCreationStore(
+    (state) => state.setModuleSelectionIsClicked,
+  );
+
+  const moduleSelectionState = useEvaluationStepsCreationStore(
+    (state) => state.moduleSelection,
+  );
+
   const { isMobile, setOpen, open } = useSidebar();
+  const [disableNext, setDisableNext] = useState(true);
+
+  // Effect to disable next button if not all modules are completed when on the last step
+  useEffect(() => {
+    console.log(tabName, modules.length, disableNext, areAllModulesCompleted);
+    if (tabName === "Classe" && selectedClass?.id) {
+      return setDisableNext(false);
+    }
+
+    if (tabName === "Elèves" && modules.length > 0) {
+      return setDisableNext(false);
+    }
+
+    if (
+      tabName === "Evaluation" &&
+      !moduleSelectionState.isClicked &&
+      !areAllModulesCompleted
+    ) {
+      return setDisableNext(true);
+    }
+
+    if (tabName === "Evaluation") {
+      return setDisableNext(false);
+    }
+
+    setDisableNext(true);
+  }, [tabName, selectedClass, areAllModulesCompleted, modules]);
 
   const clickHandler = (e: MouseEvent<HTMLButtonElement>) => {
+    const currentStep = e.currentTarget.dataset.name;
+
+    if (
+      tabName === "Evaluation" &&
+      currentStep === "next-step" &&
+      moduleSelectionState.isClicked &&
+      !areAllModulesCompleted
+    ) {
+      setModuleSelectionIsClicked(false);
+      return;
+    }
+
     onClickHandler({ e, ...clickProps, index, setOpen, open });
   };
 
@@ -55,27 +112,32 @@ export function TabContent(props: TabContentProps) {
     <TabsContent value={tabName} className={evaluationPageContainer}>
       <View {...commonProps}>
         <View.Title className="header">
-          <Button
-            className="left-arrow"
-            onClick={clickHandler}
-            data-name="step-previous"
-            type="button"
-            aria-label="Previous step"
-          >
-            <IconArrowLeft />
-          </Button>
+          {index !== 0 && (
+            <Button
+              className="left-arrow"
+              onClick={clickHandler}
+              data-name="step-previous"
+              type="button"
+              aria-label="Previous step"
+            >
+              <IconArrowLeft />
+            </Button>
+          )}
         </View.Title>
         <View.Content>{props.children}</View.Content>
         <View.Footer>
-          <Button
-            className="right-arrow"
-            onClick={clickHandler}
-            data-name="next-step"
-            type="button"
-            aria-label="Next step"
-          >
-            <IconArrowRightDashed />
-          </Button>
+          {index !== props.clickProps.arrayLength - 1 && (
+            <Button
+              className="right-arrow"
+              onClick={clickHandler}
+              data-name="next-step"
+              type="button"
+              aria-label="Next step"
+              disabled={disableNext}
+            >
+              <IconArrowRightDashed />
+            </Button>
+          )}
         </View.Footer>
       </View>
     </TabsContent>
