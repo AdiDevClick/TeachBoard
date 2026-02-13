@@ -1,7 +1,10 @@
 import { DialogContext } from "@/api/contexts/Dialog.context";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
-import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
+import type {
+  AnyObjectProps,
+  PreventDefaultAndStopPropagation,
+} from "@/utils/types/types.utils.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
@@ -17,13 +20,17 @@ import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
  * @returns The DialogProvider component that wraps its children with Dialog context.
  */
 export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
-  const [openDialogs, setOpenDialogs] = useState<UniqueSet<AppModalNames, any>>(
-    new UniqueSet()
-  );
+  const [openDialogs, setOpenDialogs] = useState<
+    UniqueSet<AppModalNames, AnyObjectProps>
+  >(new UniqueSet());
   const { setRef, observedRefs, deleteRef } = useMutationObserver({});
 
   const openDialog = useCallback(
-    (e: PreventDefaultAndStopPropagation, id: AppModalNames, options?: any) => {
+    (
+      e: PreventDefaultAndStopPropagation,
+      id: AppModalNames,
+      options?: AnyObjectProps,
+    ) => {
       preventDefaultAndStopPropagation(e);
       setOpenDialogs((prev) => {
         const next = prev.clone();
@@ -31,7 +38,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
         return next;
       });
     },
-    []
+    [],
   );
 
   const closeDialog = useCallback(
@@ -54,7 +61,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
         return next;
       });
     },
-    []
+    [deleteRef],
   );
 
   const closeAllDialogs = useCallback(() => {
@@ -66,7 +73,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
     (id: AppModalNames) => {
       return openDialogs.has(id);
     },
-    [openDialogs]
+    [openDialogs],
   );
 
   const onOpenChange = useCallback((id: AppModalNames) => {
@@ -77,18 +84,21 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
     });
   }, []);
 
-  const setDialogOptions = useCallback((id: AppModalNames, options: any) => {
-    setOpenDialogs((prev) => {
-      const next = prev.clone();
-      if (next.has(id)) {
-        next.set(id, {
-          ...next.get(id),
-          ...options,
-        });
-      }
-      return next;
-    });
-  }, []);
+  const setDialogOptions = useCallback(
+    (id: AppModalNames, options: AnyObjectProps) => {
+      setOpenDialogs((prev) => {
+        const next = prev.clone();
+        if (next.has(id)) {
+          next.set(id, {
+            ...next.get(id),
+            ...options,
+          });
+        }
+        return next;
+      });
+    },
+    [],
+  );
 
   const dialogsOptions = useMemo(() => {
     return new Map(openDialogs.entries());
@@ -98,7 +108,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
     (dialog: AppModalNames) => {
       return openDialogs.get(dialog);
     },
-    [openDialogs]
+    [openDialogs],
   );
 
   const value = useMemo(
@@ -116,7 +126,20 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
       deleteRef,
       observedRefs,
     }),
-    [openDialogs, observedRefs]
+    [
+      openDialogs,
+      observedRefs,
+      setRef,
+      deleteRef,
+      dialogOptions,
+      dialogsOptions,
+      isDialogOpen,
+      openDialog,
+      closeDialog,
+      onOpenChange,
+      closeAllDialogs,
+      setDialogOptions,
+    ],
   );
 
   return (
