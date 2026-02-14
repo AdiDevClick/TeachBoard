@@ -3,7 +3,12 @@
  */
 
 import type { useSidebar } from "@/components/ui/sidebar";
-import type { MouseEvent, PropsWithChildren } from "react";
+import type {
+  Dispatch,
+  MouseEvent,
+  PropsWithChildren,
+  SetStateAction,
+} from "react";
 
 /**
  * Types for the left content component props
@@ -25,4 +30,5 @@ export type CreateEvaluationArrowsClickHandlerProps = {
   arrayLength: number;
   setTabValue: (_v: string | undefined) => void;
   tabValues: string[];
+  setSlideDirection: Dispatch<SetStateAction<"left" | "right">>;
 } & ReturnType<typeof useSidebar>;
