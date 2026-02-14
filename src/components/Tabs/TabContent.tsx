@@ -33,6 +33,7 @@ export function TabContent(props: TabContentProps) {
     index,
     leftContent,
     name: tabName,
+    slideDirection,
     leftSide,
     onClick: onClickHandler,
     clickProps,
@@ -120,9 +121,9 @@ export function TabContent(props: TabContentProps) {
 
   /**
    * BUTTONS INTERACTIVITY - HANDLER
-   * 
+   *
    * @description The data-set is read to identify which button is clicked (previous or next).
-   * 
+   *
    * @param e - The event to check
    */
   const clickHandler = (e: MouseEvent<HTMLButtonElement>) => {
@@ -151,7 +152,11 @@ export function TabContent(props: TabContentProps) {
   };
 
   return (
-    <TabsContent value={tabName} className={evaluationPageContainer}>
+    <TabsContent
+      data-slide-direction={slideDirection}
+      value={tabName}
+      className={evaluationPageContainer}
+    >
       <View {...commonProps}>
         <View.Title className="header">
           {index !== 0 && (
