@@ -3,6 +3,7 @@ import type { AppBreadCrumbListProps } from "@/components/BreadCrumbs/types/brea
 import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import type { DropdownsProps } from "@/components/Dropdowns/types/dropdowns.types";
+import type { AvatarListWithLabelAndAddButtonProps } from "@/components/Form/types/form.types";
 import type { LabelledInputProps } from "@/components/Inputs/types/inputs.types";
 import type {
   EvaluationRadioItemDescriptionProps,
@@ -62,6 +63,20 @@ export const appBreadCrumbPropsInvalid = (props: AnyObjectProps) =>
     APP_BREADCRUMB_REQUIRES,
     APP_BREADCRUMB_SHOULD_NOT_ACCEPT,
   );
+
+//                    ------------
+
+/**
+ * Validation requirements for AppBreadCrumbSegment component.
+ *
+ * {@link import("@/components/BreadCrumbs/AppBreadCrumbSegment.tsx").AppBreadCrumbSegment}
+ */
+
+const AVATAR_LIST_WITH_LABEL_AND_ADD_BUTTON_REQUIRES = ["items"];
+export const avatarListWithLabelAndAddButtonPropsInvalid = (
+  props: AvatarListWithLabelAndAddButtonProps,
+) =>
+  checkPropsValidity(props, AVATAR_LIST_WITH_LABEL_AND_ADD_BUTTON_REQUIRES, []);
 
 //                    ------------
 
