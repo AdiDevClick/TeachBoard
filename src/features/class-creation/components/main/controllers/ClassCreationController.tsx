@@ -2,7 +2,7 @@ import type {
   CommandItemType,
   DetailedCommandItem,
 } from "@/components/Command/types/command.types.ts";
-import { AvatarsWithLabelAndAddButtonList } from "@/components/Form/AvatarListWithLabelAndAddButton.tsx";
+import { AvatarsWithLabelAndAddButtonList } from "@/components/Form/exports/form.exports";
 import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
 import {
   PopoverFieldWithCommands,
@@ -356,8 +356,8 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
       className={className}
     >
       <ControlledInputList
-        items={controllers.controlledInputsControllers}
         form={form}
+        items={controllers.controlledInputsControllers}
         setRef={setRef}
       />
       <PopoverFieldWithControllerAndCommandsList
