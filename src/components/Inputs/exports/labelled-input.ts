@@ -2,6 +2,7 @@ import { forController } from "@/components/HOCs/forController";
 import withController from "@/components/HOCs/withController";
 import withListMapper from "@/components/HOCs/withListMapper";
 import { LabelledInput } from "@/components/Inputs/LaballedInputForController";
+import { createComponentName } from "@/utils/utils";
 
 /**
  * @fileoverview This file exports the LabelledInput component and its variations with HOCs for form control and list mapping.
@@ -12,7 +13,11 @@ import { LabelledInput } from "@/components/Inputs/LaballedInputForController";
  * A version of the LabelledInput component that is integrated with react-hook-form Controller.
  */
 export const LabelledInputForController = forController(LabelledInput);
-LabelledInputForController.displayName = `forController(LabelledInputForController)`;
+createComponentName(
+  "forController",
+  "LabelledInputForController",
+  LabelledInputForController,
+);
 
 /**
  * A version of the LabelledInput component that is integrated with react-hook-form Controller and enhanced with list mapping capabilities.
@@ -20,10 +25,18 @@ LabelledInputForController.displayName = `forController(LabelledInputForControll
 export const ControlledLabelledInput = withController(
   LabelledInputForController,
 );
-ControlledLabelledInput.displayName = `withController(ControlledLabelledInput)`;
+createComponentName(
+  "withController",
+  "ControlledLabelledInput",
+  ControlledLabelledInput,
+);
 
 /**
  *  A version of the LabelledInput component that is integrated with react-hook-form Controller and enhanced with list mapping capabilities.
  */
 export const ControlledInputList = withListMapper(ControlledLabelledInput);
-ControlledInputList.displayName = `withListMapper(ControlledInputList)`;
+createComponentName(
+  "withListMapper",
+  "ControlledInputList",
+  ControlledInputList,
+);
