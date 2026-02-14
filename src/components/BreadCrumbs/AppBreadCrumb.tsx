@@ -4,6 +4,10 @@ import {
   BreadcrumbLink,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb.tsx";
+import {
+  appBreadCrumbPropsInvalid,
+  debugLogs,
+} from "@/configs/app-components.config";
 
 /**
  * Application breadcrumb item component
@@ -17,14 +21,12 @@ import {
  * @param url - URL of the breadcrumb segment
  * @param index - Index of the current segment
  */
-export function AppBreadCrumb({ ...segment }: Readonly<AppBreadcrumbProps>) {
-  const { name, url, index, segmentsLength, ...rest } = segment;
-
-  if (segmentsLength === null) {
-    throw new Error(
-      "AppBreadCrumb: segmentsLength prop is required in all usages."
-    );
+export function AppBreadCrumb(segment: Readonly<AppBreadcrumbProps>) {
+  if (appBreadCrumbPropsInvalid(segment)) {
+    debugLogs("AppBreadCrumb", segment);
+    return null;
   }
+  const { name, url, index, segmentsLength, ...rest } = segment;
 
   const useSeparator = index !== undefined && index < segmentsLength - 1;
 

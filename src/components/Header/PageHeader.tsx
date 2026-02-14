@@ -1,6 +1,5 @@
 import { useAppStore } from "@/api/store/AppStore";
-import { AppBreadCrumb } from "@/components/BreadCrumbs/AppBreadCrumb";
-import { AppBreadCrumbList } from "@/components/BreadCrumbs/AppBreadCrumbList.tsx";
+import { AppBreadCrumbList } from "@/components/BreadCrumbs/AppBreadCrumbList";
 import { Breadcrumb } from "@/components/ui/breadcrumb.tsx";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -36,9 +35,7 @@ export function PageHeader() {
         />
         {/* <h1 className="text-base font-medium">Documents</h1> */}
         <Breadcrumb>
-          <AppBreadCrumbList items={splitPaths}>
-            <AppBreadCrumb ischild segmentsLength={splitPaths.length} />
-          </AppBreadCrumbList>
+          <AppBreadCrumbList items={splitPaths} />
         </Breadcrumb>
         <div className="header__actions-container">
           <Button variant="ghost" asChild size="sm" className="actions__button">
@@ -80,7 +77,7 @@ export function PageHeader() {
  * @returns Array of breadcrumb segments with name and URL
  */
 function buildBreadcrumbsFromPath(
-  pathname: string
+  pathname: string,
 ): { url: string; name: string }[] {
   return pathname
     .split("/")

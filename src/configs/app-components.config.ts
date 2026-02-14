@@ -1,4 +1,5 @@
 import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.ts";
+import type { AppBreadCrumbListProps } from "@/components/BreadCrumbs/types/breadcrumbs.types";
 import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import type { DropdownsProps } from "@/components/Dropdowns/types/dropdowns.types";
@@ -44,6 +45,36 @@ export const labelledInputContainsInvalid = (props: LabelledInputProps) =>
     LABELLED_INPUT_REQUIRES,
     LABELLED_INPUT_SHOULD_NOT_ACCEPT,
   );
+
+//                    ------------
+
+/**
+ * Validation requirements for AppBreadCrumb component.
+ *
+ * {@link import("@/components/BreadCrumbs/AppBreadCrumb.tsx").AppBreadCrumb}
+ */
+const APP_BREADCRUMB_REQUIRES = ["segmentsLength"];
+const APP_BREADCRUMB_SHOULD_NOT_ACCEPT = ["useCommands", "creationButtonText"];
+
+export const appBreadCrumbPropsInvalid = (props: AnyObjectProps) =>
+  checkPropsValidity(
+    props,
+    APP_BREADCRUMB_REQUIRES,
+    APP_BREADCRUMB_SHOULD_NOT_ACCEPT,
+  );
+
+//                    ------------
+
+/**
+ * Validation requirements for AppBreadCrumbList component.
+ *
+ * {@link import("@/components/BreadCrumbs/AppBreadCrumbList.tsx").AppBreadCrumbList}
+ */
+
+const APP_BREADCRUMB_LIST_REQUIRES = ["items"];
+
+export const appBreadCrumbListPropsInvalid = (props: AppBreadCrumbListProps) =>
+  checkPropsValidity(props, APP_BREADCRUMB_LIST_REQUIRES, []);
 
 //                    ------------
 

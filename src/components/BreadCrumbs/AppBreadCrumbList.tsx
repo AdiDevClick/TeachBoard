@@ -1,24 +1,33 @@
+import { BreadCrumbsList } from "@/components/BreadCrumbs/exports/breadcrumbs.exports";
 import type { AppBreadCrumbListProps } from "@/components/BreadCrumbs/types/breadcrumbs.types.ts";
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import { BreadcrumbList } from "@/components/ui/breadcrumb.tsx";
+import {
+  appBreadCrumbListPropsInvalid,
+  debugLogs,
+} from "@/configs/app-components.config";
 
 /**
  * Application breadcrumb list component
  *
  * @description Renders a list of breadcrumb items using ListMapper.
  *
- * @param children - Child components to render for each breadcrumb item
  * @param items - Array of breadcrumb items
  * @param ulProps - Additional props for the BreadcrumbList component
  */
-export function AppBreadCrumbList({
-  children,
-  items,
-  ...ulProps
-}: Readonly<AppBreadCrumbListProps>) {
+export function AppBreadCrumbList(props: AppBreadCrumbListProps) {
+  if (appBreadCrumbListPropsInvalid(props)) {
+    debugLogs("AppBreadCrumbList", props);
+    return null;
+  }
+
+  const { items, ...ulProps } = props;
+
   return (
     <BreadcrumbList {...ulProps}>
-      <ListMapper items={items}>{children}</ListMapper>
+      <BreadCrumbsList
+        items={items}
+        optional={{ segmentsLength: items.length }}
+      />
     </BreadcrumbList>
   );
 }
