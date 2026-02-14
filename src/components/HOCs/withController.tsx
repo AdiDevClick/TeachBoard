@@ -4,11 +4,9 @@ import {
   controllerPropsInvalid,
   debugLogs,
 } from "@/configs/app-components.config.ts";
-import type {
-  AnyComponentLike,
-  ComponentPropsOf,
-} from "@/utils/types/types.utils.ts";
+import type { ComponentPropsOf } from "@/utils/types/types.utils.ts";
 import { createNameForHOC } from "@/utils/utils";
+import type { ComponentType } from "react";
 import { Controller } from "react-hook-form";
 
 /**
@@ -30,7 +28,7 @@ import { Controller } from "react-hook-form";
  * />
  * ```
  */
-function withController<C extends AnyComponentLike>(Wrapped: C) {
+function withController<C extends ComponentType<any>>(Wrapped: C) {
   function Component(props: WrapperPropsAny<C>) {
     if (controllerPropsInvalid(props)) {
       debugLogs("withController");
