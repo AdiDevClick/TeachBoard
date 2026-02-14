@@ -1,5 +1,5 @@
 import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs";
-import { TabContentList } from "@/components/Tabs/exports/tab-content.exports";
+import { TabContentList } from "@/features/evaluations/create/components/Tabs/exports/tab-content.exports";
 import { Tabs } from "@/components/ui/tabs";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types";
 import type { CreateEvaluationsLoaderData } from "@/routes/types/routes-config.types";
@@ -53,7 +53,7 @@ export function CreateEvaluations() {
 
   /**
    * Retrieve the current tab value -
-   * 
+   *
    * @description Defaults to the first tab if no match is found with the current URL segment.
    */
   const tabValue =

@@ -1,5 +1,5 @@
 import withListMapper from "@/components/HOCs/withListMapper";
-import { TabContent } from "@/components/Tabs/TabContent";
+import { TabContent } from "@/features/evaluations/create/components/Tabs/TabContent";
 
 /**
  * @fileoverview A file containing exports related to the TabContent component, including the main TabContent component and a list mapper for handling multiple tab contents.

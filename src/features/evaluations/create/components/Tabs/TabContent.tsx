@@ -1,0 +1,110 @@
+import {
+  contentSeparator,
+  evaluationPageContainer,
+} from "@/assets/css/EvaluationPage.module.scss";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { TabsContent } from "@/components/ui/tabs";
+import { TAB_CONTENT_VIEW_CARD_PROPS } from "@/features/evaluations/create/components/Tabs/config/tab-content.configs";
+import type {
+  LeftSideProps,
+  TabContentProps,
+} from "@/features/evaluations/create/components/Tabs/types/tabs.types";
+import { useTabContentHandler } from "@/features/evaluations/create/hooks/useTabContentHandler";
+import { LeftSidePageContent } from "@/pages/Evaluations/create/left-content/LeftSidePageContent";
+import { createComponentName } from "@/utils/utils";
+import withTitledCard from "@components/HOCs/withTitledCard.tsx";
+import { IconArrowLeft, IconArrowRightDashed } from "@tabler/icons-react";
+
+/**
+ * Tab content component for evaluation creation page.
+ *
+ * @param index - Index of the current tab
+ * @param name - Name of the tab
+ * @param leftSide - Data for the left side content
+ * @param children - Right side content component
+ * @param props - Additional props including onClick handler and clickProps
+ */
+export function TabContent(props: TabContentProps) {
+  const {
+    index,
+    leftContent,
+    name: tabName,
+    slideDirection,
+    leftSide,
+    onClick,
+    clickProps,
+  } = props;
+
+  const { clickHandler, disableNext, isMobile } = useTabContentHandler({
+    name: tabName,
+    clickProps,
+    onClick,
+    index,
+  });
+
+  const commonProps = {
+    pageId: `step-${index}`,
+    modalMode: false,
+    leftSide,
+    isMobile,
+    leftContent,
+    card: TAB_CONTENT_VIEW_CARD_PROPS,
+  };
+
+  return (
+    <TabsContent
+      data-slide-direction={slideDirection}
+      value={tabName}
+      className={evaluationPageContainer}
+    >
+      <View {...commonProps}>
+        <View.Title className="header">
+          {index !== 0 && (
+            <Button
+              className="left-arrow"
+              onClick={clickHandler}
+              data-name="step-previous"
+              type="button"
+              aria-label="Previous step"
+            >
+              <IconArrowLeft />
+            </Button>
+          )}
+        </View.Title>
+        <View.Content>{props.children}</View.Content>
+        <View.Footer>
+          {index !== props.clickProps.arrayLength - 1 && (
+            <Button
+              className="right-arrow"
+              onClick={clickHandler}
+              data-name="next-step"
+              type="button"
+              aria-label="Next step"
+              disabled={disableNext}
+            >
+              <IconArrowRightDashed />
+            </Button>
+          )}
+        </View.Footer>
+      </View>
+    </TabsContent>
+  );
+}
+
+function LeftSide(props: LeftSideProps) {
+  const { leftSide, leftContent, isMobile } = props;
+
+  return (
+    <>
+      <LeftSidePageContent item={leftSide}>{leftContent}</LeftSidePageContent>
+      <Separator
+        className={contentSeparator}
+        orientation={isMobile ? "horizontal" : "vertical"}
+      />
+    </>
+  );
+}
+
+const View = withTitledCard(LeftSide);
+createComponentName("withTitledCard", "View", View);

@@ -89,6 +89,10 @@ export function useStepThreeState() {
     useShallow((state) => state.getAllStudentsAverageScores()),
   );
 
+  const areAllModulesCompleted = useEvaluationStepsCreationStore(
+    useShallow((state) => state.areAllModulesCompleted()),
+  );
+
   return {
     selectedClass,
     tasks,
@@ -112,5 +116,6 @@ export function useStepThreeState() {
     isThisSubSkillCompleted,
     nonPresentStudents,
     allStudentsAverageScores,
+    areAllModulesCompleted,
   };
 }
