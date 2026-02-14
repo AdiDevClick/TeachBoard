@@ -6,7 +6,7 @@ import type {
   ProbeProxyResult,
 } from "@/utils/types/types.utils.ts";
 import { clsx, type ClassValue } from "clsx";
-import type { ComponentType } from "react";
+import { type ComponentType } from "react";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -389,6 +389,14 @@ function displayLogs(
     );
   }
 }
+
+/**
+ * Generate a display name for a higher-order component (HOC) by combining the HOC's name with the wrapped component's name.
+ *
+ * @param hocName - The name of the higher-order component (e.g., "withController").
+ * @param WrappedComponent - The original component being wrapped by the HOC.
+ * @param Component - The resulting component created by the HOC that will have its display name set.
+ */
 export function createNameForHOC(
   hocName: string,
   WrappedComponent: ComponentType<any>,
@@ -398,4 +406,21 @@ export function createNameForHOC(
     WrappedComponent.displayName || WrappedComponent.name || "Component";
   Component.displayName = `${hocName}(${wrappedComponentName})`;
   return Component;
+}
+
+/**
+ * Generate a display name for a component that is the output of a higher-order component (HOC).
+ *
+ * @description Usefull when you export directly a component created by a HOC without assigning it
+ *
+ * @param hocName - The name of the higher-order component (e.g., "withController").
+ * @param outputName - The name of the output component (e.g., "StepFourController").
+ * @param Component - The resulting component created by the HOC that will have its display name set.
+ */
+export function createComponentName(
+  hocName: string,
+  outputName: string,
+  Component: ComponentType<any>,
+) {
+  Component.displayName = `${hocName}(${outputName})`;
 }
