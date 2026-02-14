@@ -12,6 +12,7 @@ import { LabelledInput } from "@/components/Inputs/LaballedInputForController";
  * A version of the LabelledInput component that is integrated with react-hook-form Controller.
  */
 export const LabelledInputForController = forController(LabelledInput);
+LabelledInputForController.displayName = `forController(LabelledInputForController)`;
 
 /**
  * A version of the LabelledInput component that is integrated with react-hook-form Controller and enhanced with list mapping capabilities.
@@ -19,8 +20,10 @@ export const LabelledInputForController = forController(LabelledInput);
 export const ControlledLabelledInput = withController(
   LabelledInputForController,
 );
+ControlledLabelledInput.displayName = `withController(ControlledLabelledInput)`;
 
 /**
  *  A version of the LabelledInput component that is integrated with react-hook-form Controller and enhanced with list mapping capabilities.
  */
 export const ControlledInputList = withListMapper(ControlledLabelledInput);
+ControlledInputList.displayName = `withListMapper(ControlledInputList)`;

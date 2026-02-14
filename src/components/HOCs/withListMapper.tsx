@@ -9,6 +9,7 @@ import type {
   AnyObjectProps,
   MissingRequiredProps,
 } from "@/utils/types/types.utils.ts";
+import { createNameForHOC } from "@/utils/utils";
 import type { ComponentProps, ReactElement, ReactNode } from "react";
 
 type PropsWithOptional<
@@ -49,13 +50,13 @@ type WithListMapperComponent<C extends AnyComponentLike> = <
   Items extends readonly unknown[] | AnyObjectProps,
   TOptional extends AnyObjectProps = AnyObjectProps,
 >(
-  _props: PropsType<Items, C, TOptional>,
+  props: PropsType<Items, C, TOptional>,
 ) => ReactElement | null;
 
 function withListMapper<C extends AnyComponentLike>(
   Wrapped: C,
 ): WithListMapperComponent<C> {
-  return function Component<
+  function Component<
     Items extends readonly unknown[] | AnyObjectProps,
     TOptional extends AnyObjectProps = AnyObjectProps,
   >(props: PropsType<Items, C, TOptional>) {
@@ -66,7 +67,10 @@ function withListMapper<C extends AnyComponentLike>(
         <Wrapped {...(rest as ComponentProps<C>)} />
       </ListMapper>
     );
-  };
+  }
+
+  createNameForHOC("withListMapper", Wrapped, Component);
+  return Component;
 }
 
 /**

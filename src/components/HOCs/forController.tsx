@@ -3,6 +3,7 @@ import {
   forControllerContainsInvalid,
 } from "@/configs/app-components.config";
 import type { FieldTypes } from "@/types/MainTypes";
+import { createNameForHOC } from "@/utils/utils";
 import type { ComponentType } from "react";
 import type { FieldValues } from "react-hook-form";
 
@@ -17,7 +18,7 @@ import type { FieldValues } from "react-hook-form";
  * @returns A new component that is pre-configured for use with react-hook-form Controller.
  */
 export function forController<P>(WrapperComponent: ComponentType<P>) {
-  return function Component(props: P & FieldTypes<FieldValues>) {
+  function Component(props: P & FieldTypes<FieldValues>) {
     if (forControllerContainsInvalid(props)) {
       debugLogs("[forController]");
       return null;
@@ -35,5 +36,7 @@ export function forController<P>(WrapperComponent: ComponentType<P>) {
         aria-invalid={fieldState.invalid}
       />
     );
-  };
+  }
+
+  return createNameForHOC("forController", WrapperComponent, Component);
 }

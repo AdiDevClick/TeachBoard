@@ -6,6 +6,7 @@ import type {
   ProbeProxyResult,
 } from "@/utils/types/types.utils.ts";
 import { clsx, type ClassValue } from "clsx";
+import type { ComponentType } from "react";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -387,4 +388,14 @@ function displayLogs(
       { ...baseDetails },
     );
   }
+}
+export function createNameForHOC(
+  hocName: string,
+  WrappedComponent: ComponentType<any>,
+  Component: ComponentType<any>,
+) {
+  const wrappedComponentName =
+    WrappedComponent.displayName || WrappedComponent.name || "Component";
+  Component.displayName = `${hocName}(${wrappedComponentName})`;
+  return Component;
 }

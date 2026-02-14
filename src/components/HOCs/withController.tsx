@@ -8,6 +8,7 @@ import type {
   AnyComponentLike,
   ComponentPropsOf,
 } from "@/utils/types/types.utils.ts";
+import { createNameForHOC } from "@/utils/utils";
 import { Controller } from "react-hook-form";
 
 /**
@@ -30,7 +31,7 @@ import { Controller } from "react-hook-form";
  * ```
  */
 function withController<C extends AnyComponentLike>(Wrapped: C) {
-  return function Component(props: WrapperPropsAny<C>) {
+  function Component(props: WrapperPropsAny<C>) {
     if (controllerPropsInvalid(props)) {
       debugLogs("withController");
       return null;
@@ -79,7 +80,9 @@ function withController<C extends AnyComponentLike>(Wrapped: C) {
         )}
       />
     );
-  };
+  }
+
+  return createNameForHOC("withController", Wrapped, Component);
 }
 
 /**
