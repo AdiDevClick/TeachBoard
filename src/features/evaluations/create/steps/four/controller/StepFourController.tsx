@@ -75,7 +75,6 @@ export function StepFourController({
   const modulesOptional = (module: ClassModules) => ({
     items: Array.from(module.subSkills.values()),
     module,
-    // value: module?.value ?? module.id,
   });
 
   return (
