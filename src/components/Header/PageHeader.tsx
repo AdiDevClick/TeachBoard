@@ -7,7 +7,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import "@css/Dialog.scss";
 import "@css/PageHeader.scss";
-import { Activity, type MouseEvent } from "react";
+import { Activity, type ComponentProps, type MouseEvent } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 /** Page header component
@@ -38,7 +38,7 @@ export function PageHeader() {
           <AppBreadCrumbList items={splitPaths} />
         </Breadcrumb>
         <div className="header__actions-container">
-          <Button variant="ghost" asChild size="sm" className="actions__button">
+          <DefaultButton asChild className="actions__button">
             <Link
               to="https://github.com/adidevclick"
               rel="noopener noreferrer"
@@ -47,7 +47,7 @@ export function PageHeader() {
             >
               GitHub
             </Link>
-          </Button>
+          </DefaultButton>
           <Activity
             mode={
               isLoggedIn || location.pathname === "/login"
@@ -55,14 +55,12 @@ export function PageHeader() {
                 : "visible"
             }
           >
-            <Button
-              variant="ghost"
-              size="sm"
+            <DefaultButton
               className="actions__button dark:text-foreground"
               onClick={handleLoginClick}
             >
               Se connecter
-            </Button>
+            </DefaultButton>
           </Activity>
         </div>
       </div>
@@ -96,3 +94,7 @@ function buildBreadcrumbsFromPath(
       return acc;
     }, []);
 }
+
+const DefaultButton = (props: ComponentProps<typeof Button>) => {
+  return <Button variant="ghost" size="sm" {...props} />;
+};
