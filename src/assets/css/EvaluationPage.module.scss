@@ -4,10 +4,16 @@
  * Styles for the Evaluation Page component.
  */
 .evaluation-page {
+
   &--container {
+    --slide-right-side: -20rem;
     --gap-spacing: calc(var(--spacing) * 6);
-    height: 100%;
+
     max-height: calc(100vh - var(--content-offset, 134px));
+  }
+
+  &--container[data-slide-direction="right"] {
+    --slide-right-side: 20rem;
   }
 
   &--content {
@@ -28,6 +34,7 @@
       &__header {}
 
       .content {
+        overflow-x: hidden;
         overflow-y: auto;
         position: relative;
         display: grid;
@@ -43,6 +50,9 @@
         }
 
         &__left-side {
+          transition: var(--transform-transition);
+          transform: translateY(0);
+
           position: sticky;
           top: 15%;
           bottom: 0;
@@ -55,6 +65,12 @@
           &--number {
             font-size: calc(var(--text-xl) * 3);
             font-weight: bold;
+            transition: opacity var(--hover-opacity-transition), var(--transform-transition);
+
+            @starting-style {
+              opacity: 0;
+              transform: translateX(-1rem);
+            }
           }
 
           &--title {
@@ -63,7 +79,17 @@
           }
 
           &--description {
+            transition: opacity var(--hover-opacity-transition), var(--transform-transition);
             font-size: var(--text-md);
+
+            @starting-style {
+              transform: translateY(20px);
+            }
+          }
+
+          @starting-style {
+            opacity: 0;
+            transform: translateY(20px);
           }
         }
 
@@ -83,6 +109,9 @@
 
         &__right-side,
         .arrow-back {
+          transition: opacity var(--hover-opacity-transition), var(--transform-transition);
+          transform: translateY(0);
+
           position: sticky;
           top: 0;
           grid-column: 3;
@@ -105,6 +134,11 @@
               display: grid;
               gap: calc(var(--spacing) * 6);
             }
+          }
+
+          @starting-style {
+            opacity: 0;
+            transform: translateX(var(--slide-right-side, 20rem));
           }
         }
       }
