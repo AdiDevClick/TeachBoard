@@ -27,7 +27,11 @@ const EVALUATION_ELEMENTS = [
   { path: EvaluationPageTabsDatas.step1.name, element: <StepOne /> },
   { path: EvaluationPageTabsDatas.step2.name, element: <StepTwo /> },
   { path: EvaluationPageTabsDatas.step3.name, element: <StepThree /> },
-  { path: EvaluationPageTabsDatas.step4.name, element: <StepFour /> },
+  {
+    path: EvaluationPageTabsDatas.step4.name,
+    element: <StepFour />,
+    title: "hidden",
+  },
 ] as const;
 
 /**
@@ -43,7 +47,7 @@ const EVALUATION_ELEMENTS = [
  *
  * Routes are used in the main application router configuration (see ./src/main.tsx).
  */
-export const ROUTES_CHILDREN = [
+export const ROUTES_CHILDREN: RouteObject[] = [
   {
     index: true,
     element: <Home />,
@@ -134,7 +138,7 @@ export const ROUTES_CHILDREN = [
           path: elem.path,
           element: elem.element,
           loader: async () => ({
-            pageTitle: EVALUATION_PAGE_TITLE,
+            pageTitle: elem.title ?? EVALUATION_PAGE_TITLE,
           }),
         })),
       },
@@ -152,7 +156,7 @@ export const ROUTES_CHILDREN = [
     path: "*",
     element: <Navigate to={"/error"} />,
   },
-] as RouteObject[];
+];
 
 /**
  * Set the document title based on the selected menu item
