@@ -8,14 +8,29 @@
 .page__title-container {
   display: flex;
   font-size: var(--page-title-fs);
-  padding-block: var(--page-title-padding-top) var(--page-title-padding);
   padding-inline: 25px;
   font-weight: var(--page-title-fw);
   align-items: baseline;
   line-height: var(--page-title-lh);
+  height: var(--calculated-title-space);
+  overflow: hidden;
+  transition: var(--transform-transition), height var(--hover-opacity-transition), opacity 0.4s ease-in-out;
+
+  @starting-style {
+    transform: translateX(-1rem);
+    height: 0;
+    opacity: 0;
+  }
 
   h1 {
     display: flex;
+  }
+
+  // Title will shrink and move up
+  &:is([data-page-title="false"]) {
+    transition: var(--transform-transition), height var(--hover-opacity-transition);
+    opacity: 0;
+    transform: translateX(-1rem);
   }
 
   .title__icon {
