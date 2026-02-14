@@ -4,10 +4,13 @@ import { Tabs } from "@/components/ui/tabs";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types";
 import type { CreateEvaluationsLoaderData } from "@/routes/types/routes-config.types";
 import "@css/PageContent.scss";
-import { useEffect, useEffectEvent, useState, type JSX } from "react";
-import { Outlet, useLoaderData, useNavigate } from "react-router-dom";
-
-const tabValues: string[] = [];
+import { useEffect, useEffectEvent, useMemo, useState, type JSX } from "react";
+import {
+  Outlet,
+  useLoaderData,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
 /**
  * Create Evaluations page component
@@ -16,26 +19,74 @@ const tabValues: string[] = [];
  */
 export function CreateEvaluations() {
   const { pageDatas } = useLoaderData<CreateEvaluationsLoaderData>();
-  const navigate = useNavigate();
+  const tabItems = Object.values(pageDatas ?? {});
 
-  const [tabValue, setTabValue] = useState<string | undefined>(
-    pageDatas?.step1.name,
-  );
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [leftContent, setLeftContent] = useState<JSX.Element | null>(null);
+  const [slideDirection, setSlideDirection] = useState<"left" | "right">(
+    "right",
+  );
 
-  const trigerNavigation = useEffectEvent((tabValue: string | undefined) => {
-    navigate(tabValue?.toLocaleLowerCase() ?? "", { replace: true });
+  /**
+   * Grab values names only so they match the url segments for navigation and redirection purposes
+   */
+  const tabValues = useMemo(
+    () => tabItems.map((item) => item.name),
+    [tabItems],
+  );
+
+  /**
+   * Triggers the navigation
+   *
+   * @description To a specific tab based on the provided tab name.
+   *
+   * @param nextTabValue - The name of the tab to navigate to. It will be converted to lowercase and used as a URL segment.
+   */
+  const navigateToTab = (nextTabValue: string | undefined) => {
+    navigate(nextTabValue?.toLocaleLowerCase() ?? "", { replace: true });
+  };
+
+  const pathSegments = location.pathname.split("/").filter(Boolean);
+  const currentPathSegment = decodeURIComponent(pathSegments.at(-1) ?? "");
+
+  /**
+   * Retrieve the current tab value -
+   * 
+   * @description Defaults to the first tab if no match is found with the current URL segment.
+   */
+  const tabValue =
+    tabValues.find(
+      (value) =>
+        value.toLocaleLowerCase() === currentPathSegment.toLocaleLowerCase(),
+    ) ?? pageDatas?.step1.name;
+
+  /**
+   * INIT - CHECKER
+   *
+   * @description Ensure that the user is redirected to a known tab route on initial load or if the page is unknown from the tabs configuration
+   */
+  const ensureKnownTabRoute = useEffectEvent(() => {
+    if (!pageDatas || tabItems.length === 0) {
+      return;
+    }
+
+    if (currentPathSegment !== tabValue?.toLocaleLowerCase()) {
+      navigateToTab(pageDatas.step1.name);
+    }
   });
 
   /**
-   * Effect to navigate to the selected tab when tabValue changes
+   * INIT - REDIRECTION
+   *
+   * @description Each time a uri segment change is detected
    */
   useEffect(() => {
-    trigerNavigation(tabValue);
-  }, [tabValue]);
+    ensureKnownTabRoute();
+  }, [currentPathSegment]);
 
-  if (!pageDatas) {
+  if (!pageDatas || tabItems.length === 0) {
     return <div>Loading...</div>;
   }
 
@@ -50,31 +101,26 @@ export function CreateEvaluations() {
     onClick: handleOnArrowClick,
     clickProps: {
       arrayLength: Object.keys(pageDatas).length,
-      setTabValue,
+      setSlideDirection,
+      setTabValue: navigateToTab,
       tabValues,
     },
     leftContent,
+    slideDirection,
   };
 
   return (
     <Tabs
       value={tabValue}
-      onValueChange={setTabValue}
+      onValueChange={navigateToTab}
       className="page__content-container"
     >
       <InpageTabs
         datas={pageDatas}
         value={tabValue}
-        onValueChange={setTabValue}
+        onValueChange={navigateToTab}
       />
-      <TabContentList
-        items={Object.values(pageDatas)}
-        optional={(item) => {
-          tabValues.push(item.name);
-
-          return { ...tabContentPropsAndFunctions };
-        }}
-      >
+      <TabContentList items={tabItems} {...tabContentPropsAndFunctions}>
         <Outlet context={[leftContent, setLeftContent]} />
       </TabContentList>
     </Tabs>
@@ -85,15 +131,22 @@ export function CreateEvaluations() {
  * Handle click events for tab navigation.
  *
  * @param e - Mouse event from the click
- * @param clickProps - Object containing index, arrayLength, setTabValue, and tabValues
+ * @param clickProps - Object containing index, arrayLength, setSlideDirection, setTabValue, and tabValues
  */
 function handleOnArrowClick({
   e,
   ...clickProps
 }: CreateEvaluationArrowsClickHandlerProps) {
   e.preventDefault();
-  const { index, arrayLength, setTabValue, tabValues, setOpen, open } =
-    clickProps;
+  const {
+    index,
+    arrayLength,
+    setSlideDirection,
+    setTabValue,
+    tabValues,
+    setOpen,
+    open,
+  } = clickProps;
   let newIndex = 0;
 
   const currentStep = e.currentTarget.dataset.name;
@@ -101,10 +154,12 @@ function handleOnArrowClick({
   const isNextAllowed = index < arrayLength - 1;
 
   if (currentStep === "step-previous" && isPreviousAllowed) {
+    setSlideDirection("left");
     newIndex = index - 1;
   }
 
   if (currentStep === "next-step" && isNextAllowed) {
+    setSlideDirection("right");
     if (open) {
       setOpen(false);
     }
