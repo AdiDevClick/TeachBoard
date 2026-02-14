@@ -1,3 +1,4 @@
+import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types.ts";
 import type { PopoverItem } from "@/hooks/types/use-popover-CRUD.types.ts";
 import type { AnyObjectProps } from "@/utils/types/types.utils";
 import type { UniqueSet } from "@/utils/UniqueSet";
@@ -25,11 +26,7 @@ export type DynamicTagsItemList =
 
 export type DynamicTagsSetters = {
   onRemove?: (value: string, details?: DynamicTagItemDetails) => void;
-  setRef?: (node?: Element | null, meta?: Record<string, unknown>) => void;
-  observedRefs?: {
-    get: (key: string | undefined) => { element?: Element | null } | undefined;
-  };
-};
+} & UseMutationObserverReturn;
 
 export type DynamicTagsProps = Readonly<
   DynamicTagsSetters & {
