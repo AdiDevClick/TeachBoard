@@ -1,5 +1,6 @@
 import withListMapper from "@/components/HOCs/withListMapper";
 import { TabContent } from "@/features/evaluations/create/components/Tabs/TabContent";
+import { createComponentName } from "@/utils/utils";
 
 /**
  * @fileoverview A file containing exports related to the TabContent component, including the main TabContent component and a list mapper for handling multiple tab contents.
@@ -11,3 +12,4 @@ import { TabContent } from "@/features/evaluations/create/components/Tabs/TabCon
  * List component for mapping over multiple tab contents.
  */
 export const TabContentList = withListMapper(TabContent);
+createComponentName("withListMapper", "TabContentList", TabContentList);
