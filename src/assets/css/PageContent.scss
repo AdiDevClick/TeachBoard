@@ -17,8 +17,7 @@ $hidden-size: 3rem;
   // border-bottom: none;
   border-radius: 10px;
   padding-bottom: var(--bottom-padding);
-  margin-bottom: var(--bottom-margin);
-  margin-right: 1rem;
+  margin: var(--margins) var(--margins) var(--bottom-margin) 0;
   transition: transform 0.3s ease, border-left-width 0.3s ease-in-out;
 
   &:has(.left-arrow:hover, .header:hover) {
