@@ -2,7 +2,7 @@ import { PageTitle } from "@/components/Header/PageTitle.tsx";
 import "@css/App.scss";
 import "@css/index-tailwind.css";
 import "@css/PageTitle.scss";
-import { Activity, type ReactNode } from "react";
+import { type PropsWithChildren } from "react";
 import { useLocation, useMatches } from "react-router-dom";
 
 type MatchWithTitle = {
@@ -18,18 +18,17 @@ type MatchWithTitle = {
  * @param pageTitle Title of the page
  * @param children Page content
  */
-export default function App({ children }: Readonly<{ children: ReactNode }>) {
+export default function App({ children }: Readonly<PropsWithChildren>) {
   const location = decodeURI(useLocation().pathname);
   const matches = useMatches().find(
-    (m) => m.loaderData && m.pathname === location
+    (m) => m.loaderData && m.pathname === location,
   ) as MatchWithTitle;
   const title = matches?.loaderData?.pageTitle ?? "TeachBoard";
+  const isTitleHidden = title === "hidden";
 
   return (
     <>
-      <Activity mode={title === "hidden" ? "hidden" : "visible"}>
-        <PageTitle>{title}</PageTitle>
-      </Activity>
+      <PageTitle data-page-title={!isTitleHidden}>{title}</PageTitle>
 
       {children}
     </>
