@@ -75,7 +75,7 @@ export function StepFourController({
   const modulesOptional = (module: ClassModules) => ({
     items: Array.from(module.subSkills.values()),
     module,
-    value: module?.value ?? module.id,
+    // value: module?.value ?? module.id,
   });
 
   return (
@@ -92,7 +92,7 @@ export function StepFourController({
         {modules.length > 0 && (
           <AccordionItemWithSubSkillWithStudentsList
             items={modules}
-            optional={modulesOptional as unknown as ClassModules}
+            optional={modulesOptional}
             color1={ACCORDION_CONFIGS.color1}
             color2={ACCORDION_CONFIGS.color2}
             storeGetter={getEvaluatedStudentsForSubSkill}
