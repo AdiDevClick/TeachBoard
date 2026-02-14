@@ -95,6 +95,7 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
   const handleOnSelect = (_value: string, commandItem: CommandItemType) => {
     setSelectedClass(JSON.parse(JSON.stringify(commandItem)));
   };
+
   return (
     <PopoverFieldWithCommands
       {...stepOneInputControllers[0]}
