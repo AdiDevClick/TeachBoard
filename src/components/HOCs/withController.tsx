@@ -82,7 +82,8 @@ function withController<C extends AnyComponentLike>(Wrapped: C) {
     );
   }
 
-  return createNameForHOC("withController", Wrapped, Component);
+  createNameForHOC("withController", Wrapped, Component);
+  return Component;
 }
 
 /**

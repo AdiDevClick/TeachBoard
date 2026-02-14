@@ -38,5 +38,6 @@ export function forController<P>(WrapperComponent: ComponentType<P>) {
     );
   }
 
-  return createNameForHOC("forController", WrapperComponent, Component);
+  createNameForHOC("forController", WrapperComponent, Component);
+  return Component;
 }
