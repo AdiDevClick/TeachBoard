@@ -12,6 +12,7 @@ import {
   ItemTitle,
 } from "@/components/ui/item.tsx";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
+import { createComponentName } from "@/utils/utils";
 import { useEffect, useEffectEvent, useState } from "react";
 
 /**
@@ -82,3 +83,4 @@ export function DynamicTags(props: DynamicTagsProps) {
   );
 }
 const DynamicTagList = withListMapper(DynamicTag);
+createComponentName("withListMapper", "DynamicTagList", DynamicTagList);
