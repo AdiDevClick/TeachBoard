@@ -7,3 +7,10 @@ export type UseTabContentHandlerProps = Pick<
   TabContentProps,
   "name" | "clickProps" | "onClick" | "index"
 >;
+
+export type TabContentHandlerState = {
+  isNextDisabled: boolean;
+  isLeaving: boolean;
+  leavingDirection: "left" | "right" | null;
+  tabName: string;
+};
