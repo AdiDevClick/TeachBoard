@@ -128,10 +128,6 @@ function playOutgoingRightSideAnimation(
     return;
   }
 
-  // if (panel.dataset.animatingOut === "true") {
-  //   return;
-  // }
-
   const rightSideElement = panel.querySelector<HTMLElement>(
     '[class*="content__right-side"][data-slot="card"]',
   );

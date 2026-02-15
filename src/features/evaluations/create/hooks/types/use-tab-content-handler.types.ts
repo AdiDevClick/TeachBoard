@@ -10,7 +10,6 @@ export type UseTabContentHandlerProps = Pick<
 
 export type TabContentHandlerState = {
   isNextDisabled: boolean;
-  isLeaving: boolean;
   leavingDirection: "left" | "right" | null;
   tabName: string;
 };

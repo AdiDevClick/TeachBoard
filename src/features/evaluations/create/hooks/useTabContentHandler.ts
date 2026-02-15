@@ -29,7 +29,6 @@ export function useTabContentHandler({
   const { isMobile, setOpen, open } = useSidebar();
   const [tabState, setTabState] = useState<TabContentHandlerState>({
     isNextDisabled: true,
-    isLeaving: false,
     leavingDirection: null,
     tabName,
   });
