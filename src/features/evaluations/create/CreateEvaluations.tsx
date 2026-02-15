@@ -1,16 +1,12 @@
 import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs";
-import { TabContentList } from "@/features/evaluations/create/components/Tabs/exports/tab-content.exports";
 import { Tabs } from "@/components/ui/tabs";
+import { TabContentList } from "@/features/evaluations/create/components/Tabs/exports/tab-content.exports";
+import { resolveNavigation } from "@/features/evaluations/create/functions/eval-create-functions";
+import { useEvaluationNavigationHandler } from "@/features/evaluations/create/hooks/useEvaluationNavigationHandler";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types";
-import type { CreateEvaluationsLoaderData } from "@/routes/types/routes-config.types";
 import "@css/PageContent.scss";
-import { useEffect, useEffectEvent, useMemo, useState, type JSX } from "react";
-import {
-  Outlet,
-  useLoaderData,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { useState, type JSX } from "react";
+import { Outlet } from "react-router-dom";
 
 /**
  * Create Evaluations page component
@@ -18,73 +14,13 @@ import {
  * @description This component renders the Create Evaluations page with tabbed navigation.
  */
 export function CreateEvaluations() {
-  const { pageDatas } = useLoaderData<CreateEvaluationsLoaderData>();
-  const tabItems = Object.values(pageDatas ?? {});
-
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { pageDatas, tabItems, tabValue, tabValues, navigateToTab } =
+    useEvaluationNavigationHandler();
 
   const [leftContent, setLeftContent] = useState<JSX.Element | null>(null);
   const [slideDirection, setSlideDirection] = useState<"left" | "right">(
     "right",
   );
-
-  /**
-   * Grab values names only so they match the url segments for navigation and redirection purposes
-   */
-  const tabValues = useMemo(
-    () => tabItems.map((item) => item.name),
-    [tabItems],
-  );
-
-  /**
-   * Triggers the navigation
-   *
-   * @description To a specific tab based on the provided tab name.
-   *
-   * @param nextTabValue - The name of the tab to navigate to. It will be converted to lowercase and used as a URL segment.
-   */
-  const navigateToTab = (nextTabValue: string | undefined) => {
-    navigate(nextTabValue?.toLocaleLowerCase() ?? "", { replace: true });
-  };
-
-  const pathSegments = location.pathname.split("/").filter(Boolean);
-  const currentPathSegment = decodeURIComponent(pathSegments.at(-1) ?? "");
-
-  /**
-   * Retrieve the current tab value -
-   *
-   * @description Defaults to the first tab if no match is found with the current URL segment.
-   */
-  const tabValue =
-    tabValues.find(
-      (value) =>
-        value.toLocaleLowerCase() === currentPathSegment.toLocaleLowerCase(),
-    ) ?? pageDatas?.step1.name;
-
-  /**
-   * INIT - CHECKER
-   *
-   * @description Ensure that the user is redirected to a known tab route on initial load or if the page is unknown from the tabs configuration
-   */
-  const ensureKnownTabRoute = useEffectEvent(() => {
-    if (!pageDatas || tabItems.length === 0) {
-      return;
-    }
-
-    if (currentPathSegment !== tabValue?.toLocaleLowerCase()) {
-      navigateToTab(pageDatas.step1.name);
-    }
-  });
-
-  /**
-   * INIT - REDIRECTION
-   *
-   * @description Each time a uri segment change is detected
-   */
-  useEffect(() => {
-    ensureKnownTabRoute();
-  }, [currentPathSegment]);
 
   if (!pageDatas || tabItems.length === 0) {
     return <div>Loading...</div>;
@@ -107,12 +43,14 @@ export function CreateEvaluations() {
     },
     leftContent,
     slideDirection,
+    tabValue,
   };
 
   return (
     <Tabs
       value={tabValue}
       onValueChange={navigateToTab}
+      data-slide-direction={slideDirection}
       className="page__content-container"
     >
       <InpageTabs
@@ -144,29 +82,145 @@ function handleOnArrowClick({
     setSlideDirection,
     setTabValue,
     tabValues,
-    setOpen,
+    setOpen: setSideBarOpen,
     open,
   } = clickProps;
-  let newIndex = 0;
+  const navigation = resolveNavigation({
+    currentStep: e.currentTarget.dataset.name,
+    index,
+    arrayLength,
+  });
 
-  const currentStep = e.currentTarget.dataset.name;
-  const isPreviousAllowed = index > 0;
-  const isNextAllowed = index < arrayLength - 1;
+  if (!navigation) return;
 
-  if (currentStep === "step-previous" && isPreviousAllowed) {
-    setSlideDirection("left");
-    newIndex = index - 1;
-  }
+  setSlideDirection(navigation.incomingDirection);
 
-  if (currentStep === "next-step" && isNextAllowed) {
-    setSlideDirection("right");
+  if (navigation.incomingDirection === "right") {
     if (open) {
-      setOpen(false);
+      setSideBarOpen?.(false);
     }
-    newIndex = index + 1;
   }
 
-  if (newIndex === 0 && (!isPreviousAllowed || !isNextAllowed)) return;
+  const currentPanel = e.currentTarget.closest<HTMLElement>(
+    '[data-slot="tabs-content"]',
+  );
 
-  setTabValue(tabValues[newIndex]);
+  if (currentPanel) {
+    playOutgoingRightSideAnimation(
+      currentPanel,
+      navigation.outgoingDirection,
+      () => {
+        setTabValue(tabValues[navigation.nextIndex]);
+      },
+    );
+  } else {
+    setTabValue(tabValues[navigation.nextIndex]);
+  }
+}
+
+function playOutgoingRightSideAnimation(
+  panel: HTMLElement | null,
+  direction: "left" | "right",
+  onDone: () => void,
+) {
+  if (!panel) {
+    onDone();
+    return;
+  }
+
+  // if (panel.dataset.animatingOut === "true") {
+  //   return;
+  // }
+
+  const rightSideElement = panel.querySelector<HTMLElement>(
+    '[class*="content__right-side"][data-slot="card"]',
+  );
+  const leftNumberElement = panel.querySelector<HTMLElement>(
+    '[class*="content__left-side--number"]',
+  );
+  const leftDescriptionElement = panel.querySelector<HTMLElement>(
+    '[class*="content__left-side--description"]',
+  );
+  const leftTitleElement = panel.querySelector<HTMLElement>(
+    '[class*="content__left-side--title"]',
+  );
+
+  if (!rightSideElement) {
+    onDone();
+    return;
+  }
+
+  panel.dataset.animatingOut = "true";
+
+  const toX = direction === "left" ? "-20rem" : "20rem";
+  const leftNumberToX = direction === "left" ? "1rem" : "-1rem";
+
+  const finishOne = () => {
+    onDone();
+  };
+
+  const animation = rightSideElement.animate(
+    [
+      { isolation: "isolate", opacity: 1, transform: "translateX(0)" },
+      { isolation: "isolate", opacity: 0, transform: `translateX(${toX})` },
+    ],
+    {
+      duration: 500,
+      easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+      fill: "both",
+    },
+  );
+
+  const numberAnimation = leftNumberElement?.animate(
+    [
+      { opacity: 1, transform: "translateX(0)" },
+      { opacity: 0, transform: `translateX(${leftNumberToX})` },
+    ],
+    {
+      duration: 400,
+      easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+      fill: "both",
+    },
+  );
+
+  const descriptionAnimation = leftDescriptionElement?.animate(
+    [
+      { opacity: 1, transform: "translateY(0)" },
+      { opacity: 0, transform: "translateY(20px)" },
+    ],
+    {
+      duration: 200,
+      easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+      fill: "both",
+    },
+  );
+
+  const titleAnimation = leftTitleElement?.animate(
+    [
+      { opacity: 1, transform: "translateY(0)" },
+      { opacity: 0, transform: "translateX(-2rem)" },
+    ],
+    {
+      duration: 400,
+      easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+      fill: "both",
+    },
+  );
+
+  animation.onfinish = finishOne;
+  animation.oncancel = finishOne;
+  if (numberAnimation) {
+    numberAnimation.onfinish = finishOne;
+    numberAnimation.oncancel = finishOne;
+  }
+
+  if (titleAnimation) {
+    titleAnimation.onfinish = finishOne;
+    titleAnimation.oncancel = finishOne;
+  }
+
+  if (descriptionAnimation) {
+    descriptionAnimation.onfinish = finishOne;
+    descriptionAnimation.oncancel = finishOne;
+  }
 }
