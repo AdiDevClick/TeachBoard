@@ -5,7 +5,7 @@ import type {
 } from "@/features/evaluations/create/store/types/steps-creation-store.types";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types.ts";
 import type { CreateEvaluationsLoaderData } from "@/routes/types/routes-config.types";
-import type { PropsWithChildren, ReactNode } from "react";
+import type { JSX, PropsWithChildren } from "react";
 
 type PageDataItem = keyof NonNullable<CreateEvaluationsLoaderData["pageDatas"]>;
 
@@ -22,7 +22,7 @@ export type TabContentProps = Readonly<
     slideDirection: "left" | "right";
     onClick: (arg: CreateEvaluationArrowsClickHandlerProps) => void;
     clickProps: Omit<CreateEvaluationArrowsClickHandlerProps, "e" | "index">;
-    leftContent?: ReactNode;
+    leftContent: JSX.Element | null;
   } & PropsWithChildren
 >;
 
@@ -31,7 +31,7 @@ export type TabContentProps = Readonly<
  */
 export type LeftSideProps = Readonly<{
   leftSide: TabContentProps["leftSide"];
-  leftContent?: ReactNode;
+  leftContent: JSX.Element | null;
   isMobile: boolean;
 }>;
 
