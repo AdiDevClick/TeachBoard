@@ -26,7 +26,6 @@ type WithListMapperProps<
   ListMapperInjectedProps<TItems, TOptionalValue>,
   "items" | "optional" | "children" | "component"
 > & {
-    // children?: never;
     component?: never;
   };
 
