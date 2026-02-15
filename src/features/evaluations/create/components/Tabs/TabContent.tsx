@@ -16,6 +16,18 @@ import { createComponentName } from "@/utils/utils";
 import withTitledCard from "@components/HOCs/withTitledCard.tsx";
 import { IconArrowLeft, IconArrowRightDashed } from "@tabler/icons-react";
 
+const BUTTON_LEFT = {
+  "data-name": "step-previous",
+  "aria-label": "Previous step",
+  className: "left-arrow",
+} as const;
+
+const BUTTON_RIGHT = {
+  "data-name": "next-step",
+  "aria-label": "Next step",
+  className: "right-arrow",
+} as const;
+
 /**
  * Tab content component for evaluation creation page.
  *
@@ -30,18 +42,18 @@ export function TabContent(props: TabContentProps) {
     index,
     leftContent,
     name: tabName,
-    slideDirection,
     leftSide,
     onClick,
     clickProps,
   } = props;
-
-  const { clickHandler, disableNext, isMobile } = useTabContentHandler({
+  const { clickHandler, tabState, isMobile } = useTabContentHandler({
     name: tabName,
     clickProps,
     onClick,
     index,
   });
+
+  const id = `tab-content-${index}`;
 
   const commonProps = {
     pageId: `step-${index}`,
@@ -52,22 +64,21 @@ export function TabContent(props: TabContentProps) {
     card: TAB_CONTENT_VIEW_CARD_PROPS,
   };
 
+  const commonButtonProps = {
+    onClick: clickHandler,
+    type: "button",
+  } as const;
+
   return (
     <TabsContent
-      data-slide-direction={slideDirection}
+      id={id}
       value={tabName}
       className={evaluationPageContainer}
     >
       <View {...commonProps}>
         <View.Title className="header">
           {index !== 0 && (
-            <Button
-              className="left-arrow"
-              onClick={clickHandler}
-              data-name="step-previous"
-              type="button"
-              aria-label="Previous step"
-            >
+            <Button {...commonButtonProps} {...BUTTON_LEFT}>
               <IconArrowLeft />
             </Button>
           )}
@@ -76,12 +87,9 @@ export function TabContent(props: TabContentProps) {
         <View.Footer>
           {index !== props.clickProps.arrayLength - 1 && (
             <Button
-              className="right-arrow"
-              onClick={clickHandler}
-              data-name="next-step"
-              type="button"
-              aria-label="Next step"
-              disabled={disableNext}
+              {...commonButtonProps}
+              {...BUTTON_RIGHT}
+              disabled={tabState.isNextDisabled}
             >
               <IconArrowRightDashed />
             </Button>
