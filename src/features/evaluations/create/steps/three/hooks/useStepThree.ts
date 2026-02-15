@@ -1,3 +1,4 @@
+import type { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
 import { HandleLeftContentChange } from "@/features/evaluations/create/steps/three/components/step-three-functionnal-wrappers.functions";
 import type { StepThreeSubskillsSelectionControllerProps } from "@/features/evaluations/create/steps/three/types/step-three.types";
 import {
@@ -12,6 +13,9 @@ import { useOutletContext } from "react-router-dom";
 export type UseStepThreeProps = {
   subskillsControllerProps: StepThreeSubskillsSelectionControllerProps;
   isModuleClicked: boolean;
+  setShowStudentsEvaluation: ReturnType<
+    typeof useStepThreeState
+  >["setShowStudentsEvaluation"];
 };
 
 /**
@@ -26,7 +30,11 @@ export function useStepThree(props: UseStepThreeProps) {
   const [, setLeftContent] =
     useOutletContext<[JSX.Element, Dispatch<SetStateAction<JSX.Element>>]>();
 
-  const { subskillsControllerProps, isModuleClicked } = props;
+  const {
+    subskillsControllerProps,
+    isModuleClicked,
+    setShowStudentsEvaluation,
+  } = props;
   /**
    * DISPATCH - Display students evaluation on module click
    *
@@ -63,4 +71,26 @@ export function useStepThree(props: UseStepThreeProps) {
     // CLEANUP
     return () => onReturn();
   }, [isModuleClicked]);
+
+  /**
+   * DISPATCH - Reset view to module selection on unmount
+   *
+   * @description This makes sure the view is reset to module selection when coming back from students evaluation
+   */
+  const triggerViewResetToModules = useEffectEvent(() => {
+    if (isModuleClicked) {
+      setShowStudentsEvaluation(false);
+    }
+  });
+
+  /**
+   * INIT - Reset view to module selection
+   *
+   * @description Only once when exiting the view
+   */
+  useEffect(() => {
+    return () => {
+      triggerViewResetToModules();
+    };
+  }, []);
 }
