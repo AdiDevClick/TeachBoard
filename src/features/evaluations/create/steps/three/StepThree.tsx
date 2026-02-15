@@ -50,6 +50,7 @@ export function StepThree({
     moduleSelectionState,
     selectedSubSkill,
     evaluatedStudentsForThisSubskill,
+    setShowStudentsEvaluation,
   } = useStepThreeState();
 
   const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({
@@ -109,6 +110,7 @@ export function StepThree({
   useStepThree({
     subskillsControllerProps,
     isModuleClicked,
+    setShowStudentsEvaluation,
   });
 
   return (
