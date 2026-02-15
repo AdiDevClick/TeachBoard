@@ -130,7 +130,6 @@ export function useMutationObserver({
       }
 
       nodeRef.current = node;
-
       const obs = new MutationObserver(callback);
 
       obs.observe(node, options);
@@ -202,7 +201,6 @@ export function useMutationObserver({
     deleteRef,
     clearRefs,
     observedRefs: state.observedRefs,
-    // observedRefs: observersRef.current,
     observer: state.observer,
     findMetadata,
     findByMeta,
