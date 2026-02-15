@@ -405,7 +405,6 @@ export function createNameForHOC(
   const wrappedComponentName =
     WrappedComponent.displayName || WrappedComponent.name || "Component";
   Component.displayName = `${hocName}(${wrappedComponentName})`;
-  return Component;
 }
 
 /**
