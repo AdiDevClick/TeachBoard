@@ -1,3 +1,4 @@
+import type { UUID } from "@/api/types/openapi/common.types";
 import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types.ts";
 import type { PopoverItem } from "@/hooks/types/use-popover-CRUD.types.ts";
 import type { AnyObjectProps } from "@/utils/types/types.utils";
@@ -13,7 +14,7 @@ export type StateDetails = {
 
 export type DynamicTagsState = UniqueSet<string, StateDetails>;
 
-export type DynamicItemTuple = readonly [string, DynamicTagItemDetails];
+export type DynamicItemTuple = readonly [string | UUID, DynamicTagItemDetails];
 
 export type DynamicTagProps = PopoverItem & {
   onExitComplete?: (value: string) => void;
@@ -21,7 +22,7 @@ export type DynamicTagProps = PopoverItem & {
 } & DynamicTagsSetters;
 
 export type DynamicTagsItemList =
-  | Readonly<Record<string, DynamicTagItemDetails>>
+  | Readonly<Record<string | UUID, DynamicTagItemDetails>>
   | DynamicItemTuple[];
 
 export type DynamicTagsSetters = {
