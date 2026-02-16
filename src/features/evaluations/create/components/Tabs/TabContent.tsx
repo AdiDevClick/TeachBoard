@@ -85,7 +85,7 @@ export function TabContent(props: TabContentProps) {
     const elementsToAnimate = findNestedElementsByClass(currentPanel, {
       rightSide: "content__right-side",
       leftNumber: "--number",
-      leftDescription: "--description ",
+      leftDescription: "--description",
       leftTitle: "--title",
     });
 
@@ -208,7 +208,7 @@ function playOutgoingRightSideAnimation(
   }
 
   const toX = direction === "right" ? "-20rem" : "20rem";
-  const leftNumberToX = direction === "left" ? "1rem" : "-1rem";
+  const leftNumberToX = direction === "left" ? "10rem" : "-3rem";
 
   const finishOne = () => {
     onDone();
