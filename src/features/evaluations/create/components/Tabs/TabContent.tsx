@@ -130,7 +130,6 @@ export function TabContent(props: TabContentProps) {
           name: id,
         })
       }
-      // forceMount={tabState.isAnimating ? true : undefined}
       id={id}
       value={tabName}
       data-animating={tabState.isAnimating}
