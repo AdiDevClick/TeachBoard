@@ -76,6 +76,25 @@ export type EvaluationType = {
 };
 
 /**
+ * Type for the return value of getPresentStudentsWithAssignedTasks() in the store.
+ */
+export type ByIdValue = StudentWithPresence["fullName"][];
+
+/**
+ * Type for non-present students, structured for both byId and byName access patterns.
+ */
+export type ByNameValue = { id: StudentWithPresence["id"] };
+
+/**
+ * Props for StepFourController component.
+ */
+export type NonPresentStudentsType = {
+  byId: UniqueSet<StudentWithPresence["id"], ByIdValue>;
+  byName: UniqueSet<StudentWithPresence["fullName"], ByNameValue>;
+  count: number;
+};
+
+/**
  * State interface for Steps Creation Store.
  */
 export interface StepsCreationState {
@@ -91,6 +110,8 @@ export interface StepsCreationState {
   modules: UniqueSet<UUID, ClassModules>;
   moduleSelection: ModulesSelectionType;
   subSkillSelection: SubskillSelectionType;
+  /** Cached result for non-present students to preserve referential equality */
+  nonPresentStudentsResult: NonPresentStudentsType | null;
 }
 
 export type SelectedClassModulesReturn = ClassModules[];

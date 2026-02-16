@@ -8,9 +8,12 @@ import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
 import type { SkillsType } from "@/api/types/routes/skills.types.ts";
 import type {
+  ByIdValue,
+  ByNameValue,
   ClassModules,
   ClassModuleSubSkill,
   EvaluationType,
+  NonPresentStudentsType,
   StepsCreationState,
   StudentEvaluationModuleType,
   StudentEvaluationSubSkillType,
@@ -317,3 +320,58 @@ export const getStudentAverageScore = (
 
   return scoreCount > 0 ? totalScore / scoreCount : 0;
 };
+
+/**
+ * Save non-present students into the unique sets for both byId and byName.
+ *
+ * @param student - The student to save as non-present
+ * @param uniqueSet  - The unique set containing byId and byName sets to update
+ */
+export function saveNonPresentStudents(
+  student: StudentWithPresence,
+  uniqueSet: NonPresentStudentsType | WritableDraft<NonPresentStudentsType>,
+) {
+  uniqueSet.byId.set(student.id, [student.fullName]);
+  uniqueSet.byName.set(student.fullName, { id: student.id });
+}
+
+/**
+ * Remove a student from the non-present students unique sets when they are marked as present.
+ *
+ * @param student - The student to remove from non-present lists
+ * @param uniqueSet - The unique set containing byId and byName sets to update
+ */
+export function removeFromNonPresentStudents(
+  student: StudentWithPresence,
+  uniqueSet: NonPresentStudentsType | WritableDraft<NonPresentStudentsType>,
+) {
+  uniqueSet.byId.delete(student.id);
+  uniqueSet.byName.delete(student.fullName);
+}
+
+/**
+ * Compute a snapshot of non-present students based on the current students' presence status.
+ *
+ * @param students - The students to evaluate for presence and compute the non-present students snapshot
+ *
+ * @return The object ready to be stored in the state, containing the non-present students categorized by ID and name, along with the total count.
+ */
+export function computeNonPresentStudentsSnapshot(
+  students: StepsCreationState["students"],
+): NonPresentStudentsType {
+  const results: NonPresentStudentsType = {
+    byId: new UniqueSet<StudentWithPresence["id"], ByIdValue>(),
+    byName: new UniqueSet<StudentWithPresence["fullName"], ByNameValue>(),
+    count: 0,
+  };
+
+  students?.forEach((student) => {
+    if (!student.isPresent) {
+      saveNonPresentStudents(student, results);
+    }
+  });
+
+  results.count = results.byId.size;
+
+  return results;
+}
