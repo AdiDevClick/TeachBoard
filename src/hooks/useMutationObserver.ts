@@ -244,7 +244,7 @@ export function useMutationObserver({
     (parent: Element, selectors: { [key: string]: string }) => {
       return Object.entries(selectors).reduce(
         (acc: Record<string, Element>, [key, selector]) => {
-          const pointReplacedSelector = selector.replaceAll(".", "");
+          const pointReplacedSelector = selector.replaceAll(".", "").trim();
           const stripedSelector = '[class*="' + pointReplacedSelector + '"]';
           const foundElement = parent.querySelector(stripedSelector);
           if (foundElement) {
