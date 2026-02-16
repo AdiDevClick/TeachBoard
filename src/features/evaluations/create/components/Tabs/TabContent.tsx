@@ -51,11 +51,12 @@ export function TabContent(props: TabContentProps) {
   } = props;
   const id = `tab-content-${index}`;
 
-  const { setRef, observedRefs, findAllNestedElements } = useMutationObserver({
-    options: {
-      attributes: true,
-    },
-  });
+  const { setRef, observedRefs, findNestedElementsByClass } =
+    useMutationObserver({
+      options: {
+        attributes: true,
+      },
+    });
 
   const { clickHandler, tabState, setTabState, isMobile } =
     useTabContentHandler({
@@ -81,11 +82,11 @@ export function TabContent(props: TabContentProps) {
       return;
     }
 
-    const elementsToAnimate = findAllNestedElements(currentPanel, {
-      rightSide: '[class*="content__right-side"]',
-      leftNumber: '[class*="--number"]',
-      leftDescription: '[class*="--description"]',
-      leftTitle: '[class*="--title"]',
+    const elementsToAnimate = findNestedElementsByClass(currentPanel, {
+      rightSide: "content__right-side",
+      leftNumber: "--number",
+      leftDescription: "--description ",
+      leftTitle: "--title",
     });
 
     playOutgoingRightSideAnimation(

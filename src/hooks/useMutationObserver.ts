@@ -24,7 +24,7 @@ const defaultOptions = {
  * @returns A ref setter function to attach to the target element
  */
 export function useMutationObserver({
-  callback = () => {},
+  mutationCallback: callback = () => {},
   options = defaultOptions,
   onNodeReady,
 }: MutationObserverHook) {
@@ -179,6 +179,86 @@ export function useMutationObserver({
   }, []);
 
   /**
+   * Find a nested element within a parent element using a CSS selector.
+   *
+   * @param parent - The parent element to search within
+   * @param selector - The CSS selector to match the nested element
+   *
+   * @returns The first matching nested element, or null if not found
+   */
+  const findNestedElement = useCallback((parent: Element, selector: string) => {
+    return parent.querySelector(selector);
+  }, []);
+
+  /**
+   * Find all nested elements within a parent that match the provided selectors.
+   *
+   * @param parent - The parent element to search within
+   * @param selectors - An object where keys are identifiers and values are CSS selectors
+   * @returns An object with the same keys as the input, where each value is the corresponding found element (or null if not found)
+   *
+   * @example
+   * const selectors = {
+   *   rightSide: '.content__right-side',
+   *   leftNumber: '.left-side--number',
+   *  leftDescription: '.left-side--description',
+   *  leftTitle: '.left-side--title'
+   * };
+   * const elements = findAllNestedElements(parentElement, selectors);
+   * // elements.rightSide will contain the element matching '.content__right-side' within parentElement, and so on for the other selectors.
+   */
+  const findAllNestedElements = useCallback(
+    (parent: Element, selectors: { [key: string]: string }) => {
+      // ex objet :  { rightSide: '.content__right-side',leftNumber: '.left-side--number' }
+      // Return an object with keys corresponding to the provided selectors and values being the found elements (or null if not found)
+      return Object.entries(selectors).reduce(
+        (acc: Record<string, Element>, [key, selector]) => {
+          const found = parent.querySelector(selector);
+          if (found) acc[key] = found;
+          return acc;
+        },
+        {},
+      );
+    },
+    [],
+  );
+
+  /**
+   * Find nested elements by class name, ignoring potential variations in the class attribute (e.g., additional classes).
+   *
+   * @param parent - The parent element to search within
+   * @param selectors - An object where keys are identifiers and values are class names (without the dot)
+   * @returns An object with the same keys as the input, where each value is the corresponding found element (or null if not found)
+   *
+   * @example
+   * const selectors = {
+   *   rightSide: 'content__right-side',
+   *   leftNumber: '--number',
+   *  leftDescription: '--description',
+   * leftTitle: '--title'
+   * };
+   * const elements = findNestedElementsByClass(parentElement, selectors);
+   * // This will find elements that have class attributes containing the specified class names, even if they have additional classes (e.g., class="content__right-side extra-class").
+   */
+  const findNestedElementsByClass = useCallback(
+    (parent: Element, selectors: { [key: string]: string }) => {
+      return Object.entries(selectors).reduce(
+        (acc: Record<string, Element>, [key, selector]) => {
+          const pointReplacedSelector = selector.replaceAll(".", "");
+          const stripedSelector = '[class*="' + pointReplacedSelector + '"]';
+          const foundElement = parent.querySelector(stripedSelector);
+          if (foundElement) {
+            acc[key] = foundElement;
+          }
+          return acc;
+        },
+        {},
+      );
+    },
+    [],
+  );
+
+  /**
    * Find an observed entry by its metadata id or name.
    *
    * @description Use this if you need to locate an observed element based on its metadata.
@@ -204,5 +284,8 @@ export function useMutationObserver({
     observer: state.observer,
     findMetadata,
     findByMeta,
+    findNestedElement,
+    findAllNestedElements,
+    findNestedElementsByClass,
   };
 }
