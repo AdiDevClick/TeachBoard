@@ -113,8 +113,8 @@
         &__right-side,
         .arrow-back {
           transition: opacity 1s ease, var(--transform-transition);
-          position: sticky;
-          top: 0;
+          // position: sticky;
+          // top: 0;
           grid-column: 3;
           grid-row: 1;
           place-self: center;
