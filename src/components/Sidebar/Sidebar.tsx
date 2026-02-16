@@ -36,7 +36,7 @@ export function AppSidebar({ ...props }: SidebarProps) {
   return (
     <Sidebar
       collapsible="icon"
-      className="sidebar-collapsible-container"
+      className="z-1 sidebar-collapsible-container"
       {...props}
     >
       <Header />
