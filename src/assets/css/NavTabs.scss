@@ -4,7 +4,7 @@
   * Styles for the navigation tabs component.
   */
 .nav-tabs-container {
-  z-index: 10;
+  z-index: 1;
   $transform : calc(var(--nav-tabs-height) / 2 * -1);
   --nav-tabs-translate-y: $transform;
   position: absolute;
