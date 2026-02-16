@@ -80,11 +80,12 @@ function handleOnArrowClick({
     index,
     arrayLength,
     setSlideDirection,
-    setTabValue,
+    setTabState,
     tabValues,
     setOpen: setSideBarOpen,
     open,
   } = clickProps;
+
   const navigation = resolveNavigation({
     currentStep: e.currentTarget.dataset.name,
     index,
@@ -101,122 +102,10 @@ function handleOnArrowClick({
     }
   }
 
-  const currentPanel = e.currentTarget.closest<HTMLElement>(
-    '[data-slot="tabs-content"]',
-  );
-
-  if (currentPanel) {
-    playOutgoingRightSideAnimation(
-      currentPanel,
-      navigation.outgoingDirection,
-      () => {
-        setTabValue(tabValues[navigation.nextIndex]);
-      },
-    );
-  } else {
-    setTabValue(tabValues[navigation.nextIndex]);
-  }
-}
-
-function playOutgoingRightSideAnimation(
-  panel: HTMLElement | null,
-  direction: "left" | "right",
-  onDone: () => void,
-) {
-  if (!panel) {
-    onDone();
-    return;
-  }
-
-  const rightSideElement = panel.querySelector<HTMLElement>(
-    '[class*="content__right-side"][data-slot="card"]',
-  );
-  const leftNumberElement = panel.querySelector<HTMLElement>(
-    '[class*="content__left-side--number"]',
-  );
-  const leftDescriptionElement = panel.querySelector<HTMLElement>(
-    '[class*="content__left-side--description"]',
-  );
-  const leftTitleElement = panel.querySelector<HTMLElement>(
-    '[class*="content__left-side--title"]',
-  );
-
-  if (!rightSideElement) {
-    onDone();
-    return;
-  }
-
-  panel.dataset.animatingOut = "true";
-
-  const toX = direction === "left" ? "-20rem" : "20rem";
-  const leftNumberToX = direction === "left" ? "1rem" : "-1rem";
-
-  const finishOne = () => {
-    onDone();
-  };
-
-  const animation = rightSideElement.animate(
-    [
-      { isolation: "isolate", opacity: 1, transform: "translateX(0)" },
-      { isolation: "isolate", opacity: 0, transform: `translateX(${toX})` },
-    ],
-    {
-      duration: 500,
-      easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-      fill: "both",
-    },
-  );
-
-  const numberAnimation = leftNumberElement?.animate(
-    [
-      { opacity: 1, transform: "translateX(0)" },
-      { opacity: 0, transform: `translateX(${leftNumberToX})` },
-    ],
-    {
-      duration: 400,
-      easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-      fill: "both",
-    },
-  );
-
-  const descriptionAnimation = leftDescriptionElement?.animate(
-    [
-      { opacity: 1, transform: "translateY(0)" },
-      { opacity: 0, transform: "translateY(20px)" },
-    ],
-    {
-      duration: 200,
-      easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-      fill: "both",
-    },
-  );
-
-  const titleAnimation = leftTitleElement?.animate(
-    [
-      { opacity: 1, transform: "translateY(0)" },
-      { opacity: 0, transform: "translateX(-2rem)" },
-    ],
-    {
-      duration: 400,
-      easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-      fill: "both",
-    },
-  );
-
-  animation.onfinish = finishOne;
-  animation.oncancel = finishOne;
-  if (numberAnimation) {
-    numberAnimation.onfinish = finishOne;
-    numberAnimation.oncancel = finishOne;
-  }
-
-  if (titleAnimation) {
-    titleAnimation.onfinish = finishOne;
-    titleAnimation.oncancel = finishOne;
-  }
-
-  if (descriptionAnimation) {
-    descriptionAnimation.onfinish = finishOne;
-    descriptionAnimation.oncancel = finishOne;
-  }
+  setTabState((prev) => ({
+    ...prev,
+    isAnimating: true,
+    nextIndex: navigation.nextIndex,
+    newTabValue: tabValues[navigation.nextIndex],
+  }));
 }

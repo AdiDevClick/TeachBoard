@@ -12,4 +12,8 @@ export type TabContentHandlerState = {
   isNextDisabled: boolean;
   leavingDirection: "left" | "right" | null;
   tabName: string;
+  isAnimating?: boolean;
+  /** optional values used while animating / navigating */
+  nextIndex?: number;
+  newTabValue?: string;
 };
