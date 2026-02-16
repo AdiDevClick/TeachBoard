@@ -11,3 +11,8 @@
   box-shadow: none;
   background: none;
 }
+
+body {
+  // This is to prevent the body from scrolling on summary page an rare occasions
+  overflow: hidden;
+}
