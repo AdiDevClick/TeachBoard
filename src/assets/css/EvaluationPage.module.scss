@@ -10,6 +10,7 @@
     --outgoing-offset: -20rem;
     --gap-spacing: calc(var(--spacing) * 6);
 
+    min-height: 100%;
     max-height: calc(100vh - var(--content-offset, 134px));
 
   }
