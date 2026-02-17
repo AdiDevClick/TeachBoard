@@ -43,8 +43,8 @@ export function StepFourController({
     students: DynamicTagsItemList;
     ids: string[];
   }>(() => {
-    const studentsPresence = Array.from(nonPresentStudents.values());
-    const studentsIds = Array.from(nonPresentStudents.keys());
+    const studentsPresence = Array.from(nonPresentStudents?.values() ?? []);
+    const studentsIds = Array.from(nonPresentStudents?.keys() ?? []);
 
     if (studentsPresence.length === 0) {
       return {
