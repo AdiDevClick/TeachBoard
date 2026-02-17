@@ -95,6 +95,14 @@ export type NonPresentStudentsType = {
 };
 
 /**
+ * Tuple stored in the cached `nonPresentStudentsResult` UniqueSet: [fullName, { id }]
+ */
+export type NonPresentStudentTuple = readonly [
+  StudentWithPresence["fullName"],
+  { id: StudentWithPresence["id"] },
+];
+
+/**
  * State interface for Steps Creation Store.
  */
 export interface StepsCreationState {
@@ -110,8 +118,8 @@ export interface StepsCreationState {
   modules: UniqueSet<UUID, ClassModules>;
   moduleSelection: ModulesSelectionType;
   subSkillSelection: SubskillSelectionType;
-  /** Cached result for non-present students to preserve referential equality */
-  nonPresentStudentsResult: NonPresentStudentsType | null;
-}
+  /** Cached result for non-present students to preserve referential equality (key = studentId, value = tuple `[fullName, { id }]`) */
+  nonPresentStudentsResult: UniqueSet<UUID, NonPresentStudentTuple> | null;
+} 
 
 export type SelectedClassModulesReturn = ClassModules[];
