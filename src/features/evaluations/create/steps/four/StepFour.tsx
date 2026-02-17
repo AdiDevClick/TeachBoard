@@ -2,7 +2,6 @@ import { useAppStore } from "@/api/store/AppStore.ts";
 import { rightContent } from "@/assets/css/EvaluationPage.module.scss";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { Button } from "@/components/ui/button";
-import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState.ts";
 import {
   STEP_FOUR_CARD_PROPS,
   STEP_FOUR_INPUT_CONTROLLERS,
@@ -14,15 +13,9 @@ import {
 } from "@/features/evaluations/create/steps/four/models/step-four.models";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type ComponentProps,
-  type Dispatch,
-  type JSX,
-  type ReactNode,
-  type SetStateAction,
-} from "react";
+import { type ComponentProps } from "react";
 import { useForm } from "react-hook-form";
-import { useLoaderData, useOutletContext } from "react-router-dom";
+import { useLoaderData } from "react-router-dom";
 
 /**
  * STEP FOUR - Summary and Confirmation Component
@@ -45,7 +38,6 @@ export function StepFour({
   ...props
 }: Readonly<PageWithControllers<typeof STEP_FOUR_INPUT_CONTROLLERS>>) {
   const loaderData = useLoaderData();
-  useOutletContext<[JSX.Element, Dispatch<SetStateAction<ReactNode>>]>();
   const user = useAppStore((state) => state.user);
 
   const form = useForm<StepFourSchema>({
