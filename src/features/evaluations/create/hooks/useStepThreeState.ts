@@ -34,6 +34,10 @@ export function useStepThreeState() {
     (state) => state.subSkillSelection.selectedSubSkillId,
   );
 
+  const nonPresentStudents = useEvaluationStepsCreationStore(
+    useShallow((state) => state.nonPresentStudentsResult),
+  );
+
   // Getters
   const modules = useEvaluationStepsCreationStore(
     useShallow((state) => state.getAttendedModules()),
@@ -79,10 +83,6 @@ export function useStepThreeState() {
         selectedModuleId ?? undefined,
       ),
     ),
-  );
-
-  const nonPresentStudents = useEvaluationStepsCreationStore(
-    useShallow((state) => state.getAllNonPresentStudents()),
   );
 
   const allStudentsAverageScores = useEvaluationStepsCreationStore(
