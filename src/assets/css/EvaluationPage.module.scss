@@ -35,6 +35,10 @@
       // padding-bottom: 0px;
       background: none;
 
+      @include for-size(desktop) {
+        gap: 0;
+      }
+
       .content {
         overflow-x: hidden;
         overflow-y: auto;
