@@ -21,6 +21,7 @@ import type {
   ClassModuleSubSkill,
   EvaluationType,
   ModulesSelectionType,
+  NonPresentStudentsResult,
   StepsCreationState,
   StudentWithPresence,
   SubskillSelectionType,
@@ -247,8 +248,11 @@ export const useEvaluationStepsCreationStore = create(
                 let nonPresentStudents = state.nonPresentStudentsResult;
 
                 if (!nonPresentStudents) {
-                  nonPresentStudents = state.students.clone();
+                  nonPresentStudents =
+                    state.students.clone() as unknown as NonPresentStudentsResult;
                 }
+
+                if (!nonPresentStudents) return;
 
                 if (!isPresent) {
                   saveNonPresentStudents(student, nonPresentStudents);
@@ -273,12 +277,14 @@ export const useEvaluationStepsCreationStore = create(
            */
           setAllNonPresentStudents() {
             ensureCollections();
-            const results = get().nonPresentStudentsResult;
+            const results = get().nonPresentStudentsResult as
+              | StepsCreationState["students"]
+              | null;
             // Rebuild cached `nonPresentStudentsResult` as a UniqueSet of tuples
             if (!results) return;
-            const next = results.clone();
+            const next = results.clone() as unknown as NonPresentStudentsResult;
 
-            results?.forEach((student) => {
+            results.forEach((student) => {
               if (student.isPresent === false) {
                 removeFromNonPresentStudents(student, next);
                 saveNonPresentStudents(student, next);

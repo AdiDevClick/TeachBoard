@@ -11,7 +11,7 @@ import type {
   ClassModules,
   ClassModuleSubSkill,
   EvaluationType,
-  NonPresentStudentTuple,
+  NonPresentStudentsResult,
   StepsCreationState,
   StudentEvaluationModuleType,
   StudentEvaluationSubSkillType,
@@ -327,7 +327,7 @@ export const getStudentAverageScore = (
  */
 export function saveNonPresentStudents(
   student: StudentWithPresence,
-  uniqueSet: UniqueSet<StudentWithPresence["id"], NonPresentStudentTuple>,
+  uniqueSet: WritableDraft<NonPresentStudentsResult>,
 ) {
   uniqueSet.set(student.id, [student.fullName, { id: student.id }]);
 }
@@ -340,7 +340,7 @@ export function saveNonPresentStudents(
  */
 export function removeFromNonPresentStudents(
   student: StudentWithPresence,
-  uniqueSet: UniqueSet<UUID, NonPresentStudentTuple>,
+  uniqueSet: WritableDraft<NonPresentStudentsResult>,
 ) {
   uniqueSet.delete(student.id);
 }
