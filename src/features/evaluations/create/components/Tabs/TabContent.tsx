@@ -10,7 +10,7 @@ import type {
   LeftSideProps,
   TabContentProps,
 } from "@/features/evaluations/create/components/Tabs/types/tabs.types";
-import { useTabContentHandler } from "@/features/evaluations/create/hooks/useTabContentHandler";
+import { useTabContentHandler } from "@/features/evaluations/create/hooks/tab-handler/useTabContentHandler";
 import { useMutationObserver } from "@/hooks/useMutationObserver";
 import { LeftSidePageContent } from "@/pages/Evaluations/create/left-content/LeftSidePageContent";
 import { createComponentName } from "@/utils/utils";
