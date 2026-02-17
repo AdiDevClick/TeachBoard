@@ -1,3 +1,4 @@
+import type { useStepFourState } from "@/features/evaluations/create/hooks/useStepFourState";
 import type { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
 import type {
   ClassModuleSubSkill,
@@ -15,7 +16,7 @@ export type SubSkillWithStudentsProps = Readonly<
   {
     module: ClassModules;
     storeGetter: ReturnType<
-      typeof useStepThreeState
+      typeof useStepFourState
     >["getEvaluatedStudentsForSubSkill"];
     valueGetter: ReturnType<typeof useStepThreeState>["scoreValue"];
     index: number;

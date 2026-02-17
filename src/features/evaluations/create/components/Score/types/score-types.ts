@@ -1,6 +1,6 @@
 import type { UUID } from "@/api/types/openapi/common.types";
 import type { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input";
-import type { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
+import type { useStepFourState } from "@/features/evaluations/create/hooks/useStepFourState";
 import type { StepFourController } from "@/features/evaluations/create/steps/four/controller/StepFourController";
 import type { ComponentProps } from "react";
 
@@ -28,5 +28,5 @@ export type LabelledScoreInputProps = Readonly<{
  */
 export type AverageFieldsProps = Readonly<{
   form: Parameters<typeof StepFourController>[0]["form"];
-  students: ReturnType<typeof useStepThreeState>["allStudentsAverageScores"];
+  students: ReturnType<typeof useStepFourState>["allStudentsAverageScores"];
 }>;
