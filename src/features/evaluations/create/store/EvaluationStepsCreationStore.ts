@@ -724,9 +724,14 @@ export const useEvaluationStepsCreationStore = create(
               if (!student.isPresent) continue;
 
               const averageScore = getStudentAverageScore(student);
+              const score =
+                student.overallScore != null
+                  ? student.overallScore * 5
+                  : averageScore;
+
               scores.set(student.id, {
                 name: student.fullName,
-                score: averageScore,
+                score,
               });
             }
 
@@ -934,6 +939,13 @@ export const useEvaluationStepsCreationStore = create(
                 )
               );
             });
+          },
+          getAllPresentStudents() {
+            ensureCollections();
+
+            const students = Array.from(get().students?.values() ?? []);
+
+            return students.filter((student) => student.isPresent);
           },
         };
         return ACTIONS;
