@@ -48,7 +48,7 @@ export function StepFourController({
 
     if (studentsPresence.length === 0) {
       return {
-        students: [["Aucun", {}]],
+        students: [["Aucun", { id: "none" }]],
         ids: ["none"],
       };
     }

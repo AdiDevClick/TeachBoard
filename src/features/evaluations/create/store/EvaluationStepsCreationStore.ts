@@ -245,12 +245,9 @@ export const useEvaluationStepsCreationStore = create(
               (state) => {
                 ensureCollectionsInDraft(state);
 
-                let nonPresentStudents = state.nonPresentStudentsResult;
-
-                if (!nonPresentStudents) {
-                  nonPresentStudents =
-                    state.students.clone() as unknown as NonPresentStudentsResult;
-                }
+                const nonPresentStudents =
+                  state.nonPresentStudentsResult ??
+                  (state.students.clone() as unknown as NonPresentStudentsResult);
 
                 if (!nonPresentStudents) return;
 
