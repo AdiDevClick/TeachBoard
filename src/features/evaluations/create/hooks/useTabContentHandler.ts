@@ -48,35 +48,36 @@ export function useTabContentHandler({
         moduleSelectionState,
       } = args;
 
+      let disabled = true;
+
       switch (tabName) {
         case "Classe":
           if (selectedClass?.id) {
-            setTabState((prev) => ({
-              ...prev,
-              isNextDisabled: false,
-              tabName,
-            }));
+            disabled = false;
           }
-          return;
+          break;
         case "Elèves":
           if (modules.length > 0) {
-            setTabState((prev) => ({
-              ...prev,
-              isNextDisabled: false,
-              tabName,
-            }));
+            disabled = false;
           }
-          return;
+          break;
         case "Evaluation":
           if (!areAllModulesCompleted && !moduleSelectionState.isClicked) {
-            setTabState((prev) => ({ ...prev, isNextDisabled: true, tabName }));
-            return;
+            disabled = true;
+            break;
           }
-          setTabState((prev) => ({ ...prev, isNextDisabled: false, tabName }));
-          return;
+          disabled = false;
+          break;
         default:
-          setTabState((prev) => ({ ...prev, isNextDisabled: true, tabName }));
+          disabled = true;
+          break;
       }
+
+      setTabState((prev) => ({
+        ...prev,
+        isNextDisabled: disabled,
+        tabName,
+      }));
     },
   );
 
