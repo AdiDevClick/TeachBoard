@@ -1,6 +1,6 @@
 import { summaryPageContent } from "@/assets/css/SummaryPage.module.scss";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
-import type { DynamicItemTuple } from "@/components/Tags/types/tags.types";
+import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types";
 import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/labelled-textarea";
 import { Accordion } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,7 @@ import { AccordionItemWithSubSkillWithStudentsList } from "@/features/evaluation
 import { AverageFields } from "@/features/evaluations/create/components/Score/AverageFields";
 import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
 import type { ClassModules } from "@/features/evaluations/create/store/types/steps-creation-store.types";
-import { useMemo, type ComponentProps } from "react";
+import { useEffect, useEffectEvent, useMemo, type ComponentProps } from "react";
 
 type StepFourControllerProps = Readonly<{
   pageId: string;
@@ -39,32 +39,35 @@ export function StepFourController({
    *
    * @description Saves ids instead of names in the form for validation.
    */
-  const presenceMemo = useMemo(() => {
-    let studentsPresence: DynamicItemTuple[] = Array.from(
-      nonPresentStudents.entries(),
-    ).map(([studentId, studentValues]) => {
-      const firstValue = Array.isArray(studentValues)
-        ? studentValues[0]
-        : undefined;
+  const presenceMemo = useMemo<{
+    students: DynamicTagsItemList;
+    ids: string[];
+  }>(() => {
+    const studentsPresence = Array.from(nonPresentStudents.values());
+    const studentsIds = Array.from(nonPresentStudents.keys());
 
-      const studentName = typeof firstValue === "string" ? firstValue : "";
-
-      const normalizedStudentId =
-        typeof studentId === "string" ? studentId : String(studentId);
-
-      return [studentName, { id: normalizedStudentId }];
-    });
-
-    let studentsPresenceIds = Array.from(nonPresentStudents.keys());
     if (studentsPresence.length === 0) {
-      studentsPresence = [["Aucun", { id: "none" }]];
-      studentsPresenceIds = ["none"];
+      return {
+        students: [["Aucun", {}]],
+        ids: ["none"],
+      };
     }
 
-    form.setValue("absence", studentsPresenceIds);
+    return { students: studentsPresence, ids: studentsIds };
+  }, [nonPresentStudents]);
 
-    return studentsPresence;
-  }, [nonPresentStudents, form]);
+  const syncAbsenceField = useEffectEvent((items: typeof presenceMemo) => {
+    if (items.ids.length === 0) {
+      form.setValue("absence", ["none"]);
+      return;
+    }
+
+    form.setValue("absence", items.ids);
+  });
+
+  useEffect(() => {
+    syncAbsenceField(presenceMemo);
+  }, [presenceMemo]);
 
   /**
    * Prepares the optional prop for the AccordionItem, which includes the list of sub-skills and the module information.
@@ -106,7 +109,7 @@ export function StepFourController({
           name="absence"
           pageId={pageId}
           title={"Elèves absents aujourd'hui"}
-          itemList={presenceMemo}
+          itemList={presenceMemo.students}
           inert
           displayCRUD={false}
         />
