@@ -8,7 +8,7 @@ import type { StepTwoControllerProps } from "@/features/evaluations/create/steps
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils";
-import { type MouseEvent } from "react";
+import { useEffect, useEffectEvent, type MouseEvent } from "react";
 import { useShallow } from "zustand/shallow";
 
 export function StepTwoController({
@@ -37,6 +37,10 @@ export function StepTwoController({
   );
   const setStudentTaskAssignment = useEvaluationStepsCreationStore(
     (state) => state.setStudentTaskAssignment,
+  );
+
+  const setAllNonPresentStudents = useEvaluationStepsCreationStore(
+    (state) => state.setAllNonPresentStudents,
   );
 
   const { setRef, observedRefs } = useCommandHandler({
@@ -108,6 +112,25 @@ export function StepTwoController({
 
     setStudentPresence(parsed.data, studentData.isSelected);
   };
+
+  /**
+   * UNMOUNT - TRIGGER SAVE OF NON-PRESENT STUDENTS
+   */
+  const triggerPresenceCalculation = useEffectEvent(() => {
+    setAllNonPresentStudents();
+  });
+
+  /**
+   * UNMOUNT -
+   *
+   * @description Only once
+   */
+  useEffect(() => {
+    return () => {
+      // Prepare all non-present students for summary and validation in the next step
+      triggerPresenceCalculation();
+    };
+  }, []);
 
   return (
     <form id={formId} className={className}>
