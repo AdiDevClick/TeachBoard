@@ -193,15 +193,9 @@ function playOutgoingRightSideAnimation(
     return;
   }
 
-  // Use the elements provided by findAllNestedElements (no querySelector inside the fn)
-  const rightSideElement = elements?.rightSide as HTMLElement | undefined;
-  const leftNumberElement = elements?.leftNumber as HTMLElement | undefined;
-  const leftDescriptionElement = elements?.leftDescription as
-    | HTMLElement
-    | undefined;
-  const leftTitleElement = elements?.leftTitle as HTMLElement | undefined;
+  const { rightSide, leftNumber, leftDescription, leftTitle } = elements ?? {};
 
-  if (!rightSideElement) {
+  if (!rightSide) {
     onDone();
     return;
   }
@@ -213,7 +207,7 @@ function playOutgoingRightSideAnimation(
     onDone();
   };
 
-  rightSideElement?.animate(
+  rightSide.animate(
     [
       {
         // inset: "0",
@@ -235,7 +229,7 @@ function playOutgoingRightSideAnimation(
     },
   );
 
-  leftNumberElement?.animate(
+  leftNumber?.animate(
     [
       { opacity: 1, transform: "translateX(0)" },
       { opacity: 0, transform: `translateX(${leftNumberToX})` },
@@ -247,7 +241,7 @@ function playOutgoingRightSideAnimation(
     },
   );
 
-  leftDescriptionElement?.animate(
+  leftDescription?.animate(
     [
       { opacity: 1, transform: "translateY(0)" },
       { opacity: 0, transform: "translateY(20px)" },
@@ -259,7 +253,7 @@ function playOutgoingRightSideAnimation(
     },
   );
 
-  const titleAnimation = leftTitleElement?.animate(
+  const titleAnimation = leftTitle?.animate(
     [
       { opacity: 1, transform: "translateY(0)" },
       { opacity: 0, transform: "translateX(-2rem)" },
