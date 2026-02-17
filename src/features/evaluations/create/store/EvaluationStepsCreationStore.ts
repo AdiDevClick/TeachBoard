@@ -11,6 +11,8 @@ import {
   isSubSkillCompletedOrDisabled,
   isThisStudentAlreadyEvaluatedForThisSubSkill,
   preparedSubSkillsForUpdate,
+  removeFromNonPresentStudents,
+  saveNonPresentStudents,
   setModules,
   updateEvaluationScore,
   updateModules,
@@ -49,6 +51,7 @@ const createDefaultStepsCreationState = (): StepsCreationState => ({
     selectedSubSkillIndex: null,
     selectedSubSkillId: null,
   },
+  nonPresentStudentsResult: null,
 });
 
 export const DEFAULT_VALUES_STEPS_CREATION_STATE: StepsCreationState =
@@ -223,8 +226,75 @@ export const useEvaluationStepsCreationStore = create(
               if (!isPresent) {
                 ACTIONS.clearStudentFromModuleEvaluation(studentId);
               }
+
+              ACTIONS.updateNonPresentStudentPresence(student, isPresent);
             }
           },
+          /**
+           * Update the non-present students collection in the store based on a student's presence status.
+           *
+           * @param student - The student whose presence status has been updated
+           * @param isPresent - The updated presence status of the student
+           */
+          updateNonPresentStudentPresence(
+            student: StudentWithPresence,
+            isPresent: boolean,
+          ) {
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+
+                let nonPresentStudents = state.nonPresentStudentsResult;
+
+                if (!nonPresentStudents) {
+                  nonPresentStudents = state.students.clone();
+                }
+
+                if (!isPresent) {
+                  saveNonPresentStudents(student, nonPresentStudents);
+                }
+
+                if (isPresent) {
+                  removeFromNonPresentStudents(student, nonPresentStudents);
+                }
+
+                state.nonPresentStudentsResult = nonPresentStudents;
+              },
+              undefined,
+              "updateNonPresentStudentPresence/remove-add-FromNonPresent",
+            );
+          },
+          /**
+           * Set all non-present students in the store at once.
+           *
+           * @description This needs a set that can search by fullName and one by IDs to be able to update the presence status from both the list of students and the dynamic tags.
+           *
+           * @param object - The object containing both byId and byName unique sets for non-present students
+           */
+          setAllNonPresentStudents() {
+            ensureCollections();
+            const results = get().nonPresentStudentsResult;
+            // Rebuild cached `nonPresentStudentsResult` as a UniqueSet of tuples
+            if (!results) return;
+            const next = results.clone();
+
+            results?.forEach((student) => {
+              if (student.isPresent === false) {
+                removeFromNonPresentStudents(student, next);
+                saveNonPresentStudents(student, next);
+              }
+            });
+
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                state.nonPresentStudentsResult = next;
+              },
+              undefined,
+              "setAllNonPresentStudents",
+            );
+          },
+
           /**
            * Set the average score for a student.
            *
@@ -265,6 +335,7 @@ export const useEvaluationStepsCreationStore = create(
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
+
                 const student = state.students.get(studentId);
                 previousTaskId = student?.assignedTask?.id;
 
@@ -338,6 +409,7 @@ export const useEvaluationStepsCreationStore = create(
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
+
                 for (const module of state.modules.values()) {
                   const toEvaluate = module.studentsToEvaluate;
                   if (toEvaluate?.has(studentId)) {
@@ -790,31 +862,12 @@ export const useEvaluationStepsCreationStore = create(
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
+
                 updateModules(state, module, { subSkills: newSubskills });
               },
               undefined,
               "setSubSkillHasCompleted",
             );
-          },
-          /**
-           * Get all non-present students.
-           *
-           * @description Used in Step Four summary to list non-present students.
-           *
-           * @returns A UniqueSet of non-present students with their full names.
-           */
-          getAllNonPresentStudents() {
-            ensureCollections();
-            const students = get().students;
-            const studentsArray = new UniqueSet();
-
-            students.forEach((student) => {
-              if (!student.isPresent) {
-                studentsArray.set(student.id, [student.fullName]);
-              }
-            });
-
-            return studentsArray;
           },
           /**
            * Verify that all modules are completed (or disabled) before allowing finalization of the evaluation.
@@ -823,6 +876,7 @@ export const useEvaluationStepsCreationStore = create(
            */
           areAllModulesCompleted() {
             ensureCollections();
+
             const attendedModules = ACTIONS.getAttendedModules();
 
             return attendedModules.every((module) => module.isCompleted);
@@ -844,6 +898,7 @@ export const useEvaluationStepsCreationStore = create(
             moduleId?: UUID,
           ) {
             ensureCollections();
+
             const selectedSubSkillId =
               subSkillId ?? get().subSkillSelection?.selectedSubSkillId;
             const selectedModuleId =
