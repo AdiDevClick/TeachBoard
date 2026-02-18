@@ -211,24 +211,50 @@ export const useEvaluationStepsCreationStore = create(
            */
           setStudentPresence(studentId: UUID, isPresent: boolean) {
             ensureCollections();
-            const student = get().students.get(studentId) ?? null;
+            let assignedTaskId: UUID | null = null;
+            let hasChanged = false;
 
-            if (student) {
-              student.isPresent = isPresent;
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                const student = state.students.get(studentId);
 
-              if (student.assignedTask) {
-                ACTIONS.setStudentToModuleEvaluation(
-                  student.assignedTask.id,
-                  studentId,
-                );
-              }
+                if (!student || student.isPresent === isPresent) {
+                  return;
+                }
 
-              // !! IMPORTANT !! A student marked as not present should not have any assigned task or be part of module evaluations
-              if (!isPresent) {
-                ACTIONS.clearStudentFromModuleEvaluation(studentId);
-              }
+                const nextStudents = state.students.clone();
+                const nextStudent = {
+                  ...student,
+                  isPresent,
+                };
 
-              ACTIONS.updateNonPresentStudentPresence(student, isPresent);
+                nextStudents.set(studentId, nextStudent);
+                state.students = nextStudents;
+
+                assignedTaskId = nextStudent.assignedTask?.id ?? null;
+                hasChanged = true;
+              },
+              undefined,
+              "setStudentPresence",
+            );
+
+            if (!hasChanged) return;
+
+            if (assignedTaskId) {
+              ACTIONS.setStudentToModuleEvaluation(assignedTaskId, studentId);
+            }
+
+            if (!isPresent) {
+              ACTIONS.clearStudentFromModuleEvaluation(studentId);
+            }
+
+            const updatedStudent = get().students.get(studentId);
+            if (updatedStudent) {
+              ACTIONS.updateNonPresentStudentPresence(
+                updatedStudent,
+                isPresent,
+              );
             }
           },
           /**
@@ -334,31 +360,41 @@ export const useEvaluationStepsCreationStore = create(
             let previousTaskId: UUID | null | undefined = null;
             ensureCollections();
             const nextTask = get().tasks.get(taskId);
+            const student = get().students.get(studentId);
+            previousTaskId = student?.assignedTask?.id;
 
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
 
-                const student = state.students.get(studentId);
-                previousTaskId = student?.assignedTask?.id;
-
                 if (!student || previousTaskId === taskId) {
                   return;
                 }
 
-                const studentEvaluations = student?.evaluations;
+                let assignedTask;
 
-                // Clear all existing evaluations when changing tasks
-                if (studentEvaluations && previousTaskId) {
-                  student.evaluations = null;
+                if (student.assignedTask) {
+                  assignedTask = {
+                    id: student.assignedTask.id,
+                    name: student.assignedTask.name,
+                  };
                 }
 
                 if (nextTask) {
-                  student.assignedTask = {
+                  assignedTask = {
                     id: nextTask.id,
                     name: nextTask.name,
                   };
                 }
+
+                const clonedStudent = {
+                  ...student,
+                  evaluations: null,
+                  assignedTask,
+                };
+
+                state.students = state.students.clone();
+                state.students.set(studentId, clonedStudent);
               },
               undefined,
               "setStudentTaskAssignment",
@@ -821,12 +857,11 @@ export const useEvaluationStepsCreationStore = create(
               (module) =>
                 taskIds.some((taskId) => module.tasksList.has(taskId)),
             );
-
             affectedModules.forEach((module) => {
               for (const subSkill of module.subSkills.values()) {
                 if (!subSkill.id || !module.id) continue;
 
-                if (subSkill.isCompleted !== false) {
+                if (subSkill.isCompleted) {
                   ACTIONS.setSubSkillHasCompleted(
                     module.id,
                     subSkill.id,
@@ -855,6 +890,7 @@ export const useEvaluationStepsCreationStore = create(
             if (!module || !subSkill || subSkill.isCompleted === completed)
               return;
 
+            console.log("je suis passé");
             const updatedSubSkill = {
               ...subSkill,
               isCompleted: completed,
@@ -940,12 +976,28 @@ export const useEvaluationStepsCreationStore = create(
               );
             });
           },
+          /**
+           * FOR SUMMARY - CONTROLLER USE ONLY
+           */
           getAllPresentStudents() {
             ensureCollections();
 
             const students = Array.from(get().students?.values() ?? []);
 
             return students.filter((student) => student.isPresent);
+          },
+          /**
+           * FOR SUMMARY - CONTROLLER USE ONLY
+           *
+           * Check if there are any students with assigned tasks, which indicates that there are evaluations to be made.
+           */
+          areStudentsWithAssignedTasks() {
+            ensureCollections();
+            const students = Array.from(get().students?.values() ?? []);
+
+            return students.some(
+              (student) => student.isPresent && student.assignedTask !== null,
+            );
           },
         };
         return ACTIONS;
