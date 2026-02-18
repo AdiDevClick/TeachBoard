@@ -17,16 +17,14 @@ export type AvatarListWithLabelAndAddButtonProps = SimpleAvatarListProps & {
 /**
  * Props for FormWithDebug component
  */
-export type FormWithDebugProps = Readonly<
+export type FormWithDebugProps<T extends FieldValues> = Readonly<
   {
     formId: string;
-    form: UseFormReturn<FieldValues>;
+    form: UseFormReturn<T>;
     className?: string;
     /** Calls a handler when the form is submitted and is valid */
-    onValidSubmit?: SubmitHandler<FieldValues>;
+    onValidSubmit?: SubmitHandler<T>;
     /** Calls a handler when the form is submitted and is invalid */
-    onInvalidSubmit?:
-      | SubmitErrorHandler<FieldValues>
-      | ((e: FieldErrors<FieldValues>) => void);
+    onInvalidSubmit?: SubmitErrorHandler<T> | ((e: FieldErrors<T>) => void);
   } & PropsWithChildren
 >;

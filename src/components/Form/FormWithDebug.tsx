@@ -18,7 +18,7 @@ import { useFormState } from "react-hook-form";
  * @param onValidSubmit - Optional callback function to handle form submission when the form is valid.
  * @param onInvalidSubmit - Optional callback function to handle form submission when the form is invalid.
  */
-export function FormWithDebug(props: FormWithDebugProps) {
+export function FormWithDebug<T extends FieldValues>(props: FormWithDebugProps<T>) {
   const { formId, form, className, onValidSubmit, onInvalidSubmit, children } =
     props;
 
