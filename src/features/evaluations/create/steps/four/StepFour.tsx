@@ -14,7 +14,7 @@ import {
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type ComponentProps } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFormState } from "react-hook-form";
 import { useLoaderData } from "react-router-dom";
 
 /**
@@ -45,7 +45,7 @@ export function StepFour({
     mode: "onTouched",
     defaultValues: {
       userId: user?.userId,
-      title: loaderData.pageTitle,
+      title: "Evaluation du " + STEP_FOUR_CARD_PROPS.title.description,
       evaluations: [],
       overallScore: 0,
       absence: ["none"],
@@ -66,6 +66,7 @@ export function StepFour({
     form,
   };
 
+  console.log("Step Four called");
   return <ShowSummary {...baseCardProps} />;
 }
 
@@ -73,8 +74,8 @@ export function StepFour({
  * Convenient function to show students evaluation component
  */
 function ShowSummary(commonProps: ComponentProps<typeof Summary>) {
+  const { isValid } = useFormState({ control: commonProps.form.control });
   const formId = commonProps.formId;
-  const isValid = commonProps.form?.formState?.isValid;
   return (
     <Summary {...commonProps}>
       <Summary.Title />

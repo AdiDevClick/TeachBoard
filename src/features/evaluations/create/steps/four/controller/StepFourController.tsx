@@ -1,124 +1,69 @@
-import { summaryPageContent } from "@/assets/css/SummaryPage.module.scss";
+import { FormWithDebug } from "@/components/Form/FormWithDebug";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
-import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types";
 import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/labelled-textarea";
-import { Accordion } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
-import { CardDescription } from "@/components/ui/card";
-import { Item } from "@/components/ui/item";
-import { ACCORDION_CONFIGS } from "@/features/evaluations/create/components/Accordion/config/accordion.configs";
-import { AccordionItemWithSubSkillWithStudentsList } from "@/features/evaluations/create/components/Accordion/exports/accordion.export";
+import { LabelledAccordion } from "@/features/evaluations/create/components/Accordion/LabelledAccordion";
 import { AverageFields } from "@/features/evaluations/create/components/Score/AverageFields";
-import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
-import type { ClassModules } from "@/features/evaluations/create/store/types/steps-creation-store.types";
-import { useEffect, useEffectEvent, useMemo, type ComponentProps } from "react";
+import type { StepFourControllerProps } from "@/features/evaluations/create/steps/four/controller/types/step-four-controller.types";
+import { useStepFourHandler } from "@/features/evaluations/create/steps/four/hooks/useStepFourHandler";
 
-type StepFourControllerProps = Readonly<{
-  pageId: string;
-  form: ComponentProps<typeof ControlledDynamicTagList>["form"];
-  className: string;
-  formId: string;
-}>;
-
+/**
+ * Step Four Controller.
+ *
+ * @param pageId - The ID of the page, used for debugging and logging purposes.
+ * @param form - The react-hook-form instance used for managing the form state and validation.
+ * @param formId - The ID of the form, used for debugging and logging purposes.
+ * @param className - Additional class name(s) to be applied to the form container for styling.
+ * @param inputControllers - An object containing the configuration for the various input controllers used in this step, such as the accordion and average fields.
+ */
 export function StepFourController({
   pageId,
   form,
   formId,
   className,
+  inputControllers,
 }: StepFourControllerProps) {
   const {
     scoreValue,
-    nonPresentStudents,
     allStudentsAverageScores,
     modules,
     getEvaluatedStudentsForSubSkill,
-  } = useStepThreeState();
-
-  /**
-   * Generates a list of absent students names to display
-   *
-   * @description Saves ids instead of names in the form for validation.
-   */
-  const presenceMemo = useMemo<{
-    students: DynamicTagsItemList;
-    ids: string[];
-  }>(() => {
-    const studentsPresence = Array.from(nonPresentStudents?.values() ?? []);
-    const studentsIds = Array.from(nonPresentStudents?.keys() ?? []);
-
-    if (studentsPresence.length === 0) {
-      return {
-        students: [["Aucun", { id: "none" }]],
-        ids: ["none"],
-      };
-    }
-
-    return { students: studentsPresence, ids: studentsIds };
-  }, [nonPresentStudents]);
-
-  const syncAbsenceField = useEffectEvent((items: typeof presenceMemo) => {
-    if (items.ids.length === 0) {
-      form.setValue("absence", ["none"]);
-      return;
-    }
-
-    form.setValue("absence", items.ids);
-  });
-
-  useEffect(() => {
-    syncAbsenceField(presenceMemo);
-  }, [presenceMemo]);
-
-  /**
-   * Prepares the optional prop for the AccordionItem, which includes the list of sub-skills and the module information.
-   *
-   * @param module -
-   * @returns
-   */
-  const modulesOptional = (module: ClassModules) => ({
-    items: Array.from(module.subSkills.values()),
-    module,
-  });
+    handleInvalidSubmit,
+    handleSubmit,
+    presenceMemo,
+  } = useStepFourHandler({ form, pageId });
 
   return (
     <>
-      <CardDescription>{ACCORDION_CONFIGS.title}</CardDescription>
-      <Accordion type="single" collapsible className={summaryPageContent}>
-        {modules.length < 1 && (
-          <Item>
-            <Badge variant="outline" className="mx-auto">
-              {ACCORDION_CONFIGS.noModulesText}
-            </Badge>
-          </Item>
-        )}
-        {modules.length > 0 && (
-          <AccordionItemWithSubSkillWithStudentsList
-            items={modules}
-            optional={modulesOptional}
-            color1={ACCORDION_CONFIGS.color1}
-            color2={ACCORDION_CONFIGS.color2}
-            storeGetter={getEvaluatedStudentsForSubSkill}
-            valueGetter={scoreValue}
-          />
-        )}
-      </Accordion>
-      <form id={formId} className={className}>
-        <AverageFields form={form} students={allStudentsAverageScores} />
-        <ControlledDynamicTagList
+      <LabelledAccordion
+        inputController={inputControllers.modules}
+        accordionItems={modules}
+        storeGetter={getEvaluatedStudentsForSubSkill}
+        valueGetter={scoreValue}
+      />
+      <FormWithDebug
+        form={form}
+        formId={formId}
+        className={className}
+        onInvalidSubmit={handleInvalidSubmit}
+        onValidSubmit={handleSubmit}
+      >
+        <AverageFields
           form={form}
-          name="absence"
+          students={allStudentsAverageScores}
+          {...inputControllers.scoresAverage}
+        />
+        <ControlledDynamicTagList
+          {...inputControllers.absence}
+          form={form}
           pageId={pageId}
-          title={"Elèves absents aujourd'hui"}
           itemList={presenceMemo.students}
-          inert
           displayCRUD={false}
         />
         <ControlledLabelledTextArea
+          {...inputControllers.comments}
           form={form}
-          name="comments"
-          title="Commentaires"
         />
-      </form>
+      </FormWithDebug>
     </>
   );
 }
