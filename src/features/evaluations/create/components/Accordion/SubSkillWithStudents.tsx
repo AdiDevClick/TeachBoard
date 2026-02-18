@@ -51,8 +51,7 @@ export function SubSkillWithStudents(props: SubSkillWithStudentsProps) {
       <EvaluationSliderList
         items={storeGetter(subSkill.id, module.id)}
         optional={(student) => {
-          const value = valueGetter(student.id, subSkill.id, module.id);
-          return { value };
+          return { value: valueGetter(student.id, subSkill.id, module.id) };
         }}
         inert
       />

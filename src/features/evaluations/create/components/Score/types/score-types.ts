@@ -29,4 +29,7 @@ export type LabelledScoreInputProps = Readonly<{
 export type AverageFieldsProps = Readonly<{
   form: Parameters<typeof StepFourController>[0]["form"];
   students: ReturnType<typeof useStepFourState>["allStudentsAverageScores"];
+  title?: string;
+  description?: string;
+  placeholder?: string;
 }>;

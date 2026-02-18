@@ -1,9 +1,10 @@
 import type { useStepFourState } from "@/features/evaluations/create/hooks/useStepFourState";
-import type { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
 import type {
   ClassModuleSubSkill,
   ClassModules,
 } from "@/features/evaluations/create/store/types/steps-creation-store.types";
+
+type State = ReturnType<typeof useStepFourState>;
 
 /**
  * @fileoverview This file defines the types for the SubSkillWithStudents component, which is responsible for displaying a subskill along with the students who have been evaluated for that subskill.
@@ -15,10 +16,8 @@ import type {
 export type SubSkillWithStudentsProps = Readonly<
   {
     module: ClassModules;
-    storeGetter: ReturnType<
-      typeof useStepFourState
-    >["getEvaluatedStudentsForSubSkill"];
-    valueGetter: ReturnType<typeof useStepThreeState>["scoreValue"];
+    storeGetter: State["getEvaluatedStudentsForSubSkill"];
+    valueGetter: State["scoreValue"];
     index: number;
     color1?: string;
     color2?: string;

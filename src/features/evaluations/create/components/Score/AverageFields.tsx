@@ -5,7 +5,6 @@ import {
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
-import { AVERAGE_FIELD_CONFIGS } from "@/features/evaluations/create/components/Score/config/average-fields.configs";
 import { LabelledScoreInputList } from "@/features/evaluations/create/components/Score/exports/labelled-score-input.exports";
 import type { AverageFieldsProps } from "@/features/evaluations/create/components/Score/types/score-types";
 
@@ -20,14 +19,24 @@ import type { AverageFieldsProps } from "@/features/evaluations/create/component
  *
  * @returns The rendered AverageFields component.
  */
-export function AverageFields({ form, students }: AverageFieldsProps) {
+export function AverageFields({
+  form,
+  students,
+  ...props
+}: AverageFieldsProps) {
+  const {
+    title = "Moyenne",
+    description = "Note générale",
+    placeholder = "Aucune note",
+  } = props;
+
   return (
-    <Item className="flex-col items-start p-0 gap-2">
-      <ItemTitle>{AVERAGE_FIELD_CONFIGS.title}</ItemTitle>
-      <ItemDescription>{AVERAGE_FIELD_CONFIGS.description}</ItemDescription>
+    <Item className="flex-col items-start p-0 gap-2" {...props}>
+      <ItemTitle>{title}</ItemTitle>
+      <ItemDescription>{description}</ItemDescription>
       {students.size < 1 && (
         <Badge variant="outline" className="mx-auto">
-          {AVERAGE_FIELD_CONFIGS.noScoresText}
+          {placeholder}
         </Badge>
       )}
       <ItemGroup className="mx-auto">

@@ -1,8 +1,5 @@
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
-import type {
-  ClassModules,
-  ModulesSelectionType,
-} from "@/features/evaluations/create/store/types/steps-creation-store.types";
+import type { ModulesSelectionType } from "@/features/evaluations/create/store/types/steps-creation-store.types";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types.ts";
 import type { CreateEvaluationsLoaderData } from "@/routes/types/routes-config.types";
 import type { JSX, PropsWithChildren } from "react";
@@ -41,7 +38,7 @@ export type LeftSideProps = Readonly<{
 export type TriggerButtonInteractivityArgs = {
   tabName: string;
   selectedClass?: ClassSummaryDto;
-  modules: ClassModules[];
   areAllModulesCompleted: boolean;
   moduleSelectionState: ModulesSelectionType;
+  areStudentsWithAssignedTask: boolean;
 };
