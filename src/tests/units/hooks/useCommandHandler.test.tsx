@@ -5,11 +5,11 @@ import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.
 import type { HandleSelectionCallbackParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import { renderCommandHook } from "@/tests/hooks/reusable-hooks";
 import {
+  moduleModal,
   skillApiEndpoint,
   skillCreated,
   skillFetchActivity,
   skillFetched,
-  moduleModal,
   skillModuleModal,
   skillQueryKey,
   skillQueryKeySingle,
@@ -20,6 +20,7 @@ import {
   waitForQueryKey,
 } from "@/tests/test-utils/tests.functions.ts";
 import { stubFetchRoutes } from "@/tests/test-utils/vitest-browser.helpers";
+import { UniqueSet } from "@/utils/UniqueSet";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 const click = () => new MouseEvent("click");
@@ -31,6 +32,7 @@ const baseFields: HandleSelectionCallbackParams["options"] = {
 beforeEach(() => {
   // Clear query client cache between tests
   testQueryClient.clear();
+  useAppStore.setState({ lastUserActivity: new UniqueSet() });
 });
 
 afterEach(() => {
@@ -190,9 +192,18 @@ describe("useCommandHandler - basic behaviours", () => {
     // After the response the dialog should be closed
     expect(dialogOptions(skillModuleModal)).toBeUndefined();
 
-    // The fetch flow should have recorded the last user activity
-    // For dialog-based submit flow the activity is recorded against the page/modal id
-    expect(useAppStore.getState().lastUserActivity).toBe(skillModuleModal);
+    // The fetch flow should have recorded the last user activity in a UniqueSet.
+    const lastActivity = useAppStore.getState().lastUserActivity;
+    const details = lastActivity.values().next().value;
+
+    expect(lastActivity.size).toBeGreaterThan(0);
+    expect(details).toEqual(
+      expect.objectContaining({
+        endpoint: skillApiEndpoint,
+        method: "POST",
+        type: "fetch",
+      }),
+    );
   });
 
   test("openingCallback performs a GET and caches data", async () => {
@@ -222,7 +233,17 @@ describe("useCommandHandler - basic behaviours", () => {
     expect(resultsCallback()).toEqual([skillFetched]);
     expect(fetch).toHaveBeenCalled();
 
-    // The fetch flow should have recorded the last user activity
-    expect(useAppStore.getState().lastUserActivity).toBe(skillFetchActivity);
+    // The fetch flow should have recorded the last user activity in a UniqueSet
+    const lastActivity = useAppStore.getState().lastUserActivity;
+    const details = lastActivity.values().next().value;
+
+    expect(lastActivity.size).toBeGreaterThan(0);
+    expect(details).toEqual(
+      expect.objectContaining({
+        endpoint: skillApiEndpoint,
+        method: "GET",
+        type: "fetch",
+      }),
+    );
   });
 });

@@ -19,6 +19,7 @@ import type {
 import type { TaskTemplateDto } from "@/api/types/routes/task-templates.types";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { controllerLabelRegex } from "@/tests/test-utils/class-creation/regex.functions";
+import { waitForCache } from "@/tests/test-utils/tests.functions";
 
 import {
   fillAndTab,
@@ -237,6 +238,59 @@ describe("UI flow: class-creation (StepOne list)", () => {
   test("tasks multi-select: select 3, remove 1, add 1 updates POST payload", async () => {
     expect(ctx).toBeDefined();
     await runCreateFlow(ctx.flowArgsToggle);
+  });
+
+  test("cache: created class is selectable from cache without refetch and includes students/templates/modules for next steps", async () => {
+    expect(ctx).toBeDefined();
+
+    // Uses the regular creation flow and already asserts no extra GET for classes
+    await runCreateFlow(ctx.flowArgs);
+
+    const cached = await waitForCache(ctx.flowArgs.classesQueryKey);
+    const groups = Array.isArray(cached) ? cached : [];
+
+    const createdItem = groups
+      .flatMap((group) => {
+        const maybeItems =
+          group && typeof group === "object"
+            ? Reflect.get(group, "items")
+            : undefined;
+        return Array.isArray(maybeItems) ? maybeItems : [];
+      })
+      .find((item) => {
+        if (!item || typeof item !== "object") return false;
+        return Reflect.get(item, "id") === ctx.flowArgs.createdClassPayload.id;
+      });
+
+    expect(createdItem).toBeDefined();
+
+    const students =
+      createdItem && typeof createdItem === "object"
+        ? Reflect.get(createdItem, "students")
+        : [];
+    const templates =
+      createdItem && typeof createdItem === "object"
+        ? Reflect.get(createdItem, "templates")
+        : [];
+
+    expect(Array.isArray(students)).toBe(true);
+    expect(Array.isArray(templates)).toBe(true);
+
+    const studentsArray = Array.isArray(students) ? students : [];
+    const templatesArray = Array.isArray(templates) ? templates : [];
+
+    expect(studentsArray.length).toBeGreaterThan(0);
+    expect(templatesArray.length).toBeGreaterThan(0);
+
+    const firstTemplate = templatesArray[0];
+    const modules =
+      firstTemplate && typeof firstTemplate === "object"
+        ? Reflect.get(firstTemplate, "modules")
+        : [];
+
+    expect(Array.isArray(modules)).toBe(true);
+    const modulesArray = Array.isArray(modules) ? modules : [];
+    expect(modulesArray.length).toBeGreaterThan(0);
   });
 
   test("sync: switching diploma refreshes skills in new-task-template modal (no stale data, no preselection)", async () => {

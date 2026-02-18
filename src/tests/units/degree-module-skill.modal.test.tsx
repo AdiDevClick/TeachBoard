@@ -17,10 +17,12 @@ import {
   waitForQueryKey,
 } from "@/tests/test-utils/tests.functions";
 import { stubFetchRoutes } from "@/tests/test-utils/vitest-browser.helpers";
+import { UniqueSet } from "@/utils/UniqueSet";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 beforeEach(() => {
   testQueryClient.clear();
+  useAppStore.setState({ lastUserActivity: new UniqueSet() });
   vi.unstubAllGlobals();
 });
 
@@ -88,8 +90,17 @@ describe("DegreeModuleSkill modal integration", () => {
     const newCached = await waitForCache(fetchDatas.queryKey);
     expect(newCached).toEqual({ items: [skillCreated] });
 
-    // Verify lastUserActivity
-    expect(useAppStore.getState().lastUserActivity).toBe(skillModuleModal);
+    // Verify lastUserActivity (UniqueSet-based)
+    const lastActivity = useAppStore.getState().lastUserActivity;
+    const details = lastActivity.values().next().value;
+
+    expect(lastActivity.size).toBeGreaterThan(0);
+    expect(details).toEqual(
+      expect.objectContaining({
+        endpoint: skillApiEndpoint,
+        type: "fetch",
+      }),
+    );
 
     // Results callback should return list
     expect(resultsCallback()).toEqual({ items: [skillCreated] });
