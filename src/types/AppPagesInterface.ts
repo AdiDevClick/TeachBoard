@@ -10,7 +10,7 @@ export interface PageWithControllers<
   T = unknown,
 > extends ComponentProps<"div"> {
   pageId?: AppModalNames;
-  inputControllers?: readonly T[] | T;
+  inputControllers?: readonly T[];
   className?: string;
   modalMode?: boolean;
 }

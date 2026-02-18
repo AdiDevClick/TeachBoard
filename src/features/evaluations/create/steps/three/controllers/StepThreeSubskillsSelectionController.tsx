@@ -20,7 +20,7 @@ import { Activity } from "react";
 export function StepThreeSubskillsSelectionController(
   props: StepThreeSubskillsSelectionControllerProps,
 ) {
-  const { subSkills } = useStepThreeState();
+  const subSkills = useStepThreeState().subSkills;
 
   const { handleSubSkillChangeCallback, selectedSubSkillId } =
     useSubSkillsSelection(subSkills);
