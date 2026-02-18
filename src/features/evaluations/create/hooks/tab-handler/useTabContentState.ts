@@ -15,8 +15,8 @@ export function useTabContentState() {
     (state) => state.moduleSelection,
   );
 
-  const modules = useEvaluationStepsCreationStore(
-    useShallow((state) => state.getAttendedModules()),
+  const areStudentsWithAssignedTask = useEvaluationStepsCreationStore(
+    useShallow((state) => state.areStudentsWithAssignedTasks()),
   );
 
   const areAllModulesCompleted = useEvaluationStepsCreationStore(
@@ -27,12 +27,11 @@ export function useTabContentState() {
     (state) => state.setModuleSelectionIsClicked,
   );
 
-  console.log("called the useTabContentState");
   return {
     selectedClass,
-    modules,
     areAllModulesCompleted,
     moduleSelectionState,
     setShowStudentsEvaluation,
+    areStudentsWithAssignedTask,
   };
 }

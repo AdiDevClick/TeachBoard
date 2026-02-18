@@ -1,10 +1,10 @@
 import { useSidebar } from "@/components/ui/sidebar";
 import type { TriggerButtonInteractivityArgs } from "@/features/evaluations/create/components/Tabs/types/tabs.types";
+import { useTabContentState } from "@/features/evaluations/create/hooks/tab-handler/useTabContentState";
 import type {
   TabContentHandlerState,
   UseTabContentHandlerProps,
 } from "@/features/evaluations/create/hooks/types/use-tab-content-handler.types";
-import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
 import { useEffect, useEffectEvent, useState, type MouseEvent } from "react";
 
 /**
@@ -19,12 +19,12 @@ export function useTabContentHandler({
   index,
 }: UseTabContentHandlerProps) {
   const {
-    areAllModulesCompleted,
     selectedClass,
-    modules,
-    setShowStudentsEvaluation,
+    areAllModulesCompleted,
     moduleSelectionState,
-  } = useStepThreeState();
+    setShowStudentsEvaluation,
+    areStudentsWithAssignedTask,
+  } = useTabContentState();
 
   const { isMobile, setOpen, open } = useSidebar();
   const [tabState, setTabState] = useState<TabContentHandlerState>({
@@ -43,9 +43,9 @@ export function useTabContentHandler({
       const {
         tabName,
         selectedClass,
-        modules,
         areAllModulesCompleted,
         moduleSelectionState,
+        areStudentsWithAssignedTask,
       } = args;
 
       let disabled = true;
@@ -57,7 +57,7 @@ export function useTabContentHandler({
           }
           break;
         case "Elèves":
-          if (modules.length > 0) {
+          if (areStudentsWithAssignedTask) {
             disabled = false;
           }
           break;
@@ -90,16 +90,16 @@ export function useTabContentHandler({
     triggerButtonInteractivity({
       tabName,
       selectedClass: selectedClass ?? undefined,
-      modules,
       areAllModulesCompleted,
       moduleSelectionState,
+      areStudentsWithAssignedTask,
     });
   }, [
     tabName,
     selectedClass,
-    modules,
     areAllModulesCompleted,
     moduleSelectionState,
+    areStudentsWithAssignedTask,
   ]);
 
   /**
@@ -124,6 +124,8 @@ export function useTabContentHandler({
 
     onClickHandler({ e, ...clickProps, index, setOpen, open, setTabState });
   };
+
+  console.log("called the tabcontent handler");
 
   return {
     clickHandler,
