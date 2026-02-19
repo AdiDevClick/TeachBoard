@@ -13,6 +13,7 @@ import {
   type ClassCreationFormSchema,
 } from "@/features/class-creation/index.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { ComponentProps } from "react";
 import { useForm } from "react-hook-form";
 
 /**
@@ -65,7 +66,7 @@ function ClassCreation({
     form,
     submitRoute: API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
     submitDataReshapeFn: API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
-  };
+  } satisfies ComponentProps<typeof ClassCreationWithCard>;
 
   return (
     <ClassCreationWithCard {...commonProps}>
