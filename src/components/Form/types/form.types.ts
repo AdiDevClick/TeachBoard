@@ -2,11 +2,10 @@ import type { SimpleAvatarListProps } from "@/components/Avatar/types/avatar.typ
 import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import type { PropsWithChildren } from "react";
 import type {
-  UseFormReturn,
+  FieldErrors,
   FieldValues,
   SubmitHandler,
-  SubmitErrorHandler,
-  FieldErrors,
+  UseFormReturn,
 } from "react-hook-form";
 
 /** Props for AvatarListWithLabelAndAddButton component */
@@ -23,8 +22,8 @@ export type FormWithDebugProps<T extends FieldValues> = Readonly<
     form: UseFormReturn<T>;
     className?: string;
     /** Calls a handler when the form is submitted and is valid */
-    onValidSubmit?: SubmitHandler<T>;
+    onValidSubmit: SubmitHandler<T>;
     /** Calls a handler when the form is submitted and is invalid */
-    onInvalidSubmit?: SubmitErrorHandler<T> | ((e: FieldErrors<T>) => void);
+    onInvalidSubmit: (e: FieldErrors<T>) => void;
   } & PropsWithChildren
 >;

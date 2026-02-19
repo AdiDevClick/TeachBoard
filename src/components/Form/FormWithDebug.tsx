@@ -3,11 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { DEV_MODE } from "@/configs/app.config";
 import { cn } from "@/utils/utils";
-import type {
-  FieldValues,
-  SubmitErrorHandler,
-  SubmitHandler,
-} from "react-hook-form";
+import type { FieldValues } from "react-hook-form";
 import { useFormState } from "react-hook-form";
 
 /**
@@ -15,13 +11,14 @@ import { useFormState } from "react-hook-form";
  *
  * @param formId - The ID of the form element.
  * @param form - The react-hook-form instance controlling the form state.
- * @param onValidSubmit - Optional callback function to handle form submission when the form is valid.
- * @param onInvalidSubmit - Optional callback function to handle form submission when the form is invalid.
+ * @param onValidSubmit - Callback function to handle form submission when the form is valid.
+ * @param onInvalidSubmit - Callback function to handle form submission when the form is invalid.
  */
-export function FormWithDebug<T extends FieldValues>(props: FormWithDebugProps<T>) {
+export function FormWithDebug<T extends FieldValues>(
+  props: FormWithDebugProps<T>,
+) {
   const { formId, form, className, onValidSubmit, onInvalidSubmit, children } =
     props;
-
   const { errors, isValid } = useFormState({ control: form.control });
 
   /**
@@ -37,17 +34,11 @@ export function FormWithDebug<T extends FieldValues>(props: FormWithDebugProps<T
     return ok;
   };
 
-  const noopSubmit: SubmitHandler<FieldValues> = () => {};
-  const noopError: SubmitErrorHandler<FieldValues> = () => {};
-
   return (
     <form
       id={formId}
       className={className}
-      onSubmit={form.handleSubmit(
-        onValidSubmit ?? noopSubmit,
-        onInvalidSubmit ?? noopError,
-      )}
+      onSubmit={form.handleSubmit(onValidSubmit, onInvalidSubmit)}
     >
       {DEV_MODE && !isValid && (
         <Item
