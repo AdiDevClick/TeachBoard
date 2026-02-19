@@ -1,6 +1,6 @@
 import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types";
 import { debugLogs } from "@/configs/app-components.config";
-import { DEV_MODE, HTTP_METHODS } from "@/configs/app.config";
+import { DEV_MODE } from "@/configs/app.config";
 import { useStepFourState } from "@/features/evaluations/create/hooks/useStepFourState";
 import type { UseStepFourHandlerProps } from "@/features/evaluations/create/steps/four/hooks/types/use-step-four-handler.types";
 import {
@@ -10,7 +10,9 @@ import {
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import { useEffect, useEffectEvent, useMemo } from "react";
 import { useWatch } from "react-hook-form";
+import { toast } from "sonner";
 
+const toastId = "step-four-submit-toast";
 /**
  * Custom hook to handle the logic for Step Four of the evaluation creation process, which includes managing the state of scores, evaluated students, and form submission.
  *
@@ -33,12 +35,13 @@ export function useStepFourHandler({
     selectedClass,
   } = useStepFourState();
 
-  const { submitCallback, invalidSubmitCallback } = useCommandHandler({
-    pageId,
-    form,
-    submitRoute,
-    submitDataReshapeFn,
-  });
+  const { submitCallback, invalidSubmitCallback, isLoading, error, response } =
+    useCommandHandler({
+      pageId,
+      form,
+      submitRoute,
+      submitDataReshapeFn,
+    });
 
   // Existing watch for overallScore
   const overallScoreWatch = useWatch({
@@ -76,8 +79,10 @@ export function useStepFourHandler({
   const handleValidSubmit = (variables: StepFourFormSchema) => {
     const parsedVariables = stepFourInputSchema.parse(variables);
 
+    delete parsedVariables["overallScore"];
     submitCallback(parsedVariables, {
-      method: HTTP_METHODS.POST,
+      abortController: new AbortController(),
+      method: "POST",
     });
   };
 
@@ -138,6 +143,33 @@ export function useStepFourHandler({
   useEffect(() => {
     triggerScoreUpdate();
   }, [overallScoreWatch]);
+
+  /**
+   * RESULTS - Show toasts on loading, success and error states
+   */
+  useEffect(() => {
+    if (isLoading && !toast.getToasts().some((t) => t.id === toastId)) {
+      toast.dismiss();
+      toast.loading("Envoi en cours...", {
+        id: toastId,
+      });
+    }
+    if (error || response) {
+      toast.dismiss(toastId);
+      // If there's an error, show an error toast
+      if (error?.status === 400 || error?.status === 401) {
+        toast.error(
+          "Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations et réessayer.",
+        );
+      }
+    }
+
+    if (response) {
+      toast.success("Évaluation créée avec succès !", {
+        id: toastId,
+      });
+    }
+  }, [isLoading, error, response]);
 
   return {
     scoreValue,
