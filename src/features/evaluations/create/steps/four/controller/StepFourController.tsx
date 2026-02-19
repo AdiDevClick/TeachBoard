@@ -1,10 +1,16 @@
 import { FormWithDebug } from "@/components/Form/FormWithDebug";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
 import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/labelled-textarea";
+import { HTTP_METHODS } from "@/configs/app.config";
 import { LabelledAccordion } from "@/features/evaluations/create/components/Accordion/LabelledAccordion";
 import { AverageFields } from "@/features/evaluations/create/components/Score/AverageFields";
 import type { StepFourControllerProps } from "@/features/evaluations/create/steps/four/controller/types/step-four-controller.types";
 import { useStepFourHandler } from "@/features/evaluations/create/steps/four/hooks/useStepFourHandler";
+import {
+  stepFourInputSchema,
+  type StepFourFormSchema,
+} from "@/features/evaluations/create/steps/four/models/step-four.models";
+import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 
 /**
  * Step Four Controller.
@@ -21,16 +27,18 @@ export function StepFourController({
   formId,
   className,
   inputControllers,
+  submitRoute,
+  submitDataReshapeFn,
 }: StepFourControllerProps) {
   const {
     scoreValue,
     allStudentsAverageScores,
     modules,
     getEvaluatedStudentsForSubSkill,
-    handleInvalidSubmit,
-    handleSubmit,
     presenceMemo,
-  } = useStepFourHandler({ form, pageId });
+    handleValidSubmit,
+    invalidSubmitCallback,
+  } = useStepFourHandler({ form, pageId, submitRoute, submitDataReshapeFn });
 
   return (
     <>
@@ -44,8 +52,8 @@ export function StepFourController({
         form={form}
         formId={formId}
         className={className}
-        onInvalidSubmit={handleInvalidSubmit}
-        onValidSubmit={handleSubmit}
+        onInvalidSubmit={invalidSubmitCallback}
+        onValidSubmit={handleValidSubmit}
       >
         <AverageFields
           form={form}

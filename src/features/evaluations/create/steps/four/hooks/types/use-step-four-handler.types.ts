@@ -5,5 +5,5 @@ import type { StepFourController } from "@/features/evaluations/create/steps/fou
  */
 export type UseStepFourHandlerProps = Pick<
   Parameters<typeof StepFourController>[0],
-  "form" | "pageId"
+  "form" | "pageId" | "submitRoute" | "submitDataReshapeFn"
 >;

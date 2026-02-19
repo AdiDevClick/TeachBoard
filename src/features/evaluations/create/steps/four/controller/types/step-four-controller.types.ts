@@ -1,6 +1,6 @@
 import type { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import type { STEP_FOUR_INPUT_CONTROLLERS } from "@/features/evaluations/create/steps/four/config/step-four.configs";
-import type { StepFourSchema } from "@/features/evaluations/create/steps/four/models/step-four.models";
+import type { StepFourFormSchema } from "@/features/evaluations/create/steps/four/models/step-four.models";
 import type { StepFour } from "@/features/evaluations/create/steps/four/StepFour";
 import type { AppControllerInterface } from "@/types/AppControllerInterface";
 
@@ -17,7 +17,7 @@ import type { AppControllerInterface } from "@/types/AppControllerInterface";
 export type StepFourInputControllers = typeof STEP_FOUR_INPUT_CONTROLLERS;
 
 export type StepFourControllerProps = AppControllerInterface<
-  StepFourSchema,
+  StepFourFormSchema,
   typeof API_ENDPOINTS.POST.CREATE_EVALUATION.endpoint,
   typeof API_ENDPOINTS.POST.CREATE_EVALUATION.dataReshape
 > &

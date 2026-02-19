@@ -1,11 +1,15 @@
 import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types";
 import { debugLogs } from "@/configs/app-components.config";
-import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config";
+import { DEV_MODE, HTTP_METHODS } from "@/configs/app.config";
 import { useStepFourState } from "@/features/evaluations/create/hooks/useStepFourState";
 import type { UseStepFourHandlerProps } from "@/features/evaluations/create/steps/four/hooks/types/use-step-four-handler.types";
-import type { GlobalWithInvalidSubmit } from "@/hooks/database/types/use-command-handler.types";
+import {
+  type StepFourFormSchema,
+  stepFourInputSchema,
+} from "@/features/evaluations/create/steps/four/models/step-four.models";
+import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import { useEffect, useEffectEvent, useMemo } from "react";
-import { useWatch, type FieldErrors, type FieldValues } from "react-hook-form";
+import { useWatch } from "react-hook-form";
 
 /**
  * Custom hook to handle the logic for Step Four of the evaluation creation process, which includes managing the state of scores, evaluated students, and form submission.
@@ -13,7 +17,12 @@ import { useWatch, type FieldErrors, type FieldValues } from "react-hook-form";
  * @param form - The react-hook-form instance used for managing the form state and validation in Step Four of the evaluation creation process.
  * @param pageId - The ID of the page, used for debugging and logging purposes.
  */
-export function useStepFourHandler({ form, pageId }: UseStepFourHandlerProps) {
+export function useStepFourHandler({
+  pageId,
+  form,
+  submitRoute,
+  submitDataReshapeFn,
+}: UseStepFourHandlerProps) {
   const {
     scoreValue,
     nonPresentStudents,
@@ -23,6 +32,13 @@ export function useStepFourHandler({ form, pageId }: UseStepFourHandlerProps) {
     getAllPresentStudents,
     selectedClass,
   } = useStepFourState();
+
+  const { submitCallback, invalidSubmitCallback } = useCommandHandler({
+    pageId,
+    form,
+    submitRoute,
+    submitDataReshapeFn,
+  });
 
   // Existing watch for overallScore
   const overallScoreWatch = useWatch({
@@ -51,6 +67,19 @@ export function useStepFourHandler({ form, pageId }: UseStepFourHandlerProps) {
 
     return { students: studentsPresence, ids: studentsIds };
   }, [nonPresentStudents]);
+
+  /**
+   * Handle Step Four form submission when form is valid
+   *
+   * @param variables - The form data to submit
+   */
+  const handleValidSubmit = (variables: StepFourFormSchema) => {
+    const parsedVariables = stepFourInputSchema.parse(variables);
+
+    submitCallback(parsedVariables, {
+      method: HTTP_METHODS.POST,
+    });
+  };
 
   /**
    * INIT - Saving the class id in the form state for validation
@@ -110,46 +139,13 @@ export function useStepFourHandler({ form, pageId }: UseStepFourHandlerProps) {
     triggerScoreUpdate();
   }, [overallScoreWatch]);
 
-  const handleSubmit = (data: FieldValues) => {
-    if (DEV_MODE) {
-      console.debug(pageId + " form submitted with data:", data);
-    }
-  };
-
-  /**
-   * Handle Form submission when there are validation errors
-   *
-   * @param errors - The validation errors
-   */
-  const handleInvalidSubmit = <T extends FieldValues>(
-    errors: FieldErrors<T>,
-  ) => {
-    if (DEV_MODE) {
-      const currentValues = form.getValues();
-
-      (
-        globalThis as GlobalWithInvalidSubmit<T>
-      ).__TB_CLASS_CREATION_LAST_INVALID_SUBMIT__ = {
-        at: Date.now(),
-        keys: Object.keys(errors ?? {}),
-        values: {
-          ...currentValues,
-        },
-      };
-
-      if (!NO_CACHE_LOGS) {
-        console.debug(pageId + " invalid submit", errors);
-      }
-    }
-  };
-
   return {
     scoreValue,
     allStudentsAverageScores,
     modules,
     getEvaluatedStudentsForSubSkill,
-    handleSubmit,
-    handleInvalidSubmit,
     presenceMemo,
+    handleValidSubmit,
+    invalidSubmitCallback,
   };
 }

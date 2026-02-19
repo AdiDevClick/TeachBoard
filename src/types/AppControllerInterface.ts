@@ -15,11 +15,11 @@ export interface AppControllerInterface<
   TForm extends FieldValues = FieldValues,
   TSubmitRoute = ApiEndpointType,
   TSubmitReshapeFn = DataReshapeFn,
->  {
+> {
   className: string;
   formId: string;
   form: UseFormReturn<TForm>;
   pageId: AppModalNames;
   submitRoute?: TSubmitRoute;
   submitDataReshapeFn?: TSubmitReshapeFn;
-};
+}

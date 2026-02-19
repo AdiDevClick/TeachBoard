@@ -198,8 +198,8 @@ const stepFourSchema = (data: typeof fieldData) =>
     ),
   });
 
-export type StepFourSchema = z.infer<typeof stepFourInputSchema>;
+export type StepFourFormSchema = z.input<typeof stepFourInputSchema>;
 
-export type StepFourInputItem = FetchingInputItem<StepFourSchema>;
+export type StepFourInputItem = FetchingInputItem<StepFourFormSchema>;
 
 export const stepFourInputSchema = stepFourSchema(fieldData);

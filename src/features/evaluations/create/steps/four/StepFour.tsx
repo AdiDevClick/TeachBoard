@@ -2,20 +2,20 @@ import { useAppStore } from "@/api/store/AppStore.ts";
 import { rightContent } from "@/assets/css/EvaluationPage.module.scss";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { Button } from "@/components/ui/button";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import {
   STEP_FOUR_CARD_PROPS,
   STEP_FOUR_INPUT_CONTROLLERS,
 } from "@/features/evaluations/create/steps/four/config/step-four.configs.ts";
 import { StepFourController } from "@/features/evaluations/create/steps/four/controller/StepFourController.tsx";
 import {
-  type StepFourSchema,
   stepFourInputSchema,
+  type StepFourFormSchema,
 } from "@/features/evaluations/create/steps/four/models/step-four.models";
-import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
+import type { StepFourProps } from "@/features/evaluations/create/steps/four/types/step-four.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type ComponentProps } from "react";
 import { useForm, useFormState } from "react-hook-form";
-import { useLoaderData } from "react-router-dom";
 
 /**
  * STEP FOUR - Summary and Confirmation Component
@@ -36,18 +36,17 @@ export function StepFour({
   className = rightContent,
   inputControllers = STEP_FOUR_INPUT_CONTROLLERS,
   ...props
-}: Readonly<PageWithControllers<typeof STEP_FOUR_INPUT_CONTROLLERS>>) {
-  const loaderData = useLoaderData();
+}: StepFourProps) {
   const user = useAppStore((state) => state.user);
 
-  const form = useForm<StepFourSchema>({
+  const form = useForm<StepFourFormSchema>({
     resolver: zodResolver(stepFourInputSchema),
     mode: "onTouched",
     defaultValues: {
       userId: user?.userId,
       title: "Evaluation du " + STEP_FOUR_CARD_PROPS.title.description,
       evaluations: [],
-      overallScore: 0,
+      overallScore: {},
       absence: ["none"],
       comments: "",
       evaluationDate: new Date().toISOString(),
@@ -55,7 +54,6 @@ export function StepFour({
   });
 
   const baseCardProps = {
-    user: user?.userId,
     pageId,
     modalMode,
     className,
@@ -64,9 +62,10 @@ export function StepFour({
     card: STEP_FOUR_CARD_PROPS,
     ...props,
     form,
-  };
+    submitRoute: API_ENDPOINTS.POST.CREATE_EVALUATION.endpoint,
+    submitDataReshapeFn: API_ENDPOINTS.POST.CREATE_EVALUATION.dataReshape,
+  } satisfies ComponentProps<typeof ShowSummary>;
 
-  console.log("Step Four called");
   return <ShowSummary {...baseCardProps} />;
 }
 
