@@ -52,7 +52,7 @@ export type FetchArgs = {
   url?: string;
   abortController?: AbortController;
   retry?: number;
-  timeout?: number;
+  retryTimeout?: number;
 };
 
 export type GenericQueryResults<S, E> = {

@@ -373,6 +373,7 @@ export function useCommandHandler<
    */
   useEffect(() => {
     const isSubmission = postVariables.current !== null;
+
     if (data || error) {
       hasStartedCreation.current = false;
     }

@@ -12,7 +12,7 @@ import type {
 } from "@/hooks/database/types/QueriesTypes.ts";
 import type { ApiError } from "@/types/AppErrorInterface";
 import type { ResponseInterface } from "@/types/AppResponseInterface";
-import { wait } from "@/utils/utils";
+import { promiseState, wait, waitAndFail } from "@/utils/utils";
 import type { UseMutationOptions } from "@tanstack/react-query";
 import { useMutation, useQueryErrorResetBoundary } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -177,11 +177,26 @@ async function onFetch<
   TSuccess extends ResponseInterface<unknown>,
   TError extends ApiError,
 >({
-  timeout = 1000,
+  retryTimeout = 1000,
   retry = 3,
   ...fetchArgs
 }: FetchArgs): Promise<FetchJSONSuccess<TSuccess>> {
   const { bodyVariables, method, url, abortController, headers } = fetchArgs;
+
+  const raceMap = new Map<
+    string,
+    Promise<FetchJSONSuccess<TSuccess> | FetchJSONError<TError>>
+  >();
+  raceMap.set(
+    "fetch",
+    fetchJSON<TSuccess, TError>(getUrl(url), {
+      method: method,
+      json: bodyVariables,
+      signal: abortController?.signal,
+      headers: headers,
+    }),
+  );
+  raceMap.set("timeout", waitAndFail(6000, "Request timed out"));
 
   try {
     if (abortController?.signal.aborted) {
@@ -196,23 +211,30 @@ async function onFetch<
       });
     }
 
-    const response = await fetchJSON<TSuccess, TError>(getUrl(url), {
-      method: method,
-      json: bodyVariables,
-      signal: abortController?.signal,
-      headers: headers,
-    });
+    // Block until one of the promises settles (no immediate `pending` sentinel).
+    const response = await promiseState(raceMap, false);
 
-    if (!response.ok || response === undefined) {
-      const status = response.status;
-      const message = getErrorMessage(status, response, retry);
-
-      throw new Error(message, {
-        cause: { ...response },
+    if (response.status !== "fulfilled") {
+      throw new Error("Unreachable server response.", {
+        cause: {
+          status: 408,
+          error: "Request Timeout",
+          message: "Le serveur n'a pas répondu à temps. Veuillez réessayer.",
+        },
       });
     }
 
-    return response;
+    const settled = response.value;
+    if (!settled || settled?.ok !== true) {
+      const status = settled?.status ?? 0;
+      const message = getErrorMessage(status, settled, retry);
+
+      throw new Error(message, {
+        cause: { ...settled },
+      });
+    }
+
+    return settled;
   } catch (error) {
     const err = error as Error;
     const errorCause = {
@@ -221,11 +243,11 @@ async function onFetch<
     };
 
     if (shouldRetry(errorCause.status, retry)) {
-      await wait(timeout);
+      await wait(retryTimeout);
       return onFetch({
         ...fetchArgs,
         retry: retry - 1,
-        timeout: timeout * 2,
+        retryTimeout: retryTimeout * 2,
       });
     }
     throw errorCause;

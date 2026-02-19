@@ -1,4 +1,5 @@
 import type { QueryKeyDescriptor } from "@/hooks/database/types/QueriesTypes.ts";
+import type { DataReshapeFn } from "@/types/AppInputControllerInterface";
 
 /**
  * Parameters for useFetch hook operations.
@@ -11,6 +12,6 @@ export type FetchParams = {
   sortBy: string;
   sortOrder: "asc" | "desc";
   cachedFetchKey?: [string, string];
-  dataReshapeFn?(..._args: unknown[]): unknown;
+  dataReshapeFn?: DataReshapeFn;
   reshapeOptions?: unknown;
-} & QueryKeyDescriptor<unknown, unknown>["1"]; 
+} & QueryKeyDescriptor<unknown, unknown>["1"];

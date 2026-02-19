@@ -3,13 +3,9 @@ import type { CommandSelectionItemProps } from "@/components/Command/types/comma
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
-import type {
-  AppInputControllerMeta,
-  DataReshapeFn,
-} from "@/types/AppInputControllerInterface";
+import type { AppInputControllerMeta } from "@/types/AppInputControllerInterface";
 import type { MouseEvent, PointerEvent } from "react";
 import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
-import type { FormMethod } from "react-router-dom";
 
 type IsNever<T> = [T] extends [never] ? true : false;
 
@@ -125,12 +121,8 @@ export type HandleOpeningCallbackParams<T extends CommandHandlerMetaData> = {
 export type HandleSubmitCallbackParams = {
   variables: MutationVariables;
   submitOpts?: {
-    method?: FormMethod;
     endpointUrl?: string;
-    dataReshapeFn?: DataReshapeFn;
-    reshapeOptions?: unknown;
-    silent?: boolean;
-  };
+  } & Partial<FetchParams>;
 };
 
 /**

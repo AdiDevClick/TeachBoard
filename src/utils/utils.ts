@@ -2,6 +2,7 @@ import type { DialogContextType } from "@/api/contexts/types/context.types.ts";
 import { debugLogs } from "@/configs/app-components.config.ts";
 import { LANGUAGE, type AppModalNames } from "@/configs/app.config";
 import type {
+  AnyObjectProps,
   PreventDefaultAndStopPropagation,
   ProbeProxyResult,
 } from "@/utils/types/types.utils.ts";
@@ -79,6 +80,100 @@ export function wait(duration: number, message = "") {
       resolve(message);
     }, duration);
   });
+}
+
+/**
+ * Reject a promise after a specified duration with a given message,
+ *
+ * @description Optionnaly using an AbortController to allow cancellation.
+ *
+ * @param duration - The duration in milliseconds to wait before rejecting the promise
+ * @param message - The message to reject the promise with
+ * @param abortController - Optional AbortController to allow cancellation of the timeout
+ */
+export function waitAndFail(
+  duration: number,
+  message: string,
+  abortController?: AbortController,
+): Promise<never> {
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      const err = new Error(String(message));
+      reject(err);
+      abortController?.abort(err);
+    }, duration);
+  });
+}
+type PromiseStateResult<T> =
+  | { status: "pending" }
+  | { status: "fulfilled"; value: T; key?: string }
+  | { status: "rejected"; reason: string; key?: string };
+
+type PromiseStateSettledResult<T> = Exclude<
+  PromiseStateResult<T>,
+  { status: "pending" }
+>;
+
+/**
+ * Track the state of a promise, returning its status and value or reason once it settles.
+ *
+ * @param promise The promise to track, or a Map of promises to track with their keys included in the result
+ * @param allowImmediatePending If true (default), the function returns immediately with `{ status: 'pending' }` if the wrapped promises have not yet settled. If false, the returned promise waits for one of the wrapped promises to settle and returns its status object.
+ * @returns A promise that resolves to either { status: 'pending' } or a status object describing the settled promise
+ */
+export function promiseState<T = AnyObjectProps>(
+  promise: Promise<T> | Map<string, Promise<T>>,
+  allowImmediatePending = true,
+) {
+  const pendingState: PromiseStateResult<T> = { status: "pending" };
+
+  // Map<string, Promise> -> normalize each promise to a status-object (includes the key)
+  if (promise instanceof Map) {
+    const wrappedPromises = [];
+
+    for (const [key, promiseItem] of promise.entries()) {
+      wrappedPromises.push(
+        promiseItem
+          .then(
+            (value): PromiseStateSettledResult<T> => ({
+              status: "fulfilled",
+              value,
+              key,
+            }),
+          )
+          .catch(
+            (error_): PromiseStateSettledResult<T> => ({
+              status: "rejected",
+              reason: (error_ as Error)?.message ?? String(error_),
+              key,
+            }),
+          ),
+      );
+    }
+
+    return allowImmediatePending
+      ? Promise.race([...wrappedPromises, Promise.resolve(pendingState)])
+      : Promise.race(wrappedPromises);
+  }
+
+  // Single promise -> normalize to a status-object and optionally race against pending state
+  const normalized = promise
+    .then(
+      (value): PromiseStateSettledResult<T> => ({
+        status: "fulfilled",
+        value,
+      }),
+    )
+    .catch(
+      (error_): PromiseStateSettledResult<T> => ({
+        status: "rejected",
+        reason: (error_ as Error)?.message ?? String(error_),
+      }),
+    );
+
+  return allowImmediatePending
+    ? Promise.race([normalized, Promise.resolve(pendingState)])
+    : normalized;
 }
 
 /**
