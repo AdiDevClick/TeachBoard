@@ -13,7 +13,7 @@ import {
 } from "@/utils/styles/generic-styles.ts";
 import "@css/GenericPage.scss";
 import { GalleryVerticalEnd } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useEffectEvent } from "react";
 import { Link } from "react-router-dom";
 
 /**
@@ -27,13 +27,24 @@ export function Login({
   const { open, setOpen, openMobile, setOpenMobile } = useSidebar();
   const { closeAllDialogs } = useDialog();
 
-  /** Close sidebar on login page */
-  useEffect(() => {
+  /**
+   * INIT - Close all dialogs on login
+   */
+  const closeAllDialogsOnLogin = useEffectEvent(() => {
     if (open || openMobile) {
       setOpen(false);
       setOpenMobile(false);
     }
     closeAllDialogs();
+  });
+
+  /**
+   * INIT - Close sidebar on login page
+   *
+   * @description Only once
+   */
+  useEffect(() => {
+    closeAllDialogsOnLogin();
   }, []);
 
   return (
