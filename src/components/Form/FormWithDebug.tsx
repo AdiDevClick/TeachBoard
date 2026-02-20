@@ -2,6 +2,7 @@ import type { FormWithDebugProps } from "@/components/Form/types/form.types";
 import { Button } from "@/components/ui/button";
 import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
 import { DEV_MODE } from "@/configs/app.config";
+import useDebounce from "@/hooks/useDebounce";
 import { cn } from "@/utils/utils";
 import type { FieldValues } from "react-hook-form";
 import { useFormState } from "react-hook-form";
@@ -17,8 +18,15 @@ import { useFormState } from "react-hook-form";
 export function FormWithDebug<T extends FieldValues>(
   props: FormWithDebugProps<T>,
 ) {
-  const { formId, form, className, onValidSubmit, onInvalidSubmit, children } =
-    props;
+  const {
+    formId,
+    form,
+    className,
+    onValidSubmit,
+    onInvalidSubmit,
+    debounceDelay = 200,
+    children,
+  } = props;
   const { errors, isValid } = useFormState({ control: form.control });
 
   /**
@@ -34,11 +42,13 @@ export function FormWithDebug<T extends FieldValues>(
     return ok;
   };
 
+  const debouncedSubmit = useDebounce(onValidSubmit, debounceDelay);
+
   return (
     <form
       id={formId}
       className={className}
-      onSubmit={form.handleSubmit(onValidSubmit, onInvalidSubmit)}
+      onSubmit={form.handleSubmit(debouncedSubmit, onInvalidSubmit)}
     >
       {DEV_MODE && !isValid && (
         <Item

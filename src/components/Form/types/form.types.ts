@@ -18,6 +18,8 @@ export type AvatarListWithLabelAndAddButtonProps = SimpleAvatarListProps & {
  */
 export type FormWithDebugProps<T extends FieldValues> = Readonly<
   {
+    /** Delay in milliseconds before submitting the form */
+    debounceDelay?: number;
     formId: string;
     form: UseFormReturn<T>;
     className?: string;
