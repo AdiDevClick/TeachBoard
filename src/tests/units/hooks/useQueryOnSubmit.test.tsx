@@ -1,4 +1,5 @@
-import { onFetch, useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit";
+import { onFetch } from "@/hooks/database/functions/use-query-on-submit.functions";
+import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import { act } from "react";
 import { afterEach, describe, expect, test, vi } from "vitest";

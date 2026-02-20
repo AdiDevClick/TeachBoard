@@ -87,3 +87,18 @@ export type QueryKeyDescriptor<S, E> = [
     ) => void;
   },
 ];
+
+/**
+ * Custom hook for managing fetch operations with React Query.
+ */
+export type InternalMutationVariables = MutationVariables & {
+  abortController?: AbortController;
+};
+
+/**
+ * Default state for query results, used to reset state on new submissions.
+ */
+export type UseQueryOnSubmitState<S, E> = {
+  error: FetchJSONError<E> | null;
+  success: FetchJSONSuccess<S> | null;
+};
