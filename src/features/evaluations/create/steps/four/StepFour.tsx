@@ -73,8 +73,12 @@ export function StepFour({
  * Convenient function to show students evaluation component
  */
 function ShowSummary(commonProps: ComponentProps<typeof Summary>) {
-  const { isValid } = useFormState({ control: commonProps.form.control });
+  const { isValid, isSubmitting, isSubmitSuccessful } = useFormState({
+    control: commonProps.form.control,
+  });
+  const isDisabledCondition = isSubmitSuccessful || isSubmitting || !isValid;
   const formId = commonProps.formId;
+
   return (
     <Summary {...commonProps}>
       <Summary.Title />
@@ -84,7 +88,7 @@ function ShowSummary(commonProps: ComponentProps<typeof Summary>) {
           variant="outline"
           className="mx-auto mr-6"
           type="submit"
-          disabled={!isValid}
+          disabled={isDisabledCondition}
           form={formId}
         >
           {"Enregistrer"}

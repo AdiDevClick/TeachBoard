@@ -24,8 +24,13 @@ export function AppDialFooter({
   ...props
 }: AppDialFooterProps) {
   const isValid = formState?.isValid ?? true;
+  const isSubmitting = formState?.isSubmitting ?? false;
+  const isSubmitSuccessful = formState?.isSubmitSuccessful ?? false;
   const cancelTextValue = cancelText || "Annuler";
   const submitTextValue = submitText || "Créer";
+
+  const isDisabledCondition = isSubmitSuccessful || isSubmitting || !isValid;
+  console.log(isDisabledCondition);
 
   return (
     <DialogFooter {...props}>
@@ -39,7 +44,7 @@ export function AppDialFooter({
           variant="outline"
           className="justify-end mr-6"
           type="submit"
-          disabled={!isValid}
+          disabled={isDisabledCondition}
           form={formId}
         >
           {submitTextValue}

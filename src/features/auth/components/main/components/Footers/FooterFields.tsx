@@ -20,11 +20,16 @@ export function FooterFields({
   textToDisplay,
   pageId,
 }: Readonly<FooterFieldsProps>) {
-  const { isValid } = useFormState({ control: form.control });
+  const { isValid, isSubmitting, isSubmitSuccessful } = useFormState({
+    control: form.control,
+  });
+  const isDisabledCondition = isSubmitSuccessful || isSubmitting || !isValid;
+
   const { newItemCallback } = useAppForm({ form, pageId });
+
   return (
     <Field>
-      <Button type="submit" disabled={!isValid} form={formId}>
+      <Button type="submit" disabled={isDisabledCondition} form={formId}>
         {textToDisplay.buttonText}
       </Button>
       <AppFieldDescriptionWithLink

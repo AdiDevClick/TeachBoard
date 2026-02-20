@@ -162,12 +162,21 @@ export function useStepFourHandler({
           "Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations et réessayer.",
         );
       }
+
+      form.reset(undefined, {
+        keepValues: true,
+        keepErrors: true,
+        keepDirty: true,
+        keepTouched: true,
+        keepIsSubmitted: false,
+      });
     }
 
     if (response) {
       toast.success("Évaluation créée avec succès !", {
         id: toastId,
       });
+      form.reset();
     }
   }, [isLoading, error, response]);
 
