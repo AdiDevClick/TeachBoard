@@ -95,13 +95,42 @@ export function waitAndFail(
   duration: number,
   message: string,
   abortController?: AbortController,
-): Promise<never> {
-  return new Promise((_, reject) => {
-    setTimeout(() => {
-      const err = new Error(String(message));
-      reject(err);
-      abortController?.abort(err);
+) {
+  return new Promise((resolve, reject) => {
+    const errPayload = {
+      status: 408,
+      error: "Request Timeout",
+      message,
+      ok: false,
+    };
+
+    const timer = setTimeout(() => {
+      // If aborted before timeout fired, settle as resolved to avoid leaking a pending promise
+      if (abortController?.signal.aborted) {
+        resolve(undefined);
+        return;
+      }
+
+      reject(new Error(message, { cause: errPayload }));
     }, duration);
+
+    // If an AbortController is provided, clear the timeout and settle when aborted
+    if (abortController) {
+      const onAbort = () => {
+        clearTimeout(timer);
+        abortController.signal.removeEventListener("abort", onAbort);
+        resolve(undefined);
+      };
+
+      if (abortController.signal.aborted) {
+        clearTimeout(timer);
+        resolve(undefined);
+      } else {
+        abortController.signal.addEventListener("abort", onAbort, {
+          once: true,
+        });
+      }
+    }
   });
 }
 type PromiseStateResult<T> =
