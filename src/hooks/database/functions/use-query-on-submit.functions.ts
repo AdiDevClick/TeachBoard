@@ -209,13 +209,13 @@ export const mutationOptions = <
   return {
     mutationKey: queryKeysArr,
     mutationFn: (variables) => {
-      const { abortController, ...body } = variables ?? {};
+      const { abortController, ...body } = variables;
       const fetchArgs = {
-        bodyVariables: body,
+        bodyVariables: method === "GET" ? undefined : body,
         method,
         url,
         headers,
-        abortController,
+        abortController: abortController,
       };
       return onFetch<S, E>(fetchArgs);
     },
