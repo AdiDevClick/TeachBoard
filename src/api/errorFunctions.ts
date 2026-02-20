@@ -11,7 +11,7 @@ import { toast } from "sonner";
 export function getErrorMessage(
   status?: number,
   errorPayload?: Partial<ErrorInterface & ErrorMeta> | undefined,
-  retry?: number
+  retry?: number,
 ): string {
   const fallback =
     "HTTP Error! Please try again later or verify if you are connected to the internet.";
@@ -29,7 +29,7 @@ export function getErrorMessage(
       `A server error occurred. Retrying... (${retry} attempts left)`,
       {
         position: "top-right",
-      }
+      },
     );
   }
 
@@ -51,6 +51,8 @@ export function getErrorMessage(
         errorMessage ??
         "Ressource non trouvée. Veuillez vérifier l'URL ou contacter l'administrateur si le problème persiste."
       );
+    case 408:
+      return "La requête a pris trop de temps ou le serveur ne répond pas. Veuillez vérifier votre connexion internet ou réessayer plus tard.";
     case 500:
       return errorMessage ?? "Server error occurred during submission.";
     default:
