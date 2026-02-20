@@ -100,7 +100,6 @@ export function waitAndFail(
     const errPayload = {
       status: 408,
       error: "Request Timeout",
-      message,
       ok: false,
     };
 
@@ -110,7 +109,6 @@ export function waitAndFail(
         resolve(undefined);
         return;
       }
-
       reject(new Error(message, { cause: errPayload }));
     }, duration);
 
