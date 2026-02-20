@@ -183,22 +183,9 @@ async function onFetch<
 }: FetchArgs): Promise<FetchJSONSuccess<TSuccess>> {
   const { bodyVariables, method, url, abortController, headers } = fetchArgs;
 
-  const fetchPromise = fetchJSON<TSuccess, TError>(getUrl(url), {
-    method: method,
-    json: bodyVariables,
-    signal: abortController?.signal,
-    headers: headers,
-  });
-
-  const timeoutPromise = (
-    waitAndFail(6000, "Request timed out", abortController) as Promise<
-      FetchJSONError<TError>
-    >
-  ).catch((err) => {
-    throw err;
-  });
-
   try {
+    // This should never trigger on a first fetch except if called with an already aborted controller.
+    // It can happen on retries if the server is consistently slow or unresponsive.
     if (abortController?.signal.aborted) {
       const reason = abortController.signal.reason;
 
@@ -211,9 +198,25 @@ async function onFetch<
       });
     }
 
+    const fetchPromise = fetchJSON<TSuccess, TError>(getUrl(url), {
+      method: method,
+      json: bodyVariables,
+      signal: abortController?.signal,
+      headers: headers,
+    });
+
+    const timeoutPromise = (
+      waitAndFail(6000, "Request Timeout", abortController) as Promise<
+        FetchJSONError<TError>
+      >
+    ).catch((err) => {
+      // !! IMPORTANT !! return the cause so that race logic sees the status
+      return err.cause;
+    });
+
     const response = await Promise.race([fetchPromise, timeoutPromise]);
     // Cancel pending (either fetch or timeout) to avoid unnecessary work and potential memory leaks.
-    abortController?.abort("Race settled");
+    abortController?.abort("Request completed");
 
     if (!response || response?.ok !== true) {
       const status = response?.status ?? 0;
@@ -226,6 +229,8 @@ async function onFetch<
     return response;
   } catch (error) {
     const err = error as Error;
+    // The message will always prioritize the one from the error cause,
+    // Then the one from the error itself, and finally a generic fallback.
     const errorCause = {
       message: err.message,
       ...(err.cause as FetchJSONError<TError>),
