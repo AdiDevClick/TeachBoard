@@ -1,16 +1,10 @@
 import { FormWithDebug } from "@/components/Form/FormWithDebug";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
 import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/labelled-textarea";
-import { HTTP_METHODS } from "@/configs/app.config";
 import { LabelledAccordion } from "@/features/evaluations/create/components/Accordion/LabelledAccordion";
 import { AverageFields } from "@/features/evaluations/create/components/Score/AverageFields";
 import type { StepFourControllerProps } from "@/features/evaluations/create/steps/four/controller/types/step-four-controller.types";
 import { useStepFourHandler } from "@/features/evaluations/create/steps/four/hooks/useStepFourHandler";
-import {
-  stepFourInputSchema,
-  type StepFourFormSchema,
-} from "@/features/evaluations/create/steps/four/models/step-four.models";
-import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 
 /**
  * Step Four Controller.
