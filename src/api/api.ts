@@ -22,12 +22,11 @@ export async function fetchJSON<
   options: fetchJSONOptions = {},
 ): Promise<FetchJSONResult<TData, TErrorBody>> {
   const { json, signal, ...rest } = options;
-  const headers = {
-    Accept: "application/json",
-    ...rest.headers,
-  } as Record<string, string>;
+  const headers = new Headers(rest.headers);
+  headers.set("Accept", "application/json");
+
   if (options.img) {
-    headers["Content-Type"] = "multipart/form-data";
+    headers.set("Content-Type", "multipart/form-data");
   }
 
   if (json && !options.img) {
@@ -37,7 +36,7 @@ export async function fetchJSON<
       options.body = JSON.stringify(json);
     }
     delete options.json;
-    headers["Content-Type"] = "application/json; charset=UTF-8";
+    headers.set("Content-Type", "application/json; charset=UTF-8");
   }
 
   let newSignal = signal;
