@@ -3,6 +3,7 @@ import type { FetchingInputItem } from "@/types/AppInputControllerInterface";
 import z from "zod";
 
 const fieldData = {
+  classIdRequiredMessage: "L'identifiant de la classe est requis.",
   UUIDValidMessage: "L'identifiant doit être un UUID valide.",
   commentsInvalidCharsMessage:
     "Les commentaires contiennent des caractères invalides.",
@@ -53,7 +54,7 @@ const stepFourSchema = (data: typeof fieldData) =>
       }),
     classId: z
       .uuid(data.UUIDValidMessage)
-      .nonempty(data.userIdRequiredMessage)
+      .nonempty(data.classIdRequiredMessage)
       .meta({ description: "Identifier for the class being evaluated" }),
     evaluationDate: z
       .string()
