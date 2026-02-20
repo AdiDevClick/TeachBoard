@@ -18,15 +18,22 @@ import { useMutation, useQueryErrorResetBoundary } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
+const completedControllers = new WeakMap<AbortController, boolean>();
+
 /**
  * Options for the mutation hook.
  * @description Centralizing mutation functions
+ *
+ * @param queryKeysArr An array where the first element is the task identifier string and the second element is the query descriptor object. {@link QueryKeyDescriptor}
+ * @param getAbortController A function that returns the current AbortController instance.
+ * This allows the mutation function to always use the latest controller, enabling proper handling of successive submissions without interference from previous aborted controllers.
  */
 const mutationOptions = <
   S extends ResponseInterface<unknown>,
   E extends ApiError,
 >(
   queryKeysArr: QueryKeyDescriptor<S, E>,
+  getAbortController: () => AbortController,
 ): UseMutationOptions<
   FetchJSONSuccess<S>,
   FetchJSONError<E>,
@@ -42,7 +49,6 @@ const mutationOptions = <
     onError,
     reset,
     localState,
-    abortController,
   } = queryKeysArr[1];
 
   return {
@@ -52,7 +58,7 @@ const mutationOptions = <
         bodyVariables: variables,
         method,
         url,
-        abortController,
+        abortController: getAbortController(),
         headers,
       };
       return onFetch<S, E>(fetchArgs);
@@ -72,6 +78,8 @@ const mutationOptions = <
     },
   };
 };
+
+const defaultStateParameters = { success: null, error: null };
 
 /**
  * Handles form submission by triggering the query function.
@@ -106,7 +114,7 @@ export function useQueryOnSubmit<
   const [localState, setLocalState] = useState<{
     error: FetchJSONError<E> | null;
     success: FetchJSONSuccess<S> | null;
-  }>({ error: null, success: null });
+  }>(defaultStateParameters);
 
   queryKeysArr[1].abortController ??= abortControllerRef.current;
   queryKeysArr[1].reset = reset;
@@ -115,9 +123,11 @@ export function useQueryOnSubmit<
     setLocalState(next);
   };
 
-  // Memoize mutation options to prevent observer recreation on every render
+  // Memoize mutation options to prevent observer recreation on every render.  we
+  // supply a getter instead of the controller itself so that the mutation
+  // function can always grab the latest value (see discussion in GitHub issue).
   const options = useMemo(
-    () => mutationOptions<S, E>(queryKeysArr),
+    () => mutationOptions<S, E>(queryKeysArr, () => abortControllerRef.current),
     [queryKeysArr],
   );
 
@@ -133,8 +143,13 @@ export function useQueryOnSubmit<
     async (variables: MutationVariables = undefined) => {
       // !! IMPORTANT !! Reset local error
       try {
-        if (localState.error !== null)
-          setLocalState({ success: null, error: null });
+        if (localState.error !== null) setLocalState(defaultStateParameters);
+
+        // Abort the previous request if it's still pending to prevent
+        if (abortControllerRef.current.signal.aborted) {
+          abortControllerRef.current = new AbortController();
+          queryKeysArr[1].abortController = abortControllerRef.current;
+        }
 
         if (DEV_MODE && !NO_QUERY_LOGS) {
           console.debug("useQueryOnSubmit executing mutation", {
@@ -173,7 +188,7 @@ export function useQueryOnSubmit<
  * @param variables The variables to be sent in the request body.
  * @returns The mutation response object.
  */
-async function onFetch<
+export async function onFetch<
   TSuccess extends ResponseInterface<unknown>,
   TError extends ApiError,
 >({
@@ -181,13 +196,26 @@ async function onFetch<
   retry = 3,
   ...fetchArgs
 }: FetchArgs): Promise<FetchJSONSuccess<TSuccess>> {
-  const { bodyVariables, method, url, abortController, headers } = fetchArgs;
+  const { bodyVariables, method, url, headers, ...rest } = fetchArgs;
+  const completedRequest = "Request completed";
+  let abortController = rest.abortController;
+  const isAlreadyCompleted = abortController
+    ? completedControllers.get(abortController)
+    : false;
+
+  // !! IMPORTANT !! On recursives, it needs to be reset
+  if (isAlreadyCompleted) {
+    abortController = new AbortController();
+  }
+
+  const signal = abortController?.signal;
 
   try {
-    // This should never trigger on a first fetch except if called with an already aborted controller.
-    // It can happen on retries if the server is consistently slow or unresponsive.
-    if (abortController?.signal.aborted) {
-      const reason = abortController.signal.reason;
+    // This should never trigger on a first fetch except if called with an already
+    // aborted controller that was *not* marked as completed by us (i.e. the user
+    // cancelled before we began).  In that case we propagate a 499-style error.
+    if (signal?.aborted && !completedControllers.get(abortController!)) {
+      const reason = signal.reason;
 
       throw new Error("Request aborted", {
         cause: {
@@ -201,7 +229,7 @@ async function onFetch<
     const fetchPromise = fetchJSON<TSuccess, TError>(getUrl(url), {
       method: method,
       json: bodyVariables,
-      signal: abortController?.signal,
+      signal,
       headers: headers,
     });
 
@@ -216,7 +244,10 @@ async function onFetch<
 
     const response = await Promise.race([fetchPromise, timeoutPromise]);
     // Cancel pending (either fetch or timeout) to avoid unnecessary work and potential memory leaks.
-    abortController?.abort("Request completed");
+    if (abortController) {
+      completedControllers.set(abortController, true);
+      abortController.abort(completedRequest);
+    }
 
     if (!response || response?.ok !== true) {
       const status = response?.status ?? 0;
