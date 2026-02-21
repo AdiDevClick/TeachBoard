@@ -212,9 +212,9 @@ export function useMutationObserver({
       // ex objet :  { rightSide: '.content__right-side',leftNumber: '.left-side--number' }
       // Return an object with keys corresponding to the provided selectors and values being the found elements (or null if not found)
       return Object.entries(selectors).reduce(
-        (acc: Record<string, Element>, [key, selector]) => {
+        (acc: Record<string, HTMLElement>, [key, selector]) => {
           const found = parent.querySelector(selector);
-          if (found) acc[key] = found;
+          if (found) acc[key] = found as HTMLElement;
           return acc;
         },
         {},
@@ -243,12 +243,12 @@ export function useMutationObserver({
   const findNestedElementsByClass = useCallback(
     (parent: Element, selectors: { [key: string]: string }) => {
       return Object.entries(selectors).reduce(
-        (acc: Record<string, Element>, [key, selector]) => {
+        (acc: Record<string, HTMLElement>, [key, selector]) => {
           const pointReplacedSelector = selector.replaceAll(".", "").trim();
           const stripedSelector = '[class*="' + pointReplacedSelector + '"]';
           const foundElement = parent.querySelector(stripedSelector);
           if (foundElement) {
-            acc[key] = foundElement;
+            acc[key] = foundElement as HTMLElement;
           }
           return acc;
         },

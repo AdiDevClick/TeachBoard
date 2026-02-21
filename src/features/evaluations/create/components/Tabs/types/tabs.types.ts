@@ -16,7 +16,6 @@ type PageData = NonNullable<
 export type TabContentProps = Readonly<
   Pick<PageData, "name" | "leftSide"> & {
     index: number;
-    slideDirection: "left" | "right";
     onClick: (arg: CreateEvaluationArrowsClickHandlerProps) => void;
     clickProps: Omit<CreateEvaluationArrowsClickHandlerProps, "e" | "index">;
     leftContent: JSX.Element | null;

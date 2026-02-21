@@ -57,3 +57,24 @@
     transform: translateY(-4px);
   }
 }
+/* animations for the evaluation creation tabs - outgoing transitions */
+@keyframes outgoing-rightside {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(var(--outgoing-offset)); }
+}
+
+@keyframes out-left-number {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(var(--left-number-offset)); }
+}
+
+@keyframes out-left-desc {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(20px); }
+}
+
+@keyframes out-left-title {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateX(-2rem); }
+}
+

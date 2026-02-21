@@ -8,6 +8,7 @@
   &--container {
     --incoming-offset: 20rem;
     --outgoing-offset: -20rem;
+    --left-number-offset: -3rem;
     --gap-spacing: calc(var(--spacing) * 6);
 
     min-height: 100%;
@@ -18,6 +19,7 @@
   [data-slide-direction="left"] &--container {
     --incoming-offset: -20rem;
     --outgoing-offset: 20rem;
+    --left-number-offset: 10rem;
   }
 
   &--content {

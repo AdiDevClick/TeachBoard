@@ -42,7 +42,6 @@ export function CreateEvaluations() {
       tabValues,
     },
     leftContent,
-    slideDirection,
     tabValue,
   };
 

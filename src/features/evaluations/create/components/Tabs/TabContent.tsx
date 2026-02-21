@@ -46,7 +46,6 @@ export function TabContent(props: TabContentProps) {
     name: tabName,
     leftSide,
     onClick,
-    slideDirection,
     clickProps,
   } = props;
   const id = `tab-content-${index}`;
@@ -66,6 +65,11 @@ export function TabContent(props: TabContentProps) {
       index,
     });
 
+  const onFinish = () => {
+    setTabState((prev) => ({ ...prev, isAnimating: false }));
+    if (tabState.newTabValue) clickProps.setTabValue(tabState.newTabValue);
+  };
+
   /**
    * ANIMATION - Trigger
    *
@@ -78,26 +82,25 @@ export function TabContent(props: TabContentProps) {
 
     if (!currentPanel) {
       console.warn("Current panel not found for id:", id);
-      setTabState((prev) => ({ ...prev, isAnimating: false }));
+      onFinish();
       return;
     }
 
-    const elementsToAnimate = findNestedElementsByClass(currentPanel, {
-      rightSide: "content__right-side",
-      leftNumber: "--number",
-      leftDescription: "--description",
-      leftTitle: "--title",
-    });
+    const { rightSide, leftNumber, leftDescription, leftTitle } =
+      findNestedElementsByClass(currentPanel, {
+        rightSide: "content__right-side",
+        leftNumber: "--number",
+        leftDescription: "--description",
+        leftTitle: "--title",
+      });
 
-    playOutgoingRightSideAnimation(
-      currentPanel as HTMLElement,
-      slideDirection,
-      elementsToAnimate,
-      () => {
-        setTabState((prev) => ({ ...prev, isAnimating: false }));
-        if (tabState.newTabValue) clickProps.setTabValue(tabState.newTabValue);
-      },
-    );
+    // apply animations to the elements
+    // EvaluationPage.module.scss file is reading the slide direction from the data attribute of the parent component (left or right) and apply the propertes --outgoing-offset or --left-number-offset
+    rightSide.style.animation = "outgoing-rightside 500ms both";
+    leftNumber.style.animation = "out-left-number 500ms linear both";
+    leftDescription.style.animation = "out-left-desc 200ms both";
+    leftTitle.style.animation =
+      "out-left-title 400ms cubic-bezier(0.22,1,0.36,1) both";
   });
 
   /**
@@ -134,6 +137,11 @@ export function TabContent(props: TabContentProps) {
       value={tabName}
       data-animating={tabState.isAnimating}
       className={evaluationPageContainer}
+      onAnimationEnd={(e) => {
+        if (e.animationName === "out-left-title") {
+          onFinish();
+        }
+      }}
     >
       <View {...commonProps}>
         <View.Title className="header">
@@ -176,97 +184,3 @@ function LeftSide(props: LeftSideProps) {
 
 const View = withTitledCard(LeftSide);
 createComponentName("withTitledCard", "View", View);
-
-function playOutgoingRightSideAnimation(
-  panel: HTMLElement | null,
-  direction: "left" | "right",
-  elements: {
-    rightSide?: Element | null;
-    leftNumber?: Element | null;
-    leftDescription?: Element | null;
-    leftTitle?: Element | null;
-  } | null,
-  onDone: () => void,
-) {
-  if (!panel) {
-    onDone();
-    return;
-  }
-
-  const { rightSide, leftNumber, leftDescription, leftTitle } = elements ?? {};
-
-  if (!rightSide) {
-    onDone();
-    return;
-  }
-
-  const toX = direction === "right" ? "-20rem" : "20rem";
-  const leftNumberToX = direction === "left" ? "10rem" : "-3rem";
-
-  const finishOne = () => {
-    onDone();
-  };
-
-  rightSide.animate(
-    [
-      {
-        // inset: "0",
-        // position: "absolute",
-        opacity: 1,
-        transform: `translateX(0)`,
-      },
-      {
-        // position: "absolute",
-        opacity: 0,
-        transform: `translateX(${toX})`,
-        display: "none",
-      },
-    ],
-    {
-      duration: 200,
-      // easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-      fill: "both",
-    },
-  );
-
-  leftNumber?.animate(
-    [
-      { opacity: 1, transform: "translateX(0)" },
-      { opacity: 0, transform: `translateX(${leftNumberToX})` },
-    ],
-    {
-      duration: 500,
-      // easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-      fill: "both",
-    },
-  );
-
-  leftDescription?.animate(
-    [
-      { opacity: 1, transform: "translateY(0)" },
-      { opacity: 0, transform: "translateY(20px)" },
-    ],
-    {
-      duration: 200,
-      // easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-      fill: "both",
-    },
-  );
-
-  const titleAnimation = leftTitle?.animate(
-    [
-      { opacity: 1, transform: "translateY(0)" },
-      { opacity: 0, transform: "translateX(-2rem)" },
-    ],
-    {
-      duration: 400,
-      easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-      fill: "both",
-    },
-  );
-
-  if (titleAnimation) {
-    titleAnimation.onfinish = finishOne;
-    titleAnimation.oncancel = finishOne;
-  }
-}
