@@ -14,13 +14,16 @@ import type {
 /**
  * Types for the left content component props
  */
-export type LeftContentProps = {
-  item: {
-    number: number;
-    title: string;
-    description: string;
-  };
-} & PropsWithChildren;
+export type LeftContentProps = Readonly<
+  {
+    item: {
+      number: number;
+      title: string;
+      description: string;
+    };
+    isClicked: boolean;
+  } & PropsWithChildren
+>;
 
 /**
  * Types for the create evaluations arrow click handler props
