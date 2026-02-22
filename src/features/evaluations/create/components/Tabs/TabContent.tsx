@@ -133,7 +133,7 @@ export function TabContent({
   }, [tabState.isAnimating]);
 
   const commonProps = {
-    pageId: `step-${index}`,
+    pageId: `step-${index + 1}`,
     modalMode: false,
     leftSide,
     isClicked: moduleSelectionState.isClicked,
@@ -189,11 +189,13 @@ export function TabContent({
 }
 
 function LeftSide(props: LeftSideProps) {
-  const { leftSide, isClicked, isMobile } = props;
+  const { leftSide, isClicked, isMobile, pageId } = props;
   return (
     <>
       <LeftSidePageContent item={leftSide} isClicked={isClicked}>
-        <StepThreeSubskillsSelectionController isActive={isClicked} />
+        {pageId === "step-3" && (
+          <StepThreeSubskillsSelectionController isActive={isClicked} />
+        )}
       </LeftSidePageContent>
       <Separator
         className={contentSeparator}

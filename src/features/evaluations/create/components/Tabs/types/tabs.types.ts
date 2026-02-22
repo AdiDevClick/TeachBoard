@@ -28,6 +28,7 @@ export type TabContentProps = Readonly<
 export type LeftSideProps = Readonly<
   {
     leftSide: TabContentProps["leftSide"];
+    pageId: string;
     isMobile: boolean;
   } & Pick<ModulesSelectionType, "isClicked">
 >;
