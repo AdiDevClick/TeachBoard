@@ -78,6 +78,10 @@
         align-items: center;
         padding: 0;
 
+        &:has([data-state="expanded"], [data-state="collapsed"]) {
+          overflow: hidden;
+        }
+
         @media screen and (max-width: 768px) {
           grid-template-columns: 1fr;
           grid-template-rows: 1fr 0fr 1fr;
@@ -93,10 +97,6 @@
           gap: var(--gap-spacing);
           width: calc(100% - 20%);
 
-          & [data-state="expanded"],
-          & [data-state="collapsed"] {
-            overflow: hidden;
-          }
 
           &--number {
             grid-row: 1;
@@ -147,12 +147,14 @@
             grid-column: 1;
             max-block-size: 0;
             transition: max-block-size 500ms ease, opacity 200ms ease;
+            opacity: 0;
 
             &[data-state="expanded"] {
+              display: block;
               transition: max-block-size 1300ms ease;
               max-block-size: 500px;
+              opacity: 1;
             }
-
           }
 
           @starting-style {
@@ -183,7 +185,13 @@
           grid-column: 3;
           grid-row: 1;
           place-self: center;
-          min-width: 40%;
+          width: clamp(fit-content, auto, 850px);
+
+          &:has([data-slot="slider"]) {
+            width: min(420px, 100%);
+          }
+
+          // min-width: 420px;
 
           &.arrow-back {
             min-width: unset;
