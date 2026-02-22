@@ -166,7 +166,10 @@ export const controllerPropsInvalid = (props: AnyObjectProps) =>
 /**
  * Validation requirements for LeftSidePageContent.
  */
-const LEFT_SIDE_PAGE_CONTENT_REQUIRES = [{ item: ["title", "number"] }];
+const LEFT_SIDE_PAGE_CONTENT_REQUIRES = [
+  { item: ["title", "number"] },
+  "isClicked",
+];
 
 export const leftSidePageContentPropsInvalid = (props: LeftContentProps) =>
   checkPropsValidity(props, LEFT_SIDE_PAGE_CONTENT_REQUIRES, []);
@@ -374,9 +377,7 @@ export const stepThreeControllerPropsInvalid = (
   props: StepThreeControllerProps,
 ) => checkPropsValidity(props, STEP_THREE_CONTROLLER_REQUIRES, []);
 
-const STEP_THREE_SUBSKILLS_SELECTION_CONTROLLER_REQUIRES = [
-  ...BASE_CONTROLLERS_PROPS_REQUIRES,
-];
+const STEP_THREE_SUBSKILLS_SELECTION_CONTROLLER_REQUIRES = ["isActive"];
 export const stepThreeSubskillsSelectionControllerPropsInvalid = (
   props: StepThreeSubskillsSelectionControllerProps,
 ) =>
