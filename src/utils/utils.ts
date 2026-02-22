@@ -2,6 +2,7 @@ import type { DialogContextType } from "@/api/contexts/types/context.types.ts";
 import { debugLogs } from "@/configs/app-components.config.ts";
 import { LANGUAGE, type AppModalNames } from "@/configs/app.config";
 import type {
+  AnimationsOptions,
   AnyObjectProps,
   PreventDefaultAndStopPropagation,
   ProbeProxyResult,
@@ -545,3 +546,31 @@ export function createComponentName(
 ) {
   Component.displayName = `${hocName}(${outputName})`;
 }
+/**
+ * Defines the animation for the evaluation card
+ *
+ * @param isActive - Whether the animation is active, which determines the animation direction
+ * @returns An object containing the style for the evaluation card animation
+ */
+export const animation = (
+  isActive: boolean,
+  options: AnimationsOptions | null,
+) => {
+  const { incoming, outgoing } = options ?? {};
+  const {
+    name: incomingName = "incomingName",
+    duration: incomingDuration = "500",
+    delay: incomingDelay = "0",
+  } = incoming ?? {};
+  const {
+    name: outgoingName = "outgoingName",
+    duration: outgoingDuration = "500",
+    delay: outgoingDelay = "0",
+  } = outgoing ?? {};
+
+  const animation = isActive
+    ? `${incomingName} ${incomingDuration}ms both ${incomingDelay}ms`
+    : `${outgoingName} ${outgoingDuration}ms both ${outgoingDelay}ms`;
+
+  return { style: { animation } };
+};
