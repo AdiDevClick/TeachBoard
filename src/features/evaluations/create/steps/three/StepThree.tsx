@@ -1,25 +1,25 @@
 import { useAppStore } from "@/api/store/AppStore.ts";
 import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState.ts";
-import { DescriptionChange } from "@/features/evaluations/create/steps/three/components/step-three-functionnal-wrappers.functions";
 import {
   ShowModuleSelection,
   ShowStudentsEvaluation,
 } from "@/features/evaluations/create/steps/three/components/step-three-wrappers.functions.tsx";
-import {
-  STEP_THREE_MODULE_SELECTION_CARD_PROPS,
-  STEP_THREE_SUBSKILLS_SELECTION_CARD_PROPS,
-  STEP_THREE_SUBSKILLS_SELECTION_TITLE_PROPS,
-} from "@/features/evaluations/create/steps/three/config/step-three.configs.ts";
+import { STEP_THREE_MODULE_SELECTION_CARD_PROPS } from "@/features/evaluations/create/steps/three/config/step-three.configs.ts";
 import { attendanceRecordCreationBaseControllers } from "@/features/evaluations/create/steps/three/forms/step-two-inputs.ts";
+import {
+  card,
+  moduleCardAnimation,
+} from "@/features/evaluations/create/steps/three/functions/step-three.functions";
 import { useStepThree } from "@/features/evaluations/create/steps/three/hooks/useStepThree";
-import type { StepThreeSubskillsSelectionControllerProps } from "@/features/evaluations/create/steps/three/types/step-three.types.ts";
 import {
   attendanceRecordCreationSchemaInstance,
   type AttendanceRecordCreationFormSchema,
   type AttendanceRecordCreationInputItem,
 } from "@/features/evaluations/create/steps/two/models/attendance-record-creation.models";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
+import { animation, cn } from "@/utils/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Activity, type AnimationEvent } from "react";
 import { useForm, type FieldValues } from "react-hook-form";
 
 /**
@@ -53,6 +53,13 @@ export function StepThree({
     setShowStudentsEvaluation,
   } = useStepThreeState();
 
+  const isModuleClicked = moduleSelectionState.isClicked;
+
+  const { isModuleLoaded, setIsModuleLoaded } = useStepThree({
+    isModuleClicked,
+    setShowStudentsEvaluation,
+  });
+
   const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({
     resolver: zodResolver(attendanceRecordCreationSchemaInstance([])),
     mode: "onTouched",
@@ -61,29 +68,13 @@ export function StepThree({
     },
   });
 
-  const isModuleClicked = moduleSelectionState.isClicked;
-
-  const card = () => {
-    if (!isModuleClicked) {
-      return STEP_THREE_MODULE_SELECTION_CARD_PROPS;
-    }
-
-    return {
-      ...STEP_THREE_SUBSKILLS_SELECTION_CARD_PROPS,
-      title: {
-        ...STEP_THREE_SUBSKILLS_SELECTION_TITLE_PROPS,
-        description: DescriptionChange(selectedSubSkill ?? {}),
-      },
-    };
-  };
-
   const baseCardProps = {
     pageId,
     modalMode,
     className,
     formId: pageId + "-form",
     inputControllers,
-    card: card(),
+    card: card(selectedSubSkill, isModuleClicked),
     ...props,
     form,
   };
@@ -102,23 +93,40 @@ export function StepThree({
     tasks,
   } satisfies Parameters<typeof ShowStudentsEvaluation>[0];
 
-  const subskillsControllerProps = {
-    ...baseCardProps,
-    user,
-  } satisfies StepThreeSubskillsSelectionControllerProps;
-
-  useStepThree({
-    subskillsControllerProps,
-    isModuleClicked,
-    setShowStudentsEvaluation,
-  });
+  /**
+   * ANIMATION END HANDLER -
+   *
+   * @description Makes sure to set the module as loaded to trigger the display of the students evaluation
+   */
+  const handleAnimationEnd = (e: AnimationEvent<HTMLElement>) => {
+    if (e.animationName === "step-three-module-out") {
+      setIsModuleLoaded(true);
+    }
+  };
 
   return (
     <>
-      {!isModuleClicked && <ShowModuleSelection {...moduleSelectionProps} />}
-      {isModuleClicked && (
-        <ShowStudentsEvaluation {...studentsEvaluationProps} />
-      )}
+      <ShowModuleSelection
+        {...moduleSelectionProps}
+        id="step-three-module"
+        cardRender={{
+          className: cn(moduleSelectionProps.card.card.className, "loading"),
+          ...moduleCardAnimation(isModuleClicked, isModuleLoaded),
+          onAnimationEnd: handleAnimationEnd,
+        }}
+      />
+      <Activity mode={isModuleLoaded ? "visible" : "hidden"}>
+        <ShowStudentsEvaluation
+          {...studentsEvaluationProps}
+          id="step-three-evaluation"
+          cardRender={{
+            ...animation(isModuleClicked, {
+              incoming: { name: "step-three-evaluation-in" },
+              outgoing: { name: "step-three-evaluation-out" },
+            }),
+          }}
+        />
+      </Activity>
     </>
   );
 }

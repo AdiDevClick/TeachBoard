@@ -125,12 +125,11 @@ export function useTabContentHandler({
     onClickHandler({ e, ...clickProps, index, setOpen, open, setTabState });
   };
 
-  console.log("called the tabcontent handler");
-
   return {
     clickHandler,
     tabState,
     setTabState,
     isMobile,
+    moduleSelectionState,
   };
 }

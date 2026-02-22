@@ -27,12 +27,13 @@ export function StepThreeModuleSelectionController(
     handleSameModuleSelectionClickCallback,
     checkForCompletedModules,
     selectedModuleId,
+    moduleSelectionState,
   } = useStepThreeHandler(modules);
 
   /**
    * INIT - CHECKER
    *
-   * @description This is used to check for completed modules upon initial render.
+   * @description This is used to check for completed modules.
    */
   const initChecker = useEffectEvent(() => {
     checkForCompletedModules();
@@ -41,11 +42,13 @@ export function StepThreeModuleSelectionController(
   /**
    * INIT - CHECK FOR COMPLETED MODULES
    *
-   * @description Check for completed modules upon initial render.
+   * @description Check for completed modules upon module selection.
    */
   useEffect(() => {
-    initChecker();
-  }, []);
+    if (!moduleSelectionState.isClicked) {
+      initChecker();
+    }
+  }, [moduleSelectionState]);
 
   if (stepThreeModuleSelectionControllerPropsInvalid(props)) {
     debugLogs("StepThreeModuleSelectionController", props);

@@ -2,7 +2,6 @@ import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { EvaluationRadioItemProps } from "@/components/Radio/types/radio.types.ts";
 import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
 import type { UseStepThreeHandlerProps } from "@/features/evaluations/create/steps/three/types/step-three.types";
-import type { ClassModuleSubSkill } from "@/features/evaluations/create/store/types/steps-creation-store.types.ts";
 import { type MouseEvent } from "react";
 
 /**
@@ -22,6 +21,7 @@ export function useStepThreeHandler(
     selectedSubSkill,
     selectedSubSkillId,
     disableSubSkillsWithoutStudents,
+    moduleSelectionState,
   } = useStepThreeState();
 
   /**
@@ -64,10 +64,7 @@ export function useStepThreeHandler(
       return;
     }
 
-    const selectedSubSkill = findIndexById(value, modulesOrSubSkills) as {
-      index: number;
-      item: ClassModuleSubSkill;
-    } | null;
+    const selectedSubSkill = findIndexById(value, modulesOrSubSkills);
 
     if (!selectedSubSkill?.item) {
       return;
@@ -118,6 +115,7 @@ export function useStepThreeHandler(
     selectedModuleId,
     selectedSubSkillId,
     disableSubSkillsWithoutStudents,
+    moduleSelectionState,
   };
 }
 

@@ -8,7 +8,8 @@ import {
 import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
 import { useSubSkillsSelection } from "@/features/evaluations/create/steps/three/hooks/useSubSkillsSelection";
 import type { StepThreeSubskillsSelectionControllerProps } from "@/features/evaluations/create/steps/three/types/step-three.types.ts";
-import { Activity } from "react";
+import { animation } from "@/utils/utils";
+import { Activity, type ComponentProps } from "react";
 
 /**
  * Step Three Subskills Selection Controller.
@@ -21,20 +22,19 @@ export function StepThreeSubskillsSelectionController(
   props: StepThreeSubskillsSelectionControllerProps,
 ) {
   const subSkills = useStepThreeState().subSkills;
-
   const { handleSubSkillChangeCallback, selectedSubSkillId } =
     useSubSkillsSelection(subSkills);
+  const selectedId = selectedSubSkillId ?? subSkills[0]?.id ?? null;
 
   if (stepThreeSubskillsSelectionControllerPropsInvalid(props)) {
     debugLogs("StepThreeSubskillsSelectionController", props);
     return null;
   }
 
-  const { formId } = props;
-  const selectedId = selectedSubSkillId ?? subSkills[0]?.id;
+  const { isActive, dir = "ltr", defaultValue, ...rest } = props;
 
   return (
-    <form id={formId}>
+    <>
       <Activity mode={subSkills.length === 0 ? "visible" : "hidden"}>
         <Badge variant="outline" className="p-4">
           Aucune sous-compétence disponible pour ce module.
@@ -42,12 +42,22 @@ export function StepThreeSubskillsSelectionController(
       </Activity>
       <Activity mode={subSkills.length > 0 ? "visible" : "hidden"}>
         <RadioGroup
+          id={"step-three-subskills-selection"}
           value={selectedId}
           onValueChange={handleSubSkillChangeCallback}
+          dir={dir as ComponentProps<typeof RadioGroup>["dir"]}
+          {...animation(isActive, {
+            incoming: {
+              name: "step-three-evaluation-in",
+              delay: "200",
+            },
+            outgoing: { name: "step-three-evaluation-out" },
+          })}
+          {...rest}
         >
           <EvaluationRadioItemWithoutDescriptionList items={subSkills} />
         </RadioGroup>
       </Activity>
-    </form>
+    </>
   );
 }
