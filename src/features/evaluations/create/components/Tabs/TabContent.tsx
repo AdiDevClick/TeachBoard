@@ -108,7 +108,11 @@ export function TabContent({
     }
 
     // evaluation is shown, others won't be animated
-    if (rightSideStepThreeEvaluation && leftSubskillSelection) {
+    if (
+      isStepThreeEvaluation &&
+      rightSideStepThreeEvaluation &&
+      leftSubskillSelection
+    ) {
       rightSideStepThreeEvaluation.style.animation =
         "step-three-evaluation-out 500ms both";
       leftSubskillSelection.style.animation = "out-left-desc 200ms both 0.2s";
