@@ -35,7 +35,9 @@ export function StepThreeSubskillsSelectionController(
 
   return (
     <>
-      <Activity mode={subSkills.length === 0 ? "visible" : "hidden"}>
+      <Activity
+        mode={subSkills.length === 0 && isActive ? "visible" : "hidden"}
+      >
         <Badge variant="outline" className="p-4">
           Aucune sous-compétence disponible pour ce module.
         </Badge>
