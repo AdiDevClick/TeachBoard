@@ -71,5 +71,8 @@ export function useSubSkillsSelection(subSkills: UseStepThreeHandlerProps) {
     onModuleChangeAutoSelectFirstSubSkill();
   }, [selectedModuleId, selectedSubSkill?.isDisabled]);
 
-  return { selectedSubSkillId, handleSubSkillChangeCallback };
+  return {
+    selectedSubSkillId,
+    handleSubSkillChangeCallback,
+  };
 }
