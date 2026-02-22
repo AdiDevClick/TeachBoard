@@ -5,7 +5,7 @@ import { resolveNavigation } from "@/features/evaluations/create/functions/eval-
 import { useEvaluationNavigationHandler } from "@/features/evaluations/create/hooks/useEvaluationNavigationHandler";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types";
 import "@css/PageContent.scss";
-import { useState, type JSX } from "react";
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
 /**
@@ -17,7 +17,6 @@ export function CreateEvaluations() {
   const { pageDatas, tabItems, tabValue, tabValues, navigateToTab } =
     useEvaluationNavigationHandler();
 
-  const [leftContent, setLeftContent] = useState<JSX.Element | null>(null);
   const [slideDirection, setSlideDirection] = useState<"left" | "right">(
     "right",
   );
@@ -41,7 +40,6 @@ export function CreateEvaluations() {
       setTabValue: navigateToTab,
       tabValues,
     },
-    leftContent,
     tabValue,
   };
 
@@ -58,7 +56,7 @@ export function CreateEvaluations() {
         onValueChange={navigateToTab}
       />
       <TabContentList items={tabItems} {...tabContentPropsAndFunctions}>
-        <Outlet context={[leftContent, setLeftContent]} />
+        <Outlet />
       </TabContentList>
     </Tabs>
   );
