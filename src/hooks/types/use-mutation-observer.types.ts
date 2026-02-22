@@ -35,7 +35,7 @@ export type UseMutationObserverReturn = {
  * State data for each observed element
  */
 export type StateData = {
-  element: Element;
+  element: HTMLElement;
   meta?: MetaType;
   observer: MutationObserver;
 };

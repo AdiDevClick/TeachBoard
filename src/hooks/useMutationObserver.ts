@@ -228,7 +228,9 @@ export function useMutationObserver({
    *
    * @param parent - The parent element to search within
    * @param selectors - An object where keys are identifiers and values are class names (without the dot)
-   * @returns An object with the same keys as the input, where each value is the corresponding found element (or null if not found)
+   * @returns An object with the same keys as the input; each value is either a
+   * single matching element or an array when multiple elements satisfy the
+   * selector.
    *
    * @example
    * const selectors = {
@@ -243,12 +245,14 @@ export function useMutationObserver({
   const findNestedElementsByClass = useCallback(
     (parent: Element, selectors: { [key: string]: string }) => {
       return Object.entries(selectors).reduce(
-        (acc: Record<string, HTMLElement>, [key, selector]) => {
+        (acc: Record<string, HTMLElement | HTMLElement[]>, [key, selector]) => {
           const pointReplacedSelector = selector.replaceAll(".", "").trim();
           const stripedSelector = '[class*="' + pointReplacedSelector + '"]';
-          const foundElement = parent.querySelector(stripedSelector);
-          if (foundElement) {
-            acc[key] = foundElement as HTMLElement;
+          const nodes = parent.querySelectorAll<HTMLElement>(stripedSelector);
+          if (nodes.length === 1) {
+            acc[key] = nodes[0];
+          } else if (nodes.length > 1) {
+            acc[key] = Array.from(nodes);
           }
           return acc;
         },
@@ -276,6 +280,27 @@ export function useMutationObserver({
     return undefined;
   }, []);
 
+  /**
+   * Find all observed entries that match any of the provided metadata ids or names.
+   *
+   * @description Use this if you need to locate multiple observed elements based on their metadata.
+   */
+  const findAllByMeta = useCallback((idOrName: string[]) => {
+    return Array.from(observersRef.current.entries()).reduce(
+      (acc, [, entry]) => {
+        const meta = entry?.meta;
+        if (!meta) return acc;
+
+        if (idOrName.includes((meta.id ?? meta.name) as string)) {
+          acc.push(entry);
+        }
+
+        return acc;
+      },
+      [] as StateData[],
+    );
+  }, []);
+
   return {
     setRef,
     deleteRef,
@@ -284,6 +309,7 @@ export function useMutationObserver({
     observer: state.observer,
     findMetadata,
     findByMeta,
+    findAllByMeta,
     findNestedElement,
     findAllNestedElements,
     findNestedElementsByClass,
