@@ -25,7 +25,6 @@
  */
 .evaluation-page {
 
-
   &--container {
     --incoming-offset: 20rem;
     --outgoing-offset: -20rem;
@@ -48,13 +47,17 @@
     --outgoing-offset: 20rem;
   }
 
+  /* when a panel is actively transitioning out, clip the content of the active container */
+  &--container[data-active-transitioning="true"] .content {
+    overflow: hidden;
+  }
+
   &--content {
 
     &--container {
       display: grid;
       grid-template-columns: 0.05fr 1fr minmax(3rem, 0.05fr);
       justify-self: center;
-
       width: 97%;
       height: 100%;
       box-shadow: none;
@@ -68,8 +71,9 @@
       }
 
       .content {
+        // overflow-y: auto;
         overflow-x: hidden;
-        overflow-y: auto;
+        scrollbar-gutter: stable;
         position: relative;
         display: grid;
         grid-template-columns: 1.5fr 0fr 3fr;
@@ -78,7 +82,7 @@
         align-items: center;
         padding: 0;
 
-        &:has([data-state="expanded"], [data-state="collapsed"]) {
+        &:has([data-left-content="expanded"], [data-left-content="collapsed"]) {
           overflow: hidden;
         }
 
@@ -96,7 +100,6 @@
           place-self: center;
           gap: var(--gap-spacing);
           width: calc(100% - 20%);
-
 
           &--number {
             grid-row: 1;
@@ -123,6 +126,7 @@
           }
 
           &--description {
+
             display: none;
             grid-row: 3;
             grid-column: 1;
@@ -130,7 +134,7 @@
             font-size: var(--text-md);
             // transform: translateX(-2rem);
 
-            &[data-state="visible"] {
+            &[data-left="visible"] {
               display: unset;
               opacity: 1;
               transition-delay: 300ms;
@@ -149,12 +153,14 @@
             transition: max-block-size 500ms ease, opacity 200ms ease;
             opacity: 0;
 
-            &[data-state="expanded"] {
-              display: block;
+            &[data-left-content="expanded"] {
               transition: max-block-size 1300ms ease;
               max-block-size: 500px;
               opacity: 1;
             }
+
+            overflow: hidden;
+
           }
 
           @starting-style {
@@ -182,10 +188,12 @@
           transition: opacity 1s ease, var(--transform-transition);
           // position: sticky;
           // top: 0;
+
           grid-column: 3;
           grid-row: 1;
           place-self: center;
-          width: clamp(fit-content, auto, 850px);
+          width: clamp(300px, auto, 850px);
+          min-width: 300px;
 
           &:has([data-slot="slider"]) {
             width: min(420px, 100%);

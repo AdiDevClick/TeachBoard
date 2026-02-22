@@ -1,4 +1,5 @@
 import {
+  contentLeftSideContent,
   contentSeparator,
   evaluationPageContainer,
 } from "@/assets/css/EvaluationPage.module.scss";
@@ -6,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { TabsContent } from "@/components/ui/tabs";
 import { TAB_CONTENT_VIEW_CARD_PROPS } from "@/features/evaluations/create/components/Tabs/config/tab-content.configs";
-import { getAnimatedElements } from "@/features/evaluations/create/components/Tabs/functions/tabs.functions";
+import {
+  animateUnmoutedElements,
+  getAnimatedElements,
+} from "@/features/evaluations/create/components/Tabs/functions/tabs.functions";
 import type {
   LeftSideProps,
   TabContentProps,
@@ -18,7 +22,7 @@ import { LeftSidePageContent } from "@/pages/Evaluations/create/left-content/Lef
 import { createComponentName } from "@/utils/utils";
 import withTitledCard from "@components/HOCs/withTitledCard.tsx";
 import { IconArrowLeft, IconArrowRightDashed } from "@tabler/icons-react";
-import { useEffect, useEffectEvent } from "react";
+import { useEffect, useEffectEvent, type TransitionEvent } from "react";
 
 const BUTTON_LEFT_PROPS = {
   "data-name": "step-previous",
@@ -39,7 +43,16 @@ const BUTTON_RIGHT_PROPS = {
  * @param name - Name of the tab
  * @param leftSide - Data for the left side content
  * @param children - Right side content component
- * @param props - Additional props including onClick handler and clickProps
+ * @param onClick - Click handler for the navigation buttons
+ * @param clickProps - Additional properties for handling click events and navigation logic
+ * @param tabValue - Current active tab value in the router
+ *
+ * @description This component manages the content of each tab in the evaluation creation process, including the left side content, right side content, and the navigation logic with animations when switching between tabs.
+ *
+ * @remarks The tabs are NOT unmounted when not active, but they are hidden with CSS and animated on click. The state is managed to trigger the outgoing animations and then switch the content after the animation is finished.
+ *
+ * @remarks The tabValue is used for the step 4 - "Archiver" to trigger the specific animation when coming from step 3
+ *
  */
 export function TabContent({
   index,
@@ -48,8 +61,9 @@ export function TabContent({
   onClick,
   clickProps,
   children,
+  tabValue,
 }: TabContentProps) {
-  const id = `tab-content-${index}`;
+  const id = `tab-content-${index + 1}`;
 
   const { setRef, observedRefs, findAllNestedElements } = useMutationObserver({
     options: {
@@ -70,15 +84,20 @@ export function TabContent({
     index,
   });
 
+  /**
+   * ANIMATION - Finish handler
+   *
+   * @description Resets the state after the outgoing animation is finished and triggers the tab change by updating the tabValue in the parent component through clickProps.setTabValue.
+   */
   const onFinish = () => {
     setTabState((prev) => ({ ...prev, isAnimating: false }));
     if (tabState.newTabValue) clickProps.setTabValue(tabState.newTabValue);
   };
 
   /**
-   * ANIMATION - Trigger
+   * ANIMATION - Trigger outgoing animations
    *
-   * @description Targets elements and use Web Animations API to play the outgoing animations
+   * @description Targets elements by searching in the mutationObs and animate them @see animateUnmoutedElements
    */
   const animationTrigger = useEffectEvent(() => {
     if (!tabState.isAnimating) return;
@@ -91,40 +110,10 @@ export function TabContent({
       return;
     }
 
-    const {
-      rightSide,
-      leftNumber,
-      leftDescription,
-      leftTitle,
-      rightSideStepThreeEvaluation,
-      leftSubskillSelection,
-    } = getAnimatedElements(currentPanel, findAllNestedElements);
-
-    const isStepThreeEvaluation = moduleSelectionState.isClicked;
-
-    // normal right side animation (all tabs if no evaluation step is shown)
-    if (rightSide && !isStepThreeEvaluation) {
-      rightSide.style.animation = "outgoing-rightside 500ms both";
-    }
-
-    // evaluation is shown, others won't be animated
-    if (
-      isStepThreeEvaluation &&
-      rightSideStepThreeEvaluation &&
-      leftSubskillSelection
-    ) {
-      rightSideStepThreeEvaluation.style.animation =
-        "step-three-evaluation-out 500ms both";
-      leftSubskillSelection.style.animation = "out-left-desc 200ms both 0.2s";
-    }
-
-    if (!isStepThreeEvaluation) {
-      leftDescription.style.animation = "out-left-desc 200ms both";
-    }
-
-    leftNumber.style.animation = "out-left-number 500ms linear both";
-    leftTitle.style.animation =
-      "out-left-title 400ms cubic-bezier(0.22,1,0.36,1) both";
+    animateUnmoutedElements(
+      getAnimatedElements(currentPanel, findAllNestedElements),
+      moduleSelectionState.isClicked,
+    );
   });
 
   /**
@@ -150,6 +139,19 @@ export function TabContent({
     type: "button",
   } as const;
 
+  const handlerTransitionEnd = (e: TransitionEvent<HTMLDivElement>) => {
+    const target = e.currentTarget;
+    if (e.target !== target) return;
+
+    const dataset = target.dataset;
+
+    if (dataset.stepId === "Archiver" && e.propertyName === "transform") {
+      if (dataset.activeTransitioning === "true") {
+        dataset.activeTransitioning = "false";
+      }
+    }
+  };
+
   return (
     <TabsContent
       ref={(el) =>
@@ -158,9 +160,12 @@ export function TabContent({
         })
       }
       id={id}
+      data-step-id={tabName}
+      data-active-transitioning={tabValue === "Archiver"}
       value={tabName}
       data-animating={tabState.isAnimating}
       className={evaluationPageContainer}
+      onTransitionEnd={handlerTransitionEnd}
       onAnimationEnd={(e) => {
         if (e.animationName === "out-left-title") {
           onFinish();
@@ -198,7 +203,12 @@ function LeftSide(props: LeftSideProps) {
     <>
       <LeftSidePageContent item={leftSide} isClicked={isClicked}>
         {pageId === "step-3" && (
-          <StepThreeSubskillsSelectionController isActive={isClicked} />
+          <div
+            className={contentLeftSideContent}
+            data-left-content={isClicked ? "expanded" : "collapsed"}
+          >
+            <StepThreeSubskillsSelectionController isActive={isClicked} />
+          </div>
         )}
       </LeftSidePageContent>
       <Separator

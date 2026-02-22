@@ -2,7 +2,7 @@ import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
 import type { ModulesSelectionType } from "@/features/evaluations/create/store/types/steps-creation-store.types";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types.ts";
 import type { CreateEvaluationsLoaderData } from "@/routes/types/routes-config.types";
-import type { JSX, PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 
 type PageDataItem = keyof NonNullable<CreateEvaluationsLoaderData["pageDatas"]>;
 
@@ -18,7 +18,8 @@ export type TabContentProps = Readonly<
     index: number;
     onClick: (arg: CreateEvaluationArrowsClickHandlerProps) => void;
     clickProps: Omit<CreateEvaluationArrowsClickHandlerProps, "e" | "index">;
-    leftContent: JSX.Element | null;
+    /** Value validated by the parent using router location pathname */
+    tabValue: string;
   } & PropsWithChildren
 >;
 

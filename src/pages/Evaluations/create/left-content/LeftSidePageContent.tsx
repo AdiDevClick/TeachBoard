@@ -1,6 +1,5 @@
 import {
   contentLeftSide,
-  contentLeftSideContent,
   contentLeftSideDescription,
   contentLeftSideNumber,
   contentLeftSideTitle,
@@ -37,15 +36,10 @@ export function LeftSidePageContent(props: LeftContentProps) {
     <div className={contentLeftSide}>
       <CardTitle className={contentLeftSideNumber}>{number}.</CardTitle>
       <CardTitle className={contentLeftSideTitle}>{title}</CardTitle>
-      <div
-        className={contentLeftSideContent}
-        data-state={isClicked ? "expanded" : "collapsed"}
-      >
-        {props.children}
-      </div>
+      {props.children}
       <CardDescription
         className={contentLeftSideDescription}
-        data-state={isClicked ? "hidden" : "visible"}
+        data-left={isClicked ? "hidden" : "visible"}
       >
         {description}
       </CardDescription>
