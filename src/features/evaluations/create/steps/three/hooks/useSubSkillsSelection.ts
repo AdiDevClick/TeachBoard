@@ -34,11 +34,11 @@ export function useSubSkillsSelection(subSkills: UseStepThreeHandlerProps) {
   /**
    * INIT -
    *
-   * @description Only on mount
+   * @description When any module is selected
    */
   useEffect(() => {
     triggerInit();
-  }, []);
+  }, [selectedModuleId]);
 
   /**
    * AUTO-SELECT - FIRST SUB-SKILL
@@ -49,7 +49,6 @@ export function useSubSkillsSelection(subSkills: UseStepThreeHandlerProps) {
     if (!selectedModuleId || subSkills.length === 0) {
       return;
     }
-
     const firstActivableSubSkill = subSkills.find(
       (subSkill) => !subSkill.isDisabled,
     );
