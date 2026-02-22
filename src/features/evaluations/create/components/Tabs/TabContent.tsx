@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { TabsContent } from "@/components/ui/tabs";
 import { TAB_CONTENT_VIEW_CARD_PROPS } from "@/features/evaluations/create/components/Tabs/config/tab-content.configs";
+import { getAnimatedElements } from "@/features/evaluations/create/components/Tabs/functions/tabs.functions";
 import type {
   LeftSideProps,
   TabContentProps,
 } from "@/features/evaluations/create/components/Tabs/types/tabs.types";
 import { useTabContentHandler } from "@/features/evaluations/create/hooks/tab-handler/useTabContentHandler";
+import { StepThreeSubskillsSelectionController } from "@/features/evaluations/create/steps/three/controllers/StepThreeSubskillsSelectionController";
 import { useMutationObserver } from "@/hooks/useMutationObserver";
 import { LeftSidePageContent } from "@/pages/Evaluations/create/left-content/LeftSidePageContent";
 import { createComponentName } from "@/utils/utils";
@@ -39,31 +41,34 @@ const BUTTON_RIGHT_PROPS = {
  * @param children - Right side content component
  * @param props - Additional props including onClick handler and clickProps
  */
-export function TabContent(props: TabContentProps) {
-  const {
-    index,
-    leftContent,
-    name: tabName,
-    leftSide,
-    onClick,
-    clickProps,
-  } = props;
+export function TabContent({
+  index,
+  leftSide,
+  name: tabName,
+  onClick,
+  clickProps,
+  children,
+}: TabContentProps) {
   const id = `tab-content-${index}`;
 
-  const { setRef, observedRefs, findNestedElementsByClass } =
-    useMutationObserver({
-      options: {
-        attributes: true,
-      },
-    });
+  const { setRef, observedRefs, findAllNestedElements } = useMutationObserver({
+    options: {
+      attributes: true,
+    },
+  });
 
-  const { clickHandler, tabState, setTabState, isMobile } =
-    useTabContentHandler({
-      name: tabName,
-      clickProps,
-      onClick,
-      index,
-    });
+  const {
+    clickHandler,
+    tabState,
+    setTabState,
+    isMobile,
+    moduleSelectionState,
+  } = useTabContentHandler({
+    name: tabName,
+    clickProps,
+    onClick,
+    index,
+  });
 
   const onFinish = () => {
     setTabState((prev) => ({ ...prev, isAnimating: false }));
@@ -86,19 +91,34 @@ export function TabContent(props: TabContentProps) {
       return;
     }
 
-    const { rightSide, leftNumber, leftDescription, leftTitle } =
-      findNestedElementsByClass(currentPanel, {
-        rightSide: "content__right-side",
-        leftNumber: "--number",
-        leftDescription: "--description",
-        leftTitle: "--title",
-      });
+    const {
+      rightSide,
+      leftNumber,
+      leftDescription,
+      leftTitle,
+      rightSideStepThreeEvaluation,
+      leftSubskillSelection,
+    } = getAnimatedElements(currentPanel, findAllNestedElements);
 
-    // apply animations to the elements
-    // EvaluationPage.module.scss file is reading the slide direction from the data attribute of the parent component (left or right) and apply the propertes --outgoing-offset or --left-number-offset
-    rightSide.style.animation = "outgoing-rightside 500ms both";
+    const isStepThreeEvaluation = moduleSelectionState.isClicked;
+
+    // normal right side animation (all tabs if no evaluation step is shown)
+    if (rightSide && !isStepThreeEvaluation) {
+      rightSide.style.animation = "outgoing-rightside 500ms both";
+    }
+
+    // evaluation is shown, others won't be animated
+    if (rightSideStepThreeEvaluation && leftSubskillSelection) {
+      rightSideStepThreeEvaluation.style.animation =
+        "step-three-evaluation-out 500ms both";
+      leftSubskillSelection.style.animation = "out-left-desc 200ms both 0.2s";
+    }
+
+    if (!isStepThreeEvaluation) {
+      leftDescription.style.animation = "out-left-desc 200ms both";
+    }
+
     leftNumber.style.animation = "out-left-number 500ms linear both";
-    leftDescription.style.animation = "out-left-desc 200ms both";
     leftTitle.style.animation =
       "out-left-title 400ms cubic-bezier(0.22,1,0.36,1) both";
   });
@@ -116,8 +136,8 @@ export function TabContent(props: TabContentProps) {
     pageId: `step-${index}`,
     modalMode: false,
     leftSide,
+    isClicked: moduleSelectionState.isClicked,
     isMobile,
-    leftContent,
     card: TAB_CONTENT_VIEW_CARD_PROPS,
   };
 
@@ -151,9 +171,9 @@ export function TabContent(props: TabContentProps) {
             </Button>
           )}
         </View.Title>
-        <View.Content>{props.children}</View.Content>
+        <View.Content>{children}</View.Content>
         <View.Footer>
-          {index !== props.clickProps.arrayLength - 1 && (
+          {index !== clickProps.arrayLength - 1 && (
             <Button
               {...commonButtonProps}
               {...BUTTON_RIGHT_PROPS}
@@ -169,11 +189,12 @@ export function TabContent(props: TabContentProps) {
 }
 
 function LeftSide(props: LeftSideProps) {
-  const { leftSide, leftContent, isMobile } = props;
-
+  const { leftSide, isClicked, isMobile } = props;
   return (
     <>
-      <LeftSidePageContent item={leftSide}>{leftContent}</LeftSidePageContent>
+      <LeftSidePageContent item={leftSide} isClicked={isClicked}>
+        <StepThreeSubskillsSelectionController isActive={isClicked} />
+      </LeftSidePageContent>
       <Separator
         className={contentSeparator}
         orientation={isMobile ? "horizontal" : "vertical"}
@@ -182,5 +203,10 @@ function LeftSide(props: LeftSideProps) {
   );
 }
 
+/**
+ * The LeftSide component wrapped with a titled card layout.
+ *
+ * The children passed to the View will be rendered as the right side
+ */
 const View = withTitledCard(LeftSide);
 createComponentName("withTitledCard", "View", View);

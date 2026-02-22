@@ -25,11 +25,12 @@ export type TabContentProps = Readonly<
 /**
  * Types for LeftSide component props
  */
-export type LeftSideProps = Readonly<{
-  leftSide: TabContentProps["leftSide"];
-  leftContent: JSX.Element | null;
-  isMobile: boolean;
-}>;
+export type LeftSideProps = Readonly<
+  {
+    leftSide: TabContentProps["leftSide"];
+    isMobile: boolean;
+  } & Pick<ModulesSelectionType, "isClicked">
+>;
 
 /**
  * Types for the triggerButtonInteractivity function arguments
