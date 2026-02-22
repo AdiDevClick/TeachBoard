@@ -10,6 +10,22 @@ import type {
 } from "react";
 
 /**
+ * Types for general utilities and shared types across the application.
+ */
+export type AnimationsOptions = {
+  incoming: {
+    name: string;
+    duration?: string;
+    delay?: string;
+  };
+  outgoing: {
+    name: string;
+    duration?: string;
+    delay?: string;
+  };
+};
+
+/**
  * Union of common event types where we want to call preventDefault/stopPropagation safely.
  */
 export type PreventDefaultAndStopPropagation =
