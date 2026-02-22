@@ -1,5 +1,5 @@
 import type { ViewCardContextType } from "@/api/contexts/types/context.types.ts";
-import type { PropsWithChildren, Ref } from "react";
+import type { ComponentPropsWithoutRef, PropsWithChildren, Ref } from "react";
 
 type BaseCardProps = {
   /** Optional ID for the card component */
@@ -12,6 +12,8 @@ type BaseCardProps = {
   card?: ViewCardContextType;
   /** Whether the card is rendered in modal mode */
   modalMode: boolean;
+  /** Optional additional props for the Card component */
+  cardRender?: ComponentPropsWithoutRef<"div">;
 } & PropsWithChildren;
 
 export type WithTitledCardProps<C extends object> = BaseCardProps & C;
