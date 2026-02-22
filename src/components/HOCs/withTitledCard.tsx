@@ -73,6 +73,7 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
       modalMode = false,
       ref,
       card: viewCard,
+      cardRender,
       children,
       id,
       ...rest
@@ -89,7 +90,13 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
 
     return (
       <ViewCardProvider value={contextValue}>
-        <Card ref={ref} id={cardId} data-dialog={cardId} {...viewCard?.card}>
+        <Card
+          ref={ref}
+          id={cardId}
+          data-dialog={modalMode ? cardId : null}
+          {...viewCard?.card}
+          {...cardRender}
+        >
           {children}
         </Card>
       </ViewCardProvider>
