@@ -123,17 +123,21 @@
           }
 
           &--description {
+            display: none;
             grid-row: 3;
             grid-column: 1;
             transition: opacity var(--hover-opacity-transition) 100ms, var(--transform-transition);
             font-size: var(--text-md);
-            opacity: 0;
             // transform: translateX(-2rem);
 
             &[data-state="visible"] {
+              display: unset;
               opacity: 1;
               transition-delay: 300ms;
-              // transform: translateX(0);
+
+              @starting-style {
+                opacity: 0;
+              }
             }
           }
 
