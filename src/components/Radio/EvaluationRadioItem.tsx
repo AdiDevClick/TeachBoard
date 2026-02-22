@@ -23,7 +23,7 @@ import {
   evaluationRadioItemPropsInvalid,
 } from "@/configs/app-components.config.ts";
 import sanitizeDOMProps from "@/utils/props.ts";
-import { cn } from "@/utils/utils.ts";
+import { cn, createComponentName } from "@/utils/utils.ts";
 import { Activity, type ComponentType, type MouseEvent } from "react";
 
 /**
@@ -117,6 +117,11 @@ function withEvaluationRadioItem<T extends object>(
 export const EvaluationRadioItemWithDescription = withEvaluationRadioItem(
   EvaluationRadioItemDescription,
 );
+createComponentName(
+  "withEvaluationRadioItem",
+  "EvaluationRadioItemWithDescription",
+  EvaluationRadioItemWithDescription,
+);
 
 /**
  * List of EvaluationRadioItem components with description.
@@ -124,10 +129,20 @@ export const EvaluationRadioItemWithDescription = withEvaluationRadioItem(
 export const EvaluationRadioItemList = withListMapper(
   EvaluationRadioItemWithDescription,
 );
+createComponentName(
+  "withListMapper",
+  "EvaluationRadioItemList",
+  EvaluationRadioItemList,
+);
 
 /**
  * List of EvaluationRadioItem components without description.
  */
 export const EvaluationRadioItemWithoutDescriptionList = withListMapper(
   withEvaluationRadioItem(() => null),
+);
+createComponentName(
+  "withListMapper",
+  "EvaluationRadioItemWithoutDescriptionList",
+  EvaluationRadioItemWithoutDescriptionList,
 );
