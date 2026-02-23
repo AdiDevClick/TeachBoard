@@ -196,6 +196,13 @@ const extraInputControllers: ControllerLike[] = [
     name: "taskTemplatesAll",
     apiEndpoint: API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.ALL,
   },
+  {
+    // helper stub for the class-name availability endpoint; tests normally
+    // don’t use it, but having it here makes it easy to create a fetch stub
+    // when a spec needs to simulate the check.
+    name: "classNameAvailability",
+    apiEndpoint: API_ENDPOINTS.GET.CLASSES.endPoints.CHECK_NAME,
+  },
 ];
 
 const controllersConfig: Array<ControllersConfig<ControllerLike>> = [
