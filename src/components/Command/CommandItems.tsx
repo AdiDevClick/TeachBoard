@@ -5,7 +5,6 @@ import type {
 } from "@/components/Command/types/command.types.ts";
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import {
-  Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
@@ -18,8 +17,6 @@ import {
   debugLogs,
 } from "@/configs/app-components.config.ts";
 import { usePopoverFieldContextSafe } from "@/hooks/contexts/usePopover.ts";
-import { CommandDialog } from "cmdk";
-import { useCallback, type ComponentProps, type ComponentType } from "react";
 
 /**
  * A command items component that displays headings and their corresponding values.
@@ -37,13 +34,10 @@ export function CommandItems(props: Readonly<CommandsProps>) {
   const selectedValue = context?.selectedValue || new Set<string>();
   const contextOnSelect = context?.onSelect;
 
-  const handleSelect = useCallback(
-    (value: string, commandItem: CommandItemType) => {
-      contextOnSelect?.(value, commandItem);
-      externalOnSelect?.(value, commandItem);
-    },
-    [],
-  );
+  const handleSelect = (value: string, commandItem: CommandItemType) => {
+    contextOnSelect?.(value, commandItem);
+    externalOnSelect?.(value, commandItem);
+  };
 
   return (
     <>
@@ -90,28 +84,3 @@ export function CommandItems(props: Readonly<CommandsProps>) {
     </>
   );
 }
-
-function withDialog(WrappedComponent: ComponentType) {
-  return function DialogComponent(
-    props: ComponentProps<typeof WrappedComponent>,
-  ) {
-    return (
-      <CommandDialog>
-        <WrappedComponent {...props} />
-      </CommandDialog>
-    );
-  };
-}
-
-function withComboBox(WrappedComponent: ComponentType) {
-  return function ComboBoxComponent(props: CommandsProps) {
-    return (
-      <Command filter={props.filter}>
-        <WrappedComponent {...props} />
-      </Command>
-    );
-  };
-}
-
-export const CommandItemsForDialog = withDialog(CommandItems);
-export const CommandItemsForComboBox = withComboBox(CommandItems);
