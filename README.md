@@ -968,6 +968,9 @@ function ClassCreationView(props) {
 
 #### withController — Intégration `react-hook-form`
 - **But :** simplifier l'intégration d'un composant contrôlé par `react-hook-form`.
+- **Événement important :** l'HOC expose un prop `onValueChange` sur le composant résultant. Il est appelé
+  chaque fois que la valeur interne change (avant/après validation) et peut être utilisé pour
+  effectuer un debounce ou des contrôles en "live".
 - **Vue (exemple d'utilisation dans une form) :**
 ```tsx
 import withController from '@/components/HOCs/withController.tsx';
@@ -976,7 +979,14 @@ import Input from '@/components/Inputs/Input.tsx';
 const InputWithController = withController(Input);
 
 function MyForm({ form }) {
-  return <InputWithController form={form} name="age" label="Âge" />;
+  return (
+    <InputWithController
+      form={form}
+      name="age"
+      label="Âge"
+      onValueChange={(v) => console.log('nouvelle valeur', v)}
+    />
+  );
 }
 ```
 - **Patterns :**
