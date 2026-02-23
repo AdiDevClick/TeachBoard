@@ -10,6 +10,11 @@ export const classCreationInputControllers = [
     title: "Nom",
     type: "text",
     placeholder: "Unique nom (ex: 1A, 2B, ...)",
+    apiEndpoint: API_ENDPOINTS.GET.CLASSES.endPoints.CHECK_NAME,
+    // onValueChange can be provided here if you want to run a handler while
+    // the user is typing.  the callback will be executed after the value has
+    // been pushed to the form control (see AppInputControllerInterface docs).
+    // onValueChange: (value) => { console.log("name changed", value); },
   },
   {
     name: "description",

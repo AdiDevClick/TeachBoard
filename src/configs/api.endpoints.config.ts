@@ -62,7 +62,8 @@ export const API_ENDPOINTS = Object.freeze({
     CLASSES: {
       endPoints: {
         ALL: `${CLASSES}/`,
-        BY_ID: (id: number | string) => `${BASE_API_URL}/classes/${id}`,
+        BY_ID: (id: number | string) => `${CLASSES}/${id}`,
+        CHECK_NAME: (className: string) => `${CLASSES}/check-name/${className}`,
       },
       dataReshape: (data: ClassesFetch) =>
         // use "code" and transform to "value" for selects

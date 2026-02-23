@@ -1,7 +1,4 @@
-import type {
-  CommandItemType,
-  DetailedCommandItem,
-} from "@/components/Command/types/command.types.ts";
+import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { AvatarsWithLabelAndAddButtonList } from "@/components/Form/exports/form.exports";
 import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
 import {
@@ -112,7 +109,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     }) ?? [];
 
   const cachedKeysRef = useRef<Record<string, unknown[]>>({});
-  const selectedDiplomaRef = useRef<CommandItemType | null>(null);
+  const selectedDiplomaRef = useRef<CommandItemType>(null);
 
   const resetDialogCache = useEffectEvent(() => {
     const isModalOpen = openedDialogs.includes(pageId);
@@ -205,7 +202,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     commandItemDetails: CommandItemType,
   ) => {
     const options = {
-      mainFormField: "tasks",
+      mainFormField: "tasks" as const,
       detailedCommandItem: commandItemDetails,
     };
 
@@ -302,9 +299,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     const tasks = new Set(form.getValues("tasks") || []);
     tasks.delete(taskValue);
 
-    const currentTasksValues =
-      (form.getValues("tasksValues") as Array<[string, DetailedCommandItem]>) ||
-      [];
+    const currentTasksValues = form.getValues("tasksValues") || [];
     const nextTasksValues = currentTasksValues.filter(
       ([key]) => key !== taskValue,
     );
@@ -359,6 +354,9 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
         form={form}
         items={controllers.controlledInputsControllers}
         setRef={setRef}
+        onValueChange={(value, meta) => {
+          console.log(value, meta);
+        }}
       />
       <PopoverFieldWithControllerAndCommandsList
         items={controllers.popoverControllers}
