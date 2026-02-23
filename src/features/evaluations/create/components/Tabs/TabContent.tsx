@@ -139,10 +139,13 @@ export function TabContent({
     type: "button",
   } as const;
 
+  /**
+   * Removing the activeTransitioning for the step "Archiver"
+   *
+   * @description An overflow hidden was necessary for the step "Archiver" where the scrollbar appears during the transition.
+   */
   const handlerTransitionEnd = (e: TransitionEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
-    if (e.target !== target) return;
-
     const dataset = target.dataset;
 
     if (dataset.stepId === "Archiver" && e.propertyName === "transform") {
@@ -161,7 +164,9 @@ export function TabContent({
       }
       id={id}
       data-step-id={tabName}
-      data-active-transitioning={tabValue === "Archiver"}
+      data-active-transitioning={
+        tabValue === "Archiver" && tabName === "Archiver"
+      }
       value={tabName}
       data-animating={tabState.isAnimating}
       className={evaluationPageContainer}
