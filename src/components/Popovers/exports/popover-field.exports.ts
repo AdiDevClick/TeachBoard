@@ -10,7 +10,7 @@ import PopoverField from "@/components/Popovers/PopoverField";
  */
 
 /**
- * A version that allows it to be used in forms with controller support.
+ * An enriched version that allows it to be used in forms with controller support. It includes the memoizedMetadata (endpoints,field names etc..) enrichment
  */
 const PopoverFieldForController = forController(PopoverField);
 
