@@ -1,11 +1,11 @@
 import { UUID_SCHEMA } from "@/api/types/openapi/common.types";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
+import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas.tsx";
 import { useTabContentHandler } from "@/features/evaluations/create/hooks/tab-handler/useTabContentHandler";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
-import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas.tsx";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 
 // helpers that query the currently visible tab content rather than relying
 // on hard‑coded indices. the `data-name` attributes are guaranteed by
@@ -14,6 +14,11 @@ import { describe, expect, test } from "vitest";
 function getNextButton() {
   return document.querySelector<HTMLButtonElement>(
     'button[data-name="next-step"]',
+  );
+}
+function getPrevButton() {
+  return document.querySelector<HTMLButtonElement>(
+    'button[data-name="previous-step"]',
   );
 }
 
@@ -25,10 +30,10 @@ function getNextButton() {
  */
 // navigation helper removed – tests now use a dedicated component
 
-// helper component that exposes Next button state via the real hook
-function TestNextButton() {
+// helper component that exposes Next/Previous button state via the real hook
+function TestNextButton({ name, index }: { name: string; index: number }) {
   const { tabState } = useTabContentHandler({
-    name: "Elèves",
+    name,
     onClick: () => {},
     clickProps: {
       arrayLength: Object.keys(EvaluationPageTabsDatas).length,
@@ -37,15 +42,22 @@ function TestNextButton() {
       setTabState: () => {},
       tabValues: Object.values(EvaluationPageTabsDatas).map((d) => d.name),
     },
-    index: 1,
+    index,
   });
 
   return (
-    <button
-      aria-label="Next step"
-      data-name="next-step"
-      disabled={tabState.isNextDisabled}
-    />
+    <>
+      <button
+        aria-label="Previous step"
+        data-name="previous-step"
+        disabled={index === 0}
+      />
+      <button
+        aria-label="Next step"
+        data-name="next-step"
+        disabled={tabState.isNextDisabled}
+      />
+    </>
   );
 }
 
@@ -96,7 +108,7 @@ setupUiTestState(
   () => {
     return (
       <AppTestWrapper>
-        <TestNextButton />
+        <TestNextButton name="Elèves" index={1} />
       </AppTestWrapper>
     );
   },
@@ -221,5 +233,88 @@ describe("UI: button 'Suivant' step Elèves", () => {
       .toBeGreaterThan(0);
 
     await expect.poll(() => getNextButton()?.disabled ?? true).toBe(false);
+  });
+});
+
+// additional coverage for other steps
+
+// we need to ensure a valid class is selected before each of these
+// standalone renders. the earlier `setupUiTestState` call only affects
+// the first describe block, so we replicate the essential state here.
+
+describe("UI: next/prev states on other steps", () => {
+  beforeEach(async () => {
+    // ensure previous renders are unmounted; without this the leftover
+    // buttons polluted the DOM and `getPrevButton()` would return the wrong
+    // element, causing every assertion below to flip.
+    await cleanup();
+
+    const store = useEvaluationStepsCreationStore.getState();
+    store.clear(resetClassId);
+    store.setSelectedClass(selectedClass);
+    // mark at least one student present with an assigned task so that the
+    // evaluation step has an "attended module"; this guarantees the initial
+    // next button is disabled before the module-selection click.
+    store.setStudentPresence(studentId, true);
+    store.setStudentTaskAssignment(taskId, studentId);
+  });
+
+  test("step 1: next enabled, prev disabled", async () => {
+    // mount button component on step1
+    await render(
+      <AppTestWrapper>
+        <TestNextButton name="Classe" index={0} />
+      </AppTestWrapper>,
+    );
+
+    await expect.poll(() => getNextButton() != null).toBe(true);
+    expect(getPrevButton()).not.toBeNull();
+
+    // selectedClass is now present, so Next should be enabled
+    await expect.poll(() => getNextButton()?.disabled ?? true).toBe(false);
+    // no previous step exists
+    await expect.poll(() => getPrevButton()?.disabled ?? false).toBe(true);
+  });
+
+  test("step 3: previous enabled, next toggles with moduleSelection", async () => {
+    await render(
+      <AppTestWrapper>
+        <TestNextButton name="Evaluation" index={2} />
+      </AppTestWrapper>,
+    );
+
+    await expect.poll(() => getNextButton() != null).toBe(true);
+    expect(getPrevButton()).not.toBeNull();
+
+    // before clicking modules, next should be disabled (due to attended
+    // module present but not yet clicked)
+    await expect.poll(() => getNextButton()?.disabled ?? false).toBe(true);
+    await expect.poll(() => getPrevButton()?.disabled ?? false).toBe(false);
+
+    // simulate module click state – use the full setter to guarantee the
+    // moduleSelection object reference changes (see store fix)
+    useEvaluationStepsCreationStore
+      .getState()
+      .setModuleSelection({
+        isClicked: true,
+        selectedModuleIndex: 0,
+        selectedModuleId: moduleId,
+      });
+
+    await expect.poll(() => getNextButton()?.disabled ?? true).toBe(false);
+  });
+
+  test("step 4: previous enabled, next always disabled", async () => {
+    await render(
+      <AppTestWrapper>
+        <TestNextButton name="Archiver" index={3} />
+      </AppTestWrapper>,
+    );
+
+    await expect.poll(() => getNextButton() != null).toBe(true);
+    expect(getPrevButton()).not.toBeNull();
+
+    await expect.poll(() => getNextButton()?.disabled ?? false).toBe(true);
+    await expect.poll(() => getPrevButton()?.disabled ?? false).toBe(false);
   });
 });
