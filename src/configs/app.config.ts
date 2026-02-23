@@ -70,6 +70,7 @@ export type AppModalNames =
   | "pw-recovery"
   | "pw-recovery-email-sent"
   | "class-creation"
+  | "class-name-availability"
   | "create-diploma"
   | "new-degree-item-field"
   | "new-degree-item-year"
