@@ -1,10 +1,14 @@
 import { CommandItemsForComboBox } from "@/components/Command/CommandItems.tsx";
 import type { CommandsProps } from "@/components/Command/types/command.types.ts";
-import type { PopoverFieldProps } from "@/components/Popovers/types/popover.types.ts";
+import type {
+  MetaDatasPopoverField,
+  PopoverFieldProps,
+} from "@/components/Popovers/types/popover.types.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
+import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types.ts";
 import { PlusIcon } from "lucide-react";
-import type { ComponentType } from "react";
+import { createElement, type ComponentType } from "react";
 
 /**
  * HOC to add CommandItems and an optional "Add New" button to a component.
@@ -21,19 +25,39 @@ function withComboBoxCommands<P extends PopoverFieldProps>(
       creationButtonText,
       useButtonAddNew,
       onAddNewItem,
+      controllerFieldMeta,
       ...rest
     } = props;
 
-    const { apiEndpoint, dataReshapeFn, task } = props;
+    const resolvedMeta: CommandHandlerFieldMeta = {
+      task: controllerFieldMeta?.task ?? props.task,
+      apiEndpoint: controllerFieldMeta?.apiEndpoint ?? props.apiEndpoint,
+      dataReshapeFn: controllerFieldMeta?.dataReshapeFn ?? props.dataReshapeFn,
+      name: controllerFieldMeta?.name,
+      id: controllerFieldMeta?.id,
+    };
 
-    return (
-      <Wrapped {...(rest as P)}>
+    const wrappedOnOpenChange = (
+      isOpen: boolean,
+      meta?: MetaDatasPopoverField,
+    ) => {
+      props.onOpenChange?.(isOpen, meta ?? resolvedMeta);
+    };
+
+    return createElement(
+      Wrapped,
+      {
+        ...rest,
+        controllerFieldMeta,
+        onOpenChange: wrappedOnOpenChange,
+      } as P,
+      <>
         {children}
         {useCommands && (
           <CommandItemsForComboBox {...(rest as CommandsProps)} />
         )}
 
-        {useButtonAddNew && task && (
+        {useButtonAddNew && resolvedMeta.task && (
           <>
             <Separator />
             <Button
@@ -42,9 +66,9 @@ function withComboBoxCommands<P extends PopoverFieldProps>(
               onClick={(e) =>
                 onAddNewItem?.({
                   e,
-                  apiEndpoint: apiEndpoint!,
-                  task,
-                  dataReshapeFn,
+                  apiEndpoint: resolvedMeta.apiEndpoint,
+                  task: resolvedMeta.task,
+                  dataReshapeFn: resolvedMeta.dataReshapeFn,
                 })
               }
             >
@@ -53,7 +77,7 @@ function withComboBoxCommands<P extends PopoverFieldProps>(
             </Button>
           </>
         )}
-      </Wrapped>
+      </>,
     );
   };
 }

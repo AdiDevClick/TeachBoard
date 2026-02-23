@@ -6,7 +6,6 @@ import {
   labelledInputContainsInvalid,
 } from "@/configs/app-components.config.ts";
 import sanitizeDOMProps from "@/utils/props.ts";
-import type { InputHTMLAttributes } from "react";
 
 /**
  * A labelled input component integrated with react-hook-form Controller.
@@ -21,11 +20,7 @@ export function LabelledInput(props: LabelledInputProps) {
   }
 
   const { name, title, ...rest } = props;
-  const safeProps = sanitizeDOMProps(rest, ["form"]) as Omit<
-    InputHTMLAttributes<HTMLInputElement>,
-    "form"
-  >;
-
+  const safeProps = sanitizeDOMProps(rest, ["form"]);
   const labelName = name ?? "input-is-not-named";
 
   return (

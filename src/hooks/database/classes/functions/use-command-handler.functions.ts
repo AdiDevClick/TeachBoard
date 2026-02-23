@@ -13,7 +13,7 @@ import type {
  * Set form values after animation completes
  *
  * @param mainFormField - The main form field to set
- * @param secondaryFormField - The secondary form field to set
+ * @param secondaryFormField - The secondary form field to set (will be set as an array of values from the UniqueSet of retrievedFormField)
  * @param retrievedFormField - The retrieved form field values
  * @param values - The values to set
  * @param form - The react-hook-form instance managing the form state

@@ -34,7 +34,6 @@ function withController<C extends ComponentType<any>>(Wrapped: C) {
       debugLogs("withController");
       return null;
     }
-
     const {
       name,
       form,

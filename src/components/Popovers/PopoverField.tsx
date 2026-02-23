@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/popover.tsx";
 import { cn } from "@/utils/utils.ts";
 import { LucideChevronDown } from "lucide-react";
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useState, type Ref } from "react";
 
 const defaultValue = new Set<string>();
 
@@ -42,7 +42,6 @@ export function PopoverField({
   ...props
 }: PopoverFieldProps) {
   const { onOpenChange, children, role, multiSelection, ...rest } = props;
-
   const id = useId();
 
   const [state, setState] = useState<PopoverFieldState>({
@@ -53,9 +52,6 @@ export function PopoverField({
       : (rest.defaultValue ?? undefined),
   });
 
-  /**
-   * Reset selected value when resetKey changes
-   */
   useEffect(() => {
     function resetSelectedValue() {
       setState((prev) => ({
@@ -68,28 +64,6 @@ export function PopoverField({
       resetSelectedValue();
     }
   }, [resetKey, multiSelection]);
-
-  /**
-   * Memoize meta data to avoid unnecessary re-renders of PopoverFieldProvider and its consumers when unrelated props change.
-   *
-   * @description This is used to enrich the each selection.
-   */
-  const memoizedMeta = useMemo(
-    () => ({
-      task: rest?.task ?? "none",
-      apiEndpoint: rest?.apiEndpoint,
-      dataReshapeFn: rest?.dataReshapeFn,
-      name: state.fieldName,
-      id: containerId,
-    }),
-    [
-      rest?.task,
-      rest?.apiEndpoint,
-      rest?.dataReshapeFn,
-      state.fieldName,
-      containerId,
-    ],
-  );
 
   /**
    * Callback to handle selection of a value
@@ -122,7 +96,7 @@ export function PopoverField({
    */
   const handleOpenChange = (isOpen: boolean) => {
     setState((prev) => ({ ...prev, open: isOpen }));
-    onOpenChange?.(isOpen, memoizedMeta);
+    onOpenChange?.(isOpen);
   };
 
   const selectValue = props.multiSelection
@@ -132,7 +106,7 @@ export function PopoverField({
   return (
     <div
       id={containerId}
-      ref={(el) => setRef?.(el, memoizedMeta)}
+      ref={(setRef ?? props.ref) as Ref<HTMLDivElement>}
       className={cn("flex flex-col items-start gap-2", className)}
     >
       {label && (

@@ -1,7 +1,7 @@
 import { forController } from "@/components/HOCs/forController";
 import withController from "@/components/HOCs/withController";
 import withListMapper from "@/components/HOCs/withListMapper";
-import { LabelledInput } from "@/components/Inputs/LaballedInputForController";
+import { LabelledInput } from "@/components/Inputs/LaballedInput";
 import { createComponentName } from "@/utils/utils";
 
 /**
