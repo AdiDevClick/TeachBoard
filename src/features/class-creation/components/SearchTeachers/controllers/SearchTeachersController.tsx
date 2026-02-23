@@ -1,4 +1,4 @@
-import { CommandItemsForComboBox } from "@/components/Command/CommandItems.tsx";
+import { CommandItemsForComboBox } from "@/components/Command/exports/command-items.exports";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { SearchPrimaryTeacherControllerProps } from "@/features/class-creation/components/SearchTeachers/types/search-teachers.types.ts";

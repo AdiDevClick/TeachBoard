@@ -1,4 +1,4 @@
-import { CommandItemsForComboBox } from "@/components/Command/CommandItems.tsx";
+import { CommandItemsForComboBox } from "@/components/Command/exports/command-items.exports";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
