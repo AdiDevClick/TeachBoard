@@ -1,4 +1,4 @@
-import { CommandItemsForComboBox } from "@/components/Command/CommandItems.tsx";
+import { CommandItemsForComboBox } from "@/components/Command/exports/command-items.exports";
 import type { CommandsProps } from "@/components/Command/types/command.types.ts";
 import type {
   MetaDatasPopoverField,
