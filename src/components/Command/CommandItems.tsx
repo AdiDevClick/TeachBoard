@@ -47,12 +47,13 @@ export function CommandItems(props: Readonly<CommandsProps>) {
         <ListMapper items={commandHeadings ?? []}>
           {(item) => {
             if (commandGroupContainsInvalid(item)) {
-              debugLogs("Rendering CommandGroup");
+              debugLogs("Skipping invalid CommandGroup", item);
+              return null;
             }
             return (
               <>
                 <CommandGroup key={item.groupTitle} heading={item.groupTitle}>
-                  <ListMapper items={item.items}>
+                  <ListMapper items={item.items ?? []}>
                     {(command) => {
                       if (commandItemContainsInvalid(command)) {
                         debugLogs("Rendering CommandItems", command);
