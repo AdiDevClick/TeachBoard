@@ -493,7 +493,18 @@ export const useEvaluationStepsCreationStore = create(
           setModuleSelectionIsClicked(isClicked: boolean) {
             set(
               (state) => {
-                state.moduleSelection.isClicked = isClicked;
+                // create a new object so that selectors depending on
+                // `moduleSelection` receive a new reference. previously we
+                // mutated the existing object which meant hooks such as
+                // `useTabContentState` could read the same reference and
+                // never re-render. this led to the "next button"
+                // interactivity not updating when only the `isClicked`
+                // // flag changed (see evaluation-next-button.ui.test.tsx).
+                state.moduleSelection = {
+                  ...state.moduleSelection,
+                  isClicked,
+                };
+                // state.moduleSelection.isClicked = isClicked;
               },
               undefined,
               "setModuleSelectionIsClicked",

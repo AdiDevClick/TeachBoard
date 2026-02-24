@@ -14,4 +14,5 @@ export type FetchParams = {
   cachedFetchKey?: [string, string];
   dataReshapeFn?: DataReshapeFn;
   reshapeOptions?: unknown;
+  resetParams?: boolean;
 } & QueryKeyDescriptor<unknown, unknown>["1"];

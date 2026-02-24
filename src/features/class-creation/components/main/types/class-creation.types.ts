@@ -86,3 +86,13 @@ export type HandleFetchedTasksParams = {
   itemToDisplay: MutableRef<TaskTemplatesCacheShape | null>;
   isDiplomaChanged: boolean;
 };
+
+/**
+ * Props for the useClassCreationHandler hook, derived from ClassCreationControllerProps with only the necessary fields for handling logic.
+ */
+export type UseClassCreationHandlerProps = Readonly<
+  Pick<
+    ClassCreationControllerProps,
+    "form" | "pageId" | "submitRoute" | "submitDataReshapeFn"
+  >
+>;

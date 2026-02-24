@@ -30,6 +30,7 @@ const defaultStateParameters: FetchParams = {
   onError: undefined,
   silent: false,
   cachedFetchKey: undefined,
+  resetParams: false,
 };
 
 /**
@@ -62,7 +63,6 @@ export function useFetch<
   const [fetchParams, setFetchParams] = useState(defaultStateParameters);
   const [viewData, setViewData] = useState<TViewData | undefined>(undefined);
   const setLastUserActivity = useAppStore((state) => state.setLastUserActivity);
-  const lastUserActivity = useAppStore((state) => state.lastUserActivity);
   const navigate = useNavigate();
   const location = useLocation().pathname;
   const queryClient = useQueryClient();
@@ -140,6 +140,10 @@ export function useFetch<
             ...fetchParams,
           },
         );
+
+        if (fetchParams.resetParams) {
+          resetFetchParams();
+        }
       },
       onError: (error) => {
         setLastUserActivity(contentId, {
@@ -156,9 +160,15 @@ export function useFetch<
     },
   ]);
 
+  const resetFetchParams = () => {
+    setFetchParams(defaultStateParameters);
+    setViewData(undefined);
+  };
+
   return {
     fetchParams,
     setFetchParams,
+    resetFetchParams,
     ...queryParams,
     // raw server response.
     response: queryParams.data,

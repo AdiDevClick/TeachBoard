@@ -1,4 +1,4 @@
-import type { CommandItemType } from "@/components/Command/types/command.types.ts";
+import type { ClasseNameAvailabilityResponse } from "@/api/types/routes/classes.types";
 import { AvatarsWithLabelAndAddButtonList } from "@/components/Form/exports/form.exports";
 import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
 import {
@@ -12,33 +12,16 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
   classCreationControllerPropsInvalid,
   debugLogs,
-  taskModalPropsInvalid,
 } from "@/configs/app-components.config.ts";
-import { DEV_MODE, HTTP_METHODS, NO_CACHE_LOGS } from "@/configs/app.config.ts";
-import {
-  resetSelectedItemsFromCache,
-  saveKeys,
-  yearsListRange,
-} from "@/features/class-creation/components/main/functions/class-creation.functions.ts";
-import type {
-  ClassCreationControllerProps,
-  ClassCreationFormSchema,
-} from "@/features/class-creation/index.ts";
+import { yearsListRange } from "@/features/class-creation/components/main/functions/class-creation.functions.ts";
+import { useClassCreationHandler } from "@/features/class-creation/components/main/hooks/useClassCreationHandler";
+import type { ClassCreationControllerProps } from "@/features/class-creation/index.ts";
 import { classCreationInputControllers } from "@/features/class-creation/index.ts";
-import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
-import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
-import { useAvatarDataGenerator } from "@/hooks/useAvatarDataGenerator.ts";
-import { useQueryClient } from "@tanstack/react-query";
-import {
-  Activity,
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { useWatch } from "react-hook-form";
+import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types";
+import { useFetch } from "@/hooks/database/fetches/useFetch";
+import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
+import useDebounce from "@/hooks/useDebounce";
+import { Activity, useEffect, useMemo, type ChangeEvent } from "react";
 
 const year = new Date().getFullYear();
 const years = yearsListRange(year, 5);
@@ -75,240 +58,104 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
   } = props;
 
   // End of defensive props check
-
-  const [isSelectedDiploma, setIsSelectedDiploma] = useState(false);
-
-  const queryClient = useQueryClient();
-  const studentsMemo = useAvatarDataGenerator(form, "studentsValues");
-  const primaryTeacherMemo = useAvatarDataGenerator(
-    form,
-    "primaryTeacherValue",
-  );
-
   const {
     setRef,
     observedRefs,
-    submitCallback,
-    newItemCallback,
-    openingCallback,
-    openedDialogs,
+    handleNewItem,
     resultsCallback,
-    selectionCallback,
+    handleCommandSelection,
     invalidSubmitCallback,
-  } = useCommandHandler({
+    isSelectedDiploma,
+    primaryTeacherMemo,
+    studentsMemo,
+    handleDeletingTask,
+    handleValidSubmit,
+    handleOnSelect,
+    tasksValues,
+    degreeConfigId,
+    handleOpening,
+  } = useClassCreationHandler({
     form,
     pageId,
     submitRoute,
     submitDataReshapeFn,
   });
 
-  const tasksValues =
-    useWatch({
-      control: form.control,
-      name: "tasksValues",
-    }) ?? [];
-
-  const cachedKeysRef = useRef<Record<string, unknown[]>>({});
-  const selectedDiplomaRef = useRef<CommandItemType>(null);
-
-  const resetDialogCache = useEffectEvent(() => {
-    const isModalOpen = openedDialogs.includes(pageId);
-
-    if (isModalOpen) return;
-
-    const currentStudentsValues = form.getValues("studentsValues") ?? [];
-    const currentPrimaryTeacherValue =
-      form.getValues("primaryTeacherValue") ?? [];
-
-    if (currentStudentsValues.length > 0) {
-      resetSelectedItemsFromCache(
-        cachedKeysRef.current["search-students"],
-        currentStudentsValues,
-        queryClient,
-      );
-    }
-
-    if (currentPrimaryTeacherValue.length > 0) {
-      resetSelectedItemsFromCache(
-        cachedKeysRef.current["search-primaryteacher"],
-        currentPrimaryTeacherValue,
-        queryClient,
-      );
-    }
-  });
+  const { data, error, fetchParams, setFetchParams, onSubmit } = useFetch();
 
   /**
-   * Handle modal close behavior
+   * Handle changes to the class name input, including debounced API calls to check for name availability.
    *
-   * @description Detects when the modal closes and resets the students & primary teacher selections  from the cache
+   * @param event - The change event from the class name input
+   * @param meta - Optional metadata for the command handler, including API endpoint information
+   */
+  const debouncedClassNameAvailabilityCheck = useDebounce(
+    (rawValue: string, meta?: CommandHandlerFieldMeta) => {
+      if (meta?.name !== "name" || !meta.apiEndpoint) return;
+
+      const value = rawValue.trim();
+      if (!value) return;
+
+      const computedApiEndpoint =
+        typeof meta.apiEndpoint === "function"
+          ? meta.apiEndpoint(value)
+          : meta.apiEndpoint;
+
+      setFetchParams((prev) => ({
+        ...prev,
+        url: String(computedApiEndpoint),
+        method: "GET",
+        contentId: meta.task as FetchParams["contentId"],
+        dataReshapeFn: meta.dataReshapeFn,
+        silent: true,
+      }));
+    },
+    300,
+  );
+
+  /**
+   * TRIGGER CLASS NAME AVAILABILITY CHECK
+   *
+   * @description Every time a user types in the class name input
    */
   useEffect(() => {
-    resetDialogCache();
-  }, [openedDialogs]);
+    const url = fetchParams.url;
+
+    if (!url) return;
+    onSubmit();
+  }, [fetchParams.url]);
 
   /**
-   * Handle opening of the VerticalFieldSelect component
+   * Send a debouned API request to check for class name availability when the class name input changes.
    *
-   * @description When opening, fetch data based on the select's meta information
-   *
-   * @param open - Whether the select is opening
-   * @param metaData - The meta data from the popover field that was opened
+   * @param event - The change event from the class name input
+   * @param meta - Optional metadata for the command handler, including API endpoint information
    */
-  const handleOpening = useCallback(
-    (open: boolean, metaData?: Record<string, unknown>) => {
-      const linkedDiploma = selectedDiplomaRef.current;
-      const isNewTaskTemplate = metaData?.task === "new-task-template";
-
-      if (isNewTaskTemplate) {
-        if (!linkedDiploma || taskModalPropsInvalid(linkedDiploma)) {
-          const message =
-            "Tried to open task template modal without a selected diploma.";
-          debugLogs("[ClassCreationController] - " + message);
-          throw new Error(message);
-        }
-
-        metaData.apiEndpoint =
-          API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
-            linkedDiploma.id,
-          );
-        metaData["degreeConfig"] = linkedDiploma;
-      }
-
-      openingCallback(open, metaData);
-    },
-    [openingCallback],
-  );
-
-  /**
-   * Handle Class Creation form submission when form is valid
-   *
-   * @param variables - The form data to submit
-   */
-  const handleValidSubmit = (variables: ClassCreationFormSchema) => {
-    submitCallback(variables, {
-      method: HTTP_METHODS.POST,
-    });
-  };
-
-  /**
-   * Handle command selection from PopoverFieldWithCommands
-   * @description Updates the form values based on selected command items.
-   *
-   * @param value - The value of the selected command item
-   * @param commandItemDetails - The details of the selected command item
-   */
-  const handleCommandSelection = (
-    value: string,
-    commandItemDetails: CommandItemType,
+  const handleClassNameChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    meta?: CommandHandlerFieldMeta,
   ) => {
-    const options = {
-      mainFormField: "tasks" as const,
-      detailedCommandItem: commandItemDetails,
-    };
-
-    const newValue = commandItemDetails.id;
-    selectionCallback(newValue, options);
-
-    const otherOptions = {
-      secondaryFormField: "tasksValues",
-      detailedCommandItem: commandItemDetails,
-    };
-
-    selectionCallback(value, otherOptions);
+    debouncedClassNameAvailabilityCheck(event.target.value, meta);
   };
 
   /**
-   * Handle command selection from PopoverFieldWithControllerAndCommandsList
-   *
-   * @description Updates the selected diploma reference and selection state.
-   *
-   * @param value - The value of the selected command item
-   * @param commandItem - The details of the selected command item
+   * Effect to handle API response for class name availability check, setting form errors if the name is already taken.
    */
-  const handleOnSelect = useCallback(
-    (__value: string, commandItem: CommandItemType) => {
-      if (form.watch("degreeConfigId") !== commandItem.id) {
-        selectedDiplomaRef.current = commandItem;
-        setIsSelectedDiploma(Boolean(commandItem));
-        form.setValue("degreeConfigId", commandItem.id, {
-          shouldValidate: true,
-        });
-        form.setValue("tasks", [], { shouldValidate: true });
-        form.setValue("tasksValues", [], { shouldValidate: true });
-      }
-    },
-    [form],
-  );
+  useEffect(() => {
+    const availableFlag =
+      error?.data?.available ??
+      (data?.available as ClasseNameAvailabilityResponse);
 
-  /**
-   * Handle adding a new item
-   *
-   * @param e - The event triggering the new item addition
-   * @param rest - Additional parameters related to the new item
-   */
-  const handleNewItem = useCallback(
-    ({ e, ...rest }: HandleAddNewItemParams) => {
-      if (DEV_MODE && !NO_CACHE_LOGS) {
-        console.log("Add new item triggered", {
-          apiEndpoint: rest.apiEndpoint,
-          task: rest.task,
-          selectedDiploma: selectedDiplomaRef.current,
-          selectedStudents: form.getValues("studentsValues"),
-          selectedPrimaryTeacher: form.getValues("primaryTeacherValue"),
-        });
-      }
-      const task = rest.task;
-      rest.form = form;
-
-      if (task === "search-students") {
-        rest.selectedStudents = form.getValues("studentsValues") ?? {};
-      }
-
-      if (task === "search-primaryteacher") {
-        rest.selectedPrimaryTeacher =
-          form.getValues("primaryTeacherValue") ?? {};
-      }
-
-      if (task === "new-task-template" && selectedDiplomaRef.current) {
-        rest.apiEndpoint =
-          API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID(
-            selectedDiplomaRef.current.id,
-          );
-        rest.selectedDiploma = selectedDiplomaRef.current;
-
-        const cached = queryClient.getQueryData([task, rest.apiEndpoint]);
-
-        let data;
-        if (Array.isArray(cached)) {
-          data = cached[0];
-        }
-
-        rest.shortTemplatesList = data?.shortTemplatesList ?? [];
-      }
-      saveKeys([task, rest.apiEndpoint], cachedKeysRef);
-
-      newItemCallback({
-        e,
-        ...rest,
+    if (availableFlag === false) {
+      form.setError("name", {
+        type: "manual",
+        message:
+          "Ce nom de classe est déjà utilisé. Veuillez en choisir un autre.",
       });
-    },
-    [form, queryClient, newItemCallback],
-  );
-
-  const handleDeletingTask = (taskValue: string) => {
-    const tasks = new Set(form.getValues("tasks") || []);
-    tasks.delete(taskValue);
-
-    const currentTasksValues = form.getValues("tasksValues") || [];
-    const nextTasksValues = currentTasksValues.filter(
-      ([key]) => key !== taskValue,
-    );
-
-    form.setValue("tasksValues", nextTasksValues, {
-      shouldValidate: true,
-    });
-    form.setValue("tasks", Array.from(tasks), { shouldValidate: true });
-  };
+    } else {
+      form.clearErrors("name");
+    }
+  }, [error, form, data]);
 
   const controllers = {
     dynamicListControllers: inputControllers[2],
@@ -354,9 +201,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
         form={form}
         items={controllers.controlledInputsControllers}
         setRef={setRef}
-        onValueChange={(value, meta) => {
-          console.log(value, meta);
-        }}
+        onChange={handleClassNameChange}
       />
       <PopoverFieldWithControllerAndCommandsList
         items={controllers.popoverControllers}
@@ -381,7 +226,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
           multiSelection
           {...sharedCallbacksMemo.all}
           onSelect={handleCommandSelection}
-          resetKey={form.watch("degreeConfigId")}
+          resetKey={degreeConfigId}
           commandHeadings={resultsCallback()}
           {...controllers.dynamicListControllers}
         />

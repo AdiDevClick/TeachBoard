@@ -39,13 +39,7 @@ import type {
 } from "@/types/AppInputControllerInterface";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  startTransition,
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useRef,
-} from "react";
+import { startTransition, useEffect, useEffectEvent, useRef } from "react";
 import type {
   FieldErrors,
   FieldValues,
@@ -171,6 +165,7 @@ export function useCommandHandler<
 
     setFetchParams((prev) => ({
       ...prev,
+      silent: false,
       url: String(endpointUrlFinal ?? "none"),
       cachedFetchKey: options?.queryKey,
       method: API_ENDPOINTS.POST.METHOD,
@@ -186,7 +181,7 @@ export function useCommandHandler<
    *
    * @param errors - The validation errors
    */
-  const handleInvalidSubmit = (errors: FieldErrors<TFieldValues>) => {
+  function handleInvalidSubmit(errors: FieldErrors<TFieldValues>) {
     if (DEV_MODE) {
       const currentValues = form.getValues();
 
@@ -204,7 +199,7 @@ export function useCommandHandler<
         console.debug(pageId + " invalid submit", errors);
       }
     }
-  };
+  }
 
   /**
    * Handle opening of the VerticalFieldSelect component
@@ -214,19 +209,16 @@ export function useCommandHandler<
    * @param open - Whether the select is opening
    * @param metaData - The meta data from the popover field that was opened
    */
-  const handleOpening = (
+  function handleOpening(
     open: boolean,
     metaData?: HandleOpeningCallbackParams<TMeta>["metaData"],
-  ) => {
+  ) {
     if (!open) return;
+    const { task, apiEndpoint = "none", dataReshapeFn } = metaData ?? {};
 
-    const task = metaData?.task as FetchParams["contentId"];
-    const apiEndpoint = metaData?.apiEndpoint ?? "none";
-    const dataReshapeFn = metaData?.dataReshapeFn;
     let silent = metaData?.silent;
     const controller = new AbortController();
-    // Fail fast when a command/modal expects an endpoint but none is provided.
-    // This catches regressions where inputControllers drift from API_ENDPOINTS.
+
     if (fetchParamsPropsInvalid<TMeta>(metaData)) {
       const message = `[useCommandHandler] Missing fetchParams for task "${String(
         task,
@@ -253,13 +245,13 @@ export function useCommandHandler<
 
     setFetchParams((prev) => ({
       ...prev,
-      dataReshapeFn: dataReshapeFn ?? prev.dataReshapeFn,
+      dataReshapeFn,
       url: String(apiEndpoint),
-      contentId: task,
+      contentId: task as FetchParams["contentId"],
       abortController: controller,
       silent,
     }));
-  };
+  }
 
   /**
    * Handle selection from command list
@@ -276,10 +268,10 @@ export function useCommandHandler<
    * @param value - Selected value
    * @param options - Options containing form field names and detailed command item
    */
-  const handleSelection = (
+  function handleSelection(
     value: HandleSelectionCallbackParams<TFieldValues>["value"],
     options: HandleSelectionCallbackParams<TFieldValues>["options"],
-  ) => {
+  ) {
     const {
       mainFormField,
       secondaryFormField,
@@ -322,7 +314,7 @@ export function useCommandHandler<
       values as PathValue<TFieldValues, Path<TFieldValues>>,
       form,
     );
-  };
+  }
 
   /**
    * Handle data cache update
@@ -343,7 +335,7 @@ export function useCommandHandler<
      />
     * ```
    */
-  const handleDataCacheUpdate = useCallback((): HeadingType[] => {
+  const handleDataCacheUpdate = (): HeadingType[] => {
     const cacheKey = fetchParams.cachedFetchKey ?? [
       fetchParams.contentId,
       fetchParams.url,
@@ -354,9 +346,16 @@ export function useCommandHandler<
       console.log("Cached data for ", cacheKey, " is ", cachedData);
     }
 
-    return (cachedData ?? data) as HeadingType[];
-  }, [queryClient, data, fetchParams]);
+    // while the hook is loading and we don't yet have a cached value,
+    // we must avoid falling back to the previous `data` value, which
+    // belonged to a different request. returning an empty array keeps
+    // the popover blank until the fresh response arrives.
+    if (isLoading && cachedData === undefined) {
+      return [];
+    }
 
+    return (cachedData ?? data) as HeadingType[];
+  };
   /**
    * RESULTS - Handle dialog closing after successful submission
    */

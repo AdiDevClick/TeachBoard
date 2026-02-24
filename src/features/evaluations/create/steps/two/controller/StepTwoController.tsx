@@ -1,6 +1,5 @@
 import { UUID_SCHEMA, type UUID } from "@/api/types/openapi/common.types.ts";
 import type { InlineItemAndSwitchSelectionPayload } from "@/components/HOCs/types/with-inline-item-and-switch.types.ts";
-import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
 import { VerticalFieldWithInlineSwitchList } from "@/components/Selects/exports/vertical-field-select.exports";
 import type { VerticalSelectMetaData } from "@/components/Selects/types/select.types.ts";
 import { debugLogs } from "@/configs/app-components.config";
@@ -17,17 +16,7 @@ export function StepTwoController({
   formId,
   className,
   inputControllers = [],
-  user: _user,
-  students: _students,
-  selectedClass: _selectedClass,
-  tasks: _tasks,
 }: StepTwoControllerProps) {
-  // Placeholder form, replace 'any' with actual form schema
-  // const [selected, setSelected] = useState(false);
-
-  // const { onSubmit, isLoading, isLoaded, data, error, setFetchParams } =
-  // useFetch();
-
   const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
     useShallow((state) => state.getStudentsPresenceSelectionData),
   )();
@@ -56,10 +45,7 @@ export function StepTwoController({
    * @param open - Whether the select is opening
    * @param metaData - The meta data from the popover field that was opened
    */
-  const handleOpening = (open: boolean, metaData?: MetaDatasPopoverField) => {
-    console.log("Opening :", open, metaData);
-    // openingCallback(open, metaData);
-  };
+  const handleOpening = () => {};
 
   /**
    * Handle command selection from PopoverFieldWithControllerAndCommandsList
@@ -73,19 +59,32 @@ export function StepTwoController({
     taskId: string | UUID,
     meta?: VerticalSelectMetaData,
   ) => {
-    const studentId = meta?.id;
+    const rootId = meta?.id;
+    const nestedMeta = meta?.controllerFieldMeta;
+    const nestedId = (nestedMeta?.id as string) ?? "unknown-id";
+
+    const studentId = rootId ?? nestedId;
     if (!studentId) return;
+
+    const parsedStudentId = UUID_SCHEMA.safeParse(studentId);
+    if (!parsedStudentId.success) {
+      debugLogs(
+        "[StepTwoController]: Invalid student ID in metadata, selection ignored.",
+        { studentId, error: parsedStudentId.error },
+      );
+      return;
+    }
 
     const parsed = UUID_SCHEMA.safeParse(taskId);
     if (!parsed.success) {
       debugLogs(
-        `[StepTwoController]: Invalid task ID selected for student ${studentId}, selection ignored.`,
+        `[StepTwoController]: Invalid task ID selected for student ${parsedStudentId.data}, selection ignored.`,
         { taskId, error: parsed.error },
       );
       return;
     }
 
-    setStudentTaskAssignment(parsed.data, studentId);
+    setStudentTaskAssignment(parsed.data, parsedStudentId.data);
   };
 
   /**

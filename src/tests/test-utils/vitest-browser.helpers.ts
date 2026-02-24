@@ -185,7 +185,7 @@ export async function fillFieldsEnsuringSubmitDisabled(
   }
 }
 
-export type StubRoute = readonly [match: string, payload: unknown];
+export type StubRoute = readonly [match: string | RegExp, payload: unknown];
 
 const okJson = (payload: unknown) =>
   Promise.resolve({
@@ -198,6 +198,11 @@ const okJson = (payload: unknown) =>
  *
  * Tests can provide only the endpoints they need, while still exercising the real
  * `useCommandHandler` fetch flow.
+ *
+ * The `match` value in each route may be a simple string (matched via
+ * `String.prototype.includes`) or a `RegExp` object. Regex support is handy when
+ * you need to match the entire URL or add anchors (`^$`) to avoid accidental
+ * collisions with similar paths.
  */
 export function stubFetchRoutes({
   getRoutes = [],
@@ -219,7 +224,9 @@ export function stubFetchRoutes({
 
       if (method === "POST") {
         for (const [match, payload] of postRoutes) {
-          if (urlStr.includes(match)) {
+          const isMatch =
+            match instanceof RegExp ? match.test(urlStr) : urlStr.includes(match);
+          if (isMatch) {
             // Debug stubbed POST
             console.debug("[stubFetchRoutes] POST matched", match, payload);
             return okJson(payload);
@@ -230,7 +237,9 @@ export function stubFetchRoutes({
       }
 
       for (const [match, payload] of getRoutes) {
-        if (urlStr.includes(match)) {
+        const isMatch =
+          match instanceof RegExp ? match.test(urlStr) : urlStr.includes(match);
+        if (isMatch) {
           // Debug stubbed GET
           console.debug("[stubFetchRoutes] GET matched", match, payload);
           return okJson(payload);
@@ -714,7 +723,7 @@ export async function openPopoverByTriggerName(name: RegExp) {
   await openPopover(page.getByRole("button", { name }));
 }
 
-function getElementLabelText(el: HTMLElement): string {
+export function getElementLabelText(el: HTMLElement): string {
   const text = (el.textContent ?? "").trim();
   if (text) return text;
 
@@ -834,7 +843,7 @@ export async function selectCommandItemInContainer(
   }
 }
 
-function getCommandItemsInContainer(
+export function getCommandItemsInContainer(
   container: Element | null | undefined,
 ): HTMLElement[] {
   // Most of the app uses shadcn/ui's CommandItem wrapper (data-slot="command-item"),
