@@ -55,30 +55,34 @@ export function forController<P>(WrapperComponent: ComponentType<P>) {
       return null;
     }
 
-    // when working with a controlled component we expose a unified "onValueChange"
-    // callback regardless of the underlying DOM event.  This mirrors the behaviour
-    // of `withController` and other custom components in the repo.
     const handleChange = (e: unknown) => {
-      // the shape of the event varies depending on the wrapped component.  we
-      // normalise it to something with an optional `target.value` field without
-      // introducing `any`.
       field.onChange(e);
       userOnChange?.(e, controllerFieldMeta);
-      const value = (e as { target?: { value?: unknown } })?.target?.value ?? e;
-      userOnValueChange?.(value, controllerFieldMeta);
     };
 
     const handleOnOpenChange = (
       isOpen: boolean,
       meta?: CommandHandlerFieldMeta,
     ) => {
-      userOnOpenChange?.(isOpen, meta ?? controllerFieldMeta);
+      userOnOpenChange?.(isOpen, { ...controllerFieldMeta, ...meta });
+    };
+
+    const handleOnValueChange = (
+      value: unknown,
+      meta?: CommandHandlerFieldMeta,
+    ) => {
+      field.onChange(value);
+      userOnValueChange?.(value, {
+        ...controllerFieldMeta,
+        ...meta,
+      });
     };
 
     return (
       <WrapperComponent
         {...(rest as P)}
         {...field}
+        id={id}
         setRef={(el: Element | null) => {
           setRef?.(el, controllerFieldMeta);
         }}
@@ -86,6 +90,7 @@ export function forController<P>(WrapperComponent: ComponentType<P>) {
         value={field.value ?? ""}
         onChange={handleChange}
         onOpenChange={handleOnOpenChange}
+        onValueChange={handleOnValueChange}
         aria-invalid={fieldState.invalid}
       />
     );

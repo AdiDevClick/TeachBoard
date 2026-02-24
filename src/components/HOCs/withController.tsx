@@ -34,13 +34,7 @@ function withController<C extends ComponentType<any>>(Wrapped: C) {
       debugLogs("withController");
       return null;
     }
-    const {
-      name,
-      form,
-      defaultValue,
-      onValueChange: external,
-      ...restProps
-    } = props;
+    const { name, form, defaultValue, ...restProps } = props;
 
     return (
       <Controller
@@ -65,10 +59,6 @@ function withController<C extends ComponentType<any>>(Wrapped: C) {
                 fieldState,
                 controllerMeta: {
                   controllerName: name,
-                },
-                onValueChange: (value: string, meta?: unknown) => {
-                  field.onChange(value);
-                  external?.(value, meta);
                 },
               } as ComponentPropsOf<C>)}
             />
