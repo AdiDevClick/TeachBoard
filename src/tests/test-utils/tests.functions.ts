@@ -10,7 +10,6 @@ import {
 import type { CachedGroup, DialogOptions } from "@/tests/types/tests.types.ts";
 import { wait } from "@/utils/utils.ts";
 import { expect } from "vitest";
-
 /**
  * Creates and returns a click MouseEvent
  *
@@ -28,7 +27,7 @@ export function click() {
  * @throws - if the wait times out after 2 seconds
  */
 export async function waitForQueryKey(
-  getDialogOptions: () => DialogOptions
+  getDialogOptions: () => DialogOptions,
 ): Promise<DialogOptions> {
   const start = Date.now();
   while (true) {
@@ -81,7 +80,7 @@ export async function waitForPost(expectedCount = 1) {
  */
 export async function waitForItemsLength(
   queryKey: readonly unknown[],
-  length: number
+  length: number,
 ) {
   await expect
     .poll(
@@ -89,7 +88,7 @@ export async function waitForItemsLength(
         const cached = testQueryClient.getQueryData<CachedGroup[]>(queryKey);
         return cached?.[0]?.items?.length ?? 0;
       },
-      { timeout: 1000 }
+      { timeout: 1000 },
     )
     .toBe(length);
 }
@@ -139,7 +138,7 @@ export async function assertPostUpdatedCacheWithoutExtraGet(opts: {
         },
         {
           timeout: postTimeout,
-        }
+        },
       )
       .toBe(true);
   }
@@ -149,11 +148,11 @@ export async function assertPostUpdatedCacheWithoutExtraGet(opts: {
     .poll(
       () => {
         const cached = testQueryClient.getQueryData<CachedGroup[]>(
-          opts.queryKey
+          opts.queryKey,
         );
         return cached ?? null;
       },
-      { timeout }
+      { timeout },
     )
     .toBeTruthy();
 
@@ -163,16 +162,16 @@ export async function assertPostUpdatedCacheWithoutExtraGet(opts: {
       .poll(
         () => {
           const cached = testQueryClient.getQueryData<CachedGroup[]>(
-            opts.queryKey
+            opts.queryKey,
           );
           if (!cached) return false;
           return (
             cached[0]?.items?.some(
-              (i: any) => i?.value === opts.expectedValue
+              (i: any) => i?.value === opts.expectedValue,
             ) ?? false
           );
         },
-        { timeout }
+        { timeout },
       )
       .toBe(true);
   }
@@ -183,9 +182,15 @@ export async function assertPostUpdatedCacheWithoutExtraGet(opts: {
       // Fallback: assert global GET call count unchanged
       expect(countFetchCalls("GET")).toBe(opts.getCallsBefore);
     } else {
-      expect(countFetchCallsByUrl(opts.endpoint, "GET")).toBe(
-        opts.getCallsBefore
+      // use a regex anchored to the full string to avoid counting URLs that merely
+      // start with the same prefix (e.g. name‑availability checks).
+      const escaped = String(opts.endpoint).replace(
+        /[.*+?^${}()|[\]\\]/g,
+        "\\$&",
       );
+      const regex = new RegExp(`^${escaped}$`);
+      const actual = countFetchCallsByUrl(regex, "GET");
+      expect(actual).toBe(opts.getCallsBefore);
     }
   }
 
@@ -193,7 +198,7 @@ export async function assertPostUpdatedCacheWithoutExtraGet(opts: {
   if (opts.openPopover) {
     if (!opts.expectedValue)
       throw new Error(
-        "assertPostUpdatedCacheWithoutExtraGet: expectedValue is required when openPopover is used"
+        "assertPostUpdatedCacheWithoutExtraGet: expectedValue is required when openPopover is used",
       );
 
     const op = opts.openPopover;
@@ -209,7 +214,7 @@ export async function assertPostUpdatedCacheWithoutExtraGet(opts: {
       await openPopoverAndExpectByTrigger(
         op.trigger,
         [opts.expectedValue],
-        timeout
+        timeout,
       );
     } else if (op.containerId) {
       console.log("checking containerId");
