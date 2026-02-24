@@ -20,7 +20,12 @@ export function LabelledInput(props: LabelledInputProps) {
   }
 
   const { name, title, ...rest } = props;
-  const safeProps = sanitizeDOMProps(rest, ["form"]);
+  const safeProps = sanitizeDOMProps(rest, [
+    "form",
+    "onOpenChange",
+    "onValueChange",
+    "controllerFieldMeta",
+  ]);
   const labelName = name ?? "input-is-not-named";
 
   return (
