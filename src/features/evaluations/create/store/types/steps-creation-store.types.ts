@@ -18,6 +18,7 @@ export type StudentEvaluationModuleType = {
 export type StudentWithPresence = {
   id: UUID;
   fullName: string;
+  overallScore?: number | null;
   isPresent: boolean;
   assignedTask?: Pick<ClassTasks, "id" | "name"> | null;
   evaluations?: {
@@ -46,6 +47,8 @@ export type ClassModuleSubSkill = ClassModuleSubSkillBase & {
 export type ClassModules = ClassModuleSubSkillBase & {
   subSkills: UniqueSet<UUID, ClassModuleSubSkill>;
   tasksList: Set<ClassTasks["id"]>;
+  /** optional - Can be created by the object reshape */
+  value?: string;
   studentsToEvaluate?: Set<UUID>;
 };
 
@@ -73,6 +76,38 @@ export type EvaluationType = {
 };
 
 /**
+ * Type for the return value of getPresentStudentsWithAssignedTasks() in the store.
+ */
+export type ByIdValue = StudentWithPresence["fullName"][];
+
+/**
+ * Type for non-present students, structured for both byId and byName access patterns.
+ */
+export type ByNameValue = { id: StudentWithPresence["id"] };
+
+/**
+ * Props for StepFourController component.
+ */
+export type NonPresentStudentsType = {
+  byId: UniqueSet<StudentWithPresence["id"], ByIdValue>;
+  byName: UniqueSet<StudentWithPresence["fullName"], ByNameValue>;
+  count: number;
+};
+
+/**
+ * Tuple shape used by tags UI components: [fullName, { id }]
+ */
+export type NonPresentStudentTuple = [
+  StudentWithPresence["fullName"],
+  { id: StudentWithPresence["id"] },
+];
+
+export type NonPresentStudentsResult = UniqueSet<
+  StudentWithPresence["id"],
+  NonPresentStudentTuple
+>;
+
+/**
  * State interface for Steps Creation Store.
  */
 export interface StepsCreationState {
@@ -88,6 +123,8 @@ export interface StepsCreationState {
   modules: UniqueSet<UUID, ClassModules>;
   moduleSelection: ModulesSelectionType;
   subSkillSelection: SubskillSelectionType;
+  /** Cached result for non-present students to preserve referential equality (key = studentId, value = student details) */
+  nonPresentStudentsResult: NonPresentStudentsResult | null;
 }
 
 export type SelectedClassModulesReturn = ClassModules[];

@@ -1,24 +1,21 @@
 import { useAppStore } from "@/api/store/AppStore.ts";
+import { rightContent } from "@/assets/css/EvaluationPage.module.scss";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
-import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState.ts";
-import { STEP_FOUR_CARD_PROPS } from "@/features/evaluations/create/steps/four/config/step-four.configs.ts";
+import { Button } from "@/components/ui/button";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
+import {
+  STEP_FOUR_CARD_PROPS,
+  STEP_FOUR_INPUT_CONTROLLERS,
+} from "@/features/evaluations/create/steps/four/config/step-four.configs.ts";
 import { StepFourController } from "@/features/evaluations/create/steps/four/controller/StepFourController.tsx";
-import { attendanceRecordCreationBaseControllers } from "@/features/evaluations/create/steps/three/forms/step-two-inputs.ts";
 import {
-  attendanceRecordCreationSchemaInstance,
-  type AttendanceRecordCreationFormSchema,
-  type AttendanceRecordCreationInputItem,
-} from "@/features/evaluations/create/steps/two/models/attendance-record-creation.models";
-import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
+  stepFourInputSchema,
+  type StepFourFormSchema,
+} from "@/features/evaluations/create/steps/four/models/step-four.models";
+import type { StepFourProps } from "@/features/evaluations/create/steps/four/types/step-four.types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type ComponentProps,
-  type Dispatch,
-  type JSX,
-  type SetStateAction,
-} from "react";
-import { useForm, type FieldValues } from "react-hook-form";
-import { useOutletContext } from "react-router-dom";
+import { type ComponentProps } from "react";
+import { useForm, useFormState } from "react-hook-form";
 
 /**
  * STEP FOUR - Summary and Confirmation Component
@@ -36,43 +33,38 @@ import { useOutletContext } from "react-router-dom";
 export function StepFour({
   pageId = "evaluation-summary",
   modalMode = false,
-  className = "content__right",
-  inputControllers = attendanceRecordCreationBaseControllers,
+  className = rightContent,
+  inputControllers = STEP_FOUR_INPUT_CONTROLLERS,
   ...props
-}: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
-  const [, setLeftContent] =
-    useOutletContext<[JSX.Element, Dispatch<SetStateAction<JSX.Element>>]>();
+}: StepFourProps) {
   const user = useAppStore((state) => state.user);
-  const {
-    selectedClass,
-    tasks,
-    modules,
-    moduleSelectionState,
-    setShowStudentsEvaluation,
-    selectedSubSkill,
-    evaluatedStudentsForThisSubskill,
-  } = useStepThreeState();
 
-  const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({
-    resolver: zodResolver(attendanceRecordCreationSchemaInstance([])),
+  const form = useForm<StepFourFormSchema>({
+    resolver: zodResolver(stepFourInputSchema),
     mode: "onTouched",
     defaultValues: {
-      students: [],
+      userId: user?.userId,
+      title: "Evaluation du " + STEP_FOUR_CARD_PROPS.title.description,
+      evaluations: [],
+      overallScore: {},
+      absence: ["none"],
+      comments: "",
+      evaluationDate: new Date().toISOString(),
     },
   });
-
-  const formId = pageId + "-form";
 
   const baseCardProps = {
     pageId,
     modalMode,
     className,
-    formId,
+    formId: pageId + "-form",
     inputControllers,
     card: STEP_FOUR_CARD_PROPS,
     ...props,
     form,
-  };
+    submitRoute: API_ENDPOINTS.POST.CREATE_EVALUATION.endpoint,
+    submitDataReshapeFn: API_ENDPOINTS.POST.CREATE_EVALUATION.dataReshape,
+  } satisfies ComponentProps<typeof ShowSummary>;
 
   return <ShowSummary {...baseCardProps} />;
 }
@@ -81,10 +73,27 @@ export function StepFour({
  * Convenient function to show students evaluation component
  */
 function ShowSummary(commonProps: ComponentProps<typeof Summary>) {
+  const { isValid, isSubmitting, isSubmitSuccessful } = useFormState({
+    control: commonProps.form.control,
+  });
+  const isDisabledCondition = isSubmitSuccessful || isSubmitting || !isValid;
+  const formId = commonProps.formId;
+
   return (
     <Summary {...commonProps}>
       <Summary.Title />
       <Summary.Content />
+      <Summary.Footer>
+        <Button
+          variant="outline"
+          className="mx-auto mr-6"
+          type="submit"
+          disabled={isDisabledCondition}
+          form={formId}
+        >
+          {"Enregistrer"}
+        </Button>
+      </Summary.Footer>
     </Summary>
   );
 }

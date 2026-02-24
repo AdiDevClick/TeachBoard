@@ -15,7 +15,7 @@ import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
  * @param props - Additional props.
  */
 export function StepOne({
-  pageId = "evaluation-step-one",
+  pageId = "evaluation-class-selection",
   className = STEP_ONE_CARD_PROPS.card.className,
   modalMode = false,
   inputControllers = stepOneInputControllers,
@@ -32,7 +32,6 @@ export function StepOne({
 
   return (
     <StepOneWithCard {...commonProps}>
-      <StepOneWithCard.Title />
       <StepOneWithCard.Content />
     </StepOneWithCard>
   );

@@ -1,6 +1,7 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { DiplomaConfigDto } from "@/api/types/routes/diplomas.types.ts";
 import type { SkillsFormValues } from "@/api/types/routes/skills.types.ts";
+import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import type { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { createTaskTemplateView } from "@/features/class-creation/components/TaskTemplateCreation/functions/task-template.functions.ts";
 import type { TaskTemplateCreationFormSchema } from "@/features/class-creation/components/TaskTemplateCreation/models/class-task-template.models";
@@ -12,6 +13,11 @@ export type TaskTemplateCreationExtendedForm =
   TaskTemplateCreationFormSchema & {
     skillsDuplicate?: Array<[UUID, SkillsFormValues]>;
   };
+
+export type TaskTemplateCreationDialogOptions = {
+  selectedDiploma?: (CommandItemType & DiplomaConfigDto) | null;
+  shortTemplatesList?: string[];
+};
 
 /**
  * Props for the TaskTemplateCreationController component.

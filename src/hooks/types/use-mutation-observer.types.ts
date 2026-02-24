@@ -15,16 +15,16 @@ export type MutationObserverOptions = {
 };
 
 export interface MutationObserverHook {
-  callback?: MutationCallback;
+  mutationCallback?: MutationCallback;
   options?: MutationObserverOptions;
-  onNodeReady?: (node: Element, meta?: Record<string, unknown>) => void;
+  onNodeReady?: (_node: Element, _meta?: Record<string, unknown>) => void;
 }
 
 type MetaType = Record<string, unknown>;
 
-export type SetRefFunction = (node?: Element | null, meta?: MetaType) => void;
+export type SetRefFunction = (_node?: Element | null, _meta?: MetaType) => void;
 
-type ObserverRef = UniqueSet<string, StateData>;
+export type ObserverRef = UniqueSet<string, StateData>;
 
 export type UseMutationObserverReturn = {
   setRef?: SetRefFunction;
@@ -35,7 +35,7 @@ export type UseMutationObserverReturn = {
  * State data for each observed element
  */
 export type StateData = {
-  element: Element;
+  element: HTMLElement;
   meta?: MetaType;
   observer: MutationObserver;
 };

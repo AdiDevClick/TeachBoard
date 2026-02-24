@@ -53,11 +53,12 @@ Cette application représente le frontend de TeachBoard, une interface pédagogi
   - [Inputs](#inputs)
   - [Selects](#selects)
   - [Modal](#modal)
-  - [Form components (LoginForm)](#form-components-loginform)
+  - [Form components (LoginView)](#form-components-loginform)
   - [Lists & Data Table](#lists--data-table)
   - [Charts](#charts)
   - [Layout (Header / Sidebar / Footer)](#layout-header--sidebar--footer)
   - [Icons](#icons)
+  - [Conventions Shadcn](#conventions-shadcn)
   - [Ajouter un nouveau controller / HOC](#ajouter-un-nouveau-controller--hoc)
 - [Validation des props des composants](#validation-des-props-des-composants)
 - [Tests](#tests)
@@ -967,6 +968,9 @@ function ClassCreationView(props) {
 
 #### withController — Intégration `react-hook-form`
 - **But :** simplifier l'intégration d'un composant contrôlé par `react-hook-form`.
+- **Événement important :** l'HOC expose un prop `onValueChange` sur le composant résultant. Il est appelé
+  chaque fois que la valeur interne change (avant/après validation) et peut être utilisé pour
+  effectuer un debounce ou des contrôles en "live".
 - **Vue (exemple d'utilisation dans une form) :**
 ```tsx
 import withController from '@/components/HOCs/withController.tsx';
@@ -975,7 +979,14 @@ import Input from '@/components/Inputs/Input.tsx';
 const InputWithController = withController(Input);
 
 function MyForm({ form }) {
-  return <InputWithController form={form} name="age" label="Âge" />;
+  return (
+    <InputWithController
+      form={form}
+      name="age"
+      label="Âge"
+      onValueChange={(v) => console.log('nouvelle valeur', v)}
+    />
+  );
 }
 ```
 - **Patterns :**
@@ -1098,6 +1109,21 @@ Une vue d'ensemble des composants réutilisables fournis par le projet, avec un 
 
 ---
 
+### Conventions Shadcn
+- **Objectif :** Empêcher la modification directe des composants générés par `shadcn/ui` afin d'éviter des conflits et régressions lors des mises à jour.
+
+- **Contexte :** Les fichiers générés par `shadcn` (via `components.json`) peuvent être régénérés lors d'une mise à jour de la configuration. Modifier ces fichiers en local mène fréquemment à des conflits lors de la synchronisation avec la version upstream.
+
+- **Comment :**
+  1. Ne modifiez jamais directement les fichiers fournis ou générés par `shadcn/ui`.
+  2. Créez un *wrapper* local (p.ex. `src/components/ui/SelectWrapper.tsx` ou `src/components/wrappers/`) qui utilise le composant shadcn et applique les ajustements (styles, props, logique). 
+  3. Documentez le wrapper (README + tests unitaires) et remplacez l'usage du composant original par le wrapper dans l'app.
+  4. Pour des corrections upstream, ouvrez une issue/PR sur le dépôt `shadcn` et préférez une solution upstream permanente.
+
+**Fichiers utiles :**
+- `components.json` — configuration shadcn utilisée pour générer les composants.
+- `src/components/ui/select.tsx` — exemple d'adaptation locale.
+
 ### Buttons
 - **Look / example**:
 ```tsx
@@ -1148,27 +1174,27 @@ import VerticalFieldSelect from '@/components/Selects/VerticalFieldSelect';
 {
   modalName: 'login',
   type: Modal,
-  modalContent: LoginForm,
+  modalContent: LoginView,
   contentProps: { inputControllers: inputLoginControllers }
 }
 
 // open programmatically
 openDialog(null, 'login');
 ```
-- **Patterns**: Pattern A — modal content = controller wrapped (ex: `LoginForm`); Pattern B — `ModalWithSimpleAlert`
+- **Patterns**: Pattern A — modal content = controller wrapped (ex: `LoginView`); Pattern B — `ModalWithSimpleAlert`
 - **Emplacement**: `src/components/Modal/`, `src/pages/AllModals/AppModals.tsx`
 
 ---
 
-### Form components (LoginForm)
+### Form components (LoginView)
 - **Look / example**:
 ```tsx
-import LoginForm from '@/components/LoginForms/LoginForm';
+import LoginView from '@/components/LoginForms/LoginView';
 
-<LoginForm />
+<LoginView />
 ```
 - **Patterns**: Pattern A — use as page component; Pattern B — used as modal content (`modalMode = true`)
-- **Emplacement**: `src/components/LoginForms/LoginForm.tsx` (+ `controller/LoginFormController.tsx`)
+- **Emplacement**: `src/components/LoginForms/LoginView.tsx` (+ `controller/LoginFormController.tsx`)
 
 ---
 
@@ -1822,7 +1848,7 @@ const modals = defineStrictModalsList([
   {
     modalName: "login",
     type: Modal,
-    modalContent: LoginForm,
+    modalContent: LoginView,
     contentProps: {
       inputControllers: inputLoginControllers,
       modalMode: true,
@@ -2142,7 +2168,7 @@ if (checkPropsValidity(props, required, forbidden)) {
 
 - **Objectif :** Fermer toutes les modales ouvertes, puis ouvrir proprement une nouvelle modal.
 
-- **Contexte :** Helper pratique pour s'assurer qu'une seule modal est ouverte à la fois (utilisé dans `LoginForm`, etc.).
+- **Contexte :** Helper pratique pour s'assurer qu'une seule modal est ouverte à la fois (utilisé dans `LoginView`, etc.).
 
 - **Exemple :**
 ```ts
@@ -2338,7 +2364,7 @@ const reshaped = ObjectReshape(obj).rename("name","displayName").newShape();
 
 ### Autres helpers & références rapides
 
-- `dialogFns` — `{ closeAllDialogs, openDialog }` (ex: `LoginForm`).
+- `dialogFns` — `{ closeAllDialogs, openDialog }` (ex: `LoginView`).
 - `dataReshape / dataReshapeFn` — fonctions de reshaping définies dans `API_ENDPOINTS` (voir `src/configs/api.endpoints.config.ts`).
 - `FixtureCreatorBase` / classes de fixtures — utilitaires pour générer DTOs factices (`src/utils/FixtureCreator.ts`).
 

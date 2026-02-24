@@ -1,12 +1,18 @@
+import {
+  arrowBack,
+  contentRightSide,
+  contentRightSideContainer,
+} from "@/assets/css/EvaluationPage.module.scss";
+
 // Module selection
 export const STEP_THREE_MODULE_SELECTION_CARD_PROPS = {
-  card: { className: "content__right" },
+  card: { className: contentRightSide },
   title: {
-    title: "Liste des catégories",
+    title: "Liste des modules",
     description: "Par quoi doit-on commencer ?",
   },
   content: {
-    className: "right__content-container",
+    className: contentRightSideContainer,
   },
 };
 
@@ -15,10 +21,12 @@ export const STEP_THREE_SUBSKILLS_SELECTION_TITLE_PROPS = {
   title: "Notation des élèves",
   description: "Quelles sous-compétences évaluer ?",
 };
+
 export const STEP_THREE_SUBSKILLS_SELECTION_CARD_PROPS = {
-  card: { className: "content__right" },
+  arrowBack: { className: arrowBack },
+  card: { className: contentRightSide },
   title: STEP_THREE_SUBSKILLS_SELECTION_TITLE_PROPS,
   content: {
-    className: "right__content-container",
+    className: contentRightSideContainer,
   },
 };

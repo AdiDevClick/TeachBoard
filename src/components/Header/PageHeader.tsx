@@ -1,6 +1,5 @@
 import { useAppStore } from "@/api/store/AppStore";
-import { AppBreadCrumb } from "@/components/BreadCrumbs/AppBreadCrumb";
-import { AppBreadCrumbList } from "@/components/BreadCrumbs/AppBreadCrumbList.tsx";
+import { AppBreadCrumbList } from "@/components/BreadCrumbs/AppBreadCrumbList";
 import { Breadcrumb } from "@/components/ui/breadcrumb.tsx";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -8,7 +7,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import "@css/Dialog.scss";
 import "@css/PageHeader.scss";
-import { Activity, type MouseEvent } from "react";
+import { Activity, type ComponentProps, type MouseEvent } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 /** Page header component
@@ -36,12 +35,10 @@ export function PageHeader() {
         />
         {/* <h1 className="text-base font-medium">Documents</h1> */}
         <Breadcrumb>
-          <AppBreadCrumbList items={splitPaths}>
-            <AppBreadCrumb ischild segmentsLength={splitPaths.length} />
-          </AppBreadCrumbList>
+          <AppBreadCrumbList items={splitPaths} />
         </Breadcrumb>
         <div className="header__actions-container">
-          <Button variant="ghost" asChild size="sm" className="actions__button">
+          <DefaultButton asChild className="actions__button">
             <Link
               to="https://github.com/adidevclick"
               rel="noopener noreferrer"
@@ -50,7 +47,7 @@ export function PageHeader() {
             >
               GitHub
             </Link>
-          </Button>
+          </DefaultButton>
           <Activity
             mode={
               isLoggedIn || location.pathname === "/login"
@@ -58,14 +55,12 @@ export function PageHeader() {
                 : "visible"
             }
           >
-            <Button
-              variant="ghost"
-              size="sm"
+            <DefaultButton
               className="actions__button dark:text-foreground"
               onClick={handleLoginClick}
             >
               Se connecter
-            </Button>
+            </DefaultButton>
           </Activity>
         </div>
       </div>
@@ -80,7 +75,7 @@ export function PageHeader() {
  * @returns Array of breadcrumb segments with name and URL
  */
 function buildBreadcrumbsFromPath(
-  pathname: string
+  pathname: string,
 ): { url: string; name: string }[] {
   return pathname
     .split("/")
@@ -99,3 +94,7 @@ function buildBreadcrumbsFromPath(
       return acc;
     }, []);
 }
+
+const DefaultButton = (props: ComponentProps<typeof Button>) => {
+  return <Button variant="ghost" size="sm" {...props} />;
+};

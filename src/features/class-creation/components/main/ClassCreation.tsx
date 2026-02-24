@@ -1,5 +1,10 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import {
+  DEFAULT_SCHOOL_YEAR,
+  FOOTER_PROPS,
+  TITLE_PROPS,
+} from "@/features/class-creation/components/main/config/class-creation.configs";
 import { ClassCreationController } from "@/features/class-creation/components/main/controllers/ClassCreationController.tsx";
 import type { ClassCreationProps } from "@/features/class-creation/components/main/types/class-creation.types.ts";
 import {
@@ -8,21 +13,8 @@ import {
   type ClassCreationFormSchema,
 } from "@/features/class-creation/index.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
+import type { ComponentProps } from "react";
 import { useForm } from "react-hook-form";
-
-const titleProps = {
-  title: "Créer une classe",
-  description:
-    "Ajoutez une nouvelle classe pour commencer à gérer vos élèves et leurs évaluations.",
-};
-
-const footerProps = {
-  submitText: "Créer la classe",
-};
-
-const year = new Date().getFullYear();
-const defaultSchoolYear = year + " - " + (year + 1);
 
 /**
  * Class creation component.
@@ -45,7 +37,7 @@ function ClassCreation({
     defaultValues: {
       name: "",
       description: "",
-      schoolYear: defaultSchoolYear,
+      schoolYear: DEFAULT_SCHOOL_YEAR,
       students: [],
       degreeConfigId: "",
       userId: props.userId ?? "",
@@ -55,29 +47,27 @@ function ClassCreation({
   });
   const formId = pageId + "-form";
 
-  const commonProps = useMemo(
-    () => ({
-      pageId,
-      modalMode,
-      className,
-      formId,
-      card: {
-        card: { className },
-        title: titleProps,
-        footer: {
-          ...footerProps,
-          formState: form.formState,
-          formId,
-        },
+  const commonProps = {
+    pageId,
+    modalMode,
+    className,
+    formId,
+    card: {
+      card: { className },
+      title: TITLE_PROPS,
+      footer: {
+        ...FOOTER_PROPS,
+        formState: form.formState,
+        formId,
       },
-      inputControllers,
-      ...props,
-      form,
-      submitRoute: API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
-      submitDataReshapeFn: API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
-    }),
-    [form.formState, props],
-  );
+    },
+    inputControllers,
+    ...props,
+    form,
+    submitRoute: API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
+    submitDataReshapeFn: API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
+  } satisfies ComponentProps<typeof ClassCreationWithCard>;
+
   return (
     <ClassCreationWithCard {...commonProps}>
       <ClassCreationWithCard.Title />

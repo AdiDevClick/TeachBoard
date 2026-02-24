@@ -1,6 +1,5 @@
 import { AvatarDisplay } from "@/components/Avatar/AvatarDisplay";
-import { Dropdown } from "@/components/Dropdowns/Dropdown.tsx";
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { DropdownList } from "@/components/Dropdowns/exports/dropdown.exports";
 import type { SettingsPopupProps } from "@/components/Sidebar/footer/settings_popup/types/settings-popup.types";
 import {
   DropdownMenuContent,
@@ -20,7 +19,6 @@ import "@css/DropdownMenu.scss";
 export function TriggeredSettingsPopup({
   userData,
   avatarDisplay,
-  handleOnFooterButtonsClick,
 }: Readonly<SettingsPopupProps>) {
   const { isMobile } = useSidebar();
   const { settings, ...rest } = userData;
@@ -37,9 +35,7 @@ export function TriggeredSettingsPopup({
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <ListMapper items={settings}>
-          <Dropdown ischild {...rest} onClick={handleOnFooterButtonsClick} />
-        </ListMapper>
+        <DropdownList items={settings} optional={{ ...rest }} />
       </DropdownMenuGroup>
     </DropdownMenuContent>
   );

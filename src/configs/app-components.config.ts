@@ -1,12 +1,19 @@
 import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.ts";
+import type { AppBreadCrumbListProps } from "@/components/BreadCrumbs/types/breadcrumbs.types";
 import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
+import type { DropdownsProps } from "@/components/Dropdowns/types/dropdowns.types";
+import type { AvatarListWithLabelAndAddButtonProps } from "@/components/Form/types/form.types";
+import type { LabelledInputProps } from "@/components/Inputs/types/inputs.types";
 import type {
   EvaluationRadioItemDescriptionProps,
   EvaluationRadioItemProps,
 } from "@/components/Radio/types/radio.types.ts";
+import type { NonLabelledGroupItemProps } from "@/components/Selects/types/select.types";
 import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
+import type { LabelledTextAreaProps } from "@/components/TextAreas/types/textareas.types";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
+import type { LoginFormControllerProps } from "@/features/auth/components/login/controller/types/login-form-controller.types";
 import type { ClassCreationControllerProps } from "@/features/class-creation/class-creation.index.ts";
 import type {
   StepThreeControllerProps,
@@ -18,23 +25,128 @@ import type {
   CommandHandlerMetaData,
   HandleOpeningCallbackParams,
 } from "@/hooks/database/types/use-command-handler.types.ts";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 import { checkPropsValidity } from "@/utils/utils.ts";
+import type { AccordionItemProps } from "@radix-ui/react-accordion";
+import type { FieldValues } from "react-hook-form";
 
 //                    ------------
 
 /**
- * Validates props for LaballedInputForController component.
+ * Validates props for LabelledInputForController component.
  *
- * {@link import("@/components/Inputs/LaballedInputForController.tsx").LabelledInputForController }
+ * {@link import("@/components/Inputs/LabelledInput.tsx").LabelledInput }
  */
 const LABELLED_INPUT_SHOULD_NOT_ACCEPT = ["useCommands", "creationButtonText"];
-const LABELLED_INPUT_REQUIRES = ["field", "fieldState"];
+const LABELLED_INPUT_REQUIRES = ["name"];
 
-export const labelledInputContainsInvalid = (props: Record<string, unknown>) =>
+export const labelledInputContainsInvalid = (props: LabelledInputProps) =>
   checkPropsValidity(
-    props,
+    props as unknown as AnyObjectProps,
     LABELLED_INPUT_REQUIRES,
     LABELLED_INPUT_SHOULD_NOT_ACCEPT,
+  );
+
+//                    ------------
+
+/**
+ * Validation requirements for AppBreadCrumb component.
+ *
+ * {@link import("@/components/BreadCrumbs/AppBreadCrumb.tsx").AppBreadCrumb}
+ */
+const APP_BREADCRUMB_REQUIRES = ["segmentsLength"];
+const APP_BREADCRUMB_SHOULD_NOT_ACCEPT = ["useCommands", "creationButtonText"];
+
+export const appBreadCrumbPropsInvalid = (props: AnyObjectProps) =>
+  checkPropsValidity(
+    props,
+    APP_BREADCRUMB_REQUIRES,
+    APP_BREADCRUMB_SHOULD_NOT_ACCEPT,
+  );
+
+//                    ------------
+
+/**
+ * Validation requirements for AppBreadCrumbSegment component.
+ *
+ * {@link import("@/components/BreadCrumbs/AppBreadCrumbSegment.tsx").AppBreadCrumbSegment}
+ */
+
+const AVATAR_LIST_WITH_LABEL_AND_ADD_BUTTON_REQUIRES = ["items"];
+export const avatarListWithLabelAndAddButtonPropsInvalid = (
+  props: AvatarListWithLabelAndAddButtonProps,
+) =>
+  checkPropsValidity(props, AVATAR_LIST_WITH_LABEL_AND_ADD_BUTTON_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for AppBreadCrumbList component.
+ *
+ * {@link import("@/components/BreadCrumbs/AppBreadCrumbList.tsx").AppBreadCrumbList}
+ */
+
+const APP_BREADCRUMB_LIST_REQUIRES = ["items"];
+
+export const appBreadCrumbListPropsInvalid = (props: AppBreadCrumbListProps) =>
+  checkPropsValidity(props, APP_BREADCRUMB_LIST_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for ListMapper component.
+ *
+ * {@link import("@/components/Lists/ListMapper.tsx").ListMapper }
+ */
+const SUBSKILLS_WITH_STUDENTS_REQUIRES = [
+  "storeGetter",
+  "module",
+  "valueGetter",
+  "index",
+  "isCompleted",
+  "isDisabled",
+];
+
+export const subSkillWithStudentsPropsInvalid = (props: AnyObjectProps) =>
+  checkPropsValidity(props, SUBSKILLS_WITH_STUDENTS_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for withAccordionItem HOC.
+ *
+ * {@link import("@/features/evaluations/create/components/HOCs/withAccordionItem.tsx").withAccordionItem }
+ */
+const WITH_ACCORDION_ITEM_REQUIRES = ["value", "name"];
+
+export const withAccordionItemPropsInvalid = (props: AccordionItemProps) =>
+  checkPropsValidity(props as any, WITH_ACCORDION_ITEM_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validates props for LabelledInputForController component.
+ *
+ * {@link import("@/components/HOCs/forController.tsx").forController }
+ */
+const FOR_CONTROLLER_REQUIRES = ["field", "fieldState"];
+export const forControllerContainsInvalid = (props: FieldValues) =>
+  checkPropsValidity(props, FOR_CONTROLLER_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for LabelledTextAreaForController component.
+ *
+ * {@link import("@/components/Inputs/LabelledTextAreaForController.tsx").LabelledTextAreaForController }
+ */
+const LABELLED_TEXTAREA_REQUIRES = ["name", "title"];
+
+export const labelledTextAreaContainsInvalid = (props: LabelledTextAreaProps) =>
+  checkPropsValidity(
+    props as unknown as AnyObjectProps,
+    LABELLED_TEXTAREA_REQUIRES,
+    [],
   );
 
 //                    ------------
@@ -46,7 +158,7 @@ export const labelledInputContainsInvalid = (props: Record<string, unknown>) =>
  */
 const CONTROLLER_REQUIRES = ["form", "name"];
 
-export const controllerPropsInvalid = (props: Record<string, unknown>) =>
+export const controllerPropsInvalid = (props: AnyObjectProps) =>
   checkPropsValidity(props, CONTROLLER_REQUIRES, []);
 
 //                    ------------
@@ -54,7 +166,10 @@ export const controllerPropsInvalid = (props: Record<string, unknown>) =>
 /**
  * Validation requirements for LeftSidePageContent.
  */
-const LEFT_SIDE_PAGE_CONTENT_REQUIRES = [{ item: ["title", "number"] }];
+const LEFT_SIDE_PAGE_CONTENT_REQUIRES = [
+  { item: ["title", "number"] },
+  "isClicked",
+];
 
 export const leftSidePageContentPropsInvalid = (props: LeftContentProps) =>
   checkPropsValidity(props, LEFT_SIDE_PAGE_CONTENT_REQUIRES, []);
@@ -68,7 +183,7 @@ export const leftSidePageContentPropsInvalid = (props: LeftContentProps) =>
  */
 const LIST_MAPPER_REQUIRES = ["items"];
 
-export const listMapperContainsInvalid = (props: Record<string, unknown>) =>
+export const listMapperContainsInvalid = (props: AnyObjectProps) =>
   checkPropsValidity(props, LIST_MAPPER_REQUIRES, []);
 
 //                    ------------
@@ -80,7 +195,7 @@ export const listMapperContainsInvalid = (props: Record<string, unknown>) =>
  */
 const LOGIN_BUTTON_REQUIRES = ["name", "path"];
 
-export const loginButtonContainsInvalid = (props: Record<string, unknown>) =>
+export const loginButtonContainsInvalid = (props: AnyObjectProps) =>
   checkPropsValidity(props, LOGIN_BUTTON_REQUIRES, []);
 
 //                    ------------
@@ -91,7 +206,7 @@ export const loginButtonContainsInvalid = (props: Record<string, unknown>) =>
  */
 const MENU_BUTTON_REQUIRES = ["item"];
 
-export const menuButtonContainsInvalid = (props: Record<string, unknown>) =>
+export const menuButtonContainsInvalid = (props: AnyObjectProps) =>
   checkPropsValidity(props, MENU_BUTTON_REQUIRES, []);
 
 //                    ------------
@@ -104,15 +219,14 @@ const COMMAND_GROUP_REQUIRES = ["items", "groupTitle"];
 const COMMAND_ITEM_REQUIRES = ["id", "value"];
 const COMMAND_SELECTION_REQUIRES = ["id"];
 
-export const commandGroupContainsInvalid = (props: Record<string, unknown>) =>
+export const commandGroupContainsInvalid = (props: AnyObjectProps) =>
   checkPropsValidity(props, COMMAND_GROUP_REQUIRES, []);
 
-export const commandItemContainsInvalid = (props: Record<string, unknown>) =>
+export const commandItemContainsInvalid = (props: AnyObjectProps) =>
   checkPropsValidity(props, COMMAND_ITEM_REQUIRES, []);
 
-export const commandSelectionDoesNotContainId = (
-  props: Record<string, unknown>,
-) => checkPropsValidity(props, COMMAND_SELECTION_REQUIRES, []);
+export const commandSelectionDoesNotContainId = (props: AnyObjectProps) =>
+  checkPropsValidity(props, COMMAND_SELECTION_REQUIRES, []);
 
 //                    ------------
 
@@ -174,7 +288,7 @@ export const taskModalPropsInvalid = (props: Pick<CommandItemType, "id">) =>
 const INLINE_ITEM_AND_SWITCH_SELECTION_REQUIRES = ["title"];
 
 export const inlineItemAndSwitchSelectionPropsInvalid = (
-  props: Record<string, unknown>,
+  props: AnyObjectProps,
 ) => checkPropsValidity(props, INLINE_ITEM_AND_SWITCH_SELECTION_REQUIRES, []);
 
 //                    ------------
@@ -185,13 +299,20 @@ export const inlineItemAndSwitchSelectionPropsInvalid = (
 const EVALUATION_RADIO_ITEM_REQUIRES = ["id", "name"];
 
 export const evaluationRadioItemPropsInvalid = (
-  props: EvaluationRadioItemProps,
-) =>
-  checkPropsValidity(
-    props as unknown as Record<string, unknown>,
-    EVALUATION_RADIO_ITEM_REQUIRES,
-    [],
-  );
+  props: EvaluationRadioItemProps & AnyObjectProps,
+) => checkPropsValidity(props, EVALUATION_RADIO_ITEM_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for Dropdown.
+ *
+ * {@link import("@/components/Dropdowns/Dropdown.tsx").Dropdown}
+ */
+const DROPDOWN_REQUIRES = ["title"];
+
+export const dropdownPropsInvalid = (props: DropdownsProps) =>
+  checkPropsValidity(props as any, DROPDOWN_REQUIRES, []);
 
 //                    ------------
 
@@ -229,6 +350,22 @@ export const classCreationControllerPropsInvalid = (
 //                    ------------
 
 /**
+ * Validation requirements for Login Form Controller.
+ *
+ * {@link import("@/features/auth/components/login/controller/LoginFormController.tsx").LoginFormController}
+ */
+const LOGIN_FORM_CONTROLLER_REQUIRES = [
+  ...BASE_CONTROLLERS_PROPS_REQUIRES,
+  "setIsPwForgotten",
+  "isPwForgotten",
+];
+
+export const loginFormControllerPropsInvalid = (
+  props: LoginFormControllerProps,
+) => checkPropsValidity(props, LOGIN_FORM_CONTROLLER_REQUIRES, []);
+//                    ------------
+
+/**
  * Validation requirements for StepThreeController.
  */
 const STEP_THREE_CONTROLLER_REQUIRES = [
@@ -240,9 +377,7 @@ export const stepThreeControllerPropsInvalid = (
   props: StepThreeControllerProps,
 ) => checkPropsValidity(props, STEP_THREE_CONTROLLER_REQUIRES, []);
 
-const STEP_THREE_SUBSKILLS_SELECTION_CONTROLLER_REQUIRES = [
-  ...BASE_CONTROLLERS_PROPS_REQUIRES,
-];
+const STEP_THREE_SUBSKILLS_SELECTION_CONTROLLER_REQUIRES = ["isActive"];
 export const stepThreeSubskillsSelectionControllerPropsInvalid = (
   props: StepThreeSubskillsSelectionControllerProps,
 ) =>
@@ -273,10 +408,31 @@ export const stepThreeModuleSelectionControllerPropsInvalid = (
  *
  * {@link import("@/components/Sliders/EvaluationSlider.tsx").EvaluationSlider}
  */
-const SLIDER_REQUIRES = ["value", "onValueChange", "fullName"];
+const SLIDER_REQUIRES = ["value", "fullName"];
 
 export const evaluationSliderPropsValid = (props: EvaluationSliderProps) =>
   checkPropsValidity(props, SLIDER_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for the VerticalField's helper WithListings
+ */
+const WITH_LISTINGS_REQUIRES = ["items"];
+
+export const withListingsPropsInvalid = (props: AnyObjectProps) =>
+  checkPropsValidity(props, WITH_LISTINGS_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for NonLabelledGroupItem.
+ */
+const NON_LABELLED_GROUP_ITEM_REQUIRES = ["id", "name"];
+
+export const nonLabelledGroupItemPropsInvalid = (
+  props: NonLabelledGroupItemProps,
+) => checkPropsValidity(props, NON_LABELLED_GROUP_ITEM_REQUIRES, []);
 
 //                    ------------
 
@@ -287,7 +443,7 @@ export const evaluationSliderPropsValid = (props: EvaluationSliderProps) =>
  */
 export function debugLogs(componentName: string, details?: unknown) {
   if (DEV_MODE && !NO_COMPONENT_WARNING_LOGS) {
-    console.debug(
+    console.error(
       `[${componentName}] - Invalid props detected. Please check the component configuration.`,
       details,
     );

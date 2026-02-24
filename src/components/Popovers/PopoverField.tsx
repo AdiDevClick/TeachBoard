@@ -1,7 +1,4 @@
 import { PopoverFieldProvider } from "@/api/providers/Popover.provider.tsx";
-import withComboBoxCommands from "@/components/HOCs/withComboBoxCommands";
-import withController from "@/components/HOCs/withController.tsx";
-import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import type {
   PopoverFieldProps,
   PopoverFieldState,
@@ -15,7 +12,7 @@ import {
 } from "@/components/ui/popover.tsx";
 import { cn } from "@/utils/utils.ts";
 import { LucideChevronDown } from "lucide-react";
-import { useCallback, useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useState, type Ref } from "react";
 
 const defaultValue = new Set<string>();
 
@@ -44,8 +41,7 @@ export function PopoverField({
   resetKey,
   ...props
 }: PopoverFieldProps) {
-  const { onOpenChange, children, role, ...rest } = props;
-
+  const { onOpenChange, children, role, multiSelection, ...rest } = props;
   const id = useId();
 
   const [state, setState] = useState<PopoverFieldState>({
@@ -56,54 +52,40 @@ export function PopoverField({
       : (rest.defaultValue ?? undefined),
   });
 
-  // Reset selectedValue when resetKey changes
   useEffect(() => {
-    if (resetKey !== undefined) {
+    function resetSelectedValue() {
       setState((prev) => ({
         ...prev,
-        selectedValue: props.multiSelection ? defaultValue : undefined,
+        selectedValue: multiSelection ? defaultValue : undefined,
       }));
     }
-  }, [resetKey, props.multiSelection]);
 
-  // Meta data for this field instance
-  const memoizedMeta = useMemo(
-    () => ({
-      task: rest?.task ?? "none",
-      apiEndpoint: rest?.apiEndpoint,
-      dataReshapeFn: rest?.dataReshapeFn,
-      name: state.fieldName,
-      id: containerId,
-    }),
-    [
-      rest?.task,
-      rest?.apiEndpoint,
-      rest?.dataReshapeFn,
-      state.fieldName,
-      containerId,
-    ],
-  );
+    if (resetKey !== undefined) {
+      resetSelectedValue();
+    }
+  }, [resetKey, multiSelection]);
 
   /**
    * Callback to handle selection of a value
    *
    * !! IMPORTANT !! This function is passed to the PopoverFieldProvider to be used in CommandItems.
    */
-  const setSelectedValueCallback = useCallback((value: string) => {
-    if (props.multiSelection) {
+  const setSelectedValueCallback = (nextValue: string) => {
+    if (multiSelection) {
       setState((prev) => {
         const newSet = new Set(prev.selectedValue);
-        if (newSet.has(value)) {
-          newSet.delete(value);
+        if (newSet.has(nextValue)) {
+          newSet.delete(nextValue);
         } else {
-          newSet.add(value);
+          newSet.add(nextValue);
         }
         return { ...prev, selectedValue: newSet };
       });
-    } else {
-      setState((prev) => ({ ...prev, selectedValue: value, open: false }));
+      return;
     }
-  }, []);
+
+    setState((prev) => ({ ...prev, selectedValue: nextValue, open: false }));
+  };
 
   /**
    * Handle open state changes
@@ -112,13 +94,10 @@ export function PopoverField({
    *
    * @param isOpen - Whether the popover is open or not
    */
-  const handleOpenChange = useCallback(
-    (isOpen: boolean) => {
-      setState((prev) => ({ ...prev, open: isOpen }));
-      onOpenChange?.(isOpen, memoizedMeta);
-    },
-    [onOpenChange, memoizedMeta],
-  );
+  const handleOpenChange = (isOpen: boolean) => {
+    setState((prev) => ({ ...prev, open: isOpen }));
+    onOpenChange?.(isOpen);
+  };
 
   const selectValue = props.multiSelection
     ? placeholder
@@ -127,7 +106,7 @@ export function PopoverField({
   return (
     <div
       id={containerId}
-      ref={(el) => setRef?.(el, memoizedMeta)}
+      ref={(setRef ?? props.ref) as Ref<HTMLDivElement>}
       className={cn("flex flex-col items-start gap-2", className)}
     >
       {label && (
@@ -139,6 +118,7 @@ export function PopoverField({
       <Popover open={state.open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <Button
+            type="button"
             id={id}
             variant="outline"
             role={role}
@@ -168,15 +148,3 @@ export function PopoverField({
 }
 
 export default PopoverField;
-
-export const PopoverFieldWithController = withController(PopoverField);
-
-export const PopoverFieldWithCommands = withComboBoxCommands(PopoverField);
-
-export const PopoverFieldWithControlledCommands = withController(
-  PopoverFieldWithCommands,
-);
-
-export const PopoverFieldWithControllerAndCommandsList = withListMapper(
-  PopoverFieldWithControlledCommands,
-);

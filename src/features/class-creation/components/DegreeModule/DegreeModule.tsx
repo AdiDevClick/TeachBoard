@@ -1,4 +1,8 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import {
+  DEGREE_MODULE_CARD_TITLE,
+  DEGREE_MODULE_FOOTER_PROPS,
+} from "@/features/class-creation/components/DegreeModule/config/degree-module.configs";
 import { DegreeModuleController } from "@/features/class-creation/components/DegreeModule/controllers/DegreeModuleController.tsx";
 import { degreeModuleCreationInputControllers } from "@/features/class-creation/components/DegreeModule/forms/degree-module-inputs";
 import {
@@ -8,15 +12,7 @@ import {
 } from "@/features/class-creation/components/DegreeModule/models/degree-module.models";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
 import { useForm } from "react-hook-form";
-
-const titleProps = {
-  title: "Création de nouveaux modules de compétences",
-  description: "Ces modules pourront être associés aux diplômes.",
-};
-
-const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
 
 /**
  * View component for creating a new degree skill.
@@ -47,27 +43,24 @@ function DegreeModule({
 
   const formId = pageId + "-form";
 
-  const commonProps = useMemo(
-    () => ({
-      pageId,
-      inputControllers,
-      formId,
-      className,
-      modalMode,
-      card: {
-        card: { className },
-        title: titleProps,
-        footer: {
-          ...footerProps,
-          formState: form.formState,
-          formId,
-        },
+  const commonProps = {
+    pageId,
+    inputControllers,
+    formId,
+    className,
+    modalMode,
+    card: {
+      card: { className },
+      title: DEGREE_MODULE_CARD_TITLE,
+      footer: {
+        ...DEGREE_MODULE_FOOTER_PROPS,
+        formState: form.formState,
+        formId,
       },
-      ...props,
-      form,
-    }),
-    [form.formState, props],
-  );
+    },
+    ...props,
+    form,
+  };
 
   return (
     <DegreeModuleWithCard {...commonProps}>

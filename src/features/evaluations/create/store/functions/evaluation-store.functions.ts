@@ -11,6 +11,7 @@ import type {
   ClassModules,
   ClassModuleSubSkill,
   EvaluationType,
+  NonPresentStudentsResult,
   StepsCreationState,
   StudentEvaluationModuleType,
   StudentEvaluationSubSkillType,
@@ -143,7 +144,7 @@ export function updateModules(
   module: ClassModules,
   items: Partial<ClassModules>,
 ) {
-  const updatedModules = state.modules.clone(true);
+  const updatedModules = state.modules.clone();
 
   updatedModules.delete(module.id).set(module.id, { ...module, ...items });
 
@@ -286,4 +287,60 @@ export function setModules(
       savedModules?.set(module.id, newProperties);
     }
   });
+}
+
+/**
+ * Calculate the average score for a student across all evaluated sub-skills.
+ *
+ * @param student - The student entry containing evaluations
+ * @returns The average score of the student
+ */
+export const getStudentAverageScore = (
+  student: StudentWithPresence,
+): number => {
+  const studentEvaluations = student.evaluations;
+
+  if (!studentEvaluations) {
+    return 0;
+  }
+
+  let totalScore = 0;
+  let scoreCount = 0;
+
+  for (const module of studentEvaluations.modules.values()) {
+    for (const subSkill of module.subSkills.values()) {
+      if (typeof subSkill.score === "number") {
+        totalScore += subSkill.score;
+        scoreCount += 1;
+      }
+    }
+  }
+
+  return scoreCount > 0 ? totalScore / scoreCount : 0;
+};
+
+/**
+ * Save non-present students into the unique sets for both byId and byName.
+ *
+ * @param student - The student to save as non-present
+ * @param uniqueSet  - The unique set containing the fullname and id tuple for non-present students
+ */
+export function saveNonPresentStudents(
+  student: StudentWithPresence,
+  uniqueSet: WritableDraft<NonPresentStudentsResult>,
+) {
+  uniqueSet.set(student.id, [student.fullName, { id: student.id }]);
+}
+
+/**
+ * Remove a student from the non-present students unique sets when they are marked as present.
+ *
+ * @param student - The student to remove from non-present lists
+ * @param uniqueSet - The unique set containing byId and byName sets to update
+ */
+export function removeFromNonPresentStudents(
+  student: StudentWithPresence,
+  uniqueSet: WritableDraft<NonPresentStudentsResult>,
+) {
+  uniqueSet.delete(student.id);
 }

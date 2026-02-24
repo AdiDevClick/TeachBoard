@@ -1,6 +1,6 @@
 import type {
   DynamicTagsSetters,
-  DynamicTagsState,
+  StateDetails,
 } from "@/components/Tags/types/tags.types";
 
 /**
@@ -8,7 +8,7 @@ import type {
  */
 export type PopoverItem = {
   value?: string;
-  itemDetails?: DynamicTagsState;
+  itemDetails?: StateDetails;
 };
 
 /**

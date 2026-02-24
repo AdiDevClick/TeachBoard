@@ -10,20 +10,22 @@
  * Business logic should be implemented in the wrapped components or their parent containers.
  */
 
+import type {
+  FooterProps,
+  TitleProps,
+} from "@/api/contexts/types/context.types";
 import { ViewCardProvider } from "@/api/providers/ViewCardProvider.tsx";
 import {
   AppCardFooter,
   AppDialFooter,
 } from "@/components/Footer/AppFooter.tsx";
-import type { AppDialFooterProps } from "@/components/Footer/types/footer.types.ts";
-import type { WithTitledCardProps } from "@/components/HOCs/types/withTitledCard.types.ts";
+import type { WithTitledCardProps } from "@/components/HOCs/types/with-titled-card.types";
 import {
   DialogHeaderTitle,
   HeaderTitle,
 } from "@/components/Titles/ModalTitle.tsx";
-import type { HeaderTitleProps } from "@/components/Titles/types/titles.types.ts";
-import type { CardFooter } from "@/components/ui/card.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
+import { Separator } from "@/components/ui/separator";
 import { useViewCardContext } from "@/hooks/contexts/useViewCardContext.ts";
 import { type ComponentProps, type ComponentType } from "react";
 
@@ -71,17 +73,16 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
       modalMode = false,
       ref,
       card: viewCard,
+      cardRender,
       children,
+      id,
       ...rest
     } = props;
 
-    const cardId = "card-" + pageId;
+    const cardId = id ?? "card-" + pageId;
 
     const contextValue = {
-      card: viewCard?.card,
-      title: viewCard?.title,
-      content: viewCard?.content,
-      footer: viewCard?.footer,
+      ...viewCard,
       modalMode,
       pageId,
       rest,
@@ -89,7 +90,13 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
 
     return (
       <ViewCardProvider value={contextValue}>
-        <Card ref={ref} id={cardId} data-dialog={cardId} {...viewCard?.card}>
+        <Card
+          ref={ref}
+          id={cardId}
+          data-dialog={modalMode ? cardId : null}
+          {...viewCard?.card}
+          {...cardRender}
+        >
           {children}
         </Card>
       </ViewCardProvider>
@@ -101,22 +108,33 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
    *
    * @param props - Props for the title component.
    */
-  Component.Title = function Title(props: HeaderTitleProps) {
-    const { title, modalMode } = useViewCardContext();
+  Component.Title = function Title(props: TitleProps) {
+    const { title = {}, modalMode } = useViewCardContext();
+    const { separator = {}, ...titleProps } = { ...title, ...props };
 
     const DynamicTitle = modalMode ? DialogHeaderTitle : HeaderTitle;
-    const titleProps = title ? { ...title, ...props } : props;
+
+    const { displaySeparator = true, ...separatorProps } = separator;
 
     return (
-      <DynamicTitle
-        className="text-left"
-        style={{
-          paddingInline: `calc(var(--spacing) * 6)`,
-        }}
-        {...titleProps}
-      >
-        {props.children}
-      </DynamicTitle>
+      <>
+        <DynamicTitle
+          className="text-left"
+          style={{
+            paddingInline: `calc(var(--spacing) * 6)`,
+          }}
+          {...titleProps}
+        >
+          {props.children}
+        </DynamicTitle>
+        {displaySeparator && (
+          <Separator
+            className="mx-auto my-2 max-w-1/3"
+            orientation="horizontal"
+            {...separatorProps}
+          />
+        )}
+      </>
     );
   };
 
@@ -125,25 +143,29 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
    *
    * @param props - Props for the footer component, either AppDialFooterProps or CardFooter props.
    */
-  Component.Footer = function Footer(
-    props: AppDialFooterProps | ComponentProps<typeof CardFooter>,
-  ) {
+  Component.Footer = function Footer(props: FooterProps) {
     const { footer = {}, modalMode } = useViewCardContext();
-    const footerProps = { ...footer, ...props };
+    const { separator = {}, ...footerProps } = { ...footer, ...props };
 
-    if (!footer) {
-      return null;
-    }
+    const { displaySeparator = true, ...separatorProps } = separator;
 
-    if (modalMode) {
-      return (
-        <AppDialFooter {...(footerProps as AppDialFooterProps)}>
-          {props.children}
-        </AppDialFooter>
-      );
-    }
-
-    return <AppCardFooter {...footerProps}>{props.children}</AppCardFooter>;
+    return (
+      <>
+        {displaySeparator && (
+          <Separator
+            className="mx-auto my-2 max-w-1/3"
+            orientation="horizontal"
+            {...separatorProps}
+          />
+        )}
+        {modalMode && (
+          <AppDialFooter {...footerProps}>{props.children}</AppDialFooter>
+        )}
+        {!modalMode && (
+          <AppCardFooter {...footerProps}>{props.children}</AppCardFooter>
+        )}
+      </>
+    );
   };
 
   const CardSlot = (() => null) as ComponentType<ComponentProps<typeof Card>>;

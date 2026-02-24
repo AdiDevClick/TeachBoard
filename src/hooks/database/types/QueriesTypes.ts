@@ -3,9 +3,10 @@ import type {
   FetchJSONSuccess,
 } from "@/api/types/api.types.ts";
 import type { USER_ACTIVITIES } from "@/configs/app.config.ts";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 import type { FormMethod } from "react-router-dom";
 
-export type MutationViolation = Record<string, unknown> & {
+export type MutationViolation = AnyObjectProps & {
   propertyPath?: string;
   message?: string;
   code?: string;
@@ -14,15 +15,15 @@ export type MutationViolation = Record<string, unknown> & {
 
 export type MutationErrorDetails = {
   violations?: MutationViolation[];
-} & Record<string, unknown>;
+} & AnyObjectProps;
 
-export type MutationDebugInfo = Record<string, unknown> & {
+export type MutationDebugInfo = AnyObjectProps & {
   type?: string;
   route?: string;
   detailedDebugMessage?: string;
 };
 
-export type MutationResponse = Record<string, unknown> & {
+export type MutationResponse = AnyObjectProps & {
   ok?: boolean;
   status?: number;
   // error?: string | null;
@@ -33,7 +34,7 @@ export type MutationResponse = Record<string, unknown> & {
   // debugs?: MutationDebugInfo;
 };
 
-export type MutationVariables = Record<string, unknown> | undefined;
+export type MutationVariables = AnyObjectProps | undefined;
 
 export type QueryOnSubmitMutationState = {
   response: MutationResponse;
@@ -51,7 +52,7 @@ export type FetchArgs = {
   url?: string;
   abortController?: AbortController;
   retry?: number;
-  timeout?: number;
+  retryTimeout?: number;
 };
 
 export type GenericQueryResults<S, E> = {
@@ -82,7 +83,22 @@ export type QueryKeyDescriptor<S, E> = [
       state: {
         error: FetchJSONError<E> | null;
         success: FetchJSONSuccess<S> | null;
-      } & Record<string, unknown>
+      } & AnyObjectProps,
     ) => void;
-  }
+  },
 ];
+
+/**
+ * Custom hook for managing fetch operations with React Query.
+ */
+export type InternalMutationVariables = MutationVariables & {
+  abortController?: AbortController;
+};
+
+/**
+ * Default state for query results, used to reset state on new submissions.
+ */
+export type UseQueryOnSubmitState<S, E> = {
+  error: FetchJSONError<E> | null;
+  success: FetchJSONSuccess<S> | null;
+};

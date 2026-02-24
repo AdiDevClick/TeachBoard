@@ -1,4 +1,4 @@
-import type { FetchingInputItem } from "@/components/Inputs/types/inputs.types.ts";
+import type { FetchingInputItem } from "@/types/AppInputControllerInterface";
 import z from "zod";
 
 const dataField = {
@@ -60,7 +60,7 @@ const taskTemplateCreationSchema = (data: typeof dataField) =>
         z.object({
           moduleId: z.uuid(data.skillsValidUuidMessage),
           subSkillId: z.array(z.uuid(data.skillsValidUuidMessage)),
-        })
+        }),
       )
       .nonempty(data.skillsRequiredMessage)
       .describe("List of skills associated with the task"),

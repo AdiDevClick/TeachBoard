@@ -2,13 +2,17 @@ import { createStepsCreationDebugRehydrators } from "@/api/store/functions/debug
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
 import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
+import type { NonLabelledGroupItemProps } from "@/components/Selects/types/select.types";
 import { DEV_MODE } from "@/configs/app.config.ts";
 import {
   addNewEvaluationScore,
   filterSubSkillsBasedOnStudentsAvailability,
+  getStudentAverageScore,
   isSubSkillCompletedOrDisabled,
   isThisStudentAlreadyEvaluatedForThisSubSkill,
   preparedSubSkillsForUpdate,
+  removeFromNonPresentStudents,
+  saveNonPresentStudents,
   setModules,
   updateEvaluationScore,
   updateModules,
@@ -17,6 +21,7 @@ import type {
   ClassModuleSubSkill,
   EvaluationType,
   ModulesSelectionType,
+  NonPresentStudentsResult,
   StepsCreationState,
   StudentWithPresence,
   SubskillSelectionType,
@@ -47,6 +52,7 @@ const createDefaultStepsCreationState = (): StepsCreationState => ({
     selectedSubSkillIndex: null,
     selectedSubSkillId: null,
   },
+  nonPresentStudentsResult: null,
 });
 
 export const DEFAULT_VALUES_STEPS_CREATION_STATE: StepsCreationState =
@@ -205,23 +211,140 @@ export const useEvaluationStepsCreationStore = create(
            */
           setStudentPresence(studentId: UUID, isPresent: boolean) {
             ensureCollections();
-            const student = get().students.get(studentId) ?? null;
+            let assignedTaskId: UUID | null = null;
+            let hasChanged = false;
 
-            if (student) {
-              student.isPresent = isPresent;
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                const student = state.students.get(studentId);
 
-              if (student.assignedTask) {
-                ACTIONS.setStudentToModuleEvaluation(
-                  student.assignedTask.id,
-                  studentId,
-                );
-              }
+                if (!student || student.isPresent === isPresent) {
+                  return;
+                }
 
-              // !! IMPORTANT !! A student marked as not present should not have any assigned task or be part of module evaluations
-              if (!isPresent) {
-                ACTIONS.clearStudentFromModuleEvaluation(studentId);
-              }
+                const nextStudents = state.students.clone();
+                const nextStudent = {
+                  ...student,
+                  isPresent,
+                };
+
+                nextStudents.set(studentId, nextStudent);
+                state.students = nextStudents;
+
+                assignedTaskId = nextStudent.assignedTask?.id ?? null;
+                hasChanged = true;
+              },
+              undefined,
+              "setStudentPresence",
+            );
+
+            if (!hasChanged) return;
+
+            if (assignedTaskId) {
+              ACTIONS.setStudentToModuleEvaluation(assignedTaskId, studentId);
             }
+
+            if (!isPresent) {
+              ACTIONS.clearStudentFromModuleEvaluation(studentId);
+            }
+
+            const updatedStudent = get().students.get(studentId);
+            if (updatedStudent) {
+              ACTIONS.updateNonPresentStudentPresence(
+                updatedStudent,
+                isPresent,
+              );
+            }
+          },
+          /**
+           * Update the non-present students collection in the store based on a student's presence status.
+           *
+           * @param student - The student whose presence status has been updated
+           * @param isPresent - The updated presence status of the student
+           */
+          updateNonPresentStudentPresence(
+            student: StudentWithPresence,
+            isPresent: boolean,
+          ) {
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+
+                const nonPresentStudents =
+                  state.nonPresentStudentsResult ??
+                  (state.students.clone() as unknown as NonPresentStudentsResult);
+
+                if (!nonPresentStudents) return;
+
+                if (!isPresent) {
+                  saveNonPresentStudents(student, nonPresentStudents);
+                }
+
+                if (isPresent) {
+                  removeFromNonPresentStudents(student, nonPresentStudents);
+                }
+
+                state.nonPresentStudentsResult = nonPresentStudents;
+              },
+              undefined,
+              "updateNonPresentStudentPresence/remove-add-FromNonPresent",
+            );
+          },
+          /**
+           * Set all non-present students in the store at once.
+           *
+           * @description This needs a set that can search by fullName and one by IDs to be able to update the presence status from both the list of students and the dynamic tags.
+           *
+           * @param object - The object containing both byId and byName unique sets for non-present students
+           */
+          setAllNonPresentStudents() {
+            ensureCollections();
+            const results = get().nonPresentStudentsResult as
+              | StepsCreationState["students"]
+              | null;
+            // Rebuild cached `nonPresentStudentsResult` as a UniqueSet of tuples
+            if (!results) return;
+            const next = results.clone() as unknown as NonPresentStudentsResult;
+
+            results.forEach((student) => {
+              if (student.isPresent === false) {
+                removeFromNonPresentStudents(student, next);
+                saveNonPresentStudents(student, next);
+              }
+            });
+
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                state.nonPresentStudentsResult = next;
+              },
+              undefined,
+              "setAllNonPresentStudents",
+            );
+          },
+
+          /**
+           * Set the average score for a student.
+           *
+           * @param studentId - The ID of the student
+           * @param overallScore - The overall score to set
+           *
+           * @note This score can be overwritten by the teacher and will be saved as is.
+           */
+          setStudentOverallScore(studentId: UUID, overallScore: number | null) {
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                const student = state.students.get(studentId);
+
+                if (student && student.overallScore !== overallScore) {
+                  student.overallScore = overallScore;
+                }
+              },
+              undefined,
+              "setStudentOverallScore",
+            );
           },
           /**
            * Assign a task to a student.
@@ -237,30 +360,41 @@ export const useEvaluationStepsCreationStore = create(
             let previousTaskId: UUID | null | undefined = null;
             ensureCollections();
             const nextTask = get().tasks.get(taskId);
+            const student = get().students.get(studentId);
+            previousTaskId = student?.assignedTask?.id;
 
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
-                const student = state.students.get(studentId);
-                previousTaskId = student?.assignedTask?.id;
 
                 if (!student || previousTaskId === taskId) {
                   return;
                 }
 
-                const studentEvaluations = student?.evaluations;
+                let assignedTask;
 
-                // Clear all existing evaluations when changing tasks
-                if (studentEvaluations && previousTaskId) {
-                  student.evaluations = null;
+                if (student.assignedTask) {
+                  assignedTask = {
+                    id: student.assignedTask.id,
+                    name: student.assignedTask.name,
+                  };
                 }
 
                 if (nextTask) {
-                  student.assignedTask = {
+                  assignedTask = {
                     id: nextTask.id,
                     name: nextTask.name,
                   };
                 }
+
+                const clonedStudent = {
+                  ...student,
+                  evaluations: null,
+                  assignedTask,
+                };
+
+                state.students = state.students.clone();
+                state.students.set(studentId, clonedStudent);
               },
               undefined,
               "setStudentTaskAssignment",
@@ -314,6 +448,7 @@ export const useEvaluationStepsCreationStore = create(
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
+
                 for (const module of state.modules.values()) {
                   const toEvaluate = module.studentsToEvaluate;
                   if (toEvaluate?.has(studentId)) {
@@ -358,7 +493,18 @@ export const useEvaluationStepsCreationStore = create(
           setModuleSelectionIsClicked(isClicked: boolean) {
             set(
               (state) => {
-                state.moduleSelection.isClicked = isClicked;
+                // create a new object so that selectors depending on
+                // `moduleSelection` receive a new reference. previously we
+                // mutated the existing object which meant hooks such as
+                // `useTabContentState` could read the same reference and
+                // never re-render. this led to the "next button"
+                // interactivity not updating when only the `isClicked`
+                // // flag changed (see evaluation-next-button.ui.test.tsx).
+                state.moduleSelection = {
+                  ...state.moduleSelection,
+                  isClicked,
+                };
+                // state.moduleSelection.isClicked = isClicked;
               },
               undefined,
               "setModuleSelectionIsClicked",
@@ -518,7 +664,7 @@ export const useEvaluationStepsCreationStore = create(
            *
            * @returns Array of students with presence and task assignment details.
            */
-          getStudentsPresenceSelectionData() {
+          getStudentsPresenceSelectionData(): NonLabelledGroupItemProps[] {
             ensureCollections();
             const values = Array.from(get().students?.values() ?? []);
 
@@ -529,8 +675,9 @@ export const useEvaluationStepsCreationStore = create(
               ])
               .newShape() as StudentWithPresence[];
 
-            return students.map((student) => ({
+            return students.map((student, index) => ({
               ...student,
+              name: `students.${index}.taskId`,
               defaultValue: student.assignedTask?.id ?? undefined,
               items: Array.from(get().tasks?.values() ?? []).map((task) => ({
                 id: task.id,
@@ -610,9 +757,39 @@ export const useEvaluationStepsCreationStore = create(
             return module.subSkills.get(selectedSubSkillId) ?? null;
           },
           /**
+           * Get all students' scores for average calculation.
+           */
+          getAllStudentsAverageScores() {
+            ensureCollections();
+            const students = get().students;
+            const scores = new UniqueSet<
+              UUID,
+              { name: string; score: number }
+            >();
+
+            for (const student of students.values()) {
+              if (!student.isPresent) continue;
+
+              const averageScore = getStudentAverageScore(student);
+              const score =
+                student.overallScore != null
+                  ? student.overallScore * 5
+                  : averageScore;
+
+              scores.set(student.id, {
+                name: student.fullName,
+                score,
+              });
+            }
+
+            return scores;
+          },
+          /**
            * Verify if all of the students for a selected subskill from a module have been scored.
            *
-           * @param subSkillId - The ID of the sub-skill to check
+           * @param subSkillId - The ID of the sub-skill to check (optional, if not provided it will use the currently selected sub-skill in the store)
+           * @param moduleId - The ID of the module to check (optional, if not provided it will use the currently selected module in the store)
+           *
            * @returns True if all students have been scored for the sub-skill, otherwise false.
            */
           isThisSubSkillCompleted(subSkillId?: UUID, moduleId?: UUID) {
@@ -623,8 +800,10 @@ export const useEvaluationStepsCreationStore = create(
 
             if (!selectedModuleId || !selectedSubSkillId) return false;
 
-            const presentStudents =
-              ACTIONS.getPresentStudentsWithAssignedTasks(selectedSubSkillId);
+            const presentStudents = ACTIONS.getPresentStudentsWithAssignedTasks(
+              selectedSubSkillId,
+              selectedModuleId,
+            );
 
             // This sub-skill has no students to evaluate
             // And should be considered as isDisabled instead of completed
@@ -689,12 +868,11 @@ export const useEvaluationStepsCreationStore = create(
               (module) =>
                 taskIds.some((taskId) => module.tasksList.has(taskId)),
             );
-
             affectedModules.forEach((module) => {
               for (const subSkill of module.subSkills.values()) {
                 if (!subSkill.id || !module.id) continue;
 
-                if (subSkill.isCompleted !== false) {
+                if (subSkill.isCompleted) {
                   ACTIONS.setSubSkillHasCompleted(
                     module.id,
                     subSkill.id,
@@ -723,6 +901,7 @@ export const useEvaluationStepsCreationStore = create(
             if (!module || !subSkill || subSkill.isCompleted === completed)
               return;
 
+            console.log("je suis passé");
             const updatedSubSkill = {
               ...subSkill,
               isCompleted: completed,
@@ -738,11 +917,24 @@ export const useEvaluationStepsCreationStore = create(
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
+
                 updateModules(state, module, { subSkills: newSubskills });
               },
               undefined,
               "setSubSkillHasCompleted",
             );
+          },
+          /**
+           * Verify that all modules are completed (or disabled) before allowing finalization of the evaluation.
+           *
+           * @returns True if all modules are completed or disabled, otherwise false.
+           */
+          areAllModulesCompleted() {
+            ensureCollections();
+
+            const attendedModules = ACTIONS.getAttendedModules();
+
+            return attendedModules.every((module) => module.isCompleted);
           },
           /**
            * FOR SUBSKILLS - CONTROLLER USE ONLY
@@ -751,17 +943,32 @@ export const useEvaluationStepsCreationStore = create(
            *
            * @description Student must be present
            *
+           * @param subSkillId - The ID of the selected sub-skill (optional, if not provided it will use the currently selected sub-skill in the store)
+           * @param moduleId - The ID of the selected module (optional, if not provided it will use the currently selected module in the store)
+           *
            * @returns Array of students who are present and have assigned tasks related to the selected subskill.
            */
-          getPresentStudentsWithAssignedTasks(subSkillId?: UUID) {
+          getPresentStudentsWithAssignedTasks(
+            subSkillId?: UUID,
+            moduleId?: UUID,
+          ) {
             ensureCollections();
+
             const selectedSubSkillId =
               subSkillId ?? get().subSkillSelection?.selectedSubSkillId;
+            const selectedModuleId =
+              moduleId ?? get().moduleSelection?.selectedModuleId;
 
             if (!selectedSubSkillId) return [];
 
             const students = Array.from(get().students?.values() ?? []);
-            const modules = Array.from(get().modules?.values() ?? []);
+            const selectedModule = selectedModuleId
+              ? get().modules?.get(selectedModuleId)
+              : null;
+
+            const modules = selectedModule
+              ? [selectedModule]
+              : Array.from(get().modules?.values() ?? []);
 
             return students.filter((student) => {
               const { assignedTask, isPresent, id } = student;
@@ -779,6 +986,29 @@ export const useEvaluationStepsCreationStore = create(
                 )
               );
             });
+          },
+          /**
+           * FOR SUMMARY - CONTROLLER USE ONLY
+           */
+          getAllPresentStudents() {
+            ensureCollections();
+
+            const students = Array.from(get().students?.values() ?? []);
+
+            return students.filter((student) => student.isPresent);
+          },
+          /**
+           * FOR SUMMARY - CONTROLLER USE ONLY
+           *
+           * Check if there are any students with assigned tasks, which indicates that there are evaluations to be made.
+           */
+          areStudentsWithAssignedTasks() {
+            ensureCollections();
+            const students = Array.from(get().students?.values() ?? []);
+
+            return students.some(
+              (student) => student.isPresent && student.assignedTask !== null,
+            );
           },
         };
         return ACTIONS;

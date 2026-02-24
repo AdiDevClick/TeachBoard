@@ -1,4 +1,8 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import {
+  TASK_TEMPLATE_FOOTER,
+  TASK_TEMPLATE_TITLE,
+} from "@/features/class-creation/components/TaskTemplateCreation/config/task-template-creation.configs";
 import { TaskTemplateCreationController } from "@/features/class-creation/components/TaskTemplateCreation/controllers/TaskTemplateCreationController";
 import {
   type TaskTemplateCreationFormSchema,
@@ -8,15 +12,7 @@ import {
 import { taskTemplateCreationInputControllers } from "@/features/class-creation/index.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
 import { useForm } from "react-hook-form";
-
-const titleProps = {
-  title: "Création de nouvelles tâches",
-  description: "Ces tâches pourront être associées aux modules de compétences.",
-};
-
-const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
 
 /**
  * TaskTemplateCreation Component
@@ -40,32 +36,29 @@ function TaskTemplateCreation({
       description: "",
       taskId: "",
       degreeConfigId: "",
-      skills: [],
+      modules: [],
     },
   });
   const formId = pageId + "-form";
 
-  const commonProps = useMemo(
-    () => ({
-      pageId,
-      inputControllers,
-      formId,
-      modalMode,
-      className,
-      card: {
-        card: { className },
-        title: titleProps,
-        footer: {
-          ...footerProps,
-          formState: form.formState,
-          formId,
-        },
+  const commonProps = {
+    pageId,
+    inputControllers,
+    formId,
+    modalMode,
+    className,
+    card: {
+      card: { className },
+      title: TASK_TEMPLATE_TITLE,
+      footer: {
+        ...TASK_TEMPLATE_FOOTER,
+        formState: form.formState,
+        formId,
       },
-      ...props,
-      form,
-    }),
-    [form.formState, props],
-  );
+    },
+    ...props,
+    form,
+  };
 
   return (
     <TaskTemplateCreationWithCard {...commonProps}>

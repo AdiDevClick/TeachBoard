@@ -9,7 +9,9 @@ import type { ComponentProps } from "react";
  * @description This component wraps a DialogFooter so the AppDialog can use either DialogFooter or CardFooter.
  * @param props - Props for the DialogFooter component.
  * @param cancelText - Text for the cancel button. Defaults to "Annuler".
- * @param submit - An object containing text for the submit button. Defaults to "Créer".
+ * @param submitText - Text for the submit button. Defaults to "Créer".
+ * @param formId - The id of the form to be submitted.
+ * @param displaySubmitButton - Whether to display the submit button. Defaults to true.
  * @param formState - The form state object to determine if the form is valid.
  */
 export function AppDialFooter({
@@ -17,26 +19,37 @@ export function AppDialFooter({
   submitText,
   formState,
   formId,
+  displaySubmitButton = true,
+  displayCancelButton = true,
   ...props
 }: AppDialFooterProps) {
-  const { isValid } = formState;
+  const isValid = formState?.isValid ?? true;
+  const isSubmitting = formState?.isSubmitting ?? false;
+  const isSubmitSuccessful = formState?.isSubmitSuccessful ?? false;
   const cancelTextValue = cancelText || "Annuler";
   const submitTextValue = submitText || "Créer";
 
+  const isDisabledCondition = isSubmitSuccessful || isSubmitting || !isValid;
+
   return (
     <DialogFooter {...props}>
-      <DialogClose asChild className="justify-end">
-        <Button variant="outline">{cancelTextValue}</Button>
-      </DialogClose>
-      <Button
-        variant="outline"
-        className="justify-end mr-6"
-        type="submit"
-        disabled={!isValid}
-        form={formId}
-      >
-        {submitTextValue}
-      </Button>
+      {displayCancelButton && (
+        <DialogClose asChild className="justify-end">
+          <Button variant="outline">{cancelTextValue}</Button>
+        </DialogClose>
+      )}
+      {displaySubmitButton && (
+        <Button
+          variant="outline"
+          className="justify-end mr-6"
+          type="submit"
+          disabled={isDisabledCondition}
+          form={formId}
+        >
+          {submitTextValue}
+        </Button>
+      )}
+      {props.children}
     </DialogFooter>
   );
 }

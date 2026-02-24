@@ -3,7 +3,6 @@ import type {
   dataContextUser,
 } from "@/api/providers/types/sidebar-data.provider.types";
 import type { AppStore } from "@/api/store/types/app-store.types";
-import type { UserButtonProps } from "@/components/Sidebar/footer/types/footer.types";
 
 /**
  * User display fields for SettingsPopupProps
@@ -21,5 +20,4 @@ type UserData = Omit<dataContextUser, UserDisplay> &
 export type SettingsPopupProps = {
   userData: UserData;
   avatarDisplay: Pick<dataContext["user"], UserDisplay>;
-  handleOnFooterButtonsClick: UserButtonProps["handleOnFooterButtonsClick"];
 };

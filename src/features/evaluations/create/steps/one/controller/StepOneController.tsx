@@ -1,6 +1,6 @@
 import { useAppStore } from "@/api/store/AppStore";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
-import { PopoverFieldWithCommands } from "@/components/Popovers/PopoverField.tsx";
+import { PopoverFieldWithCommands } from "@/components/Popovers/exports/popover-field.exports";
 import {
   DEV_MODE,
   NO_CACHE_LOGS,
@@ -70,7 +70,7 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
    */
   const handleNewItem = ({ e, ...rest }: HandleAddNewItemParams) => {
     if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Add new item triggered", {
+      console.debug("Add new item triggered", {
         apiEndpoint: rest.apiEndpoint,
         task: rest.task,
       });
@@ -83,11 +83,6 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
       ...rest,
     });
   };
-  useEffect(() => {
-    if (selectedClassName) {
-      console.log("The selected parsed : ", selectedClassName);
-    }
-  }, [selectedClassName]);
 
   /**
    * Handle command selection from PopoverFieldWithControllerAndCommandsList
@@ -97,15 +92,13 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
    * @param value - The value of the selected command item
    * @param commandItem - The details of the selected command item
    */
-  const handleOnSelect = (value: string, commandItem: CommandItemType) => {
-    console.log("selected value :", value, commandItem);
+  const handleOnSelect = (_value: string, commandItem: CommandItemType) => {
     setSelectedClass(JSON.parse(JSON.stringify(commandItem)));
   };
+
   return (
     <PopoverFieldWithCommands
       {...stepOneInputControllers[0]}
-      // form={form}
-      // id={`${pageId}-year`}
       defaultValue={selectedClassName ?? stepOneInputControllers[0].placeholder}
       setRef={setRef}
       commandHeadings={resultsCallback()}

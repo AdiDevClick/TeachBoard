@@ -1,7 +1,3 @@
-import type {
-  ApiEndpointType,
-  DataReshapeFn,
-} from "@/components/Inputs/types/inputs.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { degreeModuleCreationInputControllers } from "@/features/class-creation/components/DegreeModule/forms/degree-module-inputs";
 import { diplomaCreationInputControllers } from "@/features/class-creation/components/DiplomaCreation/forms/diploma-creation-inputs";
@@ -33,6 +29,10 @@ import {
   taskTemplateFetch,
 } from "@/tests/samples/class-creation-sample-datas";
 import { stubFetchRoutes } from "@/tests/test-utils/vitest-browser.helpers";
+import type {
+  ApiEndpointType,
+  DataReshapeFn,
+} from "@/types/AppInputControllerInterface";
 
 type ControllerLike = {
   name?: string;
@@ -49,7 +49,7 @@ type ControllersConfig<T extends ControllerLike> = {
   outputNames: Record<string, string>;
 };
 
-type InstallFetchStubs = (postResponse?: unknown) => void;
+type InstallFetchStubs = (_postResponse?: unknown) => void;
 
 type StubRouteCtx = {
   controllers: Record<string, ControllerLike>;
@@ -67,7 +67,7 @@ type StubControllerUrlSpec = {
 type StubUrlSpec =
   | string
   | StubControllerUrlSpec
-  | ((ctx: StubRouteCtx) => string);
+  | ((_ctx: StubRouteCtx) => string);
 
 type StubResponseValue =
   | Record<string, unknown>
@@ -78,7 +78,7 @@ type StubResponseValue =
   | null
   | undefined;
 
-type StubResponseSpec = StubResponseValue | ((ctx: StubRouteCtx) => unknown);
+type StubResponseSpec = StubResponseValue | ((_ctx: StubRouteCtx) => unknown);
 
 type StubRouteSpec = {
   url: StubUrlSpec;
@@ -98,7 +98,7 @@ function buildFetchStubs(
   postRoutes: Array<[string, unknown]>;
 } {
   const dynamicEndpointPrefix = (
-    endpointFn: (arg: string) => string,
+    endpointFn: (_arg: string) => string,
     placeholder = "__DYNAMIC_ARG__",
   ): string => endpointFn(placeholder).replace(placeholder, "");
 
@@ -196,6 +196,13 @@ const extraInputControllers: ControllerLike[] = [
     name: "taskTemplatesAll",
     apiEndpoint: API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.ALL,
   },
+  {
+    // helper stub for the class-name availability endpoint; tests normally
+    // don’t use it, but having it here makes it easy to create a fetch stub
+    // when a spec needs to simulate the check.
+    name: "classNameAvailability",
+    apiEndpoint: API_ENDPOINTS.GET.CLASSES.endPoints.CHECK_NAME,
+  },
 ];
 
 const controllersConfig: Array<ControllersConfig<ControllerLike>> = [
@@ -222,7 +229,7 @@ const controllersConfig: Array<ControllersConfig<ControllerLike>> = [
   },
   {
     controllerName: taskTemplateCreationInputControllers,
-    outputNames: { taskLabelController: "taskId", skillsController: "skills" },
+    outputNames: { taskLabelController: "taskId", skillsController: "modules" },
   },
   {
     controllerName: degreeModuleCreationInputControllers,

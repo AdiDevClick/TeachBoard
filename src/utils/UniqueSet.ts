@@ -194,4 +194,18 @@ export class UniqueSet<K, V extends { [key: string]: unknown } | unknown[]> {
     }
     return newSet;
   }
+
+  /**
+   * JSON serializer used by `JSON.stringify()`.
+   *
+   * By default `UniqueSet` stores its data in a private `#map` field which is
+   * not enumerable — `JSON.stringify()` would otherwise emit an empty object.
+   *
+   * Returning `Array.from(this.#map.values())` produces a plain array of
+   * serializable objects that matches server-side DTO expectations (e.g.
+   * `attendedModules: ModuleDto[]`).
+   */
+  toJSON() {
+    return Array.from(this.#map.values());
+  }
 }

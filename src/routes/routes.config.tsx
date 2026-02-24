@@ -1,15 +1,15 @@
+import { COMPLETE_SIDEBAR_DATAS } from "@/configs/main.configs";
 import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas.tsx";
 import {
   inputSignupControllers,
   passwordCreationInputControllers,
 } from "@/data/inputs-controllers.data.ts";
+import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
 import { CreateEvaluations } from "@/features/evaluations/create/CreateEvaluations.tsx";
 import { StepFour } from "@/features/evaluations/create/steps/four/StepFour.tsx";
 import { StepOne } from "@/features/evaluations/create/steps/one/StepOne";
 import { StepThree } from "@/features/evaluations/create/steps/three/StepThree.tsx";
 import { StepTwo } from "@/features/evaluations/create/steps/two/StepTwo.tsx";
-import { inputLoginControllers } from "@/features/login/components/main/forms/login-inputs.ts";
-import { completeDatas } from "@/main.tsx";
 import { About } from "@/pages/About/About.tsx";
 import EmailValidation from "@/pages/Email/EmailValidation";
 import { PageError } from "@/pages/Error/PageError.tsx";
@@ -19,18 +19,20 @@ import { Login } from "@/pages/Login/Login.tsx";
 import { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
 import { Signup } from "@/pages/Signup/Signup";
 import { Navigate, type RouteObject } from "react-router-dom";
-type NavMenu = (typeof completeDatas.navMain.menus)[number];
 
-export type Loadertype<LDatas, PDatas> = {
-  loaderData?: LDatas;
-  pageTitle: string;
-  pageDatas?: PDatas;
-};
+const DATE = new Date().toLocaleDateString();
+const EVALUATION_PAGE_TITLE = "Evaluation - " + DATE;
 
-export type CreateEvaluationsLoaderData = Loadertype<
-  NavMenu,
-  typeof EvaluationPageTabsDatas
->;
+const EVALUATION_ELEMENTS = [
+  { path: EvaluationPageTabsDatas.step1.name, element: <StepOne /> },
+  { path: EvaluationPageTabsDatas.step2.name, element: <StepTwo /> },
+  { path: EvaluationPageTabsDatas.step3.name, element: <StepThree /> },
+  {
+    path: EvaluationPageTabsDatas.step4.name,
+    element: <StepFour />,
+    title: "hidden",
+  },
+] as const;
 
 /**
  * Application route children configuration.
@@ -39,21 +41,21 @@ export type CreateEvaluationsLoaderData = Loadertype<
  * @description Each route object defines a path, element, and optional loader.
  * The loader functions set the document title and return necessary data for each route.
  *
- * @see {@link completeDatas} for sidebar and navigation data.
+ * @see {@link COMPLETE_SIDEBAR_DATAS} for sidebar and navigation data.
  * @see {@link EvaluationPageTabsDatas} for evaluation page tab data.
  * @see {@link setDocumentTitle} for setting the document title based on the route.
  *
  * Routes are used in the main application router configuration (see ./src/main.tsx).
  */
-export const routeChildren = [
+export const ROUTES_CHILDREN: RouteObject[] = [
   {
     index: true,
     element: <Home />,
     loader: async () => {
-      setDocumentTitle(completeDatas.sidebarHeader.tooltip);
+      setDocumentTitle(COMPLETE_SIDEBAR_DATAS.sidebarHeader.tooltip);
 
       return {
-        loaderData: completeDatas.sidebarHeader,
+        loaderData: COMPLETE_SIDEBAR_DATAS.sidebarHeader,
         pageTitle: "Dashboard",
       };
     },
@@ -109,11 +111,11 @@ export const routeChildren = [
         index: true,
         element: <Evaluations />,
         loader: async () => {
-          setDocumentTitle(completeDatas.navMain.menus[2].title);
+          setDocumentTitle(COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title);
 
           return {
-            pageTitle: completeDatas.navMain.menus[2].title,
-            loaderData: completeDatas.navMain.menus[2],
+            pageTitle: COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title,
+            loaderData: COMPLETE_SIDEBAR_DATAS.navMain.menus[2],
           };
         },
       },
@@ -124,59 +126,27 @@ export const routeChildren = [
         path: "create",
         element: <CreateEvaluations />,
         loader: async () => {
-          const date = new Date().toLocaleDateString();
-          setDocumentTitle(completeDatas.navMain.menus[0].title);
+          setDocumentTitle(COMPLETE_SIDEBAR_DATAS.navMain.menus[0].title);
 
           return {
-            pageTitle: "Evaluation - " + date,
-            loaderData: completeDatas.navMain.menus[0],
+            pageTitle: EVALUATION_PAGE_TITLE,
+            loaderData: COMPLETE_SIDEBAR_DATAS.navMain.menus[0],
             pageDatas: EvaluationPageTabsDatas,
           };
         },
-        children: [
-          {
-            path: EvaluationPageTabsDatas.step1.name,
-            element: <StepOne />,
-            loader: async () => {
-              const date = new Date().toLocaleDateString();
-              return {
-                pageTitle: "Evaluation - " + date,
-              };
-            },
-          },
-          {
-            path: EvaluationPageTabsDatas.step2.name,
-            element: <StepTwo />,
-            loader: async () => {
-              const date = new Date().toLocaleDateString();
-              return {
-                pageTitle: "Evaluation - " + date,
-              };
-            },
-          },
-          {
-            path: EvaluationPageTabsDatas.step3.name,
-            element: <StepThree />,
-            loader: async () => {
-              const date = new Date().toLocaleDateString();
-              return {
-                pageTitle: "Evaluation - " + date,
-              };
-            },
-          },
-          {
-            path: EvaluationPageTabsDatas.step4.name,
-            element: <StepFour />,
-            loader: async () => {
-              const date = new Date().toLocaleDateString();
-              return {
-                pageTitle: "Evaluation - " + date,
-              };
-            },
-          },
-        ],
+        children: EVALUATION_ELEMENTS.map((elem) => ({
+          path: elem.path,
+          element: elem.element,
+          loader: async () => ({
+            pageTitle: elem.title ?? EVALUATION_PAGE_TITLE,
+          }),
+        })),
       },
     ],
+  },
+  {
+    path: "logout",
+    element: <Navigate to={"/"} />,
   },
   {
     path: "error",
@@ -186,7 +156,7 @@ export const routeChildren = [
     path: "*",
     element: <Navigate to={"/error"} />,
   },
-] as RouteObject[];
+];
 
 /**
  * Set the document title based on the selected menu item

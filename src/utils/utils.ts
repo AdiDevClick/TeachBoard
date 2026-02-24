@@ -2,14 +2,28 @@ import type { DialogContextType } from "@/api/contexts/types/context.types.ts";
 import { debugLogs } from "@/configs/app-components.config.ts";
 import { LANGUAGE, type AppModalNames } from "@/configs/app.config";
 import type {
+  AnimationsOptions,
+  AnyObjectProps,
   PreventDefaultAndStopPropagation,
   ProbeProxyResult,
 } from "@/utils/types/types.utils.ts";
 import { clsx, type ClassValue } from "clsx";
+import { type ComponentType } from "react";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+/**
+ * Format a number to a fixed number of decimal places and parse it back to a float.
+ *
+ * @param value - The number to format and parse.
+ * @param decimals - The number of decimal places to format to (default is 2).
+ * @returns The formatted number as a float.
+ */
+export function formatParseFloat(value: number, decimals = 2): number {
+  return Number.parseFloat(value.toFixed(decimals));
 }
 
 /**
@@ -70,6 +84,127 @@ export function wait(duration: number, message = "") {
 }
 
 /**
+ * Reject a promise after a specified duration with a given message,
+ *
+ * @description Optionnaly using an AbortController to allow cancellation.
+ *
+ * @param duration - The duration in milliseconds to wait before rejecting the promise
+ * @param message - The message to reject the promise with
+ * @param abortController - Optional AbortController to allow cancellation of the timeout
+ */
+export function waitAndFail(
+  duration: number,
+  message: string,
+  abortController?: AbortController,
+) {
+  return new Promise((resolve, reject) => {
+    const errPayload = {
+      status: 408,
+      error: "Request Timeout",
+      ok: false,
+    };
+
+    const timer = setTimeout(() => {
+      // If aborted before timeout fired, settle as resolved to avoid leaking a pending promise
+      if (abortController?.signal.aborted) {
+        resolve(undefined);
+        return;
+      }
+      reject(new Error(message, { cause: errPayload }));
+    }, duration);
+
+    // If an AbortController is provided, clear the timeout and settle when aborted
+    if (abortController) {
+      const onAbort = () => {
+        clearTimeout(timer);
+        abortController.signal.removeEventListener("abort", onAbort);
+        resolve(undefined);
+      };
+
+      if (abortController.signal.aborted) {
+        clearTimeout(timer);
+        resolve(undefined);
+      } else {
+        abortController.signal.addEventListener("abort", onAbort, {
+          once: true,
+        });
+      }
+    }
+  });
+}
+type PromiseStateResult<T> =
+  | { status: "pending" }
+  | { status: "fulfilled"; value: T; key?: string }
+  | { status: "rejected"; reason: string; key?: string };
+
+type PromiseStateSettledResult<T> = Exclude<
+  PromiseStateResult<T>,
+  { status: "pending" }
+>;
+
+/**
+ * Track the state of a promise, returning its status and value or reason once it settles.
+ *
+ * @param promise The promise to track, or a Map of promises to track with their keys included in the result
+ * @param allowImmediatePending If true (default), the function returns immediately with `{ status: 'pending' }` if the wrapped promises have not yet settled. If false, the returned promise waits for one of the wrapped promises to settle and returns its status object.
+ * @returns A promise that resolves to either { status: 'pending' } or a status object describing the settled promise
+ */
+export function promiseState<T = AnyObjectProps>(
+  promise: Promise<T> | Map<string, Promise<T>>,
+  allowImmediatePending = true,
+) {
+  const pendingState: PromiseStateResult<T> = { status: "pending" };
+
+  // Map<string, Promise> -> normalize each promise to a status-object (includes the key)
+  if (promise instanceof Map) {
+    const wrappedPromises = [];
+
+    for (const [key, promiseItem] of promise.entries()) {
+      wrappedPromises.push(
+        promiseItem
+          .then(
+            (value): PromiseStateSettledResult<T> => ({
+              status: "fulfilled",
+              value,
+              key,
+            }),
+          )
+          .catch(
+            (error_): PromiseStateSettledResult<T> => ({
+              status: "rejected",
+              reason: (error_ as Error)?.message ?? String(error_),
+              key,
+            }),
+          ),
+      );
+    }
+
+    return allowImmediatePending
+      ? Promise.race([...wrappedPromises, Promise.resolve(pendingState)])
+      : Promise.race(wrappedPromises);
+  }
+
+  // Single promise -> normalize to a status-object and optionally race against pending state
+  const normalized = promise
+    .then(
+      (value): PromiseStateSettledResult<T> => ({
+        status: "fulfilled",
+        value,
+      }),
+    )
+    .catch(
+      (error_): PromiseStateSettledResult<T> => ({
+        status: "rejected",
+        reason: (error_ as Error)?.message ?? String(error_),
+      }),
+    );
+
+  return allowImmediatePending
+    ? Promise.race([normalized, Promise.resolve(pendingState)])
+    : normalized;
+}
+
+/**
  * Prevent the default action and stop propagation of an event.
  *
  * @param e  Event to prevent default action and stop propagation
@@ -123,7 +258,7 @@ export function checkPropsValidity(
 
   const newRequired = new Set(required);
   const newForbidden = new Set(forbidden);
-  const propsKeys = new Set(Object.keys(props));
+  const propsKeys = new Set(Reflect.ownKeys(props));
 
   const { forbiddenPresent, forbiddenKeysFound } = findForbiddenKeys(
     propsKeys,
@@ -159,7 +294,10 @@ export function checkPropsValidity(
  *
  * @returns Object indicating if forbidden keys are present and which ones were found
  */
-function findForbiddenKeys(propsKeys: Set<string>, forbiddenKeys: Set<string>) {
+function findForbiddenKeys(
+  propsKeys: Set<PropertyKey>,
+  forbiddenKeys: Set<string>,
+) {
   const found: string[] = [];
 
   for (const k of forbiddenKeys) {
@@ -230,7 +368,7 @@ function probeProxyKey(
 function findMissingRequiredKeys(
   props: Record<string, unknown>,
   requiredKeys: Set<string | Record<string, unknown>>,
-  propsKeys: Set<string>,
+  propsKeys: Set<PropertyKey>,
 ) {
   const missing = new Set<string>();
   const shouldBeProxyfied = new Set<string>();
@@ -284,7 +422,7 @@ function handleNestedRequiredKey(
       continue;
     }
 
-    const newPropsKeys = new Set(Object.keys(newProps));
+    const newPropsKeys = new Set(Reflect.ownKeys(newProps));
 
     // Recursive call - propagate missing information upwards
     const nestedResult = findMissingRequiredKeys(
@@ -314,26 +452,41 @@ function handleNestedRequiredKey(
 function probeLogic(
   props: Record<string, unknown>,
   requiredKeys: Set<string | Record<string, unknown>>,
-  propsKeys: Set<string>,
+  propsKeys: Set<PropertyKey>,
   missing: Set<string>,
   shouldBeProxyfied: Set<string>,
 ) {
   for (const k of requiredKeys) {
-    const { trapAvailable, isProxyfied, unsupported } = probeProxyKey(
-      props,
-      k as PropertyKey,
-    );
-
-    if (!trapAvailable) {
-      shouldBeProxyfied.add(k as string);
-      missing.add(k as string);
+    if (!isPropertyKey(k)) {
       continue;
     }
 
-    if (!isProxyfied && unsupported && !propsKeys.has(k as string)) {
-      missing.add(k as string);
+    if (hasRequiredKey(props, k)) {
+      continue;
+    }
+
+    const { trapAvailable, isProxyfied, unsupported } = probeProxyKey(props, k);
+
+    if (!trapAvailable) {
+      shouldBeProxyfied.add(k);
+      missing.add(k);
+      continue;
+    }
+
+    if (!isProxyfied && unsupported && !propsKeys.has(k)) {
+      missing.add(k);
     }
   }
+}
+
+function isPropertyKey(
+  key: string | symbol | Record<string, unknown>,
+): key is string | symbol {
+  return typeof key === "string" || typeof key === "symbol";
+}
+
+function hasRequiredKey(props: Record<string, unknown>, key: string | symbol) {
+  return key in props || Object.hasOwn(props, key);
 }
 
 /**
@@ -359,3 +512,65 @@ function displayLogs(
     );
   }
 }
+
+/**
+ * Generate a display name for a higher-order component (HOC) by combining the HOC's name with the wrapped component's name.
+ *
+ * @param hocName - The name of the higher-order component (e.g., "withController").
+ * @param WrappedComponent - The original component being wrapped by the HOC.
+ * @param Component - The resulting component created by the HOC that will have its display name set.
+ */
+export function createNameForHOC(
+  hocName: string,
+  WrappedComponent: ComponentType<any>,
+  Component: ComponentType<any>,
+) {
+  const wrappedComponentName =
+    WrappedComponent.displayName || WrappedComponent.name || "Component";
+  Component.displayName = `${hocName}(${wrappedComponentName})`;
+}
+
+/**
+ * Generate a display name for a component that is the output of a higher-order component (HOC).
+ *
+ * @description Usefull when you export directly a component created by a HOC without assigning it
+ *
+ * @param hocName - The name of the higher-order component (e.g., "withController").
+ * @param outputName - The name of the output component (e.g., "StepFourController").
+ * @param Component - The resulting component created by the HOC that will have its display name set.
+ */
+export function createComponentName(
+  hocName: string,
+  outputName: string,
+  Component: ComponentType<any>,
+) {
+  Component.displayName = `${hocName}(${outputName})`;
+}
+/**
+ * Defines the animation for the evaluation card
+ *
+ * @param isActive - Whether the animation is active, which determines the animation direction
+ * @returns An object containing the style for the evaluation card animation
+ */
+export const animation = (
+  isActive: boolean,
+  options: AnimationsOptions | null,
+) => {
+  const { incoming, outgoing } = options ?? {};
+  const {
+    name: incomingName = "incomingName",
+    duration: incomingDuration = "500",
+    delay: incomingDelay = "0",
+  } = incoming ?? {};
+  const {
+    name: outgoingName = "outgoingName",
+    duration: outgoingDuration = "500",
+    delay: outgoingDelay = "0",
+  } = outgoing ?? {};
+
+  const animation = isActive
+    ? `${incomingName} ${incomingDuration}ms both ${incomingDelay}ms`
+    : `${outgoingName} ${outgoingDuration}ms both ${outgoingDelay}ms`;
+
+  return { style: { animation } };
+};

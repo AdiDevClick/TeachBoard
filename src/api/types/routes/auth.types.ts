@@ -1,9 +1,11 @@
+import type { User } from "@/api/store/types/app-store.types";
 import type {
   ApiError,
   ServerErrorDebugs,
   ValidationViolation,
 } from "@/types/AppErrorInterface";
 import type { ResponseInterface } from "@/types/AppResponseInterface";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 
 /**
  * Request payload accepted by the authentication login endpoint.
@@ -19,8 +21,7 @@ export type AuthLoginPayload = {
 export type AuthLoginSuccess = ResponseInterface & {
   // token?: string;
   // refreshToken?: string;
-  success: string;
-  user?: Record<string, unknown>;
+  user?: User;
 };
 
 /**
@@ -31,8 +32,8 @@ export type AuthLoginError = Extract<
   { status: 400 | 401 | 404 | 500 }
 > & {
   type?: string;
-  details?: Record<string, unknown> & ValidationViolation[];
-  debugs?: Record<string, unknown> & ServerErrorDebugs;
+  details?: AnyObjectProps & ValidationViolation[];
+  debugs?: AnyObjectProps & ServerErrorDebugs;
 };
 
 /**

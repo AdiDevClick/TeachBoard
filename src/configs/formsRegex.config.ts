@@ -9,7 +9,7 @@ export const formsRegex = {
   // are used server-side and for client-side immediate sanitization.
   // Accept commas, ampersand (&) and parentheses () in names as well.
   serverName: /^[\p{L}\p{M}0-9 ._'&,()/-]{1,100}$/u,
-  serverDescription: /^[\p{L}\p{M}0-9 ._'&,()/-]{1,500}$/u,
+  serverDescription: /^[\p{L}\p{M}0-9 ._'&",()/-]{0,500}$/u,
 
   // Client-side patterns (for immediate input sanitization)
   allowedCharsNameRemove: /[^\p{L}\p{M}0-9 ._'&,()-]/gu,
@@ -30,4 +30,9 @@ export const formsRegex = {
   viewYearRange: /^\d{4} - \d{4}$/,
   serverYearRange: /^\d{4}-\d{4}$/,
   serverSessionToken: /^[0-9a-f]{32}$/i,
+  // Date in ISO 8601 format with timezone information
+  // YYYY-MM-DDTHH:MM:SS.sssZ or YYYY-MM-DDTHH:MM:SS+HH:MM
+  // ex: 2025-10-30T19:04:03.128+01:00
+  dateISOTest:
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?([+-]\d{2}:\d{2}|Z)$/,
 };

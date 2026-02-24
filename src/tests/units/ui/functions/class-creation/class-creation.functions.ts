@@ -58,7 +58,7 @@ import { render, renderHook } from "vitest-browser-react";
 
 type FixtureLike = {
   controllers: Record<string, InputControllerLike>;
-  installFetchStubs?: (postResponse?: unknown) => void;
+  installFetchStubs?: (_postResponse?: unknown) => void;
   sample: ReturnType<typeof useAppFixtures>["sample"];
   post?: unknown;
 };
@@ -90,7 +90,7 @@ export async function baseInit(labeler: {
 export async function selectDiplomaInClassCreationDialog(
   controller: InputControllerLike,
   diploma: DiplomaConfigDto,
-  opts?: { submitName?: string }
+  opts?: { submitName?: string },
 ) {
   const submitName = opts?.submitName ?? "Créer la classe";
 
@@ -102,7 +102,7 @@ export async function selectDiplomaInClassCreationDialog(
       withinDialog: true,
       items: rxJoin(diploma.degreeLevel, diploma.degreeYear),
       timeout: 1500,
-    }
+    },
   );
 }
 
@@ -127,14 +127,14 @@ export async function initSetup(
   string: string,
   initControllerName: string,
   pageId: AppModalNames,
-  opts?: { routeArgs?: unknown[] }
+  opts?: { routeArgs?: unknown[] },
 ) {
   const Wrapper = ({ children }: { children: React.ReactNode }) =>
     React.createElement(
       AppTestWrapper,
       null,
       React.createElement(AppModals, null),
-      children
+      children,
     );
 
   const hook = await renderHook(() => useAppFixtures(), { wrapper: Wrapper });
@@ -150,7 +150,7 @@ export async function initSetup(
   const routeArgs = opts?.routeArgs;
   if (!routeArgs && routeFn.length >= 1) {
     throw new TypeError(
-      `[initSetup] Route '${string}' requires arguments; pass opts.routeArgs explicitly.`
+      `[initSetup] Route '${string}' requires arguments; pass opts.routeArgs explicitly.`,
     );
   }
 
@@ -163,8 +163,8 @@ export async function initSetup(
   if (!initController) {
     throw new TypeError(
       `[initSetup] Could not resolve controller '${initControllerName}' for route '${string}'. Available controllers: ${Object.keys(
-        controllers
-      ).join(", ")}`
+        controllers,
+      ).join(", ")}`,
     );
   }
 
@@ -180,8 +180,8 @@ export async function initSetup(
         pageId,
         controller: initController,
         options: { selectedDiploma },
-      })
-    )
+      }),
+    ),
   );
 
   return {
@@ -203,7 +203,7 @@ export async function initSetup(
 export async function openNewTaskTemplateModalFromTasksPopover(
   label: string | RegExp,
   tasksNamesParam: string[],
-  controller?: InputControllerLike
+  controller?: InputControllerLike,
 ): Promise<void> {
   await openModalAndAssertItsOpenedAndReady(label, {
     controller: controller,
@@ -244,7 +244,7 @@ export async function assertSkillsForCurrentDiplomaAndSelect(params: {
       withinDialog: true,
       items: rx(params.taskNameForLabelSelection),
       timeout: 1500,
-    }
+    },
   );
 
   // If skills were preselected, the submit button might become enabled.
@@ -255,7 +255,7 @@ export async function assertSkillsForCurrentDiplomaAndSelect(params: {
     params.expectPresent?.map((s) => codeRx(s)) ?? [
       codeRx(params.skillCodeToSelect),
     ],
-    { withinDialog: true, timeout: 1500 }
+    { withinDialog: true, timeout: 1500 },
   );
 
   // No visual preselection: selected skills show a lucide "check" icon.
@@ -263,7 +263,7 @@ export async function assertSkillsForCurrentDiplomaAndSelect(params: {
   const openPopoverEl = getOpenPopoverContent();
   expect(openPopoverEl).not.toBeNull();
   expect(
-    page.elementLocator(openPopoverEl!).getByCss("svg.lucide-check")
+    page.elementLocator(openPopoverEl!).getByCss("svg.lucide-check"),
   ).not.toBeInTheDocument();
 
   if (params.expectAbsent?.length) {
@@ -283,7 +283,7 @@ export async function assertSkillsForCurrentDiplomaAndSelect(params: {
     await assertLucideCheckIconInOpenPopover(
       params.skillCodeToSelect,
       false,
-      "check"
+      "check",
     );
 
     // Force a visual state update before selecting (otherwise the test is too fast to notice).
@@ -293,13 +293,13 @@ export async function assertSkillsForCurrentDiplomaAndSelect(params: {
       submitName,
       getOpenCommandContainer(),
       codeRx(params.skillCodeToSelect),
-      1500
+      1500,
     );
 
     await assertLucideCheckIconInOpenPopover(
       params.skillCodeToSelect,
       true,
-      "check"
+      "check",
     );
   }
 
@@ -353,7 +353,7 @@ export async function iterateDiplomaSkillAssertions(params: {
     await openNewTaskTemplateModalFromTasksPopover(
       openButton,
       tasksNames,
-      tasksController
+      tasksController,
     );
 
     // Assert skills for the current diploma, and select if needed
@@ -413,9 +413,18 @@ export async function prepareClassCreationForm(opts: {
     await baseInit(opts.labeler);
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
+    // We use a regex with anchors so that similar URLs (e.g. the name‑availability
+    // check which also contains `/api/classes/`) are **not** accidentally counted.
     const endpoint = opts.labeler.apiEndpoint;
     if (endpoint) {
-      getCallsBeforeCreation = countFetchCallsByUrl(endpoint);
+      try {
+        const exact = new RegExp(`^${endpoint}$`);
+        getCallsBeforeCreation = countFetchCallsByUrl(exact);
+      } catch {
+        // if the endpoint contains characters that break the regex we fall back
+        // to the existing behaviour (should be rare).
+        getCallsBeforeCreation = countFetchCallsByUrl(endpoint);
+      }
     }
   }
 
@@ -428,7 +437,7 @@ export async function prepareClassCreationForm(opts: {
 
   await selectDiplomaInClassCreationDialog(
     opts.diplomasController,
-    opts.diplomaToSelect
+    opts.diplomaToSelect,
   );
 
   if (opts.tasksToggleSelection) {
@@ -447,14 +456,14 @@ export async function prepareClassCreationForm(opts: {
   } else {
     if (!opts.taskToSelect) {
       throw new Error(
-        "prepareClassCreationForm requires taskToSelect when tasksToSelect/tasksToggleSelection are not provided"
+        "prepareClassCreationForm requires taskToSelect when tasksToSelect/tasksToggleSelection are not provided",
       );
     }
     await selectTaskTemplate(
       opts.tasksController,
       opts.taskToSelect,
       opts.tasksNames,
-      submitName
+      submitName,
     );
   }
 
@@ -570,7 +579,7 @@ export async function runCreateFlow(args: {
       .concat(args.tasksToggleSelection.addName);
 
     const expectedIds = expectedNames.map(
-      (n) => args.tasksToggleSelection!.taskTemplateIdByName[n]
+      (n) => args.tasksToggleSelection!.taskTemplateIdByName[n],
     );
 
     const payload = lastBody as Record<string, unknown>;
@@ -589,21 +598,21 @@ export async function selectTaskTemplate(
   taskName: string,
   tasksNames?: string[],
   submitName = "Créer la classe",
-  timeout = 1500
+  timeout = 1500,
 ) {
   await openPopoverAndExpectByTrigger(
     controllerTriggerRegex(tasksController),
-    tasksNames ?? [taskName]
+    tasksNames ?? [taskName],
   );
   await selectCommandItemInContainerEnsuringSubmitDisabled(
     submitName,
     getOpenCommandContainer(),
     rx(taskName),
-    timeout
+    timeout,
   );
   await clickTriggerAndWaitForPopoverState(
     controllerTriggerRegex(tasksController),
-    false
+    false,
   );
 }
 
@@ -617,7 +626,7 @@ export async function selectTaskTemplates(
     submitName?: string;
     availableTaskNames?: string[];
     timeout?: number;
-  }
+  },
 ): Promise<void> {
   const submitName = opts?.submitName ?? "Créer la classe";
   const timeout = opts?.timeout ?? 1500;
@@ -628,7 +637,7 @@ export async function selectTaskTemplates(
 
   await openPopoverAndExpectByTrigger(
     controllerTriggerRegex(tasksController),
-    opts?.availableTaskNames ?? taskNames
+    opts?.availableTaskNames ?? taskNames,
   );
 
   for (const name of taskNames) {
@@ -636,13 +645,13 @@ export async function selectTaskTemplates(
       submitName,
       getOpenCommandContainer(),
       rx(name),
-      timeout
+      timeout,
     );
   }
 
   await clickTriggerAndWaitForPopoverState(
     controllerTriggerRegex(tasksController),
-    false
+    false,
   );
 }
 
@@ -651,14 +660,14 @@ export async function selectTaskTemplates(
  */
 export async function removeSelectedTaskTemplateById(
   taskTemplateId: string,
-  opts?: { timeout?: number }
+  opts?: { timeout?: number },
 ): Promise<void> {
   const timeout = opts?.timeout ?? 1500;
 
   // Tag trigger button has accessible name equal to its text content.
   await userEvent.click(page.getByRole("button", { name: rx(taskTemplateId) }));
   await userEvent.click(
-    page.getByRole("button", { name: rx(`Supprimer ${taskTemplateId}`) })
+    page.getByRole("button", { name: rx(`Supprimer ${taskTemplateId}`) }),
   );
 
   await waitForTextToBeAbsent(rx(taskTemplateId), { timeout });
@@ -685,7 +694,7 @@ export async function selectTaskTemplatesWithToggle(params: {
   // Open once and keep it open: the command handler supports toggle-by-click.
   await openPopoverAndExpectByTrigger(
     controllerTriggerRegex(params.tasksController),
-    params.availableTaskNames
+    params.availableTaskNames,
   );
 
   for (const name of params.initialSelectNames) {
@@ -693,7 +702,7 @@ export async function selectTaskTemplatesWithToggle(params: {
       submitName,
       getOpenCommandContainer(),
       rx(name),
-      timeout
+      timeout,
     );
   }
 
@@ -702,7 +711,7 @@ export async function selectTaskTemplatesWithToggle(params: {
     submitName,
     getOpenCommandContainer(),
     rx(params.removeName),
-    timeout
+    timeout,
   );
 
   // Add another template.
@@ -710,12 +719,12 @@ export async function selectTaskTemplatesWithToggle(params: {
     submitName,
     getOpenCommandContainer(),
     rx(params.addName),
-    timeout
+    timeout,
   );
 
   await clickTriggerAndWaitForPopoverState(
     controllerTriggerRegex(params.tasksController),
-    false
+    false,
   );
 }
 
@@ -725,7 +734,7 @@ export async function selectTaskTemplatesWithToggle(params: {
 export async function openStudentSearchAndSelect(
   studentsController: InputControllerLike,
   studentName: string | RegExp,
-  opts?: { timeout?: number }
+  opts?: { timeout?: number },
 ) {
   await clickControlAndWaitForDialog(
     controllerLabelRegex(studentsController),
@@ -733,7 +742,7 @@ export async function openStudentSearchAndSelect(
     {
       withinDialog: true,
       timeout: opts?.timeout ?? 2000,
-    }
+    },
   );
 
   await expect
@@ -742,7 +751,7 @@ export async function openStudentSearchAndSelect(
         countFetchCallsByUrl(studentsController.apiEndpoint as string, "GET"),
       {
         timeout: 1500,
-      }
+      },
     )
     .toBeGreaterThan(0);
 
@@ -761,7 +770,7 @@ export async function selectDefaultSchoolYear() {
   const schoolYearField = page.getByLabelText(/^Année scolaire$/i);
   await userEvent.click(schoolYearField);
   await userEvent.click(
-    page.getByRole("option", { name: rx(defaultSchoolYear) })
+    page.getByRole("option", { name: rx(defaultSchoolYear) }),
   );
   await expectElementTextToMatch(schoolYearField, rx(defaultSchoolYear), 1500);
   await userEvent.tab();
@@ -786,7 +795,7 @@ export async function reopenAndPrepare(
     controller: InputControllerLike;
     nameArray: (string | RegExp)[];
   },
-  prepareOpts: Parameters<typeof prepareClassCreationForm>[0]
+  prepareOpts: Parameters<typeof prepareClassCreationForm>[0],
 ) {
   // Try to close top dialog if one is open; swallow when not.
   try {
@@ -812,7 +821,7 @@ export async function assertIconsInPopover(
     code: string | RegExp;
     icon: string;
     present: boolean;
-  }>
+  }>,
 ): Promise<void> {
   for (const { code, icon, present } of icons) {
     await assertLucideCheckIconInOpenPopover(code, present, icon);

@@ -5,11 +5,11 @@ import {
   debugLogs,
   stepThreeSubskillsSelectionControllerPropsInvalid,
 } from "@/configs/app-components.config.ts";
-import { useStepThreeHandler } from "@/features/evaluations/create/hooks/useStepThreeHandler.ts";
+import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
+import { useSubSkillsSelection } from "@/features/evaluations/create/steps/three/hooks/useSubSkillsSelection";
 import type { StepThreeSubskillsSelectionControllerProps } from "@/features/evaluations/create/steps/three/types/step-three.types.ts";
-import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore.ts";
-import { Activity, useEffect } from "react";
-import { useShallow } from "zustand/shallow";
+import { animation } from "@/utils/utils";
+import { Activity, type ComponentProps } from "react";
 
 /**
  * Step Three Subskills Selection Controller.
@@ -21,77 +21,45 @@ import { useShallow } from "zustand/shallow";
 export function StepThreeSubskillsSelectionController(
   props: StepThreeSubskillsSelectionControllerProps,
 ) {
-  const { formId } = props;
-
-  const subSkills = useEvaluationStepsCreationStore(
-    useShallow((state) => state.getSelectedModuleSubSkills()),
-  );
-
-  const {
-    handleSubSkillChangeCallback,
-    selectedSubSkillId,
-    disableSubSkillsWithoutStudents,
-    selectedModuleId,
-    selectedSubSkill,
-  } = useStepThreeHandler(subSkills);
-
-  /**
-   * INIT
-   *
-   * @description Disable sub-skills without students to evaluate upon initial render.
-   */
-  useEffect(() => {
-    if (!selectedModuleId) {
-      return;
-    }
-
-    disableSubSkillsWithoutStudents(selectedModuleId);
-  }, []);
-
-  /**
-   * AUTO-SELECT FIRST SUB-SKILL
-   *
-   * @description - Auto-select the first sub-skill that is not disabled when a change happens on the sub-skills list.
-   */
-  useEffect(() => {
-    if (!selectedModuleId || subSkills.length === 0) {
-      return;
-    }
-
-    const firstActivableSubSkill = subSkills.find(
-      (subSkill) => !subSkill.isDisabled,
-    );
-
-    const shouldSelectFirstEnabled =
-      !selectedSubSkill?.id || selectedSubSkill?.isDisabled;
-
-    if (shouldSelectFirstEnabled && firstActivableSubSkill?.id) {
-      handleSubSkillChangeCallback(firstActivableSubSkill.id);
-    }
-  }, [selectedModuleId, selectedSubSkill?.isDisabled]);
+  const subSkills = useStepThreeState().subSkills;
+  const { handleSubSkillChangeCallback, selectedSubSkillId } =
+    useSubSkillsSelection(subSkills);
+  const selectedId = selectedSubSkillId ?? subSkills[0]?.id ?? null;
 
   if (stepThreeSubskillsSelectionControllerPropsInvalid(props)) {
     debugLogs("StepThreeSubskillsSelectionController", props);
     return null;
   }
 
-  const selectedId = selectedSubSkillId ?? subSkills[0]?.id;
+  const { isActive, dir = "ltr", defaultValue, ...rest } = props;
 
   return (
-    <form id={formId}>
-      <Activity mode={subSkills.length === 0 ? "visible" : "hidden"}>
+    <>
+      <Activity
+        mode={subSkills.length === 0 && isActive ? "visible" : "hidden"}
+      >
         <Badge variant="outline" className="p-4">
           Aucune sous-compétence disponible pour ce module.
         </Badge>
       </Activity>
       <Activity mode={subSkills.length > 0 ? "visible" : "hidden"}>
         <RadioGroup
+          id={"step-three-subskills-selection"}
           value={selectedId}
           onValueChange={handleSubSkillChangeCallback}
+          dir={dir as ComponentProps<typeof RadioGroup>["dir"]}
+          {...animation(isActive, {
+            incoming: {
+              name: "step-three-evaluation-in",
+              delay: "200",
+            },
+            outgoing: { name: "step-three-evaluation-out" },
+          })}
+          {...rest}
         >
           <EvaluationRadioItemWithoutDescriptionList items={subSkills} />
         </RadioGroup>
       </Activity>
-    </form>
+    </>
   );
 }

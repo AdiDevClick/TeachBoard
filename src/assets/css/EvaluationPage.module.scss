@@ -1,161 +1,238 @@
 @use 'mixins' as *;
 
+/* global card entry animations: firing when the element with the id
+   enters the DOM. kept outside of any class so it works regardless of where
+   the card is mounted. */
+// :global(#step-three-module),
+// :global([id="step-three-module"]) {
+//   @starting-style {
+//     opacity: 0;
+//     transform: translateX(var(--incoming-offset));
+//   }
+// }
+
+:global(#step-three-evaluation) {
+
+  @starting-style {
+    opacity: 0;
+    transform: translateY(-10rem);
+  }
+}
+
+
 /**
  * Styles for the Evaluation Page component.
  */
-$bem-prefix: evaluation-page;
-$alias-map: (
-  // container: (),
-  // content: (),
-  // mainContent: (),
-  // left: (),
-  // leftNumber: (),
-  // leftTitle: (),
-  // leftDescription: (),
-  // separator: (),
-  // right: (),
-  // rightContent: (),
-  // footer: (),
-);
-
-
-
 .evaluation-page {
-  &--container {
 
-    // :local .evaluationPageContainer 
-    // @include register-alias(#{&}, evaluationPageContainer, $bem-prefix, $alias-map);
+  &--container {
+    --incoming-offset: 20rem;
+    --outgoing-offset: -20rem;
+    --left-number-offset: -3rem;
     --gap-spacing: calc(var(--spacing) * 6);
-    height: 100%;
+
+    min-height: 100%;
+    max-height: calc(100vh - var(--content-offset, 134px));
 
   }
 
+  [data-slide-direction="left"] &--container {
+    --incoming-offset: -20rem;
+    --outgoing-offset: 20rem;
+    --left-number-offset: 10rem;
+  }
+
+  [data-left-content="true"] &--container {
+    --incoming-offset: -20rem;
+    --outgoing-offset: 20rem;
+  }
+
+  /* when a panel is actively transitioning out, clip the content of the active container */
+  &--container[data-active-transitioning="true"] .content {
+    overflow: hidden;
+  }
+
   &--content {
+
     &--container {
-      // :local .evaluationPageContentContainer {
-      // @include register-alias(#{&}, evaluationPageContentContainer, $bem-prefix, $alias-map);
-      display: flex;
-      flex-direction: row;
+      display: grid;
+      grid-template-columns: 0.05fr 1fr minmax(3rem, 0.05fr);
       justify-self: center;
       width: 97%;
       height: 100%;
       box-shadow: none;
       border: none;
-      border-left: 7px solid;
+      padding: 0px;
+      // padding-bottom: 0px;
+      background: none;
 
+      @include for-size(desktop) {
+        gap: 0;
+      }
 
-      &__header {}
-
-
-      // &__content {
       .content {
-
-        // @include register-alias(#{&}, content, $bem-prefix, $alias-map);
-
+        // overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-gutter: stable;
+        position: relative;
         display: grid;
         grid-template-columns: 1.5fr 0fr 3fr;
         gap: var(--gap-spacing);
         width: 100%;
         align-items: center;
+        padding: 0;
+
+        &:has([data-left-content="expanded"], [data-left-content="collapsed"]) {
+          overflow: hidden;
+        }
 
         @media screen and (max-width: 768px) {
           grid-template-columns: 1fr;
           grid-template-rows: 1fr 0fr 1fr;
         }
 
-        &__left {
-          // :local .contentLeft {
-          // @include register-alias(#{&}, contentLeft, $bem-prefix, $alias-map);
+        &__left-side {
+          position: sticky;
+          top: 15%;
+          bottom: 0;
           display: grid;
+          align-items: center;
+          place-self: center;
           gap: var(--gap-spacing);
-          width: 100%;
+          width: calc(100% - 20%);
 
           &--number {
-            // @include register-alias(#{&}, contentLeftNumber, $bem-prefix, $alias-map);
+            grid-row: 1;
             font-size: calc(var(--text-xl) * 3);
             font-weight: bold;
+            transition: opacity var(--hover-opacity-transition), var(--transform-transition);
+
+            @starting-style {
+              opacity: 0;
+              transform: translateX(-1rem);
+            }
           }
 
           &--title {
-            // @include register-alias(#{&}, contentLeftTitle, $bem-prefix, $alias-map);
+
+            grid-row: 2;
+            transition: var(--transform-transition);
             margin-bottom: var(--gap-spacing);
             font-weight: bold;
+
+            @starting-style {
+              transform: translateX(-2rem);
+            }
           }
 
           &--description {
-            // @include register-alias(#{&}, contentLeftDescription, $bem-prefix, $alias-map);
+
+            display: none;
+            grid-row: 3;
+            grid-column: 1;
+            transition: opacity var(--hover-opacity-transition) 100ms, var(--transform-transition);
             font-size: var(--text-md);
-            // }
+            // transform: translateX(-2rem);
+
+            &[data-left="visible"] {
+              display: unset;
+              opacity: 1;
+              transition-delay: 300ms;
+
+              @starting-style {
+                opacity: 0;
+              }
+            }
+          }
+
+          /* container for the children (subskills) only */
+          &-content {
+            grid-row: 3;
+            grid-column: 1;
+            max-block-size: 0;
+            transition: max-block-size 500ms ease, opacity 200ms ease;
+            opacity: 0;
+
+            &[data-left-content="expanded"] {
+              transition: max-block-size 1300ms ease;
+              max-block-size: 500px;
+              opacity: 1;
+            }
+
+            overflow: hidden;
+
+          }
+
+          @starting-style {
+            opacity: 0;
+            transform: translateY(20px);
           }
         }
 
-        &--separator {
-          // :local .contentSeparator {
-          // @include register-alias(#{&}, contentSeparator, $bem-prefix, $alias-map);
-          height: 50%;
+        &__separator {
+          position: sticky;
+          top: 0;
+          bottom: 0;
+          height: 35vh;
           width: 1px;
           margin: auto;
 
-          @media screen and (max-width: 768px) {
-            width: 50%;
+          @include for-size(smalltablet) {
             height: 1px;
+            width: 50%;
           }
         }
 
-        &__right {
-          // :local .contentRight {
-          // @include register-alias(#{&}, contentRight, $bem-prefix, $alias-map);
-          place-self: center;
-          min-width: 40%;
+        &__right-side,
+        .arrow-back {
+          transition: opacity 1s ease, var(--transform-transition);
+          // position: sticky;
+          // top: 0;
+
           grid-column: 3;
           grid-row: 1;
+          place-self: center;
+          width: clamp(300px, auto, 850px);
+          min-width: 300px;
 
-          &--container {
-            // :local .contentRightContainer {
-            // @include register-alias(#{&}, contentRightContainer, $bem-prefix, $alias-map);
-            display: grid;
-            gap: var(--gap-spacing);
-
-            .right__content {
-              display: grid;
-              gap: calc(var(--spacing) * 3);
-            }
-
-            &.arrow-back {
-              min-width: unset;
-              justify-self: left;
-            }
-
-            // }
-
-            // }
-
-            // }
-            // }
+          &:has([data-slot="slider"]) {
+            width: min(420px, 100%);
           }
 
-          // }
+          // min-width: 420px;
+
+          &.arrow-back {
+            min-width: unset;
+            justify-self: left;
+          }
+
+          &--container {
+            display: grid;
+            place-self: center;
+            gap: calc(var(--spacing) * 3);
+            width: 100%;
+
+            & .right__content {
+              display: grid;
+              gap: calc(var(--spacing) * 6);
+            }
+          }
+
+          /* Normal slide (step‑2 → step‑3) */
+          [data-state="active"] & {
+            @starting-style {
+              opacity: 0;
+              transform: translateX(var(--incoming-offset));
+            }
+          }
 
         }
       }
 
       .footer {
-        // &__footer {
-        // :local .footer {
-
-        // @include register-alias(#{&}, footer, $bem-prefix, $alias-map);
-        padding-left: 0;
+        padding: 0;
+        justify-self: center;
       }
     }
-
-    // }
-
   }
-
 }
-
-
-// @include create-export-aliases($bem-prefix, $alias-map);
-// :export {
-//   @include create-export-alias-exports($bem-prefix, $alias-map);
-// }

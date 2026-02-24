@@ -1,8 +1,7 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { DegreeModuleController } from "@/features/class-creation/components/DegreeModule/controllers/DegreeModuleController";
+import { DegreeModule } from "@/features/class-creation";
 import { degreeModuleCreationInputControllers } from "@/features/class-creation/components/DegreeModule/forms/degree-module-inputs";
-import type { DegreeModuleFormSchema } from "@/features/class-creation/components/DegreeModule/models/degree-module.models";
-import { degreeModuleTitleProps } from "@/features/class-creation/components/DegreeModuleSkill/DegreeModuleSkill.tsx";
+import { DEGREE_MODULE_SKILL_CARD_TITLE } from "@/features/class-creation/components/DegreeModuleSkill/config/degree-module-skill.configs";
 import { degreeSubSkillsCreationInputControllers } from "@/features/class-creation/components/DegreeModuleSkill/forms/degree-module-skill-inputs";
 import { AppModals } from "@/pages/AllModals/AppModals";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
@@ -25,21 +24,7 @@ import {
   waitForDialogAndAssertText,
 } from "@/tests/test-utils/vitest-browser.helpers";
 import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions";
-import { useForm } from "react-hook-form";
 import { afterEach, describe, expect, test, vi } from "vitest";
-// Render the controller wrapped in a small component that creates the form (hooks must be used in components)
-function DegreeModuleControllerWrapper() {
-  const form = useForm<DegreeModuleFormSchema>({
-    defaultValues: { name: "", code: "", skillList: [] },
-  });
-  return (
-    <DegreeModuleController
-      formId="degree-module-form"
-      pageId="new-degree-module"
-      form={form}
-    />
-  );
-}
 
 const skillsController = degreeModuleCreationInputControllers.find(
   (c) => c.name === "skillList",
@@ -48,7 +33,7 @@ const skillQueryKey = queryKeyFor(skillsController);
 
 setupUiTestState(
   <AppTestWrapper>
-    <DegreeModuleControllerWrapper />
+    <DegreeModule modalMode={false} />
     <AppModals />
   </AppTestWrapper>,
   {
@@ -72,7 +57,7 @@ describe("DegreeModuleSkill modal UI interaction", () => {
       {
         controller: skillsController,
         nameArray: [skillFetched.code],
-        readyText: degreeModuleTitleProps.title,
+        readyText: DEGREE_MODULE_SKILL_CARD_TITLE.title,
       },
     );
 
@@ -101,7 +86,7 @@ describe("DegreeModuleSkill modal UI interaction", () => {
     await checkFormValidityAndSubmit("Ajouter");
 
     // Modal closes on success — assert dialog closed and title absent
-    await waitForDialogAndAssertText(degreeModuleTitleProps.title, {
+    await waitForDialogAndAssertText(DEGREE_MODULE_SKILL_CARD_TITLE.title, {
       present: false,
     });
 

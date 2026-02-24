@@ -12,9 +12,11 @@ import {
   countFetchCallsByUrl,
   fillFieldsEnsuringSubmitDisabled,
   getLastPostJsonBodyByUrl,
+  getOpenDialogContent,
   queryKeyFor,
   rx,
   rxExact,
+  selectCommandItemInContainerEnsuringSubmitDisabled,
   selectMultiplePopoversEnsuringSubmitDisabled,
   waitForDialogAndAssertText,
 } from "@/tests/test-utils/vitest-browser.helpers";
@@ -203,5 +205,51 @@ describe("UI flow: new-task-template", () => {
           },
         ],
       });
+  });
+
+  test("sélection d'une tâche ne déclenche pas de boucle de rendu", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const hasRenderLoopError = () =>
+      errorSpy.mock.calls.some((call) =>
+        call.some(
+          (arg) =>
+            typeof arg === "string" &&
+            /Maximum update depth exceeded|Too many re-renders/i.test(arg),
+        ),
+      );
+
+    // Open templates popover and then open creation modal
+    await openModalAndAssertItsOpenedAndReady(
+      templatesController.creationButtonText,
+      {
+        controller: templatesController,
+        nameArray: tasks,
+        readyText: rxExact(taskLabelController.label),
+      },
+    );
+
+    const dialogEl = getOpenDialogContent();
+    const taskTrigger = Array.from(dialogEl.querySelectorAll("button")).find(
+      (button) =>
+        controllerTriggerRegex(taskLabelController).test(
+          (button.textContent ?? "").trim(),
+        ),
+    );
+    if (!taskTrigger) {
+      throw new Error("Task popover trigger not found in dialog");
+    }
+    expect(taskTrigger).toBeEnabled();
+    taskTrigger.click();
+    await selectCommandItemInContainerEnsuringSubmitDisabled(
+      "Ajouter",
+      document.body,
+      rx(sample.taskFetched.name),
+      1500,
+    );
+
+    await expect.poll(hasRenderLoopError, { timeout: 1500 }).toBe(false);
+
+    errorSpy.mockRestore();
   });
 });

@@ -6,10 +6,13 @@ const defaultSchoolYear = year + " - " + (year + 1);
 
 export const classCreationInputControllers = [
   {
+    task: "class-name-availability",
     name: "name",
     title: "Nom",
     type: "text",
     placeholder: "Unique nom (ex: 1A, 2B, ...)",
+    apiEndpoint: API_ENDPOINTS.GET.CLASSES.endPoints.CHECK_NAME,
+    dataReshapeFn: API_ENDPOINTS.GET.CLASSES.dataAvailable,
   },
   {
     name: "description",

@@ -1,10 +1,4 @@
-import withController from "@/components/HOCs/withController.tsx";
-import { withInlineItemAndSwitchSelection } from "@/components/HOCs/withInlineItemAndSwitchSelection.tsx";
-import withListMapper from "@/components/HOCs/withListMapper.tsx";
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import { NonLabelledGroupItem } from "@/components/Selects/non-labelled-item/NonLabelledGroupItem.tsx";
 import type {
-  PropsWithListings,
   VerticalFieldState,
   VerticalRefSetters,
   VerticalSelectProps,
@@ -16,10 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  debugLogs,
-  listMapperContainsInvalid,
-} from "@/configs/app-components.config.ts";
 import { cn } from "@/utils/utils";
 import {
   useCallback,
@@ -27,12 +17,11 @@ import {
   useImperativeHandle,
   useRef,
   useState,
-  type ComponentProps,
-  type ComponentType,
+  type Ref,
 } from "react";
 
 const emptyHandle: VerticalRefSetters = {
-  props: {} as ComponentProps<typeof Select>,
+  props: {},
   getMeta: () => undefined,
   getLastSelectedItemValue: () => null,
   setLastSelectedItemValue: (value: string) => value,
@@ -51,11 +40,11 @@ const emptyHandle: VerticalRefSetters = {
  * @param children - Allow consumers to pass SelectItem / SelectGroup etc... to be rendered inside the select field
  * @param props - Additional props for the Select component
  */
+
 export function VerticalFieldSelect({
   ref,
   controllerRef,
   label,
-  // placeholder,
   fullWidth = true,
   className,
   side = "bottom",
@@ -69,39 +58,19 @@ export function VerticalFieldSelect({
     onOpenChange,
     onValueChange,
     children,
-    defaultValue,
     role,
-    task,
-    apiEndpoint,
-    dataReshapeFn,
     placeholder,
-    field,
-    fieldState,
-    controllerMeta,
     ...selectRootProps
-  } = props as VerticalSelectProps & {
-    field?: { name?: string };
-    fieldState?: unknown;
-    controllerMeta?: unknown;
-  };
+  } = props;
 
   const id = useId();
+
   const [state, setState] = useState<VerticalFieldState>({});
   const lastSelectedValueRef = useRef<string>(null);
   const lastCommandValueRef = useRef<string>(null);
   const handleObjectRef = useRef<VerticalRefSetters>(emptyHandle);
 
   useImperativeHandle(controllerRef ?? ref, () => handleObjectRef.current);
-
-  const fieldName = field?.name;
-  const metaBase = {
-    task,
-    apiEndpoint,
-    dataReshapeFn,
-    field,
-    fieldState,
-    controllerMeta,
-  };
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -130,7 +99,6 @@ export function VerticalFieldSelect({
       }
 
       onOpenChange?.(open);
-      // }, []);
     },
     [containerId, selectRootProps, observedRefs, onOpenChange],
   );
@@ -145,26 +113,14 @@ export function VerticalFieldSelect({
       getLastSelectedItemValue: () => value,
       getLastCommandValue: () => lastCommandValueRef.current,
     };
-    const allDetails = containerId ? observedRefs?.get(containerId) : undefined;
-    const metas = allDetails
-      ? { ...selectRootProps, ...metaBase, ...allDetails.meta }
-      : { ...selectRootProps, ...metaBase };
-    onValueChange?.(value, metas);
+    onValueChange?.(value);
   };
 
   return (
     <div
       id={containerId}
       data-open={state.open}
-      ref={(el) => {
-        setRef?.(el, {
-          task,
-          apiEndpoint,
-          dataReshapeFn,
-          name: fieldName,
-          id: containerId,
-        });
-      }}
+      ref={(setRef ?? ref) as Ref<HTMLDivElement>}
       className={cn("flex flex-col items-start gap-2", className)}
     >
       {label && (
@@ -176,7 +132,6 @@ export function VerticalFieldSelect({
       <Select
         // open={state.open}
         // value={props?.onSelect}
-        defaultValue={defaultValue}
         onOpenChange={handleOpenChange}
         onValueChange={handleValueChange}
         {...selectRootProps}
@@ -188,54 +143,21 @@ export function VerticalFieldSelect({
           className={cn(
             fullWidth ? "w-full" : "w-fit",
             triggerProps?.className,
+            "max-w-70.5 [&_[data-slot=select-value]]:block [&_[data-slot=select-value]]:truncate",
           )}
           size="default"
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent side={side}>{children}</SelectContent>
+        <SelectContent
+          side={side}
+          className="w-[var(--radix-select-trigger-width)]"
+        >
+          {children}
+        </SelectContent>
       </Select>
     </div>
   );
 }
 
-function withListings<TProps extends object, TItem = unknown>(
-  Wrapped: ComponentType<TProps>,
-) {
-  return function Component(props: TProps & PropsWithListings<TItem>) {
-    if (listMapperContainsInvalid(props)) {
-      debugLogs("withListings for VerticalFieldSelect");
-      return <Wrapped {...(props as TProps)}>{props.children}</Wrapped>;
-    }
-    const { items, ...rest } = props;
-    return (
-      <Wrapped {...(rest as TProps)}>
-        <ListMapper items={items}>
-          <NonLabelledGroupItem />
-        </ListMapper>
-        {props.children}
-      </Wrapped>
-    );
-  };
-}
-
 export default VerticalFieldSelect;
-
-export const VerticalFieldSelectWithController =
-  withController(VerticalFieldSelect);
-
-type VerticalFieldSelectListingsComponent = ComponentType<
-  VerticalSelectProps & PropsWithListings<unknown>
->;
-
-export const VerticalFieldSelectWithListings = withListings(
-  VerticalFieldSelect,
-) as VerticalFieldSelectListingsComponent;
-
-export const VerticalFieldSelectWithControllerAndInlineSwitch = withController(
-  withInlineItemAndSwitchSelection(VerticalFieldSelectWithListings),
-) as ComponentType<Record<string, unknown>>;
-
-export const VerticalFieldWithInlineSwitchList = withListMapper(
-  VerticalFieldSelectWithControllerAndInlineSwitch,
-) as ComponentType<Record<string, unknown>>;

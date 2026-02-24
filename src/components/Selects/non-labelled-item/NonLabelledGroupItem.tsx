@@ -1,5 +1,9 @@
 import type { NonLabelledGroupItemProps } from "@/components/Selects/types/select.types.ts";
 import { SelectItem } from "@/components/ui/select.tsx";
+import {
+  debugLogs,
+  nonLabelledGroupItemPropsInvalid,
+} from "@/configs/app-components.config";
 
 /**
  * Select item component.
@@ -8,14 +12,21 @@ import { SelectItem } from "@/components/ui/select.tsx";
  *
  * @param item - The item object containing entityTypeName, id, and name.
  */
-export function NonLabelledGroupItem(
-  item: Readonly<NonLabelledGroupItemProps>
-) {
-  const { id, name } = item;
+export function NonLabelledGroupItem(props: NonLabelledGroupItemProps) {
+  if (nonLabelledGroupItemPropsInvalid(props)) {
+    debugLogs("NonLabelledGroupItem", props);
 
-  if (!item || !id || !name) {
     return <div>Loading item...</div>;
   }
 
-  return <SelectItem value={id}>{name}</SelectItem>;
+  const { id, name } = props;
+
+  return (
+    <SelectItem
+      className="[&>span:last-child]:block [&>span:last-child]:overflow-hidden [&>span:last-child]:text-ellipsis truncate"
+      value={id}
+    >
+      {name}
+    </SelectItem>
+  );
 }

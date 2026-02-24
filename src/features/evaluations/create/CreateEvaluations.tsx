@@ -1,13 +1,12 @@
-import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs.tsx";
+import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs";
 import { Tabs } from "@/components/ui/tabs";
-import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types.js";
-import type { CreateEvaluationsLoaderData } from "@/routes/routes.config.js";
+import { TabContentList } from "@/features/evaluations/create/components/Tabs/exports/tab-content.exports";
+import { resolveNavigation } from "@/features/evaluations/create/functions/eval-create-functions";
+import { useEvaluationNavigationHandler } from "@/features/evaluations/create/hooks/useEvaluationNavigationHandler";
+import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types";
 import "@css/PageContent.scss";
-import { useEffect, useState, type JSX } from "react";
-import { Outlet, useLoaderData, useNavigate } from "react-router-dom";
-import { TabContentList } from "../../../components/Tabs/TabContent.js";
-
-const tabValues: string[] = [];
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
 
 /**
  * Create Evaluations page component
@@ -15,23 +14,14 @@ const tabValues: string[] = [];
  * @description This component renders the Create Evaluations page with tabbed navigation.
  */
 export function CreateEvaluations() {
-  const { pageDatas } = useLoaderData<CreateEvaluationsLoaderData>();
-  const navigate = useNavigate();
+  const { pageDatas, tabItems, tabValue, tabValues, navigateToTab } =
+    useEvaluationNavigationHandler();
 
-  const [tabValue, setTabValue] = useState<string | undefined>(
-    pageDatas?.step1.name,
+  const [slideDirection, setSlideDirection] = useState<"left" | "right">(
+    "right",
   );
 
-  const [leftContent, setLeftContent] = useState<JSX.Element | null>(null);
-
-  /**
-   * Effect to navigate to the selected tab when tabValue changes
-   */
-  useEffect(() => {
-    navigate(tabValue?.toLocaleLowerCase() ?? "", { replace: true });
-  }, [tabValue]);
-
-  if (!pageDatas) {
+  if (!pageDatas || tabItems.length === 0) {
     return <div>Loading...</div>;
   }
 
@@ -46,32 +36,27 @@ export function CreateEvaluations() {
     onClick: handleOnArrowClick,
     clickProps: {
       arrayLength: Object.keys(pageDatas).length,
-      setTabValue,
+      setSlideDirection,
+      setTabValue: navigateToTab,
       tabValues,
     },
-    leftContent,
+    tabValue,
   };
 
   return (
     <Tabs
       value={tabValue}
-      onValueChange={setTabValue}
+      onValueChange={navigateToTab}
+      data-slide-direction={slideDirection}
       className="page__content-container"
     >
       <InpageTabs
         datas={pageDatas}
         value={tabValue}
-        onValueChange={setTabValue}
+        onValueChange={navigateToTab}
       />
-      <TabContentList
-        items={Object.values(pageDatas)}
-        optional={(item) => {
-          tabValues.push(item.name);
-
-          return { ...tabContentPropsAndFunctions };
-        }}
-      >
-        <Outlet context={[leftContent, setLeftContent]} />
+      <TabContentList items={tabItems} {...tabContentPropsAndFunctions}>
+        <Outlet />
       </TabContentList>
     </Tabs>
   );
@@ -81,29 +66,43 @@ export function CreateEvaluations() {
  * Handle click events for tab navigation.
  *
  * @param e - Mouse event from the click
- * @param clickProps - Object containing index, arrayLength, setTabValue, and tabValues
+ * @param clickProps - Object containing index, arrayLength, setSlideDirection, setTabValue, and tabValues
  */
 function handleOnArrowClick({
   e,
   ...clickProps
 }: CreateEvaluationArrowsClickHandlerProps) {
   e.preventDefault();
-  const { index, arrayLength, setTabValue, tabValues } = clickProps;
-  let newIndex = 0;
+  const {
+    index,
+    arrayLength,
+    setSlideDirection,
+    setTabState,
+    tabValues,
+    setOpen: setSideBarOpen,
+    open,
+  } = clickProps;
 
-  const currentStep = e.currentTarget.dataset.name;
-  const isPreviousAllowed = index > 0;
-  const isNextAllowed = index < arrayLength - 1;
+  const navigation = resolveNavigation({
+    currentStep: e.currentTarget.dataset.name,
+    index,
+    arrayLength,
+  });
 
-  if (currentStep === "step-previous" && isPreviousAllowed) {
-    newIndex = index - 1;
+  if (!navigation) return;
+
+  setSlideDirection(navigation.incomingDirection);
+
+  if (navigation.incomingDirection === "right") {
+    if (open) {
+      setSideBarOpen?.(false);
+    }
   }
 
-  if (currentStep === "next-step" && isNextAllowed) {
-    newIndex = index + 1;
-  }
-
-  if (newIndex === 0 && (!isPreviousAllowed || !isNextAllowed)) return;
-
-  setTabValue(tabValues[newIndex]);
+  setTabState((prev) => ({
+    ...prev,
+    isAnimating: true,
+    nextIndex: navigation.nextIndex,
+    newTabValue: tabValues[navigation.nextIndex],
+  }));
 }

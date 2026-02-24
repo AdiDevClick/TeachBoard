@@ -1,4 +1,8 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import {
+  DEGREE_MODULE_SKILL_CARD_TITLE,
+  DEGREE_MODULE_SKILL_FOOTER_PROPS,
+} from "@/features/class-creation/components/DegreeModuleSkill/config/degree-module-skill.configs";
 import { DegreeModuleSkillController } from "@/features/class-creation/components/DegreeModuleSkill/controllers/DegreeModuleSkillController.tsx";
 import { degreeSubSkillsCreationInputControllers } from "@/features/class-creation/components/DegreeModuleSkill/forms/degree-module-skill-inputs";
 import type {
@@ -8,16 +12,7 @@ import type {
 import moduleSkillSchema from "@/features/class-creation/components/DegreeModuleSkill/models/degree-module-skill.model";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
 import { useForm } from "react-hook-form";
-
-export const degreeModuleTitleProps = {
-  title: "Création de nouvelles compétences",
-  description:
-    "Ces compétences pourront être associées aux modules de diplôme.",
-};
-
-const footerProps = { submitText: "Ajouter", cancelText: "Annuler" };
 
 /**
  * View component for creating a new degree skill.
@@ -47,27 +42,24 @@ export function DegreeModuleSkill({
 
   const formId = pageId + "-form";
 
-  const commonProps = useMemo(
-    () => ({
-      pageId,
-      inputControllers,
-      formId,
-      className,
-      modalMode,
-      card: {
-        card: { className },
-        title: degreeModuleTitleProps,
-        footer: {
-          ...footerProps,
-          formState: form.formState,
-          formId,
-        },
+  const commonProps = {
+    pageId,
+    inputControllers,
+    formId,
+    className,
+    modalMode,
+    card: {
+      card: { className },
+      title: DEGREE_MODULE_SKILL_CARD_TITLE,
+      footer: {
+        ...DEGREE_MODULE_SKILL_FOOTER_PROPS,
+        formState: form.formState,
+        formId,
       },
-      ...props,
-      form,
-    }),
-    [form.formState, props],
-  );
+    },
+    ...props,
+    form,
+  };
 
   return (
     <DegreeModuleSkillWithCard {...commonProps}>

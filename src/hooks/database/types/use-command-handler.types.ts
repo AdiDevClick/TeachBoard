@@ -1,38 +1,35 @@
+import type { UUID } from "@/api/types/openapi/common.types";
 import type { CommandSelectionItemProps } from "@/components/Command/types/command.types.ts";
-import type {
-  ApiEndpointType,
-  DataReshapeFn,
-} from "@/components/Inputs/types/inputs.types.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
+import type { AppInputControllerMeta } from "@/types/AppInputControllerInterface";
 import type { MouseEvent, PointerEvent } from "react";
-import type { FieldValues, UseFormReturn } from "react-hook-form";
-import type { FormMethod } from "react-router-dom";
+import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
 
 type IsNever<T> = [T] extends [never] ? true : false;
 
 type InferServerDataFromRoute<TRoute> = TRoute extends {
-  dataReshape: (data: infer TData, ...args: infer _Args) => unknown;
+  dataReshape: (_data: infer TData, ..._args: infer _Args) => unknown;
 }
   ? TData
   : unknown;
 
 type InferViewDataFromRoute<TRoute> = TRoute extends {
-  dataReshape: (...args: infer _Args) => infer TView;
+  dataReshape: (..._args: infer _Args) => infer TView;
 }
   ? TView
   : unknown;
 
 type InferServerDataFromReshapeFn<TFn> = TFn extends (
-  data: infer TData,
-  ...args: infer _Args
+  _data: infer TData,
+  ..._args: infer _Args
 ) => unknown
   ? TData
   : unknown;
 
 type InferViewDataFromReshapeFn<TFn> = TFn extends (
-  ...args: infer _Args
+  ..._args: infer _Args
 ) => infer TView
   ? TView
   : unknown;
@@ -50,10 +47,15 @@ export type InferViewData<TRoute, TSubmitReshapeFn> =
 /**
  * Shared metadata shape passed around by command controllers.
  */
-export type CommandHandlerMetaData = Record<string, unknown> & {
-  task?: AppModalNames;
-  apiEndpoint?: ApiEndpointType;
-  dataReshapeFn?: DataReshapeFn;
+export type CommandHandlerMetaData = Record<string, unknown> &
+  AppInputControllerMeta;
+
+/**
+ * Shared metadata shape with common field identifiers.
+ */
+export type CommandHandlerFieldMeta = CommandHandlerMetaData & {
+  name?: string;
+  id?: UUID;
 };
 
 /**
@@ -86,11 +88,13 @@ export type HandleAddNewItemParams = {
 /**
  * Parameters for the handleSelectionCallback function
  */
-export type HandleSelectionCallbackParams = {
+export type HandleSelectionCallbackParams<
+  TFieldValues extends FieldValues = FieldValues,
+> = {
   value: string;
   options: {
-    mainFormField?: string;
-    secondaryFormField?: string;
+    mainFormField: Path<TFieldValues>;
+    secondaryFormField?: Path<TFieldValues>;
     /**
      * Extra payload saved alongside the selected value.
      */
@@ -117,12 +121,8 @@ export type HandleOpeningCallbackParams<T extends CommandHandlerMetaData> = {
 export type HandleSubmitCallbackParams = {
   variables: MutationVariables;
   submitOpts?: {
-    method?: FormMethod;
     endpointUrl?: string;
-    dataReshapeFn?: DataReshapeFn;
-    reshapeOptions?: unknown;
-    silent?: boolean;
-  };
+  } & Partial<FetchParams>;
 };
 
 /**

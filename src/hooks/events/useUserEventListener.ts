@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import type { WindowEventHandler } from "@/hooks/events/types/user-event-listerner.types";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const defaultOptions: AddEventListenerOptions = {
   capture: true,
@@ -36,21 +37,24 @@ const defaultOptions: AddEventListenerOptions = {
  */
 export function useUserEventListener<K extends keyof WindowEventMap>(
   myGlobalEventToListen: K = "popstate" as K,
-  myEventFunction?: (e: WindowEventMap[K]) => void,
-  options = defaultOptions
+  myEventFunction?: WindowEventHandler<K>,
+  options = defaultOptions,
 ) {
   const [state, setState] = useState<WindowEventMap[K]>(null!);
   const abortControllerRef = useRef<AbortController>(null!);
 
-  const handler = (e: WindowEventMap[K]) => {
-    if (myEventFunction) {
-      setState(e);
-      return myEventFunction(e);
-    }
+  const handler = useCallback(
+    (event: WindowEventMap[K]) => {
+      if (myEventFunction) {
+        setState(event);
+        return myEventFunction(event);
+      }
 
-    setState(e);
-    return e;
-  };
+      setState(event);
+      return event;
+    },
+    [myEventFunction],
+  );
 
   useEffect(() => {
     abortControllerRef.current = new AbortController();
@@ -65,7 +69,7 @@ export function useUserEventListener<K extends keyof WindowEventMap>(
       setState(null!);
       abortControllerRef.current.abort();
     };
-  }, [myGlobalEventToListen, myEventFunction, options]);
+  }, [myGlobalEventToListen, handler, options]);
 
   return {
     myEvent: state,

@@ -38,10 +38,10 @@ export type CommandsProps = {
   multiSelection?: boolean;
   creationButtonText?: ReactNode;
   useButtonAddNew?: boolean;
-  onAddNewItem?: (payload: HandleAddNewItemParams) => void;
+  onAddNewItem?: (_payload: HandleAddNewItemParams) => void;
   commandHeadings?: HeadingType[];
   queryRecordsKey?: string[];
-  onSelect?: (value: string, commandItem: CommandItemType) => void;
+  onSelect?: (_value: string, _commandItem: CommandItemType) => void;
 } & Omit<ComponentProps<typeof Command>, "onSelect">;
 
 /**

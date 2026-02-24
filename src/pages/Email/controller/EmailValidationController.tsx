@@ -9,7 +9,7 @@ import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
 import type { EmailControllerProps } from "@/pages/Signup/types/signup.types.ts";
 import { wait } from "@/utils/utils.ts";
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 /**
@@ -21,7 +21,7 @@ import { Link, useNavigate } from "react-router-dom";
  * @param props - Props containing data, error, and onSubmit function from the validation hook
  */
 export function EmailValidationController(
-  props: Readonly<EmailControllerProps>
+  props: Readonly<EmailControllerProps>,
 ) {
   const { data, error, onSubmit } = props;
   const navigate = useNavigate();
@@ -37,11 +37,11 @@ export function EmailValidationController(
 
   const hasStartedValidation = useRef(false);
 
-  const startValidation = useCallback(() => {
+  const startValidation = () => {
     if (!hasStartedValidation.current) hasStartedValidation.current = true;
     closeAllDialogs();
     onSubmit();
-  }, []);
+  };
 
   /**
    * Main init
@@ -65,7 +65,7 @@ export function EmailValidationController(
       if (DEV_MODE && !NO_QUERY_LOGS) {
         console.debug(
           "EmailValidation redirecting to /login due to error:",
-          error ?? sessionError
+          error ?? sessionError,
         );
       }
       triggerNavigation("/login");
@@ -74,7 +74,7 @@ export function EmailValidationController(
 
     if (!data) return;
 
-    const token = (data as unknown as { token?: string })?.token ?? "";
+    const token = data.token ?? "";
 
     if (!sessionData && !sessionError) {
       onSessionCheck();
@@ -94,7 +94,7 @@ export function EmailValidationController(
     <>
       {error?.message && (
         <Link to="/">
-          <Button type="button">Revenir à l'accueil</Button>
+          <Button type="button">{"Revenir à l'accueil"}</Button>
         </Link>
       )}
     </>

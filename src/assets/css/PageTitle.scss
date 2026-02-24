@@ -1,35 +1,53 @@
 /**
   * Styles for the PageTitle component
+  * Note: This component is used in the PageHeader component, so it inherits some styles from there.
+  
+  * @see PageHeader.scss
+  * @see _index.scss for global variables used in this component
   */
 .page__title-container {
   display: flex;
-  font-size: 3rem;
+  font-size: var(--page-title-fs);
   padding-inline: 25px;
-  padding-bottom: 45px;
-  padding-top: 5px;
-  font-weight: bold;
+  font-weight: var(--page-title-fw);
   align-items: baseline;
+  line-height: var(--page-title-lh);
+  height: var(--calculated-title-space);
+  overflow: hidden;
+  transition: var(--transform-transition), height var(--hover-opacity-transition), opacity 0.4s ease-in-out;
+
+  @starting-style {
+    transform: translateX(-1rem);
+    height: 0;
+    opacity: 0;
+  }
 
   h1 {
     display: flex;
-    gap: 0.2rem;
+  }
+
+  // Title will shrink and move up
+  &:is([data-page-title="false"]) {
+    transition: var(--transform-transition), height var(--hover-opacity-transition);
+    opacity: 0;
+    transform: translateX(-1rem);
   }
 
   .title__icon {
     margin-left: 3px;
     padding-top: 10px;
-    color: var(--tb-color-primary);
+    color: var(--icon-color);
     cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    opacity: var(--icon-not-hovered-opacity);
+    transition: opacity var(--hover-opacity-transition), transform var(--hover-opacity-transition);
 
     &:hover {
-      opacity: 1;
-      transform: scale(1.1);
+      opacity: var(--hover-opacity);
+      transform: scale(var(--hover-scale));
     }
 
     &:active {
-      transform: scale(0.95);
+      transform: scale(var(--hover-scale-active));
     }
   }
 }

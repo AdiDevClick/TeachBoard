@@ -1,11 +1,13 @@
 import { expect, vi } from "vitest";
 import { locators, page, userEvent, type Locator } from "vitest/browser";
 
+/* eslint-disable no-unused-vars */
 declare module "vitest/browser" {
   interface LocatorSelectors {
     getByCss(css: string): Locator;
   }
 }
+/* eslint-enable no-unused-vars */
 
 locators.extend({
   getByCss(css: string) {
@@ -71,7 +73,7 @@ function setLastUiAction(action: string, details?: Record<string, unknown>) {
   } satisfies UiLastAction;
 }
 
-function getLastUiAction(): UiLastAction | null {
+function _getLastUiAction(): UiLastAction | null {
   return (globalThis as GlobalWithUiLastAction).__TB_UI_LAST_ACTION__ ?? null;
 }
 
@@ -183,7 +185,7 @@ export async function fillFieldsEnsuringSubmitDisabled(
   }
 }
 
-export type StubRoute = readonly [match: string, payload: unknown];
+export type StubRoute = readonly [match: string | RegExp, payload: unknown];
 
 const okJson = (payload: unknown) =>
   Promise.resolve({
@@ -196,6 +198,11 @@ const okJson = (payload: unknown) =>
  *
  * Tests can provide only the endpoints they need, while still exercising the real
  * `useCommandHandler` fetch flow.
+ *
+ * The `match` value in each route may be a simple string (matched via
+ * `String.prototype.includes`) or a `RegExp` object. Regex support is handy when
+ * you need to match the entire URL or add anchors (`^$`) to avoid accidental
+ * collisions with similar paths.
  */
 export function stubFetchRoutes({
   getRoutes = [],
@@ -217,7 +224,9 @@ export function stubFetchRoutes({
 
       if (method === "POST") {
         for (const [match, payload] of postRoutes) {
-          if (urlStr.includes(match)) {
+          const isMatch =
+            match instanceof RegExp ? match.test(urlStr) : urlStr.includes(match);
+          if (isMatch) {
             // Debug stubbed POST
             console.debug("[stubFetchRoutes] POST matched", match, payload);
             return okJson(payload);
@@ -228,7 +237,9 @@ export function stubFetchRoutes({
       }
 
       for (const [match, payload] of getRoutes) {
-        if (urlStr.includes(match)) {
+        const isMatch =
+          match instanceof RegExp ? match.test(urlStr) : urlStr.includes(match);
+        if (isMatch) {
           // Debug stubbed GET
           console.debug("[stubFetchRoutes] GET matched", match, payload);
           return okJson(payload);
@@ -712,7 +723,7 @@ export async function openPopoverByTriggerName(name: RegExp) {
   await openPopover(page.getByRole("button", { name }));
 }
 
-function getElementLabelText(el: HTMLElement): string {
+export function getElementLabelText(el: HTMLElement): string {
   const text = (el.textContent ?? "").trim();
   if (text) return text;
 
@@ -832,7 +843,7 @@ export async function selectCommandItemInContainer(
   }
 }
 
-function getCommandItemsInContainer(
+export function getCommandItemsInContainer(
   container: Element | null | undefined,
 ): HTMLElement[] {
   // Most of the app uses shadcn/ui's CommandItem wrapper (data-slot="command-item"),
@@ -907,7 +918,7 @@ export async function openPopoverByLabelText(
   const labelElement = findLabelElementScoped(label, opts?.withinDialog);
   if (!labelElement) throw new TypeError(`Popover label not found: ${label}`);
   const trigger = getTriggerFromLabelElement(labelElement, label);
-  await openPopover(trigger);
+  await openPopover(trigger, opts?.timeout ?? 500);
 
   // If no items to select, we're done.
   if (!opts?.items) return;
@@ -1005,6 +1016,7 @@ export async function openPopoverByContainerId(containerId: string) {
 
 async function openPopover(
   trigger: Parameters<typeof userEvent.click>[0] | null,
+  timeout = 500,
 ) {
   // If it's already open (e.g. dialog opened on top), close first so we can
   // re-open and force a re-render with updated cached data.
@@ -1013,7 +1025,7 @@ async function openPopover(
   if (!trigger) throw new TypeError("Popover trigger not found");
 
   await userEvent.click(trigger);
-  await waitForPopoverState(true, 500);
+  await waitForPopoverState(true, timeout);
 
   // In tests, cmdk's input value can persist across open/close cycles and
   // filter out all items in the next popover. Also, cmdk content may mount a

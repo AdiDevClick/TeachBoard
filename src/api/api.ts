@@ -3,6 +3,7 @@ import type {
   FetchJSONResult,
   fetchJSONOptions,
 } from "@/api/types/api.types";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 
 /**
  * Fetch API to JSON
@@ -14,21 +15,18 @@ import type {
  * @returns Parsed JSON response or error cause.
  */
 export async function fetchJSON<
-  TData extends object = Record<string, unknown>,
-  TErrorBody extends object = Record<string, unknown>
+  TData extends object = AnyObjectProps,
+  TErrorBody extends object = AnyObjectProps,
 >(
   url = "",
-  options: fetchJSONOptions = {}
+  options: fetchJSONOptions = {},
 ): Promise<FetchJSONResult<TData, TErrorBody>> {
   const { json, signal, ...rest } = options;
-
-  const headers = {
-    Accept: "application/json",
-    ...rest.headers,
-  } as Record<string, string>;
+  const headers = new Headers(rest.headers);
+  headers.set("Accept", "application/json");
 
   if (options.img) {
-    headers["Content-Type"] = "multipart/form-data";
+    headers.set("Content-Type", "multipart/form-data");
   }
 
   if (json && !options.img) {
@@ -38,7 +36,7 @@ export async function fetchJSON<
       options.body = JSON.stringify(json);
     }
     delete options.json;
-    headers["Content-Type"] = "application/json; charset=UTF-8";
+    headers.set("Content-Type", "application/json; charset=UTF-8");
   }
 
   let newSignal = signal;
@@ -61,7 +59,7 @@ export async function fetchJSON<
         `HTTP Error ! Status : ${response.status} - ${response.statusText}`,
         {
           cause: filteredObject,
-        }
+        },
       );
     }
 
@@ -79,7 +77,7 @@ export async function fetchJSON<
  * @returns Promise containing an error object
  */
 async function filterErrorResponse<TErrorBody extends object>(
-  response: Response
+  response: Response,
 ): Promise<FetchJSONError<TErrorBody>> {
   const cause = {
     status: response.status,

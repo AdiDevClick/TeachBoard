@@ -1,12 +1,14 @@
-import type { UUID } from "@/api/types/openapi/common.types.ts";
-import type { CommandItemType } from "@/components/Command/types/command.types.ts";
+import { UUID_SCHEMA, type UUID } from "@/api/types/openapi/common.types.ts";
 import type { InlineItemAndSwitchSelectionPayload } from "@/components/HOCs/types/with-inline-item-and-switch.types.ts";
-import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types.ts";
-import { VerticalFieldWithInlineSwitchList } from "@/components/Selects/VerticalFieldSelect.tsx";
+import { VerticalFieldWithInlineSwitchList } from "@/components/Selects/exports/vertical-field-select.exports";
+import type { VerticalSelectMetaData } from "@/components/Selects/types/select.types.ts";
+import { debugLogs } from "@/configs/app-components.config";
 import type { StepTwoControllerProps } from "@/features/evaluations/create/steps/two/types/step-two.types.ts";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
-import { type MouseEvent } from "react";
+import { preventDefaultAndStopPropagation } from "@/utils/utils";
+import { useEffect, useEffectEvent, type MouseEvent } from "react";
+import { useShallow } from "zustand/shallow";
 
 export function StepTwoController({
   pageId,
@@ -14,22 +16,20 @@ export function StepTwoController({
   formId,
   className,
   inputControllers = [],
-  user,
-  preparedStudentsTasksSelection,
-  students,
-  selectedClass,
-  tasks,
 }: StepTwoControllerProps) {
-  // Placeholder form, replace 'any' with actual form schema
-  // const [selected, setSelected] = useState(false);
+  const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
+    useShallow((state) => state.getStudentsPresenceSelectionData),
+  )();
 
-  // const { onSubmit, isLoading, isLoaded, data, error, setFetchParams } =
-  // useFetch();
   const setStudentPresence = useEvaluationStepsCreationStore(
     (state) => state.setStudentPresence,
   );
   const setStudentTaskAssignment = useEvaluationStepsCreationStore(
     (state) => state.setStudentTaskAssignment,
+  );
+
+  const setAllNonPresentStudents = useEvaluationStepsCreationStore(
+    (state) => state.setAllNonPresentStudents,
   );
 
   const { setRef, observedRefs } = useCommandHandler({
@@ -45,10 +45,7 @@ export function StepTwoController({
    * @param open - Whether the select is opening
    * @param metaData - The meta data from the popover field that was opened
    */
-  const handleOpening = (open: boolean, metaData?: MetaDatasPopoverField) => {
-    console.log("Opening :", open, metaData);
-    // openingCallback(open, metaData);
-  };
+  const handleOpening = () => {};
 
   /**
    * Handle command selection from PopoverFieldWithControllerAndCommandsList
@@ -58,9 +55,36 @@ export function StepTwoController({
    * @param id - The value of the selected command item
    * @param studentData - The details of the selected student data
    */
-  const handleOnSelect = (taskId: UUID, studentData: CommandItemType) => {
-    setStudentTaskAssignment(taskId, studentData.id);
-    console.log("selected value :", taskId, studentData, students);
+  const handleOnSelect = (
+    taskId: string | UUID,
+    meta?: VerticalSelectMetaData,
+  ) => {
+    const rootId = meta?.id;
+    const nestedMeta = meta?.controllerFieldMeta;
+    const nestedId = (nestedMeta?.id as string) ?? "unknown-id";
+
+    const studentId = rootId ?? nestedId;
+    if (!studentId) return;
+
+    const parsedStudentId = UUID_SCHEMA.safeParse(studentId);
+    if (!parsedStudentId.success) {
+      debugLogs(
+        "[StepTwoController]: Invalid student ID in metadata, selection ignored.",
+        { studentId, error: parsedStudentId.error },
+      );
+      return;
+    }
+
+    const parsed = UUID_SCHEMA.safeParse(taskId);
+    if (!parsed.success) {
+      debugLogs(
+        `[StepTwoController]: Invalid task ID selected for student ${parsedStudentId.data}, selection ignored.`,
+        { taskId, error: parsed.error },
+      );
+      return;
+    }
+
+    setStudentTaskAssignment(parsed.data, parsedStudentId.data);
   };
 
   /**
@@ -75,9 +99,37 @@ export function StepTwoController({
     e: MouseEvent<HTMLButtonElement>,
     studentData: InlineItemAndSwitchSelectionPayload,
   ) => {
-    setStudentPresence(studentData.id, studentData.isSelected);
-    console.log("selected switch :", e, studentData, students);
+    preventDefaultAndStopPropagation(e);
+    const parsed = UUID_SCHEMA.safeParse(studentData.id);
+    if (!parsed.success) {
+      debugLogs(
+        "[StepTwoController]: Invalid student ID in switch payload, selection ignored.",
+        { studentId: studentData.id, error: parsed.error },
+      );
+      return;
+    }
+
+    setStudentPresence(parsed.data, studentData.isSelected);
   };
+
+  /**
+   * UNMOUNT - TRIGGER SAVE OF NON-PRESENT STUDENTS
+   */
+  const triggerPresenceCalculation = useEffectEvent(() => {
+    setAllNonPresentStudents();
+  });
+
+  /**
+   * UNMOUNT -
+   *
+   * @description Only once
+   */
+  useEffect(() => {
+    return () => {
+      // Prepare all non-present students for summary and validation in the next step
+      triggerPresenceCalculation();
+    };
+  }, []);
 
   return (
     <form id={formId} className={className}>

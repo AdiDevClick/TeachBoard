@@ -1,3 +1,9 @@
+import {
+  centralSwitch,
+  content,
+  label,
+  labelledSwitchWithSelection,
+} from "@/assets/css/LabelledSwitchWithSelection.module.scss";
 import type {
   InlineItemAndSwitchSelectionPayload,
   InlineItemAndSwitchSelectionProps,
@@ -31,7 +37,7 @@ import { useState, type ComponentType, type MouseEvent } from "react";
  * ```
  */
 export function withInlineItemAndSwitchSelection<T extends object>(
-  Wrapped: ComponentType<T>
+  Wrapped: ComponentType<T>,
 ) {
   return function Component(props: T & InlineItemAndSwitchSelectionProps) {
     const [isSelected, setIsSelected] = useState(props.isSelected ?? false);
@@ -77,16 +83,14 @@ export function withInlineItemAndSwitchSelection<T extends object>(
     };
 
     return (
-      <Item>
-        <ItemContent>
+      <Item className={labelledSwitchWithSelection}>
+        <ItemContent className={label}>
           <ItemTitle>{props.title}</ItemTitle>
         </ItemContent>
-        <ItemActions>
+        <ItemActions className={centralSwitch}>
           <Switch onClick={handleSwitchClick} checked={isSelected} />
         </ItemActions>
-        <ItemContent>
-          <Wrapped {...props} disabled={!isSelected} />
-        </ItemContent>
+        <Wrapped {...props} className={content} disabled={!isSelected} />
       </Item>
     );
   };

@@ -1,4 +1,8 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import {
+  DEGREE_ITEM_CARD_TITLE,
+  DEGREE_ITEM_FOOTER_PROPS,
+} from "@/features/class-creation/components/DegreeItem/config/degree-item.configs";
 import { DegreeItemController } from "@/features/class-creation/components/DegreeItem/controllers/DegreeItemController.tsx";
 import {
   diplomaFieldData,
@@ -8,15 +12,7 @@ import {
 import { degreeCreationInputControllersField } from "@/features/class-creation/index.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
 import { useForm } from "react-hook-form";
-
-const titleProps = {
-  title: "Création d'un nouveau domaine / métier",
-  description: "Ajoutez un nouveau domaine / métier pour les diplômes.",
-};
-
-const footerProps = { submitText: "Créer", cancelText: "Annuler" };
 
 /**
  * View component for creating a new degree item.
@@ -44,34 +40,26 @@ function DegreeItem({
     },
   });
 
-  const narrowedPageId = pageId as
-    | "new-degree-item-field"
-    | "new-degree-item-year"
-    | "new-degree-item-degree";
+  const formId = pageId + "-form";
 
-  const formId = narrowedPageId + "-form";
-
-  const commonProps = useMemo(
-    () => ({
-      pageId: narrowedPageId,
-      inputControllers,
-      formId,
-      className,
-      modalMode,
-      card: {
-        card: { className },
-        title: titleProps,
-        footer: {
-          ...footerProps,
-          formState: form.formState,
-          formId,
-        },
+  const commonProps = {
+    pageId,
+    inputControllers,
+    formId,
+    className,
+    modalMode,
+    card: {
+      card: { className },
+      title: DEGREE_ITEM_CARD_TITLE,
+      footer: {
+        ...DEGREE_ITEM_FOOTER_PROPS,
+        formState: form.formState,
+        formId,
       },
-      ...props,
-      form,
-    }),
-    [form.formState, props],
-  );
+    },
+    ...props,
+    form,
+  };
 
   return (
     <DegreeItemWithCard {...commonProps}>

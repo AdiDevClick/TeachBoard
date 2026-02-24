@@ -1,0 +1,25 @@
+@use "Slider" as *;
+
+/**
+  * Styles for the Evaluation Student component.
+  */
+.evaluation-student {
+
+  &--container {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--gap);
+    justify-content: space-between;
+    padding: var(--gap);
+  }
+
+  &__badge {
+    margin: var(--spacing);
+  }
+
+  &__slider {
+    // transition: all 0.3s ease;
+    max-width: 30ch;
+    @extend .four-steps-slider;
+  }
+}

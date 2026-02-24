@@ -11,7 +11,7 @@ import type { ApiError } from "@/types/AppErrorInterface";
 import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const defaultStateParameters: FetchParams = {
@@ -30,6 +30,7 @@ const defaultStateParameters: FetchParams = {
   onError: undefined,
   silent: false,
   cachedFetchKey: undefined,
+  resetParams: false,
 };
 
 /**
@@ -38,12 +39,12 @@ const defaultStateParameters: FetchParams = {
  * @description Cached data is stored using React Query under the keys `[contentId, url]`.
  * Data reshaping can be applied using a provided function before caching.
  *
- * @see {@link api.endpoints.config.ts} for predefined API endpoints and their configurations and how to use the reshaper.
+ * @see {@link API_ENDPOINTS} for predefined API endpoints and their configurations and how to use the reshaper.
  * @see {@link FetchParams} for the structure of fetch parameters.
  * @see {@link useQueryOnSubmit} for query handling on fetch submission.
  * @see {@link useAppStore} for accessing global app state like user activity and navigation.
  *
- * @remarks This hook handles user activity tracking and redirects to login on 403 errors.
+ * @remarks !! IMPORTANT !! This hook handles user activity tracking and redirects to login on 403 errors.
  *
  * @param fetchParams - The parameters for the fetch operation
  * @param setFetchParams - A function to set the fetch parameters
@@ -57,12 +58,13 @@ const defaultStateParameters: FetchParams = {
 export function useFetch<
   TServerData = Record<string, unknown>,
   E extends ApiError = ApiError,
-  TViewData = unknown
+  TViewData = unknown,
 >() {
   const [fetchParams, setFetchParams] = useState(defaultStateParameters);
   const [viewData, setViewData] = useState<TViewData | undefined>(undefined);
   const setLastUserActivity = useAppStore((state) => state.setLastUserActivity);
   const navigate = useNavigate();
+  const location = useLocation().pathname;
   const queryClient = useQueryClient();
 
   const {
@@ -73,13 +75,17 @@ export function useFetch<
     ...params
   } = fetchParams;
 
-  // Note: cast to the appropriate QueryKeyDescriptor so generics flow into useQueryOnSubmit
   const queryParams = useQueryOnSubmit<ResponseInterface<TServerData>, E>([
     contentId,
     {
       ...params,
       onSuccess: (response) => {
-        setLastUserActivity(contentId);
+        setLastUserActivity(contentId, {
+          url: location,
+          endpoint: params.url,
+          method: params.method,
+          type: "fetch",
+        });
         successCallback?.(response);
 
         const cachedKey = cachedFetchKey ?? [contentId, params.url];
@@ -93,7 +99,7 @@ export function useFetch<
           ? fetchParams.dataReshapeFn(
               response.data,
               rawCachedDatas,
-              fetchParams.reshapeOptions
+              fetchParams.reshapeOptions,
             )
           : response.data;
 
@@ -106,7 +112,7 @@ export function useFetch<
             "rawCachedDatas:",
             rawCachedDatas,
             "reshapedResult:",
-            cachingDatas
+            cachingDatas,
           );
         }
         // Also expose reshaped data directly to consumers.
@@ -132,21 +138,37 @@ export function useFetch<
           [fetchParams.contentId, `${fetchParams.url}:meta`],
           {
             ...fetchParams,
-          }
+          },
         );
+
+        if (fetchParams.resetParams) {
+          resetFetchParams();
+        }
       },
       onError: (error) => {
-        setLastUserActivity(contentId);
+        setLastUserActivity(contentId, {
+          url: location,
+          endpoint: params.url,
+          method: params.method,
+          type: "fetch",
+        });
         errorCallback?.(error);
 
+        // !! IMPORTANT !! Handle forbidden error by navigating to login page
         navigateOnForbiddenError(error.status, navigate);
       },
     },
   ]);
 
+  const resetFetchParams = () => {
+    setFetchParams(defaultStateParameters);
+    setViewData(undefined);
+  };
+
   return {
     fetchParams,
     setFetchParams,
+    resetFetchParams,
     ...queryParams,
     // raw server response.
     response: queryParams.data,
@@ -165,7 +187,7 @@ export function useFetch<
  */
 function navigateOnForbiddenError(
   status: number,
-  navigate: ReturnType<typeof useNavigate>
+  navigate: ReturnType<typeof useNavigate>,
 ) {
   if (status === 403) {
     navigate("/login", { replace: true });

@@ -1,13 +1,14 @@
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
-import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
-import { PopoverFieldWithCommands } from "@/components/Popovers/PopoverField.tsx";
-import { ControlledDynamicTagList } from "@/components/Tags/DynamicTag.tsx";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
+import { PopoverFieldWithCommands } from "@/components/Popovers/exports/popover-field.exports";
+import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { HTTP_METHODS } from "@/configs/app.config.ts";
 import { degreeModuleCreationInputControllers } from "@/features/class-creation/components/DegreeModule/forms/degree-module-inputs";
 import type { DegreeModuleControllerProps } from "@/features/class-creation/components/DegreeModule/types/degree-module.types.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
+import { useMemo } from "react";
 import { useWatch } from "react-hook-form";
 
 /**
@@ -86,6 +87,14 @@ export function DegreeModuleController({
     controlledInputsList: inputControllers.slice(0, 2),
   };
 
+  const sharedCallbacksMemo = useMemo(() => {
+    const commonObsProps = {
+      setRef,
+      observedRefs,
+    };
+    return { commonObsProps };
+  }, [setRef, observedRefs]);
+
   return (
     <form
       id={formId}
@@ -93,24 +102,21 @@ export function DegreeModuleController({
       onSubmit={form.handleSubmit(handleSubmit)}
     >
       <ControlledInputList
+        {...sharedCallbacksMemo.commonObsProps}
         items={controllers.controlledInputsList}
         form={form}
-        setRef={setRef}
-        observedRefs={observedRefs}
       />
       <ControlledDynamicTagList
         form={form}
-        setRef={setRef}
         {...controllers.dynamicTagsList}
-        observedRefs={observedRefs}
+        {...sharedCallbacksMemo.commonObsProps}
         itemList={currentSkills}
       />
       <PopoverFieldWithCommands
         multiSelection
-        setRef={setRef}
+        {...sharedCallbacksMemo.commonObsProps}
         onSelect={handleCommandSelection}
         onOpenChange={openingCallback}
-        observedRefs={observedRefs}
         onAddNewItem={newItemCallback}
         commandHeadings={resultsCallback()}
         {...controllers.dynamicTagsList}

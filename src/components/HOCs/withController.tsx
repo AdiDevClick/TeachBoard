@@ -4,11 +4,9 @@ import {
   controllerPropsInvalid,
   debugLogs,
 } from "@/configs/app-components.config.ts";
-import type {
-  AnyComponentLike,
-  ComponentPropsOf,
-} from "@/utils/types/types.utils.ts";
-import type { ReactElement } from "react";
+import type { ComponentPropsOf } from "@/utils/types/types.utils.ts";
+import { createNameForHOC } from "@/utils/utils";
+import type { ComponentType } from "react";
 import { Controller } from "react-hook-form";
 
 /**
@@ -30,25 +28,19 @@ import { Controller } from "react-hook-form";
  * />
  * ```
  */
-type WithControllerComponent<C extends AnyComponentLike> = (
-  props: WrapperPropsAny<C>,
-) => ReactElement | null;
-
-function withController<C extends AnyComponentLike>(
-  Wrapped: C,
-): WithControllerComponent<C> {
-  return function Component(props: WrapperPropsAny<C>) {
+function withController<C extends ComponentType<any>>(Wrapped: C) {
+  function Component(props: WrapperPropsAny<C>) {
     if (controllerPropsInvalid(props)) {
       debugLogs("withController");
       return null;
     }
-
-    const { name, form, ...restProps } = props;
+    const { name, form, defaultValue, ...restProps } = props;
 
     return (
       <Controller
         name={name}
         control={form.control}
+        defaultValue={defaultValue}
         render={({ field, fieldState }) => (
           <Field
             ref={(el) => {
@@ -75,7 +67,10 @@ function withController<C extends AnyComponentLike>(
         )}
       />
     );
-  };
+  }
+
+  createNameForHOC("withController", Wrapped, Component);
+  return Component;
 }
 
 /**

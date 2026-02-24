@@ -24,7 +24,7 @@ const defaultOptions = {
  * @returns A ref setter function to attach to the target element
  */
 export function useMutationObserver({
-  callback = () => {},
+  mutationCallback: callback = () => {},
   options = defaultOptions,
   onNodeReady,
 }: MutationObserverHook) {
@@ -35,9 +35,28 @@ export function useMutationObserver({
   const hookId = useId();
 
   const [state, setState] = useState<State>({
-    observedRefs: observersRef.current.clone(),
+    observedRefs: new UniqueSet<string, StateData>(),
     observer: null!,
   });
+
+  /**
+   * Deletes the observer and reference for a given key.
+   *
+   * @param key - The key of the observed element to delete
+   */
+  const deleteRef = useCallback((key: string) => {
+    const obs = observersRef.current.get(key);
+
+    if (obs) {
+      obs.observer.disconnect();
+      observersRef.current.delete(key);
+    }
+
+    setState((prev) => ({
+      ...prev,
+      observedRefs: observersRef.current.clone(),
+    }));
+  }, []);
 
   /**
    * Automatically called when the setRef is set on an element as a ref.
@@ -111,7 +130,6 @@ export function useMutationObserver({
       }
 
       nodeRef.current = node;
-
       const obs = new MutationObserver(callback);
 
       obs.observe(node, options);
@@ -133,25 +151,6 @@ export function useMutationObserver({
     },
     [callback, options, onNodeReady, generatedNodeId, hookId],
   );
-
-  /**
-   * Deletes the observer and reference for a given key.
-   *
-   * @param key - The key of the observed element to delete
-   */
-  const deleteRef = useCallback((key: string) => {
-    const obs = observersRef.current.get(key);
-
-    if (obs) {
-      obs.observer.disconnect();
-      observersRef.current.delete(key);
-    }
-
-    setState((prev) => ({
-      ...prev,
-      observedRefs: observersRef.current.clone(),
-    }));
-  }, []);
 
   /**
    * Clears all observers and references.
@@ -180,6 +179,90 @@ export function useMutationObserver({
   }, []);
 
   /**
+   * Find a nested element within a parent element using a CSS selector.
+   *
+   * @param parent - The parent element to search within
+   * @param selector - The CSS selector to match the nested element
+   *
+   * @returns The first matching nested element, or null if not found
+   */
+  const findNestedElement = useCallback((parent: Element, selector: string) => {
+    return parent.querySelector(selector);
+  }, []);
+
+  /**
+   * Find all nested elements within a parent that match the provided selectors.
+   *
+   * @param parent - The parent element to search within
+   * @param selectors - An object where keys are identifiers and values are CSS selectors
+   * @returns An object with the same keys as the input, where each value is the corresponding found element (or null if not found)
+   *
+   * @example
+   * const selectors = {
+   *   rightSide: '.content__right-side',
+   *   leftNumber: '.left-side--number',
+   *  leftDescription: '.left-side--description',
+   *  leftTitle: '.left-side--title'
+   * };
+   * const elements = findAllNestedElements(parentElement, selectors);
+   * // elements.rightSide will contain the element matching '.content__right-side' within parentElement, and so on for the other selectors.
+   */
+  const findAllNestedElements = useCallback(
+    (parent: Element, selectors: { [key: string]: string }) => {
+      // ex objet :  { rightSide: '.content__right-side',leftNumber: '.left-side--number' }
+      // Return an object with keys corresponding to the provided selectors and values being the found elements (or null if not found)
+      return Object.entries(selectors).reduce(
+        (acc: Record<string, HTMLElement>, [key, selector]) => {
+          const found = parent.querySelector(selector);
+          if (found) acc[key] = found as HTMLElement;
+          return acc;
+        },
+        {},
+      );
+    },
+    [],
+  );
+
+  /**
+   * Find nested elements by class name, ignoring potential variations in the class attribute (e.g., additional classes).
+   *
+   * @param parent - The parent element to search within
+   * @param selectors - An object where keys are identifiers and values are class names (without the dot)
+   * @returns An object with the same keys as the input; each value is either a
+   * single matching element or an array when multiple elements satisfy the
+   * selector.
+   *
+   * @example
+   * const selectors = {
+   *   rightSide: 'content__right-side',
+   *   leftNumber: '--number',
+   *  leftDescription: '--description',
+   * leftTitle: '--title'
+   * };
+   * const elements = findNestedElementsByClass(parentElement, selectors);
+   * // This will find elements that have class attributes containing the specified class names, even if they have additional classes (e.g., class="content__right-side extra-class").
+   */
+  const findNestedElementsByClass = useCallback(
+    (parent: Element, selectors: { [key: string]: string }) => {
+      return Object.entries(selectors).reduce(
+        (acc: Record<string, HTMLElement | HTMLElement[]>, [key, selector]) => {
+          const pointReplacedSelector = selector.replaceAll(".", "").trim();
+          const stripedSelector = '[class*="' + pointReplacedSelector + '"]';
+          const nodes = parent.querySelectorAll<HTMLElement>(stripedSelector);
+          if (nodes.length === 1) {
+            acc[key] = nodes[0];
+          } else if (nodes.length > 1) {
+            acc[key] = Array.from(nodes);
+          }
+          return acc;
+        },
+        {},
+      );
+    },
+    [],
+  );
+
+  /**
    * Find an observed entry by its metadata id or name.
    *
    * @description Use this if you need to locate an observed element based on its metadata.
@@ -197,14 +280,38 @@ export function useMutationObserver({
     return undefined;
   }, []);
 
+  /**
+   * Find all observed entries that match any of the provided metadata ids or names.
+   *
+   * @description Use this if you need to locate multiple observed elements based on their metadata.
+   */
+  const findAllByMeta = useCallback((idOrName: string[]) => {
+    return Array.from(observersRef.current.entries()).reduce(
+      (acc, [, entry]) => {
+        const meta = entry?.meta;
+        if (!meta) return acc;
+
+        if (idOrName.includes((meta.id ?? meta.name) as string)) {
+          acc.push(entry);
+        }
+
+        return acc;
+      },
+      [] as StateData[],
+    );
+  }, []);
+
   return {
     setRef,
     deleteRef,
     clearRefs,
     observedRefs: state.observedRefs,
-    // observedRefs: observersRef.current,
     observer: state.observer,
     findMetadata,
     findByMeta,
+    findAllByMeta,
+    findNestedElement,
+    findAllNestedElements,
+    findNestedElementsByClass,
   };
 }

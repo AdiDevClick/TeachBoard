@@ -19,13 +19,16 @@ import type {
 import type { TaskTemplateDto } from "@/api/types/routes/task-templates.types";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { controllerLabelRegex } from "@/tests/test-utils/class-creation/regex.functions";
+import { waitForCache } from "@/tests/test-utils/tests.functions";
 
 import {
   fillAndTab,
   queryKeyFor,
   rx,
   rxJoin,
+  stubFetchRoutes,
   submitButtonShouldBeDisabled,
+  waitForTextToBeAbsent,
 } from "@/tests/test-utils/vitest-browser.helpers";
 
 import {
@@ -41,7 +44,7 @@ import {
 import { clickControlAndWaitForDialog } from "@/tests/units/ui/functions/useful-ui.functions";
 
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { page } from "vitest/browser";
+import { page, userEvent } from "vitest/browser";
 
 import type { InputControllerLike } from "@/tests/test-utils/class-creation/regex.functions";
 
@@ -89,7 +92,7 @@ type Ctx = {
   labels: { name: RegExp; value: string }[];
   tasksNames: string[];
   taskTemplateIdByName: Record<string, string>;
-  installCreateClassStubs: (postResponse: unknown) => void;
+  installCreateClassStubs: (_postResponse: unknown) => void;
 };
 
 function data(
@@ -203,9 +206,9 @@ setupUiTestState(null, {
       labels,
       tasksNames,
       taskTemplateIdByName,
-      installCreateClassStubs: (postResponse: unknown) =>
+      installCreateClassStubs: (_postResponse: unknown) =>
         getRoutes
-          .createClassStepOne({ createClassPostResponse: postResponse })
+          .createClassStepOne({ createClassPostResponse: _postResponse })
           .installFetchStubs(),
     } satisfies Ctx;
   },
@@ -218,10 +221,64 @@ afterEach(() => {
 describe("UI flow: class-creation (StepOne list)", () => {
   beforeEach(() => {
     const testName = expect.getState().currentTestName ?? "";
-    const createClassPostResponse = testName.includes("optional fields filled")
+    let createClassPostResponse = testName.includes("optional fields filled")
       ? classCreatedWithOptional
       : classCreated;
+
+    // for the cache-focused spec we want the response to include a template
+    // carrying modules; the test will assert their presence below.
+    if (testName.startsWith("cache:")) {
+      // pick the first template name/ID from the fixture map if available
+      const firstTemplateId =
+        Object.values(ctx.taskTemplateIdByName)[0] ?? "template-1";
+      const firstTaskName = ctx.tasksNames[0] || "foo";
+
+      createClassPostResponse = {
+        ...createClassPostResponse,
+        templates: [
+          {
+            id: firstTemplateId,
+            task: { id: "t1", name: firstTaskName, description: "" },
+            // modules array may be string codes or objects depending on API
+            modules: ["mod-a", "mod-b"],
+          },
+        ],
+      } as unknown as typeof createClassPostResponse;
+    }
+
     ctx.installCreateClassStubs(createClassPostResponse);
+  });
+
+  test("server validation error clears immediately while typing", async () => {
+    expect(ctx).toBeDefined();
+
+    // open modal without submitting yet
+    await baseInit(ctx.labeler);
+
+    // stub availability endpoint for a specific name value
+    // Using a RegExp allows us to anchor the match so that typing extra
+    // characters (e.g. "bad-nameX") no longer hits the stub.  The helper now
+    // recognises `RegExp` values, so this is both precise and future-proof.
+    stubFetchRoutes({
+      getRoutes: [[/classes\/check-name\/bad-name$/, { available: false }]],
+    });
+
+    // first grab the input node and fill the problematic name
+    await userEvent.fill(page.getByLabelText(/^Nom$/i), "bad-name");
+
+    // wait for the availability check to complete (debounced in controller)
+    await waitForTextToBeAbsent(/déjà utilisé/i, { present: true });
+
+    // the DOM may have re‑rendered the input (error message added/removed),
+    // so query it again before typing more characters.
+    const nameInput2 = page.getByLabelText(/^Nom$/i);
+    // typing did not trigger onChange reliably in this environment, so use
+    // `fill` again which guarantees the controller will see a change event.
+    await userEvent.fill(nameInput2, "bad-nameX");
+
+    // the manual error should disappear immediately now that the value has
+    // changed.
+    await waitForTextToBeAbsent(/déjà utilisé/i);
   });
 
   test("submit works with optional fields empty", async () => {
@@ -237,6 +294,48 @@ describe("UI flow: class-creation (StepOne list)", () => {
   test("tasks multi-select: select 3, remove 1, add 1 updates POST payload", async () => {
     expect(ctx).toBeDefined();
     await runCreateFlow(ctx.flowArgsToggle);
+  });
+
+  test("cache: created class is selectable from cache without refetch", async () => {
+    expect(ctx).toBeDefined();
+
+    // perform regular creation flow; util above already ensures no extra GET
+    await runCreateFlow(ctx.flowArgs);
+
+    const cached = await waitForCache(ctx.flowArgs.classesQueryKey);
+    const groups = Array.isArray(cached) ? cached : [];
+
+    const createdItem = groups
+      .flatMap((group) => {
+        const maybeItems =
+          group && typeof group === "object"
+            ? Reflect.get(group, "items")
+            : undefined;
+        return Array.isArray(maybeItems) ? maybeItems : [];
+      })
+      .find((item) => {
+        if (!item || typeof item !== "object") return false;
+        return Reflect.get(item, "id") === ctx.flowArgs.createdClassPayload.id;
+      });
+
+    expect(createdItem).toBeDefined();
+
+    // basic sanity: cached object carries id and name/value fields
+    if (createdItem && typeof createdItem === "object") {
+      expect(Reflect.get(createdItem, "id")).toBe(
+        ctx.flowArgs.createdClassPayload.id,
+      );
+      expect(
+        Reflect.get(createdItem, "name") || Reflect.get(createdItem, "value"),
+      ).toBe(ctx.flowArgs.createdClassPayload.name);
+
+      // when a template is included we expect its modules to be cached too
+      const templates = Reflect.get(createdItem, "templates");
+      if (Array.isArray(templates) && templates.length > 0) {
+        const mods = Reflect.get(templates[0], "modules");
+        expect(Array.isArray(mods)).toBe(true);
+      }
+    }
   });
 
   test("sync: switching diploma refreshes skills in new-task-template modal (no stale data, no preselection)", async () => {

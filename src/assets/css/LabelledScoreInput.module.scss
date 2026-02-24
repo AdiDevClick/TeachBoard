@@ -1,0 +1,38 @@
+.labelled-score-input {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: var(--gap);
+  align-items: center;
+  justify-items: center;
+  padding-block: var(--gap);
+
+  &__badge {
+    grid-column: 1 / 2;
+    justify-self: start;
+  }
+
+  &__text {
+    width: 100%;
+    text-align: center;
+    grid-column: 2 / 3;
+  }
+
+  &__input {
+    grid-column: 3 / 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap);
+    width: 16ch;
+
+    .p {
+      text-align: center;
+    }
+  }
+
+  &:is([data-is-editing="true"], :focus, :focus-visible, :focus-within) {
+    z-index: 60;
+    isolation: isolate;
+  }
+}

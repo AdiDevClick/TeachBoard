@@ -10,8 +10,8 @@ type GlobalWithUiTestFlags = typeof globalThis & {
 };
 
 export function setupUiTestState(
-  initialRender?: ReactNode,
-  opts?: { beforeEach?: () => void | Promise<void> }
+  initialRender?: ReactNode | (() => ReactNode),
+  opts?: { beforeEach?: () => void | Promise<void> },
 ) {
   beforeEach(async () => {
     const g = globalThis as GlobalWithUiTestFlags;
@@ -23,13 +23,13 @@ export function setupUiTestState(
         // Replace with no-op implementations for the test environment.
         const nav = globalThis as typeof globalThis & {
           location: Location & {
-            assign: (url: string | URL) => void;
-            replace: (url: string | URL) => void;
+            assign: (_url: string | URL) => void;
+            replace: (_url: string | URL) => void;
           };
           open: (
-            url?: string | URL,
-            target?: string,
-            features?: string
+            _url?: string | URL,
+            _target?: string,
+            _features?: string,
           ) => Window | null;
         };
 
@@ -65,7 +65,9 @@ export function setupUiTestState(
     // Optionally render an initial tree (JSX) in the test environment.
     if (initialRender) {
       try {
-        await render(initialRender as Parameters<typeof render>[0]);
+        await render(
+          typeof initialRender === "function" ? initialRender() : initialRender,
+        );
       } catch {
         // ignore failures during setup rendering
       }

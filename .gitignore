@@ -29,3 +29,13 @@ src/api/types/openapi/openapi-graph
 src/tests/units/ui/__screenshots__
 .github/copilot-instructions.md
 package-lock.json
+
+# TS files
+*.d.ts
+
+# Env files
+.env.prod
+
+# Test screenshots and images
+src/tests/units/ui/__screenshots__
+src/tests/units/ui/__images__

@@ -1,3 +1,4 @@
+import type { AppModal } from "@/pages/AllModals/types/modals.types";
 import type { ApiError } from "@/types/AppErrorInterface.ts";
 import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
 import type {
@@ -7,6 +8,22 @@ import type {
   ReactNode,
   SyntheticEvent,
 } from "react";
+
+/**
+ * Types for general utilities and shared types across the application.
+ */
+export type AnimationsOptions = {
+  incoming: {
+    name: string;
+    duration?: string;
+    delay?: string;
+  };
+  outgoing: {
+    name: string;
+    duration?: string;
+    delay?: string;
+  };
+};
 
 /**
  * Union of common event types where we want to call preventDefault/stopPropagation safely.
@@ -108,7 +125,7 @@ export type ProvidedKeyRecord<T> = Record<KeysOfUnion<T>, unknown>;
 export type ComponentLike<P = unknown> =
   | ComponentType<P>
   | ForwardRefExoticComponent<P>
-  | ((props: P) => ReactNode);
+  | BivariantCallback<(props: P) => ReactNode>;
 
 /**
  * Make a function type bivariant in its parameters.
@@ -144,7 +161,7 @@ export type EnsureContentList<
  */
 export const createEnsureContentList =
   <PropName extends string>() =>
-  <const T extends readonly unknown[]>(list: EnsureContentList<T, PropName>) =>
+  <const T extends readonly AppModal[]>(list: EnsureContentList<T, PropName>) =>
     list;
 
 /**
@@ -175,5 +192,5 @@ export type ProbeProxyResult = {
   unsupported?: boolean;
 };
 
-type GenericSuccess<T extends ResponseInterface> = T;
-type GenericError<T extends ApiError> = T;
+type _GenericSuccess<T extends ResponseInterface> = T;
+type _GenericError<T extends ApiError> = T;

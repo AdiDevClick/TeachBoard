@@ -1,6 +1,8 @@
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
 import { Modal, ModalWithSimpleAlert } from "@/components/Modal/Modal.tsx";
 import { inputSignupControllers } from "@/data/inputs-controllers.data.ts";
+import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
+import LoginView from "@/features/auth/components/login/LoginView";
 import DegreeItem from "@/features/class-creation/components/DegreeItem/DegreeItem";
 import {
   degreeCreationInputControllersDegree,
@@ -16,8 +18,6 @@ import SearchStudents from "@/features/class-creation/components/SearchStudents/
 import { SearchPrimaryTeacher } from "@/features/class-creation/components/SearchTeachers/SearchTeachers.tsx";
 import TaskItem from "@/features/class-creation/components/TaskItem/TaskItem";
 import TaskTemplateCreation from "@/features/class-creation/components/TaskTemplateCreation/TaskTemplateCreation";
-import { inputLoginControllers } from "@/features/login/components/main/forms/login-inputs.ts";
-import LoginForm from "@/features/login/components/main/LoginForm.tsx";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import {
   defineStrictModalsList,
@@ -40,7 +40,7 @@ const modals = defineStrictModalsList([
   {
     modalName: "login",
     type: Modal,
-    modalContent: LoginForm,
+    modalContent: LoginView,
     contentProps: {
       inputControllers: inputLoginControllers,
       modalMode: true,
@@ -58,7 +58,7 @@ const modals = defineStrictModalsList([
   {
     modalName: "apple-login",
     type: Modal,
-    modalContent: LoginForm,
+    modalContent: LoginView,
     contentProps: {
       inputControllers: inputLoginControllers,
       modalMode: true,
@@ -69,32 +69,21 @@ const modals = defineStrictModalsList([
     type: ModalWithSimpleAlert,
     modalProps: {
       isNavigationModal: false,
-      headerTitle: "Demande envoyée",
+      headerTitle: "Email envoyé",
       headerDescription:
-        "Vérifiez votre boîte mail pour réinitialiser votre mot de passe.",
+        "Un email a été envoyé. Vérifiez votre boîte mail pour réinitialiser votre mot de passe.",
     },
   },
   {
     modalName: "class-creation",
-    type: Modal,
     modalContent: ClassCreation,
-    modalProps: {
-      isNavigationModal: false,
-    },
-    contentProps: {
-      modalMode: true,
-    },
+    ...baseNonNavigationalProps,
   },
   {
     modalName: "create-diploma",
     modalContent: DiplomaCreation,
     ...baseNonNavigationalProps,
-    modalProps: {
-      isNavigationModal: false,
-      className: "max-w-2",
-    },
     contentProps: {
-      modalMode: true,
       pageId: "create-diploma",
       inputControllers: diplomaCreationInputControllers,
     },

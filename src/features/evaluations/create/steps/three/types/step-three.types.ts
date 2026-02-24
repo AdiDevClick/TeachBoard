@@ -3,12 +3,15 @@ import type { ShowStudentsEvaluation } from "@/features/evaluations/create/steps
 import type { StepThree } from "@/features/evaluations/create/steps/three/StepThree.tsx";
 import type { AttendanceRecordCreationFormSchema } from "@/features/evaluations/create/steps/two/models/attendance-record-creation.models";
 import type {
+  ClassModuleSubSkill,
   ClassTasks,
   SelectedClassModulesReturn,
   StudentWithPresence,
 } from "@/features/evaluations/create/store/types/steps-creation-store.types.ts";
 import type { AppControllerInterface } from "@/types/AppControllerInterface.ts";
 import type { UniqueSet } from "@/utils/UniqueSet.ts";
+import type { RadioGroup } from "@radix-ui/react-dropdown-menu";
+import type { ComponentProps } from "react";
 import type { FieldValues } from "react-hook-form";
 
 /**
@@ -44,19 +47,21 @@ export type StepThreeModuleSelectionControllerProps = AppControllerInterface<
  *
  * @module StepThreeSubskillsSelectionController
  */
-export type StepThreeSubskillsSelectionControllerProps = AppControllerInterface<
-  AttendanceRecordCreationFormSchema & FieldValues
+export type StepThreeSubskillsSelectionControllerProps = ComponentProps<
+  typeof RadioGroup
 > & {
-  inputControllers?: readonly unknown[];
-  user: unknown;
-} & Omit<Parameters<typeof StepThree>[0], "modalMode">;
+  isActive: boolean;
+};
 
 export type ShowStudentsEvaluationWithPreviousArrowProps = Parameters<
   typeof ShowStudentsEvaluation
 >[0] & {
-  onPreviousArrowClick: (value: boolean) => void;
+  onPreviousArrowClick: (_value: boolean) => void;
 };
 
 export type StepThreeCommonProps =
   | StepThreeControllerProps
   | StepThreeModuleSelectionControllerProps;
+export type UseStepThreeHandlerProps =
+  | SelectedClassModulesReturn
+  | ClassModuleSubSkill[];

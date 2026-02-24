@@ -1,22 +1,20 @@
+import type { ViewCardContextType } from "@/api/contexts/types/context.types";
+import withTitledCard from "@/components/HOCs/withTitledCard";
 import type {
   ModalProps,
   ModalState,
   WithSimpleAlertProps,
 } from "@/components/Modal/types/modal.types.ts";
-import { DialogHeaderTitle } from "@/components/Titles/ModalTitle.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import { Card } from "@/components/ui/card.tsx";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-} from "@/components/ui/dialog.tsx";
+import { Dialog, DialogContent } from "@/components/ui/dialog.tsx";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useUserEventListener } from "@/hooks/events/useUserEventListener";
+import type {
+  AnyComponentLike,
+  ComponentPropsOf,
+} from "@/utils/types/types.utils";
 import { wait } from "@/utils/utils.ts";
 import "@css/Dialog.scss";
-import { useEffect, useState, type ComponentType } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 const defaultModalState: ModalState = {
@@ -66,7 +64,7 @@ export function Modal({
   onOpen,
   onOpenChange,
   isNavigationModal = true,
-}: Readonly<ModalProps>) {
+}: ModalProps) {
   const { myEvent: popStateEvent } = useUserEventListener("popstate");
   const { myEvent: userMouseEvent } = useUserEventListener("pointerdown");
   const location = useLocation();
@@ -333,35 +331,48 @@ async function waitAndReplace(state: object, url: string, timer = 70) {
   history.replaceState(state, "", url);
 }
 
-function withSimpleAlert(WrappedComponent: ComponentType<ModalProps>) {
-  return ({
-    headerTitle,
-    headerDescription,
-    ref,
-    ...rest
-  }: WithSimpleAlertProps) => (
-    <WrappedComponent
-      {...rest}
-      modalContent={
-        <Card
-          id={rest.modalName ? `${rest.modalName}-card` : undefined}
-          ref={ref}
-        >
-          <DialogHeaderTitle
-            className="text-center!"
-            title={headerTitle}
-            description={headerDescription}
-          />
-          <DialogFooter>
-            <DialogClose asChild className="m-auto">
-              <Button variant="outline">Ok</Button>
-            </DialogClose>
-          </DialogFooter>
-        </Card>
-      }
-    />
-  );
+function withSimpleAlert<T extends AnyComponentLike>(WrappedComponent: T) {
+  return function Component(props: WithSimpleAlertProps) {
+    const { headerTitle, ref, headerDescription, ...rest } = props;
+
+    const commonProps = {
+      modalMode: true,
+      ref,
+      pageId: rest.modalName ?? "simple-alert",
+      card: {
+        title: {
+          title: headerTitle,
+          description: headerDescription,
+          separator: {
+            displaySeparator: false,
+          },
+        },
+        footer: {
+          className: "px-6",
+          separator: {
+            displaySeparator: false,
+          },
+          cancelText: "Ok",
+          displaySubmitButton: false,
+        },
+      } satisfies ViewCardContextType,
+    };
+
+    const injectedProps = {
+      ...rest,
+      modalContent: (
+        <SimpleAlert {...commonProps}>
+          <SimpleAlert.Title />
+          <SimpleAlert.Footer />
+        </SimpleAlert>
+      ),
+    };
+
+    return <WrappedComponent {...(injectedProps as ComponentPropsOf<T>)} />;
+  };
 }
+
+const SimpleAlert = withTitledCard(null!);
 
 /**
  * Higher-order component to create a simple alert modal

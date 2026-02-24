@@ -1,3 +1,6 @@
+@use 'keyframes' as *;
+@use "index" as *;
+
 /**
  * Styles for dialog components
  *
@@ -8,6 +11,9 @@
  * 1 : Synchronize the name with the className passed to the Modal component
  * 2 : Customize styles as needed
  *
+ * REMARKS : @link src/components/modals/Modal.tsx - The className is passed as follows :
+  * <Modal className={`dialog__content--${modalName}`} ... /> 
+ *
  * Example :
  * Your modal name is "login" -> 
  * .dialog__content--login { my-custom-styles }
@@ -17,18 +23,13 @@
   padding: 0;
   border: none;
   background: transparent;
-  max-block-size: 850px;
+  max-block-size: max-content;
+  // max-block-size: 850px;
   // block-size: max-content;
   transition: max-block-size 0.3s ease;
 
   & [data-slot="card-content"] {
-    overflow: auto;
-    max-block-size: 650px;
-    transition: max-block-size 0.3s ease;
-
-    * {
-      transition: 0.3s ease;
-    }
+    @extend .card-content-max-height-with-animation;
   }
 
   &--login,
@@ -43,34 +44,6 @@
     max-width: 350px;
   }
 
-}
-
-@keyframes dialog-tag-enter {
-  from {
-    max-block-size: 0;
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-
-  to {
-    max-block-size: 64px;
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes dialog-tag-close {
-  from {
-    max-block-size: 64px;
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  to {
-    max-block-size: 0;
-    opacity: 0;
-    transform: translateY(-4px);
-  }
 }
 
 .dialog__content [data-slot="item-group"] {

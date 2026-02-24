@@ -20,7 +20,7 @@
     "endColumn": 12
   },
   {
-    "resource": "src/components/LoginForms/LoginForm.tsx",
+    "resource": "src/components/LoginForms/LoginView.tsx",
     "owner": "typescript",
     "code": {
       "value": "80001",

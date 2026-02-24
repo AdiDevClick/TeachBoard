@@ -1,4 +1,4 @@
-import { ControlledInputList } from "@/components/Inputs/LaballedInputForController.tsx";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { HTTP_METHODS } from "@/configs/app.config.ts";
 import type { TaskItemControllerProps } from "@/features/class-creation/components/TaskItem/types/task-item.types.ts";

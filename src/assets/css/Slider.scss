@@ -10,9 +10,14 @@
 @include property(slider-progress, percentage, true, 25%);
 @include property('slider-rangeColor', '<color>', true, null);
 
+// Mixin to reuse the four-steps-slider styles across files
 .four-steps-slider {
   height: 12px;
   border-radius: 999px;
+
+  * {
+    transition: 0.3s ease;
+  }
 
   &::after {
     content: '';

@@ -1,22 +1,19 @@
+@use "mixins" as *;
+
 /**
  * Styles for the Page Header component
  */
 .page__header-container {
   display: flex;
   height: var(--page-header-height);
-  // height: calc(var(--spacing) * 16);
   align-items: center;
   gap: var(--app-overall-gap);
   transition: width 0.2s ease-in-out, height 0.2s ease-in-out;
   padding-left: 0 !important;
   flex-shrink: 0;
 
-  &:is(:where(.group\/sidebar-wrapper):has(*[data-collapsible="icon"]) *) {
-    height: calc(var(--spacing) * 12);
-  }
-
   .page__sidebar-trigger {
-    margin-left: calc(var(--spacing) * -1);
+    inset: 0;
 
     &--separator {
       margin-inline: var(--app-overall-gap);
@@ -33,11 +30,8 @@
     align-items: center;
     gap: var(--app-overall-gap);
     padding-inline: calc(var(--spacing) * 3);
-    // padding-inline: calc(var(--spacing) * 4) !important;
-    // padding-left: calc(var(--spacing) * 0) !important;
 
-    @media screen and (min-width: 1024px) {
-      // gap: calc(var(--spacing) * 2) !important;
+    @include for-size(desktop) {
       padding-inline: calc(var(--spacing) * 6);
     }
   }
@@ -46,7 +40,7 @@
   .header__breadcrumb-separator {
     display: none;
 
-    @media screen and (width >=48rem) {
+    @include for-size(above-smalltablet) {
       display: block;
     }
   }
@@ -54,13 +48,10 @@
   .header__actions-container {
     margin-left: auto;
     display: flex;
-    // align-items: center;
-    // gap: calc(var(--spacing) * 2) !important;
 
     .actions__button {
-      // display: flex;
 
-      @media screen and (max-width: 640px) {
+      @include for-size(smalltablet) {
         display: none;
       }
     }

@@ -35,10 +35,10 @@ export const taskTemplateCreationInputControllers = [
     useCommands: true,
   },
   {
-    id: "fetch-input-skills-for-tasks",
+    id: "fetch-input-modules-for-tasks",
     multiSelection: true,
-    task: "new-task-skill",
-    name: "skills",
+    task: "new-task-module",
+    name: "modules",
     label: "Compétences associées",
     type: "text",
     useCommands: true,

@@ -6,19 +6,27 @@ import { PageHeader } from "@/components/Header/PageHeader";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { Toaster } from "@/components/ui/sonner";
-import { DEV_MODE, NO_SESSIONS_CHECK_PAGES } from "@/configs/app.config.ts";
-import { calendarEvents } from "@/data/CalendarData.ts";
-import { sidebarDatas } from "@/data/SidebarData.ts";
+import {
+  DEV_MODE,
+  doesContainNoSessionPage,
+  NO_SESSION_CHECK_LOGS,
+} from "@/configs/app.config.ts";
+import { COMPLETE_SIDEBAR_DATAS } from "@/configs/main.configs";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
 import { AppModals } from "@/pages/AllModals/AppModals.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
-import { routeChildren } from "@/routes/routes.config.tsx";
+import { ROUTES_CHILDREN } from "@/routes/routes.config";
 import type { RootProps } from "@/types/MainTypes";
 import "@css/MainContainer.scss";
 import "@css/Toaster.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { StrictMode, useEffect, type CSSProperties } from "react";
+import {
+  StrictMode,
+  useEffect,
+  useEffectEvent,
+  type CSSProperties,
+} from "react";
 import { createRoot } from "react-dom/client";
 import {
   createBrowserRouter,
@@ -30,28 +38,16 @@ import {
 const queryClient = new QueryClient();
 
 /**
- * Complete sidebar data including calendar events
- *
- * @description This object merges the static sidebar data with
- * dynamic calendar events to provide a comprehensive data set
- * for the sidebar navigation.
- */
-export const completeDatas = {
-  ...sidebarDatas,
-  calendarEvents: calendarEvents,
-};
-
-/**
  * Application router configuration
  *
- * @description !! IMPORTANT !! Routes object is imported from {@link routeChildren}
+ * @description !! IMPORTANT !! Routes object is imported from {@link ROUTES_CHILDREN}
  */
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
     errorElement: <Root contentType="error" />,
-    children: routeChildren,
+    children: ROUTES_CHILDREN,
   },
 ]);
 
@@ -68,7 +64,7 @@ createRoot(document.getElementById("root")!).render(
         />
       </QueryClientProvider>
     </DialogProvider>
-  </StrictMode>
+  </StrictMode>,
 );
 
 /**
@@ -88,51 +84,82 @@ export function Root({ contentType }: Readonly<RootProps>) {
   const location = useLocation();
   const { data, isLoading, onSubmit, isLoaded, error } = useSessionChecker();
 
+  const triggerSessionCheck = useEffectEvent(() => {
+    onSubmit();
+  });
+
+  /**
+   * Show login modal to user when no active session is found
+   *
+   * @description This is a gentle reminder for users to log in without redirecting them away from the current page, providing a smoother user experience.
+   *
+   * @remark !!! IMPORTANT !! Keep in mind that this approach assumes the users will interact with the login modal when it appears or they may continue exploring the site.
+   *
+   * @important Please, use the useSessionChecker hook in your critical components and ensure a check before fetching as the server will immediately return an error uppon invalid session, which will force trigger a redirection to the login page.
+   */
+  const showLoginModalToUser = useEffectEvent(() => {
+    if (location.pathname === "/login") return;
+
+    if (DEV_MODE) {
+      console.debug(
+        "No active session found. A dialog has been opened for login.",
+      );
+    }
+    openDialog(null, "login");
+  });
+
   /**
    * Automatically check session on app load unless the last user activity was a logout
    */
   useEffect(() => {
-    // const userExists = user !== null;
     const path = location.pathname;
-    const doesContainNoSessionPage = NO_SESSIONS_CHECK_PAGES.some((page) =>
-      path.startsWith(page)
-    );
 
+    const isPublicPage = doesContainNoSessionPage(path);
     const lastActivityWasLogout = lastUserActivity === "logout";
-    const doNotCheckSession =
-      isLoaded ||
-      lastActivityWasLogout ||
-      sessionSynced ||
-      doesContainNoSessionPage;
-    // const shouldCheckSession = userExists && !doNotCheckSession;
 
-    // const doNotCheckSession =
-    //   isLoaded ||
-    //   lastActivityWasLogout ||
-    //   sessionSynced ||
-    //   path === "/login" ||
-    //   path.startsWith("/signup");
-
-    if (doNotCheckSession) return;
-    onSubmit();
-  }, [isLoaded, lastUserActivity, sessionSynced]);
+    switch (true) {
+      case lastActivityWasLogout && isPublicPage:
+      case isPublicPage:
+        if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
+          console.debug(
+            "Current page is public. No session check needed.",
+            path,
+          );
+        }
+        break;
+      case sessionSynced:
+        if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
+          console.debug(
+            "Session is already synced. No session check needed.",
+            path,
+          );
+        }
+        break;
+      default:
+        if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
+          console.debug("Checking session on app load...", path);
+        }
+        triggerSessionCheck();
+    }
+  }, [isLoaded, lastUserActivity, sessionSynced, location.pathname]);
 
   useEffect(() => {
     if (isLoading) {
-      if (DEV_MODE) {
+      if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
         console.debug("Session Check Loading...");
       }
     }
 
     if (data) {
-      if (DEV_MODE) {
+      if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
         console.debug("Session Check Data:", data);
       }
     }
 
     if (error && !isLoading) {
-      openDialog(null, "login");
-      if (DEV_MODE) {
+      showLoginModalToUser();
+
+      if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
         console.error("Session Check Error:", error);
       }
     }
@@ -149,12 +176,16 @@ export function Root({ contentType }: Readonly<RootProps>) {
       }
       className="sidebar-wrapper"
     >
-      <SidebarDataProvider value={completeDatas}>
+      <SidebarDataProvider value={COMPLETE_SIDEBAR_DATAS}>
         <AppSidebar variant="inset" />
         <SidebarInset className="main-app-container">
           <PageHeader />
           <App>
-            {errorContent ? <PageError /> : <Outlet context={completeDatas} />}
+            {errorContent ? (
+              <PageError />
+            ) : (
+              <Outlet context={COMPLETE_SIDEBAR_DATAS} />
+            )}
           </App>
         </SidebarInset>
       </SidebarDataProvider>

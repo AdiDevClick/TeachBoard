@@ -1,5 +1,4 @@
-import type { InputItem } from "@/components/Inputs/types/inputs.types";
-import type { RecoveryFormSchema } from "@/features/login/components/main/models/login.models";
+import type { PwRecoveryInputItem } from "@/models/pw-recovery.model";
 import type { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
 import type { Signup } from "@/pages/Signup/Signup.tsx";
 
@@ -52,4 +51,4 @@ export const passwordRecoveryInputControllers = [
     placeholder: "m@example.com",
     autoComplete: "email",
   },
-] satisfies InputItem<RecoveryFormSchema>[];
+] satisfies PwRecoveryInputItem[];

@@ -1,3 +1,91 @@
-.global-test {
-  color: blue;
+/**
+  * Make sure the card content has a max height -
+  * With smooth animation when content size changes
+  *
+  * All child elements will also have smooth transitions
+  */
+.card-content-max-height-with-animation {
+  overflow: auto;
+  max-block-size: 650px;
+  transition: max-block-size 0.3s ease;
+
+  * {
+    transition: 0.3s ease;
+  }
+}
+
+/**
+  * Global styles for icon styles
+  *   - Mainly used for the icons in the page title, but can be used for any icon in the app
+  */
+:root {
+  --icon-color: var(--tb-color-primary);
+  --icon-not-hovered-opacity: 0.7;
+}
+
+/**
+  * Global variables hover effects
+  */
+:root {
+  --hover-opacity: 0.7;
+  // Can be used for disabled, scale state as well
+  --hover-opacity-transition: 0.4s ease-in-out;
+  --disabled-opacity: 0.5;
+  --hover-scale: 0.8;
+  --hover-scale-active: 0.95;
+}
+
+/**
+  * Global variables transform effects
+  */
+:root {
+  --transform-transition: transform 0.7s ease-in-out;
+}
+
+$borders: calc(1px * 2);
+
+/**
+  * Global variables for the page
+  *   - Top of the page (e.g, breadcrumbs)
+  *   - The page title (e.g, "Evaluations")
+  *   - The main content container (e.g, the tabs and their content)
+  */
+:root {
+  // Spacing variables
+  --gap: calc(var(--spacing) * 2);
+  // Title
+  --page-title-padding: 50px;
+  --page-title-fs: 2rem;
+  --page-title-fw: 700;
+  --page-title-lh: 1.5;
+  --calculated-title-space: var(--page-title-space, 0rem);
+  // Header - breadcrumbs, actions, etc.
+  --page-header-height: calc(var(--spacing) * 16);
+  --app-overall-gap: var(--gap);
+  // Nav tabs
+  --nav-tabs-height: calc(var(--spacing) * 9);
+  --nav-tabs-translate-y: 0px;
+  --nav-tabs-visual-height: calc(var(--nav-tabs-height) + var(--nav-tabs-translate-y));
+
+  // Page content
+  --bottom-margin: 0.5rem;
+  --margins: 1rem;
+  --bottom-padding: 0;
+  --tw-padding-block: calc(var(--spacing) * 6);
+
+
+
+  /**
+    * CALCULATIONS - This helps adjusting the page layout for the summary page (the space is dynamic, so it can have a sticky effect on the left side of the page, while the right side scrolls)
+    */
+
+  // Combined top offset for pages that need remaining height
+  --page-top-offset: calc(var(--calculated-title-space) + var(--page-header-height));
+
+  --content-offset: calc(var(--page-top-offset) + (var(--margins) * 2) + #{$borders});
+
+  // Page title space when a title is present
+  &:has([data-page-title="true"]) {
+    --page-title-space: clamp(0px, calc((var(--page-title-fs) * var(--page-title-lh)) + var(--page-title-padding)), 8rem);
+  }
 }

@@ -1,4 +1,8 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import {
+  TASK_ITEM_TITLE,
+  TASK_ITEM_FOOTER,
+} from "@/features/class-creation/components/TaskItem/config/task-item.configs";
 import { TaskItemController } from "@/features/class-creation/components/TaskItem/controllers/TaskItemController";
 import { taskItemInputControllers } from "@/features/class-creation/components/TaskItem/forms/task-item-inputs";
 import {
@@ -8,15 +12,7 @@ import {
 } from "@/features/class-creation/components/TaskItem/models/task-item.models";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
 import { useForm } from "react-hook-form";
-
-const titleProps = {
-  title: "Création d'une nouvelle tâche",
-  description: "Ajoutez une nouvelle tâche pour les classes.",
-};
-
-const footerProps = { submitText: "Créer", cancelText: "Annuler" };
 
 /**
  * View component for creating a new task item.
@@ -46,27 +42,24 @@ export function TaskItem({
 
   const formId = pageId + "-form";
 
-  const commonProps = useMemo(
-    () => ({
-      pageId,
-      inputControllers,
-      formId,
-      className,
-      card: {
-        card: { className },
-        title: titleProps,
-        footer: {
-          ...footerProps,
-          formState: form.formState,
-          formId: formId,
-        },
+  const commonProps = {
+    pageId,
+    inputControllers,
+    formId,
+    className,
+    card: {
+      card: { className },
+      title: TASK_ITEM_TITLE,
+      footer: {
+        ...TASK_ITEM_FOOTER,
+        formState: form.formState,
+        formId: formId,
       },
-      modalMode,
-      ...props,
-      form,
-    }),
-    [form.formState, props],
-  );
+    },
+    modalMode,
+    ...props,
+    form,
+  };
 
   return (
     <TaskItemWithCard {...commonProps}>

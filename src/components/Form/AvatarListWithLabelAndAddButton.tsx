@@ -1,8 +1,11 @@
 import { SimpleAvatarList } from "@/components/Avatar/SimpleAvatar.tsx";
 import { SimpleAddButtonWithToolTip } from "@/components/Buttons/SimpleAddButton.tsx";
 import type { AvatarListWithLabelAndAddButtonProps } from "@/components/Form/types/form.types.ts";
-import withListMapper from "@/components/HOCs/withListMapper.tsx";
 import { Label } from "@/components/ui/label.tsx";
+import {
+  avatarListWithLabelAndAddButtonPropsInvalid,
+  debugLogs,
+} from "@/configs/app-components.config";
 import { cn } from "@/utils/utils.ts";
 
 /**
@@ -17,9 +20,14 @@ import { cn } from "@/utils/utils.ts";
  * @returns
  */
 export function AvatarListWithLabelAndAddButton(
-  props: AvatarListWithLabelAndAddButtonProps
+  props: AvatarListWithLabelAndAddButtonProps,
 ) {
+  if (avatarListWithLabelAndAddButtonPropsInvalid(props)) {
+    debugLogs("AvatarListWithLabelAndAddButton", props);
+  }
+
   const { items, toolTipText, onClick, label, className, ...rest } = props;
+
   return (
     <div className={cn(className, "grid gap-2")}>
       <Label>{label ?? "No label"}</Label>
@@ -32,7 +40,3 @@ export function AvatarListWithLabelAndAddButton(
     </div>
   );
 }
-
-export const AvatarsWithLabelAndAddButtonList = withListMapper(
-  AvatarListWithLabelAndAddButton
-);

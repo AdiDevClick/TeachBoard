@@ -15,6 +15,15 @@ Button {
     isolation: isolate;
   }
 
+
+}
+
+/**
+ * Apply a blur effect to the dialog overlay background
+ */
+[data-slot="dialog-overlay"] {
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
 }
 
 /* Only highlight the group when it's focused or has an open trigger, but NOT when a descendant is explicitly in editing mode */
@@ -35,7 +44,7 @@ form,
   // &:is(form):has([data-is-editing="true"], *:focus-visible, [aria-expanded="true"], [data-state="open"], [data-slot="select-trigger"][aria-expanded="true"], [data-slot="dropdown-menu-trigger"][aria-expanded="true"])::before {
   &:is(form):has([data-is-editing="true"], *:focus-visible, [aria-expanded="true"], [data-state="open"])::before {
     content: "";
-    position: absolute;
+    position: fixed;
     inset: 0;
     background-color: rgba(0, 0, 0, 0.55);
     opacity: 1;
@@ -70,15 +79,3 @@ form,
     animation: logo-spin infinite 20s linear;
   }
 }
-
-/* .card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-} */
-
-// .error-page {
-//   color: red;
-// }

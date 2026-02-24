@@ -181,3 +181,51 @@ background: $bg;
     #{$alias}: #{$bem-class};
   }
 }
+
+/**
+ * MEDIA QUERY MIXIN
+ * Usage: @include for-size(mobile) { ... }
+ *
+ * Supported sizes: mobile, tablet, smalltablet, desktop
+ */
+@mixin for-size($media) {
+  @if $media ==mobile {
+    @media (max-width: 576px) {
+      // @media (max-width: 576px) {
+      @content;
+    }
+  }
+
+  @else if $media ==tablet {
+
+    // @media (max-width: 48rem) {
+    @media (max-width: 60rem) {
+      // @media (max-width: 967px) {
+      @content;
+    }
+  }
+
+  @else if $media ==smalltablet {
+
+    @media (max-width: 48rem) {
+      // @media (max-width: 768px) {
+      @content;
+    }
+  }
+
+
+
+  @else if $media ==above-smalltablet {
+    @media (min-width: 48rem) {
+      // @media (min-width: 768px) {
+      @content;
+    }
+  }
+
+  @else if $media ==desktop {
+    @media (min-width: 60rem) {
+      // @media (min-width: 1024px) {
+      @content;
+    }
+  }
+}

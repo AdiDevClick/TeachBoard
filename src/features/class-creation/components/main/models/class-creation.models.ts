@@ -1,10 +1,37 @@
-import type { FetchingInputItem } from "@/components/Inputs/types/inputs.types.ts";
 import { formsRegex } from "@/configs/formsRegex.config.ts";
+import type { FetchingInputItem } from "@/types/AppInputControllerInterface";
 import { z } from "zod";
 
-export type ClassCreationFormSchema = z.infer<typeof classCreationSchema>;
-
-export type ClassCreationInputItem = FetchingInputItem<ClassCreationFormSchema>;
+const fieldData = {
+  nameInvalidCharsMessage:
+    "Le nom de classe ne peut contenir que des lettres, des chiffres, des espaces, des tirets et des underscores.",
+  nameMinCharsMessage:
+    "Un nom de classe ayant au moins un caractère est requis.",
+  nameMaxCharsMessage:
+    "Votre nom de classe ne peut contenir plus de 32 caractères.",
+  nameRequiredMessage: "Un nom de classe est requis.",
+  descriptionInvalidCharsMessage:
+    "La description ne peut contenir que des lettres, des chiffres, des espaces, des tirets et des underscores.",
+  descriptionMaxCharsMessage:
+    "Votre description ne peut contenir plus de 256 caractères.",
+  schoolYearRequiredMessage: "Une année scolaire est requise.",
+  schoolYearFormatMessage:
+    "Le format de l'année scolaire doit être AAAA - AAAA.",
+  degreeConfigIdUUIDMessage:
+    "L'identifiant de configuration de diplôme doit être un UUID valide.",
+  degreeConfigIdRequiredMessage:
+    "Un identifiant de configuration de diplôme est requis.",
+  userIdUUIDMessage: "L'identifiant utilisateur doit être un UUID valide.",
+  userIdRequiredMessage: "Un identifiant utilisateur est requis.",
+  primaryTeacherIdUUIDMessage:
+    "L'identifiant de l'enseignant principal doit être un UUID valide.",
+  taskIdUUIDMessage: "L'identifiant de la tâche doit être un UUID valide.",
+  tasksNonEmptyMessage: "Au moins une tâche doit être sélectionnée.",
+  studentIdUUIDMessage: "L'identifiant de l'étudiant doit être un UUID valide.",
+  studentsNonEmptyMessage: "Au moins un étudiant doit être sélectionné.",
+  studentsMaxLengthMessage:
+    "Vous ne pouvez sélectionner que jusqu'à 50 étudiants.",
+};
 
 /**
  * Schema for class creation form validation
@@ -12,61 +39,64 @@ export type ClassCreationInputItem = FetchingInputItem<ClassCreationFormSchema>;
  * name: Required string, converted to lowercase and trimmed.
  * description: Optional string up to 256 characters, trimmed.
  */
-export const classCreationSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Un nom de classe ayant au moins un caractère est requis.")
-    .max(32, "Votre nom de classe ne peut contenir plus de 32 caractères.")
-    .nonempty("Un nom de classe est requis.")
-    .toLowerCase()
-    .trim(),
-  description: z
-    .string()
-    .max(256, "Votre description ne peut contenir plus de 256 caractères.")
-    .trim()
-    .optional(),
-  schoolYear: z
-    .string()
-    .nonempty("Une année scolaire est requise.")
-    .refine(
-      (value) => formsRegex.viewYearRange.test(value),
-      "Le format de l'année scolaire doit être AAAA - AAAA."
-    )
-    .transform((value) =>
-      value
-        .split(" - ")
-        .map((s) => s.trim())
-        .join("-")
-    )
-    .refine(
-      (value) => formsRegex.serverYearRange.test(value),
-      "Le format de l'année scolaire doit être AAAA-AAAA."
-    ),
-  degreeConfigId: z
-    .uuid("L'identifiant de configuration de diplôme doit être un UUID valide.")
-    .nonempty("Un identifiant de configuration de diplôme est requis."),
-  userId: z
-    .uuid("L'identifiant utilisateur doit être un UUID valide.")
-    .nonempty("Un identifiant utilisateur est requis."),
-  primaryTeacherId: z
-    .string()
-    .optional()
-    .transform((value) => (value === "" ? undefined : value))
-    .pipe(
-      z
-        .uuid(
-          "L'identifiant de l'enseignant principal doit être un UUID valide."
-        )
-        .optional()
-    ),
-  tasks: z
-    .array(z.uuid("L'identifiant de la tâche doit être un UUID valide."))
-    .nonempty("Au moins une tâche est requise."),
-  students: z
-    .array(z.uuid("L'identifiant de l'élève doit être un UUID valide."))
-    .nonempty("La liste des étudiants ne peut pas être vide.")
-    .min(1, "La liste des étudiants ne peut pas être vide.")
-    .max(50, "La liste des étudiants ne peut pas dépasser 50 éléments.")
-    .nonoptional()
-    .describe("Identifiant unique pour l'étudiant"),
-});
+const classCreationForm = (data: typeof fieldData) =>
+  z.object({
+    name: z
+      .string()
+      .trim()
+      .regex(formsRegex.serverDescription, data.nameInvalidCharsMessage)
+      .min(1, data.nameMinCharsMessage)
+      .max(32, data.nameMaxCharsMessage)
+      .nonempty(data.nameRequiredMessage)
+      .toLowerCase()
+      .describe("class name, converted to lowercase and trimmed"),
+    description: z
+      .string()
+      .trim()
+      .regex(formsRegex.serverDescription, data.descriptionInvalidCharsMessage)
+      .max(256, data.descriptionMaxCharsMessage)
+      .optional()
+      .describe("class description, optional, trimmed"),
+    schoolYear: z
+      .string()
+      .nonempty(data.schoolYearRequiredMessage)
+      .refine(
+        (value) => formsRegex.viewYearRange.test(value),
+        data.schoolYearFormatMessage,
+      )
+      .transform((value) =>
+        value
+          .split(" - ")
+          .map((s) => s.trim())
+          .join("-"),
+      )
+      .refine(
+        (value) => formsRegex.serverYearRange.test(value),
+        data.schoolYearFormatMessage,
+      ),
+    degreeConfigId: z
+      .uuid(data.degreeConfigIdUUIDMessage)
+      .nonempty(data.degreeConfigIdRequiredMessage),
+    userId: z.uuid(data.userIdUUIDMessage).nonempty(data.userIdRequiredMessage),
+    primaryTeacherId: z
+      .string()
+      .optional()
+      .transform((value) => (value === "" ? undefined : value))
+      .pipe(z.uuid(data.primaryTeacherIdUUIDMessage).optional()),
+    tasks: z
+      .array(z.uuid(data.taskIdUUIDMessage))
+      .nonempty(data.tasksNonEmptyMessage),
+    students: z
+      .array(z.uuid(data.studentIdUUIDMessage))
+      .nonempty(data.studentsNonEmptyMessage)
+      .min(1, data.studentsNonEmptyMessage)
+      .max(50, data.studentsMaxLengthMessage)
+      .nonoptional()
+      .describe("Identifiant unique pour l'étudiant"),
+  });
+
+export type ClassCreationFormSchema = z.infer<typeof classCreationSchema>;
+
+export type ClassCreationInputItem = FetchingInputItem<ClassCreationFormSchema>;
+
+export const classCreationSchema = classCreationForm(fieldData);

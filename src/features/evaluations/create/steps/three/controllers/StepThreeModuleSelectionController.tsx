@@ -1,3 +1,4 @@
+import { evaluationRadioGroupContainer } from "@/assets/css/EvaluationRadio.module.scss";
 import { EvaluationRadioItemList } from "@/components/Radio/EvaluationRadioItem.tsx";
 import { RadioGroup } from "@/components/ui/radio-group.tsx";
 import {
@@ -6,7 +7,7 @@ import {
 } from "@/configs/app-components.config.ts";
 import { useStepThreeHandler } from "@/features/evaluations/create/hooks/useStepThreeHandler.ts";
 import type { StepThreeModuleSelectionControllerProps } from "@/features/evaluations/create/steps/three/types/step-three.types.ts";
-import { useEffect } from "react";
+import { useEffect, useEffectEvent } from "react";
 
 /**
  * Step Three Module Selection Controller.
@@ -26,16 +27,28 @@ export function StepThreeModuleSelectionController(
     handleSameModuleSelectionClickCallback,
     checkForCompletedModules,
     selectedModuleId,
+    moduleSelectionState,
   } = useStepThreeHandler(modules);
+
+  /**
+   * INIT - CHECKER
+   *
+   * @description This is used to check for completed modules.
+   */
+  const initChecker = useEffectEvent(() => {
+    checkForCompletedModules();
+  });
 
   /**
    * INIT - CHECK FOR COMPLETED MODULES
    *
-   * @description Check for completed modules upon initial render.
+   * @description Check for completed modules upon module selection.
    */
   useEffect(() => {
-    checkForCompletedModules();
-  }, []);
+    if (!moduleSelectionState.isClicked) {
+      initChecker();
+    }
+  }, [moduleSelectionState]);
 
   if (stepThreeModuleSelectionControllerPropsInvalid(props)) {
     debugLogs("StepThreeModuleSelectionController", props);
@@ -45,8 +58,9 @@ export function StepThreeModuleSelectionController(
   return (
     <form id={formId}>
       <RadioGroup
-        value={selectedModuleId ?? ""}
+        value={selectedModuleId}
         onValueChange={handleModuleChangeCallback}
+        className={evaluationRadioGroupContainer}
       >
         <EvaluationRadioItemList
           items={modules}

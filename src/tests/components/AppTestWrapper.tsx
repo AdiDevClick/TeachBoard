@@ -3,7 +3,17 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { testQueryClient } from "@/tests/test-utils/testQueryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { type PropsWithChildren } from "react";
-import { MemoryRouter } from "react-router-dom";
+import {
+  createMemoryRouter,
+  MemoryRouter,
+  RouterProvider,
+  type RouteObject,
+} from "react-router-dom";
+
+type AppTestWrapperProps = PropsWithChildren<{
+  routes?: RouteObject[];
+  initialEntries?: string[];
+}>;
 
 /**
  * AppTestWrapper component to provide necessary context for testing.
@@ -14,13 +24,27 @@ import { MemoryRouter } from "react-router-dom";
  */
 export function AppTestWrapper({
   children,
-}: Readonly<PropsWithChildren<unknown>>) {
+  routes,
+  initialEntries = ["/"],
+}: Readonly<AppTestWrapperProps>) {
+  const router = routes
+    ? createMemoryRouter(routes, {
+        initialEntries,
+      })
+    : null;
+
   return (
     <DialogProvider>
       <QueryClientProvider client={testQueryClient}>
-        <MemoryRouter initialEntries={["/"]}>
-          <SidebarProvider>{children}</SidebarProvider>
-        </MemoryRouter>
+        <SidebarProvider>
+          {routes && router ? (
+            <RouterProvider router={router} />
+          ) : (
+            <MemoryRouter initialEntries={initialEntries}>
+              {children}
+            </MemoryRouter>
+          )}
+        </SidebarProvider>
       </QueryClientProvider>
     </DialogProvider>
   );
