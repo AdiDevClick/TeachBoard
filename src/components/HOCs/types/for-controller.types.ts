@@ -1,4 +1,5 @@
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types.ts";
+import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types";
 import type { FieldTypes } from "@/types/MainTypes";
 import type { ComponentType } from "react";
 import type { FieldValues } from "react-hook-form";
@@ -8,6 +9,7 @@ import type { FieldValues } from "react-hook-form";
  */
 export type ForControllerProps<P = ComponentType> = P &
   FieldTypes<FieldValues> &
+  UseMutationObserverReturn &
   Partial<CommandHandlerFieldMeta> &
   Partial<{
     onChange: (e: unknown, meta?: CommandHandlerFieldMeta) => void;
