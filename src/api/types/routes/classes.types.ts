@@ -36,6 +36,13 @@ export type ClassesFetch =
   | ClassDto[];
 
 /**
+ * Data payload returned by GET `/classes/check-name/:name`.
+ */
+export type ClasseNameAvailabilityResponse = {
+  available: boolean;
+};
+
+/**
  * Data payload returned by POST `/classes`.
  */
 export type CreateClassResponseData = ClassDto & { degreeLevel: string };
