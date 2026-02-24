@@ -1,5 +1,4 @@
 import { LeftSidePageContent } from "@/pages/Evaluations/create/left-content/LeftSidePageContent";
-import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 // simple stub item used in tests
