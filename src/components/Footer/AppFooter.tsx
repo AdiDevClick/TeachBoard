@@ -30,7 +30,6 @@ export function AppDialFooter({
   const submitTextValue = submitText || "Créer";
 
   const isDisabledCondition = isSubmitSuccessful || isSubmitting || !isValid;
-  console.log(isDisabledCondition);
 
   return (
     <DialogFooter {...props}>
