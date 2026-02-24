@@ -26,7 +26,9 @@ import {
   queryKeyFor,
   rx,
   rxJoin,
+  stubFetchRoutes,
   submitButtonShouldBeDisabled,
+  waitForTextToBeAbsent,
 } from "@/tests/test-utils/vitest-browser.helpers";
 
 import {
@@ -42,7 +44,7 @@ import {
 import { clickControlAndWaitForDialog } from "@/tests/units/ui/functions/useful-ui.functions";
 
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { page } from "vitest/browser";
+import { page, userEvent } from "vitest/browser";
 
 import type { InputControllerLike } from "@/tests/test-utils/class-creation/regex.functions";
 
@@ -245,6 +247,38 @@ describe("UI flow: class-creation (StepOne list)", () => {
     }
 
     ctx.installCreateClassStubs(createClassPostResponse);
+  });
+
+  test("server validation error clears immediately while typing", async () => {
+    expect(ctx).toBeDefined();
+
+    // open modal without submitting yet
+    await baseInit(ctx.labeler);
+
+    // stub availability endpoint for a specific name value
+    // Using a RegExp allows us to anchor the match so that typing extra
+    // characters (e.g. "bad-nameX") no longer hits the stub.  The helper now
+    // recognises `RegExp` values, so this is both precise and future-proof.
+    stubFetchRoutes({
+      getRoutes: [[/classes\/check-name\/bad-name$/, { available: false }]],
+    });
+
+    // first grab the input node and fill the problematic name
+    await userEvent.fill(page.getByLabelText(/^Nom$/i), "bad-name");
+
+    // wait for the availability check to complete (debounced in controller)
+    await waitForTextToBeAbsent(/déjà utilisé/i, { present: true });
+
+    // the DOM may have re‑rendered the input (error message added/removed),
+    // so query it again before typing more characters.
+    const nameInput2 = page.getByLabelText(/^Nom$/i);
+    // typing did not trigger onChange reliably in this environment, so use
+    // `fill` again which guarantees the controller will see a change event.
+    await userEvent.fill(nameInput2, "bad-nameX");
+
+    // the manual error should disappear immediately now that the value has
+    // changed.
+    await waitForTextToBeAbsent(/déjà utilisé/i);
   });
 
   test("submit works with optional fields empty", async () => {
