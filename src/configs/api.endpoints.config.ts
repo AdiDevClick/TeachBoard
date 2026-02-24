@@ -2,6 +2,7 @@ import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 
 import type {
+  ClasseNameAvailabilityResponse,
   ClassesFetch,
   CreateClassResponseData,
 } from "@/api/types/routes/classes.types";
@@ -65,6 +66,7 @@ export const API_ENDPOINTS = Object.freeze({
         BY_ID: (id: number | string) => `${CLASSES}/${id}`,
         CHECK_NAME: (className: string) => `${CLASSES}/check-name/${className}`,
       },
+      dataAvailable: (data: ClasseNameAvailabilityResponse) => data,
       dataReshape: (data: ClassesFetch) =>
         // use "code" and transform to "value" for selects
         // data.classes is the actual array of classes from the server response
@@ -340,12 +342,24 @@ export const API_ENDPOINTS = Object.freeze({
           value: data.task.name,
         };
 
-        const prevShortTemplatesList = cachedDatas[0][1][0].shortTemplatesList;
+        // guard against missing cache structure, which can happen when the
+        // list has never been fetched yet. In that case we only reshape the
+        // item without trying to mutate the cache.
+        if (
+          cachedDatas &&
+          Array.isArray(cachedDatas[0]) &&
+          Array.isArray(cachedDatas[0][1]) &&
+          cachedDatas[0][1][0] &&
+          Array.isArray(cachedDatas[0][1][0].shortTemplatesList)
+        ) {
+          const prevShortTemplatesList =
+            cachedDatas[0][1][0].shortTemplatesList;
 
-        cachedDatas[0][1][0].shortTemplatesList = [
-          ...prevShortTemplatesList,
-          newItem.value,
-        ];
+          cachedDatas[0][1][0].shortTemplatesList = [
+            ...prevShortTemplatesList,
+            newItem.value,
+          ];
+        }
 
         return reshapeItemToCachedData(newItem, cachedDatas, "Tous");
       },
