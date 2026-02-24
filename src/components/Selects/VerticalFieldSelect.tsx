@@ -1,8 +1,6 @@
-import { UUID_SCHEMA } from "@/api/types/openapi/common.types";
 import type {
   VerticalFieldState,
   VerticalRefSetters,
-  VerticalSelectMetaData,
   VerticalSelectProps,
 } from "@/components/Selects/types/select.types.ts";
 import { Label } from "@/components/ui/label";
@@ -19,6 +17,7 @@ import {
   useImperativeHandle,
   useRef,
   useState,
+  type Ref,
 } from "react";
 
 const emptyHandle: VerticalRefSetters = {
@@ -60,12 +59,7 @@ export function VerticalFieldSelect({
     onValueChange,
     children,
     role,
-    task,
-    apiEndpoint,
-    dataReshapeFn,
     placeholder,
-    controllerMeta,
-    name,
     ...selectRootProps
   } = props;
 
@@ -77,13 +71,6 @@ export function VerticalFieldSelect({
   const handleObjectRef = useRef<VerticalRefSetters>(emptyHandle);
 
   useImperativeHandle(controllerRef ?? ref, () => handleObjectRef.current);
-
-  const metaBase: VerticalSelectMetaData = {
-    task,
-    apiEndpoint,
-    dataReshapeFn,
-    controllerMeta,
-  };
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -126,27 +113,14 @@ export function VerticalFieldSelect({
       getLastSelectedItemValue: () => value,
       getLastCommandValue: () => lastCommandValueRef.current,
     };
-    const allDetails = containerId ? observedRefs?.get(containerId) : undefined;
-    const metas = allDetails
-      ? { ...selectRootProps, ...metaBase, ...allDetails.meta }
-      : { ...selectRootProps, ...metaBase };
-    onValueChange?.(value, metas);
+    onValueChange?.(value);
   };
 
   return (
     <div
       id={containerId}
       data-open={state.open}
-      ref={(el) => {
-        const parsedId = UUID_SCHEMA.safeParse(containerId);
-        setRef?.(el, {
-          task,
-          apiEndpoint,
-          dataReshapeFn,
-          name,
-          id: parsedId.success ? parsedId.data : undefined,
-        });
-      }}
+      ref={(setRef ?? ref) as Ref<HTMLDivElement>}
       className={cn("flex flex-col items-start gap-2", className)}
     >
       {label && (
