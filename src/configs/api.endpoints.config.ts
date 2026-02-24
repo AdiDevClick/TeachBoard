@@ -64,7 +64,7 @@ export const API_ENDPOINTS = Object.freeze({
       endPoints: {
         ALL: `${CLASSES}/`,
         BY_ID: (id: number | string) => `${CLASSES}/${id}`,
-        CHECK_NAME: (className: string) => `${CLASSES}/check-name/${className}`,
+        CHECK_NAME: (className: string | number) => `${CLASSES}/check-name/${className}`,
       },
       dataAvailable: (data: ClasseNameAvailabilityResponse) => data,
       dataReshape: (data: ClassesFetch) =>
