@@ -40,6 +40,19 @@ describe("API_ENDPOINTS contract for class creation", () => {
     expect(tasks?.useCommands).toBe(true);
     expect(tasks?.dataReshapeFn).toBeTruthy();
     expect(tasks?.apiEndpoint).toBeTypeOf("function");
+
+    // name availability check
+    const nameCtrl = classCreationInputControllers.find(
+      (c) => c.name === "name",
+    );
+    expect(nameCtrl).toBeTruthy();
+    expect(nameCtrl?.apiEndpoint).toBeTypeOf("function");
+    // after calling with value we should get a valid URL string
+    const example = (nameCtrl!.apiEndpoint as (arg: string) => string)(
+      "Abc",
+    );
+    expect(example).toMatch(/check-name\/Abc$/);
+    expect(nameCtrl?.dataReshapeFn).toBeTruthy();
   });
 
   it("DIPLOMAS reshaper provides items with a 'value' for Command", () => {
