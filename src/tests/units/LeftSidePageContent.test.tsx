@@ -11,9 +11,9 @@ const baseItem = {
 };
 
 describe("LeftSidePageContent", () => {
-  afterEach(() => {
+  afterEach(async () => {
     // ensure DOM is cleaned between tests
-    cleanup();
+    await cleanup();
   });
 
   it("should render description when not clicked and have visible state", async () => {
@@ -31,7 +31,7 @@ describe("LeftSidePageContent", () => {
     expect(container.querySelector("[data-left='hidden']")).toBeNull();
   });
 
-  it("should render children when clicked and add expanded data-state", async () => {
+  it("should render children when clicked and update data-left state", async () => {
     const Child = () => <div data-testid="child">child</div>;
 
     const { rerender, container } = await render(
