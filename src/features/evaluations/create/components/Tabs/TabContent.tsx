@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { TabsContent } from "@/components/ui/tabs";
 import { TAB_CONTENT_VIEW_CARD_PROPS } from "@/features/evaluations/create/components/Tabs/config/tab-content.configs";
 import {
-  animateUnmoutedElements,
+  animateUnmountedElements,
   getAnimatedElements,
 } from "@/features/evaluations/create/components/Tabs/functions/tabs.functions";
 import type {
@@ -97,7 +97,7 @@ export function TabContent({
   /**
    * ANIMATION - Trigger outgoing animations
    *
-   * @description Targets elements by searching in the mutationObs and animate them @see animateUnmoutedElements
+   * @description Targets elements by searching in the mutationObs and animate them @see animateUnmountedElements
    */
   const animationTrigger = useEffectEvent(() => {
     if (!tabState.isAnimating) return;
@@ -110,7 +110,7 @@ export function TabContent({
       return;
     }
 
-    animateUnmoutedElements(
+    animateUnmountedElements(
       getAnimatedElements(currentPanel, findAllNestedElements),
       moduleSelectionState.isClicked,
     );

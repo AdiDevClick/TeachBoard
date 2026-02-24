@@ -1,4 +1,5 @@
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
+import type { RadioGroup } from "@/components/ui/radio-group";
 import type { ShowStudentsEvaluation } from "@/features/evaluations/create/steps/three/components/step-three-wrappers.functions.tsx";
 import type { StepThree } from "@/features/evaluations/create/steps/three/StepThree.tsx";
 import type { AttendanceRecordCreationFormSchema } from "@/features/evaluations/create/steps/two/models/attendance-record-creation.models";
@@ -10,7 +11,6 @@ import type {
 } from "@/features/evaluations/create/store/types/steps-creation-store.types.ts";
 import type { AppControllerInterface } from "@/types/AppControllerInterface.ts";
 import type { UniqueSet } from "@/utils/UniqueSet.ts";
-import type { RadioGroup } from "@radix-ui/react-dropdown-menu";
 import type { ComponentProps } from "react";
 import type { FieldValues } from "react-hook-form";
 
