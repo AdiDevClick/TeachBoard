@@ -413,9 +413,18 @@ export async function prepareClassCreationForm(opts: {
     await baseInit(opts.labeler);
 
     // Snapshot GET count after initial fetch (triggered by opening the popover)
+    // We use a regex with anchors so that similar URLs (e.g. the name‑availability
+    // check which also contains `/api/classes/`) are **not** accidentally counted.
     const endpoint = opts.labeler.apiEndpoint;
     if (endpoint) {
-      getCallsBeforeCreation = countFetchCallsByUrl(endpoint);
+      try {
+        const exact = new RegExp(`^${endpoint}$`);
+        getCallsBeforeCreation = countFetchCallsByUrl(exact);
+      } catch {
+        // if the endpoint contains characters that break the regex we fall back
+        // to the existing behaviour (should be rare).
+        getCallsBeforeCreation = countFetchCallsByUrl(endpoint);
+      }
     }
   }
 
