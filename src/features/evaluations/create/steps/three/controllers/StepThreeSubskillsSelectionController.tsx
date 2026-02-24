@@ -9,7 +9,7 @@ import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepTh
 import { useSubSkillsSelection } from "@/features/evaluations/create/steps/three/hooks/useSubSkillsSelection";
 import type { StepThreeSubskillsSelectionControllerProps } from "@/features/evaluations/create/steps/three/types/step-three.types.ts";
 import { animation } from "@/utils/utils";
-import { Activity, type ComponentProps } from "react";
+import { Activity } from "react";
 
 /**
  * Step Three Subskills Selection Controller.
@@ -31,7 +31,7 @@ export function StepThreeSubskillsSelectionController(
     return null;
   }
 
-  const { isActive, dir = "ltr", defaultValue, ...rest } = props;
+  const { isActive, ...rest } = props;
 
   return (
     <>
@@ -47,7 +47,6 @@ export function StepThreeSubskillsSelectionController(
           id={"step-three-subskills-selection"}
           value={selectedId}
           onValueChange={handleSubSkillChangeCallback}
-          dir={dir as ComponentProps<typeof RadioGroup>["dir"]}
           {...animation(isActive, {
             incoming: {
               name: "step-three-evaluation-in",

@@ -16,13 +16,13 @@ export const pwRecoverySchema = (data: typeof fieldData) =>
     identifier: z
       .email(data.invalidEmailErrorMessage)
       .min(5, data.identifierMinErrorMessage)
-      .max(254, data.identifierMaxErrorMessage)
+      .max(64, data.identifierMaxErrorMessage)
       .nonempty(data.identifierRequiredErrorMessage)
       .toLowerCase(),
   });
 
-export type PwRecoveryFormSchema = z.infer<typeof pwRecoveryFormSchema>;
-
 export const pwRecoveryFormSchema = pwRecoverySchema(fieldData);
+
+export type PwRecoveryFormSchema = z.infer<typeof pwRecoveryFormSchema>;
 
 export type PwRecoveryInputItem = InputItem<PwRecoveryFormSchema>;

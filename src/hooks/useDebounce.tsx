@@ -26,7 +26,7 @@ export default function useDebounce<T extends (...args: any[]) => void>(
   return useCallback(
     (...args: Parameters<T>) => {
       // Cancel any existing timer to reset the debounce period
-      if (timerRef.current) {
+      if (timerRef.current !== null) {
         clearTimeout(timerRef.current);
       }
 

@@ -30,7 +30,7 @@ export function getAnimatedElements(
  *
  * @description Applies the outgoing animations to the elements of the current tab content
  */
-export function animateUnmoutedElements(
+export function animateUnmountedElements(
   elements: ReturnType<typeof getAnimatedElements>,
   isEvaluation: boolean,
 ) {

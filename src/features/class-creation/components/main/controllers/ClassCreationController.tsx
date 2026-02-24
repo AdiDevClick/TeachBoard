@@ -21,7 +21,13 @@ import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types"
 import { useFetch } from "@/hooks/database/fetches/useFetch";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
 import useDebounce from "@/hooks/useDebounce";
-import { Activity, useEffect, useMemo, type ChangeEvent } from "react";
+import {
+  Activity,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  type ChangeEvent,
+} from "react";
 
 const year = new Date().getFullYear();
 const years = yearsListRange(year, 5);
@@ -114,15 +120,20 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
   );
 
   /**
+   * Trigger class name availability check when the fetchParams.url changes, which happens after the debounced function sets new params.
+   */
+  const triggerClassNameCheck = useEffectEvent((url: string) => {
+    if (!url) return;
+    onSubmit();
+  });
+
+  /**
    * TRIGGER CLASS NAME AVAILABILITY CHECK
    *
    * @description Every time a user types in the class name input
    */
   useEffect(() => {
-    const url = fetchParams.url;
-
-    if (!url) return;
-    onSubmit();
+    triggerClassNameCheck(fetchParams.url);
   }, [fetchParams.url]);
 
   /**

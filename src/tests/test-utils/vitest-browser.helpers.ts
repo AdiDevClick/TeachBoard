@@ -225,7 +225,9 @@ export function stubFetchRoutes({
       if (method === "POST") {
         for (const [match, payload] of postRoutes) {
           const isMatch =
-            match instanceof RegExp ? match.test(urlStr) : urlStr.includes(match);
+            match instanceof RegExp
+              ? match.test(urlStr)
+              : urlStr.includes(match);
           if (isMatch) {
             // Debug stubbed POST
             console.debug("[stubFetchRoutes] POST matched", match, payload);
@@ -447,7 +449,7 @@ export async function waitForPopoverState(
   await expect.poll(isPopoverOpen, { timeout }).toBe(expectedOpen);
 }
 
-function isElementActuallyVisible(
+export function isElementActuallyVisible(
   el: HTMLElement,
   opts?: { checkOpacity?: boolean },
 ): boolean {
@@ -475,7 +477,7 @@ function isElementActuallyVisible(
  * document when `container` is undefined). Uses
  * `isElementActuallyVisible(..., { checkOpacity: true })`.
  */
-function countVisibleElements(
+export function countVisibleElements(
   container: Element | null | undefined,
   selector: string,
   opts?: { checkOpacity?: boolean },
@@ -492,7 +494,7 @@ function countVisibleElements(
  * Given a map of key -> selector, returns an object with visible counts for
  * each key.
  */
-function getVisibleCounts(
+export function getVisibleCounts(
   container: Element | null | undefined,
   map: Record<string, string>,
 ) {
@@ -508,7 +510,7 @@ function getVisibleCounts(
  * Returns { el, visible, text, inputValue } where text/inputValue are
  * truncated to 80 chars when visible, otherwise empty strings.
  */
-function getVisibleElementInfo(
+export function getVisibleElementInfo(
   container: Element | null | undefined,
   selector: string,
 ) {
