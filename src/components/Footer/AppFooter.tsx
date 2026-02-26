@@ -61,6 +61,5 @@ export function AppDialFooter({
 export function AppCardFooter(
   props: Readonly<ComponentProps<typeof CardFooter>>,
 ) {
-  // const safeProps = props(["displayCancelButton"]);
   return <CardFooter {...props}>{props.children}</CardFooter>;
 }

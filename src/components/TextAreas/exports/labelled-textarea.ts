@@ -1,7 +1,8 @@
-import { forController } from "@/components/HOCs/forController";
 import withController from "@/components/HOCs/withController";
+import { withEventEnrichedMetadatas } from "@/components/HOCs/withEventEnrichedMetadatas";
 import withListMapper from "@/components/HOCs/withListMapper";
 import { LabelledTextArea } from "@/components/TextAreas/LabelledTextArea";
+import { createComponentName } from "@/utils/utils";
 
 /**
  * @fileoverview This file exports the LabelledTextArea component and its variations with HOCs for form control and list mapping.
@@ -12,7 +13,12 @@ import { LabelledTextArea } from "@/components/TextAreas/LabelledTextArea";
  * A version of the LabelledTextArea component that is integrated with react-hook-form Controller.
  */
 export const ControlledLabelledTextArea = withController(
-  forController(LabelledTextArea),
+  withEventEnrichedMetadatas(LabelledTextArea),
+);
+createComponentName(
+  "withController",
+  "ControlledLabelledTextArea",
+  ControlledLabelledTextArea,
 );
 
 /**
@@ -20,4 +26,9 @@ export const ControlledLabelledTextArea = withController(
  */
 export const ControlledLabelledTextAreaList = withListMapper(
   ControlledLabelledTextArea,
+);
+createComponentName(
+  "withListMapper",
+  "ControlledLabelledTextAreaList",
+  ControlledLabelledTextAreaList,
 );
