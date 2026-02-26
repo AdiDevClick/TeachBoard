@@ -28,7 +28,6 @@ import type {
   HandleSelectionCallbackParams,
   HandleSubmitCallbackParams,
   InferServerData,
-  InferViewData,
   UseCommandHandlerParams,
 } from "@/hooks/database/types/use-command-handler.types.ts";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
@@ -37,6 +36,7 @@ import type {
   ApiEndpointType,
   DataReshapeFn,
 } from "@/types/AppInputControllerInterface";
+import type { ApiSuccess } from "@/types/AppResponseInterface";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { startTransition, useEffect, useEffectEvent, useRef } from "react";
@@ -53,15 +53,18 @@ import type {
  * @param form - The form instance to manage form state and actions
  * @param pageId - The identifier for the current page or module
  */
+type NormalizeMeta<T> = T extends object ? T : Record<string, never>;
+type TMeta = CommandHandlerMetaData;
+
 export function useCommandHandler<
-  TFieldValues extends FieldValues = FieldValues,
+  TForm extends FieldValues,
   TRoute = unknown,
-  TSubmitReshapeFn = never,
-  TServerData = InferServerData<TRoute, TSubmitReshapeFn>,
-  TViewData = InferViewData<TRoute, TSubmitReshapeFn>,
+  TSubmitReshapeFn = unknown,
+  S extends ApiSuccess<any> = ApiSuccess<
+    NormalizeMeta<InferServerData<NonNullable<TRoute>, TSubmitReshapeFn>>
+  >,
   E extends ApiError = ApiError,
-  TMeta extends CommandHandlerMetaData = CommandHandlerMetaData,
->(params: UseCommandHandlerParams<TFieldValues, TRoute, TSubmitReshapeFn>) {
+>(params: UseCommandHandlerParams<TForm, TRoute, TSubmitReshapeFn>) {
   const { form, pageId } = params;
   const {
     fetchParams,
@@ -73,7 +76,7 @@ export function useCommandHandler<
     response,
     serverData,
     isLoading,
-  } = useFetch<TServerData, E, TViewData>();
+  } = useFetch<S, E>();
 
   const {
     openDialog,
@@ -181,12 +184,12 @@ export function useCommandHandler<
    *
    * @param errors - The validation errors
    */
-  function handleInvalidSubmit(errors: FieldErrors<TFieldValues>) {
+  function handleInvalidSubmit(errors: FieldErrors<TForm>) {
     if (DEV_MODE) {
       const currentValues = form.getValues();
 
       (
-        globalThis as GlobalWithInvalidSubmit<TFieldValues>
+        globalThis as GlobalWithInvalidSubmit<TForm>
       ).__TB_CLASS_CREATION_LAST_INVALID_SUBMIT__ = {
         at: Date.now(),
         keys: Object.keys(errors ?? {}),
@@ -214,6 +217,7 @@ export function useCommandHandler<
     metaData?: HandleOpeningCallbackParams<TMeta>["metaData"],
   ) {
     if (!open) return;
+
     const { task, apiEndpoint = "none", dataReshapeFn } = metaData ?? {};
 
     let silent = metaData?.silent;
@@ -227,12 +231,6 @@ export function useCommandHandler<
       debugLogs(message);
       throw new Error(message);
     }
-    // Ensure apiEndpoint is present and correspond to a known input
-    // const found = inputControllers.find(
-    //   (input: (typeof inputControllers)[number]) =>
-    //     input.task === task && input.apiEndpoint === apiEndpoint
-    // );
-    // if (!found) return;
 
     if (DEV_MODE && !NO_CACHE_LOGS) {
       console.debug("handleOpening callback in CommandHandler", metaData);
@@ -269,8 +267,8 @@ export function useCommandHandler<
    * @param options - Options containing form field names and detailed command item
    */
   function handleSelection(
-    value: HandleSelectionCallbackParams<TFieldValues>["value"],
-    options: HandleSelectionCallbackParams<TFieldValues>["options"],
+    value: HandleSelectionCallbackParams<TForm>["value"],
+    options: HandleSelectionCallbackParams<TForm>["options"],
   ) {
     const {
       mainFormField,
@@ -309,9 +307,9 @@ export function useCommandHandler<
 
     setValuesAfterAnimation(
       mainFormField,
-      secondaryFormField as Path<TFieldValues>,
+      secondaryFormField as Path<TForm>,
       retrievedFormField,
-      values as PathValue<TFieldValues, Path<TFieldValues>>,
+      values as PathValue<TForm, Path<TForm>>,
       form,
     );
   }
@@ -330,7 +328,7 @@ export function useCommandHandler<
    * <PopoverFieldWithCommands
            onSelect={handleCommandSelection}
            onOpenChange={handleOpening}
-           onAddNewItem={newItemCallback}
+           onClick={newItemCallback}
            commandHeadings={resultsCallback()} // <-- here
      />
     * ```
@@ -340,20 +338,12 @@ export function useCommandHandler<
       fetchParams.contentId,
       fetchParams.url,
     ];
+
     const cachedData = queryClient.getQueryData(cacheKey);
 
     if (DEV_MODE && !NO_CACHE_LOGS) {
       console.log("Cached data for ", cacheKey, " is ", cachedData);
     }
-
-    // while the hook is loading and we don't yet have a cached value,
-    // we must avoid falling back to the previous `data` value, which
-    // belonged to a different request. returning an empty array keeps
-    // the popover blank until the fresh response arrives.
-    if (isLoading && cachedData === undefined) {
-      return [];
-    }
-
     return (cachedData ?? data) as HeadingType[];
   };
   /**
@@ -434,7 +424,6 @@ export function useCommandHandler<
     ...mutationObs,
     // Reshaped view data (usually cached + rendered by controllers)
     data,
-
     // Raw server response and payload (typed per `route` when provided)
     response,
     serverData,
