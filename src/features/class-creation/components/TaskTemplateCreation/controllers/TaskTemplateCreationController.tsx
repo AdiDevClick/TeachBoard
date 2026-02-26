@@ -230,7 +230,7 @@ export function TaskTemplateCreationController({
         onSelect={handleCommandSelection}
         onOpenChange={openingCallback}
         observedRefs={observedRefs}
-        onAddNewItem={newItemCallback}
+        onClick={newItemCallback}
         commandHeadings={computedCommandHeadings}
       />
     </form>
