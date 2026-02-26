@@ -1,6 +1,6 @@
 import { useAppStore } from "@/api/store/AppStore";
 import type { User } from "@/api/store/types/app-store.types";
-import { testQueryClient } from "@/tests/test-utils/testQueryClient";
+import { resetTestQueryClient } from "@/tests/test-utils/testQueryClient";
 import type { ReactNode } from "react";
 import { beforeEach, vi } from "vitest";
 import { render } from "vitest-browser-react";
@@ -15,6 +15,20 @@ export function setupUiTestState(
 ) {
   beforeEach(async () => {
     const g = globalThis as GlobalWithUiTestFlags;
+
+    // make sure any React trees rendered in a previous test are torn down first
+    // so that hooks/components cannot accidentally drive state in the current
+    // run.  Individual files sometimes call `cleanup()` manually but it's easy
+    // to forget; centralising here avoids leaks that look like "cached data
+    // from the previous iteration".
+    try {
+      // `cleanup` is globally exposed by test.setup-file.ts
+      // (see `globalThis.cleanup` in that file).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (globalThis as any).cleanup();
+    } catch {
+      // ignore any failure - some environments may not have cleanup available
+    }
 
     // Prevent programmatic navigation (assign/replace/open) during tests which can
     // break the browser-based test runner when multiple suites run together.
@@ -43,7 +57,7 @@ export function setupUiTestState(
     }
 
     history.replaceState({ idx: 0 }, "", "/");
-    testQueryClient.clear();
+    resetTestQueryClient();
     vi.unstubAllGlobals();
 
     // Re-install test-specific stubs (e.g. fetch routes) after globals are reset.
