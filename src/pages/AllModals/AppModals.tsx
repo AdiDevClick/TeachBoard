@@ -1,5 +1,6 @@
 import { ListMapper } from "@/components/Lists/ListMapper.tsx";
-import { Modal, ModalWithSimpleAlert } from "@/components/Modal/Modal.tsx";
+import { ModalWithSimpleAlert } from "@/components/Modal/exports/modal.exports";
+import { Modal } from "@/components/Modal/Modal.tsx";
 import { inputSignupControllers } from "@/data/inputs-controllers.data.ts";
 import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
 import LoginView from "@/features/auth/components/login/LoginView";
