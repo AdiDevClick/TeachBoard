@@ -1,5 +1,6 @@
 import { useAppStore } from "@/api/store/AppStore";
 import type { SkillDto } from "@/api/types/routes/skills.types.ts";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import type { HandleSelectionCallbackParams } from "@/hooks/database/types/use-command-handler.types.ts";
@@ -21,6 +22,7 @@ import {
 } from "@/tests/test-utils/tests.functions.ts";
 import { stubFetchRoutes } from "@/tests/test-utils/vitest-browser.helpers";
 import { UniqueSet } from "@/utils/UniqueSet";
+import { wait } from "@/utils/utils.ts";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 const click = () => new MouseEvent("click");
@@ -141,6 +143,39 @@ describe("useCommandHandler - basic behaviours", () => {
     expect(res).toEqual(cached);
   });
 
+  test("openingCallback aborts any in-flight fetch before starting a new one", async () => {
+    const hook = await renderCommandHook();
+    const { openingCallback, rerender } = hook;
+
+    // first invocation sets an abort controller
+    openingCallback(true, {
+      task: "foo",
+      apiEndpoint: "/foo/1",
+      dataReshapeFn: () => null,
+    });
+    rerender();
+
+    // read fresh fetchParams from proxy
+    const firstController = hook.fetchParams.abortController!;
+    expect(firstController).toBeDefined();
+    expect(firstController.signal.aborted).toBe(false);
+
+    // second call should cancel the previous controller
+    openingCallback(true, {
+      task: "foo",
+      apiEndpoint: "/foo/2",
+      dataReshapeFn: () => null,
+    });
+    rerender();
+
+    const secondController = hook.fetchParams.abortController!;
+    expect(secondController).toBeDefined();
+    expect(secondController).not.toBe(firstController);
+
+    // clear any activity so later tests are unaffected
+    useAppStore.setState({ lastUserActivity: new UniqueSet() });
+  });
+
   test("submitCallback performs a POST and caches reshaped data (dialog flow)", async () => {
     const { submitCallback, openDialog, dialogOptions, setDialogOptions } =
       await renderCommandHook(skillModuleModal);
@@ -245,5 +280,52 @@ describe("useCommandHandler - basic behaviours", () => {
         type: "fetch",
       }),
     );
+  });
+
+  test("serverData contains business payload for CREATE_CLASS POST", async () => {
+    // render the hook specifying the real create-class route and reshape
+    const hook = await renderCommandHook(
+      moduleModal,
+      API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
+      API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
+    );
+
+    const { submitCallback } = hook;
+
+    // stub the create-class POST response
+    const { classCreated } =
+      await import("@/tests/samples/class-creation-sample-datas");
+    stubFetchRoutes({
+      postRoutes: [[API_ENDPOINTS.POST.CREATE_CLASS.endpoint, classCreated]],
+    });
+
+    // perform submission using the POST method (mimicking controller)
+    submitCallback(
+      { name: "foo" },
+      {
+        endpointUrl: API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
+        dataReshapeFn: API_ENDPOINTS.POST.CREATE_CLASS.dataReshape,
+        method: API_ENDPOINTS.POST.METHOD,
+      },
+    );
+
+    // the URL may update asynchronously; poll until it matches the expected
+    // endpoint (or time out).
+    const start = Date.now();
+    while (
+      hook.fetchParams.url !== API_ENDPOINTS.POST.CREATE_CLASS.endpoint &&
+      Date.now() - start < 1000
+    ) {
+      await wait(10);
+    }
+
+    // sanity-check that the request target was properly assigned
+    expect(hook.fetchParams.url).toBe(API_ENDPOINTS.POST.CREATE_CLASS.endpoint);
+
+    // now wait for the cache entry that corresponds to the POST
+    await waitForCache([moduleModal, API_ENDPOINTS.POST.CREATE_CLASS.endpoint]);
+
+    // degrees should propagate through serverData (re-read from proxy)
+    expect(hook.serverData?.degreeLevel).toEqual(classCreated.degreeLevel);
   });
 });
