@@ -846,6 +846,21 @@ Cette section décrit les **conventions d'architecture** utilisées dans le proj
   - Utiliser des hooks partagés (`useCommandHandler`, `useFetch`, etc.) pour standardiser les interactions réseau.
     - `useCommandHandler` expose déjà toute la logique de fetching, opening, selection etc... que demande un formulaire et est donc un hook très pratique à prioriser.
   - Exposer des props simples et typés au composant présentational (ex. `ClassCreationController` expose `form` et handlers, et rend `<ControlledInputList/>`, `<PopoverFieldWithCommands/>` etc.).
+    - **Remarque :** le composant `<PopoverFieldWithCommands/>` est désormais la version de base non liée au formulaire. Historiquement il exposait la variante déjà enveloppée par `withEventEnrichedMetadatas`; dans les formulaires existants il fallait donc l'importer normalement. Après la refactorisation, **tout code qui s'appuie sur les métadonnées (`task`/`apiEndpoint` etc.)** doit maintenant utiliser la version contrôlée explicite.  Autrement dit :
+      ```ts
+      // cas générique – champ isolé, sans RHF
+      import { PopoverFieldWithCommands } from "@/components/Popovers/exports/popover-field.exports";
+
+      // dans un formulaire ou pour que `useCommandHandler` reçoive des métadonnées
+      import { PopoverFieldWithCommandswithEventEnrichedMetadatas as PopoverFieldWithCommands } from "@/components/Popovers/exports/popover-field.exports";
+      ```
+      Le second import est exactement équivalent à l'ancien comportement par défaut.
+      
+      Les composants de ce repo (`ClassCreationController`, `StepOneController`, etc.) ont été mis à jour en conséquence.
+      pour éviter qu’il ne rende `null` lorsqu’il n’y a aucun contexte de formulaire.
+
+    - **Nouveau comportement** : l’HOC `withEventEnrichedMetadatas` est désormais *inoffensif* même si les props `field`/`fieldState` manquent (cas des champs hors formulaire).
+      Vous pouvez donc envelopper n’importe quel champ avec lui sans craindre un `null`. Il continuera à enrichir les callbacks (`onOpenChange`, `onClick`, etc.) avec les métadonnées fournies via `task`, `apiEndpoint`…
   - Tester les controllers via des tests unitaires simulant les hooks et le store (Vitest + stubs).
 
 <a id="structure-des-dossiers-pour-une-feature-pattern-mvc"></a>
@@ -1141,12 +1156,12 @@ import { SimpleAddButtonWithToolTip } from '@/components/Buttons/SimpleAddButton
 ### Inputs
 - **Look / example**:
 ```tsx
-import { ControlledLabelledInput } from '@/components/Inputs/LaballedInputForController';
+import { ControlledLabelledInput } from '@/components/Inputs/LaballedInputwithEventEnrichedMetadatas';
 
 <ControlledLabelledInput form={form} name="email" title="Adresse e-mail" />
 ```
 - **Patterns**: Pattern A — Controlled input via `withController`; Pattern B — list mapping via `withListMapper` (`ControlledInputList`)
-- **Emplacement**: `src/components/Inputs/LaballedInputForController.tsx`
+- **Emplacement**: `src/components/Inputs/LaballedInputwithEventEnrichedMetadatas.tsx`
 
 ---
 
@@ -1399,18 +1414,18 @@ Voici un exemple pratique montrant : 1) la définition des constantes d'acceptat
 export const LABELLED_INPUT_SHOULD_NOT_ACCEPT = ["useCommands", "creationButtonText"];
 export const LABELLED_INPUT_REQUIRES = ["field", "fieldState"];
 
-export const labelledInputContainsInvalid = (props: LaballedInputForControllerProps) =>
+export const labelledInputContainsInvalid = (props: LaballedInputwithEventEnrichedMetadatasProps) =>
   checkPropsValidity(props, LABELLED_INPUT_REQUIRES, LABELLED_INPUT_SHOULD_NOT_ACCEPT);
 ```
 
-- Dans `<LabelledInputForController/>`, appeler simplement la fonction et utilisez le logger pour retourner une alerte :
+- Dans `<LabelledInputwithEventEnrichedMetadatas/>`, appeler simplement la fonction et utilisez le logger pour retourner une alerte :
 ```tsx
-// Exemple d'utilisation (top-of-render guard) — src/components/Inputs/LaballedInputForController.tsx
+// Exemple d'utilisation (top-of-render guard) — src/components/Inputs/LaballedInputwithEventEnrichedMetadatas.tsx
 import { labelledInputContainsInvalid } from '@/configs/app-components.config';
 
-export function LabelledInputForController<T extends FieldValues>(props: LaballedInputForControllerProps<T>) {
+export function LabelledInputwithEventEnrichedMetadatas<T extends FieldValues>(props: LaballedInputwithEventEnrichedMetadatasProps<T>) {
   if (labelledInputContainsInvalid(props)) {
-    debugLogs("LabelledInputForController");
+    debugLogs("LabelledInputwithEventEnrichedMetadatas");
     return null; // garde : rendu bloqué si props invalides
   }
 
@@ -1424,7 +1439,7 @@ export function LabelledInputForController<T extends FieldValues>(props: Laballe
 }
 ```
 
-- Composants déjà protégés : `LaballedInputForController`, `withController`, `ListMapper`, `LoginButton`, `PrimaryMenuButton`, `SidebarCalendar` (absence d'events en contexte).
+- Composants déjà protégés : `LaballedInputwithEventEnrichedMetadatas`, `withController`, `ListMapper`, `LoginButton`, `PrimaryMenuButton`, `SidebarCalendar` (absence d'events en contexte).
 - Pour un nouveau composant, ajoutez un validateur dédié dans [Components Config](src/configs/app-components.config.ts), importez-le avec `debugLogs` et appliquez le garde en entrée pour garder le comportement homogène.
 
 <!-- --- -->
