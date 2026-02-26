@@ -1,7 +1,7 @@
-import { forController } from "@/components/HOCs/forController";
 import withController from "@/components/HOCs/withController";
+import { withEventEnrichedMetadatas } from "@/components/HOCs/withEventEnrichedMetadatas";
 import withListMapper from "@/components/HOCs/withListMapper";
-import { LabelledInput } from "@/components/Inputs/LaballedInput";
+import { LabelledInput } from "@/components/Inputs/LabelledInput";
 import { createComponentName } from "@/utils/utils";
 
 /**
@@ -12,18 +12,19 @@ import { createComponentName } from "@/utils/utils";
 /**
  * A version of the LabelledInput component that is integrated with react-hook-form Controller.
  */
-export const LabelledInputForController = forController(LabelledInput);
+export const LabelledInputWithEventEnrichedMetadatas =
+  withEventEnrichedMetadatas(LabelledInput);
 createComponentName(
-  "forController",
-  "LabelledInputForController",
-  LabelledInputForController,
+  "withEventEnrichedMetadatas",
+  "LabelledInputWithEventEnrichedMetadatas",
+  LabelledInputWithEventEnrichedMetadatas,
 );
 
 /**
  * A version of the LabelledInput component that is integrated with react-hook-form Controller and enhanced with list mapping capabilities.
  */
 export const ControlledLabelledInput = withController(
-  LabelledInputForController,
+  LabelledInputWithEventEnrichedMetadatas,
 );
 createComponentName(
   "withController",
