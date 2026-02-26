@@ -1,9 +1,10 @@
 import type {
   FetchJSONError,
+  FetchJSONOptions,
   FetchJSONResult,
-  fetchJSONOptions,
 } from "@/api/types/api.types";
-import type { AnyObjectProps } from "@/utils/types/types.utils";
+import type { ApiError } from "@/types/AppErrorInterface";
+import type { ApiSuccess } from "@/types/AppResponseInterface";
 
 /**
  * Fetch API to JSON
@@ -15,11 +16,11 @@ import type { AnyObjectProps } from "@/utils/types/types.utils";
  * @returns Parsed JSON response or error cause.
  */
 export async function fetchJSON<
-  TData extends object = AnyObjectProps,
-  TErrorBody extends object = AnyObjectProps,
+  TData extends ApiSuccess<any>,
+  TErrorBody extends ApiError,
 >(
   url = "",
-  options: fetchJSONOptions = {},
+  options: FetchJSONOptions = {},
 ): Promise<FetchJSONResult<TData, TErrorBody>> {
   const { json, signal, ...rest } = options;
   const headers = new Headers(rest.headers);
@@ -76,14 +77,14 @@ export async function fetchJSON<
  * @param response HTTP response
  * @returns Promise containing an error object
  */
-async function filterErrorResponse<TErrorBody extends object>(
+async function filterErrorResponse<TErrorBody extends ApiError>(
   response: Response,
 ): Promise<FetchJSONError<TErrorBody>> {
   const cause = {
     status: response.status,
     statusText: response.statusText ?? null,
     ok: response.ok,
-  } as FetchJSONError<TErrorBody>;
+  } as unknown as FetchJSONError<TErrorBody>;
 
   try {
     return {
