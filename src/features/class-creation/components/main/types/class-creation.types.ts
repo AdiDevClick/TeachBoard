@@ -3,7 +3,7 @@ import type {
   DetailedCommandItem,
   HeadingType,
 } from "@/components/Command/types/command.types.ts";
-import type { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import type { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import type ClassCreation from "@/features/class-creation/components/main/ClassCreation.tsx";
 import type {
   ClassCreationFormSchema,
