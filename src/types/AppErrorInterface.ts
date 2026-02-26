@@ -1,85 +1,76 @@
+import type { AnyObjectProps } from "@/utils/types/types.utils";
+
 /** Detailed validation violation coming from the backend */
 export type ValidationViolation = [
   field: string,
   message: string,
   invalidValue?: unknown,
-  code?: string
+  code?: string,
 ][number];
 
-/** Common properties shared by every API error */
-export interface ErrorInterface {
-  status: number;
-  error?: string;
-}
+type ClientCookies = [
+  {
+    fromUserAgent: boolean;
+    changed: boolean;
+    sameSite: string;
+    name: string;
+    value: string;
+    path: string;
+    domain: string;
+    httpOnly: boolean;
+    secure: boolean;
+    maxAge: number;
+  },
+];
 
-/** Optional metadata present on most errors */
-export type ErrorMeta = {
-  message?: string;
-  /** Generic error `type` sometimes returned by backend (e.g. 'An unexpected error occurred...') */
-  type?: string;
-  // errorId?: string;
-  route?: string;
-  // timestamp?: string;
+type ClientRemoteType = {
+  domainSocket: boolean;
+  inetSocket: boolean;
 };
+
+/** Common properties shared by every API error */
+export interface ErrorInterface<TStatus extends number = number> {
+  status: TStatus;
+  error?: string;
+  type?: string;
+}
 
 /** Validation error details payload */
 export type ValidationErrorDetails = {
   summary?: string;
   violations: ValidationViolation[];
-} & Record<string, unknown>;
+} & AnyObjectProps;
 
 /** Server-side debug information (500 range) */
 export type ServerErrorDebugs = {
   severity?: string;
-  traceId?: string;
-  clientRemoteType?: string;
+  clientRemoteType?: ClientRemoteType;
   clientIP?: string;
-  clientCookies?: string;
+  clientCookies?: ClientCookies;
   detailedDebugMessage?: string;
+  detailedMessage?: string;
   type?: string;
-  status: number;
-} & Record<string, unknown>;
+  status: 500;
+  route?: string;
+} & AnyObjectProps;
 
 /** Specific error contracts mapped to HTTP status codes */
-export type ValidationError = ErrorInterface &
-  ErrorMeta & {
-    status: 400;
-    details: ValidationErrorDetails;
-  };
+export type ValidationError = ErrorInterface<400> & {
+  details: ValidationErrorDetails;
+};
 
-export type UnauthorizedError = ErrorInterface &
-  ErrorMeta & {
-    status: 401;
-  };
+export type UnauthorizedError = ErrorInterface<401>;
 
-export type ForbiddenError = ErrorInterface &
-  ErrorMeta & {
-    status: 403;
-  };
+export type ForbiddenError = ErrorInterface<403>;
 
-export type NotFoundError = ErrorInterface &
-  ErrorMeta & {
-    status: 404;
-  };
+export type NotFoundError = ErrorInterface<404>;
 
-export type ConflictError = ErrorInterface &
-  ErrorMeta & {
-    status: 409;
-  };
+export type ConflictError = ErrorInterface<409>;
 
-export type ServerError = ErrorInterface &
-  ErrorMeta & {
-    status: 500;
-    debugs?: ServerErrorDebugs;
-  };
-
-/** Fallback error shape when the backend returns an unexpected payload */
-export type GenericApiError = ErrorInterface &
-  Partial<ErrorMeta> & {
-    details?: Record<string, unknown>;
-    debugs?: Record<string, unknown>;
-    // response?: unknown;
-  };
+export type ServerError = ErrorInterface<500> & {
+  debugs: ServerErrorDebugs;
+  details: ValidationErrorDetails;
+};
 
 export type KnownApiError =
   | ValidationError
@@ -89,4 +80,5 @@ export type KnownApiError =
   | ConflictError
   | ServerError;
 
-export type ApiError = KnownApiError | GenericApiError;
+export type ApiError<TMeta extends object = Record<string, never>> =
+  KnownApiError & Partial<TMeta>;
