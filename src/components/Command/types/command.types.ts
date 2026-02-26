@@ -1,7 +1,7 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
+import type { MetaDatasPopoverField } from "@/components/Popovers/types/popover.types";
 import type { Command, CommandItem } from "@/components/ui/command.tsx";
-import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
-import type { ComponentProps, ReactNode } from "react";
+import type { ComponentProps, MouseEventHandler, ReactNode } from "react";
 
 /** A heading with a title and corresponding values */
 export type HeadingType = {
@@ -38,7 +38,8 @@ export type CommandsProps = {
   multiSelection?: boolean;
   creationButtonText?: ReactNode;
   useButtonAddNew?: boolean;
-  onAddNewItem?: (_payload: HandleAddNewItemParams) => void;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+  controllerFieldMeta?: MetaDatasPopoverField;
   commandHeadings?: HeadingType[];
   queryRecordsKey?: string[];
   onSelect?: (_value: string, _commandItem: CommandItemType) => void;
