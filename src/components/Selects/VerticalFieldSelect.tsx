@@ -60,6 +60,7 @@ export function VerticalFieldSelect({
     children,
     role,
     placeholder,
+    value,
     ...selectRootProps
   } = props;
 
@@ -134,6 +135,7 @@ export function VerticalFieldSelect({
         // value={props?.onSelect}
         onOpenChange={handleOpenChange}
         onValueChange={handleValueChange}
+        value={value ?? ""}
         {...selectRootProps}
       >
         <SelectTrigger
