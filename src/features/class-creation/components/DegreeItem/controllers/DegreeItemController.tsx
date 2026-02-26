@@ -1,4 +1,4 @@
-import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { DegreeTypeMessage } from "@/features/class-creation/components/DegreeItem/controllers/types/degree-item-controller.types";
 import type { DegreeItemControllerProps } from "@/features/class-creation/components/DegreeItem/types/degree-item.types.ts";

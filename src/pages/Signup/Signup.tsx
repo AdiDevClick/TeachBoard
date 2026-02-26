@@ -1,4 +1,4 @@
-import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import {
   DialogHeaderTitle,
   HeaderTitle,
@@ -84,7 +84,7 @@ export function Signup({
                 disabled={!form.formState.isValid}
                 form={formId}
               >
-                S'enregistrer
+                {"S'enregistrer"}
               </Button>
             </Field>
           </FieldGroup>
