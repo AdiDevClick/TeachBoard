@@ -105,7 +105,7 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
       observedRefs={observedRefs}
       onOpenChange={openingCallback}
       onSelect={handleOnSelect}
-      onAddNewItem={handleNewItem}
+      onClick={handleNewItem}
     />
   );
 }
