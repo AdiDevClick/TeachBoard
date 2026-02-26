@@ -3,7 +3,7 @@ import type { HeaderTitleProps } from "@/components/Titles/types/titles.types.ts
 import type { Card, CardContent, CardFooter } from "@/components/ui/card.tsx";
 import type { Separator } from "@/components/ui/separator";
 import type { AppModalNames } from "@/configs/app.config.ts";
-import type { UniqueSet } from "@/utils/UniqueSet.ts";
+import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types";
 import type {
   AnyObjectProps,
   PreventDefaultAndStopPropagation,
@@ -30,10 +30,10 @@ export type DialogContextType = {
   setDialogOptions: (id: AppModalNames, options: AnyObjectProps) => void;
   closeAllDialogs: () => void;
   deleteRef: (id: AppModalNames) => void;
-  setRef: (ref: Element | null) => void;
-  observedRefs: UniqueSet<string, { element: Element | null }>;
+  // setRef: (ref: Element | null) => void;
+  // observedRefs: UniqueSet<string, { element: Element | null }>;
   openedDialogs: AppModalNames[];
-};
+} & UseMutationObserverReturn;
 
 /**
  * Type for ViewCard context
