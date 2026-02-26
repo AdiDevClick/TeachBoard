@@ -1,4 +1,4 @@
-import type { ClasseNameAvailabilityResponse } from "@/api/types/routes/classes.types";
+import type { ClassRouteResponse } from "@/api/types/routes/classes.types";
 import { AvatarsWithLabelAndAddButtonList } from "@/components/Form/exports/form.exports";
 import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import {
@@ -78,7 +78,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     submitDataReshapeFn,
   });
   const { availabilityError, availabilityCheck } =
-    useDebouncedChecker<ClasseNameAvailabilityResponse>(300);
+    useDebouncedChecker<ClassRouteResponse>(300);
 
   /**
    * Send a debouned API request to check for class name availability when the class name input changes.
