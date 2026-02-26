@@ -1,20 +1,15 @@
-import type { ViewCardContextType } from "@/api/contexts/types/context.types";
-import withTitledCard from "@/components/HOCs/withTitledCard";
 import type {
   ModalProps,
   ModalState,
-  WithSimpleAlertProps,
 } from "@/components/Modal/types/modal.types.ts";
 import { Dialog, DialogContent } from "@/components/ui/dialog.tsx";
+import type { AppModalNames } from "@/configs/app.config";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useUserEventListener } from "@/hooks/events/useUserEventListener";
-import type {
-  AnyComponentLike,
-  ComponentPropsOf,
-} from "@/utils/types/types.utils";
+import type { ObserverRef } from "@/hooks/types/use-mutation-observer.types";
 import { wait } from "@/utils/utils.ts";
 import "@css/Dialog.scss";
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 const defaultModalState: ModalState = {
@@ -94,15 +89,12 @@ export function Modal({
    */
 
   /**
-   * User navigating via browser buttons.
-   * This also handles mouse back/forward buttons.
+   * USER NAVIGATION BY BROWSER BUTTONS
    *
-   * @description This is triggered by a change in history state.
+   * This also handles mouse back/forward buttons.
+   * @description Browser back/forward buttons or programmatically via pushState/replaceState.
    */
-  useEffect(() => {
-    if (!popStateEvent) return;
-
-    popStateEvent.preventDefault();
+  const navigationTrigger = useEffectEvent(() => {
     let popState = null;
 
     /**
@@ -133,18 +125,31 @@ export function Modal({
       isHandledByPopState: popState,
       isHandledByUserEvent: false,
     }));
+  });
+
+  /**
+   * USER NAVIGATION BY BROWSER BUTTONS.
+   *
+   * @description This is triggered by a change in history state.
+   */
+  useEffect(() => {
+    if (!popStateEvent) return;
+
+    popStateEvent.preventDefault();
+    navigationTrigger();
   }, [popStateEvent, modalState.isHandledByUserEvent]);
 
   /**
-   * User navigating via mouse buttons
+   * USER NAVIGATION BY MOUSE BUTTONS
    *
    * @description Keys can be handled here as well.
    * By default, Escape is handled by the Dialog component.
    *
    * Mouseback is also handled by the component but here we just track the event for navigation conflict issues handling.
    */
-  useEffect(() => {
+  const triggerMouseEvent = useEffectEvent((userMouseEvent: MouseEvent) => {
     if (!userMouseEvent?.button || !modalState.isOpen) return;
+
     userMouseEvent.preventDefault();
 
     let forward = null;
@@ -168,58 +173,87 @@ export function Modal({
       userInput,
       isHandledByUserEvent: true,
     }));
+  });
+
+  /**
+   * User navigating via mouse buttons
+   *
+   * @description Each time a mouse button event is detected
+   */
+  useEffect(() => {
+    triggerMouseEvent(userMouseEvent);
   }, [userMouseEvent]);
 
   /**
-   * Modify history
+   * MODIFY HISTORY AND URL -
    *
-   * @description This section is for normal behaviour when no conflict between popstate and user events occurs.
+   * @description Normal behaviour when no conflict between popstate and user events occurs.
    *
    * There should be no keys or popstate events handled here.
    */
+  const historyModificationTrigger = useEffectEvent(
+    (
+      modalURL: string,
+      popStateEvent: PopStateEvent | null,
+      isStateOpened: boolean | null,
+      isOpen: boolean | ((id: string) => boolean),
+    ) => {
+      const mouseInteraction = modalState.isHandledByUserEvent;
+
+      if (
+        isOpen ||
+        isStateOpened === null ||
+        !isStateOpened ||
+        mouseInteraction
+      )
+        return;
+
+      const stateObj = {
+        ...history.state,
+        forwardURL: modalURL,
+      };
+      // Force close the modal if opened
+      if (isDialogOpen(modalName)) closeDialog(popStateEvent, modalName);
+
+      const userIsOnModalURL = currentLocation === modalURL;
+      // const userIsOnPreviousURL = currentLocation === modalState.previousUrl;
+      const browserUrlIsDifferentThanRouter = currentLocation !== routerPath;
+      const targetUrl = routerPath === modalState.previousUrl;
+      const shouldGoBack =
+        userIsOnModalURL && browserUrlIsDifferentThanRouter && targetUrl;
+
+      // Case 1 : user closes modal with a click on close cross or outside the modal
+      if (shouldGoBack) {
+        history.back();
+        waitAndReplace(stateObj, modalState.previousUrl);
+      }
+
+      if (!isStateOpened) return;
+      setModalState((prev) => ({
+        ...prev,
+        forward: null,
+        isOpen: false,
+        previousUrl: "",
+        url: "",
+        historyIdx: history.state.idx,
+        userInput: null,
+        isHandledByUserEvent: false,
+        isHandledByPopState: false,
+      }));
+    },
+  );
+  /**
+   * MODIFY HISTORY AND URL
+   *
+   * @description Each time the modal open state changes
+   */
   useEffect(() => {
-    const mouseInteraction = modalState.isHandledByUserEvent;
-
-    if (
-      isOpen ||
-      modalState.isOpen === null ||
-      !modalState.isOpen ||
-      mouseInteraction
-    )
-      return;
-
-    const stateObj = {
-      ...history.state,
-      forwardURL: modalURL,
-    };
-    // Force close the modal if opened
-    if (isDialogOpen(modalName)) closeDialog(popStateEvent, modalName);
-
-    const userIsOnModalURL = currentLocation === modalURL;
-    // const userIsOnPreviousURL = currentLocation === modalState.previousUrl;
-    const browserUrlIsDifferentThanRouter = currentLocation !== routerPath;
-    const targetUrl = routerPath === modalState.previousUrl;
-    const shouldGoBack =
-      userIsOnModalURL && browserUrlIsDifferentThanRouter && targetUrl;
-
-    // Case 1 : user closes modal with a click on close cross or outside the modal
-    if (shouldGoBack) {
-      history.back();
-      waitAndReplace(stateObj, modalState.previousUrl);
-    }
-
-    if (!modalState.isOpen) return;
-    setModalState((prev) => ({
-      ...prev,
-      forward: null,
-      isOpen: false,
-      previousUrl: "",
-      url: "",
-      historyIdx: history.state.idx,
-      userInput: null,
-      isHandledByUserEvent: false,
-      isHandledByPopState: false,
-    }));
+    historyModificationTrigger(
+      modalURL,
+      popStateEvent,
+      modalState.isOpen,
+      isOpen,
+    );
   }, [
     userMouseEvent,
     modalState.userInput,
@@ -230,68 +264,101 @@ export function Modal({
   ]);
 
   /**
-   * Open state changes
+   * OPEN MODAL - Verify and set the open state
+   *
+   * @description This is triggered by a change in the open state.
+   * It verifies if the modal can be opened and sets the URL.
+   * The URL is only set if the modal is not already open to avoid conflicts with popstate and user events handling.
+   */
+  const openDialogTrigger = useEffectEvent(
+    (
+      isReady: boolean | HTMLElement,
+      isOpen: boolean | ((id: string) => boolean),
+    ) => {
+      if (!isReady) return;
+
+      let isModalOpened = null;
+      const currentIndex = history.state?.idx;
+      const currentPathLocation = location.pathname;
+
+      if (isOpen && !modalState.isOpen) {
+        isModalOpened = true;
+        waitAndPush(
+          {
+            ...history.state,
+            modalName,
+            backgroundURL: currentPathLocation,
+            actualURL: modalURL,
+            ...popStateEvent?.state,
+          },
+          modalURL,
+          10,
+        );
+      }
+
+      if (!isOpen && modalState.isOpen && modalState.previousUrl) {
+        isModalOpened = false;
+      }
+
+      if (isModalOpened === null) return;
+      setModalState((prev) => ({
+        ...prev,
+        historyIdx: currentIndex,
+        previousUrl: currentPathLocation,
+        isOpen: isModalOpened,
+        url: modalURL,
+        isHandledByPopState: false,
+        isHandledByUserEvent: false,
+      }));
+    },
+  );
+
+  /**
+   * OPEN MODAL
+   *
+   * @description Each time the open state changes
    */
   useEffect(() => {
-    if (!modalState.isReady) return;
-
-    let isModalOpened = null;
-    const currentIndex = history.state?.idx;
-    const currentPathLocation = location.pathname;
-
-    if (isOpen && !modalState.isOpen) {
-      isModalOpened = true;
-      waitAndPush(
-        {
-          ...history.state,
-          modalName,
-          backgroundURL: currentPathLocation,
-          actualURL: modalURL,
-          ...popStateEvent?.state,
-        },
-        modalURL,
-        10,
-      );
-    }
-
-    if (!isOpen && modalState.isOpen && modalState.previousUrl) {
-      isModalOpened = false;
-    }
-
-    if (isModalOpened === null) return;
-    setModalState((prev) => ({
-      ...prev,
-      historyIdx: currentIndex,
-      previousUrl: currentPathLocation,
-      isOpen: isModalOpened,
-      url: modalURL,
-      isHandledByPopState: false,
-      isHandledByUserEvent: false,
-    }));
+    openDialogTrigger(modalState.isReady, isOpen);
   }, [isOpen, modalState.isReady]);
 
   /**
-   * Verify and set the observedRef element
+   * INIT - Trigger verification
    *
-   * @description This is the init
+   * @description Saves the ready element to be opened
+   */
+  const triggerVerification = useEffectEvent(
+    (
+      isReady: boolean | HTMLElement,
+      observedRefs: ObserverRef,
+      modalName: AppModalNames,
+    ) => {
+      if (observedRefs.size > 0) {
+        const observedEntry = observedRefs.get(modalName);
+        const observedElement =
+          observedEntry?.element instanceof HTMLElement
+            ? observedEntry.element
+            : false;
+
+        if (isReady !== observedElement) {
+          setModalState((prev) => ({
+            ...prev,
+            isReady: observedElement,
+          }));
+        }
+      }
+    },
+  );
+
+  /**
+   * INIT - Verify and set the observedRef element as ready to open the modal
+   *
+   * @description  Each time the observedRefs changes
    */
   useEffect(() => {
     if (!isNavigationModal || !observedRefs || !modalName) return;
 
-    if (observedRefs.size > 0) {
-      const observedEntry = observedRefs.get(modalName);
-      const observedElement =
-        observedEntry?.element instanceof HTMLElement
-          ? observedEntry.element
-          : false;
-
-      if (modalState.isReady !== observedElement) {
-        setModalState((prev) => ({
-          ...prev,
-          isReady: observedElement,
-        }));
-      }
-    }
+    triggerVerification(modalState.isReady, observedRefs, modalName);
   }, [observedRefs, modalState.isReady, isNavigationModal, modalName]);
 
   return (
@@ -330,53 +397,3 @@ async function waitAndReplace(state: object, url: string, timer = 70) {
   await wait(timer);
   history.replaceState(state, "", url);
 }
-
-function withSimpleAlert<T extends AnyComponentLike>(WrappedComponent: T) {
-  return function Component(props: WithSimpleAlertProps) {
-    const { headerTitle, ref, headerDescription, ...rest } = props;
-
-    const commonProps = {
-      modalMode: true,
-      ref,
-      pageId: rest.modalName ?? "simple-alert",
-      card: {
-        title: {
-          title: headerTitle,
-          description: headerDescription,
-          separator: {
-            displaySeparator: false,
-          },
-        },
-        footer: {
-          className: "px-6",
-          separator: {
-            displaySeparator: false,
-          },
-          cancelText: "Ok",
-          displaySubmitButton: false,
-        },
-      } satisfies ViewCardContextType,
-    };
-
-    const injectedProps = {
-      ...rest,
-      modalContent: (
-        <SimpleAlert {...commonProps}>
-          <SimpleAlert.Title />
-          <SimpleAlert.Footer />
-        </SimpleAlert>
-      ),
-    };
-
-    return <WrappedComponent {...(injectedProps as ComponentPropsOf<T>)} />;
-  };
-}
-
-const SimpleAlert = withTitledCard(null!);
-
-/**
- * Higher-order component to create a simple alert modal
- *
- * @description This contains a title, description and an Ok button to close the modal.
- */
-export const ModalWithSimpleAlert = withSimpleAlert(Modal);
