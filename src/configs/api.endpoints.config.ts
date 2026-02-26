@@ -2,7 +2,6 @@ import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 
 import type {
-  ClasseNameAvailabilityResponse,
   ClassesFetch,
   CreateClassResponseData,
 } from "@/api/types/routes/classes.types";
@@ -29,6 +28,7 @@ import type {
   TasksFetch,
 } from "@/api/types/routes/tasks.types";
 import type { TeachersFetch } from "@/api/types/routes/teachers.types";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 
 const BASE_API_URL = "/api";
 
@@ -64,9 +64,10 @@ export const API_ENDPOINTS = Object.freeze({
       endPoints: {
         ALL: `${CLASSES}/`,
         BY_ID: (id: number | string) => `${CLASSES}/${id}`,
-        CHECK_NAME: (className: string | number) => `${CLASSES}/check-name/${className}`,
+        CHECK_NAME: (className: string | number) =>
+          `${CLASSES}/check-name/${className}`,
       },
-      dataAvailable: (data: ClasseNameAvailabilityResponse) => data,
+      dataAvailable: () => null,
       dataReshape: (data: ClassesFetch) =>
         // use "code" and transform to "value" for selects
         // data.classes is the actual array of classes from the server response
@@ -380,18 +381,18 @@ export const API_ENDPOINTS = Object.freeze({
     CREATE_EVALUATION: {
       endpoint: EVALUATIONS,
       dataReshape: (
-        data: unknown,
+        data: Record<string, unknown>,
         cachedDatas: CachedQueriesData | undefined,
       ) => {
         const newItem = {
           ...data,
-          value: data?.name,
+          value: data.name as string | undefined,
         };
 
         return reshapeItemToCachedData(
           newItem,
           cachedDatas,
-          data?.classId ?? "Tous",
+          (data.classId as string) ?? "Tous",
         );
       },
     },
@@ -442,8 +443,8 @@ function getCachedDatas(cachedDatas: CachedQueriesData | undefined) {
  * @param groupConditionValue The group condition value for grouping items
  * @returns The reshaped data structure with the new item added
  */
-function reshapeItemToCachedData(
-  newItem: Record<string, unknown>,
+function reshapeItemToCachedData<T extends AnyObjectProps>(
+  newItem: T,
   cachedDatas: CachedQueriesData | undefined,
   groupConditionValue: string,
 ) {
