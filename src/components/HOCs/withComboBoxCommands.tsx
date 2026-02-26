@@ -10,8 +10,8 @@ import { createElement, type ComponentProps, type ComponentType } from "react";
  *
  * @param Wrapped - The component to be wrapped with command functionalities.
  */
-function withComboBoxCommands<P extends ComponentType>(Wrapped: P) {
-  return function Component(props: P & CommandsProps) {
+function withComboBoxCommands<P extends ComponentType<any>>(Wrapped: P) {
+  return function Component(props: ComponentProps<P> & CommandsProps) {
     const {
       useCommands,
       children,
