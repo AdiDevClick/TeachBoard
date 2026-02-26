@@ -25,6 +25,7 @@ export function LabelledInput(props: LabelledInputProps) {
     "onOpenChange",
     "onValueChange",
     "controllerFieldMeta",
+    "fieldState",
   ]);
   const labelName = name ?? "input-is-not-named";
 
