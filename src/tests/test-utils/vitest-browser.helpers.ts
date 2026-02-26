@@ -804,6 +804,7 @@ export async function selectCommandItemInContainer(
   // (best-effort) wait for it to close/change after selection.
   const popoverBeforeSelection = getOpenPopoverContent();
 
+  // wait for the item to appear
   await expect
     .poll(
       () => {
