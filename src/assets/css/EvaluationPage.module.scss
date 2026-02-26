@@ -126,7 +126,6 @@
           }
 
           &--description {
-
             display: none;
             grid-row: 3;
             grid-column: 1;
@@ -185,6 +184,7 @@
 
         &__right-side,
         .arrow-back {
+
           transition: opacity 1s ease, var(--transform-transition);
           // position: sticky;
           // top: 0;
@@ -192,14 +192,15 @@
           grid-column: 3;
           grid-row: 1;
           place-self: center;
-          width: clamp(300px, auto, 850px);
-          min-width: 300px;
+          width: clamp(300px, fit-content, 850px);
 
           &:has([data-slot="slider"]) {
             width: min(420px, 100%);
           }
 
-          // min-width: 420px;
+          &:has(form>[role="radiogroup"]) {
+            width: clamp(450px, 100%, 850px);
+          }
 
           &.arrow-back {
             min-width: unset;
@@ -207,6 +208,9 @@
           }
 
           &--container {
+            overflow: auto;
+            max-height: 50vh;
+
             display: grid;
             place-self: center;
             gap: calc(var(--spacing) * 3);
