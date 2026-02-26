@@ -14,7 +14,7 @@ import type { FieldValues } from "react-hook-form";
 // version of this type made those props required, which led to numerous
 // compiler errors after we started wrapping components unconditionally.  To
 // match the runtime behaviour we now make the props optional.
-export type withEventEnrichedMetadatasProps = Partial<FieldTypes<FieldValues>> &
+export type WithEventEnrichedMetadatasProps = Partial<FieldTypes<FieldValues>> &
   UseMutationObserverReturn &
   Partial<CommandHandlerFieldMeta> &
   Partial<{

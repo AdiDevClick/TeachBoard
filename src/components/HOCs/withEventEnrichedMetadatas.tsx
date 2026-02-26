@@ -1,4 +1,4 @@
-import type { withEventEnrichedMetadatasProps } from "@/components/HOCs/types/with-event-enriched-metadatas.types";
+import type { WithEventEnrichedMetadatasProps } from "@/components/HOCs/types/with-event-enriched-metadatas.types";
 import {
   debugLogs,
   withEventEnrichedMetadatasContainsInvalid,
@@ -20,7 +20,7 @@ import { useMemo, type ComponentType, type MouseEvent } from "react";
 export function withEventEnrichedMetadatas<P extends object>(
   WrapperComponent: ComponentType<P>,
 ) {
-  function Component(props: P & withEventEnrichedMetadatasProps) {
+  function Component(props: P & WithEventEnrichedMetadatasProps) {
     if (withEventEnrichedMetadatasContainsInvalid(props)) {
       debugLogs("[withEventEnrichedMetadatas]");
     }
