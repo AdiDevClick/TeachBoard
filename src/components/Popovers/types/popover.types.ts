@@ -55,9 +55,7 @@ export type PopoverCommandProps = {
 /** Props spécifiques au PopoverField */
 export type PopoverFieldProps = PopoverBaseProps &
   PopoverSelectionProps &
-  PopoverCommandProps & {
-    controllerFieldMeta?: MetaDatasPopoverField;
-  };
+  PopoverCommandProps;
 
 export type PopoverFieldState = {
   open: boolean;

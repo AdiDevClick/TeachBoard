@@ -103,8 +103,8 @@ export type PropsWithListings<T> = {
   items: T[];
 } & PropsWithChildren;
 
-export type ForControllerVerticalFieldSelectProps = FieldTypes<FieldValues> &
-  Pick<VerticalSelectProps, "onValueChange">;
+export type WithEventEnrichedMetadatasVerticalFieldSelectProps =
+  FieldTypes<FieldValues> & Pick<VerticalSelectProps, "onValueChange">;
 
 /**
  * Props for the LabelledGroup component

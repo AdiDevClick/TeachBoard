@@ -1,4 +1,4 @@
-import { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input";
+import { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input.exports";
 import { Badge } from "@/components/ui/badge";
 import { Item } from "@/components/ui/item";
 import type { LabelledScoreInputProps } from "@/features/evaluations/create/components/Score/types/score-types";
