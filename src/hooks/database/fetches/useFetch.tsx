@@ -8,7 +8,7 @@ import {
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
 import type { ApiError } from "@/types/AppErrorInterface";
-import type { ResponseInterface } from "@/types/AppResponseInterface.ts";
+import type { ApiSuccess } from "@/types/AppResponseInterface";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -56,9 +56,9 @@ const defaultStateParameters: FetchParams = {
  * @returns An object containing fetch parameters, a function to set them, and query status.
  */
 export function useFetch<
-  TServerData = Record<string, unknown>,
+  S extends ApiSuccess = ApiSuccess<any>,
   E extends ApiError = ApiError,
-  TViewData = unknown,
+  TViewData = S extends { data: infer M } ? M : never,
 >() {
   const [fetchParams, setFetchParams] = useState(defaultStateParameters);
   const [viewData, setViewData] = useState<TViewData | undefined>(undefined);
@@ -66,7 +66,6 @@ export function useFetch<
   const navigate = useNavigate();
   const location = useLocation().pathname;
   const queryClient = useQueryClient();
-
   const {
     onSuccess: successCallback,
     onError: errorCallback,
@@ -75,7 +74,7 @@ export function useFetch<
     ...params
   } = fetchParams;
 
-  const queryParams = useQueryOnSubmit<ResponseInterface<TServerData>, E>([
+  const queryParams = useQueryOnSubmit<S, E>([
     contentId,
     {
       ...params,
@@ -115,9 +114,10 @@ export function useFetch<
             cachingDatas,
           );
         }
-        // Also expose reshaped data directly to consumers.
+
         setViewData(cachingDatas as TViewData);
 
+        // `cachingDatas` can be any shape (depends on the optional reshaper)
         const maybeItems = (cachingDatas as { items?: unknown })?.items;
         const isEmptyItemsCount = maybeItems === 0;
         const isEmptyItemsArray =
@@ -172,9 +172,9 @@ export function useFetch<
     ...queryParams,
     // raw server response.
     response: queryParams.data,
-    // Convenience shortcut for `response.data`.
-    serverData: queryParams.data?.data,
-    // Override `data` to be the reshaped view data.
+    // Convenience shortcut for `response.data` (not all responses have this).
+    serverData: queryParams.data?.data as TViewData | undefined,
+    // // Quick access to reshaped data.
     data: viewData,
   };
 }
