@@ -301,7 +301,7 @@ export function Modal({
     >
       {children}
       <DialogContent
-        ref={(el) => setRef(el, { modalName })}
+        ref={(el) => setRef?.(el, { modalName })}
         id={modalName}
         data-dialog={modalName}
         className={className}
