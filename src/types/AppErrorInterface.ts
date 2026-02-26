@@ -65,7 +65,9 @@ export type ForbiddenError = ErrorInterface<403>;
 
 export type NotFoundError = ErrorInterface<404>;
 
-export type ConflictError = ErrorInterface<409>;
+export type ConflictError = ErrorInterface<409> & {
+  available?: false;
+};
 
 export type ServerError = ErrorInterface<500> & {
   debugs: ServerErrorDebugs;
