@@ -1,11 +1,11 @@
-import type { ForControllerProps } from "@/components/HOCs/types/for-controller.types";
+import type { withEventEnrichedMetadatasProps } from "@/components/HOCs/types/with-event-enriched-metadatas.types";
 import {
   debugLogs,
-  forControllerContainsInvalid,
+  withEventEnrichedMetadatasContainsInvalid,
 } from "@/configs/app-components.config";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
 import { createNameForHOC } from "@/utils/utils";
-import { useMemo, type ComponentType } from "react";
+import { useMemo, type ComponentType, type MouseEvent } from "react";
 
 /**
  * Higher-order component to pre-configure some components to be ready for use with react-hook-form Controller.
@@ -17,20 +17,23 @@ import { useMemo, type ComponentType } from "react";
  *
  * @returns A new component that is pre-configured for use with react-hook-form Controller.
  */
-export function forController<P>(WrapperComponent: ComponentType<P>) {
-  function Component(props: ForControllerProps<P>) {
+export function withEventEnrichedMetadatas<P extends object>(
+  WrapperComponent: ComponentType<P>,
+) {
+  function Component(props: P & withEventEnrichedMetadatasProps) {
+    if (withEventEnrichedMetadatasContainsInvalid(props)) {
+      debugLogs("[withEventEnrichedMetadatas]");
+    }
+
     const {
-      field,
-      fieldState,
       setRef,
       task,
       apiEndpoint,
       dataReshapeFn,
-      name,
-      id,
       onOpenChange: userOnOpenChange,
       onChange: userOnChange,
       onValueChange: userOnValueChange,
+      onClick: userOnClick,
       ...rest
     } = props;
 
@@ -44,58 +47,46 @@ export function forController<P>(WrapperComponent: ComponentType<P>) {
         task: task ?? "none",
         apiEndpoint,
         dataReshapeFn,
-        name: name ?? field.name,
-        id,
+        name: props.name,
+        id: props.id,
       }),
-      [task, apiEndpoint, dataReshapeFn, name, id, field.name],
+      [task, apiEndpoint, dataReshapeFn, props.name, props.id],
     );
 
-    if (forControllerContainsInvalid(props)) {
-      debugLogs("[forController]");
-      return null;
-    }
-
     const handleChange = (e: unknown) => {
-      field.onChange(e);
       userOnChange?.(e, controllerFieldMeta);
     };
 
-    const handleOnOpenChange = (
-      isOpen: boolean,
-      meta?: CommandHandlerFieldMeta,
-    ) => {
-      userOnOpenChange?.(isOpen, { ...controllerFieldMeta, ...meta });
+    const handleOnOpenChange = (isOpen: boolean) => {
+      userOnOpenChange?.(isOpen, controllerFieldMeta);
     };
 
-    const handleOnValueChange = (
-      value: unknown,
-      meta?: CommandHandlerFieldMeta,
-    ) => {
-      field.onChange(value);
-      userOnValueChange?.(value, {
+    const handleOnValueChange = (value: unknown) => {
+      userOnValueChange?.(value, controllerFieldMeta);
+    };
+
+    const handleOnClick = (e: MouseEvent<HTMLButtonElement>) => {
+      userOnClick?.({
         ...controllerFieldMeta,
-        ...meta,
+        e,
       });
     };
 
     return (
       <WrapperComponent
         {...(rest as P)}
-        {...field}
-        id={id}
-        setRef={(el: Element | null) => {
+        setRef={(el: HTMLElement) => {
           setRef?.(el, controllerFieldMeta);
         }}
         controllerFieldMeta={controllerFieldMeta}
-        value={field.value ?? ""}
         onChange={handleChange}
         onOpenChange={handleOnOpenChange}
         onValueChange={handleOnValueChange}
-        aria-invalid={fieldState.invalid}
+        onClick={handleOnClick}
       />
     );
   }
 
-  createNameForHOC("forController", WrapperComponent, Component);
+  createNameForHOC("withEventEnrichedMetadatas", WrapperComponent, Component);
   return Component;
 }
