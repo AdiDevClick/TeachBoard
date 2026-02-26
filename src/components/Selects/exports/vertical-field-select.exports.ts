@@ -1,5 +1,5 @@
-import { forController } from "@/components/HOCs/forController";
 import withController from "@/components/HOCs/withController";
+import { withEventEnrichedMetadatas } from "@/components/HOCs/withEventEnrichedMetadatas";
 import { withInlineItemAndSwitchSelection } from "@/components/HOCs/withInlineItemAndSwitchSelection";
 import withListMapper from "@/components/HOCs/withListMapper";
 import { WithListings } from "@/components/Selects/helpers/vertical-field-select.helpers";
@@ -13,11 +13,12 @@ import { createComponentName } from "@/utils/utils";
 /**
  * A version that allows it to be used in forms with controller support.
  */
-const VerticalFieldSelectForController = forController(VerticalFieldSelect);
+const VerticalFieldSelectWithEventEnrichedMetadatas =
+  withEventEnrichedMetadatas(VerticalFieldSelect);
 createComponentName(
-  "forController",
-  "VerticalFieldSelectForController",
-  VerticalFieldSelectForController,
+  "withEventEnrichedMetadatas",
+  "VerticalFieldSelectWithEventEnrichedMetadatas",
+  VerticalFieldSelectWithEventEnrichedMetadatas,
 );
 
 /**
@@ -35,7 +36,7 @@ createComponentName(
  * A controller-wrapped version of the VerticalFieldSelect component for use in forms.
  */
 export const VerticalFieldSelectWithController = withController(
-  VerticalFieldSelectForController,
+  VerticalFieldSelectWithEventEnrichedMetadatas,
 );
 createComponentName(
   "withController",
@@ -47,7 +48,7 @@ createComponentName(
  * A version that combines controller support with inline item and switch selection capabilities.
  */
 export const VerticalFieldSelectWithControllerAndInlineSwitch = withController(
-  forController(
+  withEventEnrichedMetadatas(
     withInlineItemAndSwitchSelection(VerticalFieldSelectWithListings),
   ),
 );
