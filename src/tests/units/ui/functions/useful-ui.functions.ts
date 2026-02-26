@@ -58,7 +58,7 @@ export async function clickEnabledButton(name: string | RegExp) {
  * @param opts - Options.
  */
 export async function openModalAndAssertItsOpenedAndReady<
-  T extends InputControllerLike
+  T extends InputControllerLike,
 >(
   name: RegExp | string,
   opts?: {
@@ -66,7 +66,7 @@ export async function openModalAndAssertItsOpenedAndReady<
     controller?: T;
     nameArray?: (string | RegExp)[];
     readyText?: string | RegExp;
-  }
+  },
 ) {
   const defaultNameArray = ["default", "default2"];
   // The creation button lives inside the popover.
@@ -74,13 +74,13 @@ export async function openModalAndAssertItsOpenedAndReady<
     try {
       await openPopoverAndExpectByLabel(
         controllerLabelRegex(opts?.controller as T),
-        opts?.nameArray ?? defaultNameArray
+        opts?.nameArray ?? defaultNameArray,
       );
     } catch {
       // Fall back to opening by trigger if there's no visible label for this controller
       await openPopoverAndExpectByTrigger(
         controllerTriggerRegex(opts?.controller as T),
-        opts?.nameArray ?? defaultNameArray
+        opts?.nameArray ?? defaultNameArray,
       );
     }
   }
@@ -103,7 +103,7 @@ export async function assertLucideIconForOptionInContainer(
   opts: {
     icon: string;
     present: boolean;
-  }
+  },
 ) {
   const container = page.elementLocator(containerEl);
   const option = container.getByRole("option", { name: optionName });
@@ -126,7 +126,7 @@ export async function assertLucideIconForOptionInContainer(
 export async function assertLucideCheckIconInOpenPopover(
   textToCheck: string | RegExp,
   present: boolean,
-  icon: string = "check"
+  icon: string = "check",
 ) {
   const containerEl = getOpenPopoverContent() ?? getOpenDialogContent();
 
@@ -155,7 +155,7 @@ export function codeRx(code: string) {
   // - prevents false-positives like SUB_01 matching inside NET_SUB_01
   return new RegExp(
     String.raw`(?<![A-Z0-9_])${escapeRegExp(code)}(?![A-Z0-9_])`,
-    ""
+    "",
   );
 }
 
@@ -166,7 +166,7 @@ export function codeRx(code: string) {
 export async function clickControlAndWaitForDialog(
   label: RegExp,
   dialogText: string | RegExp,
-  opts?: { withinDialog?: boolean; timeout?: number }
+  opts?: { withinDialog?: boolean; timeout?: number },
 ) {
   await clickControlByLabelText(label, { withinDialog: opts?.withinDialog });
   await waitForDialogAndAssertText(dialogText, {
@@ -184,7 +184,7 @@ export async function clickControlAndWaitForDialog(
 export async function clickTriggerAndWaitForPopoverState(
   trigger: RegExp,
   expectedOpen = false,
-  timeout = 500
+  timeout = 500,
 ) {
   await clickEnabledButton(trigger);
   await waitForPopoverState(expectedOpen, timeout);
