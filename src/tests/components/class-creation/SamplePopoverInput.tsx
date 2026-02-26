@@ -56,18 +56,16 @@ export function SamplePopoverInput({
     ...controller,
     apiEndpoint:
       typeof controller.apiEndpoint === "function" && selectedDiploma?.id
-        ? (controller.apiEndpoint as (_id: string) => unknown)(
-            selectedDiploma.id,
-          )
+        ? controller.apiEndpoint(selectedDiploma.id)
         : controller.apiEndpoint,
   };
 
   return (
     <PopoverFieldWithCommands
-      {...(resolvedController as Record<string, unknown>)}
+      {...resolvedController}
       commandHeadings={resultsCallback()}
       onOpenChange={openingCallback}
-      onAddNewItem={handleAddNew}
+      onClick={handleAddNew}
       onSelect={onSelect}
     />
   );
