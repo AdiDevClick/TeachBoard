@@ -4,6 +4,24 @@ import type { FieldTypes } from "@/types/MainTypes";
 import type { MouseEvent } from "react";
 import type { FieldValues } from "react-hook-form";
 
+export type OnClickWithMeta = (
+  meta: CommandHandlerFieldMeta & { e: MouseEvent<HTMLButtonElement> },
+) => void;
+
+export type OnOpenChangeWithMeta = (
+  isOpen: boolean,
+  meta: CommandHandlerFieldMeta,
+) => void;
+
+export type OnValueChangeWithMeta = (
+  value: unknown,
+  meta: CommandHandlerFieldMeta,
+) => void;
+
+export type OnChangeWithMeta = (
+  e: unknown,
+  meta: CommandHandlerFieldMeta,
+) => void;
 /**
  * Props type for components wrapped with `withController`.  This includes the props of the wrapped component
  */
@@ -18,12 +36,10 @@ export type WithEventEnrichedMetadatasProps = Partial<FieldTypes<FieldValues>> &
   UseMutationObserverReturn &
   Partial<CommandHandlerFieldMeta> &
   Partial<{
-    onChange: (e: unknown, meta?: CommandHandlerFieldMeta) => void;
-    onValueChange: (value: unknown, meta?: CommandHandlerFieldMeta) => void;
-    onOpenChange: (open: boolean, meta?: CommandHandlerFieldMeta) => void;
-    onClick: (
-      meta: CommandHandlerFieldMeta & { e: MouseEvent<HTMLButtonElement> },
-    ) => void;
+    onChange: OnChangeWithMeta;
+    onValueChange: OnValueChangeWithMeta;
+    onOpenChange: OnOpenChangeWithMeta;
+    onClick: OnClickWithMeta;
     /**
      * Meta object computed by the controller HOC. Components may choose to
      * ignore it or use it instead of computing their own local metadata.
