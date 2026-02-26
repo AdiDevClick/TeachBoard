@@ -5,7 +5,12 @@ import {
 } from "@/configs/app-components.config";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
 import { createNameForHOC } from "@/utils/utils";
-import { useMemo, type ComponentType, type MouseEvent } from "react";
+import {
+  useMemo,
+  type ComponentProps,
+  type ComponentType,
+  type MouseEvent,
+} from "react";
 
 /**
  * Higher-order component to pre-configure some components to be ready for use with react-hook-form Controller.
@@ -17,10 +22,12 @@ import { useMemo, type ComponentType, type MouseEvent } from "react";
  *
  * @returns A new component that is pre-configured for use with react-hook-form Controller.
  */
-export function withEventEnrichedMetadatas<P extends object>(
+export function withEventEnrichedMetadatas<P extends ComponentType<any>>(
   WrapperComponent: ComponentType<P>,
 ) {
-  function Component(props: P & WithEventEnrichedMetadatasProps) {
+  function Component(
+    props: ComponentProps<P> & WithEventEnrichedMetadatasProps,
+  ) {
     if (withEventEnrichedMetadatasContainsInvalid(props)) {
       debugLogs("[withEventEnrichedMetadatas]");
     }
@@ -74,7 +81,7 @@ export function withEventEnrichedMetadatas<P extends object>(
 
     return (
       <WrapperComponent
-        {...(rest as P)}
+        {...(rest as ComponentProps<P>)}
         setRef={(el: HTMLElement) => {
           setRef?.(el, controllerFieldMeta);
         }}
