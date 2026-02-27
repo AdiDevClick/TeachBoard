@@ -1,9 +1,12 @@
 import { CommandItems } from "@/components/Command/CommandItems";
-import type { CommandsProps } from "@/components/Command/types/command.types";
+import type { ComboProps } from "@/components/Command/types/command.types";
 import { Command, CommandDialog } from "@/components/ui/command";
 import { createComponentName, createNameForHOC } from "@/utils/utils";
 import type { ComponentProps, ComponentType } from "react";
 
+/**
+ * HOC to wrap a component with CommandDialog, providing dialog functionalities.
+ */
 function withDialog(WrappedComponent: ComponentType) {
   function DialogComponent(props: ComponentProps<typeof WrappedComponent>) {
     return (
@@ -16,11 +19,20 @@ function withDialog(WrappedComponent: ComponentType) {
   return DialogComponent;
 }
 
-function withComboBox(WrappedComponent: ComponentType) {
-  function ComboBoxComponent(props: CommandsProps) {
+/**
+ * HOC to wrap a component with Command, providing ComboBox functionalities.
+ *
+ * @param filter - The filter function to be passed to the Command component, enabling ComboBox features.
+ */
+export function withComboBox<P extends object>(
+  WrappedComponent: ComponentType<P>,
+) {
+  function ComboBoxComponent(props: ComboProps<P>) {
+    const { filter, ...rest } = props;
+
     return (
-      <Command filter={props.filter}>
-        <WrappedComponent {...props} />
+      <Command filter={filter}>
+        <WrappedComponent {...(rest as P)} />
       </Command>
     );
   }
