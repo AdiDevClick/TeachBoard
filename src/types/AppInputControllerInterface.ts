@@ -3,14 +3,12 @@ import type { AppModalNames } from "@/configs/app.config.ts";
 import type { HTMLInputTypeAttribute } from "react";
 import type { FieldValues, Path } from "react-hook-form";
 
-/* eslint-disable no-unused-vars */
 export type ApiEndpointType = string | ((id: number | string) => string);
 // NOTE: this intentionally uses a bivariant function type so endpoint reshapers
 // with specific first parameter types (e.g. `DegreesFetch`) remain assignable here.
 export type DataReshapeFn = {
   bivarianceHack(data: unknown, ...args: unknown[]): unknown;
 }["bivarianceHack"];
-/* eslint-enable no-unused-vars */
 
 /**
  * Shared metadata for inputs/selects/popovers that fetch or reshape data.
@@ -46,7 +44,7 @@ type AppInputControllerLabel =
 type AppInputControllerOptions = {
   useButtonAddNew?: boolean;
   fullWidth?: boolean;
-  creationButtonText?: string | boolean;
+  creationButtonText?: string;
   toolTipText?: string;
   multiSelection?: boolean;
 };
