@@ -1,22 +1,26 @@
 import { CommandItemsForComboBox } from "@/components/Command/exports/command-items.exports";
-import type { CommandsProps } from "@/components/Command/types/command.types.ts";
+import type {
+  WithComboBoxCommandsBaseProps,
+  WithComboBoxCommandsResultProps,
+} from "@/components/HOCs/types/with-combo-box-commands.types";
 import { Button } from "@/components/ui/button.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
+import { createNameForHOC } from "@/utils/utils";
 import { PlusIcon } from "lucide-react";
-import { createElement, type ComponentProps, type ComponentType } from "react";
+import { createElement, type ComponentType } from "react";
 
 /**
- * HOC to add CommandItems and an optional "Add New" button to a component.
- *
- * @param Wrapped - The component to be wrapped with command functionalities.
+ * HOC to add command‑panel functionality to a base component.
+ * The resulting component accepts the original props of `Wrapped` plus the
+ * extras defined in `WithComboBoxCommandsExtra`.
  */
-function withComboBoxCommands<P extends ComponentType<any>>(Wrapped: P) {
-  return function Component(props: ComponentProps<P> & CommandsProps) {
+function withComboBoxCommands<P extends object>(Wrapped: ComponentType<P>) {
+  function Component(props: WithComboBoxCommandsResultProps<P>) {
     const {
-      useCommands,
+      useCommands = true,
       children,
-      creationButtonText,
-      useButtonAddNew,
+      creationButtonText = "Add New",
+      useButtonAddNew = false,
       onClick,
       controllerFieldMeta,
       ...rest
@@ -26,15 +30,14 @@ function withComboBoxCommands<P extends ComponentType<any>>(Wrapped: P) {
 
     return createElement(
       Wrapped,
-      {
-        ...rest,
-      } as ComponentProps<P>,
+      rest as P,
       <>
         {children}
         {useCommands && (
-          <CommandItemsForComboBox {...(rest as CommandsProps)} />
+          <CommandItemsForComboBox
+            {...(rest as WithComboBoxCommandsBaseProps)}
+          />
         )}
-
         {useButtonAddNew && effectiveTask && (
           <>
             <Separator />
@@ -50,7 +53,10 @@ function withComboBoxCommands<P extends ComponentType<any>>(Wrapped: P) {
         )}
       </>,
     );
-  };
+  }
+
+  createNameForHOC("withComboBoxCommands", Wrapped, Component);
+  return Component;
 }
 
 export default withComboBoxCommands;
