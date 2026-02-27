@@ -1,8 +1,11 @@
 import type { UUID } from "@/api/types/openapi/common.types";
-import type { SelectContent, SelectItem } from "@/components/ui/select.tsx";
+import type {
+  Select,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select.tsx";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types";
-import type { AppInputControllerMeta } from "@/types/AppInputControllerInterface";
 import type { FieldTypes } from "@/types/MainTypes";
 import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
 import type {
@@ -23,17 +26,7 @@ export type VerticalFieldState = {
   command?: boolean;
 };
 
-export type SelectRootProps = {
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
-  onOpenChange?: (open: boolean) => void;
-  open?: boolean;
-  disabled?: boolean;
-  required?: boolean;
-  name?: string;
-  dir?: "ltr" | "rtl";
-};
+export type SelectRootProps = ComponentProps<typeof Select>;
 
 export type VerticalRefSetters = {
   /** Underlying props for the select */
@@ -84,14 +77,13 @@ export type VerticalSelectProps = Omit<SelectRootProps, "onValueChange"> & {
   fullWidth?: boolean;
   className?: string;
   side?: ComponentProps<typeof SelectContent>["side"];
-  id?: UUID | string;
+  id?: string | UUID;
   /**
    * Allow value-change handlers that accept extra args.
    * The underlying Select will still call it with a single `value`.
    */
   onValueChange?: (value: string, meta?: VerticalSelectMetaData) => void;
-} & AppInputControllerMeta &
-  UseMutationObserverReturn &
+} & UseMutationObserverReturn &
   PropsWithChildren;
 
 type LabelledGroupBaseProps<T> = {
