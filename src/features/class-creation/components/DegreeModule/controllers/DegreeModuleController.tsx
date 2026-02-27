@@ -86,9 +86,11 @@ export function DegreeModuleController({
     );
   };
 
+  // split the array elements so we can omit the `id` when sending props to
+  // <PopoverFieldWithCommands>, which requires a branded UUID type.
   const controllers = {
-    dynamicTagsList: inputControllers[2],
-    controlledInputsList: inputControllers.slice(0, 2),
+    controlledInputsControllers: inputControllers.slice(0, 2),
+    dynamicTagsController: inputControllers[2],
   };
 
   const sharedCallbacksMemo = useMemo(() => {
@@ -107,23 +109,22 @@ export function DegreeModuleController({
     >
       <ControlledInputList
         {...sharedCallbacksMemo.commonObsProps}
-        items={controllers.controlledInputsList}
-        form={form}
+        items={controllers.controlledInputsControllers}
+        control={form.control}
       />
       <ControlledDynamicTagList
-        form={form}
-        {...controllers.dynamicTagsList}
+        control={form.control}
+        {...controllers.dynamicTagsController}
         {...sharedCallbacksMemo.commonObsProps}
         itemList={currentSkills as DynamicTagsItemList}
       />
       <PopoverFieldWithCommands
         multiSelection
-        {...sharedCallbacksMemo.commonObsProps}
         onSelect={handleCommandSelection}
         onOpenChange={openingCallback}
         onClick={newItemCallback}
         commandHeadings={resultsCallback()}
-        {...controllers.dynamicTagsList}
+        {...controllers.dynamicTagsController}
       />
     </form>
   );

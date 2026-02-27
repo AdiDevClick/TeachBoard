@@ -53,7 +53,7 @@ export function DegreeModuleSkillController({
     >
       <ControlledInputList
         items={inputControllers}
-        form={form}
+        control={form.control}
         setRef={setRef}
         observedRefs={observedRefs}
       />

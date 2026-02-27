@@ -119,7 +119,7 @@ export function DiplomaCreationController({
     >
       <PopoverFieldWithControllerAndCommandsList
         items={controllers.popoverControllers}
-        form={form}
+        control={form.control}
         commandHeadings={resultsCallback()}
         onSelect={onSelectHandler}
         onOpenChange={openingCallback}
@@ -128,7 +128,7 @@ export function DiplomaCreationController({
         onClick={newItemCallback}
       />
       <ControlledDynamicTagList
-        form={form}
+        control={form.control}
         setRef={setRef}
         {...controllers.tagListController}
         observedRefs={observedRefs}

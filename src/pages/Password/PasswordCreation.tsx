@@ -126,7 +126,10 @@ export function PasswordCreation({
                 className="grid gap-4"
               >
                 <FieldGroup>
-                  <ControlledInputList items={inputControllers} form={form} />
+                  <ControlledInputList
+                    items={inputControllers}
+                    control={form.control}
+                  />
                   <Field>
                     <Button
                       form={formId}
