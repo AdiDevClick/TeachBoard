@@ -5,12 +5,14 @@
 
 import { LoginButton } from "@/components/Buttons/LoginButton";
 import withListMapper from "@/components/HOCs/withListMapper";
+import { createComponentName } from "@/utils/utils";
 import { lazy } from "react";
 
 /**
  * Exporting the LoginButton component wrapped with the withListMapper HOC for use in lists.
  */
 export const LoginButtonList = withListMapper(LoginButton);
+createComponentName("withListMapper", "LoginButtonList", LoginButtonList);
 
 /**
  * LAZY-LOADED VERSIONS
@@ -27,3 +29,8 @@ export const LazyLoginButton = lazy(async () => {
  * Exporting the lazy-loaded version of the LoginButton component wrapped with the withListMapper HOC for use in lists.
  */
 export const LazyLoginButtonList = withListMapper(LazyLoginButton);
+createComponentName(
+  "withListMapper",
+  "LazyLoginButtonList",
+  LazyLoginButtonList,
+);
