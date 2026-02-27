@@ -12,10 +12,12 @@ export type InlineItemAndSwitchSelectionPayload = {
 /**
  * Expected props for withInlineItemAndSwitchSelection HOC.
  */
-export type InlineItemAndSwitchSelectionProps =
-  InlineItemAndSwitchSelectionPayload & {
-    onSwitchClick?: (
-      e: MouseEvent<HTMLButtonElement>,
-      payload: InlineItemAndSwitchSelectionPayload,
-    ) => void;
-  };
+export type InlineItemAndSwitchSelectionProps = Omit<
+  InlineItemAndSwitchSelectionPayload,
+  "setIsSelected"
+> & {
+  onSwitchClick?: (
+    e: MouseEvent<HTMLButtonElement>,
+    payload: InlineItemAndSwitchSelectionPayload,
+  ) => void;
+};
