@@ -33,6 +33,7 @@ export const classCreationInputControllers = [
     useButtonAddNew: true,
     useCommands: true,
     creationButtonText: "Ajouter une tâche",
+    multiSelection: true,
   },
   {
     // Required for withController to be able to process the field
@@ -79,7 +80,7 @@ export const classCreationInputControllers = [
     type: "text",
     placeholder: defaultSchoolYear,
     defaultValue: defaultSchoolYear,
-    creationButtonText: false,
+    // creationButtonText: false,
     useCommands: false,
     fullWidth: false,
     useButtonAddNew: false,
