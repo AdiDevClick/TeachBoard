@@ -49,7 +49,7 @@ export function TaskItemController({
     >
       <ControlledInputList
         items={inputControllers}
-        form={form}
+        control={form.control}
         setRef={setRef}
         observedRefs={observedRefs}
       />

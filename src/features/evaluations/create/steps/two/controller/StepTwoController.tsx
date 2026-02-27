@@ -137,7 +137,7 @@ export function StepTwoController({
         items={preparedStudentsTasksSelection}
         setRef={setRef}
         observedRefs={observedRefs}
-        form={form}
+        control={form.control}
         {...inputControllers[0]}
         onOpenChange={handleOpening}
         onValueChange={handleOnSelect}
