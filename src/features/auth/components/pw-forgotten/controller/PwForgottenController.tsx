@@ -106,7 +106,7 @@ export function PwForgottenController(props: PwForgottenControllerProps) {
         <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
           Ou continuez avec
         </FieldSeparator>
-        <ControlledInputList items={inputControllers} form={form} />
+        <ControlledInputList items={inputControllers} control={form.control} />
       </FieldGroup>
     </form>
   );

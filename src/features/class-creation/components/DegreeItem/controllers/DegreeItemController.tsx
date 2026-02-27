@@ -78,7 +78,7 @@ export function DegreeItemController({
     >
       <ControlledInputList
         items={inputControllers}
-        form={form}
+        control={form.control}
         setRef={setRef}
         observedRefs={observedRefs}
       />

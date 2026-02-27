@@ -156,7 +156,7 @@ export const labelledTextAreaContainsInvalid = (props: LabelledTextAreaProps) =>
  *
  * {@link import("@/components/HOCs/withController.tsx").default}
  */
-const CONTROLLER_REQUIRES = ["form", "name"];
+const CONTROLLER_REQUIRES = ["control", "name"];
 
 export const controllerPropsInvalid = (props: AnyObjectProps) =>
   checkPropsValidity(props, CONTROLLER_REQUIRES, []);
