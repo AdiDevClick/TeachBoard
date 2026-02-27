@@ -9,6 +9,8 @@ import {
 } from "@/configs/app-components.config";
 import type { ComponentType } from "react";
 
+type Props<C extends object> = C & PropsWithListings<NonLabelledGroupItemProps>;
+
 /**
  * Higher-Order Component - WithListings
  *
@@ -22,9 +24,7 @@ import type { ComponentType } from "react";
  * @returns A new component with listing capabilities
  */
 export function WithListings<C extends object>(Wrapped: ComponentType<C>) {
-  return function Component(
-    props: C & PropsWithListings<NonLabelledGroupItemProps>,
-  ) {
+  return function Component(props: Props<C>) {
     if (withListingsPropsInvalid(props)) {
       debugLogs(
         "[WithListings for VerticalFieldSelect] - invalid items provided",
