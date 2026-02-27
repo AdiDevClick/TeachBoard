@@ -1,4 +1,4 @@
-import type { WithEventEnrichedMetadatasProps } from "@/components/HOCs/types/with-event-enriched-metadatas.types";
+import type { WithEnrichedProps } from "@/components/HOCs/types/with-event-enriched-metadatas.types";
 import {
   debugLogs,
   withEventEnrichedMetadatasContainsInvalid,
@@ -7,7 +7,7 @@ import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command
 import { createNameForHOC } from "@/utils/utils";
 import {
   useMemo,
-  type ComponentProps,
+  type ChangeEvent,
   type ComponentType,
   type MouseEvent,
 } from "react";
@@ -15,19 +15,24 @@ import {
 /**
  * Higher-order component to pre-configure some components to be ready for use with react-hook-form Controller.
  *
- * @param WrapperComponent - The component to wrap with Controller integration.
- * @param field - The field props from react-hook-form Controller.
- * @param fieldState - The field state from react-hook-form Controller.
- * @param props - Other props to pass to the wrapped component.
+ * @param WrapperComponent - The component to wrap with Controller integration.Controller.Controller.
+ * @param apiEndpoint - The API endpoint to be used for the command handler metadata enrichment.
+ * @param dataReshapeFn - The function to reshape data before submission, to be used for the command handler metadata enrichment.
+ * @param task - The task name to be used for the command handler metadata enrichment.
+ * @param setRef - The ref setter function to be used for the command handler metadata enrichment.
+ * @param name - The name of the field to be controlled, to be used for the command handler metadata enrichment.
+ * @param id - The id of the field to be controlled, to be used for the command handler metadata enrichment.
+ * @param onChange - The change event handler to be called with enriched metadata when the controlled component's value changes.
+ * @param onOpenChange - The open change event handler to be called with enriched metadata when the controlled component's open state changes (e.g., for dropdowns).
+ * @param onValueChange - The value change event handler to be called with enriched metadata when the controlled component's value changes (debounced).
+ * @param onClick - The click event handler to be called with enriched metadata when the controlled component is clicked.
  *
  * @returns A new component that is pre-configured for use with react-hook-form Controller.
  */
-export function withEventEnrichedMetadatas<P extends ComponentType<any>>(
+export function withEventEnrichedMetadatas<P extends object>(
   WrapperComponent: ComponentType<P>,
 ) {
-  function Component(
-    props: ComponentProps<P> & WithEventEnrichedMetadatasProps,
-  ) {
+  function Component(props: WithEnrichedProps<P>) {
     if (withEventEnrichedMetadatasContainsInvalid(props)) {
       debugLogs("[withEventEnrichedMetadatas]");
     }
@@ -60,7 +65,7 @@ export function withEventEnrichedMetadatas<P extends ComponentType<any>>(
       [task, apiEndpoint, dataReshapeFn, props.name, props.id],
     );
 
-    const handleChange = (e: unknown) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
       userOnChange?.(e, controllerFieldMeta);
     };
 
@@ -79,19 +84,19 @@ export function withEventEnrichedMetadatas<P extends ComponentType<any>>(
       });
     };
 
-    return (
-      <WrapperComponent
-        {...(rest as ComponentProps<P>)}
-        setRef={(el: HTMLElement) => {
-          setRef?.(el, controllerFieldMeta);
-        }}
-        controllerFieldMeta={controllerFieldMeta}
-        onChange={handleChange}
-        onOpenChange={handleOnOpenChange}
-        onValueChange={handleOnValueChange}
-        onClick={handleOnClick}
-      />
-    );
+    const wrapperProps = {
+      ...rest,
+      setRef: (el: HTMLElement) => {
+        setRef?.(el, controllerFieldMeta);
+      },
+      controllerFieldMeta,
+      onChange: handleChange,
+      onOpenChange: handleOnOpenChange,
+      onValueChange: handleOnValueChange,
+      onClick: handleOnClick,
+    };
+
+    return <WrapperComponent {...(wrapperProps as P)} />;
   }
 
   createNameForHOC("withEventEnrichedMetadatas", WrapperComponent, Component);
