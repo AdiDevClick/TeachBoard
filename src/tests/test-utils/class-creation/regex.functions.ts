@@ -11,7 +11,7 @@ export type InputControllerLike = {
   dataReshapeFn?: unknown;
   useCommands?: boolean;
   useButtonAddNew?: boolean;
-  creationButtonText?: string | false;
+  creationButtonText?: string;
 };
 
 export function controllerLabel(controller: InputControllerLike): string {
@@ -20,7 +20,7 @@ export function controllerLabel(controller: InputControllerLike): string {
 
 export function controllerTriggerText(controller: InputControllerLike): string {
   const raw = String(
-    controller.placeholder ?? controller.label ?? controller.title ?? ""
+    controller.placeholder ?? controller.label ?? controller.title ?? "",
   ).trim();
 
   // Avoid brittle matching on ellipsis differences ("..." vs "…").
@@ -28,7 +28,7 @@ export function controllerTriggerText(controller: InputControllerLike): string {
 }
 
 export function controllerTriggerRegex(
-  controller: InputControllerLike
+  controller: InputControllerLike,
 ): RegExp {
   const text = controllerTriggerText(controller);
   if (!text) return /.+/i;
