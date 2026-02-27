@@ -122,6 +122,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
       },
     ],
   };
+
   const sharedCallbacksMemo = useMemo(() => {
     const sharedCallbacks = {
       onOpenChange: handleOpening,
@@ -148,14 +149,14 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
       className={className}
     >
       <ControlledInputList
-        form={form}
+        control={form.control}
         items={controllers.controlledInputsControllers}
         setRef={setRef}
         onChange={handleClassNameChange}
       />
       <PopoverFieldWithControllerAndCommandsList
         items={controllers.popoverControllers}
-        form={form}
+        control={form.control}
         {...sharedCallbacksMemo.all}
         commandHeadings={resultsCallback()}
       />
@@ -166,7 +167,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
       />
       <Activity mode={isSelectedDiploma ? "visible" : "hidden"}>
         <ControlledDynamicTagList
-          form={form}
+          control={form.control}
           {...sharedCallbacksMemo.commonObsProps}
           {...controllers.dynamicListControllers}
           itemList={tasksValues}
@@ -184,7 +185,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
       <VerticalFieldSelectWithController
         {...sharedCallbacksMemo.commonObsProps}
         name="schoolYear"
-        form={form}
+        control={form.control}
         fullWidth={false}
         placeholder={"defaultSchoolYear"}
         defaultValue={defaultSchoolYear}

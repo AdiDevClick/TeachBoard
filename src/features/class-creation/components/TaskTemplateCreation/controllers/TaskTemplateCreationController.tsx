@@ -214,7 +214,7 @@ export function TaskTemplateCreationController({
     >
       <ControlledInputList
         items={controllers.inputsControllers}
-        form={form}
+        control={form.control}
         setRef={setRef}
         observedRefs={observedRefs}
       />
@@ -225,7 +225,7 @@ export function TaskTemplateCreationController({
       />
       <PopoverFieldWithControllerAndCommandsList
         items={controllers.popoverFieldsControllers}
-        form={form}
+        control={form.control}
         setRef={setRef}
         onSelect={handleCommandSelection}
         onOpenChange={openingCallback}
