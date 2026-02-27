@@ -13,10 +13,12 @@ import { useMemo } from "react";
  */
 export function PopoverFieldProvider(props: PopoverFieldContextType) {
   const { onSelect, selectedValue } = props;
+
   const value = useMemo(
     () => ({ onSelect, selectedValue }),
-    [onSelect, selectedValue]
+    [onSelect, selectedValue],
   );
+
   return (
     <PopoverFieldContext.Provider value={value}>
       {props.children}
