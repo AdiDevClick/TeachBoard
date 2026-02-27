@@ -1,5 +1,6 @@
 import { AppBreadCrumb } from "@/components/BreadCrumbs/AppBreadCrumb";
 import withListMapper from "@/components/HOCs/withListMapper";
+import { createComponentName } from "@/utils/utils";
 import { lazy } from "react";
 
 /**
@@ -11,6 +12,7 @@ import { lazy } from "react";
  * Exports for breadcrumb components
  */
 export const BreadCrumbsList = withListMapper(AppBreadCrumb);
+createComponentName("withListMapper", "BreadCrumbsList", BreadCrumbsList);
 
 /**
  * LAZY-LOADED COMPONENTS
