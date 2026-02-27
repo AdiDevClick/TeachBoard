@@ -1,7 +1,9 @@
 import type { Input } from "@/components/ui/input";
 import type { ComponentProps } from "react";
 
-/**
- * HOC component type that wraps a component with react-hook-form Controller.
- */
-export type LabelledInputProps = Readonly<ComponentProps<typeof Input>>;
+type SelfProps = { title?: string };
+
+/** Props accepted by the `LabelledInput` component. */
+export type LabelledInputProps = Readonly<
+  Omit<ComponentProps<typeof Input>, keyof SelfProps> & SelfProps
+>;
