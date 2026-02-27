@@ -4,6 +4,7 @@ import type { AppModalNames } from "@/configs/app.config.ts";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import type { AppInputControllerMeta } from "@/types/AppInputControllerInterface";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 import type { MouseEvent, PointerEvent } from "react";
 import type { FieldValues, Path, UseFormReturn } from "react-hook-form";
 
@@ -47,15 +48,14 @@ export type InferViewData<TRoute, TSubmitReshapeFn> =
 /**
  * Shared metadata shape passed around by command controllers.
  */
-export type CommandHandlerMetaData = Record<string, unknown> &
-  AppInputControllerMeta;
+export type CommandHandlerMetaData = AnyObjectProps & AppInputControllerMeta;
 
 /**
  * Shared metadata shape with common field identifiers.
  */
 export type CommandHandlerFieldMeta = CommandHandlerMetaData & {
   name?: string;
-  id?: UUID;
+  id?: UUID | string;
 };
 
 /**
