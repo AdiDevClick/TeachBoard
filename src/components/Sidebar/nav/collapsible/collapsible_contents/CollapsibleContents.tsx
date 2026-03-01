@@ -1,4 +1,4 @@
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { ListMapper } from "@/components/Lists/ListMapper";
 import { SubMenuButton } from "@/components/Sidebar/nav/elements/sub_menu_button/SubMenuButton.tsx";
 import type { CollapsibleContentsProps } from "@/components/Sidebar/nav/types/NavTypes.ts";
 import { SidebarMenuSub } from "@/components/ui/sidebar.tsx";

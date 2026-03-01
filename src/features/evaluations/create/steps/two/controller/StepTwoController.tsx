@@ -1,6 +1,6 @@
 import { UUID_SCHEMA, type UUID } from "@/api/types/openapi/common.types.ts";
 import type { InlineItemAndSwitchSelectionPayload } from "@/components/HOCs/types/with-inline-item-and-switch.types.ts";
-import { VerticalFieldWithInlineSwitchList } from "@/components/Selects/exports/vertical-field-select.exports";
+import { InlineSwitchList } from "@/components/Selects/exports/vertical-field-select.exports";
 import type { VerticalSelectMetaData } from "@/components/Selects/types/select.types.ts";
 import { debugLogs } from "@/configs/app-components.config";
 import type { StepTwoControllerProps } from "@/features/evaluations/create/steps/two/types/step-two.types.ts";
@@ -133,7 +133,7 @@ export function StepTwoController({
 
   return (
     <form id={formId} className={className}>
-      <VerticalFieldWithInlineSwitchList
+      <InlineSwitchList
         items={preparedStudentsTasksSelection}
         setRef={setRef}
         observedRefs={observedRefs}
