@@ -1,4 +1,4 @@
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { ListMapper } from "@/components/Lists/ListMapper";
 import { ModalWithSimpleAlert } from "@/components/Modal/exports/modal.exports";
 import { Modal } from "@/components/Modal/Modal.tsx";
 import { inputSignupControllers } from "@/data/inputs-controllers.data.ts";
