@@ -31,7 +31,7 @@ src/tests/units/ui/__screenshots__
 package-lock.json
 
 # TS files
-*.d.ts
+# *.d.ts
 
 # Env files
 .env.prod
