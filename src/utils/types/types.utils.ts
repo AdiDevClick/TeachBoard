@@ -117,6 +117,12 @@ export type OwnProps<T> = {
 };
 
 /**
+ * Helper type to extract only the non-function properties of a type, useful for distinguishing between value props and callback props in our HOCs.
+ */
+export type NonFunctionValue<T> = T extends (...args: unknown[]) => unknown
+  ? never
+  : T;
+/**
  * Strict version of an object type that forbids any additional properties.
  *
  * This is useful for our HOCs where we want the wrapped component to reject
@@ -154,7 +160,7 @@ export type ComponentLike<P = unknown> =
  * Useful for React callback props where callers may pass subtypes
  * (e.g. `DetailedCommandItem` where `CommandItemType` is expected).
  */
-export type BivariantCallback<T extends (...args: any[]) => any> = {
+export type BivariantCallback<T extends (...args: unknown[]) => any> = {
   bivarianceHack(...args: Parameters<T>): ReturnType<T>;
 }["bivarianceHack"];
 
