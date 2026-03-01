@@ -1,8 +1,5 @@
 import { CommandItemsForComboBox } from "@/components/Command/exports/command-items.exports";
-import type {
-  WithComboBoxCommandsBaseProps,
-  WithComboBoxCommandsResultProps,
-} from "@/components/HOCs/types/with-combo-box-commands.types";
+import type { WithComboBoxCommandsResultProps } from "@/components/HOCs/types/with-combo-box-commands.types";
 import { Button } from "@/components/ui/button.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
 import { createNameForHOC } from "@/utils/utils";
@@ -33,11 +30,7 @@ function withComboBoxCommands<P extends object>(Wrapped: ComponentType<P>) {
       rest as P,
       <>
         {children}
-        {useCommands && (
-          <CommandItemsForComboBox
-            {...(rest as WithComboBoxCommandsBaseProps)}
-          />
-        )}
+        {useCommands && <CommandItemsForComboBox {...rest} />}
         {useButtonAddNew && effectiveTask && (
           <>
             <Separator />

@@ -9,6 +9,7 @@
 
 import type { WithEventEnrichedMetadatasEvents } from "@/components/HOCs/types/with-event-enriched-metadatas.types";
 import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types";
+import type { RemoveStringIndex } from "@/utils/types/types.utils";
 import type { Control } from "react-hook-form";
 
 // the wrapped component to declare its own stricter fields if needed.
@@ -35,7 +36,7 @@ export type WithControllerInjectedProps = {
  */
 
 export type WithControllerProps<P extends object> = Omit<
-  P,
-  keyof WithControllerInjectedProps
+  RemoveStringIndex<P>,
+  keyof WithEventEnrichedMetadatasEvents
 > &
   WithControllerInjectedProps;

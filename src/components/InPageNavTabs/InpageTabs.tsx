@@ -1,5 +1,5 @@
 import type { InpageTabsProps } from "@/components/InPageNavTabs/types/navtabs.types.ts";
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { ListMapper } from "@/components/Lists/ListMapper";
 import VerticalFieldSelect from "@/components/Selects/VerticalFieldSelect";
 import { SelectGroup, SelectItem } from "@/components/ui/select.tsx";
 import { useSidebar } from "@/components/ui/sidebar.tsx";

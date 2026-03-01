@@ -1,4 +1,4 @@
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { ListMapper } from "@/components/Lists/ListMapper";
 import type { LabelledGroupProps } from "@/components/Selects/types/select.types.ts";
 import { SelectGroup, SelectLabel } from "@/components/ui/select.tsx";
 

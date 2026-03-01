@@ -4,6 +4,7 @@
 
 import type { CommandItemsForComboBox } from "@/components/Command/exports/command-items.exports";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
+import type { RemoveStringIndex } from "@/utils/types/types.utils";
 import type { ComponentProps, MouseEvent, ReactNode } from "react";
 
 /**
@@ -13,6 +14,9 @@ import type { ComponentProps, MouseEvent, ReactNode } from "react";
 export type WithComboBoxCommandsBaseProps = ComponentProps<
   typeof CommandItemsForComboBox
 >;
+
+type WithComboBoxCommandsBaseOwnProps =
+  RemoveStringIndex<WithComboBoxCommandsBaseProps>;
 
 /**
  * Additional options added by the HOC itself.
@@ -36,7 +40,7 @@ export interface WithComboBoxCommandsExtra {
  * Props consumed by the enhanced component returned from the HOC.
  * It combines the command‑widget props with the HOC extras.
  */
-export type WithComboBoxCommandsProps = WithComboBoxCommandsBaseProps &
+export type WithComboBoxCommandsProps = WithComboBoxCommandsBaseOwnProps &
   WithComboBoxCommandsExtra;
 
 /**
@@ -45,7 +49,7 @@ export type WithComboBoxCommandsProps = WithComboBoxCommandsBaseProps &
  * dropping any properties on `P` that would conflict with the HOC.
  */
 export type WithComboBoxCommandsResultProps<P extends object> = Omit<
-  P,
+  RemoveStringIndex<P>,
   keyof WithComboBoxCommandsProps
 > &
-  WithComboBoxCommandsProps;
+  (WithComboBoxCommandsBaseOwnProps & WithComboBoxCommandsExtra);
