@@ -48,7 +48,7 @@ export const diplomaCreationInputControllers = [
     task: "new-degree-module",
     name: "modulesList",
     title: "Modules",
-    type: "button",
+    // type: "button",
     useButtonAddNew: true,
     creationButtonText: "Ajouter un module",
     useCommands: true,
