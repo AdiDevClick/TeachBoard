@@ -35,7 +35,14 @@ createComponentName(
 /**
  *  A version of the LabelledInput component that is integrated with react-hook-form Controller and enhanced with list mapping capabilities.
  */
+/**
+ * A list‑mapped version of the controlled labelled input.
+ * we annotate it loosely – the HOC is a generic wrapper that can accept
+ * arbitrary props, and letting inference run produces a type that exceeds
+ * the compiler’s serialization limit.
+ */
 export const ControlledInputList = withListMapper(ControlledLabelledInput);
+
 createComponentName(
   "withListMapper",
   "ControlledInputList",

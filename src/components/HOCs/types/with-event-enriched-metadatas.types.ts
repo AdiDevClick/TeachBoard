@@ -3,6 +3,7 @@ import type {
   HandleAddNewItemParams,
 } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types";
+import type { RemoveStringIndex } from "@/utils/types/types.utils";
 import type { ChangeEvent } from "react";
 
 export type OnClickWithMeta = (params: HandleAddNewItemParams) => void;
@@ -41,16 +42,24 @@ export type WithEventEnrichedMetadatasEvents = {
   onClick?: OnClickWithMeta;
 };
 
+type CommandHandlerFieldMetaOwnProps = Pick<
+  CommandHandlerFieldMeta,
+  "task" | "apiEndpoint" | "dataReshapeFn" | "name" | "id"
+>;
+
 /**
  * Props type for components wrapped with `withEventEnrichedMetadatas`.  This includes the props of the wrapped component
  */
 export type WithEventEnrichedMetadatasProps = UseMutationObserverReturn &
-  CommandHandlerFieldMeta &
+  CommandHandlerFieldMetaOwnProps &
   WithEventEnrichedMetadatasEvents;
 
 /**
  * The props accepted by the component returned by `withEventEnrichedMetadatas`.  This includes the original props of the wrapped component (P) plus the enrichment props defined in `WithEventEnrichedMetadatasProps`.
  */
-export type WithEnrichedProps<P extends object> =
-  WithEventEnrichedMetadatasProps &
-    Omit<P, keyof WithEventEnrichedMetadatasProps>;
+
+export type WithEnrichedProps<P extends object> = Omit<
+  RemoveStringIndex<P>,
+  keyof WithEventEnrichedMetadatasEvents
+> &
+  WithEventEnrichedMetadatasProps;

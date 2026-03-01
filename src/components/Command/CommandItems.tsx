@@ -3,7 +3,7 @@ import type {
   CommandItemType,
   CommandsProps,
 } from "@/components/Command/types/command.types.ts";
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { ListMapper } from "@/components/Lists/ListMapper";
 import {
   CommandEmpty,
   CommandGroup,
