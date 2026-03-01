@@ -24,8 +24,7 @@ createComponentName(
 /**
  * A version that includes listing capabilities, allowing it to display a list of items.
  */
-export const VerticalFieldSelectWithListings =
-  WithListings(VerticalFieldSelect);
+const VerticalFieldSelectWithListings = WithListings(VerticalFieldSelect);
 createComponentName(
   "WithListings",
   "VerticalFieldSelectWithListings",
@@ -47,7 +46,7 @@ createComponentName(
 /**
  * A version that combines controller support with inline item and switch selection capabilities.
  */
-export const VerticalFieldSelectWithControllerAndInlineSwitch = withController(
+const VerticalFieldSelectWithControllerAndInlineSwitch = withController(
   withEventEnrichedMetadatas(
     withInlineItemAndSwitchSelection(VerticalFieldSelectWithListings),
   ),
@@ -61,11 +60,7 @@ createComponentName(
 /**
  * A version that maps a list of items to the VerticalFieldSelect component with inline switch selection.
  */
-export const VerticalFieldWithInlineSwitchList = withListMapper(
+export const InlineSwitchList = withListMapper(
   VerticalFieldSelectWithControllerAndInlineSwitch,
 );
-createComponentName(
-  "withListMapper",
-  "VerticalFieldWithInlineSwitchList",
-  VerticalFieldWithInlineSwitchList,
-);
+createComponentName("withListMapper", "InlineSwitchList", InlineSwitchList);
