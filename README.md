@@ -1006,7 +1006,15 @@ function MyForm({ form }) {
 ```
 - **Patterns :**
   - **Pattern A (simple) :** wrapper + props minimales
-  - **Pattern B (avec options) :** `controllerProps` pour règles, defaultValue, etc.
+  - **Pattern B (avec options) :** `controllerProps` pour règles, `defaultValue`, etc.  Par exemple : 
+  ```tsx
+  <InputWithController
+    form={form}
+    name="age"
+    defaultValue="18"
+    label="Âge"
+  />
+  ```
 - **Logique abstraite (extrait) :**
 ```tsx
 <Controller
