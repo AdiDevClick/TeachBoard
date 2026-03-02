@@ -273,6 +273,28 @@ describe("UI flow: class-creation (StepOne list)", () => {
     expect(nameInput).toHaveAttribute("aria-invalid", "false");
   });
 
+  test("required name error remains when typing optional description", async () => {
+    // open form modal
+    await openPopoverAndExpectByLabel(
+      controllerLabelRegex(ctx.labeler.controller),
+      ctx.labeler.nameArray,
+    );
+    await page.getByRole("button", { name: /Créer une classe/i }).click();
+    await waitForDialogState(true);
+
+    // leave the name input and trigger validation by blurring
+    const nameInput = page.getByLabelText(/^Nom$/i);
+    await userEvent.tab();
+    expect(nameInput).toHaveAttribute("aria-invalid", "true");
+
+    // type into the optional description field
+    const descInput = page.getByLabelText(/Description \(optionnelle\)/i);
+    await userEvent.type(descInput, "quelque chose");
+
+    // error should still be present on the name input
+    expect(nameInput).toHaveAttribute("aria-invalid", "true");
+  });
+
   test("submit works with optional fields empty", async () => {
     expect(ctx).toBeDefined();
     // keep default stub
