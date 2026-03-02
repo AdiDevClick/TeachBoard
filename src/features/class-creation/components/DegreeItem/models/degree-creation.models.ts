@@ -1,5 +1,5 @@
 import { formsRegex } from "@/configs/formsRegex.config.ts";
-import type { InputItem } from "@/types/AppInputControllerInterface";
+import type { FetchingInputItem } from "@/types/AppInputControllerInterface";
 import z from "zod";
 
 const fieldData = {
@@ -90,11 +90,12 @@ const degreeCreationSchema = (data: typeof fieldData) => {
       .nonoptional(),
     description: z
       .string()
+      .trim()
       .max(data.maxDescriptionLength, data.maxDescriptionLengthExceededMessage)
       .regex(formsRegex.serverName, data.descriptionRegexMessage)
-      .trim()
       .toLowerCase()
-      .optional(),
+      .optional()
+      .describe("degree description, optional, trimmed"),
   });
 };
 
@@ -104,6 +105,7 @@ const diplomaLevelData = degreeCreationSchema(levelData);
 
 export type DegreeCreationFormSchema = z.infer<typeof diplomaFieldData>;
 
-export type DegreeCreationInputItem = InputItem<DegreeCreationFormSchema>;
+export type DegreeCreationInputItem =
+  FetchingInputItem<DegreeCreationFormSchema>;
 
 export { diplomaFieldData, diplomaLevelData, diplomaYearData };

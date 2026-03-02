@@ -1,4 +1,4 @@
-import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { HTTP_METHODS } from "@/configs/app.config.ts";
 import type { TaskItemControllerProps } from "@/features/class-creation/components/TaskItem/types/task-item.types.ts";
@@ -49,7 +49,7 @@ export function TaskItemController({
     >
       <ControlledInputList
         items={inputControllers}
-        form={form}
+        control={form.control}
         setRef={setRef}
         observedRefs={observedRefs}
       />

@@ -1,6 +1,7 @@
-import type { ClasseNameAvailabilityResponse } from "@/api/types/routes/classes.types";
+import type { ClassRouteResponse } from "@/api/types/routes/classes.types";
 import { AvatarsWithLabelAndAddButtonList } from "@/components/Form/exports/form.exports";
-import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
+import { FormWithDebug } from "@/components/Form/FormWithDebug";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import {
   PopoverFieldWithCommands,
   PopoverFieldWithControllerAndCommandsList,
@@ -15,20 +16,11 @@ import {
 } from "@/configs/app-components.config.ts";
 import { yearsListRange } from "@/features/class-creation/components/main/functions/class-creation.functions.ts";
 import { useClassCreationHandler } from "@/features/class-creation/components/main/hooks/useClassCreationHandler";
+import { useDebouncedChecker } from "@/features/class-creation/components/main/hooks/useDebouncedChecker";
 import type { ClassCreationControllerProps } from "@/features/class-creation/index.ts";
 import { classCreationInputControllers } from "@/features/class-creation/index.ts";
-import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types";
-import { useFetch } from "@/hooks/database/fetches/useFetch";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
-import useDebounce from "@/hooks/useDebounce";
-import {
-  Activity,
-  useEffect,
-  useEffectEvent,
-  useMemo,
-  type ChangeEvent,
-} from "react";
-
+import { Activity, useEffect, useMemo, type ChangeEvent } from "react";
 const year = new Date().getFullYear();
 const years = yearsListRange(year, 5);
 const defaultSchoolYear = year + " - " + (year + 1);
@@ -86,55 +78,8 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     submitRoute,
     submitDataReshapeFn,
   });
-
-  const { data, error, fetchParams, setFetchParams, onSubmit } = useFetch();
-
-  /**
-   * Handle changes to the class name input, including debounced API calls to check for name availability.
-   *
-   * @param event - The change event from the class name input
-   * @param meta - Optional metadata for the command handler, including API endpoint information
-   */
-  const debouncedClassNameAvailabilityCheck = useDebounce(
-    (rawValue: string, meta?: CommandHandlerFieldMeta) => {
-      if (meta?.name !== "name" || !meta.apiEndpoint) return;
-
-      const value = rawValue.trim();
-      if (!value) return;
-
-      const computedApiEndpoint =
-        typeof meta.apiEndpoint === "function"
-          ? meta.apiEndpoint(value)
-          : meta.apiEndpoint;
-
-      setFetchParams((prev) => ({
-        ...prev,
-        url: String(computedApiEndpoint),
-        method: "GET",
-        contentId: meta.task as FetchParams["contentId"],
-        dataReshapeFn: meta.dataReshapeFn,
-        silent: true,
-      }));
-    },
-    300,
-  );
-
-  /**
-   * Trigger class name availability check when the fetchParams.url changes, which happens after the debounced function sets new params.
-   */
-  const triggerClassNameCheck = useEffectEvent((url: string) => {
-    if (!url) return;
-    onSubmit();
-  });
-
-  /**
-   * TRIGGER CLASS NAME AVAILABILITY CHECK
-   *
-   * @description Every time a user types in the class name input
-   */
-  useEffect(() => {
-    triggerClassNameCheck(fetchParams.url);
-  }, [fetchParams.url]);
+  const { availabilityError, availabilityCheck } =
+    useDebouncedChecker<ClassRouteResponse>(300);
 
   /**
    * Send a debouned API request to check for class name availability when the class name input changes.
@@ -146,27 +91,29 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     event: ChangeEvent<HTMLInputElement>,
     meta?: CommandHandlerFieldMeta,
   ) => {
-    debouncedClassNameAvailabilityCheck(event.target.value, meta);
+    const value = event.target.value;
+    const target = meta?.name;
+
+    if (target !== "name") {
+      return;
+    }
+
+    form.clearErrors("name");
+    availabilityCheck(value, meta);
   };
 
   /**
    * Effect to handle API response for class name availability check, setting form errors if the name is already taken.
    */
   useEffect(() => {
-    const availableFlag =
-      error?.data?.available ??
-      (data?.available as ClasseNameAvailabilityResponse);
-
-    if (availableFlag === false) {
+    if (availabilityError === false) {
       form.setError("name", {
         type: "manual",
         message:
           "Ce nom de classe est déjà utilisé. Veuillez en choisir un autre.",
       });
-    } else {
-      form.clearErrors("name");
     }
-  }, [error, form, data]);
+  }, [availabilityError, form]);
 
   const controllers = {
     dynamicListControllers: inputControllers[2],
@@ -183,11 +130,12 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
       },
     ],
   };
+
   const sharedCallbacksMemo = useMemo(() => {
     const sharedCallbacks = {
       onOpenChange: handleOpening,
       onSelect: handleOnSelect,
-      onAddNewItem: handleNewItem,
+      onClick: handleNewItem,
     };
     const commonObsProps = {
       setRef,
@@ -202,21 +150,24 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
   }, [observedRefs, handleOnSelect, handleNewItem, handleOpening, setRef]);
 
   return (
-    <form
-      ref={(el) => setRef(el, { name: pageId, formId })}
-      id={formId}
-      onSubmit={form.handleSubmit(handleValidSubmit, invalidSubmitCallback)}
+    <FormWithDebug
+      setRef={setRef}
+      form={form}
+      formId={formId}
+      pageId={pageId}
+      onValidSubmit={handleValidSubmit}
       className={className}
+      onInvalidSubmit={invalidSubmitCallback}
     >
       <ControlledInputList
-        form={form}
+        control={form.control}
         items={controllers.controlledInputsControllers}
         setRef={setRef}
         onChange={handleClassNameChange}
       />
       <PopoverFieldWithControllerAndCommandsList
         items={controllers.popoverControllers}
-        form={form}
+        control={form.control}
         {...sharedCallbacksMemo.all}
         commandHeadings={resultsCallback()}
       />
@@ -227,7 +178,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
       />
       <Activity mode={isSelectedDiploma ? "visible" : "hidden"}>
         <ControlledDynamicTagList
-          form={form}
+          control={form.control}
           {...sharedCallbacksMemo.commonObsProps}
           {...controllers.dynamicListControllers}
           itemList={tasksValues}
@@ -245,7 +196,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
       <VerticalFieldSelectWithController
         {...sharedCallbacksMemo.commonObsProps}
         name="schoolYear"
-        form={form}
+        control={form.control}
         fullWidth={false}
         placeholder={"defaultSchoolYear"}
         defaultValue={defaultSchoolYear}
@@ -254,6 +205,6 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
       >
         <NonLabelledGroupItemList items={years} />
       </VerticalFieldSelectWithController>
-    </form>
+    </FormWithDebug>
   );
 }

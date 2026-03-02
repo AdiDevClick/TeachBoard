@@ -1,5 +1,12 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
+import type { ApiError } from "@/types/AppErrorInterface";
+import type {
+  ApiSuccess,
+  AppRouteResponseContract,
+} from "@/types/AppResponseInterface";
+
+export type DiplomasErrorStatus = 400 | 401 | 404 | 500;
 
 /**
  * Single diploma configuration returned by the backend.
@@ -26,3 +33,14 @@ export type DiplomasFetch = Record<string, DiplomaConfigDto[]>;
  * Data payload returned by POST `/degrees/config` (create a diploma config).
  */
 export type CreateDiplomaResponseData = DiplomaConfigDto;
+
+export type DiplomasSuccess =
+  | Extract<ApiSuccess<DiplomasFetch>, { status: 200 }>
+  | Extract<ApiSuccess<CreateDiplomaResponseData>, { status: 201 }>;
+
+export type DiplomasError = Extract<ApiError, { status: DiplomasErrorStatus }>;
+
+export type DiplomasRouteResult = AppRouteResponseContract<
+  DiplomasSuccess,
+  DiplomasError
+>;

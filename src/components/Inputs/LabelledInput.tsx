@@ -10,8 +10,8 @@ import sanitizeDOMProps from "@/utils/props.ts";
 /**
  * A labelled input component integrated with react-hook-form Controller.
  *
- * @param props - Props for the labelled input component
- * @returns
+ * @param title - The title for the input label
+ * @param props - Any Input type props
  */
 export function LabelledInput(props: LabelledInputProps) {
   if (labelledInputContainsInvalid(props)) {
@@ -25,6 +25,7 @@ export function LabelledInput(props: LabelledInputProps) {
     "onOpenChange",
     "onValueChange",
     "controllerFieldMeta",
+    "fieldState",
   ]);
   const labelName = name ?? "input-is-not-named";
 

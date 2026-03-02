@@ -1,7 +1,8 @@
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
-import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import { PopoverFieldWithCommands } from "@/components/Popovers/exports/popover-field.exports";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
+import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { HTTP_METHODS } from "@/configs/app.config.ts";
 import { degreeModuleCreationInputControllers } from "@/features/class-creation/components/DegreeModule/forms/degree-module-inputs";
@@ -79,12 +80,17 @@ export function DegreeModuleController({
       secondaryFormField: "skillListDetails",
       detailedCommandItem: commandItem,
     };
-    selectionCallback(value, options);
+    selectionCallback(
+      value,
+      options as Parameters<typeof selectionCallback>[1],
+    );
   };
 
+  // split the array elements so we can omit the `id` when sending props to
+  // <PopoverFieldWithCommands>, which requires a branded UUID type.
   const controllers = {
-    dynamicTagsList: inputControllers[2],
-    controlledInputsList: inputControllers.slice(0, 2),
+    controlledInputsControllers: inputControllers.slice(0, 2),
+    dynamicTagsController: inputControllers[2],
   };
 
   const sharedCallbacksMemo = useMemo(() => {
@@ -103,23 +109,22 @@ export function DegreeModuleController({
     >
       <ControlledInputList
         {...sharedCallbacksMemo.commonObsProps}
-        items={controllers.controlledInputsList}
-        form={form}
+        items={controllers.controlledInputsControllers}
+        control={form.control}
       />
       <ControlledDynamicTagList
-        form={form}
-        {...controllers.dynamicTagsList}
+        control={form.control}
+        {...controllers.dynamicTagsController}
         {...sharedCallbacksMemo.commonObsProps}
-        itemList={currentSkills}
+        itemList={currentSkills as DynamicTagsItemList}
       />
       <PopoverFieldWithCommands
         multiSelection
-        {...sharedCallbacksMemo.commonObsProps}
         onSelect={handleCommandSelection}
         onOpenChange={openingCallback}
-        onAddNewItem={newItemCallback}
+        onClick={newItemCallback}
         commandHeadings={resultsCallback()}
-        {...controllers.dynamicTagsList}
+        {...controllers.dynamicTagsController}
       />
     </form>
   );

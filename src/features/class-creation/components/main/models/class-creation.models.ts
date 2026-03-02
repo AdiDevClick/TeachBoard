@@ -53,8 +53,9 @@ const classCreationForm = (data: typeof fieldData) =>
     description: z
       .string()
       .trim()
-      .regex(formsRegex.serverDescription, data.descriptionInvalidCharsMessage)
       .max(256, data.descriptionMaxCharsMessage)
+      .regex(formsRegex.serverDescription, data.descriptionInvalidCharsMessage)
+      .toLowerCase()
       .optional()
       .describe("class description, optional, trimmed"),
     schoolYear: z

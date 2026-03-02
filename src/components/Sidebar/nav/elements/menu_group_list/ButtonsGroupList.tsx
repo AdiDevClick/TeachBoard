@@ -1,4 +1,4 @@
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { ListMapper } from "@/components/Lists/ListMapper";
 import type { ButtonsGroupListProps } from "@/components/Sidebar/nav/types/NavTypes.ts";
 import {
   SidebarGroup,

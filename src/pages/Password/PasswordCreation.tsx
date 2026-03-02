@@ -1,5 +1,5 @@
 import { useAuthMemoryStore } from "@/api/store/AuthMemoryStore";
-import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import { HeaderTitle } from "@/components/Titles/ModalTitle.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
@@ -126,7 +126,10 @@ export function PasswordCreation({
                 className="grid gap-4"
               >
                 <FieldGroup>
-                  <ControlledInputList items={inputControllers} form={form} />
+                  <ControlledInputList
+                    items={inputControllers}
+                    control={form.control}
+                  />
                   <Field>
                     <Button
                       form={formId}

@@ -1,4 +1,11 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
+import type { ApiError } from "@/types/AppErrorInterface";
+import type {
+  ApiSuccess,
+  AppRouteResponseContract,
+} from "@/types/AppResponseInterface";
+
+export type SkillsErrorStatus = 400 | 401 | 500;
 
 export type SkillType = "MAIN" | "SUB";
 
@@ -53,3 +60,14 @@ export interface SkillsFetch {
  * The code supports both `{ skill: SkillDto }` and a raw `SkillDto`.
  */
 export type CreateSkillResponseData = { skill: SkillDto } | SkillDto;
+
+export type SkillsSuccess =
+  | Extract<ApiSuccess<SkillsFetch>, { status: 200 }>
+  | Extract<ApiSuccess<CreateSkillResponseData>, { status: 201 }>;
+
+export type SkillsError = Extract<ApiError, { status: SkillsErrorStatus }>;
+
+export type SkillsRouteResult = AppRouteResponseContract<
+  SkillsSuccess,
+  SkillsError
+>;

@@ -19,6 +19,7 @@ import {
   AppCardFooter,
   AppDialFooter,
 } from "@/components/Footer/AppFooter.tsx";
+import type { AppDialFooterProps } from "@/components/Footer/types/footer.types";
 import type { WithTitledCardProps } from "@/components/HOCs/types/with-titled-card.types";
 import {
   DialogHeaderTitle,
@@ -141,11 +142,15 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
   /**
    * Footer Slot
    *
-   * @param props - Props for the footer component, either AppDialFooterProps or CardFooter props.
+   * @param props - Props for the footer component, either AppDialFooterProps or CardFooter props;
+   *                when rendering a dial also accepts `displaySubmitButton`/`displayCancelButton`.
    */
   Component.Footer = function Footer(props: FooterProps) {
     const { footer = {}, modalMode } = useViewCardContext();
     const { separator = {}, ...footerProps } = { ...footer, ...props };
+
+    const { displaySubmitButton, displayCancelButton, ...allFooterProps } =
+      footerProps as AppDialFooterProps;
 
     const { displaySeparator = true, ...separatorProps } = separator;
 
@@ -159,10 +164,16 @@ function withTitledCard<C extends object>(WrappedContent: ComponentType<C>) {
           />
         )}
         {modalMode && (
-          <AppDialFooter {...footerProps}>{props.children}</AppDialFooter>
+          <AppDialFooter
+            {...allFooterProps}
+            displayCancelButton={displayCancelButton}
+            displaySubmitButton={displaySubmitButton}
+          >
+            {props.children}
+          </AppDialFooter>
         )}
         {!modalMode && (
-          <AppCardFooter {...footerProps}>{props.children}</AppCardFooter>
+          <AppCardFooter {...allFooterProps}>{props.children}</AppCardFooter>
         )}
       </>
     );

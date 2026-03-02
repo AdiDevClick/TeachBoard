@@ -50,7 +50,7 @@ export function Login({
   return (
     <div {...GENERIC_CONTAINER_STYLE}>
       <div {...GENERIC_CONTENT_STYLE}>
-        <Link to="/" {...GENERIC_LOGO_STYLE}>
+        <Link to="/" className={GENERIC_LOGO_STYLE.className}>
           <div {...GENERIC_LOGO_BACKGROUND_STYLE}>
             <GalleryVerticalEnd {...GENERIC_LOGO_ICON_STYLE} />
           </div>

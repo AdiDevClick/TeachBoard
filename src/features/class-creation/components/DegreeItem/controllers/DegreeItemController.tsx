@@ -1,14 +1,24 @@
-import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
+import { FormWithDebug } from "@/components/Form/FormWithDebug";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { DegreeTypeMessage } from "@/features/class-creation/components/DegreeItem/controllers/types/degree-item-controller.types";
 import type { DegreeItemControllerProps } from "@/features/class-creation/components/DegreeItem/types/degree-item.types.ts";
+import { useDebouncedChecker } from "@/features/class-creation/components/main/hooks/useDebouncedChecker";
 import { degreeCreationInputControllersField } from "@/features/class-creation/index.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
+import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
+import { type ChangeEvent, useEffect } from "react";
 import { toast } from "sonner";
 
 const loaderToasterId = "degree-item-creation-loader-toast";
 const creationToasterId = "degree-item-created-toast";
+
+/**
+ * The only fields that exist on the degree form.
+ * used to keep `form.trigger`/`setError` calls strongly‑typed.
+ */
+type DegreeFieldKey = "name" | "code" | "description";
 
 /**
  * Controller component for creating a new degree item.
@@ -33,12 +43,21 @@ export function DegreeItemController({
   form,
   submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_DEGREE.dataReshape,
 }: DegreeItemControllerProps) {
-  const { setRef, observedRefs, submitCallback, serverData, isLoading } =
-    useCommandHandler({
-      form,
-      pageId,
-      submitDataReshapeFn,
-    });
+  const {
+    setRef,
+    observedRefs,
+    submitCallback,
+    serverData,
+    isLoading,
+    invalidSubmitCallback,
+  } = useCommandHandler({
+    form,
+    pageId,
+    submitDataReshapeFn,
+  });
+
+  const { availabilityCheck, availabilityError, fetchParams } =
+    useDebouncedChecker(300);
 
   if (isLoading) {
     toast.loading("Création en cours...", { id: loaderToasterId });
@@ -61,28 +80,65 @@ export function DegreeItemController({
    * @param variables - form variables
    */
   const handleSubmit = (variables: MutationVariables) => {
-    // We use the same endPoints as GET from the inputs
-    // controllers. No need to specify POST endPoint again here.
     submitCallback(variables, {
       dataReshapeFn: submitDataReshapeFn,
     });
   };
 
-  const id = formId ?? pageId + "-form";
+  /**
+   * Send a debouned API request to check for class name availability when the class name input changes.
+   *
+   * @param event - The change event from the class name input
+   * @param meta - Optional metadata for the command handler, including API endpoint information
+   */
+
+  const handleCodeOrNameChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    meta?: CommandHandlerFieldMeta,
+  ) => {
+    const value = event.target.value;
+    const fieldName = meta?.name;
+
+    if (fieldName) form.clearErrors(`root.${fieldName}`);
+
+    availabilityCheck(value, {
+      ...meta,
+      filters: fieldName ? { by: fieldName } : {},
+    });
+  };
+
+  /**
+   * Effect to handle API response for class name availability check, setting form errors if the name is already taken.
+   */
+  useEffect(() => {
+    if (availabilityError === false && fetchParams.filters.by) {
+      const fieldKey = fetchParams.filters.by as DegreeFieldKey;
+
+      form.setError(fieldKey, {
+        type: "manual",
+        message: `Ce ${fieldKey} est déjà utilisé. Veuillez en choisir un autre.`,
+      });
+    }
+  }, [availabilityError, form, fetchParams.filters.by]);
 
   return (
-    <form
-      id={id}
+    <FormWithDebug
+      form={form}
+      setRef={setRef}
+      pageId={pageId}
+      formId={formId}
       className={className}
-      onSubmit={form.handleSubmit(handleSubmit)}
+      onValidSubmit={handleSubmit}
+      onInvalidSubmit={invalidSubmitCallback}
     >
       <ControlledInputList
         items={inputControllers}
-        form={form}
+        control={form.control}
         setRef={setRef}
         observedRefs={observedRefs}
+        onChange={handleCodeOrNameChange}
       />
-    </form>
+    </FormWithDebug>
   );
 }
 

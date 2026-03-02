@@ -7,7 +7,7 @@ import type {
   UseQueryOnSubmitState,
 } from "@/hooks/database/types/QueriesTypes.ts";
 import type { ApiError } from "@/types/AppErrorInterface";
-import type { ResponseInterface } from "@/types/AppResponseInterface";
+import type { ApiSuccess } from "@/types/AppResponseInterface";
 import { useMutation, useQueryErrorResetBoundary } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
 
@@ -36,8 +36,8 @@ import { useCallback, useMemo, useRef, useState } from "react";
  * ```
  */
 export function useQueryOnSubmit<
-  S extends ResponseInterface<unknown>,
-  E extends ApiError,
+  S extends ApiSuccess<any> = ApiSuccess<any>,
+  E extends ApiError = ApiError,
 >(queryKeysArr: QueryKeyDescriptor<S, E>) {
   const { reset } = useQueryErrorResetBoundary();
   const [localState, setLocalState] = useState<UseQueryOnSubmitState<S, E>>(

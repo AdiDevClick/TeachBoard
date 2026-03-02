@@ -33,7 +33,7 @@ import type { FieldValues } from "react-hook-form";
 //                    ------------
 
 /**
- * Validates props for LabelledInputForController component.
+ * Validates props for LabelledInputwithEventEnrichedMetadatas component.
  *
  * {@link import("@/components/Inputs/LabelledInput.tsx").LabelledInput }
  */
@@ -125,20 +125,20 @@ export const withAccordionItemPropsInvalid = (props: AccordionItemProps) =>
 //                    ------------
 
 /**
- * Validates props for LabelledInputForController component.
+ * Validates props for LabelledInputwithEventEnrichedMetadatas component.
  *
- * {@link import("@/components/HOCs/forController.tsx").forController }
+ * {@link import("@/components/HOCs/withEventEnrichedMetadatas.tsx").withEventEnrichedMetadatas }
  */
-const FOR_CONTROLLER_REQUIRES = ["field", "fieldState"];
-export const forControllerContainsInvalid = (props: FieldValues) =>
+const FOR_CONTROLLER_REQUIRES = ["name"];
+export const withEventEnrichedMetadatasContainsInvalid = (props: FieldValues) =>
   checkPropsValidity(props, FOR_CONTROLLER_REQUIRES, []);
 
 //                    ------------
 
 /**
- * Validation requirements for LabelledTextAreaForController component.
+ * Validation requirements for LabelledTextAreawithEventEnrichedMetadatas component.
  *
- * {@link import("@/components/Inputs/LabelledTextAreaForController.tsx").LabelledTextAreaForController }
+ * {@link import("@/components/Inputs/LabelledTextAreaWithEventEnrichedMetadatas.tsx").LabelledTextAreaWithEventEnrichedMetadatas }
  */
 const LABELLED_TEXTAREA_REQUIRES = ["name", "title"];
 
@@ -156,7 +156,7 @@ export const labelledTextAreaContainsInvalid = (props: LabelledTextAreaProps) =>
  *
  * {@link import("@/components/HOCs/withController.tsx").default}
  */
-const CONTROLLER_REQUIRES = ["form", "name"];
+const CONTROLLER_REQUIRES = ["control", "name"];
 
 export const controllerPropsInvalid = (props: AnyObjectProps) =>
   checkPropsValidity(props, CONTROLLER_REQUIRES, []);

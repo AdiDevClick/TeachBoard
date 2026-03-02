@@ -1,6 +1,8 @@
+import type { ApiError } from "@/types/AppErrorInterface";
+import type { ApiSuccess } from "@/types/AppResponseInterface";
 import type { AnyObjectProps } from "@/utils/types/types.utils";
 
-export type fetchJSONOptions = {
+export type FetchJSONOptions = {
   headers?: Partial<Headers>;
   json?: BodyInit | AnyObjectProps | Array<[string, unknown]>;
   img?: boolean;
@@ -8,19 +10,19 @@ export type fetchJSONOptions = {
 } & RequestInit;
 
 /** Error object returned on non-OK responses */
-export type FetchJSONError<TErrorBody = AnyObjectProps> = {
-  status: Response["status"];
-  statusText?: Response["statusText"];
+export type FetchJSONError<TErrorBody extends ApiError> = {
   ok: false;
-} & Partial<TErrorBody>;
+  statusText: string;
+} & TErrorBody;
 
 /** Success object returned on OK responses */
-export type FetchJSONSuccess<TData> = {
+export type FetchJSONSuccess<TSuccessBody extends ApiSuccess> = {
   ok: true;
-} & TData;
+  // statusText: never;
+} & TSuccessBody;
 
 /** Wrapper for FetchJSONResult */
 export type FetchJSONResult<
-  TData extends object = AnyObjectProps,
-  TErrorBody extends object = AnyObjectProps,
-> = FetchJSONSuccess<TData> | FetchJSONError<TErrorBody>;
+  TSuccessBody extends ApiSuccess<any> = ApiSuccess<any>,
+  TErrorBody extends ApiError = ApiError,
+> = FetchJSONSuccess<TSuccessBody> | FetchJSONError<TErrorBody>;

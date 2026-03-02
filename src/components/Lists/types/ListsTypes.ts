@@ -1,16 +1,8 @@
 import type {
-  AnyObjectProps,
   ExtractItemType,
   MergeProvided,
-  MissingRequiredProps,
-  RemainingProps,
 } from "@/utils/types/types.utils.ts";
-import type {
-  ComponentProps,
-  ElementType,
-  ReactElement,
-  ReactNode,
-} from "react";
+import type { PropsWithChildren, ReactElement, ReactNode } from "react";
 
 /**
  * Metadata injected only in children function / element clone modes (not component mode)
@@ -54,55 +46,24 @@ export type ListMapperPartialChildrenObject<
  * - children function mode: render function with item, index, and optional props
  * - children mode: render function or element to be cloned
  */
-export type ListMapperProps<
-  TItems,
-  C extends ElementType,
-  TOptionalInput = undefined,
-  TChildProps extends AnyObjectProps = AnyObjectProps,
-> =
-  | ({
-      /** Component mode: component receives item props automatically */
-      items: TItems;
-      optional?: TOptionalInput;
-      component: C;
-      children?: never;
-    } & MissingRequiredProps<
-      ComponentProps<C>,
-      ListMapperProvidedProps<TItems, ListMapperOptionalValue<TOptionalInput>>
-    > &
-      Partial<
-        RemainingProps<
-          ComponentProps<C>,
-          ListMapperProvidedProps<
-            TItems,
-            ListMapperOptionalValue<TOptionalInput>
-          >
-        >
-      >)
-  | {
-      /** Children function mode: full type safety with render function */
-      items: TItems;
-      optional?: TOptionalInput;
-      component?: never;
-      children: (
-        item: ListMapperItem<TItems>,
-        index: number,
-        optional: ListMapperOptionalValue<TOptionalInput>,
-      ) => ReactNode;
-    }
-  | {
-      /** Children ReactElement mode: cloneElement will inject item props */
-      items: TItems;
-      optional?: TOptionalInput;
-      component?: never;
-      children: ReactElement<
-        ListMapperChildProps<
-          TItems,
-          ListMapperOptionalValue<TOptionalInput>,
-          TChildProps
-        >
-      >;
-    };
+export type ChildrenMode<TItems, TOptional> = Readonly<
+  {
+    /** Children ReactElement mode: cloneElement will inject item props */
+    items: TItems;
+    optional?: ListMapperOptionalInput<TItems, TOptional>;
+  } & PropsWithChildren
+>;
+
+export type ChildrenFunctionMode<TItems, TOptionalValue> = Readonly<{
+  /** Children function mode: full type safety with render function */
+  items: TItems;
+  optional?: ListMapperOptionalInput<TItems, TOptionalValue>;
+  children: (
+    item: ListMapperItem<TItems>,
+    index: number,
+    optional: TOptionalValue,
+  ) => ReactNode;
+}>;
 
 export type ListMapperOptionalResolver<TItems, TOptional> = (
   item: ListMapperItem<TItems>,
@@ -114,7 +75,8 @@ export type ListMapperOptionalInput<TItems, TOptional> =
   | ListMapperOptionalResolver<TItems, TOptional>;
 
 export type ListMapperOptionalValue<TOptionalInput> = TOptionalInput extends (
-  ...args: unknown[]
+  // ...args: unknown[]
+  ...args: infer _A
 ) => infer R
   ? R
   : TOptionalInput;

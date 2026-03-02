@@ -7,7 +7,7 @@ import type {
   QueryKeyDescriptor,
 } from "@/hooks/database/types/QueriesTypes";
 import type { ApiError } from "@/types/AppErrorInterface";
-import type { ResponseInterface } from "@/types/AppResponseInterface";
+import type { ApiSuccess } from "@/types/AppResponseInterface";
 import { wait, waitAndFail } from "@/utils/utils";
 import type { UseMutationOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -23,8 +23,8 @@ const completedControllers = new WeakMap<AbortController, boolean>();
  * @returns The mutation response object.
  */
 export async function onFetch<
-  TSuccess extends ResponseInterface<unknown>,
-  TError extends ApiError,
+  TSuccess extends ApiSuccess<any> = ApiSuccess<any>,
+  TError extends ApiError = ApiError,
 >({
   retryTimeout = 1000,
   retry = 3,
@@ -164,7 +164,7 @@ export function onQueryError<TError extends ApiError>(
  *
  * @param response The mutation response object.
  */
-export function onQuerySuccess<TSuccess extends ResponseInterface<unknown>>(
+export function onQuerySuccess<TSuccess extends ApiSuccess>(
   response: FetchJSONSuccess<TSuccess>,
   querySuccessDescription?: string,
 ) {
@@ -185,8 +185,8 @@ export function onQuerySuccess<TSuccess extends ResponseInterface<unknown>>(
  *   the second element is the query descriptor object. @see QueryKeyDescriptor
  */
 export const mutationOptions = <
-  S extends ResponseInterface<unknown>,
-  E extends ApiError,
+  S extends ApiSuccess<any> = ApiSuccess<any>,
+  E extends ApiError = ApiError,
 >(
   queryKeysArr: QueryKeyDescriptor<S, E>,
 ): UseMutationOptions<

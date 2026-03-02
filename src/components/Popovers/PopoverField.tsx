@@ -47,7 +47,7 @@ export function PopoverField({
   const [state, setState] = useState<PopoverFieldState>({
     open: false,
     fieldName: rest?.name,
-    selectedValue: props.multiSelection
+    selectedValue: multiSelection
       ? defaultValue
       : (rest.defaultValue ?? undefined),
   });
@@ -99,7 +99,7 @@ export function PopoverField({
     onOpenChange?.(isOpen);
   };
 
-  const selectValue = props.multiSelection
+  const selectValue = multiSelection
     ? placeholder
     : (state.selectedValue ?? placeholder);
 

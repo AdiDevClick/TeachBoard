@@ -1,0 +1,5662 @@
+---
+openapi: 3.1.0
+components:
+  schemas:
+    AssignedTaskModel:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          description: Assigned task id
+    Attendances:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        id:
+          $ref: "#/components/schemas/UUID"
+        sessionId:
+          $ref: "#/components/schemas/UUID"
+        studentId:
+          $ref: "#/components/schemas/UUID"
+        present:
+          type: boolean
+        presentForEvaluation:
+          type: boolean
+        comment:
+          type: string
+        recordedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        coursesessions:
+          $ref: "#/components/schemas/CourseSessions"
+        users:
+          $ref: "#/components/schemas/Users"
+    AttendedModulesModel:
+      type: object
+      required:
+      - id
+      - name
+      - code
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          description: The ID of the attended module
+        name:
+          type: string
+          examples:
+          - Mathematics
+          pattern: \S
+          description: The name of the attended module
+        code:
+          type: string
+          examples:
+          - MATH101
+          pattern: \S
+          description: The code of the attended module
+    AvailabilityResponse:
+      type: object
+      description: Class name availability response payload
+      properties:
+        available:
+          type: boolean
+          description: Classe name availability data
+    ClassModel:
+      type: object
+      required:
+      - name
+      - primaryTeacherId
+      - schoolYear
+      - degreeConfigId
+      - userId
+      description: Class model to create and update classes
+      properties:
+        code:
+          type: string
+        id: {}
+        identifier: {}
+        entityTypeName:
+          type: string
+        name:
+          type: string
+          examples:
+          - BTS 1
+          - BARMAN 2
+          - CAP 1
+          - 1ere année CAP
+          - Terminale BAC PRO
+          maxLength: 100
+          pattern: \S
+          description: Name of the class
+        description:
+          type: string
+          examples:
+          - This class is for the final year students.
+          maxLength: 255
+          description: Description of the class
+        primaryTeacherId:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          examples:
+          - 550e8400-e29b-41d4-a716-446655440000
+          description: The primary teacher of the class
+        schoolYear:
+          type: string
+          examples:
+          - 2023-2024
+          maxLength: 9
+          pattern: "^(\\d{4})-(\\d{4})$"
+          description: The school year of the class
+        degreeConfigId:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          examples:
+          - "BTS, CAP, BEP, BAC, etc."
+          description: The degree associated with the class
+        userId:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          examples:
+          - 550e8400-e29b-41d4-a716-446655440000
+          description: L'ID utilisateur ne peut pas être vide
+        students:
+          type: array
+          examples:
+          - - 550e8400-e29b-41d4-a716-446655440000
+            - 550e8400-e29b-41d4-a716-446655440001
+          items:
+            type: string
+            format: uuid
+            pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+          description: "List of students in the class, it can be empty"
+        tasks:
+          type: array
+          examples:
+          - - 550e8400-e29b-41d4-a716-446655440000
+            - 550e8400-e29b-41d4-a716-446655440001
+          items:
+            type: string
+            format: uuid
+            pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+          description: "List of tasks for the class, like assignments(cook, clean,\
+            \ barman, waiter) or projects. It can be empty"
+    ClassResponse:
+      type: object
+      description: Single class response payload
+      properties:
+        data:
+          description: Class response data
+          allOf:
+          - $ref: "#/components/schemas/ClassSummaryDTO"
+    ClassSummaryDTO:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        description:
+          type: string
+        schoolYear:
+          type: string
+        degreeConfigName:
+          type: string
+        degreeLevel:
+          type: string
+        degreeYearCode:
+          type: string
+        degreeYearName:
+          type: string
+        primaryTeacher:
+          type: object
+          additionalProperties: {}
+        students:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        templates:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskTemplateViewDTO"
+        evaluations:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        taskTemplateViewDTO:
+          $ref: "#/components/schemas/TaskTemplate"
+    ClassTaskModel:
+      type: object
+      required:
+      - name
+      - description
+      description: Class task model to create and update class tasks
+      properties:
+        code:
+          type: string
+        id: {}
+        identifier: {}
+        entityTypeName:
+          type: string
+        name:
+          type: string
+          examples:
+          - Waiter the tables
+          maxLength: 100
+          pattern: "^[\\p{L}\\p{M}0-9\\/,&._' \\-()]{2,100}$"
+          description: Name of the task
+        description:
+          type: string
+          examples:
+          - Used to ensure the tables are clean and ready for customers.
+          maxLength: 500
+          pattern: "^[\\p{L}\\p{M}0-9'.,\\/;:!?\"%&$€@#()\\n\\r \\ -]{4,500}$"
+          description: Description of the task
+    ClassTeacherAssignment:
+      type: object
+      properties:
+        persistent:
+          type: boolean
+        id:
+          $ref: "#/components/schemas/UUID"
+        classId:
+          $ref: "#/components/schemas/UUID"
+        teacherId:
+          $ref: "#/components/schemas/UUID"
+        assignedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        leftAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        role:
+          $ref: "#/components/schemas/Role"
+        active:
+          type: boolean
+        notes:
+          type: string
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        classe:
+          $ref: "#/components/schemas/Classes"
+        teacher:
+          $ref: "#/components/schemas/Users"
+    ClassTemplate:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        persistent:
+          type: boolean
+        id:
+          $ref: "#/components/schemas/UUID"
+        classId:
+          $ref: "#/components/schemas/UUID"
+        templateId:
+          $ref: "#/components/schemas/UUID"
+        isActive:
+          type: boolean
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        deletedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        classe:
+          $ref: "#/components/schemas/Classes"
+        taskTemplate:
+          $ref: "#/components/schemas/TaskTemplate"
+    Classes:
+      type: object
+      properties:
+        code:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        persistent:
+          type: boolean
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        description:
+          type: string
+        primaryTeacherId:
+          $ref: "#/components/schemas/UUID"
+        schoolName:
+          type: string
+        userId:
+          $ref: "#/components/schemas/UUID"
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        deletedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        schoolYear:
+          type: string
+        groupId:
+          $ref: "#/components/schemas/UUID"
+        studentList:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/Users"
+        degreeConfiguration:
+          $ref: "#/components/schemas/DegreeConfiguration"
+        group:
+          $ref: "#/components/schemas/Group"
+        classTemplates:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClassTemplate"
+        students:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        studentsIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+            pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+        templates:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClassTemplate"
+        primaryTeacherSummary:
+          type: object
+          additionalProperties: {}
+        classTasksTemplates:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClassTemplate"
+        classTemplate:
+          $ref: "#/components/schemas/ClassTemplate"
+    ClassesResponse:
+      type: object
+      description: Multiple classes response payload
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClassSummaryDTO"
+          description: Classes response data
+    ClientRemoteType:
+      type: object
+      description: Representation of client remote socket type
+      properties:
+        domainSocket:
+          type: boolean
+          description: Domain socket present
+        inetSocket:
+          type: boolean
+          description: Inet socket present
+    CookieSnapshot:
+      type: object
+      description: Snapshot of a client cookie
+      properties:
+        fromUserAgent:
+          type: boolean
+          description: Cookie originates from user agent heuristics
+        changed:
+          type: boolean
+          description: Cookie changed flag
+        sameSite:
+          type: string
+          description: SameSite attribute
+        name:
+          type: string
+          description: Cookie name
+        value:
+          type: string
+          description: Cookie value
+        path:
+          type: string
+          description: Cookie path
+        domain:
+          type: string
+          description: Cookie domain
+        httpOnly:
+          type: boolean
+          description: HttpOnly flag
+        secure:
+          type: boolean
+          description: Secure flag
+        maxAge:
+          type: integer
+          format: int64
+          description: Max-Age value
+    CourseAssignments:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        id:
+          $ref: "#/components/schemas/UUID"
+        courseId:
+          $ref: "#/components/schemas/UUID"
+        userId:
+          $ref: "#/components/schemas/UUID"
+        classes:
+          $ref: "#/components/schemas/Classes"
+    CourseSessions:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        id:
+          $ref: "#/components/schemas/UUID"
+        courseAssignmentId:
+          $ref: "#/components/schemas/UUID"
+        sessionDate:
+          $ref: "#/components/schemas/OffsetDateTime"
+        topic:
+          type: string
+        durationMinutes:
+          type: integer
+          format: int32
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        attendancesList:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attendances"
+    DebugPayload:
+      type: object
+      description: Debug information for non-prod contexts (minimal fields)
+      properties:
+        type:
+          type: string
+          examples:
+          - Invalid request format
+          description: Error type identifier
+        clientRemoteType:
+          $ref: "#/components/schemas/ClientRemoteType"
+          type: object
+          description: Remote address representation
+        clientCookies:
+          type: array
+          items:
+            $ref: "#/components/schemas/CookieSnapshot"
+          description: Client cookies snapshot
+        clientIP:
+          type: string
+          examples:
+          - 127.0.0.1
+          description: Client IP address
+        route:
+          type: string
+          examples:
+          - /api/auth/login
+          description: Route where error occurred
+        status:
+          type: integer
+          format: int32
+          examples:
+          - 500
+          description: Error status in debug payload
+    DegreeConfiguration:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        id:
+          $ref: "#/components/schemas/UUID"
+        degreeLevelId:
+          $ref: "#/components/schemas/UUID"
+        degreeYearId:
+          $ref: "#/components/schemas/UUID"
+        degreeFieldId:
+          $ref: "#/components/schemas/UUID"
+        description:
+          type: string
+        isActive:
+          type: boolean
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        deletedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        modules:
+          type: array
+          items:
+            type: object
+            properties:
+              identifier: {}
+              entityTypeName:
+                type: string
+              persistent:
+                type: boolean
+              id:
+                $ref: "#/components/schemas/UUID"
+              name:
+                type: string
+              code:
+                type: string
+              type:
+                $ref: "#/components/schemas/SkillType"
+              isActive:
+                type: boolean
+              createdAt:
+                $ref: "#/components/schemas/OffsetDateTime"
+              updatedAt:
+                $ref: "#/components/schemas/OffsetDateTime"
+              deletedAt:
+                $ref: "#/components/schemas/OffsetDateTime"
+              evaluationskillscoresList:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EvaluationSkillScores"
+              subskills:
+                type: array
+                items:
+                  type: object
+                  description: Cyclic reference to org.teacherboard.entities.Skills
+              modules:
+                type: array
+                items:
+                  type: object
+                  description: Cyclic reference to org.teacherboard.entities.Skills
+              modulesCodeList:
+                type: array
+                items:
+                  type: string
+              skillSummary:
+                type: object
+                additionalProperties: {}
+        modulesCodeList:
+          type: array
+          items:
+            type: string
+    DegreeConfigurationDto:
+      type: object
+      required:
+      - levelId
+      - yearId
+      - diplomaFieldId
+      description: Degree configuration for relating degree levels and year
+      properties:
+        levelId:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          examples:
+          - 550e8400-e29b-41d4-a716-446655440000
+          description: The degree level ID with UUID format
+        yearId:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          examples:
+          - 550e8400-e29b-41d4-a716-446655440000
+          description: The degree year ID with UUID format
+        diplomaFieldId:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          examples:
+          - 550e8400-e29b-41d4-a716-446655440000
+          description: The degree field ID with UUID format
+        modulesList:
+          type: array
+          examples:
+          - - BT12
+            - DT101
+            - DF10
+          items:
+            type: string
+          description: The list of modules to acquire for the degree
+    DegreeConfigurationResponse:
+      type: object
+      description: Degree configuration response payload
+      properties:
+        data:
+          description: Degree configuration response data
+          allOf:
+          - $ref: "#/components/schemas/DegreeConfigurationViewDTO"
+    DegreeConfigurationViewDTO:
+      type: object
+      description: Concise summary for DegreeConfiguration used in API views
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        degreeLevel:
+          type: string
+        degreeYear:
+          type: string
+        degreeField:
+          type: string
+        modules:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+    DegreeDto:
+      type: object
+      required:
+      - name
+      - code
+      description: Degree type for classes
+      properties:
+        id: {}
+        identifier: {}
+        entityTypeName:
+          type: string
+        name:
+          type: string
+          minLength: 2
+          examples:
+          - Brevet de Technicien Supérieur
+          maxLength: 100
+          pattern: "^[A-Za-zÀ-ÖØ-öø-ÿ0-9._' -]{2,100}$"
+          description: The name of the degree
+        code:
+          type: string
+          minLength: 2
+          examples:
+          - BTS
+          maxLength: 10
+          pattern: "^[A-Za-z0-9]{2,10}$"
+          description: The code of the degree
+        description:
+          type: string
+          minLength: 4
+          examples:
+          - Le Brevet de Technicien Supérieur (BTS) est un diplôme national de l'enseignement
+            supérieur français...
+          maxLength: 500
+          pattern: "^[A-Za-zÀ-ÖØ-öø-ÿ0-9'.,;:!?()\"%&$€@#\\n\\r -]{0,500}$"
+          description: The description of the degree
+    DegreeResponse:
+      type: object
+      description: Single degree response payload
+      properties:
+        data:
+          description: Degree response data
+          allOf:
+          - $ref: "#/components/schemas/DegreeViewDTO"
+    DegreeViewDTO:
+      type: object
+      description: Concise summary for Degree used in API views
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        code:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+        identifier:
+          type: string
+        entityTypeName:
+          type: string
+    DegreesResponse:
+      type: object
+      description: Multiple degrees response payload
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DegreeViewDTO"
+          description: Degrees response data
+    Error400Parsing:
+      type: object
+      description: related to parsing
+      allOf:
+      - $ref: "#/components/schemas/StandardErrorResponse"
+      - $ref: "#/components/schemas/ParsingDebugPayload"
+    Error400Validation:
+      type: object
+      description: related to violation of constraints such as validation annotations
+      allOf:
+      - $ref: "#/components/schemas/ErrorDetails"
+      properties:
+        title:
+          type: string
+          examples:
+          - Constraint Violation
+          description: Title of the validation error
+        detail:
+          type: string
+          examples:
+          - validation constraint violations
+          description: A description of the validation error
+        status:
+          type: integer
+          format: int32
+          examples:
+          - 400
+          description: HTTP status code
+    Error401Unauthorized:
+      type: object
+      description: Authentication error response
+      allOf:
+      - $ref: "#/components/schemas/StandardErrorResponse"
+      properties:
+        debugs:
+          $ref: "#/components/schemas/DebugPayload"
+          type: object
+          description: Optional debug payload (present in non-production contexts)
+    Error403Forbidden:
+      type: object
+      description: related to forbidden access
+      allOf:
+      - $ref: "#/components/schemas/ParsingDebugPayload"
+      - $ref: "#/components/schemas/StandardErrorResponse"
+    Error500Internal:
+      type: object
+      description: Internal server error response
+      allOf:
+      - $ref: "#/components/schemas/StandardErrorResponse"
+      - $ref: "#/components/schemas/ParsingDebugPayload"
+      properties:
+        details:
+          description: Optional error details payload
+          allOf:
+          - $ref: "#/components/schemas/ErrorId"
+    ErrorDetails:
+      type: object
+      description: Details returned by the error handler
+      properties:
+        violations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationViolation"
+          description: Validation errors (400)
+    ErrorId:
+      type: object
+      description: Opaque identifier for support correlation (5xx)
+      properties:
+        errorId:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          description: Opaque identifier for support correlation (5xx)
+    EvaluationClassAggregates:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        id:
+          $ref: "#/components/schemas/UUID"
+        evaluationId:
+          $ref: "#/components/schemas/UUID"
+        metric:
+          type: string
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        evaluations:
+          $ref: "#/components/schemas/Evaluations"
+    EvaluationCreation:
+      type: object
+      description: Evaluation creation response payload
+      properties:
+        data:
+          description: Evaluation creation response data
+          allOf:
+          - $ref: "#/components/schemas/EvaluationModel"
+    EvaluationModel:
+      type: object
+      required:
+      - title
+      - comments
+      - classId
+      - evaluationDate
+      - userId
+      - attendedModules
+      description: Evaluation model to create and update evaluations
+      properties:
+        title:
+          type: string
+          minLength: 2
+          examples:
+          - Midterm Exam
+          - Final Project
+          maxLength: 100
+          pattern: "^[A-Za-zÀ-ÖØ-öø-ÿ0-9._' /-]{2,100}$"
+          description: The title of the evaluation
+        comments:
+          type: string
+          minLength: 4
+          examples:
+          - This is a sample evaluation
+          maxLength: 500
+          pattern: "^[A-Za-zÀ-ÖØ-öø-ÿ0-9'.,;:!?()\"%&$€@#\\n\\r -]{4,500}$"
+          description: The comments for the evaluation
+        classId:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          description: The class associated with the evaluation. This will be used
+            to retrieve tasks templates
+        evaluationDate:
+          $ref: "#/components/schemas/OffsetDateTime"
+          type: string
+          description: The date of the evaluation
+        userId:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          description: The user's ID creating the evaluation for permissions purpose
+        absence:
+          type: array
+          items:
+            type: string
+            format: uuid
+            pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+          description: An array containing students IDs for students that are missing
+            the evaluation that day
+        evaluations:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentEvaluationModel"
+          description: Detailed per-student evaluations (modules + sub-skill scores)
+        attendedModules:
+          type: array
+          maxItems: 25
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/AttendedModulesModel"
+          description: A list of attended modules during the evaluation
+    EvaluationSkillScores:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        id:
+          $ref: "#/components/schemas/UUID"
+        evaluationTaskId:
+          $ref: "#/components/schemas/UUID"
+        subskillId:
+          $ref: "#/components/schemas/UUID"
+        score:
+          type: number
+        comment:
+          type: string
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        evaluationTaskAssignments:
+          $ref: "#/components/schemas/EvaluationTaskAssignments"
+        subskills:
+          $ref: "#/components/schemas/Skills"
+    EvaluationTaskAssignments:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        id:
+          $ref: "#/components/schemas/UUID"
+        evaluationId:
+          $ref: "#/components/schemas/UUID"
+        studentId:
+          $ref: "#/components/schemas/UUID"
+        taskTemplateId:
+          $ref: "#/components/schemas/UUID"
+        assignedBy:
+          $ref: "#/components/schemas/UUID"
+        comments:
+          type: string
+        overallScore:
+          type: number
+        wasPresent:
+          type: boolean
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        evaluations:
+          $ref: "#/components/schemas/Evaluations"
+        student:
+          $ref: "#/components/schemas/Users"
+        taskTemplate:
+          $ref: "#/components/schemas/TaskTemplate"
+        assignedByUser:
+          $ref: "#/components/schemas/Users"
+        evaluationSkillScoresList:
+          type: array
+          items:
+            $ref: "#/components/schemas/EvaluationSkillScores"
+    Evaluations:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        id:
+          $ref: "#/components/schemas/UUID"
+        classId:
+          $ref: "#/components/schemas/UUID"
+        evaluatorId:
+          $ref: "#/components/schemas/UUID"
+        evaluationDate:
+          $ref: "#/components/schemas/OffsetDateTime"
+        title:
+          type: string
+        comments:
+          type: string
+        userId:
+          $ref: "#/components/schemas/UUID"
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        deletedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        evaluationclassaggregatesList:
+          type: array
+          items:
+            $ref: "#/components/schemas/EvaluationClassAggregates"
+        evaluationTaskAssignmentsList:
+          type: array
+          items:
+            $ref: "#/components/schemas/EvaluationTaskAssignments"
+        classes:
+          $ref: "#/components/schemas/Classes"
+    EvaluationsResponse:
+      type: object
+      description: Multiple evaluations response payload
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/EvaluationModel"
+          description: Evaluations response data
+    Group:
+      type: object
+      properties:
+        code:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        persistent:
+          type: boolean
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        tier:
+          type: string
+        createdBy:
+          $ref: "#/components/schemas/UUID"
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        memberships:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/GroupMembership"
+        invitations:
+          type: array
+          items:
+            $ref: "#/components/schemas/GroupInvitation"
+        classes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Classes"
+    GroupAcceptInvitationModel:
+      type: object
+      required:
+      - token
+      properties:
+        token:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          description: Token d'invitation
+    GroupClassLinkModel:
+      type: object
+      required:
+      - classId
+      properties:
+        classId:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          description: Identifiant de la classe à associer
+    GroupClassViewDTO:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        schoolYear:
+          type: string
+    GroupCreatedResponse:
+      type: object
+      description: Group creation response payload
+      properties:
+        data:
+          description: Group creation response data
+          allOf:
+          - $ref: "#/components/schemas/GroupViewDTO"
+    GroupDetailResponse:
+      type: object
+      description: Group detail response payload
+      properties:
+        data:
+          description: Group detail response data
+          allOf:
+          - $ref: "#/components/schemas/GroupDetailViewDTO"
+    GroupDetailViewDTO:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        slug:
+          type: string
+        tier:
+          type: string
+        memberCount:
+          type: integer
+          format: int64
+        classCount:
+          type: integer
+          format: int64
+        adminUsername:
+          type: string
+        classes:
+          type: array
+          items:
+            $ref: "#/components/schemas/GroupClassViewDTO"
+    GroupInvitation:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        persistent:
+          type: boolean
+        id:
+          $ref: "#/components/schemas/UUID"
+        groupId:
+          $ref: "#/components/schemas/UUID"
+        email:
+          type: string
+        invitedUserId:
+          $ref: "#/components/schemas/UUID"
+        token:
+          $ref: "#/components/schemas/UUID"
+        status:
+          $ref: "#/components/schemas/Status1"
+        role:
+          $ref: "#/components/schemas/Role1"
+        expiresAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        group:
+          $ref: "#/components/schemas/Group"
+        invitedUser:
+          $ref: "#/components/schemas/Users"
+    GroupInvitationModel:
+      type: object
+      required:
+      - email
+      properties:
+        email:
+          type: string
+          pattern: \S
+          description: Email de la personne invitée
+        role:
+          $ref: "#/components/schemas/Role1"
+          type: string
+          description: Rôle proposé dans le groupe
+          default: MEMBER
+        userId:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          description: Identifiant utilisateur si la personne existe déjà
+    GroupInvitationResponse:
+      type: object
+      description: Group invitation response payload
+      properties:
+        data:
+          description: Group invitation response data
+          allOf:
+          - $ref: "#/components/schemas/GroupInvitationViewDTO"
+    GroupInvitationViewDTO:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        email:
+          type: string
+        status:
+          type: string
+        role:
+          type: string
+        expiresAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+    GroupMembership:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        persistent:
+          type: boolean
+        id:
+          $ref: "#/components/schemas/UUID"
+        groupId:
+          $ref: "#/components/schemas/UUID"
+        userId:
+          $ref: "#/components/schemas/UUID"
+        role:
+          $ref: "#/components/schemas/Role1"
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        group:
+          $ref: "#/components/schemas/Group"
+        user:
+          $ref: "#/components/schemas/Users"
+    GroupModel:
+      type: object
+      required:
+      - name
+      - tier
+      description: Payload utilisé pour créer ou modifier un groupe/école
+      properties:
+        code:
+          type: string
+        id: {}
+        identifier: {}
+        entityTypeName:
+          type: string
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+          pattern: "^[A-Za-zÀ-ÖØ-öø-ÿ0-9._' -]{2,100}$"
+        slug:
+          type: string
+          maxLength: 120
+          pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        description:
+          type: string
+          maxLength: 500
+        tier:
+          type: string
+          pattern: \S
+    GroupViewDTO:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        slug:
+          type: string
+        tier:
+          type: string
+        memberCount:
+          type: integer
+          format: int64
+        classCount:
+          type: integer
+          format: int64
+        adminUsername:
+          type: string
+    GroupsResponse:
+      type: object
+      description: Multiple groups response payload
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/GroupViewDTO"
+          description: Groups response data
+    Images:
+      type: object
+      properties:
+        code:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        id:
+          $ref: "#/components/schemas/UUID"
+        userId:
+          $ref: "#/components/schemas/UUID"
+        relatedTable:
+          type: string
+        relatedId:
+          $ref: "#/components/schemas/UUID"
+        path:
+          type: string
+        name:
+          type: string
+        youtubeId:
+          $ref: "#/components/schemas/UUID"
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        users:
+          $ref: "#/components/schemas/Users"
+    JsonObject:
+      type: array
+      items:
+        type: object
+        properties:
+          key:
+            type: string
+          value: {}
+    JwtTokens:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        id:
+          $ref: "#/components/schemas/UUID"
+        userId:
+          $ref: "#/components/schemas/UUID"
+        validatorHash:
+          type: string
+        selector:
+          type: string
+        tokenType:
+          type: string
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        expiresAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        usedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        attempts:
+          type: integer
+          format: int32
+        users:
+          $ref: "#/components/schemas/Users"
+        used:
+          type: boolean
+    LoginRequest:
+      type: object
+      required:
+      - identifier
+      - password
+      description: "User login request - User can provide whatever they want in the\
+        \ identifier field, this is intended for security reasons to not reveal whether\
+        \ an email or username exists in the system"
+      properties:
+        identifier:
+          type: string
+          pattern: \S
+        password:
+          type: string
+          pattern: \S
+    LoginResponse:
+      type: object
+      description: Login response wrapper with data object (user + session)
+      properties:
+        data:
+          description: Data payload containing user and session
+          allOf:
+          - $ref: "#/components/schemas/LoginUser"
+          - $ref: "#/components/schemas/SessionId"
+    LoginUser:
+      type: object
+      description: Login response data containing user
+      properties:
+        user:
+          $ref: "#/components/schemas/LoginUserDTO"
+          type: object
+          description: Authenticated user summary
+    LoginUserDTO:
+      type: object
+      description: User summary returned on login (no sensitive fields)
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          examples:
+          - 1f0de94e-a442-6895-bb6a-6baf81233df8
+          description: User id
+        email:
+          type: string
+          examples:
+          - user@example.com
+          description: Email
+        username:
+          type: string
+          examples:
+          - username
+          description: Username
+        firstName:
+          type: string
+          examples:
+          - UserFirstName
+          description: First name
+        lastName:
+          type: string
+          examples:
+          - UserLastName
+          description: Last name
+        role:
+          $ref: "#/components/schemas/Role"
+        schoolName:
+          type: string
+          examples:
+          - MYDEFAULTSCHOOLNAME
+          description: School name
+        profilePictureUrl:
+          type: string
+          examples:
+          - https://cdn.example.com/avatar.png
+          description: Profile picture url
+        status:
+          $ref: "#/components/schemas/Status"
+        lastLogin:
+          type: string
+          examples:
+          - 2025-12-26T20:47:13.113525Z
+          description: Last login timestamp
+        createdAt:
+          type: string
+          examples:
+          - 2025-12-21T17:46:01.560721Z
+          description: Created at
+        classId:
+          $ref: "#/components/schemas/UUID"
+    MenuVisibility:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        userId:
+          $ref: "#/components/schemas/UUID"
+        menuItemKey:
+          type: string
+        visible:
+          type: boolean
+    ModuleViewDTO:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        code:
+          type: string
+        name:
+          type: string
+        subSkills:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkillSummaryDTO"
+    NextStepResponse:
+      type: object
+      description: Top-level nextStep hint for client flows
+      properties:
+        nextStep:
+          type: string
+          examples:
+          - password_creation
+          description: Next step hint for the client
+    OffsetDateTime:
+      type: string
+      format: date-time
+      examples:
+      - 2022-03-10T12:15:50-04:00
+    ParsingDebugDetails:
+      type: object
+      description: Parsing-specific detailed debug fields
+      properties:
+        detailedMessage:
+          type: string
+          examples:
+          - Malformed JSON in request
+          description: Detailed debug message (server-side context)
+        detailedDebugMessage:
+          type: string
+          examples:
+          - "Illegal unquoted character ((CTRL-CHAR, code 13)): ..."
+          description: Detailed server debug message (stack/parse detail)
+    ParsingDebugPayload:
+      type: object
+      description: Detailed debug information for parsing errors
+      properties:
+        debugs:
+          description: Optional debug payload (present in non-production contexts)
+          allOf:
+          - $ref: "#/components/schemas/DebugPayload"
+          - $ref: "#/components/schemas/ParsingDebugDetails"
+    PasswordRecoveryRequest:
+      type: object
+      required:
+      - identifier
+      description: User password recovery request
+      properties:
+        identifier:
+          type: string
+          minLength: 4
+          examples:
+          - user@example.com
+          maxLength: 100
+          pattern: \S
+          description: "User identifier for password recovery, can be email or username"
+    Permissions:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        description:
+          type: string
+        rolesList:
+          type: array
+          items:
+            $ref: "#/components/schemas/Roles"
+    Role:
+      type: string
+      enum:
+      - ADMIN
+      - TEACHER
+      - STUDENT
+      - STAFF
+    Role1:
+      type: string
+      enum:
+      - OWNER
+      - ADMIN
+      - MEMBER
+      - TEACHER
+      - STUDENT
+    Roles:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        permissionsList:
+          type: array
+          items:
+            $ref: "#/components/schemas/Permissions"
+        userrolesList:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRoles"
+    RouteResponse:
+      type: object
+      description: Standard response wrapper used by all routes
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        id: {}
+        identifier: {}
+        entityTypeName:
+          type: string
+        responseMap:
+          $ref: "#/components/schemas/JsonObject"
+        nextStep:
+          type: string
+          description: Next step hint for client flows
+        token:
+          type: string
+          description: Token when returned during verification flow
+        status:
+          type: string
+          description: HTTP status code
+        success:
+          type: string
+          description: Success message if any
+        error:
+          type: string
+          description: Error message if any
+        datas:
+          type: object
+          description: Response data (object) containing additional fields like session
+            or user
+        singleArrayDatas:
+          type: object
+          description: Response data (object) containing additional fields as tuples
+        message:
+          type: string
+          description: Additional message for the response
+        available:
+          type: boolean
+          description: Example boolean data field for availability checks
+    SessionId:
+      type: object
+      description: Session Id for authenticated users
+      properties:
+        session:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          description: Session id
+    SessionResponse:
+      type: object
+      description: Session response wrapper under `data`
+      properties:
+        data:
+          description: Session id or summary
+          allOf:
+          - $ref: "#/components/schemas/SessionId"
+    Severity:
+      type: object
+      description: Severity level for debug payload
+      properties:
+        level:
+          type: string
+          examples:
+          - high
+          description: Severity level (low|medium|high)
+    SignupRequest:
+      type: object
+      required:
+      - email
+      - username
+      description: User registration request
+      properties:
+        email:
+          type: string
+          examples:
+          - john.doe@example.com
+          pattern: "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+          description: User email address
+        username:
+          type: string
+          minLength: 4
+          maxLength: 100
+          pattern: "^[a-zA-Z0-9._-]{3,}$"
+    SignupValidation:
+      type: object
+      required:
+      - password
+      - passwordConfirmation
+      description: User registration validation
+      properties:
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+          maxLength: 255
+          pattern: "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\\W).{8,}$"
+        passwordConfirmation:
+          type: string
+          writeOnly: true
+          minLength: 8
+          maxLength: 255
+          pattern: "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\\W).{8,}$"
+    Skill:
+      type: object
+      required:
+      - name
+      - code
+      description: Skill model representing a skill with its attributes.
+      properties:
+        validStructure:
+          type: boolean
+        id: {}
+        identifier: {}
+        entityTypeName:
+          type: string
+        name:
+          type: string
+          minLength: 2
+          examples:
+          - Web Development
+          - Data Analysis
+          maxLength: 100
+          pattern: \S
+          description: The name of the skill for either lower or higher skills in
+            the tree
+        code:
+          type: string
+          examples:
+          - BT12
+          - DT101
+          pattern: "^[a-zA-Z0-9_\\-]+$"
+          description: The code of the skill for either lower or higher skills in
+            the tree
+        skillList:
+          type: array
+          examples:
+          - - BT12
+            - DT101
+            - DF10
+          items:
+            type: string
+          description: "List of associated skills codes representing the code of lower\
+            \ or higher skills in the tree.If empty, it means no associated skills\
+            \ yet. If you create a higher skill, pass here a related lower skill code"
+    SkillCreation:
+      type: object
+      description: Skill creation response payload
+      properties:
+        data:
+          description: Skill creation response data
+          allOf:
+          - $ref: "#/components/schemas/SkillViewDTO"
+    SkillEntry:
+      type: object
+      properties:
+        moduleId:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          description: Module id
+        subSkillId:
+          type: array
+          items:
+            type: string
+            format: uuid
+            pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+          description: List of sub-skill ids
+    SkillSummaryDTO:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        code:
+          type: string
+        name:
+          type: string
+    SkillType:
+      type: string
+      enum:
+      - MAIN
+      - SUB
+    SkillViewDTO:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        code:
+          type: string
+        type:
+          type: string
+        modules:
+          type: array
+          items:
+            $ref: "#/components/schemas/Skills"
+        modulesCodes:
+          type: array
+          items:
+            type: string
+    SkillWithSubSkills:
+      type: object
+      required:
+      - name
+      - code
+      - subSkills
+      description: Skill model representing a skill with its attributes and associated
+        sub-skills.
+      properties:
+        validStructure:
+          type: boolean
+        id: {}
+        identifier: {}
+        entityTypeName:
+          type: string
+        name:
+          type: string
+          minLength: 2
+          examples:
+          - Web Development
+          - Data Analysis
+          maxLength: 100
+          pattern: \S
+          description: The name of the skill for either lower or higher skills in
+            the tree
+        code:
+          type: string
+          examples:
+          - BT12
+          - DT101
+          pattern: "^[a-zA-Z0-9_\\-]+$"
+          description: The code of the skill for either lower or higher skills in
+            the tree
+        skillList:
+          type: array
+          examples:
+          - - BT12
+            - DT101
+            - DF10
+          items:
+            type: string
+          description: "List of associated skills codes representing the code of lower\
+            \ or higher skills in the tree.If empty, it means no associated skills\
+            \ yet. If you create a higher skill, pass here a related lower skill code"
+        subSkills:
+          type: array
+          minItems: 1
+          examples:
+          - - name: Web Development
+              code: BT12
+              skillList:
+              - DT101
+            - name: Data Analysis
+              code: DF10
+              skillList:
+              - willBeReplacedByDT101
+          items:
+            $ref: "#/components/schemas/Skill"
+          description: List of associated sub-skills representing lower skills in
+            the tree. The skill code in the 'skillList' must match the main skill
+            code or will be ignored and replaced by the main skill code. It can only
+            be lower skills
+    Skills:
+      type: object
+      properties:
+        identifier: {}
+        entityTypeName:
+          type: string
+        persistent:
+          type: boolean
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        code:
+          type: string
+        type:
+          $ref: "#/components/schemas/SkillType"
+        isActive:
+          type: boolean
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        deletedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        subskills:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/Skills"
+            type: object
+            description: Cyclic reference to org.teacherboard.entities.Skills
+        modules:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/Skills"
+            type: object
+            description: Cyclic reference to org.teacherboard.entities.Skills
+        evaluationskillscoresList:
+          type: array
+          items:
+            $ref: "#/components/schemas/EvaluationSkillScores"
+        modulesCodeList:
+          type: array
+          items:
+            type: string
+        subSkillsCodeList:
+          type: array
+          items:
+            type: string
+        skillSummary:
+          type: object
+          additionalProperties: {}
+    SkillsResponse:
+      type: object
+      description: Multiple skills response payload
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkillViewDTO"
+          description: Skills response data
+    StandardErrorResponse:
+      type: object
+      description: Common error fields shared by specific error responses
+      properties:
+        error:
+          type: string
+          examples:
+          - Unauthorized
+          description: Error message
+        status:
+          type: integer
+          format: int32
+          examples:
+          - 401
+          description: HTTP status code
+        type:
+          type: string
+          examples:
+          - Authentication error
+          description: Error type identifier when provided
+    StandardSuccessResponse:
+      type: object
+      description: Generic success response used across routes for operations that
+        only return success / status / optional nextStep
+      properties:
+        success:
+          type: string
+          examples:
+          - Operation completed successfully
+          description: Success message
+        status:
+          type: integer
+          format: int32
+          examples:
+          - 200
+          description: HTTP status code
+    Status:
+      type: string
+      enum:
+      - PENDING
+      - ACTIVE
+      - INACTIVE
+      - SUSPENDED
+      - DELETED
+    Status1:
+      type: string
+      enum:
+      - PENDING
+      - ACCEPTED
+      - CANCELED
+      - EXPIRED
+    StudentEvaluationModel:
+      type: object
+      required:
+      - id
+      - isPresent
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          description: The student id
+        isPresent:
+          type: boolean
+          description: Indicates whether the student is present at the evaluation
+        overallScore:
+          type: number
+          description: Overall score for the student (0 - 20)
+          maximum: 20
+          minimum: 0
+        assignedTask:
+          $ref: "#/components/schemas/AssignedTaskModel"
+          type: object
+          description: Assigned task to the student during the evaluation
+        evaluations:
+          $ref: "#/components/schemas/StudentEvaluationsDetailModel"
+          type: object
+          description: Student evaluations detail (modules + sub-skills)
+    StudentEvaluationsDetailModel:
+      type: object
+      required:
+      - modules
+      properties:
+        modules:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentModuleEvaluationModel"
+          description: List of module evaluations for the student
+    StudentModuleEvaluationModel:
+      type: object
+      required:
+      - id
+      - subSkills
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          description: Module id
+        name:
+          type: string
+          description: Module name
+        subSkills:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentSubSkillScoreModel"
+          description: Sub-skill scores for the module
+    StudentSubSkillScoreModel:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          description: The sub-skill id
+        score:
+          type: number
+          description: Score for the sub-skill (0 - 100)
+          maximum: 100
+          minimum: 0
+    StudentTaskHistory:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        id:
+          $ref: "#/components/schemas/UUID"
+        studentId:
+          $ref: "#/components/schemas/UUID"
+        taskId:
+          $ref: "#/components/schemas/UUID"
+        evaluationDate:
+          $ref: "#/components/schemas/OffsetDateTime"
+        overallScore:
+          type: number
+        classId:
+          $ref: "#/components/schemas/UUID"
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        student:
+          $ref: "#/components/schemas/Users"
+        task:
+          $ref: "#/components/schemas/Task"
+        classes:
+          $ref: "#/components/schemas/Classes"
+    StudentsResponse:
+      type: object
+      description: Students list response payload
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: "#/components/schemas/UUID"
+              firstName:
+                type: string
+              lastName:
+                type: string
+              role:
+                type: string
+              schoolName:
+                type: string
+              classId:
+                $ref: "#/components/schemas/UUID"
+          description: Students response data
+    Task:
+      type: object
+      properties:
+        code:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        description:
+          type: string
+        colorCode:
+          type: string
+        isActive:
+          type: boolean
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        studentTaskHistory:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentTaskHistory"
+    TaskResponse:
+      type: object
+      description: Single task response payload
+      properties:
+        data:
+          description: Task response data
+          allOf:
+          - $ref: "#/components/schemas/TaskViewDTO"
+    TaskTemplate:
+      type: object
+      properties:
+        code:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        persistent:
+          type: boolean
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        task:
+          $ref: "#/components/schemas/Task"
+        degreeConfiguration:
+          type: object
+          properties:
+            code:
+              type: string
+            name:
+              type: string
+            identifier: {}
+            entityTypeName:
+              type: string
+            id:
+              $ref: "#/components/schemas/UUID"
+            degreeLevelId:
+              $ref: "#/components/schemas/UUID"
+            degreeYearId:
+              $ref: "#/components/schemas/UUID"
+            degreeFieldId:
+              $ref: "#/components/schemas/UUID"
+            description:
+              type: string
+            isActive:
+              type: boolean
+            createdAt:
+              $ref: "#/components/schemas/OffsetDateTime"
+            updatedAt:
+              $ref: "#/components/schemas/OffsetDateTime"
+            deletedAt:
+              $ref: "#/components/schemas/OffsetDateTime"
+            modules:
+              type: array
+              items:
+                type: object
+                properties:
+                  identifier: {}
+                  entityTypeName:
+                    type: string
+                  persistent:
+                    type: boolean
+                  id:
+                    $ref: "#/components/schemas/UUID"
+                  name:
+                    type: string
+                  code:
+                    type: string
+                  type:
+                    $ref: "#/components/schemas/SkillType"
+                  isActive:
+                    type: boolean
+                  createdAt:
+                    $ref: "#/components/schemas/OffsetDateTime"
+                  updatedAt:
+                    $ref: "#/components/schemas/OffsetDateTime"
+                  deletedAt:
+                    $ref: "#/components/schemas/OffsetDateTime"
+                  evaluationskillscoresList:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/EvaluationSkillScores"
+                  subskills:
+                    type: array
+                    items:
+                      type: object
+                      description: Cyclic reference to org.teacherboard.entities.Skills
+                  modules:
+                    type: array
+                    items:
+                      type: object
+                      description: Cyclic reference to org.teacherboard.entities.Skills
+                  modulesCodeList:
+                    type: array
+                    items:
+                      type: string
+                  skillSummary:
+                    type: object
+                    additionalProperties: {}
+            modulesCodeList:
+              type: array
+              items:
+                type: string
+        subskills:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/TaskTemplateSubskill"
+        classTemplates:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClassTemplate"
+        isActive:
+          type: boolean
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        deletedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+    TaskTemplateDTO:
+      type: object
+      required:
+      - name
+      - description
+      - taskId
+      - degreeConfigId
+      - modules
+      properties:
+        code:
+          type: string
+        id: {}
+        identifier: {}
+        entityTypeName:
+          type: string
+        name:
+          type: string
+          examples:
+          - Waiter the tables
+          maxLength: 100
+          pattern: "^[\\p{L}\\p{M}0-9\\/,&._' \\-()]{2,100}$"
+          description: Name of the task
+        description:
+          type: string
+          examples:
+          - Used to ensure the tables are clean and ready for customers.
+          maxLength: 500
+          pattern: "^[\\p{L}\\p{M}0-9'.,\\/;:!?\"%&$€@#()\\n\\r \\ -]{4,500}$"
+          description: Description of the task
+        taskId:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          examples:
+          - 550e8400-e29b-41d4-a716-446655440000
+          description: Unique identifier of the task template
+        degreeConfigId:
+          $ref: "#/components/schemas/UUID"
+          type: string
+          examples:
+          - 550e8400-e29b-41d4-a716-446655440000
+          description: Identifier of the degree configuration associated with the
+            task template
+        modules:
+          type: array
+          examples:
+          - moduleId: 550e8400-e29b-41d4-a716-446655440000
+            subSkillId:
+            - 550e8400-e29b-41d4-a716-446655440001
+            - 550e8400-e29b-41d4-a716-446655440002
+          items:
+            $ref: "#/components/schemas/SkillEntry"
+          description: List of modules (module + sub skill ids) to attach to the template
+    TaskTemplateResponse:
+      type: object
+      description: Single task template response payload
+      properties:
+        data:
+          description: Task template response data
+          allOf:
+          - $ref: "#/components/schemas/TaskTemplateViewDTO"
+    TaskTemplateSubSkillKey:
+      type: object
+      properties:
+        templateId:
+          $ref: "#/components/schemas/UUID"
+        mainskillId:
+          $ref: "#/components/schemas/UUID"
+        subskillId:
+          $ref: "#/components/schemas/UUID"
+    TaskTemplateSubskill:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        persistent:
+          type: boolean
+        id:
+          $ref: "#/components/schemas/TaskTemplateSubSkillKey"
+        taskTemplate:
+          $ref: "#/components/schemas/TaskTemplate"
+        mainSkill:
+          $ref: "#/components/schemas/Skills"
+          type: object
+          additionalProperties: {}
+        subSkill:
+          $ref: "#/components/schemas/Skills"
+          type: object
+          additionalProperties: {}
+    TaskTemplateViewDTO:
+      type: object
+      description: View DTO returned when creating or retrieving a TaskTemplate (entity-assigned
+        view)
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        task:
+          $ref: "#/components/schemas/TaskViewDTO"
+        degreeConfiguration:
+          $ref: "#/components/schemas/DegreeConfigurationViewDTO"
+        modules:
+          type: array
+          items:
+            $ref: "#/components/schemas/ModuleViewDTO"
+        taskName:
+          type: string
+    TaskTemplatesByDegreeResponse:
+      type: object
+      description: Task templates by degree response payload
+      properties:
+        shortTemplatesList:
+          type: array
+          items:
+            type: string
+          description: Short templates list
+        taskTemplates:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskTemplateViewDTO"
+          description: Task templates list
+    TaskTemplatesResponse:
+      type: object
+      description: Multiple task templates response payload
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskTemplateViewDTO"
+          description: Task templates response data
+    TaskViewDTO:
+      type: object
+      description: Concise summary for Task used in API views
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        description:
+          type: string
+    TasksResponse:
+      type: object
+      description: Multiple tasks response payload
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskViewDTO"
+          description: Tasks response data
+    TeachersResponse:
+      type: object
+      description: Multiple teachers response payload
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: "#/components/schemas/UUID"
+              firstName:
+                type: string
+              lastName:
+                type: string
+              role:
+                type: string
+              schoolName:
+                type: string
+              classId:
+                $ref: "#/components/schemas/UUID"
+          description: Teachers response data
+    TokenResponse:
+      type: object
+      description: Top-level token returned during some flows
+      properties:
+        token:
+          type: string
+          examples:
+          - <jwt-token>
+          description: JWT token
+    UUID:
+      type: string
+      format: uuid
+      pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+    UserRoles:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        id:
+          $ref: "#/components/schemas/UUID"
+        userId:
+          $ref: "#/components/schemas/UUID"
+        roleId:
+          $ref: "#/components/schemas/UUID"
+        assignedBy:
+          type: string
+        assignedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        roles:
+          $ref: "#/components/schemas/Roles"
+        users:
+          $ref: "#/components/schemas/Users"
+    UserSettings:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        id:
+          $ref: "#/components/schemas/UUID"
+        userId:
+          $ref: "#/components/schemas/UUID"
+        settings:
+          type: object
+          additionalProperties: {}
+        version:
+          type: integer
+          format: int32
+        active:
+          type: boolean
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        users:
+          $ref: "#/components/schemas/Users"
+    Users:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        identifier: {}
+        entityTypeName:
+          type: string
+        persistent:
+          type: boolean
+        id:
+          $ref: "#/components/schemas/UUID"
+        email:
+          type: string
+          pattern: "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+        username:
+          type: string
+          minLength: 4
+          maxLength: 100
+          pattern: "^[a-zA-Z0-9._-]{3,}$"
+        passwordHash:
+          type: string
+          pattern: "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\\W).{8,}$"
+        firstName:
+          type: string
+          pattern: "^[A-Za-zÀ-ÖØ-öø-ÿ' -]{1,}$"
+        lastName:
+          type: string
+          pattern: "^[A-Za-zÀ-ÖØ-öø-ÿ' -]{1,}$"
+        phone:
+          type: string
+          pattern: "^(\\+\\d{1,3}[- ]?)?\\d{10}$"
+        role:
+          $ref: "#/components/schemas/Role"
+        schoolName:
+          type: string
+        profilePictureUrl:
+          type: string
+        status:
+          $ref: "#/components/schemas/Status"
+        lastLogin:
+          $ref: "#/components/schemas/OffsetDateTime"
+        settings:
+          type: object
+          additionalProperties: {}
+        createdAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        updatedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        deletedAt:
+          $ref: "#/components/schemas/OffsetDateTime"
+        classId:
+          $ref: "#/components/schemas/UUID"
+        attendancesList:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attendances"
+        classe:
+          $ref: "#/components/schemas/Classes"
+        classesList:
+          type: array
+          items:
+            $ref: "#/components/schemas/Classes"
+        classAssignments:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: "#/components/schemas/ClassTeacherAssignment"
+        evaluationsList:
+          type: array
+          items:
+            $ref: "#/components/schemas/Evaluations"
+        imagesList:
+          type: array
+          items:
+            $ref: "#/components/schemas/Images"
+        userrolesList:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRoles"
+        usersettingsList:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserSettings"
+        usertokensList:
+          type: array
+          items:
+            $ref: "#/components/schemas/JwtTokens"
+        courseassignmentsList:
+          type: array
+          items:
+            $ref: "#/components/schemas/CourseAssignments"
+        menuvisibilityList:
+          type: array
+          items:
+            $ref: "#/components/schemas/MenuVisibility"
+        rolesString:
+          type: string
+    ValidationViolation:
+      type: object
+      description: Validation error item
+      properties:
+        field:
+          type: string
+          examples:
+          - login.request.identifier
+          description: Property path or field name
+        message:
+          type: string
+          examples:
+          - Email is required
+          description: Validation message
+  securitySchemes:
+    SecurityScheme:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Authentication
+tags:
+- name: Authentication
+  description: Endpoints related to user authentication and session management
+- name: Classes
+  description: /api/classes
+- name: Degrees
+  description: /api/degrees
+- name: Evaluations
+  description: /api/evaluations
+- name: Groups
+  description: /api/groups
+- name: Skills
+  description: /api/skills
+- name: Students
+  description: /api/students
+- name: Tasks
+  description: /api/tasks
+- name: Teachers
+  description: /api/teachers
+paths:
+  /api/auth/*:
+    post:
+      operationId: quickJsonParse
+      x-quarkus-openapi-method-ref: m1153850991_24595795
+      tags:
+      - Authentication
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+  /api/auth/login:
+    post:
+      summary: Authenticate a user and create a session
+      operationId: login
+      x-quarkus-openapi-method-ref: m1153850991_1914808533
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Login successful and session created
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/LoginResponse"
+  /api/auth/logout:
+    post:
+      summary: Logout current session
+      operationId: logout
+      x-quarkus-openapi-method-ref: m1153850991_-1157972089
+      tags:
+      - Authentication
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/NextStepResponse"
+        "204":
+          description: No active session
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/NextStepResponse"
+  /api/auth/logout-all:
+    post:
+      summary: Logout from all devices for the current user
+      operationId: logoutAll
+      x-quarkus-openapi-method-ref: m1153850991_-2061437988
+      tags:
+      - Authentication
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Logged out from all devices
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/NextStepResponse"
+  /api/auth/password-creation:
+    post:
+      summary: Create a new password after email verification
+      operationId: createPassword
+      x-quarkus-openapi-method-ref: m1153850991_1254147941
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupValidation"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "201":
+          description: Password created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/NextStepResponse"
+  /api/auth/password-recovery:
+    post:
+      summary: Request a password recovery email
+      operationId: passwordRecoveryRequest
+      x-quarkus-openapi-method-ref: m1153850991_-558050209
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PasswordRecoveryRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "202":
+          description: Password recovery email sent
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/NextStepResponse"
+  /api/auth/session:
+    post:
+      summary: Get current session info
+      operationId: getSession
+      x-quarkus-openapi-method-ref: m1153850991_-1731813391
+      tags:
+      - Authentication
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Session active
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/SessionResponse"
+        "403":
+          description: No active session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error403Forbidden"
+  /api/auth/signup:
+    post:
+      summary: Sign up a new user
+      operationId: signup
+      x-quarkus-openapi-method-ref: m1153850991_-1173462839
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "202":
+          description: Please check your email to validate your account
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/NextStepResponse"
+  /api/auth/verify/{sel}/{val}:
+    get:
+      summary: Verify a user's email using selector and validator tokens
+      operationId: verifyEmail
+      x-quarkus-openapi-method-ref: m1153850991_714992639
+      tags:
+      - Authentication
+      parameters:
+      - description: Selector token from the verification link
+        required: true
+        name: sel
+        in: path
+        schema:
+          type: string
+      - description: Validator token from the verification link
+        required: true
+        name: val
+        in: path
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Email verification succeeded and token returned
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/TokenResponse"
+                - $ref: "#/components/schemas/NextStepResponse"
+  /api/classes:
+    post:
+      summary: Create a new class
+      operationId: createClasses
+      x-quarkus-openapi-method-ref: m807127244_-454670788
+      tags:
+      - Classes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClassModel"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "201":
+          description: Class created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/ClassResponse"
+    get:
+      summary: Retrieve all classes
+      operationId: getAllClassesRoute
+      x-quarkus-openapi-method-ref: m807127244_431899782
+      tags:
+      - Classes
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Classes retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/ClassesResponse"
+  /api/classes/*:
+    post:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m807127244_1938714467
+      tags:
+      - Classes
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    put:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m807127244_1938714467
+      tags:
+      - Classes
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    delete:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m807127244_1938714467
+      tags:
+      - Classes
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    options:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m807127244_1938714467
+      tags:
+      - Classes
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    get:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m807127244_1938714467
+      tags:
+      - Classes
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+  /api/classes/check-name:
+    get:
+      operationId: checkNameNoParam
+      x-quarkus-openapi-method-ref: m807127244_225216603
+      tags:
+      - Classes
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+  /api/classes/check-name/{name}:
+    get:
+      summary: Verify class name availability
+      operationId: checkName
+      x-quarkus-openapi-method-ref: m807127244_-1120021895
+      tags:
+      - Classes
+      parameters:
+      - description: Class name
+        required: true
+        name: name
+        in: path
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Class name is available
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/AvailabilityResponse"
+        "409":
+          description: Class name not available
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/Error500Internal"
+                - $ref: "#/components/schemas/AvailabilityResponse"
+  /api/classes/{id}:
+    delete:
+      summary: Delete a class by id
+      operationId: deleteClassRoute
+      x-quarkus-openapi-method-ref: m807127244_-935547618
+      tags:
+      - Classes
+      parameters:
+      - description: Class id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "204":
+          description: Class deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardSuccessResponse"
+        "404":
+          description: Class not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+    get:
+      summary: Retrieve a class by id
+      operationId: getClassByIdRoute
+      x-quarkus-openapi-method-ref: m807127244_667484839
+      tags:
+      - Classes
+      parameters:
+      - description: Class id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Class retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/ClassResponse"
+        "404":
+          description: Class not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+    put:
+      summary: Update a class by id
+      operationId: updateClassRoute
+      x-quarkus-openapi-method-ref: m807127244_-344825852
+      tags:
+      - Classes
+      parameters:
+      - description: Class id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClassModel"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "204":
+          description: Class updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardSuccessResponse"
+        "404":
+          description: Class not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+  /api/degrees/*:
+    post:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m911938905_892908662
+      tags:
+      - Degrees
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    put:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m911938905_892908662
+      tags:
+      - Degrees
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    delete:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m911938905_892908662
+      tags:
+      - Degrees
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    options:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m911938905_892908662
+      tags:
+      - Degrees
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+  /api/degrees/config:
+    post:
+      summary: Create a new degree configuration
+      operationId: createDegreeConfiguration
+      x-quarkus-openapi-method-ref: m911938905_-1057709167
+      tags:
+      - Degrees
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DegreeConfigurationDto"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "201":
+          description: Degree configuration created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/DegreeConfigurationResponse"
+    get:
+      summary: Retrieve all degree configurations
+      operationId: getDegreeConfigurations
+      x-quarkus-openapi-method-ref: m911938905_-63130486
+      tags:
+      - Degrees
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Degree configurations retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/DegreeConfigurationResponse"
+  /api/degrees/config/{id}:
+    delete:
+      summary: Delete a degree configuration by ID
+      operationId: deleteDegreeConfigById
+      x-quarkus-openapi-method-ref: m911938905_-212075102
+      tags:
+      - Degrees
+      parameters:
+      - description: Degree configuration id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "204":
+          description: Degree configuration deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardSuccessResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+    get:
+      summary: Retrieve degree configuration by ID
+      operationId: getDegreeConfigurationsById
+      x-quarkus-openapi-method-ref: m911938905_-1686882082
+      tags:
+      - Degrees
+      parameters:
+      - description: Degree configuration id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Degree configuration retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/DegreeConfigurationResponse"
+        "404":
+          description: Degree configuration not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+    put:
+      summary: Update a degree configuration by ID
+      operationId: updateDegreeConfiguration
+      x-quarkus-openapi-method-ref: m911938905_219073411
+      tags:
+      - Degrees
+      parameters:
+      - description: Degree configuration id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DegreeConfigurationDto"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "204":
+          description: Degree configuration updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardSuccessResponse"
+        "404":
+          description: Degree configuration not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+  /api/evaluations:
+    post:
+      summary: Create a new evaluation
+      operationId: createEvaluations
+      x-quarkus-openapi-method-ref: m1131574824_1927650577
+      tags:
+      - Evaluations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluationModel"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "201":
+          description: Evaluation created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/EvaluationCreation"
+    get:
+      summary: Retrieve all evaluations
+      operationId: getAllEvaluations
+      x-quarkus-openapi-method-ref: m1131574824_544490574
+      tags:
+      - Evaluations
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: All evaluations retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/EvaluationsResponse"
+  /api/evaluations/*:
+    post:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1131574824_-888312441
+      tags:
+      - Evaluations
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    put:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1131574824_-888312441
+      tags:
+      - Evaluations
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    delete:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1131574824_-888312441
+      tags:
+      - Evaluations
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    options:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1131574824_-888312441
+      tags:
+      - Evaluations
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+  /api/evaluations/{id}:
+    delete:
+      summary: Delete an evaluation by id
+      operationId: deleteEvaluationsById
+      x-quarkus-openapi-method-ref: m1131574824_-1665867842
+      tags:
+      - Evaluations
+      parameters:
+      - description: Evaluation id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "204":
+          description: Evaluation deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardSuccessResponse"
+        "404":
+          description: Evaluation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+    get:
+      summary: Retrieve an evaluation by id
+      operationId: getEvaluationsById
+      x-quarkus-openapi-method-ref: m1131574824_1714460551
+      tags:
+      - Evaluations
+      parameters:
+      - description: Evaluation id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Evaluation retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/EvaluationCreation"
+        "404":
+          description: Evaluation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+    put:
+      summary: Update an evaluation by id
+      operationId: updateEvaluationsById
+      x-quarkus-openapi-method-ref: m1131574824_-292189312
+      tags:
+      - Evaluations
+      parameters:
+      - description: Evaluation id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluationModel"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "204":
+          description: Evaluation updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardSuccessResponse"
+        "404":
+          description: Evaluation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+  /api/groups:
+    post:
+      summary: Créer un groupe
+      operationId: createGroupRoute
+      x-quarkus-openapi-method-ref: m440046452_2030024924
+      tags:
+      - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupModel"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Requête invalide
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "201":
+          description: Groupe créé
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/GroupCreatedResponse"
+    get:
+      summary: Rechercher des groupes
+      operationId: searchGroupsRoute
+      x-quarkus-openapi-method-ref: m440046452_-899039007
+      tags:
+      - Groups
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Groupes récupérés
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/GroupsResponse"
+  /api/groups/*:
+    post:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m440046452_-850855493
+      tags:
+      - Groups
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    put:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m440046452_-850855493
+      tags:
+      - Groups
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    delete:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m440046452_-850855493
+      tags:
+      - Groups
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    options:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m440046452_-850855493
+      tags:
+      - Groups
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    get:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m440046452_-850855493
+      tags:
+      - Groups
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+  /api/groups/invitations/accept:
+    post:
+      summary: Accepter une invitation par token
+      operationId: acceptInvitationRoute
+      x-quarkus-openapi-method-ref: m440046452_1781517367
+      tags:
+      - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupAcceptInvitationModel"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Invitation invalide
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Invitation acceptée
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/GroupDetailResponse"
+  /api/groups/{id}:
+    get:
+      summary: Détail d'un groupe
+      operationId: getGroupByIdRoute
+      x-quarkus-openapi-method-ref: m440046452_-401717690
+      tags:
+      - Groups
+      parameters:
+      - description: Group id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Groupe trouvé
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/GroupDetailResponse"
+        "404":
+          description: Groupe introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+  /api/groups/{id}/classes:
+    post:
+      summary: Associer une classe à un groupe
+      operationId: attachClassRoute
+      x-quarkus-openapi-method-ref: m440046452_263941537
+      tags:
+      - Groups
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupClassLinkModel"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Classe associée
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/GroupDetailResponse"
+        "404":
+          description: Groupe ou classe introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+  /api/groups/{id}/classes/{classId}:
+    delete:
+      summary: Dissocier une classe d'un groupe
+      operationId: detachClassRoute
+      x-quarkus-openapi-method-ref: m440046452_535729234
+      tags:
+      - Groups
+      parameters:
+      - name: classId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Classe dissociée
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/GroupDetailResponse"
+        "404":
+          description: Groupe ou classe introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+  /api/groups/{id}/invitations:
+    post:
+      summary: Créer une invitation
+      operationId: createInvitationRoute
+      x-quarkus-openapi-method-ref: m440046452_-2142589723
+      tags:
+      - Groups
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupInvitationModel"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Requête invalide
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "201":
+          description: Invitation créée
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/GroupInvitationResponse"
+  /api/skills/*:
+    post:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1914771465_1915946950
+      tags:
+      - Skills
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    put:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1914771465_1915946950
+      tags:
+      - Skills
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    delete:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1914771465_1915946950
+      tags:
+      - Skills
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    options:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1914771465_1915946950
+      tags:
+      - Skills
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+  /api/skills/main/with-subskills:
+    post:
+      summary: Create a main skill along with its sub-skills
+      operationId: createSkillWithSubSkills
+      x-quarkus-openapi-method-ref: m1914771465_1576545458
+      tags:
+      - Skills
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SkillWithSubSkills"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "201":
+          description: Main skill and its sub-skills created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/SkillCreation"
+  /api/students:
+    get:
+      summary: Retrieve all students
+      description: Retrieve all students associated with the authenticated user.
+      operationId: getAllStudentsRoute
+      x-quarkus-openapi-method-ref: m282502311_-857940715
+      tags:
+      - Students
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Students retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/StudentsResponse"
+  /api/students/*:
+    post:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m282502311_-1439756568
+      tags:
+      - Students
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    put:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m282502311_-1439756568
+      tags:
+      - Students
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    delete:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m282502311_-1439756568
+      tags:
+      - Students
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    options:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m282502311_-1439756568
+      tags:
+      - Students
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    get:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m282502311_-1439756568
+      tags:
+      - Students
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+  /api/students/not-assigned:
+    get:
+      summary: Retrieve all students
+      description: Retrieve all students associated with the authenticated user.
+      operationId: getAllNonAssignedStudentsInSchool
+      x-quarkus-openapi-method-ref: m282502311_664897914
+      tags:
+      - Students
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Students retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/StudentsResponse"
+  /api/task-templates:
+    post:
+      summary: Create a new task template
+      operationId: createTaskTemplateEndpoint
+      x-quarkus-openapi-method-ref: m1810357624_-131934546
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskTemplateDTO"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "201":
+          description: Template task created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/TaskTemplateResponse"
+    get:
+      summary: Retrieve all task templates
+      operationId: getAllTaskTemplates
+      x-quarkus-openapi-method-ref: m1810357624_-1617736159
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Task templates retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/TaskTemplatesResponse"
+  /api/task-templates/*:
+    post:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1810357624_-1320882121
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    put:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1810357624_-1320882121
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    delete:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1810357624_-1320882121
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    options:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1810357624_-1320882121
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+  /api/task-templates/by-degree-config/{configId}:
+    get:
+      summary: Retrieve task templates by degree configuration id
+      operationId: getTaskTemplatesByDegreeConfigurationId
+      x-quarkus-openapi-method-ref: m1810357624_-1804411840
+      parameters:
+      - description: Degree configuration id
+        required: true
+        name: configId
+        in: path
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Task templates retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/TaskTemplatesByDegreeResponse"
+        "404":
+          description: Degree configuration not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+  /api/task-templates/{id}:
+    delete:
+      summary: Delete a task template by id
+      operationId: deleteTaskTemplate
+      x-quarkus-openapi-method-ref: m1810357624_-1460564156
+      parameters:
+      - description: Task template id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "204":
+          description: Task template deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardSuccessResponse"
+        "404":
+          description: Task template not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+    get:
+      summary: Retrieve a task template by id
+      operationId: getTaskTemplateById
+      x-quarkus-openapi-method-ref: m1810357624_-1326469527
+      parameters:
+      - description: Task template id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Task template retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/TaskTemplateResponse"
+        "404":
+          description: Task template not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+    put:
+      summary: Update a task template by id
+      operationId: updateTaskTemplate
+      x-quarkus-openapi-method-ref: m1810357624_-176664389
+      parameters:
+      - description: Task template id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskTemplateDTO"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "204":
+          description: Task template updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardSuccessResponse"
+        "404":
+          description: Task template not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+  /api/tasks:
+    post:
+      summary: Create a new task
+      operationId: createTask
+      x-quarkus-openapi-method-ref: m1942971180_666778819
+      tags:
+      - Tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClassTaskModel"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "201":
+          description: Task created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/TaskResponse"
+    get:
+      summary: Retrieve all tasks
+      operationId: getAllTasks
+      x-quarkus-openapi-method-ref: m1942971180_-1790154797
+      tags:
+      - Tasks
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Tasks retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/TasksResponse"
+  /api/tasks/*:
+    post:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1942971180_-1504829181
+      tags:
+      - Tasks
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    put:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1942971180_-1504829181
+      tags:
+      - Tasks
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    delete:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1942971180_-1504829181
+      tags:
+      - Tasks
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    options:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1942971180_-1504829181
+      tags:
+      - Tasks
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+  /api/tasks/{id}:
+    delete:
+      summary: Delete a task by id
+      operationId: deleteTask
+      x-quarkus-openapi-method-ref: m1942971180_506454634
+      tags:
+      - Tasks
+      parameters:
+      - description: Task id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "204":
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardSuccessResponse"
+        "404":
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+    get:
+      summary: Retrieve a task by id
+      operationId: getTask
+      x-quarkus-openapi-method-ref: m1942971180_1454976577
+      tags:
+      - Tasks
+      parameters:
+      - description: Task id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Task retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/TaskResponse"
+        "404":
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+    put:
+      summary: Update a task by id
+      operationId: updateTask
+      x-quarkus-openapi-method-ref: m1942971180_-24427720
+      tags:
+      - Tasks
+      parameters:
+      - description: Task id
+        required: true
+        name: id
+        in: path
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClassTaskModel"
+        required: true
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "204":
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardSuccessResponse"
+        "404":
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+  /api/teachers:
+    get:
+      summary: Retrieve all teachers
+      description: Retrieve all teachers associated with the authenticated user.
+      operationId: getAllTeachersInSchool
+      x-quarkus-openapi-method-ref: m1234838047_716378188
+      tags:
+      - Teachers
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+        "200":
+          description: Teachers retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: "#/components/schemas/StandardSuccessResponse"
+                - $ref: "#/components/schemas/TeachersResponse"
+  /api/teachers/*:
+    post:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1234838047_-1982119824
+      tags:
+      - Teachers
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    put:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1234838047_-1982119824
+      tags:
+      - Teachers
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    delete:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1234838047_-1982119824
+      tags:
+      - Teachers
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    options:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1234838047_-1982119824
+      tags:
+      - Teachers
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+    get:
+      operationId: sessionAuthBlocking
+      x-quarkus-openapi-method-ref: m1234838047_-1982119824
+      tags:
+      - Teachers
+      responses:
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error500Internal"
+        "400":
+          description: Validation error OR parse error
+          content:
+            application/json:
+              schema:
+                anyOf:
+                - $ref: "#/components/schemas/Error400Parsing"
+                - $ref: "#/components/schemas/Error400Validation"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error401Unauthorized"
+info:
+  title: Enterprise API Middleware
+  version: 1.0.0
+  description: APIs for core enterprise integration services.
+  contact:
+    email: devteam@teachboard.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html

@@ -116,8 +116,35 @@ export type OwnProps<T> = {
     : never]: T[K];
 };
 
+/**
+ * Helper type to extract only the non-function properties of a type, useful for distinguishing between value props and callback props in our HOCs.
+ */
+export type NonFunctionValue<T> = T extends (...args: unknown[]) => unknown
+  ? never
+  : T;
+/**
+ * Strict version of an object type that forbids any additional properties.
+ *
+ * This is useful for our HOCs where we want the wrapped component to reject
+ * extra props even when the props are supplied via a variable (not just an
+ * object literal).  The technique is to intersect the original type with a
+ * mapped type that assigns `never` to any key that is not present on `T`.
+ *
+ * Example:
+ * ```ts
+ * type A = { x: number };
+ * type B = NoExtraProps<A>;
+ * const obj = { x: 1, y: 2 };
+ * const a: B = obj; // error: 'y' is not allowed
+ * ```
+ */
+export type NoExtraProps<T extends object> = T & {
+  [K in Exclude<string, keyof T>]?: never;
+};
+
 export type KeysOfUnion<T> = T extends unknown ? keyof T : never;
 export type ProvidedKeyRecord<T> = Record<KeysOfUnion<T>, unknown>;
+export type HasStringIndex<T> = string extends keyof T ? true : false;
 
 /**
  * Union of component-like signatures (function, class, forwardRef, render prop).
@@ -190,6 +217,45 @@ export type ProbeProxyResult = {
   trapAvailable: boolean;
   isProxyfied: boolean;
   unsupported?: boolean;
+};
+
+/**
+ * FOR TESTS ONLY: helper type to assert that a type is rejected by the compiler.
+ */
+
+// equality (used when we want two types to match exactly)
+export type IsSame<A, B> = A extends B ? (B extends A ? true : false) : false;
+
+/**
+ * Useful for tests - Assert that A is assignable to B, but not the other way around.
+ */
+export type IsAssignable<A, B> = A extends B
+  ? Exclude<
+      keyof RemoveStringIndex<A>,
+      keyof RemoveStringIndex<B>
+    > extends never
+    ? true
+    : false
+  : false;
+
+/**
+ * Useful for tests - Assert that A is assignable to B, but not the other way around.
+ */
+export type ShouldReject<A, B> =
+  IsAssignable<A, B> extends true
+    ? Exclude<
+        keyof RemoveStringIndex<A>,
+        keyof RemoveStringIndex<B>
+      > extends never
+      ? never
+      : true
+    : true;
+
+// remove `string` index signature from a type – used both for the wrapped
+// component's props and for our known metadata keys.
+
+export type RemoveStringIndex<T> = {
+  [K in keyof T as string extends K ? never : K]: T[K];
 };
 
 type _GenericSuccess<T extends ResponseInterface> = T;

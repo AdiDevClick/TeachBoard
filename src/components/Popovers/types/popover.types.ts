@@ -1,19 +1,13 @@
-import type {
-  CommandItemType,
-  HeadingType,
-} from "@/components/Command/types/command.types.ts";
 import type { VerticalSelectProps } from "@/components/Selects/types/select.types.ts";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types.ts";
-import type { BivariantCallback } from "@/utils/types/types.utils.ts";
 import type { ButtonProps } from "react-day-picker";
 
 export type PopoverBaseProps = Omit<
   VerticalSelectProps,
-  "side" | "onOpenChange" | "onSelect" | "onValueChange" | "value"
+  "side" | "onSelect" | "onValueChange" | "value"
 > & {
   side?: "top" | "bottom" | "left" | "right";
   role?: ButtonProps["role"];
-  onOpenChange?: (open: boolean, meta?: MetaDatasPopoverField) => void;
   /** When this key changes, the selectedValue state will be reset */
   resetKey?: string | number;
 };
@@ -24,40 +18,21 @@ export type PopoverMultiValue = string[] | Set<string> | undefined;
 
 export type PopoverSelectionValue = PopoverSingleValue | PopoverMultiValue;
 
-export type PopoverSingleSelectionProps = {
-  multiSelection?: false;
-  value?: string;
-  onValueChange?: (value: PopoverSelectionValue, ...args: unknown[]) => void;
-};
-
-export type PopoverMultiSelectionProps = {
-  multiSelection: true;
-  value?: string[] | Set<string>;
-  onValueChange?: (value: PopoverSelectionValue, ...args: unknown[]) => void;
-};
-
-export type PopoverSelectionProps =
-  | PopoverSingleSelectionProps
-  | PopoverMultiSelectionProps;
-
-export type PopoverCommandProps = {
+export type PopoverSelectionProps = {
   /**
-   * Callback invoked when a command item is selected.
-   * Bivariant to allow passing richer item subtypes (e.g. DetailedCommandItem).
+   * When truthy the popover allows selecting multiple values (the internal
+   * representation is a `Set`).  Any boolean is accepted, which makes it easy
+   * to pass through a variable or spread from other objects without narrowing.
+   *
+   * Optional: the field behaves as a regular single-selection popover when
+   * the prop is omitted or falsy.  This matches the behaviour of the
+   * implementation which treats the flag truthily.
    */
-  onSelect?: BivariantCallback<
-    (value: string, commandItem: CommandItemType) => void
-  >;
-  /** Headings provided to Command items when using command lists */
-  commandHeadings?: HeadingType[];
+  multiSelection?: boolean;
 };
 
 /** Props spécifiques au PopoverField */
-export type PopoverFieldProps = PopoverBaseProps &
-  PopoverSelectionProps &
-  PopoverCommandProps & {
-    controllerFieldMeta?: MetaDatasPopoverField;
-  };
+export type PopoverFieldProps = PopoverBaseProps & PopoverSelectionProps;
 
 export type PopoverFieldState = {
   open: boolean;

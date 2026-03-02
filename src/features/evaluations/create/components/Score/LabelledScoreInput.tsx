@@ -1,4 +1,4 @@
-import { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input";
+import { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input.exports";
 import { Badge } from "@/components/ui/badge";
 import { Item } from "@/components/ui/item";
 import type { LabelledScoreInputProps } from "@/features/evaluations/create/components/Score/types/score-types";
@@ -34,7 +34,7 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
    * @description This allows us to make sure the server receives the updated overall score for each student as it can be updated in real-time.
    */
   useWatch({
-    control: form.control,
+    control: form?.control,
     name: watchId,
     compute: (score) => {
       if (score) {
@@ -50,7 +50,7 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
       <div className={labelledScoreInputInput}>
         <ControlledLabelledInput
           name={watchId}
-          form={form}
+          control={form?.control}
           type="number"
           min={0}
           max={20}

@@ -2,7 +2,7 @@ import type {
   CommandItemType,
   HeadingType,
 } from "@/components/Command/types/command.types.ts";
-import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/exports/popover-field.exports";
 import { DynamicTags } from "@/components/Tags/DynamicTags";
 import type { DynamicTagItemDetails } from "@/components/Tags/types/tags.types";
@@ -214,7 +214,7 @@ export function TaskTemplateCreationController({
     >
       <ControlledInputList
         items={controllers.inputsControllers}
-        form={form}
+        control={form.control}
         setRef={setRef}
         observedRefs={observedRefs}
       />
@@ -225,12 +225,12 @@ export function TaskTemplateCreationController({
       />
       <PopoverFieldWithControllerAndCommandsList
         items={controllers.popoverFieldsControllers}
-        form={form}
+        control={form.control}
         setRef={setRef}
         onSelect={handleCommandSelection}
         onOpenChange={openingCallback}
         observedRefs={observedRefs}
-        onAddNewItem={newItemCallback}
+        onClick={newItemCallback}
         commandHeadings={computedCommandHeadings}
       />
     </form>

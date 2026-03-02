@@ -4,13 +4,7 @@ import { Button } from "@/components/ui/button.tsx";
 import { CommandItem } from "@/components/ui/command.tsx";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { CheckIcon, Plus } from "lucide-react";
-import {
-  Activity,
-  useCallback,
-  useState,
-  type TouchEvent,
-  type WheelEvent,
-} from "react";
+import { Activity, useState, type TouchEvent, type WheelEvent } from "react";
 
 /**
  * Props for CommandSelectionItem component.
@@ -18,16 +12,18 @@ import {
  * @param command - The command item data.
  * @param details - Additional details for the command item.
  * @param multiSelection - Flag indicating if multiple selections are allowed.
+ * @param selectedValue - The currently selected value(s).
+ * @param onSelect - Callback function to handle selection of the command item.
+ * @param avatarDisplay - Flag indicating if avatars should be displayed next to items.
  */
 export function CommandSelectionItem(props: CommandSelectionItemProps) {
   const {
     command,
     details,
-    multiSelection,
+    multiSelection = false,
     selectedValue,
     onSelect,
     avatarDisplay,
-    // ...rest
   } = props;
 
   const [avatarSelection, setAvatarSelection] = useState(
@@ -36,19 +32,30 @@ export function CommandSelectionItem(props: CommandSelectionItemProps) {
 
   const { id, disabled, value } = command;
   let isSelected = false;
+
   if (multiSelection) {
     isSelected = selectedValue instanceof Set && selectedValue.has(value);
   } else {
     isSelected = selectedValue === value;
   }
 
-  const selectCallback = useCallback((value: string) => {
+  /**
+   * Updates the avatar selection state if `avatarDisplay` is true, and then calls the `onSelect` callback with the selected value and command details.
+   *
+   * @param value - The value of the selected command item.
+   */
+  const selectCallback = (value: string) => {
+    let newCommand = { ...command, ...details };
+
     if (avatarDisplay) {
-      command.isSelected = !command.isSelected;
-      setAvatarSelection(command.isSelected);
+      const newSelection = !avatarSelection;
+      setAvatarSelection(newSelection);
+
+      newCommand = { ...newCommand, isSelected: newSelection };
     }
-    onSelect?.(value, { ...command, ...details });
-  }, []);
+
+    onSelect?.(value, { ...newCommand });
+  };
 
   const avatarProps = {
     ...command,

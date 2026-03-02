@@ -1,5 +1,6 @@
 import withListMapper from "@/components/HOCs/withListMapper";
 import { LabelledScoreInput } from "@/features/evaluations/create/components/Score/LabelledScoreInput";
+import { createComponentName } from "@/utils/utils";
 
 /**
  * @fileoverview Exports the LabelledScoreInputList component, which is a list of LabelledScoreInput components wrapped with the withListMapper HOC.
@@ -11,3 +12,8 @@ import { LabelledScoreInput } from "@/features/evaluations/create/components/Sco
  * A version of the LabelledScoreInput component that can be used to display a list of scores for multiple students.
  */
 export const LabelledScoreInputList = withListMapper(LabelledScoreInput);
+createComponentName(
+  "withListMapper",
+  "LabelledScoreInputList",
+  LabelledScoreInputList,
+);

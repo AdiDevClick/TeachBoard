@@ -3,8 +3,7 @@ import type {
   DetailedCommandItem,
   HeadingType,
 } from "@/components/Command/types/command.types.ts";
-import type { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import type ClassCreation from "@/features/class-creation/components/main/ClassCreation.tsx";
+import type { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import type {
   ClassCreationFormSchema,
   ClassCreationInputItem,
@@ -28,13 +27,12 @@ export type ClassCreationExtendedFormSchema = ClassCreationFormSchema & {
 /**
  * Props for ClassCreationController component
  */
-
 export type ClassCreationControllerProps = AppControllerInterface<
   ClassCreationExtendedFormSchema,
   typeof API_ENDPOINTS.POST.CREATE_CLASS.endpoint,
   typeof API_ENDPOINTS.POST.CREATE_CLASS.dataReshape
 > &
-  Omit<Parameters<typeof ClassCreation>[0], "modalMode">;
+  Omit<ClassCreationProps, "modalMode">;
 
 /**
  * Simple mutable ref shape (compatible with React's `useRef` result).

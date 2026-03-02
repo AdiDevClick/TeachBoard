@@ -15,7 +15,7 @@ export const NO_PROXY_LOGS = true;
 export const NO_MUTATION_OBSERVER_LOGS = true;
 export const NO_CACHE_LOGS = true;
 export const NO_QUERY_LOGS = true;
-export const NO_COMPONENT_WARNING_LOGS = true;
+export const NO_COMPONENT_WARNING_LOGS = false;
 export const ANIMATIONS_LOGS = false;
 export const NO_SESSION_CHECK_LOGS = true;
 

@@ -26,11 +26,13 @@ export function AppDialFooter({
   const isValid = formState?.isValid ?? true;
   const isSubmitting = formState?.isSubmitting ?? false;
   const isSubmitSuccessful = formState?.isSubmitSuccessful ?? false;
+  const errors = formState?.errors;
   const cancelTextValue = cancelText || "Annuler";
   const submitTextValue = submitText || "Créer";
 
-  const isDisabledCondition = isSubmitSuccessful || isSubmitting || !isValid;
-
+  const hasAnyErrors = errors && Object.keys(errors).length > 0;
+  const isDisabledCondition =
+    isSubmitSuccessful || isSubmitting || hasAnyErrors || !isValid;
   return (
     <DialogFooter {...props}>
       {displayCancelButton && (

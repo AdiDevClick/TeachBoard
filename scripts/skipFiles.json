@@ -1,6 +1,15 @@
 [
   "${workspaceFolder}/node_modules/**",
+  "${workspaceFolder}/dist/**/*.js",
   "**/node_modules/**",
+  "**/node_modules/react/cjs/**",
+  "**/node_modules/react-scripts/**",
+  "**/react-devtools-shared/**",
+  "**/hmr/**",
+  "**/devtools/**",
+  "**/backend/**",
+  "**/webpack:**",
+  "**/node_modules/vite/**",
   "**/node_modules/react/**",
   "**/node_modules/react-dom/**",
   "**/node_modules/react-reconciler/**",
@@ -47,5 +56,10 @@
   "debug:localhost*/@react-refresh*",
   "debug:localhost*%40react-refresh*",
   "*%40react-refresh*",
-  "**/*%40react-refresh*"
+  "**/*%40react-refresh*",
+  "**/*chunk*.js",
+  "**/proxy.js",
+  "**/*bundle.js",
+  "**/prepareInjection.js",
+  "**/index-tailwind*"
 ]

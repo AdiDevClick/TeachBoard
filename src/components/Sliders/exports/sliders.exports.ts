@@ -1,5 +1,6 @@
 import withListMapper from "@/components/HOCs/withListMapper";
 import { EvaluationSlider } from "@/components/Sliders/EvaluationSlider";
+import { createComponentName } from "@/utils/utils";
 /**
  * @fileoverview This file exports the EvaluationSlider component and its list mapper.
  */
@@ -8,3 +9,8 @@ import { EvaluationSlider } from "@/components/Sliders/EvaluationSlider";
  * A version of the EvaluationSlider component that can be used to render a list of sliders based on a list of items.
  */
 export const EvaluationSliderList = withListMapper(EvaluationSlider);
+createComponentName(
+  "withListMapper",
+  "EvaluationSliderList",
+  EvaluationSliderList,
+);

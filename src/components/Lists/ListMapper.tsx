@@ -1,16 +1,11 @@
-import type {
-  ListMapperOptionalValue,
-  ListMapperProps,
-} from "@/components/Lists/types/ListsTypes.ts";
+import { retrieveOptional } from "@/components/Lists/functions/list-mapper.functions";
+import type { ChildrenFunctionMode } from "@/components/Lists/types/ListsTypes";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import {
   debugLogs,
   listMapperContainsInvalid,
 } from "@/configs/app-components.config.ts";
-import type {
-  AnyObjectProps,
-  ExtractItemType,
-} from "@/utils/types/types.utils.ts";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 import { wait } from "@/utils/utils.ts";
 import {
   Activity,
@@ -19,12 +14,12 @@ import {
   useEffect,
   useId,
   useState,
-  type ElementType,
-  type ReactNode,
 } from "react";
 
 /**
  * A generic list component that will map over its items list
+ *
+ * @remarks There is an overload version of this component that allows you to pass a component @see ListMapper.overloads.d.ts
  *
  * @description This component will render a list of components
  * or let you access the individual items through a custom function.
@@ -63,13 +58,12 @@ import {
  * > <ListMapper component={MyListItem} items={myItems} optional={myOptionalProps}/>
  * ```
  */
+
 export function ListMapper<
   TItems extends readonly unknown[] | AnyObjectProps,
-  TOptionalInput = undefined,
-  C extends ElementType = ElementType,
-  TChildProps extends AnyObjectProps = AnyObjectProps,
->(props: Readonly<ListMapperProps<TItems, C, TOptionalInput, TChildProps>>) {
-  const { items, optional, children, component, ...rest } = props;
+  TOptionalValue = undefined,
+>(props: ChildrenFunctionMode<TItems, TOptionalValue>) {
+  const { items, optional, children, ...rest } = props as any;
 
   const id = useId();
 
@@ -96,7 +90,6 @@ export function ListMapper<
   }
 
   const isArrayInput = Array.isArray(items);
-
   const itemsArray = isArrayInput ? items : Object.entries(items);
 
   if (!itemsArray || itemsArray.length === 0) {
@@ -125,25 +118,9 @@ export function ListMapper<
     // Use existing id or create a stable one based on index only
     const itemId = "id" in item ? item.id : `${id}-${index}`;
 
-    // Case A: component prop provided (act as a Component but you provide the child to display as a prop)
-
-    if (component) {
-      const Component = component;
-
-      const injectedOptional = retrieveOptional(optional, item, index);
-
-      return (
-        <Component key={itemId} {...item} {...injectedOptional} {...rest} />
-      );
-    }
-
     // Case B: Render function - best type safety (act as a function with params)
     if (typeof children === "function") {
-      const renderFn = children as (
-        item: ExtractItemType<TItems>,
-        index: number,
-        optional?: TOptionalInput | ListMapperOptionalValue<TOptionalInput>,
-      ) => ReactNode;
+      const renderFn = children;
 
       const injectedOptional = retrieveOptional(optional, item, index);
 
@@ -162,6 +139,7 @@ export function ListMapper<
         ...item,
         index: index,
         ...injectedOptional,
+        ...rest,
       };
 
       const Component = children.type;
@@ -174,18 +152,4 @@ export function ListMapper<
 
     return null;
   });
-}
-
-function retrieveOptional<TItems, TOptional>(
-  optional: TOptional | ((item: TItems, index: number) => TOptional),
-  item: TItems,
-  index: number,
-): TOptional {
-  if (typeof optional === "function") {
-    return (optional as (item: TItems, index: number) => TOptional)(
-      item,
-      index,
-    );
-  }
-  return optional;
 }

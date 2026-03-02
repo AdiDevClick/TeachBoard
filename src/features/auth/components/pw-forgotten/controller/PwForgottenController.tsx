@@ -1,5 +1,5 @@
 import { LoginButtonList } from "@/components/Buttons/exports/buttons.exports";
-import { ControlledInputList } from "@/components/Inputs/exports/labelled-input";
+import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import { Field, FieldGroup, FieldSeparator } from "@/components/ui/field.tsx";
 import {
   debugLogs,
@@ -106,7 +106,7 @@ export function PwForgottenController(props: PwForgottenControllerProps) {
         <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
           Ou continuez avec
         </FieldSeparator>
-        <ControlledInputList items={inputControllers} form={form} />
+        <ControlledInputList items={inputControllers} control={form.control} />
       </FieldGroup>
     </form>
   );

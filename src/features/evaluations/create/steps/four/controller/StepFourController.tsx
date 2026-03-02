@@ -56,14 +56,14 @@ export function StepFourController({
         />
         <ControlledDynamicTagList
           {...inputControllers.absence}
-          form={form}
+          control={form.control}
           pageId={pageId}
           itemList={presenceMemo.students}
           displayCRUD={false}
         />
         <ControlledLabelledTextArea
           {...inputControllers.comments}
-          form={form}
+          control={form.control}
         />
       </FormWithDebug>
     </>

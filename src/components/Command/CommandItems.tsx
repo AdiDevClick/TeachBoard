@@ -3,7 +3,7 @@ import type {
   CommandItemType,
   CommandsProps,
 } from "@/components/Command/types/command.types.ts";
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { ListMapper } from "@/components/Lists/ListMapper";
 import {
   CommandEmpty,
   CommandGroup,
@@ -23,10 +23,11 @@ import { usePopoverFieldContextSafe } from "@/hooks/contexts/usePopover.ts";
  *
  * @param commandHeadings - An array of headings with titles and values to be displayed
  * @param filter - Optional filter function for the command component
- * @param props - Props for the command items component
+ * @param onSelect - Optional callback function that is called when an item is selected, receiving the selected value and command item details
+ *
  * @returns A CommandItems component
  */
-export function CommandItems(props: Readonly<CommandsProps>) {
+export function CommandItems(props: CommandsProps) {
   const { commandHeadings, onSelect: externalOnSelect, ...rest } = props;
 
   // !! IMPORTANT !! This context can be null
@@ -66,11 +67,11 @@ export function CommandItems(props: Readonly<CommandsProps>) {
 
                       return (
                         <CommandSelectionItem
-                          command={command}
                           details={itemDetails}
-                          selectedValue={selectedValue}
                           onSelect={handleSelect}
                           {...rest}
+                          selectedValue={selectedValue}
+                          command={command}
                         />
                       );
                     }}

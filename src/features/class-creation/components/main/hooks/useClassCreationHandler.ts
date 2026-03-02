@@ -209,7 +209,10 @@ export function useClassCreationHandler({
       detailedCommandItem: commandItemDetails,
     };
 
-    selectionCallback(value, otherOptions);
+    selectionCallback(
+      value,
+      otherOptions as unknown as Parameters<typeof selectionCallback>[1],
+    );
   };
   /**
    * Handle deleting a task from the selected tasks list

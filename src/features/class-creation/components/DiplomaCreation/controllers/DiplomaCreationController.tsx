@@ -74,7 +74,10 @@ export function DiplomaCreationController({
       secondaryFormField: "modulesListDetails",
       detailedCommandItem: taskDetails,
     };
-    selectionCallback(value, options);
+    selectionCallback(
+      value,
+      options as Parameters<typeof selectionCallback>[1],
+    );
   };
 
   /**
@@ -116,16 +119,16 @@ export function DiplomaCreationController({
     >
       <PopoverFieldWithControllerAndCommandsList
         items={controllers.popoverControllers}
-        form={form}
+        control={form.control}
         commandHeadings={resultsCallback()}
         onSelect={onSelectHandler}
         onOpenChange={openingCallback}
         setRef={setRef}
         observedRefs={observedRefs}
-        onAddNewItem={newItemCallback}
+        onClick={newItemCallback}
       />
       <ControlledDynamicTagList
-        form={form}
+        control={form.control}
         setRef={setRef}
         {...controllers.tagListController}
         observedRefs={observedRefs}
@@ -137,7 +140,7 @@ export function DiplomaCreationController({
         onSelect={handleSelection}
         onOpenChange={openingCallback}
         observedRefs={observedRefs}
-        onAddNewItem={newItemCallback}
+        onClick={newItemCallback}
         commandHeadings={resultsCallback()}
         {...controllers.tagListController}
       />
