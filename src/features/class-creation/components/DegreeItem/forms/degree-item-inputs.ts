@@ -1,17 +1,21 @@
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import type DegreeItem from "@/features/class-creation/components/DegreeItem/DegreeItem.tsx";
 
 export const degreeCreationInputControllersDegree = [
   {
     name: "name",
-    title: "Nom du diplôme",
+    title: "Nom",
     type: "text",
     placeholder: "Ex: Brevet des collèges, Bac Pro, ...",
+    autoComplete: "off",
+    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.AVAILABLE,
   },
   {
     name: "code",
-    title: "Code du diplôme",
+    title: "Code",
     type: "text",
     placeholder: "Ex: BTS, BACPRO, ...",
+    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.AVAILABLE,
   },
   {
     name: "description",
@@ -25,15 +29,18 @@ export const degreeCreationInputControllersDegree = [
 export const degreeCreationInputControllersField = [
   {
     name: "name",
-    title: "Nom du métier / domaine",
+    title: "Nom",
     type: "text",
     placeholder: "Ex: Cuisine, Prothésiste Dentaire...",
+    autoComplete: "off",
+    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.AVAILABLE,
   },
   {
     name: "code",
-    title: "Code du métier / domaine",
+    title: "Code",
     type: "text",
     placeholder: "Ex: CUISINE, PROTHDENT...",
+    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.AVAILABLE,
   },
   {
     name: "description",
@@ -48,15 +55,18 @@ export const degreeCreationInputControllersField = [
 export const degreeCreationInputControllersYear = [
   {
     name: "name",
-    title: "Année scolaire du diplôme",
+    title: "Année scolaire",
     type: "text",
     placeholder: "Ex: Première année, Deuxième année...",
+    autoComplete: "off",
+    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.AVAILABLE,
   },
   {
     name: "code",
-    title: "Code de l'année",
+    title: "Code",
     type: "text",
     placeholder: "Ex: 1A, 2A...",
+    apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.AVAILABLE,
   },
   {
     name: "description",

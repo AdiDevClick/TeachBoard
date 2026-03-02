@@ -95,6 +95,8 @@ export const API_ENDPOINTS = Object.freeze({
         LEVEL: `${DEGREES}/level`,
         YEAR: `${DEGREES}/year`,
         FIELD: `${DEGREES}/field`,
+        AVAILABLE: (degreeNameOrCode: string) =>
+          `${DEGREES}/available/${degreeNameOrCode}`,
       },
       dataReshape: (data: DegreesFetch) =>
         dataReshaper(data)
