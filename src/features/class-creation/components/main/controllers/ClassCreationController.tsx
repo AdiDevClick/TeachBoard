@@ -1,5 +1,6 @@
 import type { ClassRouteResponse } from "@/api/types/routes/classes.types";
 import { AvatarsWithLabelAndAddButtonList } from "@/components/Form/exports/form.exports";
+import { FormWithDebug } from "@/components/Form/FormWithDebug";
 import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import {
   PopoverFieldWithCommands,
@@ -90,8 +91,15 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
     event: ChangeEvent<HTMLInputElement>,
     meta?: CommandHandlerFieldMeta,
   ) => {
+    const value = event.target.value;
+    const target = meta?.name;
+
+    if (target !== "name") {
+      return;
+    }
+
     form.clearErrors("name");
-    availabilityCheck(event.target.value, meta);
+    availabilityCheck(value, meta);
   };
 
   /**
@@ -142,11 +150,14 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
   }, [observedRefs, handleOnSelect, handleNewItem, handleOpening, setRef]);
 
   return (
-    <form
-      ref={(el) => setRef(el, { name: pageId, formId })}
-      id={formId}
-      onSubmit={form.handleSubmit(handleValidSubmit, invalidSubmitCallback)}
+    <FormWithDebug
+      setRef={setRef}
+      form={form}
+      formId={formId}
+      pageId={pageId}
+      onValidSubmit={handleValidSubmit}
       className={className}
+      onInvalidSubmit={invalidSubmitCallback}
     >
       <ControlledInputList
         control={form.control}
@@ -194,6 +205,6 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
       >
         <NonLabelledGroupItemList items={years} />
       </VerticalFieldSelectWithController>
-    </form>
+    </FormWithDebug>
   );
 }
