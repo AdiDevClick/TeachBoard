@@ -42,7 +42,7 @@ export function useDebouncedChecker<
    */
   const availabilityCheck = useDebounce(
     (rawValue: string, meta?: CommandHandlerFieldMeta) => {
-      if (meta?.name !== "name" || !meta.apiEndpoint) return;
+      if (!meta?.apiEndpoint) return;
 
       const value = rawValue.trim();
       if (!value) return;
@@ -58,11 +58,16 @@ export function useDebouncedChecker<
         method: "GET",
         contentId: meta.task as FetchParams["contentId"],
         dataReshapeFn: meta.dataReshapeFn,
+        filters: { ...meta.filters },
         silent: true,
       }));
     },
     delay,
   );
 
-  return { availabilityError: error?.available, availabilityCheck };
+  return {
+    availabilityError: error?.available,
+    availabilityCheck,
+    fetchParams,
+  };
 }
