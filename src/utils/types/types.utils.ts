@@ -160,7 +160,7 @@ export type ComponentLike<P = unknown> =
  * Useful for React callback props where callers may pass subtypes
  * (e.g. `DetailedCommandItem` where `CommandItemType` is expected).
  */
-export type BivariantCallback<T extends (...args: unknown[]) => any> = {
+export type BivariantCallback<T extends (...args: any[]) => any> = {
   bivarianceHack(...args: Parameters<T>): ReturnType<T>;
 }["bivarianceHack"];
 
