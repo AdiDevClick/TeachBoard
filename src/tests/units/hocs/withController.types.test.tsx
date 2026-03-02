@@ -96,7 +96,7 @@ const typedFunnyControllerPayload: ControlledProps = {
 };
 
 // verify that controller itself accepts the expected props.
-const typedLegitimateControlledPayload: ControlledProps = {
+const _typedLegitimateControlledPayload = {
   ...basePayload,
   setRef: () => {},
   task: "apple-login" as AppModalNames,
@@ -109,7 +109,9 @@ const typedLegitimateControlledPayload: ControlledProps = {
     expect(e.target).toBeDefined();
     expect(meta).toBeDefined();
   },
-};
+} satisfies ControlledProps;
+
+void _typedLegitimateControlledPayload;
 // verify that LabelledInput itself only accepts the expected props.  we
 // choose a small set of "required" values for the purpose of this test.
 // typescript will flag any mismatch at compile time.
@@ -230,7 +232,7 @@ it("Case 2 : controlled component rejects inline extra props", async () => {
   expect(container).toBeDefined();
 });
 
-// <ControlledLabelledInput/> should clearly reject the payload
+// Spread payload have difficulties with excess property checks - Please try to type your payload before using it until we can fix the spread issue
 it("Case 3 : controlled component rejects extra props (checked by helpers)", async () => {
   // compile-time assertions using our helpers
   const isAssignable: IsAssignable<

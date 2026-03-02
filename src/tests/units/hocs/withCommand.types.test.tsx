@@ -499,6 +499,7 @@ describe("withListMapper types", () => {
       />,
     );
 
+    // the payload is missing name so optional needs to merge and type it correctly  for this test to succeed
     const { container: c4 } = await render(
       <PopoverFieldWithControllerAndCommandsList
         {...listOfCommandsPayload}
@@ -509,13 +510,19 @@ describe("withListMapper types", () => {
     );
 
     const { container: c4Strict } = await render(
+      <PopoverFieldWithControllerAndCommandsList
+        {..._listOfCommandsPayloadCheckWithoutItemsAndName}
+        // @ts-expect-error should not be able to access item.name because `item` should be typed as `never` since the props are not valid
+        optional={(item) => {
+          // @ts-expect-error : has missing required `name and/or items` and invalid payload for this component
+          expect(item.name).toBeUndefined();
+        }}
+      />,
+    );
+    const { container: c4Strict2 } = await render(
       // @ts-expect-error : has missing required `name and/or items` and invalid payload for this component
       <PopoverFieldWithControllerAndCommandsList
         {..._listOfCommandsPayloadCheckWithoutItemsAndName}
-        optional={(item) => {
-          // @ts-expect-error should not be able to access item.name because `item` should be typed as `never` since the props are not valid
-          expect(item.name).toBeDefined();
-        }}
       />,
     );
 
@@ -524,6 +531,8 @@ describe("withListMapper types", () => {
     expect(c2).toBeDefined();
     expect(c3).toBeDefined();
     expect(c4).toBeDefined();
+    expect(c4Strict).toBeDefined();
+    expect(c4Strict2).toBeDefined();
   });
 
   it("Case 0 : union type should not drop items property", () => {

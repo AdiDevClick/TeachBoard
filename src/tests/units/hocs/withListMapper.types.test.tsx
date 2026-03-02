@@ -12,11 +12,7 @@ import type {
   DynamicTagsState,
 } from "@/components/Tags/types/tags.types";
 import type { AppModalNames } from "@/configs/app.config";
-import {
-  classCreationSchema,
-  diplomaCreationInputControllers,
-  type ClassCreationFormSchema,
-} from "@/features/class-creation";
+import { diplomaCreationInputControllers } from "@/features/class-creation";
 import {
   diplomaCreationSchema,
   type DiplomaCreationFormState,
@@ -34,6 +30,16 @@ import { useState, type ChangeEvent, type ComponentProps } from "react";
 import { useForm } from "react-hook-form";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render } from "vitest-browser-react";
+
+/**
+ * !! IMPORTANT INFORMATION !!
+ *
+ * NEVER EVER MODIFY THIS FILE TO FIX A TYPING ISSUE IN THE COMPONENTS. If you have a typing issue, you should fix it in the component itself and then add a test case here to ensure the issue is fixed and doesn't regress.
+ *
+ * THIS FILE IS THE TRUTH SOURCE FOR THE COMPONENTS' TYPES. If it's green, the types are correct. If it's red, there is a typing issue that needs to be fixed in the component code, not here.
+ *
+ * If you feel the need to bypass the type system in this file, then you are doing it wrong. Please modify the component's types instead
+ */
 
 /**
  * This test suite verifies the TypeScript typings of the `withListMapper` HOC when applied to a base component (in this case, `PopoverFieldWithControllerAndCommandsList`).  It ensures that:
@@ -55,8 +61,6 @@ beforeEach(() => {
 });
 
 let form: ReturnType<typeof useForm<DiplomaCreationFormState>> | null = null;
-let formClass: ReturnType<typeof useForm<ClassCreationFormSchema>> | null =
-  null;
 const itemsToIterate = diplomaCreationInputControllers.slice(0, 3);
 
 beforeEach(async () => {
@@ -67,21 +71,12 @@ beforeEach(async () => {
     }),
   );
   form = result.current;
-
-  const { result: resultClass } = await renderHook(() =>
-    useForm({
-      resolver: zodResolver(classCreationSchema),
-      mode: "onTouched",
-    }),
-  );
-  formClass = resultClass.current;
 });
 
 type ListProps = ComponentProps<
   typeof PopoverFieldWithControllerAndCommandsList
 >;
 
-type EvaluationListProps = ComponentProps<typeof EvaluationSliderList>;
 type ControlledProps = ComponentProps<
   typeof PopoverFieldWithControlledCommands
 >;
@@ -114,15 +109,6 @@ for (let i = 0; i < 5; i++) {
     id: newId,
   });
 }
-
-const legitimateSliderPayload: EvaluationListProps = {
-  items: students,
-  optional: (_student: StudentWithPresence) => ({ value: [0] }),
-  // slider callback only receives the value according to its declaration
-  onValueChange: (_value: number[]) => {},
-};
-
-void legitimateSliderPayload;
 
 const basePayload = {
   name: "foo",
@@ -241,7 +227,7 @@ describe("withListMapper types", () => {
     // render to ensure runtime compatibility when props are split across two
     // objects (a very common pattern when combining stored payload with
     // runtime values).
-    const runtimePayload: ListProps = {
+    const runtimePayload = {
       ...legitimateControlledPayload,
       // setRef: () => {},
       // // observedRefs: [],
@@ -263,7 +249,8 @@ describe("withListMapper types", () => {
       // creationButtonText: "Ajouter un module",
       // useCommands: true,
       // placeholder: "Recherchez des modules...",
-    };
+    } satisfies ListProps;
+
     const isAssignable: IsAssignable<typeof runtimePayload, ListProps> = true;
 
     const { container } = await render(
@@ -286,6 +273,11 @@ describe("withListMapper types", () => {
       items: itemsToIterate,
     };
 
+    const falseRuntimePayloadRejected: ShouldReject<
+      typeof falseRuntimePayload,
+      ListProps
+    > = true;
+
     const validItemAssignable: IsAssignable<
       typeof validItemPayload,
       ChildPayloadContract
@@ -302,6 +294,7 @@ describe("withListMapper types", () => {
     );
 
     expect(badContainer.firstChild).not.toBeNull();
+    expect(falseRuntimePayloadRejected).toBe(true);
     expect(validItemAssignable).toBe(true);
     expect(invalidItemRejected).toBe(true);
   });
@@ -342,11 +335,11 @@ describe("withListMapper types", () => {
     const { container: badContainer } = await render(
       // compile-time check: passing an item that contains an unexpected field
       // should no longer compile. the line below is intentionally erroneous.
+      // @ts-expect-error extra props that isn't allowed should be rejected
       <PopoverFieldWithControllerAndCommandsList
         items={[
           {
             ...legitimateControlledPayload,
-            // @ts-expect-error extra props that isn't allowed should be rejected
             type: "button",
             myFunnyPropThatShouldNotExist,
           },
@@ -405,9 +398,9 @@ describe("withListMapper types", () => {
     expect(container).toBeDefined();
   });
 
-  it("Case 5 : ListMapper without items props should reject", async () => {
+  it("Case 5 : ListMapper without control props should reject", async () => {
     const { container } = await render(
-      // @ts-expect-error missing required `items` prop should be rejected by the component type
+      // @ts-expect-error missing required `control` prop should be rejected by the component type
       <PopoverFieldWithControllerAndCommandsList
         items={itemsToIterate}
         {...legitimateControlledPayload}
@@ -417,7 +410,7 @@ describe("withListMapper types", () => {
     expect(container).toBeDefined();
   });
 
-  it("Case 5.5 : ListMapper without control props should reject", async () => {
+  it("Case 5.5 : ListMapper without items props should reject", async () => {
     const { container } = await render(
       // @ts-expect-error missing required `items` prop should be rejected by the component type
       <PopoverFieldWithControllerAndCommandsList
@@ -446,6 +439,7 @@ describe("withListMapper types", () => {
     );
     expect(container).toBeDefined();
   });
+
   it("Case 7 : ListMapper should not reject a tuple access from optional", async () => {
     const [renderItems, setRenderItems] = useState<DynamicTagsState>(
       new UniqueSet(),
@@ -484,33 +478,66 @@ describe("withListMapper types", () => {
     expect(container).toBeDefined();
   });
 
-  // it("Case 8 : ListMapper should accepte legitimate items from many scenarios", async () => {
-  //   const studentsMemo = useAvatarDataGenerator(formClass!, "studentsValues");
-  //   const primaryTeacherMemo = useAvatarDataGenerator(
-  //     formClass!,
-  //     "primaryTeacherValue",
-  //   );
+  it("Case 8 : ListMapper with optional as non function should validate component props", async () => {
+    const handleValueChange = (
+      newValue: number[],
+      student?: EvaluationSliderProps,
+    ) => {
+      expect(newValue).toBeDefined();
+      expect(student).toBeUndefined();
+    };
 
-  //   const controllers = {
-  //     avatarControllers: [
-  //       {
-  //         ...classCreationInputControllers[4],
-  //         items: studentsMemo,
-  //       },
-  //       {
-  //         ...classCreationInputControllers[5],
-  //         items: primaryTeacherMemo,
-  //       },
-  //     ],
-  //   };
+    const { container } = await render(
+      <EvaluationSliderList
+        items={students}
+        optional={{ value: [0] }}
+        onValueChange={handleValueChange}
+      />,
+    );
 
-  //   const { container } = await render(
-  //     <AvatarsWithLabelAndAddButtonList
-  //       // @ts-expect-error looks like type text isn't correct
-  //       items={controllers.avatarControllers}
-  //       type="button"
-  //     />,
-  //   );
-  //   expect(container).toBeDefined();
-  // });
+    expect(container).toBeDefined();
+  });
+
+  it("Case 9 : ListMapper with optional that doesn't match component props should be rejected", async () => {
+    const handleValueChange = (
+      newValue: number[],
+      student?: EvaluationSliderProps,
+    ) => {
+      expect(newValue).toBeDefined();
+      expect(student).toBeUndefined();
+    };
+
+    const { container } = await render(
+      // @ts-expect-error optional "test" doesn't match the expected type of the component props since the component expect a "value" field in the optional, not a "test" field
+      <EvaluationSliderList
+        items={students}
+        optional={{ test: [0] }}
+        onValueChange={handleValueChange}
+      />,
+    );
+
+    expect(container).toBeDefined();
+  });
+
+  it("Case 10 : Case 9 highlights an issue with optional function return value not being fully typed, so an empty return shouldn't be accepted too", async () => {
+    const handleValueChange = (
+      newValue: number[],
+      student?: EvaluationSliderProps,
+    ) => {
+      expect(newValue).toBeDefined();
+      expect(student).toBeUndefined();
+    };
+
+    const { container } = await render(
+      // @ts-expect-error the optional function return lacks the required `value` property and an empty object should not be allowed
+      <EvaluationSliderList
+        items={students}
+        optional={(student) => {
+          return {};
+        }}
+        onValueChange={handleValueChange}
+      />,
+    );
+    expect(container).toBeDefined();
+  });
 });
