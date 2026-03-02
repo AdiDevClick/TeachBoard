@@ -1,7 +1,6 @@
 import type {
   ExtractItemType,
   MergeProvided,
-  NonFunctionValue,
 } from "@/utils/types/types.utils.ts";
 import type { PropsWithChildren, ReactElement, ReactNode } from "react";
 
@@ -47,11 +46,11 @@ export type ListMapperPartialChildrenObject<
  * - children function mode: render function with item, index, and optional props
  * - children mode: render function or element to be cloned
  */
-export type ChildrenMode<TItems, TOptionalValue> = Readonly<
+export type ChildrenMode<TItems, TOptional> = Readonly<
   {
     /** Children ReactElement mode: cloneElement will inject item props */
     items: TItems;
-    optional?: ListMapperOptionalInput<TItems, TOptionalValue>;
+    optional?: ListMapperOptionalInput<TItems, TOptional>;
   } & PropsWithChildren
 >;
 
@@ -66,21 +65,18 @@ export type ChildrenFunctionMode<TItems, TOptionalValue> = Readonly<{
   ) => ReactNode;
 }>;
 
-type BivariantCallback<TArgs extends unknown[], TResult> = {
-  bivarianceHack: (...args: TArgs) => TResult;
-}["bivarianceHack"];
-
-export type ListMapperOptionalResolver<TItems, TOptional> = BivariantCallback<
-  [item: ListMapperItem<TItems>, index: number],
-  TOptional
->;
+export type ListMapperOptionalResolver<TItems, TOptional> = (
+  item: ListMapperItem<TItems>,
+  index: number,
+) => TOptional;
 
 export type ListMapperOptionalInput<TItems, TOptional> =
-  | NonFunctionValue<TOptional>
+  | TOptional
   | ListMapperOptionalResolver<TItems, TOptional>;
 
 export type ListMapperOptionalValue<TOptionalInput> = TOptionalInput extends (
-  ...args: unknown[]
+  // ...args: unknown[]
+  ...args: infer _A
 ) => infer R
   ? R
   : TOptionalInput;
