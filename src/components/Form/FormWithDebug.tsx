@@ -20,7 +20,9 @@ export function FormWithDebug<T extends FieldValues>(
 ) {
   const {
     formId,
+    setRef,
     form,
+    pageId,
     className,
     onValidSubmit,
     onInvalidSubmit,
@@ -47,6 +49,7 @@ export function FormWithDebug<T extends FieldValues>(
   return (
     <form
       id={formId}
+      ref={(el) => setRef?.(el, { name: pageId, formId })}
       className={className}
       onSubmit={form.handleSubmit(debouncedSubmit, onInvalidSubmit)}
     >
