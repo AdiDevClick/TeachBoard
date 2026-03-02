@@ -124,6 +124,8 @@ export function DegreeItemController({
   return (
     <FormWithDebug
       form={form}
+      setRef={setRef}
+      pageId={pageId}
       formId={formId}
       className={className}
       onValidSubmit={handleSubmit}
