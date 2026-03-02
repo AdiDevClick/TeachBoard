@@ -1,52 +1,126 @@
-import { ListMapper } from "@/components/Lists/ListMapper.tsx";
+import { ListMapper } from "@/components/Lists/ListMapper";
 import type {
-  ListMapperInjectedProps,
+  ListMapperItem,
   ListMapperOptionalInput,
-} from "@/components/Lists/types/ListsTypes.ts";
-import type { AnyObjectProps } from "@/utils/types/types.utils.ts";
+  ListMapperOptionalValue,
+} from "@/components/Lists/types/ListsTypes";
+import type {
+  AnyObjectProps,
+  MergeProvided,
+  RemoveStringIndex,
+} from "@/utils/types/types.utils";
 import { createNameForHOC } from "@/utils/utils";
-import type { ComponentType } from "react";
+import type { ComponentType, ReactElement } from "react";
 
-type OptionalInjectedProps<
-  P extends object,
-  Injected extends object,
-  Reserved extends PropertyKey = never,
-> = Omit<P, keyof Injected> &
-  Partial<Pick<P, Exclude<Extract<keyof P, keyof Injected>, Reserved>>>;
+type TBaseProps<TProps extends object> = RemoveStringIndex<TProps>;
 
-type WithListMapperProps<
-  P extends object,
-  TItems extends readonly unknown[] | AnyObjectProps,
-  TOptionalValue = undefined,
+type OmittedByMerge<TProps extends object, TItem, TOptionalValue> = Omit<
+  TBaseProps<TProps>,
+  keyof RemoveStringIndex<MergeProvided<TItem, TOptionalValue>>
+>;
+
+type MergeAllRemainingProps<
+  T extends object,
+  TItems,
+  TOptionalInput,
+> = OmittedByMerge<
+  T,
+  ListMapperItem<TItems>,
+  NoInfer<ListMapperOptionalValue<TOptionalInput>>
+>;
+
+/**
+ * Constrains items-array element types so TypeScript applies excess-property
+ * checking to inline object literals while keeping structural compatibility for
+ * variable references.
+ */
+type ConstrainedItems<
+  T extends object,
+  TItems,
+> = TItems extends readonly (infer TItem)[]
+  ? TItem extends readonly unknown[]
+    ? TItems // tuple items — no extra-props constraint
+    : readonly Partial<RemoveStringIndex<T>>[] // plain-object items — contextual type for excess-prop check
+  : TItems; // record / object TItems — pass through
+
+/**
+ * First leg of the intersection that forms {@link WithListMapperComponent}.
+ *
+ * This signature handles the **function** form of `optional` exclusively.
+ * {@link WithListMapperOriginalSig} for that role.
+ */
+type WithListMapperFuncOptionalSig<T extends object> = <
+  TItems extends AnyObjectProps | readonly unknown[],
+  TOptionalFn,
+>(
+  props: {
+    items: TItems & ConstrainedItems<T, TItems>;
+    optional: TOptionalFn &
+      ((
+        item: ListMapperItem<TItems>,
+        index: number,
+      ) => Partial<RemoveStringIndex<T>>);
+  } & OmittedByMerge<
+    T,
+    ListMapperItem<TItems>,
+    TOptionalFn extends (...args: never[]) => infer R ? R : never
+  >,
+) => ReactElement | null;
+
+/**
+ * Second (last) leg of the intersection that forms {@link WithListMapperComponent}.
+ *
+ * This is the *canonical* call signature — equivalent to the pre-intersection
+ * single signature.
+ */
+type WithListMapperOriginalSig<T extends object> = <
+  TItems extends AnyObjectProps | readonly unknown[],
+  TOptionalInput = undefined,
+>(
+  props: {
+    items: TItems & ConstrainedItems<T, TItems>;
+    optional?: ListMapperOptionalInput<TItems, TOptionalInput>;
+  } & MergeAllRemainingProps<T, TItems, TOptionalInput>,
+) => ReactElement | null;
+
+/**
+ * Component type produced by `withListMapper`.
+ *
+ * This is a **function-intersection** type (not an object-literal overload)
+ */
+type WithListMapperComponent<T extends object> =
+  WithListMapperFuncOptionalSig<T> & WithListMapperOriginalSig<T>;
+
+/**
+ * Internal props type used by the Component implementation at runtime.
+ */
+type WithListMapperImplProps<
+  T extends object,
+  TItems extends AnyObjectProps | readonly unknown[],
+  TOptionalInput = undefined,
 > = {
-  items: TItems;
-  optional?: ListMapperOptionalInput<TItems, TOptionalValue>;
-} & OptionalInjectedProps<
-  P,
-  ListMapperInjectedProps<TItems, TOptionalValue>,
-  "items" | "optional" | "children" | "component"
-> & {
-    component?: never;
-  };
+  items: ConstrainedItems<T, TItems>;
+  optional?: ListMapperOptionalInput<TItems, TOptionalInput>;
+} & MergeAllRemainingProps<T, TItems, TOptionalInput>;
 
-function withListMapper<WrappedProps extends object>(
-  Wrapped: ComponentType<WrappedProps>,
-) {
+function withListMapper<T extends object>(Wrapped: ComponentType<T>) {
   function Component<
-    TItems extends readonly unknown[] | AnyObjectProps,
-    TOptionalValue = undefined,
-  >(props: WithListMapperProps<WrappedProps, TItems, TOptionalValue>) {
+    TItems extends AnyObjectProps | readonly unknown[],
+    TOptionalInput = undefined,
+  >(props: WithListMapperImplProps<T, TItems, TOptionalInput>) {
     const { items, optional, ...rest } = props;
 
     return (
-      <ListMapper items={items} optional={optional}>
-        <Wrapped {...(rest as WrappedProps)} />
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      <ListMapper items={items} optional={optional as any}>
+        <Wrapped {...(rest as T)} />
       </ListMapper>
     );
   }
 
   createNameForHOC("withListMapper", Wrapped, Component);
-  return Component;
+
+  return Component as WithListMapperComponent<T>;
 }
 
 /**
@@ -55,10 +129,16 @@ function withListMapper<WrappedProps extends object>(
  * @example
  *
  * ```tsx
- * const MyListItemWithListMapper = WithListMapper(MyComponentThatNeedsListMapping);
+ * const MyListItemWithListMapper = withListMapper(MyComponentThatNeedsListMapping);
  *
- * How to use:
- * <MyListItemWithListMapper items={myItems} optional={myOptionalProps} otherProp1={} />
+ * // Without optional:
+ * <MyListItemWithListMapper items={myItems} otherProp="value" />
+ *
+ * // With optional as function (return type drives prop inference):
+ * <MyListItemWithListMapper items={myItems} optional={(item) => ({ extraProp: item.name })} />
+ *
+ * // With optional as static value:
+ * <MyListItemWithListMapper items={myItems} optional={{ extraProp: "shared" }} />
  * ```
  */
 export default withListMapper;
