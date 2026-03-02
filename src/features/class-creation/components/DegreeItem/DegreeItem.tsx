@@ -32,7 +32,7 @@ function DegreeItem({
 }: Readonly<PageWithControllers<DegreeCreationInputItem>>) {
   const form = useForm<DegreeCreationFormSchema>({
     resolver: zodResolver(diplomaFieldData),
-    mode: "onTouched",
+    mode: "onChange",
     defaultValues: {
       name: "",
       code: "",
