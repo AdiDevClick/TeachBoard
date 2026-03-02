@@ -64,7 +64,7 @@ export function useFetch<
   const [viewData, setViewData] = useState<TViewData | undefined>(undefined);
   const setLastUserActivity = useAppStore((state) => state.setLastUserActivity);
   const navigate = useNavigate();
-  const location = useLocation().pathname;
+  const pathname = useLocation().pathname;
   const queryClient = useQueryClient();
   const {
     onSuccess: successCallback,
@@ -74,13 +74,27 @@ export function useFetch<
     ...params
   } = fetchParams;
 
+  let newUrl = params.url;
+  /**
+   * Build URL with filters params if they exist
+   */
+  if (Object.entries(params.filters).length !== 0) {
+    const createdPath = new URL(params.url, window.location.origin);
+
+    Object.entries(params.filters ?? {}).forEach(([key, value]) => {
+      createdPath.searchParams.set(key, String(value));
+    });
+
+    newUrl = createdPath.pathname + createdPath.search;
+  }
   const queryParams = useQueryOnSubmit<S, E>([
     contentId,
     {
       ...params,
+      url: newUrl,
       onSuccess: (response) => {
         setLastUserActivity(contentId, {
-          url: location,
+          url: pathname,
           endpoint: params.url,
           method: params.method,
           type: "fetch",
@@ -147,7 +161,7 @@ export function useFetch<
       },
       onError: (error) => {
         setLastUserActivity(contentId, {
-          url: location,
+          url: pathname,
           endpoint: params.url,
           method: params.method,
           type: "fetch",
