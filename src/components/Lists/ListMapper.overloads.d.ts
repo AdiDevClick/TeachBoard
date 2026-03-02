@@ -3,7 +3,7 @@ import type { AnyObjectProps } from "@/utils/types/types.utils";
 
 declare module "@/components/Lists/ListMapper" {
   export function ListMapper<
-    TItems extends readonly unknown[] | AnyObjectProps,
+    TItems extends AnyObjectProps | readonly unknown[],
     TOptionalInput = undefined,
   >(props: ChildrenMode<TItems, TOptionalInput>): ReactNode;
 }
