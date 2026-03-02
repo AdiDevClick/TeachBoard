@@ -260,13 +260,8 @@ describe("withListMapper types", () => {
     expect(isAssignable).toBe(true);
   });
 
+  // This test shows that spread with extra props doesn't cause an error at the call site - please be aware of this when you use the HOC - Try to type/satisfies your payloads before you spread them to ensure you catch any extra props that might be rejected by the component - Required props missing will still be caught even with the spread - Future fix might come soon
   it("Case 1.2 : rejects non legitimate payload", async () => {
-    // This call omits the required `items` prop; the HOC should detect this at
-    // runtime (in addition to TypeScript already catching it) and simply
-    // render `null`.
-    // we cast away types so that the file compiles – the point of the test is
-    // to exercise the guard logic rather than the compiler.
-
     const falseRuntimePayload = {
       ...funnyControllerPayload,
       control: form?.control,
