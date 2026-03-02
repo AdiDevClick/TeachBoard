@@ -90,11 +90,12 @@ const degreeCreationSchema = (data: typeof fieldData) => {
       .nonoptional(),
     description: z
       .string()
+      .trim()
       .max(data.maxDescriptionLength, data.maxDescriptionLengthExceededMessage)
       .regex(formsRegex.serverName, data.descriptionRegexMessage)
-      .trim()
       .toLowerCase()
-      .optional(),
+      .optional()
+      .describe("degree description, optional, trimmed"),
   });
 };
 
