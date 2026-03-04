@@ -120,7 +120,7 @@ describe("useDebouncedChecker", () => {
     expect(fakeFetch.fetchParams.url).toEqual("/check/bac");
 
     // simulate server response saying name is unavailable
-    fakeFetch.error = { available: false };
+    fakeFetch.error = { data: { available: false } };
     fakeFetch.fetchParams.searchParams = { by: "name" };
 
     // re-render to fire effect that sets the manual error
@@ -154,10 +154,15 @@ describe("useDebouncedChecker", () => {
     const form = formRef.current!;
     const { availabilityCheck } = getHookResults(hook);
 
-    // prime cache manually using the shared test client
-    const { testQueryClient } = require("@/tests/test-utils/testQueryClient");
-    testQueryClient.setQueryData(["whatever", "/check/bac"], {
-      available: false,
+    // Capture the onCacheVerify callback that the hook installs on fetchParams
+    let capturedOnCacheVerify: ((data: any) => unknown) | undefined;
+    fakeFetch.setFetchParams.mockImplementation((upd) => {
+      if (typeof upd === "function") {
+        fakeFetch.fetchParams = upd(fakeFetch.fetchParams);
+      } else {
+        fakeFetch.fetchParams = upd;
+      }
+      capturedOnCacheVerify = fakeFetch.fetchParams.onCacheVerify;
     });
 
     await act(async () => {
@@ -165,13 +170,19 @@ describe("useDebouncedChecker", () => {
       vi.runAllTimers();
     });
 
-    // `setFetchParams` is still invoked (we simply wrap the cache result),
-    // but the onSubmit call is short‑circuited by the verifier and carries the
-    // cached error.  what really matters for callers is that the form error
-    // ends up set.
     expect(fakeFetch.setFetchParams).toHaveBeenCalled();
-    expect(fakeFetch.onSubmit).toHaveBeenCalledTimes(1);
-    expect(fakeFetch.onSubmit.mock.calls[0][0]).toHaveProperty("cachedError");
+    expect(capturedOnCacheVerify).toBeTypeOf("function");
+
+    // onCacheVerify must reject with { data: cachedData } so useFetch propagates it as an error
+    await expect(capturedOnCacheVerify!({ available: false })).rejects.toEqual({
+      data: { available: false },
+    });
+
+    // simulate the error propagated by useFetch after cache verification fails
+    fakeFetch.error = { data: { available: false } };
+    fakeFetch.fetchParams.searchParams = { by: "name" };
+    hook.rerender();
+
     expect(form.getFieldState("name").error?.message).toContain("déjà utilisé");
   });
 
@@ -207,10 +218,14 @@ describe("useDebouncedChecker", () => {
       if (onCacheCb) {
         try {
           await onCacheCb({ available: false });
-        } catch {}
+        } catch (err) {
+          // propagate the rejection as the fetch error so the hook's useEffect fires
+          fakeFetch.error = err as any;
+        }
       }
     });
 
+    hook.rerender();
     expect(form.getFieldState("name").error?.message).toContain("déjà utilisé");
   });
 });
