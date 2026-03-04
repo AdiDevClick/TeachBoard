@@ -90,11 +90,11 @@ const modals = defineStrictModalsList([
     },
   },
   {
-    modalName: "new-degree-item-degree",
+    modalName: "new-degree-item-level",
     modalContent: DegreeItem,
     ...baseNonNavigationalProps,
     contentProps: {
-      pageId: "new-degree-item-degree",
+      pageId: "new-degree-item-level",
       inputControllers: degreeCreationInputControllersDegree,
     },
   },
