@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { classCreationInputControllers } from "@/features/class-creation/components/main/forms/class-creation-inputs";
+import { CLASS_CREATION_INPUT_CONTROLLERS } from "@/features/class-creation/components/main/forms/class-creation-inputs";
 
 import { describe, expect, it } from "vitest";
 
@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 describe("API_ENDPOINTS contract for class creation", () => {
   it("classCreationInputControllers are wired with apiEndpoint/dataReshapeFn when required", () => {
     // Diploma select (commands + add new)
-    const diploma = classCreationInputControllers.find(
+    const diploma = CLASS_CREATION_INPUT_CONTROLLERS.inputs.find(
       (c) => c.name === "degreeConfigId",
     );
     expect(diploma).toBeTruthy();
@@ -19,7 +19,7 @@ describe("API_ENDPOINTS contract for class creation", () => {
     expect(diploma?.dataReshapeFn).toBeTruthy();
 
     // Students search button
-    const students = classCreationInputControllers.find(
+    const students = CLASS_CREATION_INPUT_CONTROLLERS.avatar.find(
       (c) => c.name === "students",
     );
     expect(students).toBeTruthy();
@@ -27,7 +27,7 @@ describe("API_ENDPOINTS contract for class creation", () => {
     expect(students?.dataReshapeFn).toBeTruthy();
 
     // Primary teacher button
-    const teacher = classCreationInputControllers.find(
+    const teacher = CLASS_CREATION_INPUT_CONTROLLERS.avatar.find(
       (c) => c.name === "primaryTeacherId",
     );
     expect(teacher).toBeTruthy();
@@ -35,22 +35,20 @@ describe("API_ENDPOINTS contract for class creation", () => {
     expect(teacher?.dataReshapeFn).toBeTruthy();
 
     // Tasks template selector: endpoint is a function (depends on selected diploma)
-    const tasks = classCreationInputControllers.find((c) => c.name === "tasks");
+    const tasks = CLASS_CREATION_INPUT_CONTROLLERS.dynamicList;
     expect(tasks).toBeTruthy();
     expect(tasks?.useCommands).toBe(true);
     expect(tasks?.dataReshapeFn).toBeTruthy();
     expect(tasks?.apiEndpoint).toBeTypeOf("function");
 
     // name availability check
-    const nameCtrl = classCreationInputControllers.find(
+    const nameCtrl = CLASS_CREATION_INPUT_CONTROLLERS.inputs.find(
       (c) => c.name === "name",
     );
     expect(nameCtrl).toBeTruthy();
     expect(nameCtrl?.apiEndpoint).toBeTypeOf("function");
     // after calling with value we should get a valid URL string
-    const example = (nameCtrl!.apiEndpoint as (arg: string) => string)(
-      "Abc",
-    );
+    const example = (nameCtrl!.apiEndpoint as (arg: string) => string)("Abc");
     expect(example).toMatch(/check-name\/Abc$/);
     expect(nameCtrl?.dataReshapeFn).toBeTruthy();
   });

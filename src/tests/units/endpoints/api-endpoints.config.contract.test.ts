@@ -21,34 +21,34 @@ describe("API_ENDPOINTS full contract", () => {
   it("provides stable base GET endpoints", () => {
     expect(API_ENDPOINTS.GET.CLASSES.endPoints.ALL).toBe("/api/classes/");
     expect(API_ENDPOINTS.GET.CLASSES.endPoints.BY_ID(123)).toBe(
-      "/api/classes/123"
+      "/api/classes/123",
     );
 
     expect(API_ENDPOINTS.GET.SKILLS.endPoints.MODULES).toBe("/api/skills/main");
     expect(API_ENDPOINTS.GET.SKILLS.endPoints.SUBSKILLS).toBe(
-      "/api/skills/sub"
+      "/api/skills/sub",
     );
 
     expect(API_ENDPOINTS.GET.DEGREES.endpoints.LEVEL).toBe(
-      "/api/degrees/level"
+      "/api/degrees/level",
     );
     expect(API_ENDPOINTS.GET.DEGREES.endpoints.YEAR).toBe("/api/degrees/year");
     expect(API_ENDPOINTS.GET.DEGREES.endpoints.FIELD).toBe(
-      "/api/degrees/field"
+      "/api/degrees/field",
     );
 
     expect(API_ENDPOINTS.GET.DIPLOMAS.endpoint).toBe("/api/degrees/config");
 
     expect(API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.ALL).toBe(
-      "/api/task-templates"
+      "/api/task-templates",
     );
     expect(
-      API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID("abc")
+      API_ENDPOINTS.GET.TASKSTEMPLATES.endpoints.BY_DIPLOMA_ID("abc"),
     ).toBe("/api/task-templates/by-degree-config/abc");
 
-    expect(API_ENDPOINTS.GET.TASKS.endpoint).toBe("/api/tasks");
+    expect(API_ENDPOINTS.GET.TASKS.endpoints.ALL).toBe("/api/tasks");
     expect(API_ENDPOINTS.GET.STUDENTS.endpoint).toBe(
-      "/api/students/not-assigned"
+      "/api/students/not-assigned",
     );
     expect(API_ENDPOINTS.GET.TEACHERS.endpoint).toBe("/api/teachers/");
 
@@ -188,36 +188,36 @@ describe("API_ENDPOINTS full contract", () => {
     expect(API_ENDPOINTS.POST.AUTH.LOGIN.endpoint).toBe("/api/auth/login");
     expect(API_ENDPOINTS.POST.AUTH.SIGNUP).toBe("/api/auth/signup");
     expect(API_ENDPOINTS.POST.AUTH.PASSWORD_CREATION).toBe(
-      "/api/auth/password-creation"
+      "/api/auth/password-creation",
     );
     expect(API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.endpoint).toBe(
-      "/api/auth/password-recovery"
+      "/api/auth/password-recovery",
     );
     expect(API_ENDPOINTS.POST.AUTH.SESSION_CHECK).toBe("/api/auth/session");
     expect(API_ENDPOINTS.POST.AUTH.LOGOUT).toBe("/api/auth/logout");
 
     expect(API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.LEVEL).toBe(
-      "/api/degrees/level"
+      "/api/degrees/level",
     );
     expect(API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.YEAR).toBe(
-      "/api/degrees/year"
+      "/api/degrees/year",
     );
     expect(API_ENDPOINTS.POST.CREATE_DEGREE.endpoints.FIELD).toBe(
-      "/api/degrees/field"
+      "/api/degrees/field",
     );
 
     expect(API_ENDPOINTS.POST.CREATE_SKILL.endPoints.MODULE).toBe(
-      "/api/skills/main"
+      "/api/skills/main",
     );
     expect(API_ENDPOINTS.POST.CREATE_SKILL.endPoints.SUBSKILL).toBe(
-      "/api/skills/sub"
+      "/api/skills/sub",
     );
 
     expect(API_ENDPOINTS.POST.CREATE_DIPLOMA.endpoint).toBe(
-      "/api/degrees/config"
+      "/api/degrees/config",
     );
     expect(API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.endpoint).toBe(
-      "/api/task-templates"
+      "/api/task-templates",
     );
     expect(API_ENDPOINTS.POST.CREATE_TASK.endpoint).toBe("/api/tasks");
   });
@@ -232,7 +232,7 @@ describe("API_ENDPOINTS full contract", () => {
 
     const shaped = API_ENDPOINTS.POST.CREATE_CLASS.dataReshape(
       { id: "new", name: "1a", degreeLevel: "BTS" } as any,
-      [["k", cached]] as any
+      [["k", cached]] as any,
     );
 
     const list = expectGroupList(shaped);
@@ -261,7 +261,7 @@ describe("API_ENDPOINTS full contract", () => {
     const returned = API_ENDPOINTS.POST.AUTH.LOGIN.dataReshape(
       raw as any,
       null as any,
-      { login }
+      { login },
     );
 
     expect(login).toHaveBeenCalledTimes(1);
@@ -278,7 +278,7 @@ describe("API_ENDPOINTS full contract", () => {
         refreshToken: "rt",
         avatar: "a.png",
         schoolName: "TB",
-      })
+      }),
     );
     expect(returned).toBe(raw);
   });
@@ -288,13 +288,13 @@ describe("API_ENDPOINTS full contract", () => {
 
     const shaped = API_ENDPOINTS.POST.CREATE_DEGREE.dataReshape(
       { degree: { id: "deg1", name: "BTS" } } as any,
-      [["k", cached]] as any
+      [["k", cached]] as any,
     );
 
     const list = expectGroupList(shaped);
     expect(list[0].groupTitle).toBe("Tous");
     expect(list[0].items[0]).toEqual(
-      expect.objectContaining({ id: "deg1", value: "BTS" })
+      expect.objectContaining({ id: "deg1", value: "BTS" }),
     );
   });
 
@@ -303,13 +303,13 @@ describe("API_ENDPOINTS full contract", () => {
 
     const shaped = API_ENDPOINTS.POST.CREATE_SKILL.dataReshape(
       { skill: { id: "sk1", code: "JS" } } as any,
-      [["k", cached]] as any
+      [["k", cached]] as any,
     );
 
     const list = expectGroupList(shaped);
     expect(list[0].groupTitle).toBe("Tous");
     expect(list[0].items[0]).toEqual(
-      expect.objectContaining({ id: "sk1", value: "JS" })
+      expect.objectContaining({ id: "sk1", value: "JS" }),
     );
   });
 
@@ -323,13 +323,13 @@ describe("API_ENDPOINTS full contract", () => {
         degreeYear: "2024",
         degreeField: "Informatique",
       } as any,
-      [["k", cached]] as any
+      [["k", cached]] as any,
     );
 
     const list = expectGroupList(shaped);
     expect(list[0].groupTitle).toBe("Informatique");
     expect(list[0].items[0]).toEqual(
-      expect.objectContaining({ id: "dip1", value: "BTS 2024" })
+      expect.objectContaining({ id: "dip1", value: "BTS 2024" }),
     );
   });
 
@@ -338,7 +338,7 @@ describe("API_ENDPOINTS full contract", () => {
 
     const shaped = API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.dataReshape(
       { id: "tt1", task: { name: "Ex 1", description: "Addition" } } as any,
-      [["k", cached]] as any
+      [["k", cached]] as any,
     );
 
     const list = expectGroupList(shaped);
@@ -348,7 +348,7 @@ describe("API_ENDPOINTS full contract", () => {
         id: "tt1",
         description: "Addition",
         value: "Ex 1",
-      })
+      }),
     );
     expect(list[0].shortTemplatesList).toContain("Ex 1");
   });
@@ -358,13 +358,13 @@ describe("API_ENDPOINTS full contract", () => {
 
     const shaped = API_ENDPOINTS.POST.CREATE_TASK.dataReshape(
       { id: "task1", name: "Devoir 1" } as any,
-      [["k", cached]] as any
+      [["k", cached]] as any,
     );
 
     const list = expectGroupList(shaped);
     expect(list[0].groupTitle).toBe("Tous");
     expect(list[0].items[0]).toEqual(
-      expect.objectContaining({ id: "task1", value: "Devoir 1" })
+      expect.objectContaining({ id: "task1", value: "Devoir 1" }),
     );
   });
 });

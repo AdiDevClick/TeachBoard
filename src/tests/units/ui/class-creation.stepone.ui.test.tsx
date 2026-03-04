@@ -1,4 +1,4 @@
-import { taskTemplateCreationInputControllers } from "@/features/class-creation/components/TaskTemplateCreation/forms/task-template-inputs";
+import { TASK_TEMPLATE_CREATION_INPUTS_CONTROLLERS } from "@/features/class-creation/components/TaskTemplateCreation/forms/task-template-inputs";
 import {
   classCreated,
   classFetched,
@@ -31,7 +31,6 @@ import {
   submitButtonShouldBeDisabled,
   waitForDialogState,
 } from "@/tests/test-utils/vitest-browser.helpers";
-
 import {
   assertIconsInPopover,
   baseInit,
@@ -64,11 +63,11 @@ const tasksNames = [
 const tasksToSelectForSubmit = tasksNames.slice(0, 3);
 const labels = [
   {
-    name: rx(taskTemplateCreationInputControllers[0].title!),
+    name: rx(TASK_TEMPLATE_CREATION_INPUTS_CONTROLLERS[0].title!),
     value: "template",
   },
   {
-    name: rx(taskTemplateCreationInputControllers[1].title!),
+    name: rx(TASK_TEMPLATE_CREATION_INPUTS_CONTROLLERS[1].title!),
     value: "Une description suffisamment longue.",
   },
 ];
@@ -282,9 +281,16 @@ describe("UI flow: class-creation (StepOne list)", () => {
     await page.getByRole("button", { name: /Créer une classe/i }).click();
     await waitForDialogState(true);
 
-    // leave the name input and trigger validation by blurring
+    // stub the name-check endpoint so the test never touches the real API
+    stubFetchRoutes({
+      getRoutes: [[/classes\/check-name\//, { available: true }]],
+    });
+
+    // With mode:"onChange", validation triggers on field change, not on bare blur.
+    // Type a character then clear it to mark the name field as required-invalid.
     const nameInput = page.getByLabelText(/^Nom$/i);
-    await userEvent.tab();
+    await userEvent.type(nameInput, "x");
+    await userEvent.clear(nameInput);
     expect(nameInput).toHaveAttribute("aria-invalid", "true");
 
     // type into the optional description field

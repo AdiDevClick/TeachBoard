@@ -18,7 +18,7 @@ import {
 
 export const degreeFieldModal: AppModalNames = "new-degree-item-field";
 export const degreeYearModal: AppModalNames = "new-degree-item-year";
-export const degreeLevelModal: AppModalNames = "new-degree-item-degree";
+export const degreeLevelModal: AppModalNames = "new-degree-item-level";
 export const diplomaModal: AppModalNames = "create-diploma";
 export const taskModal: AppModalNames = "new-task-item";
 export const taskTemplateModal: AppModalNames = "new-task-template";
