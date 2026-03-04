@@ -1,4 +1,4 @@
-import type { ClassCreationExtendedFormSchema } from "@/features/class-creation";
+import type { ClassCreationExtendedFormSchema } from "@/features/class-creation/components/main/types/class-creation.types";
 import type { SearchPrimaryTeacherFormSchema } from "@/features/class-creation/components/SearchTeachers/models/search-teachers.models";
 import type { SearchPrimaryTeacher } from "@/features/class-creation/components/SearchTeachers/SearchTeachers.tsx";
 import type { AppControllerInterface } from "@/types/AppControllerInterface.ts";

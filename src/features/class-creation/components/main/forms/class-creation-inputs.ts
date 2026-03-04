@@ -1,5 +1,3 @@
-// Re-export for direct import in tests and other modules
-export { CLASS_CREATION_INPUT_CONTROLLERS } from "../config/class-creation.configs";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { ClassCreationInputControllers } from "@/features/class-creation/components/main/types/class-creation.types";
 
