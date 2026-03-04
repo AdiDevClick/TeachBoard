@@ -3,6 +3,7 @@ import type {
   DetailedCommandItem,
   HeadingType,
 } from "@/components/Command/types/command.types.ts";
+import type { AvatarsWithLabelAndAddButtonList } from "@/components/Form/exports/form.exports";
 import type { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import type {
   ClassCreationFormSchema,
@@ -48,10 +49,34 @@ export type DiplomaTaskContext = {
 };
 
 /**
+ * Avatar input item type: same as `ClassCreationInputItem` but with `type`
+ * narrowed to the Button-compatible values required by `AvatarListWithLabelAndAddButton`.
+ */
+export type AvatarInputItem = Omit<ClassCreationInputItem, "type"> &
+  Pick<Parameters<typeof AvatarsWithLabelAndAddButtonList>[0], "type">;
+
+/**
+ * Structured input controllers for the class creation form.
+ * Each key corresponds to a distinct sub-section of the form.
+ */
+export type ClassCreationInputControllers = {
+  readonly inputs: readonly ClassCreationInputItem[];
+  readonly dynamicList: ClassCreationInputItem;
+  readonly popover: ClassCreationInputItem;
+  readonly avatar: readonly AvatarInputItem[];
+  readonly yearSelection: ClassCreationInputItem;
+};
+
+/**
  * Class creation component props.
  */
 export type ClassCreationProps = { userId?: UUID } & Readonly<
-  PageWithControllers<ClassCreationInputItem>
+  Omit<
+    PageWithControllers<ClassCreationInputControllers>,
+    "inputControllers"
+  > & {
+    inputControllers?: ClassCreationInputControllers;
+  }
 >;
 
 /**
