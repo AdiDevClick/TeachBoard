@@ -253,7 +253,7 @@ Ce projet centralise à la fois les **endpoints** et la **transformation des don
   - **Utilisez un schéma OpenAPI ou GraphQL** quand il est disponible pour générer ou valider automatiquement les interfaces/DTOs.
 
 
-**Note :** le hook [`useFetch()`](src/hooks/database/fetches/useFetch.tsx) applique la fonction `dataReshape` (déclarée dans `API_ENDPOINTS`) à la réception de la réponse ; la donnée reshaped est ensuite exposée aux composants via `data`.
+**Note :** le hook [`useFetch()`](src/hooks/database/fetches/useFetch.tsx) applique la fonction `dataReshape` (déclarée dans `API_ENDPOINTS`) à la réception de la réponse ; la donnée reshaped est ensuite exposée aux composants via `data`. Il met également en cache *tous* les résultats (succès **et** payloads d'erreur) sous la clé `[contentId,url]` afin d'éviter des appels répétés pour la même requête.
 
 Pour les détails d'implémentation et des exemples complets, consultez `src/hooks/database/fetches/useFetch.tsx` et la section **Recettes rapides** ci‑dessous (exemples de reshapes et d'utilisation).
 
