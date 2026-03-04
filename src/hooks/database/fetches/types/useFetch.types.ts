@@ -24,7 +24,7 @@ export type FetchParams<
   E extends FetchJSONError<any> = FetchJSONError<any>,
 > = {
   contentId: QueryKeyDescriptor<S, E>["0"];
-  searchParams: SearchParams;
+  searchParams?: SearchParams;
   dataReshapeFn?: DataReshapeFn;
   reshapeOptions?: unknown;
   resetParams?: boolean;
