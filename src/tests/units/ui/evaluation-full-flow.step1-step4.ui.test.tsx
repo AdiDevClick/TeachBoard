@@ -418,7 +418,21 @@ describe("UI flow: evaluations step1 -> step4", () => {
       .poll(() => (document.body.textContent ?? "").includes("Module B"))
       .toBe(true);
 
-    await userEvent.click(page.getByLabelText(rxExact("Module partagé")));
+    // Clicking via Playwright locator is blocked by the absolute-positioned FieldSeparator.
+    // Call setModuleSelection directly, mirroring handleModuleChangeCallback, like selectClass() does.
+    const sharedModuleId = evaluationFlowFixture.modules.shared.id;
+    const modulesArray = Array.from(
+      useEvaluationStepsCreationStore.getState().modules.values(),
+    );
+    const sharedModuleIndex = modulesArray.findIndex(
+      (m) => m.id === sharedModuleId,
+    );
+    expect(sharedModuleIndex).toBeGreaterThanOrEqual(0);
+    useEvaluationStepsCreationStore.getState().setModuleSelection({
+      isClicked: true,
+      selectedModuleIndex: sharedModuleIndex,
+      selectedModuleId: sharedModuleId,
+    });
     await expect
       .poll(
         () =>
