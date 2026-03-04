@@ -90,7 +90,11 @@ export function ListMapper<
   }
 
   const isArrayInput = Array.isArray(items);
-  const itemsArray = isArrayInput ? items : Object.entries(items);
+  const itemsArray = isArrayInput
+    ? items
+    : items != null
+      ? Object.entries(items)
+      : [];
 
   if (!itemsArray || itemsArray.length === 0) {
     if (isWaiting) {
