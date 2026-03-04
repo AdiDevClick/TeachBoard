@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import type TaskItem from "@/features/class-creation/components/TaskItem/TaskItem";
 
 export const taskItemInputControllers = [
@@ -6,6 +7,8 @@ export const taskItemInputControllers = [
     title: "Nom de la tâche",
     type: "text",
     placeholder: "Ex: Installer un système d'exploitation...",
+    task: "availability",
+    apiEndpoint: API_ENDPOINTS.GET.TASKS.endpoints.AVAILABILITY,
   },
   {
     name: "description",

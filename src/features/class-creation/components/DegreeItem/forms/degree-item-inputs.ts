@@ -9,6 +9,7 @@ export const degreeCreationInputControllersDegree = [
     placeholder: "Ex: Brevet des collèges, Bac Pro, ...",
     autoComplete: "off",
     apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.AVAILABLE,
+    task: "availability",
   },
   {
     name: "code",
@@ -16,6 +17,7 @@ export const degreeCreationInputControllersDegree = [
     type: "text",
     placeholder: "Ex: BTS, BACPRO, ...",
     apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.AVAILABLE,
+    task: "availability",
   },
   {
     name: "description",
@@ -34,6 +36,7 @@ export const degreeCreationInputControllersField = [
     placeholder: "Ex: Cuisine, Prothésiste Dentaire...",
     autoComplete: "off",
     apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.AVAILABLE,
+    task: "availability",
   },
   {
     name: "code",
@@ -41,6 +44,7 @@ export const degreeCreationInputControllersField = [
     type: "text",
     placeholder: "Ex: CUISINE, PROTHDENT...",
     apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.AVAILABLE,
+    task: "availability",
   },
   {
     name: "description",
@@ -60,6 +64,7 @@ export const degreeCreationInputControllersYear = [
     placeholder: "Ex: Première année, Deuxième année...",
     autoComplete: "off",
     apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.AVAILABLE,
+    task: "availability",
   },
   {
     name: "code",
@@ -67,6 +72,7 @@ export const degreeCreationInputControllersYear = [
     type: "text",
     placeholder: "Ex: 1A, 2A...",
     apiEndpoint: API_ENDPOINTS.GET.DEGREES.endpoints.AVAILABLE,
+    task: "availability",
   },
   {
     name: "description",

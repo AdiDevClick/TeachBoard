@@ -7,12 +7,18 @@ export const degreeModuleCreationInputControllers = [
     title: "Nom du module",
     type: "text",
     placeholder: "Ex: Mettre en place une infrastructure réseau...",
+    autoComplete: "off",
+    task: "availability",
+    apiEndpoint: API_ENDPOINTS.GET.SKILLS.endPoints.AVAILABILITY,
   },
   {
     name: "code",
     title: "Code",
     type: "text",
     placeholder: "Ex: C7, G90...",
+    autoComplete: "off",
+    task: "availability",
+    apiEndpoint: API_ENDPOINTS.GET.SKILLS.endPoints.AVAILABILITY,
   },
   {
     // id: "fetch-input-skills",

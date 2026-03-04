@@ -29,7 +29,7 @@ export const diplomaCreationInputControllers = [
     id: "school-year-input",
   },
   {
-    task: "new-degree-item-degree",
+    task: "new-degree-item-level",
     name: "levelId",
     label: "Diplôme / Niveau scolaire",
     placeholder: "Sélectionnez...",
@@ -48,7 +48,6 @@ export const diplomaCreationInputControllers = [
     task: "new-degree-module",
     name: "modulesList",
     title: "Modules",
-    // type: "button",
     useButtonAddNew: true,
     creationButtonText: "Ajouter un module",
     useCommands: true,
