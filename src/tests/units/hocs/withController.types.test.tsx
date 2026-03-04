@@ -9,7 +9,7 @@ import type { AppModalNames } from "@/configs/app.config.ts";
 import {
   type ClassCreationFormSchema,
   classCreationSchema,
-} from "@/features/class-creation";
+} from "@/features/class-creation/components/main/models/class-creation.models";
 import { DEFAULT_SCHOOL_YEAR } from "@/features/class-creation/components/main/config/class-creation.configs";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
 import type { IsAssignable, ShouldReject } from "@/utils/types/types.utils";
