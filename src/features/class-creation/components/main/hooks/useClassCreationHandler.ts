@@ -5,11 +5,11 @@ import {
 } from "@/configs/app-components.config";
 import { DEV_MODE, HTTP_METHODS, NO_CACHE_LOGS } from "@/configs/app.config";
 import {
-  resetSelectedItemsFromCache,
   saveKeys,
-  type ClassCreationFormSchema,
-  type UseClassCreationHandlerProps,
-} from "@/features/class-creation";
+  resetSelectedItemsFromCache,
+} from "@/features/class-creation/components/main/functions/class-creation.functions";
+import type { ClassCreationFormSchema } from "@/features/class-creation/components/main/models/class-creation.models";
+import type { UseClassCreationHandlerProps } from "@/features/class-creation/components/main/types/class-creation.types";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import type {
   CommandHandlerFieldMeta,
@@ -62,10 +62,13 @@ export function useClassCreationHandler({
     "primaryTeacherValue",
   );
 
-  const tasksValues = form.watch("tasksValues") ?? [];
-  const degreeConfigId = form.watch("degreeConfigId");
-  const studentsValues = form.watch("studentsValues") ?? [];
-  const primaryTeacherValue = form.watch("primaryTeacherValue") ?? {};
+  const [tasksValues, degreeConfigId, studentsValues, primaryTeacherValue] =
+    form.watch([
+      "tasksValues",
+      "degreeConfigId",
+      "studentsValues",
+      "primaryTeacherValue",
+    ]);
 
   /**
    * Handle Class Creation form submission when form is valid
@@ -137,6 +140,8 @@ export function useClassCreationHandler({
   };
   /**
    * Handle adding a new item
+   *
+   * @description The callback will prepare data to open the corresponding modal with the right context
    *
    * @param e - The event triggering the new item addition
    * @param rest - Additional parameters related to the new item
@@ -223,7 +228,9 @@ export function useClassCreationHandler({
     const tasks = new Set(form.getValues("tasks") || []);
     tasks.delete(taskValue);
 
-    const nextTasksValues = tasksValues.filter(([key]) => key !== taskValue);
+    const nextTasksValues = (tasksValues ?? []).filter(
+      ([key]) => key !== taskValue,
+    );
 
     form.setValue("tasksValues", nextTasksValues, {
       shouldValidate: true,
@@ -241,7 +248,7 @@ export function useClassCreationHandler({
 
     if (isModalOpen) return;
 
-    if (studentsValues.length > 0) {
+    if (studentsValues && studentsValues.length > 0) {
       resetSelectedItemsFromCache(
         cachedKeysRef.current["search-students"],
         studentsValues,
@@ -249,7 +256,7 @@ export function useClassCreationHandler({
       );
     }
 
-    if (primaryTeacherValue.length > 0) {
+    if (primaryTeacherValue && primaryTeacherValue?.length > 0) {
       resetSelectedItemsFromCache(
         cachedKeysRef.current["search-primaryteacher"],
         primaryTeacherValue,
