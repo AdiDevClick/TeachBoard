@@ -9,7 +9,7 @@ import type {
 import type { ApiError } from "@/types/AppErrorInterface";
 import type { ApiSuccess } from "@/types/AppResponseInterface";
 import { wait, waitAndFail } from "@/utils/utils";
-import type { UseMutationOptions } from "@tanstack/react-query";
+import { type UseMutationOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 const completedControllers = new WeakMap<AbortController, boolean>();
@@ -203,19 +203,31 @@ export const mutationOptions = <
     onSuccess,
     onError,
     reset,
+    onCacheVerify,
     localState,
+    cachedFetchKey,
+    queryClient,
   } = queryKeysArr[1];
 
   return {
     mutationKey: queryKeysArr,
     mutationFn: (variables) => {
+      if (onCacheVerify) {
+        const cached = queryClient?.getQueryData(cachedFetchKey!);
+        const cacheCallback = onCacheVerify(cached);
+
+        if (cacheCallback !== undefined) {
+          return cacheCallback;
+        }
+      }
+
       const { abortController, ...body } = variables;
       const fetchArgs = {
         bodyVariables: method === "GET" ? undefined : body,
         method,
         url,
         headers,
-        abortController: abortController,
+        abortController,
       };
       return onFetch<S, E>(fetchArgs);
     },
