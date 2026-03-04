@@ -22,6 +22,7 @@ import type {
 } from "@/features/evaluations/create/steps/three/types/step-three.types.ts";
 import type { LeftContentProps } from "@/features/evaluations/create/types/create.types.ts";
 import type {
+  CommandHandlerFieldMeta,
   CommandHandlerMetaData,
   HandleOpeningCallbackParams,
 } from "@/hooks/database/types/use-command-handler.types.ts";
@@ -90,6 +91,33 @@ const APP_BREADCRUMB_LIST_REQUIRES = ["items"];
 
 export const appBreadCrumbListPropsInvalid = (props: AppBreadCrumbListProps) =>
   checkPropsValidity(props, APP_BREADCRUMB_LIST_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for availability check in class creation.
+ *
+ * Used by {@link import("@/features/class-creation/components/main/hooks/useDebouncedChecker").useDebouncedChecker}
+ */
+const DEBOUNCE_AVAILABILITY_CHECK_REQUIRES = [
+  "apiEndpoint",
+  { searchParams: ["by"] },
+  "name",
+  "task",
+];
+
+/**
+ * Returns `false` when props are invalid or missing.
+ *
+ * @note Check for a false state instead of a true one to avoid confusion
+ */
+export function isValidDebounceAvailabilityMeta(
+  props: CommandHandlerFieldMeta | undefined,
+): props is Required<CommandHandlerFieldMeta> {
+  if (!props) return false;
+
+  return !checkPropsValidity(props, DEBOUNCE_AVAILABILITY_CHECK_REQUIRES, []);
+}
 
 //                    ------------
 
