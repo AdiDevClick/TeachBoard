@@ -2,7 +2,7 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { degreeModuleCreationInputControllers } from "@/features/class-creation/components/DegreeModule/forms/degree-module-inputs";
 import { diplomaCreationInputControllers } from "@/features/class-creation/components/DiplomaCreation/forms/diploma-creation-inputs";
 import { TASK_TEMPLATE_CREATION_POPOVER_CONTROLLERS } from "@/features/class-creation/components/TaskTemplateCreation/forms/task-template-inputs";
-import { CLASS_CREATION_INPUT_CONTROLLERS } from "@/features/class-creation/components/main/forms/class-creation-inputs";
+import { CLASS_CREATION_INPUT_CONTROLLERS } from "@/features/class-creation/components/main/config/class-creation.configs";
 import { stepOneInputControllers } from "@/features/evaluations/create/steps/one/forms/step-one-inputs.ts";
 import {
   classCreated,
