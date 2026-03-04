@@ -1,16 +1,15 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import {
+  TASK_TEMPLATE_CREATION_CONTROLLERS,
   TASK_TEMPLATE_FOOTER,
   TASK_TEMPLATE_TITLE,
 } from "@/features/class-creation/components/TaskTemplateCreation/config/task-template-creation.configs";
 import { TaskTemplateCreationController } from "@/features/class-creation/components/TaskTemplateCreation/controllers/TaskTemplateCreationController";
 import {
   type TaskTemplateCreationFormSchema,
-  type TaskTemplateCreationInputItem,
   taskTemplateSchema,
 } from "@/features/class-creation/components/TaskTemplateCreation/models/class-task-template.models";
-import { taskTemplateCreationInputControllers } from "@/features/class-creation/index.ts";
-import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
+import type { TaskTemplateCreationProps } from "@/features/class-creation/components/TaskTemplateCreation/types/task-template-creation.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
@@ -25,9 +24,9 @@ function TaskTemplateCreation({
   pageId = "new-task-template",
   modalMode = true,
   className = "grid gap-4",
-  inputControllers = taskTemplateCreationInputControllers,
+  inputControllers = TASK_TEMPLATE_CREATION_CONTROLLERS,
   ...props
-}: Readonly<PageWithControllers<TaskTemplateCreationInputItem>>) {
+}: TaskTemplateCreationProps) {
   const form = useForm<TaskTemplateCreationFormSchema>({
     resolver: zodResolver(taskTemplateSchema),
     mode: "onTouched",

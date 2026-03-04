@@ -4,13 +4,12 @@ import {
   DEGREE_ITEM_FOOTER_PROPS,
 } from "@/features/class-creation/components/DegreeItem/config/degree-item.configs";
 import { DegreeItemController } from "@/features/class-creation/components/DegreeItem/controllers/DegreeItemController.tsx";
+import { degreeCreationInputControllersField } from "@/features/class-creation/components/DegreeItem/forms/degree-item-inputs";
 import {
   diplomaFieldData,
   type DegreeCreationFormSchema,
-  type DegreeCreationInputItem,
 } from "@/features/class-creation/components/DegreeItem/models/degree-creation.models";
-import { degreeCreationInputControllersField } from "@/features/class-creation/index.ts";
-import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
+import type { DegreeItemProps } from "@/features/class-creation/components/DegreeItem/types/degree-item.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
@@ -29,7 +28,7 @@ function DegreeItem({
   modalMode = true,
   className = "grid gap-4",
   ...props
-}: Readonly<PageWithControllers<DegreeCreationInputItem>>) {
+}: DegreeItemProps) {
   const form = useForm<DegreeCreationFormSchema>({
     resolver: zodResolver(diplomaFieldData),
     mode: "onChange",

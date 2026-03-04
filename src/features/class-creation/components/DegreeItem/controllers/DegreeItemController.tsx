@@ -2,23 +2,17 @@ import { FormWithDebug } from "@/components/Form/FormWithDebug";
 import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { DegreeTypeMessage } from "@/features/class-creation/components/DegreeItem/controllers/types/degree-item-controller.types";
+import { degreeCreationInputControllersField } from "@/features/class-creation/components/DegreeItem/forms/degree-item-inputs";
 import type { DegreeItemControllerProps } from "@/features/class-creation/components/DegreeItem/types/degree-item.types.ts";
 import { useDebouncedChecker } from "@/features/class-creation/components/main/hooks/useDebouncedChecker";
-import { degreeCreationInputControllersField } from "@/features/class-creation/index.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
-import { type ChangeEvent, useEffect } from "react";
+import { type ChangeEvent } from "react";
 import { toast } from "sonner";
 
 const loaderToasterId = "degree-item-creation-loader-toast";
 const creationToasterId = "degree-item-created-toast";
-
-/**
- * The only fields that exist on the degree form.
- * used to keep `form.trigger`/`setError` calls strongly‑typed.
- */
-type DegreeFieldKey = "name" | "code" | "description";
 
 /**
  * Controller component for creating a new degree item.
@@ -56,8 +50,7 @@ export function DegreeItemController({
     submitDataReshapeFn,
   });
 
-  const { availabilityCheck, availabilityError, fetchParams } =
-    useDebouncedChecker(300);
+  const { availabilityCheck } = useDebouncedChecker(form, 300);
 
   if (isLoading) {
     toast.loading("Création en cours...", { id: loaderToasterId });
@@ -96,30 +89,17 @@ export function DegreeItemController({
     event: ChangeEvent<HTMLInputElement>,
     meta?: CommandHandlerFieldMeta,
   ) => {
-    const value = event.target.value;
     const fieldName = meta?.name;
+    if (!fieldName) {
+      return;
+    }
+    const type = pageId.split("-").at(-1)?.toUpperCase();
 
-    if (fieldName) form.clearErrors(`root.${fieldName}`);
-
-    availabilityCheck(value, {
+    availabilityCheck(event, {
       ...meta,
-      filters: fieldName ? { by: fieldName } : {},
+      searchParams: { by: fieldName, type },
     });
   };
-
-  /**
-   * Effect to handle API response for class name availability check, setting form errors if the name is already taken.
-   */
-  useEffect(() => {
-    if (availabilityError === false && fetchParams.filters.by) {
-      const fieldKey = fetchParams.filters.by as DegreeFieldKey;
-
-      form.setError(fieldKey, {
-        type: "manual",
-        message: `Ce ${fieldKey} est déjà utilisé. Veuillez en choisir un autre.`,
-      });
-    }
-  }, [availabilityError, form, fetchParams.filters.by]);
 
   return (
     <FormWithDebug

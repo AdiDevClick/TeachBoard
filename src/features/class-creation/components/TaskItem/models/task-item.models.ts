@@ -1,5 +1,5 @@
 import { formsRegex } from "@/configs/formsRegex.config.ts";
-import type { InputItem } from "@/types/AppInputControllerInterface";
+import type { FetchingInputItem } from "@/types/AppInputControllerInterface";
 import z from "zod";
 
 const data = {
@@ -51,4 +51,4 @@ export const taskItemCreationSchema = z.object({
 
 export type TaskItemFormSchema = z.infer<typeof taskItemCreationSchema>;
 
-export type TaskItemCreationInputItem = InputItem<TaskItemFormSchema>;
+export type TaskItemCreationInputItem = FetchingInputItem<TaskItemFormSchema>;
