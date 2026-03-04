@@ -94,11 +94,9 @@ describe("checkPropsValidity / findMissingRequiredKeys behaviour", () => {
   it("Nested requirement fails when property is an array of objects", () => {
     const props = {
       items: [{ id: "1", name: "Alice" }],
-    } as unknown as Record<string, unknown>;
+    };
 
-    const nestedRequirement = [
-      { items: ["id", "name"] },
-    ] as unknown as string[];
+    const nestedRequirement = [{ items: ["id", "name"] }];
 
     const result = checkPropsValidity(props, nestedRequirement as any, []);
 
@@ -106,10 +104,55 @@ describe("checkPropsValidity / findMissingRequiredKeys behaviour", () => {
     expect(result).toBe(true);
   });
 
+  it("Handles nested-of-nested requirement", () => {
+    const requires = [
+      "anotherTopLevelProp",
+      "otherProp",
+      {
+        item: [
+          {
+            itemTitleObject: [
+              "nestedItemTitleValue",
+              { myDeepNestedProp: ["myDeepNestedPropValue"] },
+            ],
+          },
+          "someItemProp",
+          "anotherItemProp",
+        ],
+      },
+    ] as string[];
+
+    const propsOk = {
+      anotherTopLevelProp: "x",
+      otherProp: 1,
+      item: {
+        itemTitleObject: {
+          nestedItemTitleValue: "x",
+          myDeepNestedProp: {
+            myDeepNestedPropValue: "x",
+          },
+        },
+        someItemProp: 1,
+        anotherItemProp: 2,
+      },
+    };
+
+    expect(checkPropsValidity(propsOk, requires, [])).toBe(false);
+
+    const propsMissing = {
+      item: {
+        itemTitleObject: {},
+        someItemProp: 1,
+        anotherItemProp: 2,
+      },
+    };
+    expect(checkPropsValidity(propsMissing, requires, [])).toBe(true);
+  });
+
   it("Top-level items requirement passes when items is present", () => {
     const props = {
       items: [{ id: "1", name: "Alice" }],
-    } as unknown as Record<string, unknown>;
+    };
 
     const topLevelRequirement = ["items"];
 
