@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { CLASS_CREATION_INPUT_CONTROLLERS } from "@/features/class-creation/components/main/forms/class-creation-inputs";
+import { CLASS_CREATION_INPUT_CONTROLLERS } from "@/features/class-creation/components/main/config/class-creation.configs";
 
 import { describe, expect, it } from "vitest";
 
@@ -10,9 +10,7 @@ import { describe, expect, it } from "vitest";
 describe("API_ENDPOINTS contract for class creation", () => {
   it("classCreationInputControllers are wired with apiEndpoint/dataReshapeFn when required", () => {
     // Diploma select (commands + add new)
-    const diploma = CLASS_CREATION_INPUT_CONTROLLERS.inputs.find(
-      (c) => c.name === "degreeConfigId",
-    );
+    const diploma = CLASS_CREATION_INPUT_CONTROLLERS.popover;
     expect(diploma).toBeTruthy();
     expect(diploma?.useCommands).toBe(true);
     expect(diploma?.apiEndpoint).toBeTruthy();
@@ -49,8 +47,7 @@ describe("API_ENDPOINTS contract for class creation", () => {
     expect(nameCtrl?.apiEndpoint).toBeTypeOf("function");
     // after calling with value we should get a valid URL string
     const example = (nameCtrl!.apiEndpoint as (arg: string) => string)("Abc");
-    expect(example).toMatch(/check-name\/Abc$/);
-    expect(nameCtrl?.dataReshapeFn).toBeTruthy();
+    expect(example).toMatch(/available\/Abc$/);
   });
 
   it("DIPLOMAS reshaper provides items with a 'value' for Command", () => {

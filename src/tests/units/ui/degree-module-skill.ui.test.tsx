@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { DegreeModule } from "@/features/class-creation";
+import DegreeModule from "@/features/class-creation/components/DegreeModule/DegreeModule";
 import { degreeModuleCreationInputControllers } from "@/features/class-creation/components/DegreeModule/forms/degree-module-inputs";
 import { DEGREE_MODULE_SKILL_CARD_TITLE } from "@/features/class-creation/components/DegreeModuleSkill/config/degree-module-skill.configs";
 import { degreeSubSkillsCreationInputControllers } from "@/features/class-creation/components/DegreeModuleSkill/forms/degree-module-skill-inputs";
