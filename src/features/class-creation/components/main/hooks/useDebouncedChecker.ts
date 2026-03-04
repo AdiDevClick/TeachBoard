@@ -1,8 +1,16 @@
+import {
+  debugLogs,
+  isValidDebounceAvailabilityMeta,
+} from "@/configs/app-components.config";
+import type { lastErrorType } from "@/features/class-creation/components/main/hooks/types/use-debounced-checker.types";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types";
 import { useFetch } from "@/hooks/database/fetches/useFetch";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
 import useDebounce from "@/hooks/useDebounce";
-import { useEffect, useEffectEvent } from "react";
+import type { AppRouteResponseContract } from "@/types/AppResponseInterface";
+import { preventDefaultAndStopPropagation } from "@/utils/utils";
+import { useEffect, useEffectEvent, useRef, type ChangeEvent } from "react";
+import type { UseFormReturn } from "react-hook-form";
 
 /**
  * Custom hook to manage debounced availability checks for input names during class creation, utilizing the useFetch hook for API calls and handling command input changes.
@@ -11,11 +19,20 @@ import { useEffect, useEffectEvent } from "react";
  * @returns An object containing the availability error (if any) and the debounced availability check function to be used in input change handlers.
  */
 export function useDebouncedChecker<
-  T extends object = object,
-  S extends Extract<T, "success"> = Extract<T, "success">,
-  E extends Extract<T, "error"> = Extract<T, "error">,
->(delay: number = 500) {
-  const { error, fetchParams, setFetchParams, onSubmit } = useFetch<S, E>();
+  T extends AppRouteResponseContract<any, any> = AppRouteResponseContract<
+    any,
+    any
+  >,
+>(form: UseFormReturn<any>, delay: number = 500) {
+  type Success = T extends AppRouteResponseContract<infer SS, any> ? SS : never;
+  type Error = T extends AppRouteResponseContract<any, infer EE> ? EE : never;
+
+  const { response, error, fetchParams, setFetchParams, onSubmit } = useFetch<
+    Success,
+    Error
+  >();
+
+  const lastErrorRef = useRef<lastErrorType>(null);
 
   /**
    * Trigger name availability check when the fetchParams.url changes, which happens after the debounced function sets new params.
@@ -41,32 +58,87 @@ export function useDebouncedChecker<
    * @param meta - Optional metadata for the command handler, including API endpoint information
    */
   const availabilityCheck = useDebounce(
-    (rawValue: string, meta?: CommandHandlerFieldMeta) => {
-      if (!meta?.apiEndpoint) return;
+    (event: ChangeEvent<HTMLInputElement>, meta?: CommandHandlerFieldMeta) => {
+      preventDefaultAndStopPropagation(event);
+      const value = event.target.value.trim().toLowerCase();
 
-      const value = rawValue.trim();
-      if (!value) return;
+      if (!isValidDebounceAvailabilityMeta(meta) || value.length < 2) {
+        debugLogs("useDebouncedChecker", meta);
+        return;
+      }
+
+      const { name, task, searchParams, dataReshapeFn, apiEndpoint } = meta;
+
+      const fieldState = form.getFieldState(name);
+      const lastError = lastErrorRef.current;
+
+      if (
+        !fieldState.error &&
+        lastError?.error &&
+        lastError?.errorKey === name &&
+        lastError.value === value
+      ) {
+        form.setError(name, lastError.error);
+      }
+
+      // clear any remaining error when we are actually performing a new check.
+      if (fieldState.error && lastErrorRef.current?.error) {
+        lastErrorRef.current.error = null;
+      }
 
       const computedApiEndpoint =
-        typeof meta.apiEndpoint === "function"
-          ? meta.apiEndpoint(value)
-          : meta.apiEndpoint;
+        typeof apiEndpoint === "function" ? apiEndpoint(value) : apiEndpoint;
+
+      lastErrorRef.current = { ...lastErrorRef.current, value };
 
       setFetchParams((prev) => ({
         ...prev,
         url: String(computedApiEndpoint),
         method: "GET",
-        contentId: meta.task as FetchParams["contentId"],
-        dataReshapeFn: meta.dataReshapeFn,
-        filters: { ...meta.filters },
+        contentId: task as FetchParams["contentId"],
+        dataReshapeFn,
+        searchParams,
         silent: true,
+        onCacheVerify(cachedData: any) {
+          if (cachedData?.available === false) {
+            return Promise.reject({ data: cachedData });
+          }
+        },
+        // cachedFetchKey: [task, computedApiEndpoint],
       }));
     },
     delay,
   );
 
+  /**
+   * Effect to handle API response for class name availability check, setting form errors if the name is already taken.
+   */
+  useEffect(() => {
+    const notIsAvailable = error?.data?.available === false;
+
+    if (notIsAvailable && fetchParams.searchParams.by) {
+      const fieldKey = fetchParams.searchParams.by;
+      let fieldLabel = fieldKey;
+
+      if (fieldLabel === "name") {
+        fieldLabel = "nom";
+      }
+
+      const manualError = {
+        type: "manual",
+        message: `Ce ${fieldLabel} est déjà utilisé. Veuillez en choisir un autre.`,
+      };
+
+      lastErrorRef.current = {
+        value: lastErrorRef.current?.value,
+        errorKey: fieldKey,
+        error: manualError,
+      };
+      form.setError(fieldKey, manualError);
+    }
+  }, [response, error, form, fetchParams.searchParams.by]);
+
   return {
-    availabilityError: error?.available,
     availabilityCheck,
     fetchParams,
   };
