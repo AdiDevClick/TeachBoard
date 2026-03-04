@@ -322,7 +322,10 @@ export async function openPopoverAndExpectByLabel(
   items: Array<string | RegExp>,
   opts?: { withinDialog?: boolean; timeout?: number },
 ) {
-  await openPopoverByLabelText(label, { withinDialog: opts?.withinDialog });
+  await openPopoverByLabelText(label, {
+    withinDialog: opts?.withinDialog,
+    timeout: opts?.timeout,
+  });
   await expectOpenPopoverToContain(items, opts?.timeout ?? 1000);
 }
 
@@ -533,18 +536,44 @@ function isPopoverOpen(): boolean {
 async function closeOpenPopoverIfAny() {
   if (!isPopoverOpen()) return;
 
-  // Clicking the trigger can be flaky because the popover content may cover it
-  // and intercept pointer events. Escape + outside pointerdown is more reliable.
+  // When a dialog is open, DO NOT use Escape — that would close the dialog
+  // (which is the topmost Radix focus scope) instead of the popover.
+  // Find the open popover's trigger (Radix sets data-state="open" on it) and
+  // click it to toggle the popover closed.  This is both dialog-safe and
+  // more specific than a blanket Escape / outside-click.
+  const openDialog = getLastVisibleDialogContent();
+  if (openDialog) {
+    const openTrigger = elQuery(
+      undefined,
+      '[data-slot="popover-trigger"][data-state="open"]',
+    );
+    if (openTrigger) {
+      await userEvent.click(openTrigger);
+      try {
+        await waitForPopoverState(false, 200);
+        return;
+      } catch {
+        // trigger click didn't close it; fall through to body click
+      }
+    }
+    // Fallback: click document.body — safe since no dialog overlay is used
+    await userEvent.click(document.body);
+    try {
+      await waitForPopoverState(false, 200);
+    } catch {
+      // best effort; continue
+    }
+    return;
+  }
+
+  // No dialog open: Escape + outside pointerdown is reliable.
   await userEvent.keyboard("{Escape}");
 
   try {
     await waitForPopoverState(false, 200);
     return;
   } catch {
-    const overlay = elQuery(undefined, SELECTORS.dialogOverlay);
-    const dismissTarget =
-      (getLastVisibleDialogContent() ? overlay : null) ?? document.body;
-    await userEvent.click(dismissTarget);
+    await userEvent.click(document.body);
     await waitForPopoverState(false, 200);
   }
 }
@@ -1028,6 +1057,45 @@ async function openPopover(
   if (!trigger) throw new TypeError("Popover trigger not found");
 
   await userEvent.click(trigger);
+
+  // When a popover has a cmdk CommandInput, the first click can trigger a
+  // data-fetch (causing a React state update / re-render). In some nested-dialog
+  // scenarios the resulting re-render briefly remounts/replaces children inside
+  // the popover content, which causes Radix to fire onFocusOutside and close the
+  // popover immediately.
+  //
+  // Strategy: immediately after the click, pull focus into the popover content
+  // (specifically the cmdk input if present). This prevents Radix from detecting
+  // a "focus outside" event caused by the re-render cycle.
+  //
+  // If the popover is still closed after the focus injection attempt, the first
+  // click already ran handleOpening (which pre-populated the command items via
+  // the fetch stub). A second click will open the popover; this time the
+  // commandHeadings are already available so no new re-render / focus loss
+  // occurs and the popover stays open.
+  const injectFocusIntoPopover = () => {
+    try {
+      const open = getOpenPopoverContent();
+      if (!open) return;
+      const cmdkInput = getCommandItem(open);
+      if (cmdkInput && document.activeElement !== cmdkInput) {
+        cmdkInput.focus();
+      }
+    } catch {
+      // non-fatal
+    }
+  };
+
+  injectFocusIntoPopover();
+
+  if (!isPopoverOpen()) {
+    // Popover was opened then immediately closed by the re-render cycle.
+    // Click the trigger again — commandHeadings are now populated so the
+    // PopoverContent children won't replace themselves, keeping the popover open.
+    await userEvent.click(trigger);
+    injectFocusIntoPopover();
+  }
+
   await waitForPopoverState(true, timeout);
 
   // In tests, cmdk's input value can persist across open/close cycles and
