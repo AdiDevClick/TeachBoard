@@ -15,6 +15,27 @@ describe("useQueryOnSubmit / onFetch helper", () => {
     vi.unstubAllGlobals();
   });
 
+  test("useQueryOnSubmit accepts cachedFetchKey in descriptor", async () => {
+    // this is largely a type-check sanity; passing the extra field should compile
+    const fetchStub = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: "ok", ok: true }),
+    });
+    vi.stubGlobal("fetch", fetchStub);
+
+    const { result } = await renderHook(
+      () =>
+        useQueryOnSubmit(["t", { url: "/foo", cachedFetchKey: ["a", "b"] }]),
+      { wrapper: AppTestWrapper },
+    );
+
+    await act(async () => {
+      await result.current.onSubmit();
+    });
+
+    expect(fetchStub).toHaveBeenCalledTimes(1);
+  });
+
   test("onFetch replaces an already-aborted controller before starting a new request", async () => {
     const controller = new AbortController();
 
