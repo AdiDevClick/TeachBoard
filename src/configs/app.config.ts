@@ -74,7 +74,7 @@ export type AppModalNames =
   | "create-diploma"
   | "new-degree-item-field"
   | "new-degree-item-year"
-  | "new-degree-item-degree"
+  | "new-degree-item-level"
   | "new-degree-module"
   | "new-degree-module-skill"
   | "new-task-template"
@@ -88,7 +88,8 @@ export type AppModalNames =
   | "evaluation-class-selection"
   | "evaluation-attendance"
   | "evaluation-module-selection"
-  | "evaluation-summary";
+  | "evaluation-summary"
+  | "availability";
 
 /**
  * Pages that do not require session checks
