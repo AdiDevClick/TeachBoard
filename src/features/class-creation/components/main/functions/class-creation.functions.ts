@@ -3,7 +3,7 @@ import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import type {
   CreateDisabledGroupParams,
   HandleDiplomaChangeParams,
-} from "@/features/class-creation";
+} from "@/features/class-creation/components/main/types/class-creation.types";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
 
