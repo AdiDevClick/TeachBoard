@@ -6,11 +6,11 @@ import { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-in
 import { LabelledInput } from "@/components/Inputs/LabelledInput";
 import type { LabelledInputProps } from "@/components/Inputs/types/inputs.types";
 import type { AppModalNames } from "@/configs/app.config.ts";
+import { DEFAULT_SCHOOL_YEAR } from "@/features/class-creation/components/main/config/class-creation.configs";
 import {
   type ClassCreationFormSchema,
   classCreationSchema,
 } from "@/features/class-creation/components/main/models/class-creation.models";
-import { DEFAULT_SCHOOL_YEAR } from "@/features/class-creation/components/main/config/class-creation.configs";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
 import type { IsAssignable, ShouldReject } from "@/utils/types/types.utils";
 import { zodResolver } from "@hookform/resolvers/zod";
