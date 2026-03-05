@@ -1,7 +1,7 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import {
-  TASK_ITEM_TITLE,
   TASK_ITEM_FOOTER,
+  TASK_ITEM_TITLE,
 } from "@/features/class-creation/components/TaskItem/config/task-item.configs";
 import { TaskItemController } from "@/features/class-creation/components/TaskItem/controllers/TaskItemController";
 import { taskItemInputControllers } from "@/features/class-creation/components/TaskItem/forms/task-item-inputs";
@@ -33,7 +33,7 @@ export function TaskItem({
 }: Readonly<PageWithControllers<TaskItemCreationInputItem>>) {
   const form = useForm<TaskItemFormSchema>({
     resolver: zodResolver(taskItemCreationSchema),
-    mode: "onTouched",
+    mode: "onChange",
     defaultValues: {
       name: "",
       description: "",
