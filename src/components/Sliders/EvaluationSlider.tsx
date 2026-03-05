@@ -8,6 +8,7 @@ import {
   debugLogs,
   evaluationSliderPropsValid,
 } from "@/configs/app-components.config.ts";
+import sanitizeDOMProps from "@/utils/props";
 import {
   evaluationStudentBadge,
   evaluationStudentContainer,
@@ -24,6 +25,7 @@ import { useEffect, useEffectEvent, useState, type CSSProperties } from "react";
  */
 export function EvaluationSlider(props: EvaluationSliderProps) {
   const { fullName, onValueChange, value, ...rest } = props;
+  const safeSliderProps = sanitizeDOMProps(rest, ["isPresent", "assignedTask"]);
 
   const [internalValue, setInternalValue] = useState<number[]>(value ?? [0]);
 
@@ -74,7 +76,7 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
             "--slider-rangeColor": sliderRangeColor(internalValue[0]),
           } as CSSProperties
         }
-        {...rest}
+        {...safeSliderProps}
         onValueChange={handleValueChange}
       />
     </Item>
