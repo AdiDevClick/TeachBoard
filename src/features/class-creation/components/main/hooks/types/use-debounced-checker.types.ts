@@ -4,6 +4,7 @@
  */
 export type lastErrorType = {
   value?: string;
+  errorValue?: string;
   errorKey?: string;
   error?: { type: string; message: string } | null;
 } | null;

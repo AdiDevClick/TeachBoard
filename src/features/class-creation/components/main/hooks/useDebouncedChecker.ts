@@ -72,18 +72,13 @@ export function useDebouncedChecker<
       const fieldState = form.getFieldState(name);
       const lastError = lastErrorRef.current;
 
-      if (
-        !fieldState.error &&
-        lastError?.error &&
-        lastError?.errorKey === name &&
-        lastError.value === value
-      ) {
-        form.setError(name, lastError.error);
-      }
+      const { errorValue, errorKey, error } = lastError || {};
 
-      // clear any remaining error when we are actually performing a new check.
-      if (fieldState.error && lastErrorRef.current?.error) {
-        lastErrorRef.current.error = null;
+      if (errorValue === value) {
+        if (!fieldState.error && error && errorKey === name) {
+          form.setError(name, error);
+        }
+        return;
       }
 
       const computedApiEndpoint =
@@ -104,7 +99,6 @@ export function useDebouncedChecker<
             return Promise.reject({ data: cachedData });
           }
         },
-        // cachedFetchKey: [task, computedApiEndpoint],
       }));
     },
     delay,
@@ -115,9 +109,9 @@ export function useDebouncedChecker<
    */
   useEffect(() => {
     const notIsAvailable = error?.data?.available === false;
+    const fieldKey = fetchParams.searchParams?.by;
 
-    if (notIsAvailable && fetchParams.searchParams.by) {
-      const fieldKey = fetchParams.searchParams.by;
+    if (notIsAvailable && fieldKey) {
       let fieldLabel = fieldKey;
 
       if (fieldLabel === "name") {
@@ -130,13 +124,13 @@ export function useDebouncedChecker<
       };
 
       lastErrorRef.current = {
-        value: lastErrorRef.current?.value,
+        errorValue: lastErrorRef.current?.value,
         errorKey: fieldKey,
         error: manualError,
       };
       form.setError(fieldKey, manualError);
     }
-  }, [response, error, form, fetchParams.searchParams.by]);
+  }, [response, error, form, fetchParams.searchParams?.by]);
 
   return {
     availabilityCheck,
