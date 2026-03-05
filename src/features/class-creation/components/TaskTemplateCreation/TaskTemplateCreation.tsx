@@ -29,7 +29,7 @@ function TaskTemplateCreation({
 }: TaskTemplateCreationProps) {
   const form = useForm<TaskTemplateCreationFormSchema>({
     resolver: zodResolver(taskTemplateSchema),
-    mode: "onTouched",
+    mode: "onChange",
     defaultValues: {
       name: "",
       description: "",
