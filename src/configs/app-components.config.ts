@@ -472,12 +472,12 @@ export const nonLabelledGroupItemPropsInvalid = (
  */
 const STEP_TWO_ON_SELECT_REQUIRES = ["id"];
 
-export const isStepTwoOnSelectPropsInvalid = (
+export const isStepTwoOnSelectPropsValid = (
   props: VerticalSelectMetaData | undefined,
 ): props is Required<VerticalSelectMetaData> => {
-  if (!props) return true;
+  if (!props) return false;
 
-  return checkPropsValidity(props, STEP_TWO_ON_SELECT_REQUIRES, []);
+  return !checkPropsValidity(props, STEP_TWO_ON_SELECT_REQUIRES, []);
 };
 
 //                    ------------

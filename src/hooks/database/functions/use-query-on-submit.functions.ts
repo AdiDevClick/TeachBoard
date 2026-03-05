@@ -213,7 +213,17 @@ export const mutationOptions = <
     mutationKey: queryKeysArr,
     mutationFn: (variables) => {
       if (onCacheVerify) {
-        const cached = queryClient?.getQueryData(cachedFetchKey!);
+        if (
+          cachedFetchKey === undefined ||
+          cachedFetchKey === null ||
+          queryClient === undefined
+        ) {
+          throw new Error(
+            "cachedFetchKey must be provided in query descriptor when onCacheVerify is used.",
+          );
+        }
+
+        const cached = queryClient.getQueryData(cachedFetchKey);
         const cacheCallback = onCacheVerify(cached);
 
         if (cacheCallback !== undefined) {

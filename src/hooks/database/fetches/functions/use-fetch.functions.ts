@@ -28,14 +28,14 @@ export function navigateOnForbiddenError(
  * @returns The modified URL with search parameters as query strings if they exist, otherwise the original URL.
  */
 export function createSearchParamsEndpoint(params: FetchParams) {
-  const { searchParams, url } = params;
+  const { searchParams = {}, url } = params;
   let builtEndpoint = url;
 
   if (Object.entries(searchParams).length !== 0) {
     const createdPath = new URL(url, globalThis.location.origin);
 
     Object.entries(searchParams ?? {}).forEach(([key, value]) => {
-      createdPath.searchParams.set(key, value as string);
+      createdPath.searchParams.set(key, String(value));
     });
 
     builtEndpoint = createdPath.pathname + createdPath.search;

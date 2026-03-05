@@ -149,7 +149,7 @@ export function useFetch<
 
           if (DEV_MODE && !NO_QUERY_LOGS) {
             console.debug(
-              "[useFetch:onSuccess] endpoint:",
+              "[useFetch:onError] endpoint:",
               fetchParams.url,
               "error.data:",
               error.data,
