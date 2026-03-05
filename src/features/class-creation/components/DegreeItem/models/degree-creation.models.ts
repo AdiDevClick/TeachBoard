@@ -92,7 +92,7 @@ const degreeCreationSchema = (data: typeof fieldData) => {
       .string()
       .trim()
       .max(data.maxDescriptionLength, data.maxDescriptionLengthExceededMessage)
-      .regex(formsRegex.serverName, data.descriptionRegexMessage)
+      .regex(formsRegex.serverDescription, data.descriptionRegexMessage)
       .toLowerCase()
       .optional()
       .describe("degree description, optional, trimmed"),

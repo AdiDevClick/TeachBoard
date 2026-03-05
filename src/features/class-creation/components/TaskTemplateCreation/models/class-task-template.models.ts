@@ -1,3 +1,4 @@
+import { formsRegex } from "@/configs/formsRegex.config.ts";
 import type { FetchingInputItem } from "@/types/AppInputControllerInterface";
 import z from "zod";
 
@@ -16,6 +17,8 @@ const dataField = {
     "La description de la tâche doit contenir au moins 10 caractères.",
   descriptionMaxLengthMessage:
     "La description de la tâche ne peut pas dépasser 512 caractères.",
+  descriptionRegexMessage:
+    "La description de la tâche ne doit pas contenir de caractères spéciaux.",
   arrayItemRegexMessage:
     "Les compétences ne doivent pas contenir de caractères spéciaux.",
   taskValidUuidMessage: "La tâche doit être un UUID valide.",
@@ -42,6 +45,7 @@ const taskTemplateCreationSchema = (data: typeof dataField) =>
       .nonempty(data.descriptionMinLengthMessage)
       .max(data.descriptionMaxLength, data.descriptionMaxLengthMessage)
       .min(data.descriptionMinLength, data.descriptionMinLengthMessage)
+      .regex(formsRegex.serverDescription, data.descriptionRegexMessage)
       .trim()
       .toLowerCase()
       .describe("Description of the task"),
