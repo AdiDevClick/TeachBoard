@@ -81,6 +81,11 @@ export function useDebouncedChecker<
         return;
       }
 
+      // Clear any existing error on the field when starting a new check
+      if (fieldState.error) {
+        form.clearErrors(name);
+      }
+
       const computedApiEndpoint =
         typeof apiEndpoint === "function" ? apiEndpoint(value) : apiEndpoint;
 
