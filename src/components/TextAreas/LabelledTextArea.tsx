@@ -5,6 +5,7 @@ import {
   debugLogs,
   labelledTextAreaContainsInvalid,
 } from "@/configs/app-components.config";
+import sanitizeDOMProps from "@/utils/props";
 
 /**
  * A labelled textarea component.
@@ -20,11 +21,18 @@ export function LabelledTextArea(props: LabelledTextAreaProps) {
   }
 
   const { name, title, ...rest } = props;
+  const safeProps = sanitizeDOMProps(rest, [
+    "onOpenChange",
+    "onValueChange",
+    "controllerFieldMeta",
+    "fieldState",
+    "setRef",
+  ]);
   const labelName = name ?? "input-is-not-named";
   return (
     <>
       <Label htmlFor={labelName}>{title}</Label>
-      <Textarea {...rest} id={labelName} />
+      <Textarea {...safeProps} id={labelName} />
     </>
   );
 }
