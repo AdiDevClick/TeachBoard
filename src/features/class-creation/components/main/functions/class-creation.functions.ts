@@ -5,22 +5,6 @@ import type {
   HandleDiplomaChangeParams,
 } from "@/features/class-creation/components/main/types/class-creation.types";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
-import type { QueryClient, QueryKey } from "@tanstack/react-query";
-
-type SelectedItemRef = {
-  id: string | number;
-  [key: string]: unknown;
-};
-
-function isSelectedItemRef(value: unknown): value is SelectedItemRef {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "id" in value &&
-    (typeof (value as { id?: unknown }).id === "string" ||
-      typeof (value as { id?: unknown }).id === "number")
-  );
-}
 
 function logResetLookupDebug(items: unknown, id: string | number) {
   if (!DEV_MODE || NO_CACHE_LOGS) return;
@@ -44,70 +28,6 @@ function logResetLookupDebug(items: unknown, id: string | number) {
   }
 
   console.log("[Reset DATA] Items type:", typeof items);
-}
-
-/**
- * Reset selected items in cache
- *
- * @param queryKey - The query key to access cached data
- * @param selectedItems - The items that have been selected and need to be reset in the cache
- * @param queryClient - The query client instance used to access and manipulate the cache
- */
-export function resetSelectedItemsFromCache(
-  queryKey: QueryKey,
-  selectedItems:
-    | Record<string, unknown>
-    | Array<unknown>
-    | Map<string, unknown>,
-  queryClient: QueryClient,
-) {
-  if (!queryKey) return;
-  const cachedData = queryClient.getQueryData(queryKey);
-  if (!cachedData || !Array.isArray(cachedData) || !cachedData[0]?.items)
-    return;
-
-  if (DEV_MODE && !NO_CACHE_LOGS) {
-    console.log("[Reset DATA] Cached data structure:", cachedData);
-    console.log(
-      "[Reset DATA] Items type:",
-      cachedData[0].items.constructor.name,
-    );
-    console.log("[Reset DATA] Items to reset:", selectedItems);
-  }
-
-  const selectedValues = Array.isArray(selectedItems)
-    ? selectedItems
-    : Object.values(selectedItems ?? {});
-
-  selectedValues.forEach((itemDetails) => {
-    // Support entries form: [key, details]
-    const details =
-      Array.isArray(itemDetails) && itemDetails.length === 2
-        ? itemDetails[1]
-        : itemDetails;
-
-    if (!isSelectedItemRef(details)) return;
-
-    const items = cachedData[0]?.items;
-    let cachedItem;
-
-    logResetLookupDebug(items, details.id);
-    if (Array.isArray(items)) {
-      cachedItem = items.find((item) => {
-        if (typeof item !== "object" || item === null || !item.id) return false;
-
-        return item.id === details.id;
-      });
-    }
-
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("[Reset DATA] Found cached item:", cachedItem);
-    }
-
-    if (cachedItem) {
-      cachedItem.isSelected = false;
-    }
-  });
 }
 
 /**

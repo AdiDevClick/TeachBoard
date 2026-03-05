@@ -4,10 +4,7 @@ import {
   taskModalPropsInvalid,
 } from "@/configs/app-components.config";
 import { DEV_MODE, HTTP_METHODS, NO_CACHE_LOGS } from "@/configs/app.config";
-import {
-  saveKeys,
-  resetSelectedItemsFromCache,
-} from "@/features/class-creation/components/main/functions/class-creation.functions";
+import { saveKeys } from "@/features/class-creation/components/main/functions/class-creation.functions";
 import type { ClassCreationFormSchema } from "@/features/class-creation/components/main/models/class-creation.models";
 import type { UseClassCreationHandlerProps } from "@/features/class-creation/components/main/types/class-creation.types";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
@@ -56,12 +53,6 @@ export function useClassCreationHandler({
   const cachedKeysRef = useRef<Record<string, unknown[]>>({});
   const selectedDiplomaRef = useRef<CommandItemType>(null);
 
-  const studentsMemo = useAvatarDataGenerator(form, "studentsValues");
-  const primaryTeacherMemo = useAvatarDataGenerator(
-    form,
-    "primaryTeacherValue",
-  );
-
   const [tasksValues, degreeConfigId, studentsValues, primaryTeacherValue] =
     form.watch([
       "tasksValues",
@@ -69,6 +60,9 @@ export function useClassCreationHandler({
       "studentsValues",
       "primaryTeacherValue",
     ]);
+
+  const studentsMemo = useAvatarDataGenerator(studentsValues);
+  const primaryTeacherMemo = useAvatarDataGenerator(primaryTeacherValue);
 
   /**
    * Handle Class Creation form submission when form is valid
@@ -159,14 +153,6 @@ export function useClassCreationHandler({
     const task = rest.task;
     rest.form = form;
 
-    if (task === "search-students") {
-      rest.selectedStudents = studentsValues ?? {};
-    }
-
-    if (task === "search-primaryteacher") {
-      rest.selectedPrimaryTeacher = primaryTeacherValue ?? {};
-    }
-
     if (task === "new-task-template" && selectedDiplomaRef.current) {
       rest.apiEndpoint =
         typeof rest.apiEndpoint === "function"
@@ -248,20 +234,15 @@ export function useClassCreationHandler({
 
     if (isModalOpen) return;
 
-    if (studentsValues && studentsValues.length > 0) {
-      resetSelectedItemsFromCache(
-        cachedKeysRef.current["search-students"],
-        studentsValues,
-        queryClient,
-      );
+    const studentsKey = cachedKeysRef.current["search-students"];
+    const teacherKey = cachedKeysRef.current["search-primaryteacher"];
+
+    if (studentsKey) {
+      queryClient.removeQueries({ queryKey: studentsKey });
     }
 
-    if (primaryTeacherValue && primaryTeacherValue?.length > 0) {
-      resetSelectedItemsFromCache(
-        cachedKeysRef.current["search-primaryteacher"],
-        primaryTeacherValue,
-        queryClient,
-      );
+    if (teacherKey) {
+      queryClient.removeQueries({ queryKey: teacherKey });
     }
   });
 

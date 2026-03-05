@@ -4,7 +4,7 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { SearchPrimaryTeacherControllerProps } from "@/features/class-creation/components/SearchTeachers/types/search-teachers.types.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useEffectEvent } from "react";
 
 /**
  * Controller for searching and selecting primary teachers.
@@ -78,11 +78,11 @@ export function SearchPrimaryTeacherController({
   };
 
   /**
-   * Initial fetch setup
+   * INIT FETCH SETUP - TRIGGER
    *
    * @description Sets up the fetch parameters for retrieving students and triggers the fetch on component mount.
    */
-  useEffect(() => {
+  const triggerFetchOnInit = useEffectEvent(() => {
     const metaData = {
       dataReshapeFn: API_ENDPOINTS.GET.TEACHERS.dataReshape,
       apiEndpoint: API_ENDPOINTS.GET.TEACHERS.endpoint,
@@ -91,6 +91,15 @@ export function SearchPrimaryTeacherController({
     };
 
     openingCallback(true, metaData);
+  });
+
+  /**
+   * INIT FETCH SETUP -
+   *
+   * @description Only on mount
+   */
+  useEffect(() => {
+    triggerFetchOnInit();
   }, []);
 
   const handleSubmit = () => {

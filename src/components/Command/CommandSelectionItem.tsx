@@ -45,16 +45,17 @@ export function CommandSelectionItem(props: CommandSelectionItemProps) {
    * @param value - The value of the selected command item.
    */
   const selectCallback = (value: string) => {
-    let newCommand = { ...command, ...details };
+    const newCommand = { ...command };
 
     if (avatarDisplay) {
-      const newSelection = !avatarSelection;
-      setAvatarSelection(newSelection);
+      newCommand.isSelected = !avatarSelection;
+      setAvatarSelection(!avatarSelection);
 
-      newCommand = { ...newCommand, isSelected: newSelection };
+      // Update the real command object to reflect the new selection state for future interactions
+      Object.assign(command, newCommand);
     }
 
-    onSelect?.(value, { ...newCommand });
+    onSelect?.(value, { ...newCommand, ...details });
   };
 
   const avatarProps = {
