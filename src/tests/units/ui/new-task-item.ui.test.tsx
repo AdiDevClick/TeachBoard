@@ -14,6 +14,7 @@ import {
 import { initSetup } from "@/tests/units/ui/functions/class-creation/class-creation.functions.ts";
 import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions";
 import { afterEach, describe, test, vi } from "vitest";
+import { page } from "vitest/browser";
 
 let taskController: any;
 let tasksQueryKey: any;
@@ -92,5 +93,53 @@ describe("UI flow: new-task-item", () => {
         timeout: 2500,
       },
     });
+  });
+
+  test("description : un caract\u00e8re invalide d\u00e9clenche l'erreur, l'ajout de caract\u00e8res la maintient, une valeur valide la supprime et permet la soumission", async () => {
+    const tasks = [sample.taskFetched.name, sample.taskFetched2.name];
+    // Open modal
+    await openModalAndAssertItsOpenedAndReady(
+      taskController.creationButtonText,
+      {
+        controller: taskController,
+        nameArray: tasks,
+        readyText: taskItemInputControllers[0].title,
+      },
+    );
+
+    const descInput = page.getByRole("textbox", {
+      name: taskItemInputControllers[1].title,
+    });
+
+    await fillFieldsEnsuringSubmitDisabled("Créer", [
+      // Step 1+2 : bad char → aria-invalid="true"
+      {
+        locator: descInput,
+        value: "<bad chars here!!",
+        assertAttribute: "aria-invalid",
+        toBe: "true",
+      },
+      // Step 3+4+5 : append chars → error persists -> submit disabled
+      {
+        locator: descInput,
+        value: "<bad chars here!! extra content ajout\u00e9",
+        assertAttribute: "aria-invalid",
+        toBe: "true",
+      },
+      // Step 6 : valid value → aria-invalid="false" + submit disabled
+      {
+        locator: descInput,
+        value: "Une description valide et suffisamment longue.",
+        assertAttribute: "aria-invalid",
+        toBe: "false",
+      },
+      // Step 7 : clear errors -> aria-invalid="true" (not optional)
+      {
+        locator: descInput,
+        assertAttribute: "aria-invalid",
+        toBe: "true",
+        clearInput: true,
+      },
+    ]);
   });
 });

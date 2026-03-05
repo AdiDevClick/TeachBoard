@@ -19,8 +19,8 @@ import {
 } from "@/tests/test-utils/vitest-browser.helpers";
 import { initSetup } from "@/tests/units/ui/functions/class-creation/class-creation.functions.ts";
 import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions.ts";
-import { afterEach, describe, test, vi } from "vitest";
-import { page } from "vitest/browser";
+import { afterEach, describe, expect, test, vi } from "vitest";
+import { page, userEvent } from "vitest/browser";
 
 let diplomaYearController: InputControllerLike;
 let degreeYearQueryKey: ReturnType<typeof queryKeyFor>;
@@ -68,7 +68,7 @@ describe("UI flow: new-degree-item-year", () => {
     // Snapshot GET count after initial fetch (triggered by opening the popover)
     const getCallsBeforeCreation = countFetchCallsByUrl(apiEndpointRaw, "GET");
 
-    // Fill fields
+    // Fill required fields
     await fillFieldsEnsuringSubmitDisabled("Créer", [
       {
         locator: page.getByRole("textbox", {
@@ -76,17 +76,18 @@ describe("UI flow: new-degree-item-year", () => {
         }),
         value: degreeCreated.name,
       },
-      {
-        locator: page.getByRole("textbox", {
-          name: degreeCreationInputControllersYear[1].title,
-        }),
-        value: degreeCreated.code,
-      },
+      // !! IMPORTANT !! Optional field should be tested BEFORE the required code field, as it can validate the form
       {
         locator: page.getByRole("textbox", {
           name: degreeCreationInputControllersYear[2].title,
         }),
         value: "Description valide",
+      },
+      {
+        locator: page.getByRole("textbox", {
+          name: degreeCreationInputControllersYear[1].title,
+        }),
+        value: degreeCreated.code,
       },
     ]);
 
@@ -110,5 +111,52 @@ describe("UI flow: new-degree-item-year", () => {
         timeout: 2500,
       },
     });
+  });
+
+  test("description optionnelle : un caractère invalide déclenche l'erreur, l'ajout d'un caractère la maintient, vider le champ devrait la supprimer (BUG : le regex serverName interdit la chaîne vide)", async () => {
+    // Open modal
+    await openModalAndAssertItsOpenedAndReady(
+      String(diplomaYearController.creationButtonText),
+      {
+        controller: diplomaYearController,
+        nameArray: years,
+        readyText: degreeCreationInputControllersYear[0].title,
+      },
+    );
+
+    const descInput = page.getByRole("textbox", {
+      name: degreeCreationInputControllersYear[2].title,
+    });
+
+    await fillFieldsEnsuringSubmitDisabled("Créer", [
+      // Step 1+2 : bad char → aria-invalid="true"
+      {
+        locator: descInput,
+        value: "<!!Quite bad input there",
+        assertAttribute: "aria-invalid",
+        toBe: "true",
+      },
+      // Step 3+4 : append chars → error persists
+      {
+        locator: descInput,
+        value: "<!!Quite bad input there with some extra chars",
+        assertAttribute: "aria-invalid",
+        toBe: "true",
+      },
+      // Step 5 :  append valid chars -> no error
+      {
+        locator: descInput,
+        value: "This is a legit description field",
+        assertAttribute: "aria-invalid",
+        toBe: "false",
+      },
+    ]);
+
+    // Step 6 : Cleared field should be aria-invalid="false"
+    // BUG : le regex serverName exige {1,100} caractères, donc la chaîne vide échoue toujours
+    await userEvent.clear(descInput);
+    await expect
+      .poll(() => descInput.element().getAttribute("aria-invalid"))
+      .toBe("false");
   });
 });

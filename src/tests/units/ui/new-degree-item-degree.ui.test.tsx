@@ -18,8 +18,8 @@ import {
 } from "@/tests/test-utils/vitest-browser.helpers";
 import { initSetup } from "@/tests/units/ui/functions/class-creation/class-creation.functions.ts";
 import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions.ts";
-import { afterEach, beforeEach, describe, test, vi } from "vitest";
-import { page } from "vitest/browser";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { page, userEvent } from "vitest/browser";
 
 let diplomaLevelController: any;
 let degreeLevelQueryKey: any;
@@ -66,7 +66,7 @@ describe("UI flow: new-degree-item-degree", () => {
       "GET",
     );
 
-    // Fill fields
+    // Fill required fields
     await fillFieldsEnsuringSubmitDisabled("Créer", [
       {
         locator: page.getByRole("textbox", {
@@ -74,17 +74,18 @@ describe("UI flow: new-degree-item-degree", () => {
         }),
         value: degreeCreated.name,
       },
-      {
-        locator: page.getByRole("textbox", {
-          name: degreeCreationInputControllersDegree[1].title,
-        }),
-        value: degreeCreated.code,
-      },
+      // !! IMPORTANT : Verify description BEFORE code or the form might be valid as Description is optional
       {
         locator: page.getByRole("textbox", {
           name: degreeCreationInputControllersDegree[2].title,
         }),
         value: "Description valide",
+      },
+      {
+        locator: page.getByRole("textbox", {
+          name: degreeCreationInputControllersDegree[1].title,
+        }),
+        value: degreeCreated.code,
       },
     ]);
 
@@ -109,5 +110,52 @@ describe("UI flow: new-degree-item-degree", () => {
         timeout: 2500,
       },
     });
+  });
+
+  test("description optionnelle : un caractère invalide déclenche l'erreur, l'ajout d'un caractère la maintient, vider le champ devrait la supprimer (BUG : le regex serverName interdit la chaîne vide)", async () => {
+    // Open modal
+    await openModalAndAssertItsOpenedAndReady(
+      diplomaLevelController.creationButtonText,
+      {
+        controller: diplomaLevelController,
+        nameArray: levels,
+        readyText: degreeCreationInputControllersDegree[0].title,
+      },
+    );
+
+    const descInput = page.getByRole("textbox", {
+      name: degreeCreationInputControllersDegree[2].title,
+    });
+
+    await fillFieldsEnsuringSubmitDisabled("Créer", [
+      // Step 1+2 : bad char → aria-invalid="true"
+      {
+        locator: descInput,
+        value: "<",
+        assertAttribute: "aria-invalid",
+        toBe: "true",
+      },
+      // Step 3+4+5 : append chars → error persists -> submit disabled
+      {
+        locator: descInput,
+        value: "<extra",
+        assertAttribute: "aria-invalid",
+        toBe: "true",
+      },
+      // Step 6 : valid value → aria-invalid="false" + submit disabled
+      {
+        locator: descInput,
+        value: "Legit description",
+        assertAttribute: "aria-invalid",
+        toBe: "false",
+      },
+    ]);
+
+    // Step 7 : clear field —>  optional should be aria-invalid="false"
+    // BUG : le regex serverName exige {1,100} caractères, donc la chaîne vide échoue toujours
+    await userEvent.clear(descInput);
+    await expect
+      .poll(() => descInput.element().getAttribute("aria-invalid"))
+      .toBe("false");
   });
 });

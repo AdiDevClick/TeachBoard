@@ -1,13 +1,11 @@
 import { expect, vi } from "vitest";
 import { locators, page, userEvent, type Locator } from "vitest/browser";
 
-/* eslint-disable no-unused-vars */
 declare module "vitest/browser" {
   interface LocatorSelectors {
     getByCss(css: string): Locator;
   }
 }
-/* eslint-enable no-unused-vars */
 
 locators.extend({
   getByCss(css: string) {
@@ -132,12 +130,20 @@ export async function checkFormValidityAndSubmit(
  * Assert that the submit button with the given name is disabled.
  *
  * @param name - The exact name of the submit button.
+ * @param disabled - Whether the button should be disabled (default true).
  */
-export async function submitButtonShouldBeDisabled(name: string) {
+export async function submitButtonShouldBeDisabled(
+  name: string,
+  disabled = true,
+) {
   const rgx = new RegExp(`^${name}$`, "i");
   const submit = page.getByRole("button", { name: rgx });
 
-  expect(submit).toBeDisabled();
+  if (disabled) {
+    expect(submit).toBeDisabled();
+  } else {
+    expect(submit).toBeEnabled();
+  }
 }
 
 export async function fillAndTab(
@@ -158,30 +164,73 @@ export async function fillAndTab(
 
 /**
  * Fill a field and tab out, asserting the submit button is disabled right before.
+ *
+ * @param submitName - The exact name of the submit button to check before filling.
+ * @param target - The field to fill (Locator or Element).
+ * @param value - The value to fill into the field.
+ * @param isSubmitDisabled - Whether the submit button should be disabled before filling (default true).
  */
 export async function fillAndTabEnsuringSubmitDisabled(
   submitName: string,
   target: Parameters<typeof userEvent.fill>[0],
   value: string,
+  isSubmitDisabled = true,
 ) {
-  await submitButtonShouldBeDisabled(submitName);
+  await submitButtonShouldBeDisabled(submitName, isSubmitDisabled);
   await fillAndTab(target, value);
 }
 
 /**
  * Fill multiple fields in sequence, asserting the submit button is disabled
  * right before each field fill.
+ *
+ * @param submitName - The exact name of the submit button to check before filling each field.
+ * @param items - An array of field configurations, each containing:
+ *  - `label` (string or RegExp) to find the field by label text, or `locator` to specify the field directly.
+ * - `value` to fill into the field (default "").
+ * - `assertAttribute` and `toBe` to assert a specific attribute value after filling.
+ * - `clearInput` to clear the field instead of filling (default false).
+ * - `isSubmitDisabled` to specify whether the submit button should be disabled before filling this field (default true).
  */
 export async function fillFieldsEnsuringSubmitDisabled(
   submitName: string,
   items: Array<
-    | { label: string | RegExp; value: string }
-    | { locator: Locator; value: string }
+    | {
+        label: string | RegExp;
+        value?: string;
+        assertAttribute?: string;
+        toBe?: "true" | "false";
+        clearInput?: boolean;
+        isSubmitDisabled?: boolean;
+      }
+    | {
+        locator: Locator;
+        value?: string;
+        assertAttribute?: string;
+        toBe?: "true" | "false";
+        clearInput?: boolean;
+        isSubmitDisabled?: boolean;
+      }
   >,
 ) {
-  for (const it of items) {
-    const target = "locator" in it ? it.locator : page.getByLabelText(it.label);
-    await fillAndTabEnsuringSubmitDisabled(submitName, target, it.value);
+  for (const item of items) {
+    const target =
+      "locator" in item ? item.locator : page.getByLabelText(item.label);
+    if (item.clearInput) {
+      await userEvent.clear(target);
+    } else {
+      await fillAndTabEnsuringSubmitDisabled(
+        submitName,
+        target,
+        item.value ?? "",
+        item.isSubmitDisabled,
+      );
+    }
+    if (item.assertAttribute) {
+      await expect
+        .poll(() => target.element().getAttribute(item.assertAttribute ?? ""))
+        .toBe(item.toBe);
+    }
   }
 }
 

@@ -1,12 +1,12 @@
 import { UUID_SCHEMA } from "@/api/types/openapi/common.types";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
+import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import {
   buildEvaluationCreateRoutes,
   evaluationFlowFixture,
   installEvaluationFlowFetchStub,
   type EvaluationFlowFetchControl,
 } from "@/tests/samples/ui-fixtures/evaluation-flow.ui.fixtures";
-import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import {
   openPopoverByLabelText,
@@ -293,6 +293,58 @@ function getOverallScoreInput(studentId: string): HTMLInputElement {
   }
 
   return input;
+}
+
+async function setupToStepFour() {
+  const classA = evaluationFlowFixture.classes.classA;
+  const classAStudents = evaluationFlowFixture.students.classA;
+  const student1 = fullNameOf(classAStudents[0]);
+  const student2 = fullNameOf(classAStudents[1]);
+  const student3 = fullNameOf(classAStudents[2]);
+  const task1Name = evaluationFlowFixture.templates.task1.task.name;
+  const task2Name = evaluationFlowFixture.templates.task2.task.name;
+  const task3Name = evaluationFlowFixture.templates.task3.task.name;
+
+  await expect.poll(() => getActiveStepName()).toBe("Classe");
+  await selectClass(classA.name);
+
+  await clickNext();
+  await expect.poll(() => getActiveStepName()).toBe("Elèves");
+
+  await toggleStudentAndSelectTask(student1, task1Name);
+  await toggleStudentAndSelectTask(student2, task2Name);
+  await toggleStudentAndSelectTask(student3, task3Name);
+
+  await clickNext();
+  await expect.poll(() => getActiveStepName()).toBe("Evaluation");
+
+  // Wait for modules to be rendered before completing them from the store
+  await expect
+    .poll(() => (document.body.textContent ?? "").includes("Module partagé"))
+    .toBe(true);
+
+  completeAllModulesFromStore();
+
+  await expect
+    .poll(() =>
+      useEvaluationStepsCreationStore.getState().areAllModulesCompleted(),
+    )
+    .toBe(true);
+
+  await clickNext();
+  await expect.poll(() => getActiveStepName()).toBe("Archiver");
+
+  // Fill all numeric score inputs to trigger full form validation
+  const scoreInputs = Array.from(
+    getActivePanel().querySelectorAll<HTMLInputElement>("input"),
+  ).filter((input) => input.type === "number");
+
+  for (const input of scoreInputs) {
+    await userEvent.clear(input);
+    await userEvent.fill(input, "15");
+  }
+
+  await expect.poll(() => getStepFourSaveButton().disabled).toBe(false);
 }
 
 setupUiTestState(
@@ -667,5 +719,63 @@ describe("UI flow: evaluations step1 -> step4", () => {
 
     const postBodies = fetchControl.getStats().postBodies;
     expect(postBodies.length).toBe(beforeSpam + 1);
+  }, 30000);
+});
+
+describe("UI flow: step-four focused", () => {
+  beforeEach(async () => {
+    expect(fetchControl).toBeDefined();
+    await setupToStepFour();
+  });
+
+  test("commentaires optionnels : caractère invalide désactive l'enregistrement, vidage le réactive", async () => {
+    const comments = getStepFourCommentArea();
+
+    await userEvent.fill(comments, "<bad>");
+    await expect.poll(() => getStepFourSaveButton().disabled).toBe(true);
+
+    // Clearing an optional field (empty string matches regex {0,n}) should re-enable save
+    await userEvent.clear(comments);
+    await expect.poll(() => getStepFourSaveButton().disabled).toBe(false);
+  });
+
+  test("submit : le POST contient les champs attendus", async () => {
+    const classAStudents = evaluationFlowFixture.students.classA;
+    const presentStudentIds = new Set([
+      classAStudents[0].id,
+      classAStudents[1].id,
+      classAStudents[2].id,
+    ]);
+    const absentStudentIds = classAStudents
+      .filter((s) => !presentStudentIds.has(s.id))
+      .map((s) => s.id);
+
+    const comments = getStepFourCommentArea();
+    await userEvent.fill(comments, "Bon travail");
+    await userEvent.tab();
+
+    await expect.poll(() => getStepFourSaveButton().disabled).toBe(false);
+    await userEvent.click(getStepFourSaveButton());
+    await expect.poll(() => fetchControl.getStats().postCalls).toBe(1);
+
+    const postBody = fetchControl.getStats().postBodies[0] as Record<
+      string,
+      unknown
+    >;
+
+    expect(postBody).toHaveProperty(
+      "classId",
+      evaluationFlowFixture.classes.classA.id,
+    );
+    expect(postBody).toHaveProperty("userId");
+    // overallScore is removed before POST in handleValidSubmit
+    expect(postBody).not.toHaveProperty("overallScore");
+
+    const absenceValue = postBody.absence;
+    expect(Array.isArray(absenceValue)).toBe(true);
+
+    for (const absentId of absentStudentIds) {
+      expect(absenceValue as string[]).toContain(absentId);
+    }
   }, 30000);
 });
