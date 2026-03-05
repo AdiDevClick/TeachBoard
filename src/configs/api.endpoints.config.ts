@@ -2,6 +2,7 @@ import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 
 import type {
+  ClasseNameAvailabilityResponse,
   ClassesFetch,
   CreateClassResponseData,
 } from "@/api/types/routes/classes.types";
@@ -41,6 +42,8 @@ const STUDENTS = `${BASE_API_URL}/students`;
 const TEACHERS = `${BASE_API_URL}/teachers`;
 const CLASSES = `${BASE_API_URL}/classes`;
 const EVALUATIONS = `${BASE_API_URL}/evaluations`;
+const TASKS = `${BASE_API_URL}/tasks`;
+const TASK_TEMPLATES = `${BASE_API_URL}/task-templates`;
 
 /**
  * API Endpoints Configuration
@@ -64,10 +67,10 @@ export const API_ENDPOINTS = Object.freeze({
       endPoints: {
         ALL: `${CLASSES}/`,
         BY_ID: (id: number | string) => `${CLASSES}/${id}`,
-        CHECK_NAME: (className: string | number) =>
-          `${CLASSES}/check-name/${className}`,
+        AVAILABILITY: (className: string) =>
+          `${CLASSES}/available/${className}`,
       },
-      dataAvailable: () => null,
+      dataAvailable: (data: ClasseNameAvailabilityResponse) => data,
       dataReshape: (data: ClassesFetch) =>
         // use "code" and transform to "value" for selects
         // data.classes is the actual array of classes from the server response
@@ -80,7 +83,12 @@ export const API_ENDPOINTS = Object.freeze({
           .newShape(),
     },
     SKILLS: {
-      endPoints: { MODULES: `${SKILLS}/main`, SUBSKILLS: `${SKILLS}/sub` },
+      endPoints: {
+        MODULES: `${SKILLS}/main`,
+        SUBSKILLS: `${SKILLS}/sub`,
+        AVAILABILITY: (nameOrCode: string) =>
+          `${SKILLS}/available/${nameOrCode}`,
+      },
       dataReshape: (data: SkillsFetch) =>
         dataReshaper(data)
           // data.Skills is the actual array of skills from the server response
@@ -125,9 +133,10 @@ export const API_ENDPOINTS = Object.freeze({
     },
     TASKSTEMPLATES: {
       endpoints: {
-        ALL: `${BASE_API_URL}/task-templates`,
+        ALL: TASK_TEMPLATES,
         BY_DIPLOMA_ID: (id: number | string) =>
-          `${BASE_API_URL}/task-templates/by-degree-config/${id}`,
+          `${TASK_TEMPLATES}/by-degree-config/${id}`,
+        AVAILABILITY: (name: string) => `${TASK_TEMPLATES}/available/${name}`,
       },
       dataReshape: (data: TaskTemplatesFetch) =>
         dataReshaper(data.taskTemplates)
@@ -140,7 +149,10 @@ export const API_ENDPOINTS = Object.freeze({
           .newShape(),
     },
     TASKS: {
-      endpoint: `${BASE_API_URL}/tasks`,
+      endpoints: {
+        ALL: TASKS,
+        AVAILABILITY: (name: string) => `${TASKS}/available/${name}`,
+      },
       dataReshape: (data: TasksFetch) =>
         dataReshaper(data)
           .assignSourceTo("items")

@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { taskTemplateCreationInputControllers } from "@/features/class-creation/components/TaskTemplateCreation/forms/task-template-inputs";
+import { TASK_TEMPLATE_CREATION_INPUTS_CONTROLLERS } from "@/features/class-creation/components/TaskTemplateCreation/forms/task-template-inputs";
 import { diplomaFetchedSkills } from "@/tests/samples/class-creation-sample-datas";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import {
@@ -90,8 +90,8 @@ describe("UI flow: new-task-template", () => {
     );
 
     // Fill required inputs
-    const nameLabel = rx(taskTemplateCreationInputControllers[0].title!);
-    const descLabel = rx(taskTemplateCreationInputControllers[1].title!);
+    const nameLabel = rx(TASK_TEMPLATE_CREATION_INPUTS_CONTROLLERS[0].title!);
+    const descLabel = rx(TASK_TEMPLATE_CREATION_INPUTS_CONTROLLERS[1].title!);
 
     const fills = [
       {
@@ -162,8 +162,8 @@ describe("UI flow: new-task-template", () => {
       "GET",
     );
 
-    const nameLabel = rx(taskTemplateCreationInputControllers[0].title!);
-    const descLabel = rx(taskTemplateCreationInputControllers[1].title!);
+    const nameLabel = rx(TASK_TEMPLATE_CREATION_INPUTS_CONTROLLERS[0].title!);
+    const descLabel = rx(TASK_TEMPLATE_CREATION_INPUTS_CONTROLLERS[1].title!);
 
     await fillFieldsEnsuringSubmitDisabled("Ajouter", [
       { label: nameLabel, value: "template" },

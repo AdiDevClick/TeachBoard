@@ -19,10 +19,6 @@ export type SuccessWithData<TData = AnyObjectProps> = ResponseInterface<200> & {
   data: TData;
 };
 
-export type SuccessAvailability = ResponseInterface<200> & {
-  available: true;
-};
-
 /**
  * Meta-information that can be attached to success responses.  This generic
  * parameter is **not** an arbitrary shape injected at the top level; it
@@ -40,8 +36,7 @@ export type SuccessAvailability = ResponseInterface<200> & {
 export type KnownApiSuccess<TMeta extends object = Record<string, never>> =
   | CreatedSuccess<TMeta>
   | GenericSuccess
-  | SuccessWithData<TMeta>
-  | SuccessAvailability;
+  | SuccessWithData<TMeta>;
 
 export type ApiSuccess<TMeta extends object = Record<string, never>> =
   KnownApiSuccess<TMeta>;

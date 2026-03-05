@@ -58,7 +58,10 @@ export function SearchStudentsController({
       secondaryFormField: "studentsValues",
       detailedCommandItem: commandItemDetails,
     };
-    selectionCallback(newValue, options);
+    selectionCallback(
+      newValue,
+      options as Parameters<typeof selectionCallback>[1],
+    );
 
     localForm.setValue("students", form?.getValues("students") || [], {
       shouldValidate: true,

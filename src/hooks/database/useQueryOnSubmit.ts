@@ -8,7 +8,11 @@ import type {
 } from "@/hooks/database/types/QueriesTypes.ts";
 import type { ApiError } from "@/types/AppErrorInterface";
 import type { ApiSuccess } from "@/types/AppResponseInterface";
-import { useMutation, useQueryErrorResetBoundary } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useQueryErrorResetBoundary,
+} from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 /**
@@ -40,6 +44,7 @@ export function useQueryOnSubmit<
   E extends ApiError = ApiError,
 >(queryKeysArr: QueryKeyDescriptor<S, E>) {
   const { reset } = useQueryErrorResetBoundary();
+  const queryClient = useQueryClient();
   const [localState, setLocalState] = useState<UseQueryOnSubmitState<S, E>>(
     USE_QUERY_DEFAULT_STATE_PARAM,
   );
@@ -57,6 +62,7 @@ export function useQueryOnSubmit<
     const extendedDescriptor = {
       ...descriptor,
       reset,
+      queryClient,
       localState: (next: UseQueryOnSubmitState<S, E>) => {
         setLocalState(next);
       },
@@ -65,7 +71,7 @@ export function useQueryOnSubmit<
     const newKeys: QueryKeyDescriptor<S, E> = [key, extendedDescriptor];
 
     return mutationOptions<S, E>(newKeys);
-  }, [queryKeysArr, reset]);
+  }, [queryKeysArr, reset, queryClient]);
 
   const { mutateAsync, data, isPending, error } = useMutation(options);
 
@@ -77,7 +83,7 @@ export function useQueryOnSubmit<
    * @param variables The variables to be passed to the mutation function.
    */
   const onSubmit = useCallback(
-    async (variables: MutationVariables = undefined) => {
+    async (variables?: MutationVariables) => {
       // !! IMPORTANT !! Reset local error
       // Reset the previous abort controller if it was used
       try {
@@ -107,7 +113,6 @@ export function useQueryOnSubmit<
         if (DEV_MODE && !NO_QUERY_LOGS) {
           console.error("useQueryOnSubmit mutation rejected", err);
         }
-
         return err;
       }
     },

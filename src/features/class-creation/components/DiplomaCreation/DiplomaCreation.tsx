@@ -4,12 +4,12 @@ import {
   DIPLOMA_CREATION_CARD_TITLE,
 } from "@/features/class-creation/components/DiplomaCreation/config/diploma-creation.configs";
 import { DiplomaCreationController } from "@/features/class-creation/components/DiplomaCreation/controllers/DiplomaCreationController.tsx";
+import { diplomaCreationInputControllers } from "@/features/class-creation/components/DiplomaCreation/forms/diploma-creation-inputs";
 import {
   diplomaCreationSchema,
   type DiplomaCreationFormState,
   type DiplomaInputItem,
 } from "@/features/class-creation/components/DiplomaCreation/models/diploma-creation.models";
-import { diplomaCreationInputControllers } from "@/features/class-creation/index.ts";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";

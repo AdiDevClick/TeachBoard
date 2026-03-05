@@ -5,6 +5,11 @@ import {
   NO_QUERY_LOGS,
   USER_ACTIVITIES,
 } from "@/configs/app.config.ts";
+import {
+  cacheFetchResult,
+  createSearchParamsEndpoint,
+  navigateOnForbiddenError,
+} from "@/hooks/database/fetches/functions/use-fetch.functions";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
 import type { ApiError } from "@/types/AppErrorInterface";
@@ -16,11 +21,7 @@ import { toast } from "sonner";
 
 const defaultStateParameters: FetchParams = {
   contentId: USER_ACTIVITIES.none,
-  page: 1,
-  pageSize: 10,
-  filters: {},
-  sortBy: "",
-  sortOrder: "asc",
+  searchParams: {},
   url: "",
   headers: undefined,
   method: API_ENDPOINTS.GET.METHOD,
@@ -28,7 +29,6 @@ const defaultStateParameters: FetchParams = {
   reshapeOptions: undefined,
   onSuccess: undefined,
   onError: undefined,
-  silent: false,
   cachedFetchKey: undefined,
   resetParams: false,
 };
@@ -55,6 +55,7 @@ const defaultStateParameters: FetchParams = {
  *
  * @returns An object containing fetch parameters, a function to set them, and query status.
  */
+
 export function useFetch<
   S extends ApiSuccess = ApiSuccess<any>,
   E extends ApiError = ApiError,
@@ -69,28 +70,20 @@ export function useFetch<
   const {
     onSuccess: successCallback,
     onError: errorCallback,
-    cachedFetchKey,
     contentId,
     ...params
   } = fetchParams;
 
-  let newUrl = params.url;
   /**
-   * Build URL with filters params if they exist
+   * Build URL with search params if they exist
    */
-  if (Object.entries(params.filters).length !== 0) {
-    const createdPath = new URL(params.url, window.location.origin);
+  const newUrl = createSearchParamsEndpoint(fetchParams);
 
-    Object.entries(params.filters ?? {}).forEach(([key, value]) => {
-      createdPath.searchParams.set(key, String(value));
-    });
-
-    newUrl = createdPath.pathname + createdPath.search;
-  }
   const queryParams = useQueryOnSubmit<S, E>([
     contentId,
     {
       ...params,
+      cachedFetchKey: fetchParams.cachedFetchKey ?? [contentId, newUrl],
       url: newUrl,
       onSuccess: (response) => {
         setLastUserActivity(contentId, {
@@ -101,20 +94,12 @@ export function useFetch<
         });
         successCallback?.(response);
 
-        const cachedKey = cachedFetchKey ?? [contentId, params.url];
-
-        // Reshape data for caching
-        const rawCachedDatas = queryClient.getQueriesData({
-          queryKey: cachedKey,
-        });
-
-        const cachingDatas = fetchParams.dataReshapeFn
-          ? fetchParams.dataReshapeFn(
-              response.data,
-              rawCachedDatas,
-              fetchParams.reshapeOptions,
-            )
-          : response.data;
+        // reuse shared caching logic
+        const cachingDatas = cacheFetchResult(
+          queryClient,
+          fetchParams,
+          response,
+        );
 
         if (DEV_MODE && !NO_QUERY_LOGS) {
           console.debug(
@@ -122,8 +107,6 @@ export function useFetch<
             fetchParams.url,
             "response.data:",
             response.data,
-            "rawCachedDatas:",
-            rawCachedDatas,
             "reshapedResult:",
             cachingDatas,
           );
@@ -144,17 +127,6 @@ export function useFetch<
           });
         }
 
-        // Caching under [contentId, url] keys
-        queryClient.setQueryData(cachedKey, cachingDatas);
-        // Also update a convenience record with fetchParams metadata if need be
-        // for debugging (not used by consumers).
-        queryClient.setQueryData(
-          [fetchParams.contentId, `${fetchParams.url}:meta`],
-          {
-            ...fetchParams,
-          },
-        );
-
         if (fetchParams.resetParams) {
           resetFetchParams();
         }
@@ -167,6 +139,25 @@ export function useFetch<
           type: "fetch",
         });
         errorCallback?.(error);
+
+        if (error?.data !== undefined) {
+          const cachedData = cacheFetchResult(queryClient, fetchParams, error);
+          // we do not normally expose error data through `viewData`, but
+          // having it available can be handy for callers that treat the
+          // cached value as authoritative.
+          setViewData(cachedData as TViewData);
+
+          if (DEV_MODE && !NO_QUERY_LOGS) {
+            console.debug(
+              "[useFetch:onSuccess] endpoint:",
+              fetchParams.url,
+              "error.data:",
+              error.data,
+              "reshapedResult:",
+              cachedData,
+            );
+          }
+        }
 
         // !! IMPORTANT !! Handle forbidden error by navigating to login page
         navigateOnForbiddenError(error.status, navigate);
@@ -187,23 +178,8 @@ export function useFetch<
     // raw server response.
     response: queryParams.data,
     // Convenience shortcut for `response.data` (not all responses have this).
-    serverData: queryParams.data?.data as TViewData | undefined,
-    // // Quick access to reshaped data.
+    serverData: queryParams.data?.data,
+    // Quick access to reshaped data.
     data: viewData,
   };
-}
-
-/**
- * Navigate to a specific page errors.
- *
- * @param status - The HTTP status code.
- * @param navigate - The navigate function from react-router-dom.
- */
-function navigateOnForbiddenError(
-  status: number,
-  navigate: ReturnType<typeof useNavigate>,
-) {
-  if (status === 403) {
-    navigate("/login", { replace: true });
-  }
 }

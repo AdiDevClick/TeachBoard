@@ -1,6 +1,4 @@
-import type { ClassCreationExtendedFormSchema } from "@/features/class-creation/index.ts";
 import { useMemo } from "react";
-import { useWatch, type FieldPath, type UseFormReturn } from "react-hook-form";
 
 /**
  * Custom hook to generate avatar data based on form data.
@@ -10,21 +8,10 @@ import { useWatch, type FieldPath, type UseFormReturn } from "react-hook-form";
  *
  * @returns An array of avatar data objects.
  */
-export function useAvatarDataGenerator(
-  form: UseFormReturn<ClassCreationExtendedFormSchema>,
-  formPropertyToWatch: Extract<
-    FieldPath<ClassCreationExtendedFormSchema>,
-    "studentsValues" | "primaryTeacherValue"
-  >,
-) {
-  const watchedData = useWatch({
-    control: form.control,
-    name: formPropertyToWatch,
-  });
-  const entries = Array.isArray(watchedData) ? watchedData : [];
+export function useAvatarDataGenerator(values: any[] | undefined) {
   const dataMemo = useMemo(
     () =>
-      entries.map(([, details]) => {
+      (values ?? []).map(([, details]) => {
         const fullName = `${details.firstName || ""} ${
           details.lastName || ""
         }`.trim();
@@ -36,7 +23,7 @@ export function useAvatarDataGenerator(
             (details.lastName?.slice(0, 1).toUpperCase() || ""),
         };
       }),
-    [watchedData],
+    [values],
   );
 
   return dataMemo;

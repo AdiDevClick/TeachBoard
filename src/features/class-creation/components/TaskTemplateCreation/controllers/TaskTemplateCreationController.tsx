@@ -2,6 +2,7 @@ import type {
   CommandItemType,
   HeadingType,
 } from "@/components/Command/types/command.types.ts";
+import { FormWithDebug } from "@/components/Form/FormWithDebug";
 import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import { PopoverFieldWithControllerAndCommandsList } from "@/components/Popovers/exports/popover-field.exports";
 import { DynamicTags } from "@/components/Tags/DynamicTags";
@@ -13,6 +14,8 @@ import {
 } from "@/configs/app-components.config.ts";
 import { DEV_MODE, HTTP_METHODS, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { createDisabledGroup } from "@/features/class-creation/components/main/functions/class-creation.functions.ts";
+import { useDebouncedChecker } from "@/features/class-creation/components/main/hooks/useDebouncedChecker";
+import { TASK_TEMPLATE_CREATION_CONTROLLERS } from "@/features/class-creation/components/TaskTemplateCreation/config/task-template-creation.configs";
 import {
   createTaskTemplateView,
   updateValues,
@@ -24,9 +27,10 @@ import type {
 } from "@/features/class-creation/components/TaskTemplateCreation/types/task-template-creation.types.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
+import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useQueryClient } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useMemo, type ChangeEvent } from "react";
 
 /**
  * Controller component for creating task templates.
@@ -40,7 +44,7 @@ import { useMemo } from "react";
 export function TaskTemplateCreationController({
   pageId,
   formId,
-  inputControllers = [],
+  inputControllers = TASK_TEMPLATE_CREATION_CONTROLLERS,
   className,
   form,
   submitRoute = API_ENDPOINTS.POST.CREATE_TASK_TEMPLATE.endpoint,
@@ -56,6 +60,7 @@ export function TaskTemplateCreationController({
     submitCallback,
     dialogOptions,
     openedDialogs,
+    invalidSubmitCallback,
   } = useCommandHandler({
     form,
     pageId,
@@ -66,6 +71,8 @@ export function TaskTemplateCreationController({
   const dialogData = dialogOptions(pageId) as
     | TaskTemplateCreationDialogOptions
     | undefined;
+
+  const { availabilityCheck } = useDebouncedChecker(form, 300);
 
   const diplomaDatas = useMemo(() => {
     const selectedDiploma = dialogData?.selectedDiploma ?? null;
@@ -191,6 +198,28 @@ export function TaskTemplateCreationController({
     );
   };
 
+  /**
+   * Send a debouned API request to check for class name availability when the class name input changes.
+   *
+   * @param event - The change event from the class name input
+   * @param meta - Optional metadata for the command handler, including API endpoint information
+   */
+  const handleOnChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    meta?: CommandHandlerFieldMeta,
+  ) => {
+    const fieldName = meta?.name;
+
+    if (fieldName !== "name" || !fieldName) {
+      return;
+    }
+
+    availabilityCheck(event, {
+      ...meta,
+      searchParams: { by: fieldName },
+    });
+  };
+
   if (
     diplomaDatas.diploma?.id &&
     form.getValues("degreeConfigId") !== diplomaDatas.diploma.id
@@ -200,31 +229,29 @@ export function TaskTemplateCreationController({
     });
   }
 
-  const controllers = {
-    inputsControllers: inputControllers.slice(0, 2),
-    popoverFieldsControllers: inputControllers.slice(3, 5),
-    dynamicTagsControllers: inputControllers[2],
-  };
-
   return (
-    <form
-      id={formId}
+    <FormWithDebug
+      formId={formId}
+      form={form}
+      pageId={pageId}
       className={className}
-      onSubmit={form.handleSubmit(handleSubmit)}
+      onValidSubmit={handleSubmit}
+      onInvalidSubmit={invalidSubmitCallback}
     >
       <ControlledInputList
-        items={controllers.inputsControllers}
+        items={inputControllers.inputs}
         control={form.control}
         setRef={setRef}
         observedRefs={observedRefs}
+        onChange={handleOnChange}
       />
       <DynamicTags
-        {...controllers.dynamicTagsControllers}
+        {...inputControllers.dynamicTags}
         displayCRUD={false}
         itemList={diplomaDatas.tagData}
       />
       <PopoverFieldWithControllerAndCommandsList
-        items={controllers.popoverFieldsControllers}
+        items={inputControllers.popovers}
         control={form.control}
         setRef={setRef}
         onSelect={handleCommandSelection}
@@ -233,7 +260,7 @@ export function TaskTemplateCreationController({
         onClick={newItemCallback}
         commandHeadings={computedCommandHeadings}
       />
-    </form>
+    </FormWithDebug>
   );
 }
 

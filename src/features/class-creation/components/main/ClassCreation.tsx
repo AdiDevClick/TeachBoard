@@ -1,17 +1,17 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
+  CLASS_CREATION_INPUT_CONTROLLERS,
   DEFAULT_SCHOOL_YEAR,
   FOOTER_PROPS,
   TITLE_PROPS,
 } from "@/features/class-creation/components/main/config/class-creation.configs";
 import { ClassCreationController } from "@/features/class-creation/components/main/controllers/ClassCreationController.tsx";
-import type { ClassCreationProps } from "@/features/class-creation/components/main/types/class-creation.types.ts";
 import {
-  classCreationInputControllers,
-  classCreationSchema,
   type ClassCreationFormSchema,
-} from "@/features/class-creation/index.ts";
+  classCreationSchema,
+} from "@/features/class-creation/components/main/models/class-creation.models";
+import type { ClassCreationProps } from "@/features/class-creation/components/main/types/class-creation.types.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ComponentProps } from "react";
 import { useForm } from "react-hook-form";
@@ -28,7 +28,7 @@ function ClassCreation({
   pageId = "class-creation",
   className = "grid gap-4",
   modalMode = true,
-  inputControllers = classCreationInputControllers,
+  inputControllers = CLASS_CREATION_INPUT_CONTROLLERS,
   ...props
 }: ClassCreationProps) {
   const form = useForm<ClassCreationFormSchema>({

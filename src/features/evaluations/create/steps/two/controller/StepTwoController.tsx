@@ -2,7 +2,10 @@ import { UUID_SCHEMA, type UUID } from "@/api/types/openapi/common.types.ts";
 import type { InlineItemAndSwitchSelectionPayload } from "@/components/HOCs/types/with-inline-item-and-switch.types.ts";
 import { InlineSwitchList } from "@/components/Selects/exports/vertical-field-select.exports";
 import type { VerticalSelectMetaData } from "@/components/Selects/types/select.types.ts";
-import { debugLogs } from "@/configs/app-components.config";
+import {
+  debugLogs,
+  isStepTwoOnSelectPropsInvalid,
+} from "@/configs/app-components.config";
 import type { StepTwoControllerProps } from "@/features/evaluations/create/steps/two/types/step-two.types.ts";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
@@ -52,34 +55,33 @@ export function StepTwoController({
    *
    * @description Updates the selected diploma reference and selection state.
    *
-   * @param id - The value of the selected command item
-   * @param studentData - The details of the selected student data
+   * @param taskId - The value of the selected command item
+   * @param meta - The details of the selected student data
    */
   const handleOnSelect = (
     taskId: string | UUID,
     meta?: VerticalSelectMetaData,
   ) => {
-    const rootId = meta?.id;
-    const nestedMeta = meta?.controllerFieldMeta;
-    const nestedId = (nestedMeta?.id as string) ?? "unknown-id";
-
-    const studentId = rootId ?? nestedId;
-    if (!studentId) return;
-
-    const parsedStudentId = UUID_SCHEMA.safeParse(studentId);
-    if (!parsedStudentId.success) {
+    if (isStepTwoOnSelectPropsInvalid(meta)) {
       debugLogs(
-        "[StepTwoController]: Invalid student ID in metadata, selection ignored.",
-        { studentId, error: parsedStudentId.error },
+        "[StepTwoController#handleOnSelect]: There is no ID in metadata, selection ignored.",
+        { meta },
       );
       return;
     }
+    const studentId = meta?.id;
 
+    const parsedStudentId = UUID_SCHEMA.safeParse(studentId);
     const parsed = UUID_SCHEMA.safeParse(taskId);
-    if (!parsed.success) {
+    if (!parsedStudentId.success || !parsed.success) {
       debugLogs(
-        `[StepTwoController]: Invalid task ID selected for student ${parsedStudentId.data}, selection ignored.`,
-        { taskId, error: parsed.error },
+        "[StepTwoController#handleOnSelect]: Invalid student ID in metadata, selection ignored.",
+        {
+          studentId,
+          error: parsedStudentId.error,
+          taskId,
+          taskError: parsed.error,
+        },
       );
       return;
     }
@@ -103,7 +105,7 @@ export function StepTwoController({
     const parsed = UUID_SCHEMA.safeParse(studentData.id);
     if (!parsed.success) {
       debugLogs(
-        "[StepTwoController]: Invalid student ID in switch payload, selection ignored.",
+        "[StepTwoController#handleOnSwitch]: Invalid student ID in switch payload, selection ignored.",
         { studentId: studentData.id, error: parsed.error },
       );
       return;

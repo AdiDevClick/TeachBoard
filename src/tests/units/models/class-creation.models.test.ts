@@ -1,4 +1,4 @@
-import { classCreationSchema } from "@/features/class-creation/index.ts";
+import { classCreationSchema } from "@/features/class-creation/components/main/models/class-creation.models";
 import { describe, expect, test } from "vitest";
 
 describe("Class creation schema - schoolYear transform", () => {

@@ -4,6 +4,7 @@ import { calendarEvents } from "@/data/CalendarData";
 import { formatRangeCompat } from "@/utils/utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render } from "vitest-browser-react";
+import { MemoryRouter } from "react-router-dom";
 
 /**
  * This test suite verifies the TypeScript typings of the `ListMapper`.
@@ -32,14 +33,16 @@ describe("withListMapper types", () => {
 
   it("Case 1: ListMapper should render correctly", async () => {
     const { container } = await render(
-      <ListMapper
-        items={[
-          { url: "1", title: "Item 1" },
-          { url: "2", title: "Item 2" },
-        ]}
-      >
-        <SubMenuButton ischild />
-      </ListMapper>,
+      <MemoryRouter>
+        <ListMapper
+          items={[
+            { url: "1", title: "Item 1" },
+            { url: "2", title: "Item 2" },
+          ]}
+        >
+          <SubMenuButton ischild />
+        </ListMapper>
+      </MemoryRouter>,
     );
     expect(container.children).toBeDefined();
   });
@@ -78,7 +81,9 @@ describe("withListMapper types", () => {
     };
 
     const { container } = await render(
-      <ListMapper {...props}>{props.children}</ListMapper>,
+      <MemoryRouter>
+        <ListMapper {...props}>{props.children}</ListMapper>
+      </MemoryRouter>,
     );
     expect(container).toBeDefined();
   });

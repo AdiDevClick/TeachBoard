@@ -23,7 +23,7 @@ export interface DegreeRefDto {
   name: string;
   code: string;
   description?: string;
-  type?: DegreeType;
+  type: DegreeType;
   identifier?: string;
   entityTypeName?: string;
 }

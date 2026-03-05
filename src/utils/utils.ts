@@ -240,15 +240,56 @@ export function handleModalOpening({
 /**
  * Check the validity of props against required and forbidden keys.
  *
+ * @see checkPropsValidity.test.ts for detailed implementation and logging of prop validation.
+ *
  * @param props - The props object to validate.
  * @param required - An array of required prop keys.
  * @param forbidden - An array of forbidden prop keys.
  *
  * @returns True if any forbidden keys are present or any required keys are missing; otherwise, false.
+ *
+ * @example
+ * ```ts
+ * const props = {
+ *   topLayerObject: {
+ *     firstNested: "nestedValue",
+ *     firstVeryNested: {
+ *       firstVeryNestedResult: {
+ *         extremelyNested: "value2",
+ *       },
+ *     },
+ *   },
+ *   topLayerOther: "abc",
+ *   topLayerExtra: 1,
+ * };
+ *
+ * const required = [
+ *   {
+ *     topLayerObject: [
+ *       "firstNested",
+ *       { firstVeryNested: [{ firstVeryNestedResult: ["extremelyNested"] }] },
+ *       "topLayerOther",
+ *       "topLayerExtra",
+ *     ],
+ *   },
+ * ];
+ *
+ * const forbidden = ["imForbidden"];
+ * ```
+ *
+ * const result = checkPropsValidity(props, required, forbidden);
+ * // result will be true if any of the required keys are missing or if any forbidden keys are present, false otherwise
+ * ```
+ *
+ * In this example, `checkPropsValidity` will check if `props` contains the required keys specified in `required` and does not contain any of the forbidden keys specified in `forbidden`. The function will return `true` if any required keys are missing or if any forbidden keys are present, and `false` otherwise.
+ *
+ * @remarks Use array to search inside a layer, use object to search inside this layer and next ones.
+ * For example, with the required array `[{ item: ["title", "number"] }]`, the function will check if there is an `item` key in props, and if so, it will check if `item` is an object that contains both `title` and `number` keys.
+ * If `item` is missing or not an object, or if either `title` or `number` is missing from `item`, the function will consider the required keys as missing.
  */
 export function checkPropsValidity(
   props: Record<string, unknown>,
-  required: string[],
+  required: (string | Record<string, unknown>)[],
   forbidden: string[],
 ) {
   if (typeof props !== "object" || props === null) {

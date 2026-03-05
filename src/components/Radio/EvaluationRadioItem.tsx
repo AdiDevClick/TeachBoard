@@ -45,7 +45,7 @@ function withEvaluationRadioItem<T extends object>(
   return function EvaluationRadioItem<C extends EvaluationRadioItemProps>(
     props: C & T,
   ) {
-    const { id, name, itemClick, isCompleted, ...rest } = props;
+    const { id, name, itemClick, isDisabled, isCompleted, ...rest } = props;
 
     const safeProps = sanitizeDOMProps(rest, [
       "subSkills",
@@ -82,7 +82,7 @@ function withEvaluationRadioItem<T extends object>(
       <FieldLabel
         htmlFor={`r-${id}`}
         className={cn(evaluationRadioGroupContent, {
-          "bg-gray-300": safeProps.isDisabled,
+          "bg-gray-300": isDisabled,
         })}
         onClick={handleClick}
         {...safeProps}
@@ -97,7 +97,7 @@ function withEvaluationRadioItem<T extends object>(
                 {...iconStyle}
                 id={`r-${id}`}
                 value={id}
-                disabled={safeProps.isDisabled}
+                disabled={isDisabled}
               />
               <Label className={itemTitleLabel} htmlFor={`r-${id}`}>
                 {name}

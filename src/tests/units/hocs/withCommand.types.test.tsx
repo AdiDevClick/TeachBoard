@@ -11,7 +11,7 @@ import {
 import type { PopoverField } from "@/components/Popovers/PopoverField";
 import type { PopoverFieldProps } from "@/components/Popovers/types/popover.types";
 import type { AppModalNames } from "@/configs/app.config";
-import { diplomaCreationInputControllers } from "@/features/class-creation";
+import { diplomaCreationInputControllers } from "@/features/class-creation/components/DiplomaCreation/forms/diploma-creation-inputs";
 import {
   diplomaCreationSchema,
   type DiplomaCreationFormState,
@@ -25,6 +25,10 @@ import { type ChangeEvent, type ComponentProps, type MouseEvent } from "react";
 import { useForm } from "react-hook-form";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render } from "vitest-browser-react";
+
+/**
+ * @important Il est strictement interdit de modifier ces tests
+ */
 
 /**
  * This test suite verifies the TypeScript typings of the `withListMapper` HOC when applied to a base component (in this case, `PopoverFieldWithControllerAndCommandsList`).  It ensures that:
@@ -45,7 +49,7 @@ beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => {});
 });
 
-let form: ReturnType<typeof useForm<DiplomaCreationFormState>> | null = null;
+let form = {} as ReturnType<typeof useForm<DiplomaCreationFormState>>;
 const itemsToIterate = diplomaCreationInputControllers.slice(0, 3);
 // dummy list used for union-type test
 const students: unknown[] = [];
@@ -297,7 +301,7 @@ const controlledEnrichedPayload = {
     expect(metadata).toBeDefined();
   },
   // defaultValue: "default", <- check it on the next payload to ensure it's not lost in the chain
-  control: form!.control,
+  control: form.control,
 } satisfies ControlledEnrichedCommand;
 
 const { name, ...rest } = controlledEnrichedPayload;
@@ -444,6 +448,7 @@ describe("withListMapper types", () => {
   it("Chain sanity: each HOC stage accepts its expected payload", async () => {
     // This test exists primarily for compile-time validation; rendering
     // ensures runtime props are compatible as well.
+
     const { container: c0 } = await render(
       <PopoverFieldWithCommandsBase {...commandPayload} />,
     );
@@ -457,7 +462,10 @@ describe("withListMapper types", () => {
     );
 
     const { container: c2 } = await render(
-      <PopoverFieldWithControlledCommands {...controlledEnrichedPayload} />,
+      <PopoverFieldWithControlledCommands
+        {...controlledEnrichedPayload}
+        control={form.control}
+      />,
     );
 
     const { container: c2Strict } = await render(
@@ -474,6 +482,7 @@ describe("withListMapper types", () => {
     const { container: c3Strict } = await render(
       <PopoverFieldWithControlledCommands
         {...controlledEnrichedPayload}
+        control={form.control}
         // @ts-expect-error `type` is not allowed & has extra props
         type="button"
         myFunnyPropThatShouldNotExist={myFunnyPropThatShouldNotExist}
@@ -482,7 +491,10 @@ describe("withListMapper types", () => {
 
     // previous examples with variables continue to compile as before
     const { container: c3 } = await render(
-      <PopoverFieldWithControlledCommands {...controlledEnrichedPayload} />,
+      <PopoverFieldWithControlledCommands
+        {...controlledEnrichedPayload}
+        control={form.control}
+      />,
     );
 
     const { container: c3UltraStrict } = await render(
@@ -499,10 +511,11 @@ describe("withListMapper types", () => {
       />,
     );
 
-    // the payload is missing name so optional needs to merge and type it correctly  for this test to succeed
+    // the payload is normal, optional needs to type item correctly
     const { container: c4 } = await render(
       <PopoverFieldWithControllerAndCommandsList
         {...listOfCommandsPayload}
+        control={form.control}
         optional={(item) => {
           expect(item.name).toBeDefined();
         }}
@@ -529,10 +542,13 @@ describe("withListMapper types", () => {
     expect(c0).toBeDefined();
     expect(c1).toBeDefined();
     expect(c2).toBeDefined();
+    expect(c2Strict.firstChild).toBeNull();
     expect(c3).toBeDefined();
+    expect(c3UltraStrict.firstChild).toBeNull();
+    expect(c31Strict.firstChild).toBeNull();
     expect(c4).toBeDefined();
-    expect(c4Strict).toBeDefined();
-    expect(c4Strict2).toBeDefined();
+    expect(c4Strict.firstChild).toBeDefined();
+    expect(c4Strict2.firstChild).toBeDefined();
   });
 
   it("Case 0 : union type should not drop items property", () => {

@@ -42,12 +42,18 @@ export const useAppStore = create(
             const usAct = new UniqueSet() as LastUserActivity;
 
             const rawLastActivity = get().lastUserActivity;
-            const lastActivityUrl =
+            const lastActivityEntry =
               rawLastActivity instanceof UniqueSet
-                ? rawLastActivity.values().next().value?.url
+                ? rawLastActivity.values().next().value
                 : null;
+            const lastActivityUrl = lastActivityEntry?.url ?? null;
 
-            if (lastActivityUrl === details.url) {
+            // verify if the new activity is the same as the last one to avoid redundant updates
+            const isSameActivity =
+              lastActivityUrl === details.url &&
+              lastActivityEntry?.endpoint === details.endpoint;
+
+            if (isSameActivity) {
               return;
             }
 

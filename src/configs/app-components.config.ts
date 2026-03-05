@@ -9,12 +9,15 @@ import type {
   EvaluationRadioItemDescriptionProps,
   EvaluationRadioItemProps,
 } from "@/components/Radio/types/radio.types.ts";
-import type { NonLabelledGroupItemProps } from "@/components/Selects/types/select.types";
+import type {
+  NonLabelledGroupItemProps,
+  VerticalSelectMetaData,
+} from "@/components/Selects/types/select.types";
 import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
 import type { LabelledTextAreaProps } from "@/components/TextAreas/types/textareas.types";
 import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
 import type { LoginFormControllerProps } from "@/features/auth/components/login/controller/types/login-form-controller.types";
-import type { ClassCreationControllerProps } from "@/features/class-creation/class-creation.index.ts";
+import type { ClassCreationControllerProps } from "@/features/class-creation/components/main/types/class-creation.types";
 import type {
   StepThreeControllerProps,
   StepThreeModuleSelectionControllerProps,
@@ -22,6 +25,7 @@ import type {
 } from "@/features/evaluations/create/steps/three/types/step-three.types.ts";
 import type { LeftContentProps } from "@/features/evaluations/create/types/create.types.ts";
 import type {
+  CommandHandlerFieldMeta,
   CommandHandlerMetaData,
   HandleOpeningCallbackParams,
 } from "@/hooks/database/types/use-command-handler.types.ts";
@@ -90,6 +94,33 @@ const APP_BREADCRUMB_LIST_REQUIRES = ["items"];
 
 export const appBreadCrumbListPropsInvalid = (props: AppBreadCrumbListProps) =>
   checkPropsValidity(props, APP_BREADCRUMB_LIST_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for availability check in class creation.
+ *
+ * Used by {@link import("@/features/class-creation/components/main/hooks/useDebouncedChecker").useDebouncedChecker}
+ */
+const DEBOUNCE_AVAILABILITY_CHECK_REQUIRES = [
+  "apiEndpoint",
+  { searchParams: ["by"] },
+  "name",
+  "task",
+];
+
+/**
+ * Returns `false` when props are invalid or missing.
+ *
+ * @note Check for a false state instead of a true one to avoid confusion
+ */
+export function isValidDebounceAvailabilityMeta(
+  props: CommandHandlerFieldMeta | undefined,
+): props is Required<CommandHandlerFieldMeta> {
+  if (!props) return false;
+
+  return !checkPropsValidity(props, DEBOUNCE_AVAILABILITY_CHECK_REQUIRES, []);
+}
 
 //                    ------------
 
@@ -433,6 +464,21 @@ const NON_LABELLED_GROUP_ITEM_REQUIRES = ["id", "name"];
 export const nonLabelledGroupItemPropsInvalid = (
   props: NonLabelledGroupItemProps,
 ) => checkPropsValidity(props, NON_LABELLED_GROUP_ITEM_REQUIRES, []);
+
+//                    ------------
+
+/**
+ * Validation requirements for the StepTwoController's handleOnSelect
+ */
+const STEP_TWO_ON_SELECT_REQUIRES = ["id"];
+
+export const isStepTwoOnSelectPropsInvalid = (
+  props: VerticalSelectMetaData | undefined,
+): props is Required<VerticalSelectMetaData> => {
+  if (!props) return true;
+
+  return checkPropsValidity(props, STEP_TWO_ON_SELECT_REQUIRES, []);
+};
 
 //                    ------------
 

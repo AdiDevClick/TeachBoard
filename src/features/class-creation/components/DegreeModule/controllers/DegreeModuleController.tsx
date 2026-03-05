@@ -7,9 +7,11 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { HTTP_METHODS } from "@/configs/app.config.ts";
 import { degreeModuleCreationInputControllers } from "@/features/class-creation/components/DegreeModule/forms/degree-module-inputs";
 import type { DegreeModuleControllerProps } from "@/features/class-creation/components/DegreeModule/types/degree-module.types.ts";
+import { useDebouncedChecker } from "@/features/class-creation/components/main/hooks/useDebouncedChecker";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
-import { useMemo } from "react";
+import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
+import { useMemo, type ChangeEvent } from "react";
 import { useWatch } from "react-hook-form";
 
 /**
@@ -46,6 +48,8 @@ export function DegreeModuleController({
     submitRoute,
     submitDataReshapeFn,
   });
+
+  const { availabilityCheck } = useDebouncedChecker(form, 300);
 
   const currentSkills =
     useWatch({
@@ -86,6 +90,28 @@ export function DegreeModuleController({
     );
   };
 
+  /**
+   * Send a debouned API request to check for class name availability when the class name input changes.
+   *
+   * @param event - The change event from the class name input
+   * @param meta - Optional metadata for the command handler, including API endpoint information
+   */
+  const handleValueChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    meta?: CommandHandlerFieldMeta,
+  ) => {
+    const fieldName = meta?.name;
+
+    if (!fieldName) {
+      return;
+    }
+
+    availabilityCheck(event, {
+      ...meta,
+      searchParams: { by: fieldName },
+    });
+  };
+
   // split the array elements so we can omit the `id` when sending props to
   // <PopoverFieldWithCommands>, which requires a branded UUID type.
   const controllers = {
@@ -111,6 +137,7 @@ export function DegreeModuleController({
         {...sharedCallbacksMemo.commonObsProps}
         items={controllers.controlledInputsControllers}
         control={form.control}
+        onChange={handleValueChange}
       />
       <ControlledDynamicTagList
         control={form.control}

@@ -56,8 +56,7 @@ export type CommandHandlerMetaData = AnyObjectProps & AppInputControllerMeta;
 export type CommandHandlerFieldMeta = CommandHandlerMetaData & {
   name?: string;
   id?: UUID | string;
-  filters?: Record<string, unknown>;
-};
+} & Pick<FetchParams, "searchParams">;
 
 /**
  * Parameters for the useCommandHandler hook

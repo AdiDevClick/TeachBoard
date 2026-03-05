@@ -43,6 +43,7 @@ export function StepFourController({
         valueGetter={scoreValue}
       />
       <FormWithDebug
+        pageId={pageId}
         form={form}
         formId={formId}
         className={className}

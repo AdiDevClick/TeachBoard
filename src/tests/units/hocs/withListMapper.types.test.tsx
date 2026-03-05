@@ -12,7 +12,7 @@ import type {
   DynamicTagsState,
 } from "@/components/Tags/types/tags.types";
 import type { AppModalNames } from "@/configs/app.config";
-import { diplomaCreationInputControllers } from "@/features/class-creation";
+import { diplomaCreationInputControllers } from "@/features/class-creation/components/DiplomaCreation/forms/diploma-creation-inputs";
 import {
   diplomaCreationSchema,
   type DiplomaCreationFormState,
@@ -60,7 +60,7 @@ beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => {});
 });
 
-let form: ReturnType<typeof useForm<DiplomaCreationFormState>> | null = null;
+let form = {} as ReturnType<typeof useForm<DiplomaCreationFormState>>;
 const itemsToIterate = diplomaCreationInputControllers.slice(0, 3);
 
 beforeEach(async () => {
@@ -383,8 +383,9 @@ describe("withListMapper types", () => {
       <EvaluationSliderList
         items={students}
         optional={(student) => {
+          // value must be number[] to match EvaluationSliderProps at runtime
           return {
-            value: student.id + "newValue",
+            value: [student.id.length % 100],
           };
         }}
         onValueChange={handleValueChange}
@@ -436,9 +437,10 @@ describe("withListMapper types", () => {
   });
 
   it("Case 7 : ListMapper should not reject a tuple access from optional", async () => {
-    const [renderItems, setRenderItems] = useState<DynamicTagsState>(
-      new UniqueSet(),
+    const { result: stateResult } = await renderHook(() =>
+      useState<DynamicTagsState>(new UniqueSet()),
     );
+    const [renderItems, setRenderItems] = stateResult.current;
     const props: DynamicTagsProps = {
       pageId: "test-page",
       itemList: [],

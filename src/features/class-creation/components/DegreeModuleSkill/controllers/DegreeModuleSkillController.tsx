@@ -3,8 +3,11 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { HTTP_METHODS } from "@/configs/app.config.ts";
 import { degreeSubSkillsCreationInputControllers } from "@/features/class-creation/components/DegreeModuleSkill/forms/degree-module-skill-inputs";
 import type { DegreeModuleSkillControllerProps } from "@/features/class-creation/components/DegreeModuleSkill/types/degree-module-skill.types.ts";
+import { useDebouncedChecker } from "@/features/class-creation/components/main/hooks/useDebouncedChecker";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
+import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
+import type { ChangeEvent } from "react";
 
 /**
  * DegreeModuleSkillController component
@@ -34,6 +37,8 @@ export function DegreeModuleSkillController({
     submitDataReshapeFn,
   });
 
+  const { availabilityCheck } = useDebouncedChecker(form, 300);
+
   /**
    * Handle form submission
    *
@@ -42,6 +47,28 @@ export function DegreeModuleSkillController({
   const handleSubmit = (variables: MutationVariables) => {
     submitCallback(variables, {
       method: HTTP_METHODS.POST,
+    });
+  };
+
+  /**
+   * Send a debouned API request to check for class name availability when the class name input changes.
+   *
+   * @param event - The change event from the class name input
+   * @param meta - Optional metadata for the command handler, including API endpoint information
+   */
+  const handleValueChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    meta?: CommandHandlerFieldMeta,
+  ) => {
+    const fieldName = meta?.name;
+
+    if (!fieldName) {
+      return;
+    }
+
+    availabilityCheck(event, {
+      ...meta,
+      searchParams: { by: fieldName },
     });
   };
 
@@ -56,6 +83,7 @@ export function DegreeModuleSkillController({
         control={form.control}
         setRef={setRef}
         observedRefs={observedRefs}
+        onChange={handleValueChange}
       />
     </form>
   );

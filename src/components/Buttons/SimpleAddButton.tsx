@@ -51,7 +51,12 @@ export function SimpleAddButtonWithToolTip(
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="outline" {...safeRest} onClick={handleLocalClick}>
+        <Button
+          variant="outline"
+          type="button"
+          {...safeRest}
+          onClick={handleLocalClick}
+        >
           <PlusIcon />
         </Button>
       </TooltipTrigger>

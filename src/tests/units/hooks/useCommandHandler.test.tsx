@@ -172,6 +172,8 @@ describe("useCommandHandler - basic behaviours", () => {
     expect(secondController).toBeDefined();
     expect(secondController).not.toBe(firstController);
 
+    // abort the second controller to prevent its stale fetch from contaminating later tests
+    secondController.abort();
     // clear any activity so later tests are unaffected
     useAppStore.setState({ lastUserActivity: new UniqueSet() });
   });
@@ -229,10 +231,12 @@ describe("useCommandHandler - basic behaviours", () => {
 
     // The fetch flow should have recorded the last user activity in a UniqueSet.
     const lastActivity = useAppStore.getState().lastUserActivity;
-    const details = lastActivity.values().next().value;
+    const postActivity = [...lastActivity.values()].find(
+      (a: any) => a.method === "POST",
+    );
 
-    expect(lastActivity.size).toBeGreaterThan(0);
-    expect(details).toEqual(
+    expect(postActivity).toBeTruthy();
+    expect(postActivity).toEqual(
       expect.objectContaining({
         endpoint: skillApiEndpoint,
         method: "POST",
