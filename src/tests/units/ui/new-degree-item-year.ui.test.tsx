@@ -150,13 +150,13 @@ describe("UI flow: new-degree-item-year", () => {
         assertAttribute: "aria-invalid",
         toBe: "false",
       },
+      // Step 6 : Cleared field should be aria-invalid="false"
+      {
+        locator: descInput,
+        clearInput: true,
+        assertAttribute: "aria-invalid",
+        toBe: "false",
+      },
     ]);
-
-    // Step 6 : Cleared field should be aria-invalid="false"
-    // BUG : le regex serverName exige {1,100} caractères, donc la chaîne vide échoue toujours
-    await userEvent.clear(descInput);
-    await expect
-      .poll(() => descInput.element().getAttribute("aria-invalid"))
-      .toBe("false");
   });
 });

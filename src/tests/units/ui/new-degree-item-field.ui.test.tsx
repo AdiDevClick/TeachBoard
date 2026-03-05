@@ -18,8 +18,8 @@ import {
 } from "@/tests/test-utils/vitest-browser.helpers";
 import { initSetup } from "@/tests/units/ui/functions/class-creation/class-creation.functions.ts";
 import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions.ts";
-import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { page, userEvent } from "vitest/browser";
+import { afterEach, beforeEach, describe, test, vi } from "vitest";
+import { page } from "vitest/browser";
 
 let diplomaFieldController: any;
 let degreeFieldQueryKey: any;
@@ -149,13 +149,13 @@ describe("UI flow: new-degree-item-field", () => {
         assertAttribute: "aria-invalid",
         toBe: "false",
       },
+      // Step 6 : cleared field should be aria-invalid="false"
+      {
+        locator: descInput,
+        clearInput: true,
+        assertAttribute: "aria-invalid",
+        toBe: "false",
+      },
     ]);
-
-    // Step 6 : cleared field should be aria-invalid="false"
-    // BUG : le regex serverName exige {1,100} caractères, donc la chaîne vide échoue toujours
-    await userEvent.clear(descInput);
-    await expect
-      .poll(() => descInput.element().getAttribute("aria-invalid"))
-      .toBe("false");
   });
 });
