@@ -4,7 +4,7 @@ import { InlineSwitchList } from "@/components/Selects/exports/vertical-field-se
 import type { VerticalSelectMetaData } from "@/components/Selects/types/select.types.ts";
 import {
   debugLogs,
-  isStepTwoOnSelectPropsInvalid,
+  isStepTwoOnSelectPropsValid,
 } from "@/configs/app-components.config";
 import type { StepTwoControllerProps } from "@/features/evaluations/create/steps/two/types/step-two.types.ts";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore.ts";
@@ -62,7 +62,7 @@ export function StepTwoController({
     taskId: string | UUID,
     meta?: VerticalSelectMetaData,
   ) => {
-    if (isStepTwoOnSelectPropsInvalid(meta)) {
+    if (!isStepTwoOnSelectPropsValid(meta)) {
       debugLogs(
         "[StepTwoController#handleOnSelect]: There is no ID in metadata, selection ignored.",
         { meta },

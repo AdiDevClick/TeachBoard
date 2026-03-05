@@ -283,7 +283,7 @@ describe("UI flow: class-creation (StepOne list)", () => {
 
     // stub the name-check endpoint so the test never touches the real API
     stubFetchRoutes({
-      getRoutes: [[/classes\/check-name\//, { available: true }]],
+      getRoutes: [[/classes\/available\//, { available: true }]],
     });
 
     // With mode:"onChange", validation triggers on field change, not on bare blur.
