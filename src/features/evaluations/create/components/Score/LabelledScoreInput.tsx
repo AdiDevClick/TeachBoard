@@ -26,7 +26,7 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
   );
 
   const { form, id, item } = props;
-  const watchId = `overallScore.${id}`;
+  const watchId = `overallScore.${id}` as const;
 
   /**
    * Make sure to sync the overallScore with the student's entry in the store -
@@ -38,7 +38,7 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
     name: watchId,
     compute: (score) => {
       if (score) {
-        setStudentOverallScore(id, score);
+        setStudentOverallScore(id, score as number);
       }
     },
   });
@@ -54,6 +54,7 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
           type="number"
           min={0}
           max={20}
+          step={"any"}
           defaultValue={formatParseFloat(item.score / 5)}
         />
         <p>{"/20"}</p>
