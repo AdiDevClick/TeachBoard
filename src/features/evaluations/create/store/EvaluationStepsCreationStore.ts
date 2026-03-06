@@ -4,6 +4,7 @@ import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
 import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
 import type { NonLabelledGroupItemProps } from "@/components/Selects/types/select.types";
 import { DEV_MODE } from "@/configs/app.config.ts";
+import type { ScoreItem } from "@/features/evaluations/create/components/Score/types/score-types";
 import {
   addNewEvaluationScore,
   filterSubSkillsBasedOnStudentsAvailability,
@@ -762,10 +763,7 @@ export const useEvaluationStepsCreationStore = create(
           getAllStudentsAverageScores() {
             ensureCollections();
             const students = get().students;
-            const scores = new UniqueSet<
-              UUID,
-              { name: string; score: number }
-            >();
+            const scores = new UniqueSet<UUID, ScoreItem>();
 
             for (const student of students.values()) {
               if (!student.isPresent) continue;
@@ -901,7 +899,6 @@ export const useEvaluationStepsCreationStore = create(
             if (!module || !subSkill || subSkill.isCompleted === completed)
               return;
 
-            console.log("je suis passé");
             const updatedSubSkill = {
               ...subSkill,
               isCompleted: completed,
