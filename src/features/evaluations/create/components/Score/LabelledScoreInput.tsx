@@ -54,7 +54,7 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
           type="number"
           min={0}
           max={20}
-          step={"any"}
+          step={0.25}
           defaultValue={formatParseFloat(item.score / 5)}
         />
         <p>{"/20"}</p>
