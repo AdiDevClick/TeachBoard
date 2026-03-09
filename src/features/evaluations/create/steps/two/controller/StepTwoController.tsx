@@ -1,5 +1,6 @@
 import { UUID_SCHEMA, type UUID } from "@/api/types/openapi/common.types.ts";
 import type { InlineItemAndSwitchSelectionPayload } from "@/components/HOCs/types/with-inline-item-and-switch.types.ts";
+import { withInlineItemAndSwitchSelection } from "@/components/HOCs/withInlineItemAndSwitchSelection";
 import { InlineSwitchList } from "@/components/Selects/exports/vertical-field-select.exports";
 import type { VerticalSelectMetaData } from "@/components/Selects/types/select.types.ts";
 import {
@@ -11,7 +12,6 @@ import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/s
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils";
 import { useEffect, useEffectEvent, type MouseEvent } from "react";
-import { useShallow } from "zustand/shallow";
 
 export function StepTwoController({
   pageId,
@@ -20,20 +20,17 @@ export function StepTwoController({
   className,
   inputControllers = [],
 }: StepTwoControllerProps) {
-  const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
-    useShallow((state) => state.getStudentsPresenceSelectionData),
-  )();
+  const preparedStudentsTasksSelection = useEvaluationStepsCreationStore
+    .getState()
+    .getStudentsPresenceSelectionData();
 
-  const setStudentPresence = useEvaluationStepsCreationStore(
-    (state) => state.setStudentPresence,
-  );
-  const setStudentTaskAssignment = useEvaluationStepsCreationStore(
-    (state) => state.setStudentTaskAssignment,
-  );
-
-  const setAllNonPresentStudents = useEvaluationStepsCreationStore(
-    (state) => state.setAllNonPresentStudents,
-  );
+  const {
+    setStudentPresence,
+    setAllStudentsPresence,
+    setStudentTaskAssignment,
+    setAllNonPresentStudents,
+    allPresent,
+  } = useEvaluationStepsCreationStore();
 
   const { setRef, observedRefs } = useCommandHandler({
     form,
@@ -92,7 +89,7 @@ export function StepTwoController({
   /**
    * Handle switch click from VerticalFieldWithInlineSwitchList
    *
-   * @description Updates the selected diploma reference and selection state.
+   * @description Updates the selected task for the student based on the switch state.
    *
    * @param e - The mouse event triggered by the switch click
    * @param studentData - The details of the selected student data
@@ -112,6 +109,21 @@ export function StepTwoController({
     }
 
     setStudentPresence(parsed.data, studentData.isSelected);
+  };
+
+  /**
+   * Handle switch all on/off
+   *
+   * @description Sets all students as present or not present based on the switch state.
+   * @param e - The mouse event triggered by the switch click
+   * @param studentData - The details of the selected student data
+   */
+  const handleOnSwitchAll = (
+    e: MouseEvent<HTMLButtonElement>,
+    studentData: InlineItemAndSwitchSelectionPayload,
+  ) => {
+    preventDefaultAndStopPropagation(e);
+    setAllStudentsPresence(studentData.isSelected);
   };
 
   /**
@@ -135,6 +147,11 @@ export function StepTwoController({
 
   return (
     <form id={formId} className={className}>
+      <AllOnSwitch
+        isSelected={allPresent}
+        onSwitchClick={handleOnSwitchAll}
+        {...inputControllers[1]}
+      />
       <InlineSwitchList
         items={preparedStudentsTasksSelection}
         setRef={setRef}
@@ -148,3 +165,5 @@ export function StepTwoController({
     </form>
   );
 }
+
+const AllOnSwitch = withInlineItemAndSwitchSelection(() => null);
