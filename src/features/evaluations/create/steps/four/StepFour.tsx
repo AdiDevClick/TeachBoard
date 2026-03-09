@@ -38,7 +38,6 @@ export function StepFour({
   ...props
 }: StepFourProps) {
   const user = useAppStore((state) => state.user);
-
   const form = useForm<StepFourFormSchema>({
     resolver: zodResolver(stepFourInputSchema),
     mode: "onTouched",

@@ -118,6 +118,7 @@ export interface StepsCreationState {
   id?: UUID | null;
   description?: string | null;
   students: UniqueSet<UUID, StudentWithPresence>;
+  allPresent: boolean;
   tasks: UniqueSet<UUID, ClassTasks>;
   evaluations?: unknown[] | null;
   modules: UniqueSet<UUID, ClassModules>;

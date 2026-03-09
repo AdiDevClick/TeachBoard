@@ -34,3 +34,11 @@ export const STEP_FOUR_MODULES_INPUT_CONTROLLERS = {
   color2: "bg-green-50/50",
   placeholder: "Aucun module évalué",
 } satisfies StepFourInputItem;
+
+export const STEP_FOUR_TITLE_INPUT_CONTROLLERS = {
+  name: "title",
+  title: "Titre",
+  type: "text",
+  placeholder: "Evaluation du 01/01/2024",
+  required: true,
+} satisfies StepFourInputItem;

@@ -20,7 +20,12 @@ import {
   inlineItemAndSwitchSelectionPropsInvalid,
 } from "@/configs/app-components.config.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
-import { useState, type ComponentType, type MouseEvent } from "react";
+import {
+  useEffect,
+  useState,
+  type ComponentType,
+  type MouseEvent,
+} from "react";
 
 /**
  * Wrap a component to be displayed inline within an Item with a Switch.
@@ -41,6 +46,18 @@ export function withInlineItemAndSwitchSelection<T extends object>(
 ) {
   return function Component(props: T & InlineItemAndSwitchSelectionProps) {
     const [isSelected, setIsSelected] = useState(props.isSelected ?? false);
+
+    /**
+     * Handle the switch click event.
+     *
+     * @description In the case of the All ON/OFF, this needs to be handled
+     */
+    useEffect(() => {
+      if (props.isSelected !== isSelected) {
+        setIsSelected(props.isSelected);
+      }
+    }, [props.isSelected, isSelected]);
+
     if (inlineItemAndSwitchSelectionPropsInvalid(props)) {
       debugLogs("withInlineItemAndSwitchSelection");
       return null;
