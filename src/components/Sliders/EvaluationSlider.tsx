@@ -25,7 +25,11 @@ import { useEffect, useEffectEvent, useState, type CSSProperties } from "react";
  */
 export function EvaluationSlider(props: EvaluationSliderProps) {
   const { fullName, onValueChange, value, ...rest } = props;
-  const safeSliderProps = sanitizeDOMProps(rest, ["isPresent", "assignedTask"]);
+  const safeSliderProps = sanitizeDOMProps(rest, [
+    "isPresent",
+    "assignedTask",
+    "overallScore",
+  ]);
 
   const [internalValue, setInternalValue] = useState<number[]>(value ?? [0]);
 
