@@ -148,7 +148,10 @@ export function TabContent({
     const target = e.currentTarget;
     const dataset = target.dataset;
 
-    if (dataset.stepId === "Archiver" && e.propertyName === "transform") {
+    if (
+      (dataset.stepId === "Archiver" || dataset.stepId === "Elèves") &&
+      e.propertyName === "transform"
+    ) {
       if (dataset.activeTransitioning === "true") {
         dataset.activeTransitioning = "false";
       }
@@ -165,7 +168,8 @@ export function TabContent({
       id={id}
       data-step-id={tabName}
       data-active-transitioning={
-        tabValue === "Archiver" && tabName === "Archiver"
+        (tabValue === "Archiver" || tabValue === "Elèves") &&
+        tabName === tabValue
       }
       value={tabName}
       data-animating={tabState.isAnimating}
