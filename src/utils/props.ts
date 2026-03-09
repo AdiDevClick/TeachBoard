@@ -12,6 +12,7 @@ const EXCLUDED_KEYS = new Set([
   "apiEndpoint",
   "dataReshapeFn",
   "creationButtonText",
+  "__isProxyfied",
 ]);
 
 export function sanitizeDOMProps<T extends Record<string, unknown>>(
