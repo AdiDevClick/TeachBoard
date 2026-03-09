@@ -54,6 +54,7 @@ const createDefaultStepsCreationState = (): StepsCreationState => ({
     selectedSubSkillId: null,
   },
   nonPresentStudentsResult: null,
+  allPresent: false,
 });
 
 export const DEFAULT_VALUES_STEPS_CREATION_STATE: StepsCreationState =
@@ -74,8 +75,8 @@ export const useEvaluationStepsCreationStore = create(
           createStepsCreationDebugRehydrators(get, set);
 
         const ACTIONS = {
-          clear: (classId: UUID) => {
-            if (get().selectedClass?.id === classId) {
+          clear: (classId: UUID, force: boolean) => {
+            if (get().selectedClass?.id === classId && !force) {
               return false;
             }
 
@@ -188,10 +189,13 @@ export const useEvaluationStepsCreationStore = create(
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
+
                 students.forEach((student) => {
                   const details = {
                     id: student.id,
-                    fullName: student.firstName + " " + student.lastName,
+                    fullName:
+                      student.fullName ||
+                      student.firstName + " " + student.lastName,
                     isPresent: false,
                     assignedTask: null,
                   };
@@ -257,6 +261,24 @@ export const useEvaluationStepsCreationStore = create(
                 isPresent,
               );
             }
+          },
+          /**
+           * Turn ON/OFF all students presence at once.
+           *
+           * @param isPresent - The presence status to set for all students
+           */
+          setAllStudentsPresence(isPresent: boolean) {
+            get().students.forEach((student) => {
+              ACTIONS.setStudentPresence(student.id, isPresent);
+            });
+
+            set(
+              (state) => {
+                state.allPresent = isPresent;
+              },
+              undefined,
+              "setAllStudentsPresence",
+            );
           },
           /**
            * Update the non-present students collection in the store based on a student's presence status.
