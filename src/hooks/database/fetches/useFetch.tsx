@@ -90,7 +90,8 @@ export function useFetch<
           url: pathname,
           endpoint: params.url,
           method: params.method,
-          type: "fetch",
+          status: response.status,
+          type: "useFetch",
         });
         successCallback?.(response);
 
@@ -136,7 +137,8 @@ export function useFetch<
           url: pathname,
           endpoint: params.url,
           method: params.method,
-          type: "fetch",
+          type: "useFetch",
+          status: error.status,
         });
         errorCallback?.(error);
 
