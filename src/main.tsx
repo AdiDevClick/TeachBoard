@@ -115,9 +115,13 @@ export function Root({ contentType }: Readonly<RootProps>) {
     const path = location.pathname;
 
     const isPublicPage = doesContainNoSessionPage(path);
-    const lastActivityWasLogout = lastUserActivity === "logout";
+    const lastActivityWasLogout =
+      lastUserActivity.entries().next().value?.[0] === "logout";
+    const lastActivityWasForbidden =
+      lastUserActivity.entries().next().value?.[1].status === 403;
 
     switch (true) {
+      case lastActivityWasForbidden && isPublicPage:
       case lastActivityWasLogout && isPublicPage:
       case isPublicPage:
         if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
