@@ -40,6 +40,27 @@ function getNextButton() {
   );
 }
 
+/** Returns the switch inside the AllOnSwitch (the first [data-slot="item"] directly in the form). */
+function getAllOnSwitch(): HTMLButtonElement | null {
+  const firstItem = document.querySelector<HTMLElement>('[data-slot="item"]');
+  return (
+    firstItem?.querySelector<HTMLButtonElement>('button[role="switch"]') ?? null
+  );
+}
+
+/** Returns the first student-row switch (button[role="switch"] inside a data-slot="field" row). */
+function getStudentRowSwitch(): HTMLButtonElement | null {
+  // Student rows are wrapped by withController which renders a [data-slot="field"] container;
+  // the AllOnSwitch has no such wrapper, so this picks up only student switches.
+  const studentField = document.querySelector<HTMLElement>(
+    '[data-slot="field"]',
+  );
+  return (
+    studentField?.querySelector<HTMLButtonElement>('button[role="switch"]') ??
+    null
+  );
+}
+
 const studentId = UUID_SCHEMA.parse("123e4567-e89b-12d3-a456-426614174001");
 const taskId = UUID_SCHEMA.parse("123e4567-e89b-12d3-a456-426614174010");
 const moduleId = UUID_SCHEMA.parse("123e4567-e89b-12d3-a456-426614174100");
@@ -94,8 +115,8 @@ describe("UI: StepTwo flow regression", () => {
     await expect.poll(() => getNextButton() != null).toBe(true);
     await expect.poll(() => getNextButton()?.disabled ?? false).toBe(true);
 
-    const switchButton = page.getByRole("switch");
-    await userEvent.click(switchButton);
+    await expect.poll(() => getStudentRowSwitch() != null).toBe(true);
+    await userEvent.click(getStudentRowSwitch()!);
 
     await expect
       .poll(
@@ -131,8 +152,30 @@ describe("UI: StepTwo flow regression", () => {
       </AppTestWrapper>,
     );
 
-    const switchAfterRemount = page.getByRole("switch").element();
-    expect(switchAfterRemount.getAttribute("aria-checked")).toBe("true");
+    const switchAfterRemount = getStudentRowSwitch();
+    expect(switchAfterRemount?.getAttribute("aria-checked")).toBe("true");
     await expect.poll(() => getNextButton()?.disabled ?? true).toBe(false);
+  });
+
+  test("‘Tous’ toggle updates store and child switches immediately", async () => {
+    await render(
+      <AppTestWrapper>
+        <StepTwo />
+      </AppTestWrapper>,
+    );
+
+    const allSwitch = getAllOnSwitch();
+    expect(allSwitch?.getAttribute("aria-checked")).toBe("false");
+
+    await userEvent.click(allSwitch!);
+
+    await expect
+      .poll(() => useEvaluationStepsCreationStore.getState().allPresent)
+      .toBe(true);
+
+    // re‑query student switch after state update and re‑render
+    await expect
+      .poll(() => getStudentRowSwitch()?.getAttribute("aria-checked"))
+      .toBe("true");
   });
 });
