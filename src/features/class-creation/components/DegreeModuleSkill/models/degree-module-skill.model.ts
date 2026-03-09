@@ -1,5 +1,5 @@
 import { formsRegex } from "@/configs/formsRegex.config.ts";
-import type { InputItem } from "@/types/AppInputControllerInterface";
+import type { FetchingInputItem } from "@/types/AppInputControllerInterface";
 import z from "zod";
 
 const data = {
@@ -41,5 +41,6 @@ const moduleSkillSchema = z.object({
 });
 
 export type DegreeModuleSkillFormSchema = z.infer<typeof moduleSkillSchema>;
-export type DegreeModuleSkillInputItem = InputItem<DegreeModuleSkillFormSchema>;
+export type DegreeModuleSkillInputItem =
+  FetchingInputItem<DegreeModuleSkillFormSchema>;
 export default moduleSkillSchema;
