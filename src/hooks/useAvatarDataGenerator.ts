@@ -12,9 +12,13 @@ export function useAvatarDataGenerator(values: any[] | undefined) {
   const dataMemo = useMemo(
     () =>
       (values ?? []).map(([, details]) => {
-        const fullName = `${details.firstName || ""} ${
-          details.lastName || ""
-        }`.trim();
+        let fullName = details.fullName;
+
+        if (!fullName) {
+          fullName =
+            `${details.firstName || ""} ${details.lastName || ""}`.trim();
+        }
+
         return {
           src: `https://github.com/${details.firstName}.png`,
           alt: `@${fullName}`,
