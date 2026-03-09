@@ -216,7 +216,7 @@ export function TaskTemplateCreationController({
 
     availabilityCheck(event, {
       ...meta,
-      searchParams: { by: fieldName },
+      searchParams: { filterBy: fieldName },
     });
   };
 

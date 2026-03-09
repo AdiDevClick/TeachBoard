@@ -218,7 +218,12 @@ export function useCommandHandler<
   ) {
     if (!open) return;
 
-    const { task, apiEndpoint = "none", dataReshapeFn } = metaData ?? {};
+    const {
+      task,
+      searchParams,
+      apiEndpoint = "none",
+      dataReshapeFn,
+    } = metaData ?? {};
 
     let silent = metaData?.silent;
     const controller = new AbortController();
@@ -243,6 +248,7 @@ export function useCommandHandler<
 
     setFetchParams((prev) => ({
       ...prev,
+      searchParams,
       dataReshapeFn,
       url: String(apiEndpoint),
       contentId: task as FetchParams["contentId"],

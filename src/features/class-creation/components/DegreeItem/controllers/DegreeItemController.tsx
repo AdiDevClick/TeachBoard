@@ -97,7 +97,7 @@ export function DegreeItemController({
 
     availabilityCheck(event, {
       ...meta,
-      searchParams: { by: fieldName, type },
+      searchParams: { filterBy: fieldName, type },
     });
   };
 

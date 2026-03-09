@@ -161,7 +161,7 @@ export const API_ENDPOINTS = Object.freeze({
           .newShape(),
     },
     STUDENTS: {
-      endpoint: `${STUDENTS}/not-assigned`,
+      endpoint: `${STUDENTS}`,
       dataReshape: (data: StudentsFetch) =>
         dataReshaper(data)
           .assignSourceTo("items")

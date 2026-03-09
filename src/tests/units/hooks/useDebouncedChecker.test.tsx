@@ -35,7 +35,7 @@ const meta = {
   // the hook expects `searchParams`, not `filters`.  the previous
   // implementation used the wrong key which made the early validation check
   // pass accidentally; our fix ensures runners are typed correctly.
-  searchParams: { by: "name" },
+  searchParams: { filterBy: "name" },
   task: "whatever",
 };
 
@@ -121,7 +121,7 @@ describe("useDebouncedChecker", () => {
 
     // simulate server response saying name is unavailable
     fakeFetch.error = { data: { available: false } };
-    fakeFetch.fetchParams.searchParams = { by: "name" };
+    fakeFetch.fetchParams.searchParams = { filterBy: "name" };
 
     // re-render to fire effect that sets the manual error
     hook.rerender();
@@ -180,7 +180,7 @@ describe("useDebouncedChecker", () => {
 
     // simulate the error propagated by useFetch after cache verification fails
     fakeFetch.error = { data: { available: false } };
-    fakeFetch.fetchParams.searchParams = { by: "name" };
+    fakeFetch.fetchParams.searchParams = { filterBy: "name" };
     hook.rerender();
 
     expect(form.getFieldState("name").error?.message).toContain("déjà utilisé");
