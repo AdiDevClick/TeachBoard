@@ -47,6 +47,7 @@ export type LastUserActivityDetails = {
   endpoint?: string;
   method?: FormMethod;
   type?: string;
+  status?: number;
 };
 /**
  * Persisting Application store.
