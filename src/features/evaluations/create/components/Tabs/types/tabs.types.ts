@@ -15,9 +15,16 @@ type PageData = NonNullable<
  */
 export type TabContentProps = Readonly<
   Pick<PageData, "name" | "leftSide"> & {
-    index: number;
+    /**
+     * Provided by the list mapper; consumers do not need to supply this when
+     * using the `TabContentList`
+     */
+    index?: number;
     onClick: (arg: CreateEvaluationArrowsClickHandlerProps) => void;
-    clickProps: Omit<CreateEvaluationArrowsClickHandlerProps, "e" | "index">;
+    clickProps: Omit<
+      CreateEvaluationArrowsClickHandlerProps,
+      "e" | "index" | "setTabState"
+    >;
     /** Value validated by the parent using router location pathname */
     tabValue: string;
   } & PropsWithChildren
