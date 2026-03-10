@@ -15,7 +15,12 @@ import type {
 } from "@/components/Selects/types/select.types";
 import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
 import type { LabelledTextAreaProps } from "@/components/TextAreas/types/textareas.types";
-import { DEV_MODE, NO_COMPONENT_WARNING_LOGS } from "@/configs/app.config.ts";
+import {
+  DEV_MODE,
+  NO_ANIMATIONS_LOGS,
+  NO_COMPONENT_HANDLER_WARNING_LOGS,
+  NO_COMPONENT_PROPS_WARNING_LOGS,
+} from "@/configs/app.config.ts";
 import type { LoginFormControllerProps } from "@/features/auth/components/login/controller/types/login-form-controller.types";
 import type { ClassCreationControllerProps } from "@/features/class-creation/components/main/types/class-creation.types";
 import type {
@@ -482,16 +487,50 @@ export const isStepTwoOnSelectPropsValid = (
 
 //                    ------------
 
+type DebugDetails = {
+  type: "componentHandler" | "propsValidation" | "animation";
+  [key: string]: unknown;
+};
 /**
  * Logs debug information for a component when in development mode.
  *
  * @param componentName - The name of the component for logging purposes.
+ * @param details - Additional details to log, including the type of log (component handler or props validation) and any relevant data.
+ *
+ * @description This function checks if the application is in development mode and logs detailed information about the component's props or handler state. It can be used to identify issues with component configuration or to trace the flow of data through component handlers.
  */
-export function debugLogs(componentName: string, details?: unknown) {
-  if (DEV_MODE && !NO_COMPONENT_WARNING_LOGS) {
-    console.error(
-      `[${componentName}] - Invalid props detected. Please check the component configuration.`,
-      details,
-    );
+export function debugLogs(componentName: string, details?: DebugDetails) {
+  if (!DEV_MODE) return;
+  const { type, ...allDetails } = details || {};
+
+  switch (type) {
+    case "propsValidation":
+      if (!NO_COMPONENT_PROPS_WARNING_LOGS) {
+        console.error(
+          `[${componentName}] - Invalid props detected. Please check the component configuration.`,
+          allDetails,
+        );
+      }
+      break;
+    case "componentHandler":
+      if (!NO_COMPONENT_HANDLER_WARNING_LOGS) {
+        console.warn(
+          `[${componentName}] - Component handler verifications.`,
+          allDetails,
+        );
+      }
+      break;
+    case "animation":
+      if (!NO_ANIMATIONS_LOGS) {
+        console.log(`[${componentName}] - Animation state change.`, allDetails);
+      }
+      break;
+    default:
+      if (!NO_COMPONENT_PROPS_WARNING_LOGS) {
+        console.error(
+          `[${componentName}] - Invalid props detected. Please check the component configuration.`,
+          allDetails,
+        );
+      }
   }
 }
