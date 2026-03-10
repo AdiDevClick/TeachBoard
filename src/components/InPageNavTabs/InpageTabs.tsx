@@ -33,7 +33,7 @@ export function InpageTabs({
         <SelectGroup className="nav-tabs__select-group">
           <ListMapper items={datas}>
             {([key, item]) => (
-              <SelectItem key={key} value={item.name}>
+              <SelectItem key={key} value={item.name} disabled={item.disabled}>
                 {item.name}
               </SelectItem>
             )}
@@ -46,7 +46,7 @@ export function InpageTabs({
   return (
     <TabsList className="nav-tabs-container">
       {Object.entries(datas).map(([key, item]) => (
-        <TabsTrigger key={key} value={item.name}>
+        <TabsTrigger key={key} value={item.name} disabled={item.disabled}>
           {item.name}
         </TabsTrigger>
       ))}
