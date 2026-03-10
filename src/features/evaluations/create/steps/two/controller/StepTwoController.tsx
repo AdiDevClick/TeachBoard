@@ -60,10 +60,11 @@ export function StepTwoController({
     meta?: VerticalSelectMetaData,
   ) => {
     if (!isStepTwoOnSelectPropsValid(meta)) {
-      debugLogs(
-        "[StepTwoController#handleOnSelect]: There is no ID in metadata, selection ignored.",
-        { meta },
-      );
+      debugLogs("StepTwoController:handleOnSelect", {
+        type: "propsValidation",
+        meta,
+        message: "There is no ID in metadata, selection ignored.",
+      });
       return;
     }
     const studentId = meta?.id;
@@ -72,8 +73,9 @@ export function StepTwoController({
     const parsed = UUID_SCHEMA.safeParse(taskId);
     if (!parsedStudentId.success || !parsed.success) {
       debugLogs(
-        "[StepTwoController#handleOnSelect]: Invalid student ID in metadata, selection ignored.",
+        "StepTwoController:handleOnSelect - Invalid student ID in metadata, selection ignored.",
         {
+          type: "componentHandler",
           studentId,
           error: parsedStudentId.error,
           taskId,
@@ -102,8 +104,12 @@ export function StepTwoController({
     const parsed = UUID_SCHEMA.safeParse(studentData.id);
     if (!parsed.success) {
       debugLogs(
-        "[StepTwoController#handleOnSwitch]: Invalid student ID in switch payload, selection ignored.",
-        { studentId: studentData.id, error: parsed.error },
+        "StepTwoController:handleOnSwitch - Invalid student ID in switch payload, selection ignored.",
+        {
+          type: "componentHandler",
+          studentId: studentData.id,
+          error: parsed.error,
+        },
       );
       return;
     }
