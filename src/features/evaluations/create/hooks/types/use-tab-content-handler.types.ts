@@ -5,8 +5,16 @@ import type { TabContentProps } from "@/features/evaluations/create/components/T
  */
 export type UseTabContentHandlerProps = Pick<
   TabContentProps,
-  "name" | "clickProps" | "onClick" | "index"
+  "name" | "clickProps" | "onClick" | "index" | "tabValue"
 >;
+
+/**
+ * Types for the tab evaluation state used in the Create Evaluations page navigation logic
+ */
+export type TabEvalState = {
+  slideDirection: "left" | "right";
+  tabsSeen: Set<string>;
+};
 
 export type TabContentHandlerState = {
   isNextDisabled: boolean;

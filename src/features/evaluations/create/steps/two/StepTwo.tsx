@@ -14,6 +14,7 @@ import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useEffectEvent } from "react";
 import { useForm, type FieldValues } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 /**
  * Step Two component for creating attendance records.
@@ -33,10 +34,12 @@ export function StepTwo({
   inputControllers = attendanceRecordCreationBaseControllers,
   ...props
 }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
-  const user = useAppStore((state) => state.user);
+  const navigate = useNavigate();
   const selectedClass = useEvaluationStepsCreationStore(
     (state) => state.selectedClass,
   );
+
+  const user = useAppStore((state) => state.user);
   const students = useEvaluationStepsCreationStore((state) => state.students);
   const tasks = useEvaluationStepsCreationStore((state) => state.tasks);
   const moduleSelectionState = useEvaluationStepsCreationStore(
@@ -50,6 +53,17 @@ export function StepTwo({
     defaultValues: {
       students: [],
     },
+  });
+
+  /**
+   * INIT - REDIRECT IF NO CLASS
+   *
+   * @description If no class was selected before, redirect the user to the first step to select a class before creating attendance records.
+   */
+  const redirectToStepOneIfNoClassSelected = useEffectEvent(() => {
+    if (!selectedClass) {
+      navigate("/evaluations/create");
+    }
   });
 
   /**
@@ -73,6 +87,7 @@ export function StepTwo({
    * @description Each time with we arrive on this step
    */
   useEffect(() => {
+    redirectToStepOneIfNoClassSelected();
     resetClickStatus();
   }, [moduleSelectionState.isClicked]);
 

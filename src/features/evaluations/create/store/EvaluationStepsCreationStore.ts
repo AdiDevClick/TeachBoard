@@ -75,7 +75,7 @@ export const useEvaluationStepsCreationStore = create(
           createStepsCreationDebugRehydrators(get, set);
 
         const ACTIONS = {
-          clear: (classId: UUID, force: boolean) => {
+          clear: (classId: UUID, force?: boolean) => {
             if (get().selectedClass?.id === classId && !force) {
               return false;
             }
@@ -952,6 +952,10 @@ export const useEvaluationStepsCreationStore = create(
             ensureCollections();
 
             const attendedModules = ACTIONS.getAttendedModules();
+
+            if (attendedModules.length === 0) {
+              return false;
+            }
 
             return attendedModules.every((module) => module.isCompleted);
           },

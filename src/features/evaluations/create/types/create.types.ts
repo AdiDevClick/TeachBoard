@@ -3,7 +3,10 @@
  */
 
 import type { useSidebar } from "@/components/ui/sidebar";
-import type { TabContentHandlerState } from "@/features/evaluations/create/hooks/types/use-tab-content-handler.types";
+import type {
+  TabContentHandlerState,
+  TabEvalState,
+} from "@/features/evaluations/create/hooks/types/use-tab-content-handler.types";
 import type {
   Dispatch,
   MouseEvent,
@@ -35,7 +38,7 @@ export type CreateEvaluationArrowsClickHandlerProps = {
   setTabValue: (_v: string | undefined) => void;
   setTabState: Dispatch<SetStateAction<TabContentHandlerState>>;
   tabValues: string[];
-  setSlideDirection: Dispatch<SetStateAction<"left" | "right">>;
+  setTabEvalState: Dispatch<SetStateAction<TabEvalState>>;
 } & Partial<ReturnType<typeof useSidebar>>;
 
 /**

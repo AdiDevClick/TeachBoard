@@ -17,6 +17,7 @@ export function useTabContentHandler({
   clickProps,
   onClick: onClickHandler,
   index,
+  tabValue,
 }: UseTabContentHandlerProps) {
   const {
     selectedClass,
@@ -72,6 +73,17 @@ export function useTabContentHandler({
           disabled = true;
           break;
       }
+
+      const { setTabEvalState } = clickProps;
+      setTabEvalState((prev) => {
+        const tabsSeen = new Set(prev.tabsSeen);
+        if (disabled && tabValue !== tabName) {
+          tabsSeen.delete(tabName);
+        } else {
+          tabsSeen.add(tabName);
+        }
+        return { ...prev, tabsSeen: tabsSeen };
+      });
 
       setTabState((prev) => ({
         ...prev,
