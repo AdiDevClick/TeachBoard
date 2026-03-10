@@ -265,6 +265,11 @@ export const useEvaluationStepsCreationStore = create(
           /**
            * Turn ON/OFF all students presence at once.
            *
+           * @description This triggers each students presence update which in turn triggers the related module evaluation updates, so it may induce performance issues with a big number of students.
+           * If one student is set as not present, the toggle will still remain ON.
+           *
+           * @important Please only use it for UI and not for source of truth regarding allPresent state.
+           *
            * @param isPresent - The presence status to set for all students
            */
           setAllStudentsPresence(isPresent: boolean) {

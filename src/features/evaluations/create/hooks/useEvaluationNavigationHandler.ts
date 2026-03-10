@@ -12,7 +12,7 @@ import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
 export function useEvaluationNavigationHandler() {
   const [tabEvalState, setTabEvalState] = useState<TabEvalState>({
     slideDirection: "right",
-    tabsSeen: new Set(),
+    tabsSeen: new Set(["Classe"]),
   });
 
   const { pageDatas } = useLoaderData<CreateEvaluationsLoaderData>();
