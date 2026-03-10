@@ -64,7 +64,8 @@ export function TabContent({
   children,
   tabValue,
 }: TabContentProps) {
-  const id = `tab-content-${index + 1}`;
+  const idx = index ?? 0;
+  const id = `tab-content-${idx + 1}`;
 
   const { setRef, observedRefs, findAllNestedElements } = useMutationObserver({
     options: {
@@ -152,7 +153,7 @@ export function TabContent({
   }, [tabState.isAnimating]);
 
   const commonProps = {
-    pageId: `step-${index + 1}`,
+    pageId: `step-${idx + 1}`,
     modalMode: false,
     leftSide,
     isClicked: moduleSelectionState.isClicked,
@@ -209,7 +210,7 @@ export function TabContent({
     >
       <View {...commonProps}>
         <View.Title className="header">
-          {index !== 0 && (
+          {idx !== 0 && (
             <Button {...commonButtonProps} {...BUTTON_LEFT_PROPS}>
               <IconArrowLeft />
             </Button>
@@ -217,7 +218,7 @@ export function TabContent({
         </View.Title>
         <View.Content>{children}</View.Content>
         <View.Footer>
-          {index !== clickProps.arrayLength - 1 && (
+          {idx !== clickProps.arrayLength - 1 && (
             <Button
               {...commonButtonProps}
               {...BUTTON_RIGHT_PROPS}
