@@ -6,6 +6,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { TabsContent } from "@/components/ui/tabs";
+import { debugLogs } from "@/configs/app-components.config";
 import { TAB_CONTENT_VIEW_CARD_PROPS } from "@/features/evaluations/create/components/Tabs/config/tab-content.configs";
 import {
   animateUnmountedElements,
@@ -82,6 +83,7 @@ export function TabContent({
     clickProps,
     onClick,
     index,
+    tabValue,
   });
 
   /**
@@ -90,8 +92,28 @@ export function TabContent({
    * @description Resets the state after the outgoing animation is finished and triggers the tab change by updating the tabValue in the parent component through clickProps.setTabValue.
    */
   const onFinish = () => {
-    setTabState((prev) => ({ ...prev, isAnimating: false }));
-    if (tabState.newTabValue) clickProps.setTabValue(tabState.newTabValue);
+    const pending = tabState.newTabValue;
+    setTabState((prev) => ({
+      ...prev,
+      isAnimating: false,
+      newTabValue: undefined,
+    }));
+    debugLogs("TabContent:onFinish", {
+      type: "animation",
+      tabValue: pending,
+      message:
+        "Animation finished, calling setTabState() but not yet navigating to new tab until state is updated",
+    });
+
+    if (pending) {
+      debugLogs("TabContent:onFinish", {
+        type: "animation",
+        tabValue: pending,
+        message:
+          "Animation finished, calling setTabValue() and navigating to new tab",
+      });
+      clickProps.setTabValue(pending);
+    }
   };
 
   /**
@@ -105,7 +127,11 @@ export function TabContent({
     const currentPanel = observedRefs.get(id)?.element ?? null;
 
     if (!currentPanel) {
-      console.warn("Current panel not found for id:", id);
+      debugLogs("TabContent:animationTrigger", {
+        type: "animation",
+        tabValue: tabValue,
+        message: `Current panel not found for id: ${id}`,
+      });
       onFinish();
       return;
     }
