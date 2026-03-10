@@ -15,7 +15,19 @@ export const NO_PROXY_LOGS = true;
 export const NO_MUTATION_OBSERVER_LOGS = true;
 export const NO_CACHE_LOGS = true;
 export const NO_QUERY_LOGS = true;
-export const NO_COMPONENT_WARNING_LOGS = false;
+/**
+ * Disable component props validation warnings in the console.
+ */
+export const NO_COMPONENT_PROPS_WARNING_LOGS = false;
+/**
+ * Disable component handler warnings in the console.
+ */
+export const NO_COMPONENT_HANDLER_WARNING_LOGS = true;
+/**
+ * Disable animation logs in the console.
+ */
+export const NO_ANIMATIONS_LOGS = true;
+
 export const ANIMATIONS_LOGS = false;
 export const NO_SESSION_CHECK_LOGS = true;
 
