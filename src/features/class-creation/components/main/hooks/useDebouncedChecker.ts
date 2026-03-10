@@ -63,7 +63,7 @@ export function useDebouncedChecker<
       const value = event.target.value.trim().toLowerCase();
 
       if (!isValidDebounceAvailabilityMeta(meta) || value.length < 2) {
-        debugLogs("useDebouncedChecker", meta);
+        debugLogs("useDebouncedChecker", { type: "propsValidation", meta });
         return;
       }
 
