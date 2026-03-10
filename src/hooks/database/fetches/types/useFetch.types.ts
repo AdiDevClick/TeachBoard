@@ -8,7 +8,7 @@ import type { DataReshapeFn } from "@/types/AppInputControllerInterface";
  * Define here any additional parameters you want to use for your query, such as pagination, filters, sorting, etc.
  */
 export type SearchParams = {
-  by?: string;
+  filterBy?: string;
   page?: number;
   pageSize?: number;
   sortBy?: string;

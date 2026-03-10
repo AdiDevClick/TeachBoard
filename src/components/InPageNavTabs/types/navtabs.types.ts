@@ -3,6 +3,7 @@
  */
 type TabItem = {
   name: string;
+  disabled: boolean;
   [key: string]: unknown;
 };
 

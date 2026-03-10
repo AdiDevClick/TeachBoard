@@ -23,7 +23,7 @@ import {
 import { initSetup } from "@/tests/units/ui/functions/class-creation/class-creation.functions.ts";
 import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { page } from "vitest/browser";
+import { page, userEvent } from "vitest/browser";
 
 let templatesController: any;
 let skillsController: any;
@@ -251,5 +251,51 @@ describe("UI flow: new-task-template", () => {
     await expect.poll(hasRenderLoopError, { timeout: 1500 }).toBe(false);
 
     errorSpy.mockRestore();
+  });
+
+  test("description : un caract\u00e8re invalide devrait d\u00e9clencher l'erreur, l'ajout de caract\u00e8res devrait la maintenir, une valeur valide devrait la supprimer (BUG : pas de regex sur description \u2192 les caract\u00e8res invalides sont accept\u00e9s)", async () => {
+    // Open modal
+    await openModalAndAssertItsOpenedAndReady(
+      templatesController.creationButtonText,
+      {
+        controller: templatesController,
+        nameArray: tasks,
+        readyText: rxExact(taskLabelController.label),
+      },
+    );
+
+    const descLabel = rx(TASK_TEMPLATE_CREATION_INPUTS_CONTROLLERS[1].title);
+    const descInput = page.getByLabelText(descLabel);
+
+    await fillFieldsEnsuringSubmitDisabled("Ajouter", [
+      // Step 1+2 : bad char → aria-invalid="true"
+      {
+        locator: descInput,
+        value: "<!!Quite bad input there",
+        assertAttribute: "aria-invalid",
+        toBe: "true",
+      },
+      // Step 3+4 : append chars → error persists
+      {
+        locator: descInput,
+        value: "<!!Quite bad input there with some extra chars",
+        assertAttribute: "aria-invalid",
+        toBe: "true",
+      },
+      // Step 5 :  append valid chars -> no error
+      {
+        locator: descInput,
+        value: "Une description valide et suffisamment longue.",
+        assertAttribute: "aria-invalid",
+        toBe: "false",
+      },
+      // Step 6 : Cleared field should be aria-invalid="true" (not optional)
+      {
+        locator: descInput,
+        assertAttribute: "aria-invalid",
+        toBe: "true",
+        clearInput: true,
+      },
+    ]);
   });
 });

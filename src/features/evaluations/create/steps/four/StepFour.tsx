@@ -13,9 +13,11 @@ import {
   type StepFourFormSchema,
 } from "@/features/evaluations/create/steps/four/models/step-four.models";
 import type { StepFourProps } from "@/features/evaluations/create/steps/four/types/step-four.types";
+import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type ComponentProps } from "react";
+import { useEffect, type ComponentProps } from "react";
 import { useForm, useFormState } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 /**
  * STEP FOUR - Summary and Confirmation Component
@@ -38,7 +40,9 @@ export function StepFour({
   ...props
 }: StepFourProps) {
   const user = useAppStore((state) => state.user);
-
+  const navigate = useNavigate();
+  const { selectedClass, getAttendedModules } =
+    useEvaluationStepsCreationStore();
   const form = useForm<StepFourFormSchema>({
     resolver: zodResolver(stepFourInputSchema),
     mode: "onTouched",
@@ -52,6 +56,15 @@ export function StepFour({
       evaluationDate: new Date().toISOString(),
     },
   });
+
+  /**
+   * INIT - REDIRECT IF NO CLASS OR NO ATTENDED MODULES
+   */
+  useEffect(() => {
+    if (!selectedClass || getAttendedModules().length === 0) {
+      navigate("/evaluations/create");
+    }
+  }, [getAttendedModules, navigate, selectedClass]);
 
   const baseCardProps = {
     pageId,

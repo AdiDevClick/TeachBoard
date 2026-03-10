@@ -15,6 +15,7 @@ export function useStepThreeState() {
     setEvaluationForStudent,
     setSubSkillHasCompleted,
     isThisSubSkillCompleted,
+    getAttendedModules,
   } = useEvaluationStepsCreationStore();
 
   // States
@@ -97,5 +98,6 @@ export function useStepThreeState() {
     setEvaluationForStudent,
     setSubSkillHasCompleted,
     isThisSubSkillCompleted,
+    getAttendedModules,
   };
 }

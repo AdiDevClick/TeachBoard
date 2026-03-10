@@ -8,4 +8,10 @@ export const attendanceRecordCreationBaseControllers = [
     placeholder: "Sélectionnez une tâche",
     fullWidth: true,
   },
+  {
+    name: "switchAll",
+    title: "Tous",
+    type: "button",
+    fullWidth: true,
+  },
 ] satisfies Parameters<typeof StepTwo>[0]["inputControllers"];

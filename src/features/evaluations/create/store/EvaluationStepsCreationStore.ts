@@ -4,6 +4,7 @@ import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
 import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
 import type { NonLabelledGroupItemProps } from "@/components/Selects/types/select.types";
 import { DEV_MODE } from "@/configs/app.config.ts";
+import type { ScoreItem } from "@/features/evaluations/create/components/Score/types/score-types";
 import {
   addNewEvaluationScore,
   filterSubSkillsBasedOnStudentsAvailability,
@@ -53,6 +54,7 @@ const createDefaultStepsCreationState = (): StepsCreationState => ({
     selectedSubSkillId: null,
   },
   nonPresentStudentsResult: null,
+  allPresent: false,
 });
 
 export const DEFAULT_VALUES_STEPS_CREATION_STATE: StepsCreationState =
@@ -73,8 +75,8 @@ export const useEvaluationStepsCreationStore = create(
           createStepsCreationDebugRehydrators(get, set);
 
         const ACTIONS = {
-          clear: (classId: UUID) => {
-            if (get().selectedClass?.id === classId) {
+          clear: (classId: UUID, force?: boolean) => {
+            if (get().selectedClass?.id === classId && !force) {
               return false;
             }
 
@@ -187,10 +189,13 @@ export const useEvaluationStepsCreationStore = create(
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
+
                 students.forEach((student) => {
                   const details = {
                     id: student.id,
-                    fullName: student.firstName + " " + student.lastName,
+                    fullName:
+                      student.fullName ||
+                      student.firstName + " " + student.lastName,
                     isPresent: false,
                     assignedTask: null,
                   };
@@ -256,6 +261,24 @@ export const useEvaluationStepsCreationStore = create(
                 isPresent,
               );
             }
+          },
+          /**
+           * Turn ON/OFF all students presence at once.
+           *
+           * @param isPresent - The presence status to set for all students
+           */
+          setAllStudentsPresence(isPresent: boolean) {
+            get().students.forEach((student) => {
+              ACTIONS.setStudentPresence(student.id, isPresent);
+            });
+
+            set(
+              (state) => {
+                state.allPresent = isPresent;
+              },
+              undefined,
+              "setAllStudentsPresence",
+            );
           },
           /**
            * Update the non-present students collection in the store based on a student's presence status.
@@ -762,10 +785,7 @@ export const useEvaluationStepsCreationStore = create(
           getAllStudentsAverageScores() {
             ensureCollections();
             const students = get().students;
-            const scores = new UniqueSet<
-              UUID,
-              { name: string; score: number }
-            >();
+            const scores = new UniqueSet<UUID, ScoreItem>();
 
             for (const student of students.values()) {
               if (!student.isPresent) continue;
@@ -901,7 +921,6 @@ export const useEvaluationStepsCreationStore = create(
             if (!module || !subSkill || subSkill.isCompleted === completed)
               return;
 
-            console.log("je suis passé");
             const updatedSubSkill = {
               ...subSkill,
               isCompleted: completed,
@@ -933,6 +952,10 @@ export const useEvaluationStepsCreationStore = create(
             ensureCollections();
 
             const attendedModules = ACTIONS.getAttendedModules();
+
+            if (attendedModules.length === 0) {
+              return false;
+            }
 
             return attendedModules.every((module) => module.isCompleted);
           },

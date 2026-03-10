@@ -23,6 +23,7 @@ import { waitForCache } from "@/tests/test-utils/tests.functions";
 
 import {
   fillAndTab,
+  fillFieldsEnsuringSubmitDisabled,
   openPopoverAndExpectByLabel,
   queryKeyFor,
   rx,
@@ -253,23 +254,33 @@ describe("UI flow: class-creation (StepOne list)", () => {
 
     // stub the name‑check endpoint so the test never touches the real API
     stubFetchRoutes({
-      getRoutes: [[/classes\/check-name\//, { available: true }]],
+      getRoutes: [[/classes\/available\//, { available: true }]],
     });
 
     // click the create button to show the form
     await page.getByRole("button", { name: /Créer une classe/i }).click();
     await waitForDialogState(true);
 
-    // fill the problematic name and verify that no server error is applied
-    // (current implementation never flags the field invalid, so we assert
-    // the behaviour rather than the *intended* one).
     const nameInput = page.getByLabelText(/^Nom$/i);
-    await userEvent.fill(nameInput, "bad-name");
-    expect(nameInput).toHaveAttribute("aria-invalid", "false");
 
-    // changing the value again should likewise keep it valid
-    await userEvent.fill(nameInput, "bad-nameX");
-    expect(nameInput).toHaveAttribute("aria-invalid", "false");
+    await fillFieldsEnsuringSubmitDisabled("Créer la classe", [
+      // fill the problematic name and verify that no server error is applied
+      // (current implementation never flags the field invalid, so we assert
+      // the behaviour rather than the *intended* one).
+      {
+        locator: nameInput,
+        value: "bad-name",
+        assertAttribute: "aria-invalid",
+        toBe: "false",
+      },
+      // changing the value again should likewise keep it valid
+      {
+        locator: nameInput,
+        value: "bad-nameX",
+        assertAttribute: "aria-invalid",
+        toBe: "false",
+      },
+    ]);
   });
 
   test("required name error remains when typing optional description", async () => {
@@ -299,6 +310,48 @@ describe("UI flow: class-creation (StepOne list)", () => {
 
     // error should still be present on the name input
     expect(nameInput).toHaveAttribute("aria-invalid", "true");
+  });
+
+  test("optional description: invalid char triggers error, clearing the field removes the error", async () => {
+    // open form modal
+    await openPopoverAndExpectByLabel(
+      controllerLabelRegex(ctx.labeler.controller),
+      ctx.labeler.nameArray,
+    );
+    await page.getByRole("button", { name: /Créer une classe/i }).click();
+    await waitForDialogState(true);
+
+    // stub the name-check endpoint so the test never touches the real API
+    stubFetchRoutes({
+      getRoutes: [[/classes\/available\//, { available: true }]],
+    });
+
+    const nameInput = page.getByLabelText(/^Nom$/i);
+    const descInput = page.getByLabelText(/Description \(optionnelle\)/i);
+
+    await fillFieldsEnsuringSubmitDisabled("Créer la classe", [
+      // Fill valid name so that name validation doesn't interfere
+      {
+        locator: nameInput,
+        value: "Classe test",
+        assertAttribute: "aria-invalid",
+        toBe: "false",
+      },
+      // Enter an invalid character in the optional description field
+      {
+        locator: descInput,
+        value: "<!!Quite bad input there with some extra chars",
+        assertAttribute: "aria-invalid",
+        toBe: "true",
+      },
+      // Clearing an optional field (empty string is valid: regex uses {0,n})
+      {
+        locator: descInput,
+        assertAttribute: "aria-invalid",
+        toBe: "false",
+        clearInput: true,
+      },
+    ]);
   });
 
   test("submit works with optional fields empty", async () => {

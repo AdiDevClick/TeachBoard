@@ -1,5 +1,6 @@
 import { UUID_SCHEMA, type UUID } from "@/api/types/openapi/common.types.ts";
 import type { InlineItemAndSwitchSelectionPayload } from "@/components/HOCs/types/with-inline-item-and-switch.types.ts";
+import { withInlineItemAndSwitchSelection } from "@/components/HOCs/withInlineItemAndSwitchSelection";
 import { InlineSwitchList } from "@/components/Selects/exports/vertical-field-select.exports";
 import type { VerticalSelectMetaData } from "@/components/Selects/types/select.types.ts";
 import {
@@ -11,7 +12,6 @@ import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/s
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils";
 import { useEffect, useEffectEvent, type MouseEvent } from "react";
-import { useShallow } from "zustand/shallow";
 
 export function StepTwoController({
   pageId,
@@ -20,20 +20,17 @@ export function StepTwoController({
   className,
   inputControllers = [],
 }: StepTwoControllerProps) {
-  const preparedStudentsTasksSelection = useEvaluationStepsCreationStore(
-    useShallow((state) => state.getStudentsPresenceSelectionData),
-  )();
+  const preparedStudentsTasksSelection = useEvaluationStepsCreationStore
+    .getState()
+    .getStudentsPresenceSelectionData();
 
-  const setStudentPresence = useEvaluationStepsCreationStore(
-    (state) => state.setStudentPresence,
-  );
-  const setStudentTaskAssignment = useEvaluationStepsCreationStore(
-    (state) => state.setStudentTaskAssignment,
-  );
-
-  const setAllNonPresentStudents = useEvaluationStepsCreationStore(
-    (state) => state.setAllNonPresentStudents,
-  );
+  const {
+    setStudentPresence,
+    setAllStudentsPresence,
+    setStudentTaskAssignment,
+    setAllNonPresentStudents,
+    allPresent,
+  } = useEvaluationStepsCreationStore();
 
   const { setRef, observedRefs } = useCommandHandler({
     form,
@@ -63,10 +60,11 @@ export function StepTwoController({
     meta?: VerticalSelectMetaData,
   ) => {
     if (!isStepTwoOnSelectPropsValid(meta)) {
-      debugLogs(
-        "[StepTwoController#handleOnSelect]: There is no ID in metadata, selection ignored.",
-        { meta },
-      );
+      debugLogs("StepTwoController:handleOnSelect", {
+        type: "propsValidation",
+        meta,
+        message: "There is no ID in metadata, selection ignored.",
+      });
       return;
     }
     const studentId = meta?.id;
@@ -75,8 +73,9 @@ export function StepTwoController({
     const parsed = UUID_SCHEMA.safeParse(taskId);
     if (!parsedStudentId.success || !parsed.success) {
       debugLogs(
-        "[StepTwoController#handleOnSelect]: Invalid student ID in metadata, selection ignored.",
+        "StepTwoController:handleOnSelect - Invalid student ID in metadata, selection ignored.",
         {
+          type: "componentHandler",
           studentId,
           error: parsedStudentId.error,
           taskId,
@@ -92,7 +91,7 @@ export function StepTwoController({
   /**
    * Handle switch click from VerticalFieldWithInlineSwitchList
    *
-   * @description Updates the selected diploma reference and selection state.
+   * @description Updates the selected task for the student based on the switch state.
    *
    * @param e - The mouse event triggered by the switch click
    * @param studentData - The details of the selected student data
@@ -105,13 +104,32 @@ export function StepTwoController({
     const parsed = UUID_SCHEMA.safeParse(studentData.id);
     if (!parsed.success) {
       debugLogs(
-        "[StepTwoController#handleOnSwitch]: Invalid student ID in switch payload, selection ignored.",
-        { studentId: studentData.id, error: parsed.error },
+        "StepTwoController:handleOnSwitch - Invalid student ID in switch payload, selection ignored.",
+        {
+          type: "componentHandler",
+          studentId: studentData.id,
+          error: parsed.error,
+        },
       );
       return;
     }
 
     setStudentPresence(parsed.data, studentData.isSelected);
+  };
+
+  /**
+   * Handle switch all on/off
+   *
+   * @description Sets all students as present or not present based on the switch state.
+   * @param e - The mouse event triggered by the switch click
+   * @param studentData - The details of the selected student data
+   */
+  const handleOnSwitchAll = (
+    e: MouseEvent<HTMLButtonElement>,
+    studentData: InlineItemAndSwitchSelectionPayload,
+  ) => {
+    preventDefaultAndStopPropagation(e);
+    setAllStudentsPresence(studentData.isSelected);
   };
 
   /**
@@ -135,6 +153,11 @@ export function StepTwoController({
 
   return (
     <form id={formId} className={className}>
+      <AllOnSwitch
+        isSelected={allPresent}
+        onSwitchClick={handleOnSwitchAll}
+        {...inputControllers[1]}
+      />
       <InlineSwitchList
         items={preparedStudentsTasksSelection}
         setRef={setRef}
@@ -148,3 +171,5 @@ export function StepTwoController({
     </form>
   );
 }
+
+const AllOnSwitch = withInlineItemAndSwitchSelection(() => null);

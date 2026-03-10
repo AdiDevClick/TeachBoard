@@ -82,6 +82,9 @@ export function SearchStudentsController({
       apiEndpoint: API_ENDPOINTS.GET.STUDENTS.endpoint,
       task: pageId,
       form,
+      searchParams: {
+        filterBy: "classId",
+      },
     };
     openingCallback(true, metaData);
   });

@@ -1,4 +1,5 @@
 import { FormWithDebug } from "@/components/Form/FormWithDebug";
+import { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input.exports";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
 import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/labelled-textarea";
 import { LabelledAccordion } from "@/features/evaluations/create/components/Accordion/LabelledAccordion";
@@ -36,6 +37,11 @@ export function StepFourController({
 
   return (
     <>
+      <ControlledLabelledInput
+        control={form.control}
+        {...inputControllers.title}
+        defaultValue={form.getValues("title")}
+      />
       <LabelledAccordion
         inputController={inputControllers.modules}
         accordionItems={modules}

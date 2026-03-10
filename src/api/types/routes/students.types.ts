@@ -15,6 +15,7 @@ export interface StudentDto {
   id: UUID;
   firstName: string;
   lastName: string;
+  fullName?: string;
   email?: Email;
   username?: string;
   role?: Extract<AppRoles, "STUDENT">;

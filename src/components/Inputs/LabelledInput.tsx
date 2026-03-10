@@ -6,6 +6,7 @@ import {
   labelledInputContainsInvalid,
 } from "@/configs/app-components.config.ts";
 import sanitizeDOMProps from "@/utils/props.ts";
+import { cn } from "@/utils/utils";
 
 /**
  * A labelled input component integrated with react-hook-form Controller.
@@ -19,7 +20,7 @@ export function LabelledInput(props: LabelledInputProps) {
     return null;
   }
 
-  const { name, title, ...rest } = props;
+  const { name, title, className, fullWidth = true, ...rest } = props;
   const safeProps = sanitizeDOMProps(rest, [
     "form",
     "onOpenChange",
@@ -28,13 +29,19 @@ export function LabelledInput(props: LabelledInputProps) {
     "fieldState",
   ]);
   const labelName = name ?? "input-is-not-named";
+  const inputWidth = fullWidth ? "" : "w-fit!";
 
   return (
     <>
       <Label className={title ? "" : "hidden"} htmlFor={labelName}>
         {title}
       </Label>
-      <Input required {...safeProps} id={labelName} />
+      <Input
+        className={cn(inputWidth, className)}
+        required
+        {...safeProps}
+        id={labelName}
+      />
     </>
   );
 }

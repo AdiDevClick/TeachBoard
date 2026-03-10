@@ -161,16 +161,16 @@ export const API_ENDPOINTS = Object.freeze({
           .newShape(),
     },
     STUDENTS: {
-      endpoint: `${STUDENTS}/not-assigned`,
+      endpoint: `${STUDENTS}`,
       dataReshape: (data: StudentsFetch) =>
         dataReshaper(data)
           .assignSourceTo("items")
           .addToRoot({ groupTitle: "Tous" })
-          .createPropertyWithContentFromKeys(
-            ["firstName", "lastName"],
-            "fullName",
-            " ",
-          )
+          // .createPropertyWithContentFromKeys(
+          //   ["firstName", "lastName"],
+          //   "fullName",
+          //   " ",
+          // )
           .setProxyPropertyWithContent("newRole", "Etudiant")
           .assign([
             ["fullName", "value"],
@@ -186,11 +186,11 @@ export const API_ENDPOINTS = Object.freeze({
         dataReshaper(data)
           .assignSourceTo("items")
           .addToRoot({ groupTitle: "Tous" })
-          .createPropertyWithContentFromKeys(
-            ["firstName", "lastName"],
-            "fullName",
-            " ",
-          )
+          // .createPropertyWithContentFromKeys(
+          //   ["firstName", "lastName"],
+          //   "fullName",
+          //   " ",
+          // )
           .setProxyPropertyWithContent("newRole", "Enseignant")
           .assign([
             ["fullName", "value"],

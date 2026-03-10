@@ -37,6 +37,8 @@ export function useStepFourState() {
     useShallow((state) => state.getAllPresentStudents()),
   );
 
+  const { clear } = useEvaluationStepsCreationStore();
+
   return {
     scoreValue,
     nonPresentStudents,
@@ -45,5 +47,6 @@ export function useStepFourState() {
     getEvaluatedStudentsForSubSkill,
     getAllPresentStudents,
     selectedClass,
+    clear,
   };
 }

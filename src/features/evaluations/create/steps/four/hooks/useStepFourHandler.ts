@@ -1,3 +1,4 @@
+import type { UUID } from "@/api/types/openapi/common.types";
 import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types";
 import { debugLogs } from "@/configs/app-components.config";
 import { DEV_MODE } from "@/configs/app.config";
@@ -10,6 +11,7 @@ import {
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import { useEffect, useEffectEvent, useMemo } from "react";
 import { useWatch } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const toastId = "step-four-submit-toast";
@@ -33,6 +35,7 @@ export function useStepFourHandler({
     getEvaluatedStudentsForSubSkill,
     getAllPresentStudents,
     selectedClass,
+    clear,
   } = useStepFourState();
 
   const { submitCallback, invalidSubmitCallback, isLoading, error, response } =
@@ -42,6 +45,9 @@ export function useStepFourHandler({
       submitRoute,
       submitDataReshapeFn,
     });
+
+  const { setValue, reset } = form;
+  const navigate = useNavigate();
 
   // Existing watch for overallScore
   const overallScoreWatch = useWatch({
@@ -95,9 +101,9 @@ export function useStepFourHandler({
         const noAbsentStudents = items?.ids.length === 0;
         const ids = noAbsentStudents ? ["none"] : items?.ids;
 
-        form.setValue("absence", ids!);
-        form.setValue("classId", classId);
-        form.setValue("attendedModules", modules);
+        setValue("absence", ids!);
+        setValue("classId", classId);
+        setValue("attendedModules", modules);
       }
     },
   );
@@ -123,7 +129,7 @@ export function useStepFourHandler({
   const triggerScoreUpdate = useEffectEvent(() => {
     try {
       const parsed = JSON.parse(JSON.stringify(getAllPresentStudents));
-      form.setValue("evaluations", parsed);
+      setValue("evaluations", parsed);
     } catch (error) {
       if (DEV_MODE) {
         debugLogs(
@@ -131,7 +137,7 @@ export function useStepFourHandler({
           error,
         );
       }
-      form.setValue("evaluations", []);
+      setValue("evaluations", []);
     }
   });
 
@@ -156,27 +162,24 @@ export function useStepFourHandler({
     }
     if (error || response) {
       toast.dismiss(toastId);
-      // If there's an error, show an error toast
-      if (error?.status === 400 || error?.status === 401) {
-        toast.error(
-          "Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations et réessayer.",
-        );
+
+      if (error) {
+        reset(undefined, {
+          keepValues: true,
+          keepErrors: true,
+          keepDirty: true,
+          keepTouched: true,
+          keepIsSubmitted: false,
+        });
       }
 
-      form.reset(undefined, {
-        keepValues: true,
-        keepErrors: true,
-        keepDirty: true,
-        keepTouched: true,
-        keepIsSubmitted: false,
-      });
-    }
-
-    if (response) {
-      toast.success("Évaluation créée avec succès !", {
-        id: toastId,
-      });
-      form.reset();
+      if (response) {
+        toast.success("Évaluation créée avec succès !", {
+          id: toastId,
+        });
+        clear(selectedClass?.id as UUID, true);
+        navigate("/evaluations");
+      }
     }
   }, [isLoading, error, response]);
 

@@ -63,7 +63,7 @@ export function useDebouncedChecker<
       const value = event.target.value.trim().toLowerCase();
 
       if (!isValidDebounceAvailabilityMeta(meta) || value.length < 2) {
-        debugLogs("useDebouncedChecker", meta);
+        debugLogs("useDebouncedChecker", { type: "propsValidation", meta });
         return;
       }
 
@@ -79,6 +79,11 @@ export function useDebouncedChecker<
           form.setError(name, error);
         }
         return;
+      }
+
+      // Clear any existing error on the field when starting a new check
+      if (fieldState.error) {
+        form.clearErrors(name);
       }
 
       const computedApiEndpoint =

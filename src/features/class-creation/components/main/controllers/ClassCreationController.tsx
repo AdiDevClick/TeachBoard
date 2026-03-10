@@ -97,7 +97,7 @@ export function ClassCreationController(props: ClassCreationControllerProps) {
 
     availabilityCheck(event, {
       ...meta,
-      searchParams: { by: fieldName },
+      searchParams: { filterBy: fieldName },
     });
   };
 

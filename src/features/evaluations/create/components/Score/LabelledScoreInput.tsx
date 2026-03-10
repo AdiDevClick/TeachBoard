@@ -11,7 +11,6 @@ import {
   labelledScoreInputText,
 } from "@css/LabelledScoreInput.module.scss";
 import { useWatch } from "react-hook-form";
-import { useShallow } from "zustand/shallow";
 
 /**
  * LabelledScoreInput component for displaying and editing the average score of a student.
@@ -21,12 +20,10 @@ import { useShallow } from "zustand/shallow";
  * @param form - The react-hook-form instance for managing form state.
  */
 export function LabelledScoreInput(props: LabelledScoreInputProps) {
-  const setStudentOverallScore = useEvaluationStepsCreationStore(
-    useShallow((state) => state.setStudentOverallScore),
-  );
+  const { setStudentOverallScore } = useEvaluationStepsCreationStore();
 
   const { form, id, item } = props;
-  const watchId = `overallScore.${id}`;
+  const watchId = `overallScore.${id}` as const;
 
   /**
    * Make sure to sync the overallScore with the student's entry in the store -
@@ -38,7 +35,7 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
     name: watchId,
     compute: (score) => {
       if (score) {
-        setStudentOverallScore(id, score);
+        setStudentOverallScore(id, score as number);
       }
     },
   });
@@ -54,6 +51,7 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
           type="number"
           min={0}
           max={20}
+          step={0.25}
           defaultValue={formatParseFloat(item.score / 5)}
         />
         <p>{"/20"}</p>

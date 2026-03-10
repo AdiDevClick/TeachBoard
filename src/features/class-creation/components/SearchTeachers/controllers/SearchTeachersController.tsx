@@ -1,6 +1,7 @@
 import { CommandItemsForComboBox } from "@/components/Command/exports/command-items.exports";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import { resetSelectedItemsFromCache } from "@/features/class-creation/components/main/functions/class-creation.functions";
 import type { SearchPrimaryTeacherControllerProps } from "@/features/class-creation/components/SearchTeachers/types/search-teachers.types.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { useQueryClient } from "@tanstack/react-query";

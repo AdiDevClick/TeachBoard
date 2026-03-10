@@ -108,7 +108,7 @@ export function DegreeModuleController({
 
     availabilityCheck(event, {
       ...meta,
-      searchParams: { by: fieldName },
+      searchParams: { filterBy: fieldName },
     });
   };
 

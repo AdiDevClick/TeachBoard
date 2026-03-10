@@ -1,10 +1,8 @@
 import type { UUID } from "@/api/types/openapi/common.types";
-import type { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input.exports";
 import type { useStepFourState } from "@/features/evaluations/create/hooks/useStepFourState";
 import type { StepFourController } from "@/features/evaluations/create/steps/four/controller/StepFourController";
-import type { ComponentProps } from "react";
 
-type ScoreItem = {
+export type ScoreItem = {
   name: string;
   score: number;
 };
@@ -18,9 +16,9 @@ export type LabelledScoreInputProps = Readonly<{
   /** The unique identifier for the student, used to track which student's score is being edited. */
   id: UUID;
   /**
-   * The react-hook-form instance used to manage the form state for the score input.
+   * The react-hook-form instance for managing form state
    */
-  form: ComponentProps<typeof ControlledLabelledInput>["form"];
+  form: AverageFieldsProps["form"];
 }>;
 
 /**

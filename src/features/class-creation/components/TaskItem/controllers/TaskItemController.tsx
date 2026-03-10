@@ -66,7 +66,7 @@ export function TaskItemController({
 
     availabilityCheck(event, {
       ...meta,
-      searchParams: { by: fieldName },
+      searchParams: { filterBy: fieldName },
     });
   };
 

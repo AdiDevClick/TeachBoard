@@ -1,5 +1,7 @@
+import { debugLogs } from "@/configs/app-components.config";
+import type { TabEvalState } from "@/features/evaluations/create/hooks/types/use-tab-content-handler.types";
 import type { CreateEvaluationsLoaderData } from "@/routes/types/routes-config.types";
-import { useEffect, useEffectEvent, useMemo } from "react";
+import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
 
 /**
@@ -8,6 +10,11 @@ import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
  * @returns
  */
 export function useEvaluationNavigationHandler() {
+  const [tabEvalState, setTabEvalState] = useState<TabEvalState>({
+    slideDirection: "right",
+    tabsSeen: new Set(),
+  });
+
   const { pageDatas } = useLoaderData<CreateEvaluationsLoaderData>();
   const tabItems = Object.values(pageDatas ?? {});
 
@@ -30,7 +37,11 @@ export function useEvaluationNavigationHandler() {
    * @param nextTabValue - The name of the tab to navigate to. It will be converted to lowercase and used as a URL segment.
    */
   const navigateToTab = (nextTabValue: string | undefined) => {
-    navigate(nextTabValue?.toLocaleLowerCase() ?? "", { replace: true });
+    debugLogs("useEvaluationNavigationHandler:navigateToTab", {
+      type: "componentHandler",
+      value: nextTabValue,
+    });
+    navigate(nextTabValue?.toLocaleLowerCase() ?? "");
   };
 
   const pathSegments = location.pathname.split("/").filter(Boolean);
@@ -57,7 +68,15 @@ export function useEvaluationNavigationHandler() {
       return;
     }
 
-    if (currentPathSegment !== tabValue?.toLocaleLowerCase()) {
+    if (
+      currentPathSegment.toLocaleLowerCase() !== tabValue?.toLocaleLowerCase()
+    ) {
+      debugLogs("useEvaluationNavigationHandler:ensureKnownTabRoute", {
+        type: "componentHandler",
+        value: currentPathSegment,
+        expectedValues: tabValues,
+        willForceNavigationTo: pageDatas.step1.name,
+      });
       navigateToTab(pageDatas.step1.name);
     }
   });
@@ -77,5 +96,7 @@ export function useEvaluationNavigationHandler() {
     navigateToTab,
     tabItems,
     pageDatas,
+    tabEvalState,
+    setTabEvalState,
   };
 }
