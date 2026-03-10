@@ -1,11 +1,13 @@
 import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs";
+import type { InpageTabsProps } from "@/components/InPageNavTabs/types/navtabs.types";
 import { Tabs } from "@/components/ui/tabs";
+import { debugLogs } from "@/configs/app-components.config";
 import { TabContentList } from "@/features/evaluations/create/components/Tabs/exports/tab-content.exports";
 import { resolveNavigation } from "@/features/evaluations/create/functions/eval-create-functions";
 import { useEvaluationNavigationHandler } from "@/features/evaluations/create/hooks/useEvaluationNavigationHandler";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types";
 import "@css/PageContent.scss";
-import { useState } from "react";
+import { useMemo } from "react";
 import { Outlet } from "react-router-dom";
 
 /**
@@ -14,12 +16,31 @@ import { Outlet } from "react-router-dom";
  * @description This component renders the Create Evaluations page with tabbed navigation.
  */
 export function CreateEvaluations() {
-  const { pageDatas, tabItems, tabValue, tabValues, navigateToTab } =
-    useEvaluationNavigationHandler();
+  const {
+    pageDatas,
+    tabItems,
+    tabValue,
+    tabValues,
+    navigateToTab,
+    tabEvalState,
+    setTabEvalState,
+  } = useEvaluationNavigationHandler();
 
-  const [slideDirection, setSlideDirection] = useState<"left" | "right">(
-    "right",
-  );
+  /**
+   * Memoized tab trigger data with disabled state based on whether the tab has been seen or not.
+   */
+  const tabsTriggersMemo = useMemo(() => {
+    if (!pageDatas) {
+      return {};
+    }
+
+    return Object.fromEntries(
+      Object.entries(pageDatas).map(([key, item]) => {
+        const disabled = !tabEvalState.tabsSeen.has(item.name);
+        return [key, { ...item, disabled }];
+      }),
+    ) satisfies InpageTabsProps["datas"];
+  }, [pageDatas, tabEvalState]);
 
   if (!pageDatas || tabItems.length === 0) {
     return <div>Loading...</div>;
@@ -36,22 +57,40 @@ export function CreateEvaluations() {
     onClick: handleOnArrowClick,
     clickProps: {
       arrayLength: Object.keys(pageDatas).length,
-      setSlideDirection,
       setTabValue: navigateToTab,
+      setTabEvalState,
       tabValues,
     },
     tabValue,
   };
 
+  /**
+   * Handle the end of the outgoing animation -
+   *
+   * @description The animation triggers the tab value change that will switch content
+   *
+   * @important This onChange avoids a concurrence triggering navigation bug - DO NOT REMOVE to use navigateToTab directly in the onValueChange props
+   *
+   * @param value - The new tab value
+   */
+  const onChange = (value: string) => {
+    debugLogs("CreateEvaluations:onChange", {
+      type: "componentHandler",
+      value,
+      tabEvalState,
+    });
+    navigateToTab(value);
+  };
+
   return (
     <Tabs
       value={tabValue}
-      onValueChange={navigateToTab}
-      data-slide-direction={slideDirection}
-      className="page__content-container"
+      onValueChange={onChange}
+      data-slide-direction={tabEvalState.slideDirection}
+      className={"page__content-container"}
     >
       <InpageTabs
-        datas={pageDatas}
+        datas={tabsTriggersMemo}
         value={tabValue}
         onValueChange={navigateToTab}
       />
@@ -76,11 +115,11 @@ function handleOnArrowClick({
   const {
     index,
     arrayLength,
-    setSlideDirection,
     setTabState,
     tabValues,
     setOpen: setSideBarOpen,
     open,
+    setTabEvalState,
   } = clickProps;
 
   const navigation = resolveNavigation({
@@ -91,7 +130,15 @@ function handleOnArrowClick({
 
   if (!navigation) return;
 
-  setSlideDirection(navigation.incomingDirection);
+  setTabEvalState((prev) => {
+    const tabsSeen = new Set(prev.tabsSeen);
+    tabsSeen.add(tabValues[navigation.nextIndex]);
+    return {
+      ...prev,
+      slideDirection: navigation.incomingDirection,
+      tabsSeen,
+    };
+  });
 
   if (navigation.incomingDirection === "right") {
     if (open) {
