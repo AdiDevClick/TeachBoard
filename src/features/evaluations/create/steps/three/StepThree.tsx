@@ -42,7 +42,6 @@ export function StepThree({
   inputControllers = attendanceRecordCreationBaseControllers,
   ...props
 }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
-  const user = useAppStore((state) => state.user);
   const {
     selectedClass,
     tasks,
@@ -51,13 +50,17 @@ export function StepThree({
     selectedSubSkill,
     evaluatedStudentsForThisSubskill,
     setShowStudentsEvaluation,
+    getAttendedModules,
   } = useStepThreeState();
 
+  const user = useAppStore((state) => state.user);
   const isModuleClicked = moduleSelectionState.isClicked;
 
   const { isModuleLoaded, setIsModuleLoaded } = useStepThree({
+    selectedClass,
     isModuleClicked,
     setShowStudentsEvaluation,
+    getAttendedModules,
   });
 
   const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({
@@ -67,6 +70,17 @@ export function StepThree({
       students: [],
     },
   });
+
+  /**
+   * ANIMATION END HANDLER -
+   *
+   * @description Makes sure to set the module as loaded to trigger the display of the students evaluation
+   */
+  const handleAnimationEnd = (e: AnimationEvent<HTMLElement>) => {
+    if (e.animationName === "step-three-module-out") {
+      setIsModuleLoaded(true);
+    }
+  };
 
   const baseCardProps = {
     pageId,
@@ -92,17 +106,6 @@ export function StepThree({
     selectedClass: selectedClass ?? null,
     tasks,
   } satisfies Parameters<typeof ShowStudentsEvaluation>[0];
-
-  /**
-   * ANIMATION END HANDLER -
-   *
-   * @description Makes sure to set the module as loaded to trigger the display of the students evaluation
-   */
-  const handleAnimationEnd = (e: AnimationEvent<HTMLElement>) => {
-    if (e.animationName === "step-three-module-out") {
-      setIsModuleLoaded(true);
-    }
-  };
 
   return (
     <>
