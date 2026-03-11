@@ -119,6 +119,18 @@ export const ROUTES_CHILDREN: RouteObject[] = [
           };
         },
       },
+      {
+        path: "TP",
+        element: <Evaluations />,
+      },
+      {
+        path: "Atelier",
+        // element: <AtelierEvaluations />,
+      },
+      {
+        path: "Techno",
+        // element: <TechnoEvaluations />,
+      },
       // The page is split into 2 zones :
       // - Left zone : Description or Subskills list
       // - Right zone : Evaluation and module selection
