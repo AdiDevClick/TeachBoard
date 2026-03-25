@@ -1,12 +1,13 @@
 import { SimpleAvatarList } from "@/components/Avatar/SimpleAvatar.tsx";
-import { SimpleAddButtonWithToolTip } from "@/components/Buttons/SimpleAddButton.tsx";
+import { SimpleAddButtonWithToolTip } from "@/components/Buttons/exports/buttons.exports";
 import type { AvatarListWithLabelAndAddButtonProps } from "@/components/Form/types/form.types.ts";
 import { Label } from "@/components/ui/label.tsx";
 import {
   avatarListWithLabelAndAddButtonPropsInvalid,
   debugLogs,
 } from "@/configs/app-components.config";
-import { cn } from "@/utils/utils.ts";
+import { cn, preventDefaultAndStopPropagation } from "@/utils/utils.ts";
+import type { MouseEvent } from "react";
 
 /**
  * Avatar list component with a label and an add button.
@@ -23,20 +24,32 @@ export function AvatarListWithLabelAndAddButton(
   props: AvatarListWithLabelAndAddButtonProps,
 ) {
   if (avatarListWithLabelAndAddButtonPropsInvalid(props)) {
-    debugLogs("AvatarListWithLabelAndAddButton", props);
+    debugLogs("AvatarListWithLabelAndAddButton", {
+      type: "propsValidation",
+      props,
+    });
   }
 
-  const { items, toolTipText, onClick, label, className, ...rest } = props;
+  const { items, label, className, onClick: externalOnClick, ...rest } = props;
+
+  /**
+   * Handle click event for the button.
+   *
+   * @description Adds other data to the event handler if needed.
+   */
+  const handleLocalClick = (e: MouseEvent<HTMLButtonElement>) => {
+    preventDefaultAndStopPropagation(e);
+
+    if (externalOnClick) {
+      externalOnClick({ e, ...rest });
+    }
+  };
 
   return (
     <div className={cn(className, "grid gap-2")}>
       <Label>{label ?? "No label"}</Label>
       <SimpleAvatarList items={items} />
-      <SimpleAddButtonWithToolTip
-        {...rest}
-        toolTipText={toolTipText ?? "No tooltip text"}
-        onClick={onClick}
-      />
+      <SimpleAddButtonWithToolTip {...rest} onClick={handleLocalClick} />
     </div>
   );
 }
