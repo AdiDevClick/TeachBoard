@@ -1,7 +1,9 @@
 import type { SimpleAvatarListProps } from "@/components/Avatar/types/avatar.types.ts";
-import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
+import type { SimpleAddButtonWithToolTip } from "@/components/Buttons/exports/buttons.exports";
+import type { Button } from "@/components/ui/button";
+import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types";
 import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types";
-import type { PropsWithChildren } from "react";
+import type { ComponentProps, PropsWithChildren } from "react";
 import type {
   FieldErrors,
   FieldValues,
@@ -12,7 +14,12 @@ import type {
 /** Props for AvatarListWithLabelAndAddButton component */
 export type AvatarListWithLabelAndAddButtonProps = SimpleAvatarListProps & {
   label?: string;
-} & SimpleAddButtonWithToolTipProps;
+  className?: string;
+  onClick?: (
+    payload: HandleAddNewItemParams &
+      Omit<ComponentProps<typeof Button>, "onClick">,
+  ) => void;
+} & Omit<ComponentProps<typeof SimpleAddButtonWithToolTip>, "onClick">;
 
 /**
  * Props for FormWithDebug component
