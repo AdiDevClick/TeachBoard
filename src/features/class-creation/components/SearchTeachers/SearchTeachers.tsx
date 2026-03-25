@@ -28,7 +28,7 @@ export function SearchPrimaryTeacher({
     resolver: zodResolver(SearchPrimaryTeacherSchema),
     mode: "onTouched",
     defaultValues: {
-      primaryTeacherId: props.form?.watch("primaryTeacherId"),
+      primaryTeacherId: props.form?.watch("primaryTeacherId") ?? "",
     },
   });
   const formId = pageId + "-form";
