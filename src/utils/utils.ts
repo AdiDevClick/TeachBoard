@@ -542,6 +542,7 @@ function displayLogs(
 ) {
   if (forbiddenPresent) {
     debugLogs(`Props validation failed: Forbidden prop key(s) present in`, {
+      type: "forbiddenProp",
       ...baseDetails,
     });
   }
@@ -549,7 +550,7 @@ function displayLogs(
   if (requiredIsMissing) {
     debugLogs(
       `Props validation failed: Required prop key(s) missing or invalid in`,
-      { ...baseDetails },
+      { type: "propsValidation", ...baseDetails },
     );
   }
 }
