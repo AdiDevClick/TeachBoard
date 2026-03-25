@@ -1,7 +1,10 @@
 import { CommandItemsForComboBox } from "@/components/Command/exports/command-items.exports";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
+import {
+  debugLogs,
+  validSearchTeacherOrStudentProps,
+} from "@/configs/app-components.config";
 import type { SearchStudentsControllerProps } from "@/features/class-creation/components/SearchStudents/types/search-students.types.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
 import { useEffect, useEffectEvent } from "react";
@@ -42,13 +45,13 @@ export function SearchStudentsController({
     _value: string,
     commandItemDetails: CommandItemType,
   ) => {
-    if (commandItemDetails.id === undefined || commandItemDetails.id === null) {
-      if (DEV_MODE && !NO_CACHE_LOGS) {
-        console.warn(
-          "Selected command item has no ID, selection ignored:",
-          commandItemDetails,
-        );
-      }
+    if (!validSearchTeacherOrStudentProps(commandItemDetails)) {
+      debugLogs("SearchPrimaryTeacherController:handleOnSelect", {
+        type: "componentHandler",
+        message: "Selected command item has no ID, selection ignored",
+        commandItemDetails,
+      });
+
       return;
     }
 
