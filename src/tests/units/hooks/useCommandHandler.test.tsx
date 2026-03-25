@@ -240,7 +240,7 @@ describe("useCommandHandler - basic behaviours", () => {
       expect.objectContaining({
         endpoint: skillApiEndpoint,
         method: "POST",
-        type: "fetch",
+        type: "useFetch",
       }),
     );
   });
@@ -281,7 +281,7 @@ describe("useCommandHandler - basic behaviours", () => {
       expect.objectContaining({
         endpoint: skillApiEndpoint,
         method: "GET",
-        type: "fetch",
+        type: "useFetch",
       }),
     );
   });
