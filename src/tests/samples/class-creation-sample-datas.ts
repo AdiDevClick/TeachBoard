@@ -16,6 +16,9 @@ import {
   TeacherFixtureCreator,
 } from "@/utils/FixtureCreator";
 
+const buildFullName = (firstName: string, lastName: string): string =>
+  `${firstName} ${lastName}`.trim();
+
 export const degreeFieldModal: AppModalNames = "new-degree-item-field";
 export const degreeYearModal: AppModalNames = "new-degree-item-year";
 export const degreeLevelModal: AppModalNames = "new-degree-item-level";
@@ -151,9 +154,29 @@ export const studentFetched = new StudentFixtureCreator();
 
 export const studentFetched2 = new StudentFixtureCreator();
 
+export const studentFetchedFullName = buildFullName(
+  studentFetched.firstName,
+  studentFetched.lastName,
+);
+
+export const studentFetched2FullName = buildFullName(
+  studentFetched2.firstName,
+  studentFetched2.lastName,
+);
+
 export const teacherFetched = new TeacherFixtureCreator();
 
 export const teacherFetched2 = new TeacherFixtureCreator();
+
+export const teacherFetchedFullName = buildFullName(
+  teacherFetched.firstName,
+  teacherFetched.lastName,
+);
+
+export const teacherFetched2FullName = buildFullName(
+  teacherFetched2.firstName,
+  teacherFetched2.lastName,
+);
 
 export const skillsModulesFetched = {
   Skills: [
