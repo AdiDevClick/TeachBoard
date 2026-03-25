@@ -47,9 +47,7 @@ describe("API_ENDPOINTS full contract", () => {
     ).toBe("/api/task-templates/by-degree-config/abc");
 
     expect(API_ENDPOINTS.GET.TASKS.endpoints.ALL).toBe("/api/tasks");
-    expect(API_ENDPOINTS.GET.STUDENTS.endpoint).toBe(
-      "/api/students/not-assigned",
-    );
+    expect(API_ENDPOINTS.GET.STUDENTS.endpoint).toBe("/api/students");
     expect(API_ENDPOINTS.GET.TEACHERS.endpoint).toBe("/api/teachers/");
 
     expect(API_ENDPOINTS.GET.AUTH.SIGNUP_VALIDATION).toBe("/api/auth/verify/");
@@ -148,6 +146,7 @@ describe("API_ENDPOINTS full contract", () => {
         id: "22222222-2222-4222-8222-222222222222",
         firstName: "Alice",
         lastName: "Doe",
+        fullName: "Alice Doe",
         img: "img.png",
       },
     ];
@@ -168,6 +167,7 @@ describe("API_ENDPOINTS full contract", () => {
         id: "33333333-3333-4333-8333-333333333333",
         firstName: "Bob",
         lastName: "Smith",
+        fullName: "Bob Smith",
         img: "img.png",
       },
     ];
