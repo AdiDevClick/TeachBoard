@@ -111,7 +111,7 @@ export const appBreadCrumbListPropsInvalid = (props: AppBreadCrumbListProps) =>
  */
 const DEBOUNCE_AVAILABILITY_CHECK_REQUIRES = [
   "apiEndpoint",
-  { searchParams: ["by"] },
+  { searchParams: ["filterBy"] },
   "name",
   "task",
 ];
