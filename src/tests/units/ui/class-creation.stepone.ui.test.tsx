@@ -5,7 +5,7 @@ import {
   classFetched2,
   diplomaFetched,
   diplomaFetched2,
-  studentFetched,
+  studentFetchedFullName,
   taskFetched,
   taskFetched2,
   taskFetched3,
@@ -27,7 +27,6 @@ import {
   openPopoverAndExpectByLabel,
   queryKeyFor,
   rx,
-  rxJoin,
   stubFetchRoutes,
   submitButtonShouldBeDisabled,
   waitForDialogState,
@@ -64,11 +63,11 @@ const tasksNames = [
 const tasksToSelectForSubmit = tasksNames.slice(0, 3);
 const labels = [
   {
-    name: rx(TASK_TEMPLATE_CREATION_INPUTS_CONTROLLERS[0].title!),
+    name: rx(TASK_TEMPLATE_CREATION_INPUTS_CONTROLLERS[0].title),
     value: "template",
   },
   {
-    name: rx(TASK_TEMPLATE_CREATION_INPUTS_CONTROLLERS[1].title!),
+    name: rx(TASK_TEMPLATE_CREATION_INPUTS_CONTROLLERS[1].title),
     value: "Une description suffisamment longue.",
   },
 ];
@@ -115,7 +114,7 @@ function data(
     createClassPostEndpoint,
     classFetched: classFetched as unknown as ClassDto,
     classFetched2: classFetched2 as unknown as ClassDto,
-    studentName: rxJoin(studentFetched.firstName, studentFetched.lastName),
+    studentName: rx(studentFetchedFullName),
   };
 }
 
@@ -169,6 +168,7 @@ setupUiTestState(null, {
 
     // Ensure the test selects at least 3 templates during creation to reflect the multi-select feature
     flowArgs.tasksToSelect = tasksToSelectForSubmit;
+    flowArgs.taskTemplateIdByName = taskTemplateIdByName;
 
     const flowArgs2 = {
       ...flowArgs,
@@ -180,6 +180,7 @@ setupUiTestState(null, {
 
     // Also select at least 3 templates for the optional-fields flow
     flowArgs2.tasksToSelect = tasksToSelectForSubmit;
+    flowArgs2.taskTemplateIdByName = taskTemplateIdByName;
 
     const flowArgsToggle: RunCreateFlowArgs = {
       ...flowArgs,
