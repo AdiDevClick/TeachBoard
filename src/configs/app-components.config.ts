@@ -284,7 +284,7 @@ export function simpleAvatarPropsInvalid(props: SimpleAvatarProps) {
 /**
  * Validation requirements for SimpleAddButtonWithToolTip component.
  *
- * {@link import("@/components/Buttons/SimpleAddButton.tsx").SimpleAddButtonWithToolTip}
+ * {@link import("@/components/Buttons/exports/buttons.exports.tsx").SimpleAddButtonWithToolTip}
  */
 const SIMPLE_ADD_BUTTON_REQUIRES = ["toolTipText"];
 export function withToolTipPropsInvalid(props: WithToolTipProps) {
