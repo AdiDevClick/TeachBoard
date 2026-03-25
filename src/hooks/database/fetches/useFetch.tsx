@@ -1,10 +1,7 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import {
-  DEV_MODE,
-  NO_QUERY_LOGS,
-  USER_ACTIVITIES,
-} from "@/configs/app.config.ts";
+import { debugLogs } from "@/configs/app-components.config";
+import { USER_ACTIVITIES } from "@/configs/app.config.ts";
 import {
   cacheFetchResult,
   createSearchParamsEndpoint,
@@ -102,16 +99,13 @@ export function useFetch<
           response,
         );
 
-        if (DEV_MODE && !NO_QUERY_LOGS) {
-          console.debug(
-            "[useFetch:onSuccess] endpoint:",
-            fetchParams.url,
-            "response.data:",
-            response.data,
-            "reshapedResult:",
-            cachingDatas,
-          );
-        }
+        debugLogs("[useFetch:onSuccess] endpoint:", {
+          type: "queryLogs",
+          url: fetchParams.url,
+          responseData: response.data,
+          reshapedResult: cachingDatas,
+          message: "Fetch successful",
+        });
 
         setViewData(cachingDatas as TViewData);
 
@@ -149,16 +143,13 @@ export function useFetch<
           // cached value as authoritative.
           setViewData(cachedData as TViewData);
 
-          if (DEV_MODE && !NO_QUERY_LOGS) {
-            console.debug(
-              "[useFetch:onError] endpoint:",
-              fetchParams.url,
-              "error.data:",
-              error.data,
-              "reshapedResult:",
-              cachedData,
-            );
-          }
+          debugLogs("[useFetch:onError] endpoint:", {
+            type: "queryLogs",
+            url: fetchParams.url,
+            responseData: error.data,
+            reshapedResult: cachedData,
+            message: error.message,
+          });
         }
 
         // !! IMPORTANT !! Handle forbidden error by navigating to login page

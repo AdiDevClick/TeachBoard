@@ -13,12 +13,4 @@ export type LoginButtonProps = ComponentProps<"button"> &
   (LoginButtonsSvgsType | SafeListMapperProp<LoginButtonsSvgsType>);
 
 /** SimpleAddButton types */
-export type SimpleAddButtonWithToolTipProps = Omit<
-  ComponentProps<typeof Button>,
-  "onClick"
-> & {
-  toolTipText?: string;
-  onClick?: (
-    payload: HandleAddNewItemParams & Omit<ComponentProps<typeof Button>, "onClick">
-  ) => void;
-};
+export type SimpleAddButtonProps = ComponentProps<typeof Button>;

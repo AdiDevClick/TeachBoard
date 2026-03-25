@@ -1,9 +1,9 @@
 import type { SimpleAvatarProps } from "@/components/Avatar/types/avatar.types.ts";
 import type { AppBreadCrumbListProps } from "@/components/BreadCrumbs/types/breadcrumbs.types";
-import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import type { DropdownsProps } from "@/components/Dropdowns/types/dropdowns.types";
 import type { AvatarListWithLabelAndAddButtonProps } from "@/components/Form/types/form.types";
+import type { WithToolTipProps } from "@/components/HOCs/types/with-tooltip.types";
 import type { LabelledInputProps } from "@/components/Inputs/types/inputs.types";
 import type {
   EvaluationRadioItemDescriptionProps,
@@ -18,8 +18,10 @@ import type { LabelledTextAreaProps } from "@/components/TextAreas/types/textare
 import {
   DEV_MODE,
   NO_ANIMATIONS_LOGS,
+  NO_CACHE_LOGS,
   NO_COMPONENT_HANDLER_WARNING_LOGS,
   NO_COMPONENT_PROPS_WARNING_LOGS,
+  NO_QUERY_LOGS,
 } from "@/configs/app.config.ts";
 import type { LoginFormControllerProps } from "@/features/auth/components/login/controller/types/login-form-controller.types";
 import type { ClassCreationControllerProps } from "@/features/class-creation/components/main/types/class-creation.types";
@@ -109,7 +111,7 @@ export const appBreadCrumbListPropsInvalid = (props: AppBreadCrumbListProps) =>
  */
 const DEBOUNCE_AVAILABILITY_CHECK_REQUIRES = [
   "apiEndpoint",
-  { searchParams: ["by"] },
+  { searchParams: ["filterBy"] },
   "name",
   "task",
 ];
@@ -285,10 +287,7 @@ export function simpleAvatarPropsInvalid(props: SimpleAvatarProps) {
  * {@link import("@/components/Buttons/SimpleAddButton.tsx").SimpleAddButtonWithToolTip}
  */
 const SIMPLE_ADD_BUTTON_REQUIRES = ["toolTipText"];
-
-export function simpleAddButtonWithToolTipPropsInvalid(
-  props: SimpleAddButtonWithToolTipProps,
-) {
+export function withToolTipPropsInvalid(props: WithToolTipProps) {
   return checkPropsValidity(props, SIMPLE_ADD_BUTTON_REQUIRES, []);
 }
 
@@ -487,8 +486,34 @@ export const isStepTwoOnSelectPropsValid = (
 
 //                    ------------
 
+/**
+ * Validation requirements for SearchTeachersController and SearchStudentsController handleOnSelect
+ *
+ * {@link import("@/features/class-creation/components/SearchTeachers/controllers/SearchTeachersController.tsx").SearchPrimaryTeacherController}
+ * {@link import("@/features/class-creation/components/SearchStudents/controllers/SearchStudentsController.tsx").SearchStudentsController}
+ */
+const SEARCH_TEACHER_OR_STUDENT_ON_SELECT_REQUIRES = ["id"];
+
+export const validSearchTeacherOrStudentProps = (props: CommandItemType) => {
+  if (!props) return false;
+
+  return !checkPropsValidity(
+    props,
+    SEARCH_TEACHER_OR_STUDENT_ON_SELECT_REQUIRES,
+    [],
+  );
+};
+
+//                    ------------
+
 type DebugDetails = {
-  type: "componentHandler" | "propsValidation" | "animation";
+  type:
+    | "componentHandler"
+    | "propsValidation"
+    | "animation"
+    | "forbiddenProp"
+    | "queryLogs"
+    | "cacheLogs";
   [key: string]: unknown;
 };
 /**
@@ -525,12 +550,25 @@ export function debugLogs(componentName: string, details?: DebugDetails) {
         console.log(`[${componentName}] - Animation state change.`, allDetails);
       }
       break;
-    default:
+    case "forbiddenProp":
       if (!NO_COMPONENT_PROPS_WARNING_LOGS) {
         console.error(
-          `[${componentName}] - Invalid props detected. Please check the component configuration.`,
+          `[${componentName}] - Forbidden prop detected. Please check the component configuration.`,
           allDetails,
         );
       }
+      break;
+    case "queryLogs":
+      if (!NO_QUERY_LOGS) {
+        console.debug(`[${componentName}] - Query logs.`, allDetails);
+      }
+      break;
+    case "cacheLogs":
+      if (!NO_CACHE_LOGS) {
+        console.debug(`[${componentName}] - Cache logs.`, allDetails);
+      }
+      break;
+    default:
+      console.log(`[${componentName}] - Debug log.`, allDetails);
   }
 }

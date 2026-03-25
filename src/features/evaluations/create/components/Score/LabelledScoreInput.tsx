@@ -34,7 +34,7 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
     control: form?.control,
     name: watchId,
     compute: (score) => {
-      if (score) {
+      if (Number.isFinite(score)) {
         setStudentOverallScore(id, score as number);
       }
     },

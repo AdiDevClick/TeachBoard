@@ -1,4 +1,4 @@
-import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
+import { debugLogs } from "@/configs/app-components.config";
 import { USE_QUERY_DEFAULT_STATE_PARAM } from "@/hooks/database/configs/use-query-on-submit.configs";
 import { mutationOptions } from "@/hooks/database/functions/use-query-on-submit.functions";
 import type {
@@ -100,19 +100,20 @@ export function useQueryOnSubmit<
           abortController: abortControllerRef.current,
         };
 
-        if (DEV_MODE && !NO_QUERY_LOGS) {
-          console.debug("useQueryOnSubmit executing mutation", {
-            key: queryKeysArr?.[0],
-            url: queryKeysArr?.[1]?.url,
-            method: queryKeysArr?.[1]?.method,
-          });
-        }
+        debugLogs("useQueryOnSubmit:onSubmit", {
+          type: "queryLogs",
+          key: queryKeysArr?.[0],
+          url: queryKeysArr?.[1]?.url,
+          method: queryKeysArr?.[1]?.method,
+        });
 
         return await mutateAsync(payload);
       } catch (err) {
-        if (DEV_MODE && !NO_QUERY_LOGS) {
-          console.error("useQueryOnSubmit mutation rejected", err);
-        }
+        debugLogs("useQueryOnSubmit mutation rejected", {
+          type: "queryLogs",
+          error: err,
+        });
+
         return err;
       }
     },

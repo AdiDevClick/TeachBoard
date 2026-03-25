@@ -262,6 +262,20 @@ export function stubFetchRoutes({
   readonly postRoutes?: readonly StubRoute[];
   readonly defaultGetPayload?: unknown;
 }) {
+  const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
+
+  const isStringRouteMatch = (urlStr: string, match: string) => {
+    const normalizedUrl = trimTrailingSlash(urlStr);
+    const normalizedMatch = trimTrailingSlash(match);
+
+    return (
+      urlStr.includes(match) ||
+      normalizedUrl.includes(match) ||
+      urlStr.includes(normalizedMatch) ||
+      normalizedUrl.includes(normalizedMatch)
+    );
+  };
+
   vi.stubGlobal(
     "fetch",
     vi.fn().mockImplementation((url: string, init?: RequestInit) => {
@@ -276,7 +290,7 @@ export function stubFetchRoutes({
           const isMatch =
             match instanceof RegExp
               ? match.test(urlStr)
-              : urlStr.includes(match);
+              : isStringRouteMatch(urlStr, match);
           if (isMatch) {
             // Debug stubbed POST
             console.debug("[stubFetchRoutes] POST matched", match, payload);
@@ -289,7 +303,9 @@ export function stubFetchRoutes({
 
       for (const [match, payload] of getRoutes) {
         const isMatch =
-          match instanceof RegExp ? match.test(urlStr) : urlStr.includes(match);
+          match instanceof RegExp
+            ? match.test(urlStr)
+            : isStringRouteMatch(urlStr, match);
         if (isMatch) {
           // Debug stubbed GET
           console.debug("[stubFetchRoutes] GET matched", match, payload);

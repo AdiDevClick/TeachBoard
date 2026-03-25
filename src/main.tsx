@@ -114,11 +114,11 @@ export function Root({ contentType }: Readonly<RootProps>) {
   useEffect(() => {
     const path = location.pathname;
 
+    const lastEntry = lastUserActivity.entries().next().value;
+
     const isPublicPage = doesContainNoSessionPage(path);
-    const lastActivityWasLogout =
-      lastUserActivity.entries().next().value?.[0] === "logout";
-    const lastActivityWasForbidden =
-      lastUserActivity.entries().next().value?.[1].status === 403;
+    const lastActivityWasLogout = lastEntry?.[0] === "logout";
+    const lastActivityWasForbidden = lastEntry?.[1]?.status === 403;
 
     switch (true) {
       case lastActivityWasForbidden && isPublicPage:

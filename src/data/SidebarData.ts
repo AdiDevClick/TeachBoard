@@ -104,13 +104,13 @@ export const sidebarDatas = {
       {
         title: "Evaluations",
         tooltip: "Gérer mes évaluations",
-        url: "#",
+        url: "/evaluations",
         icon: IconFileCertificate,
         isActive: false,
         subMenus: [
           {
             title: "TP",
-            url: "#",
+            url: "/evaluations/TP",
             icon: GraduationCap,
           },
           {

@@ -4,7 +4,9 @@
  */
 
 import { LoginButton } from "@/components/Buttons/LoginButton";
+import { SimpleAddButton } from "@/components/Buttons/SimpleAddButton";
 import withListMapper from "@/components/HOCs/withListMapper";
+import { withToolTip } from "@/components/HOCs/withToolTip";
 import { createComponentName } from "@/utils/utils";
 import { lazy } from "react";
 
@@ -33,4 +35,15 @@ createComponentName(
   "withListMapper",
   "LazyLoginButtonList",
   LazyLoginButtonList,
+);
+
+/**
+ * Exporting the SimpleAddButton component that can display a tooltip on hover, wrapped with the withToolTip HOC.
+ */
+export const SimpleAddButtonWithToolTip = withToolTip(SimpleAddButton);
+
+createComponentName(
+  "withToolTip",
+  "SimpleAddButtonWithToolTip",
+  SimpleAddButtonWithToolTip,
 );

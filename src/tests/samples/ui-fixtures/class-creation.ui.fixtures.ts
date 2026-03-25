@@ -20,6 +20,7 @@ import {
   diplomaFetched2,
   skillsModulesFetched,
   studentFetched,
+  studentFetchedFullName,
   taskCreated,
   taskFetched,
   taskFetched2,
@@ -399,7 +400,12 @@ const routes = (
         },
         {
           url: { controller: controllers.studentsController },
-          response: ({ sample }: StubRouteCtx) => [sample.studentFetched],
+          response: ({ sample }: StubRouteCtx) => [
+            {
+              ...sample.studentFetched,
+              fullName: studentFetchedFullName,
+            },
+          ],
         },
         {
           url: { controller: controllers.diplomaModuleController },

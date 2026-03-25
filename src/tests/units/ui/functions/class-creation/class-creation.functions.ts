@@ -498,6 +498,7 @@ export async function runCreateFlow(args: {
   classFetched2: ClassDto;
   studentName: string | RegExp;
   tasksToSelect?: string[];
+  taskTemplateIdByName?: TaskTemplateIdByName;
   tasksToggleSelection?: {
     availableTaskNames: string[];
     initialSelectNames: [string, string, string];
@@ -572,6 +573,19 @@ export async function runCreateFlow(args: {
   expect(lastBody).toMatchObject({
     schoolYear: `${currentYear}-${currentYear + 1}`,
   });
+
+  if (args.tasksToSelect?.length && args.taskTemplateIdByName) {
+    const expectedIds = args.tasksToSelect
+      .map((name) => args.taskTemplateIdByName?.[name])
+      .filter((id): id is string => Boolean(id));
+
+    const payload = lastBody as Record<string, unknown>;
+    const payloadTasks = payload.tasks;
+
+    expect(Array.isArray(payloadTasks)).toBe(true);
+    expect(payloadTasks).toHaveLength(args.tasksToSelect.length);
+    expect(payloadTasks).toEqual(expect.arrayContaining(expectedIds));
+  }
 
   if (args.tasksToggleSelection) {
     const expectedNames = args.tasksToggleSelection.initialSelectNames

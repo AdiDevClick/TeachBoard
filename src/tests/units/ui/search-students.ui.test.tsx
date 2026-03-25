@@ -5,9 +5,12 @@ import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import {
   studentFetched,
   studentFetched2,
+  studentFetched2FullName,
+  studentFetchedFullName,
 } from "@/tests/samples/class-creation-sample-datas";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { rx, stubFetchRoutes } from "@/tests/test-utils/vitest-browser.helpers";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { page } from "vitest/browser";
@@ -30,7 +33,10 @@ function SearchStudentsHost() {
       primaryTeacherValue: [],
     },
   });
-  mainForm = f;
+
+  useEffect(() => {
+    mainForm = f;
+  }, [f]);
 
   return <SearchStudents form={f} modalMode={false} />;
 }
@@ -45,7 +51,10 @@ setupUiTestState(
         getRoutes: [
           [
             API_ENDPOINTS.GET.STUDENTS.endpoint,
-            [studentFetched, studentFetched2],
+            [
+              { ...studentFetched, fullName: studentFetchedFullName },
+              { ...studentFetched2, fullName: studentFetched2FullName },
+            ],
           ],
         ],
         defaultGetPayload: [],
@@ -57,7 +66,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe("UI flow: search students controller", () => {
   test("displays fetched students and allows selection", async () => {
-    const studentLabel = `${studentFetched.firstName} ${studentFetched.lastName}`;
+    const studentLabel = studentFetchedFullName;
 
     await expect.element(page.getByText(rx(studentLabel))).toBeInTheDocument();
 
@@ -71,8 +80,8 @@ describe("UI flow: search students controller", () => {
   });
 
   test("supports multi-selection", async () => {
-    const label1 = `${studentFetched.firstName} ${studentFetched.lastName}`;
-    const label2 = `${studentFetched2.firstName} ${studentFetched2.lastName}`;
+    const label1 = studentFetchedFullName;
+    const label2 = studentFetched2FullName;
 
     await page.getByText(rx(label1)).click();
     await page.getByText(rx(label2)).click();
@@ -85,7 +94,7 @@ describe("UI flow: search students controller", () => {
   });
 
   test("re-selection après réouverture — la sélection est conservée", async () => {
-    const label1 = `${studentFetched.firstName} ${studentFetched.lastName}`;
+    const label1 = studentFetchedFullName;
 
     // Première sélection
     await page.getByText(rx(label1)).click();

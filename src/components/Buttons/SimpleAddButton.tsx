@@ -1,18 +1,7 @@
-import type { SimpleAddButtonWithToolTipProps } from "@/components/Buttons/types/ButtonTypes.ts";
+import type { SimpleAddButtonProps } from "@/components/Buttons/types/ButtonTypes";
 import { Button } from "@/components/ui/button.tsx";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip.tsx";
-import {
-  debugLogs,
-  simpleAddButtonWithToolTipPropsInvalid,
-} from "@/configs/app-components.config.ts";
-import sanitizeDOMProps from "@/utils/props.ts";
-import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
+import sanitizeDOMProps from "@/utils/props";
 import { PlusIcon } from "lucide-react";
-import type { MouseEvent, PointerEvent } from "react";
 
 /**
  * A simple button with a plus icon and a tooltip.
@@ -20,49 +9,12 @@ import type { MouseEvent, PointerEvent } from "react";
  * @param toolTipText The label to show in the tooltip
  * @param props Additional button props
  */
-export function SimpleAddButtonWithToolTip(
-  props: SimpleAddButtonWithToolTipProps,
-) {
-  if (simpleAddButtonWithToolTipPropsInvalid(props)) {
-    debugLogs("Rendering SimpleAddButtonWithToolTip");
-  }
-
-  const { toolTipText, onClick: externalOnClick, ...rest } = props;
-
-  const safeRest = sanitizeDOMProps(rest, ["toolTipText"]);
-
-  /**
-   * Handle click event for the button.
-   *
-   * @description Adds other data to the event handler if needed.
-   *
-   * @param event - The mouse event triggered by clicking the button
-   */
-  const handleLocalClick = (
-    e: PointerEvent<HTMLButtonElement> | MouseEvent<HTMLButtonElement>,
-  ) => {
-    preventDefaultAndStopPropagation(e);
-
-    if (externalOnClick) {
-      externalOnClick({ e, ...rest });
-    }
-  };
+export function SimpleAddButton(props: SimpleAddButtonProps) {
+  const safeRest = sanitizeDOMProps(props, ["toolTipText"]);
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          variant="outline"
-          type="button"
-          {...safeRest}
-          onClick={handleLocalClick}
-        >
-          <PlusIcon />
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p>{toolTipText ?? "Tooltip text"}</p>
-      </TooltipContent>
-    </Tooltip>
+    <Button variant="outline" type="button" {...safeRest}>
+      <PlusIcon />
+    </Button>
   );
 }

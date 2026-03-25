@@ -17,6 +17,7 @@ import {
   retrieveValuesByMode,
   setValuesAfterAnimation,
 } from "@/hooks/database/classes/functions/use-command-handler.functions.ts";
+import { resolveFetchCacheKey } from "@/hooks/database/fetches/functions/use-fetch.functions";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import { useFetch } from "@/hooks/database/fetches/useFetch.tsx";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
@@ -152,19 +153,14 @@ export function useCommandHandler<
     postVariables.current = variables;
 
     // Update fetchParams - this will trigger the useEffect above
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.debug(
-        "handleSubmit setting fetchParams",
-        {
-          endpointUrlFinal,
-          options,
-          cachedFetchKey: options?.queryKey,
-          reshapeFn,
-        },
-        " variables:",
-        variables,
-      );
-    }
+    debugLogs("useCommandHandler:handleSubmit", {
+      type: "cacheLogs",
+      endpointUrlFinal,
+      options,
+      cachedFetchKey: options?.queryKey,
+      reshapeFn,
+      variables,
+    });
 
     setFetchParams((prev) => ({
       ...prev,
@@ -198,9 +194,10 @@ export function useCommandHandler<
         },
       };
 
-      if (!NO_CACHE_LOGS) {
-        console.debug(pageId + " invalid submit", errors);
-      }
+      debugLogs("useCommandHandler:handleInvalidSubmit", {
+        type: "cacheLogs",
+        errors,
+      });
     }
   }
 
@@ -237,9 +234,10 @@ export function useCommandHandler<
       throw new Error(message);
     }
 
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.debug("handleOpening callback in CommandHandler", metaData);
-    }
+    debugLogs("useCommandHandler:handleOpening", {
+      type: "cacheLogs",
+      ...metaData,
+    });
 
     if (apiEndpoint === "none") {
       controller.abort("Pure cache - No API fetch for this command");
@@ -340,16 +338,15 @@ export function useCommandHandler<
     * ```
    */
   const handleDataCacheUpdate = (): HeadingType[] => {
-    const cacheKey = fetchParams.cachedFetchKey ?? [
-      fetchParams.contentId,
-      fetchParams.url,
-    ];
-
+    const cacheKey = resolveFetchCacheKey(fetchParams);
     const cachedData = queryClient.getQueryData(cacheKey);
 
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Cached data for ", cacheKey, " is ", cachedData);
-    }
+    debugLogs("useCommandHandler:handleDataCacheUpdate", {
+      type: "cacheLogs",
+      cacheKey,
+      cachedData,
+    });
+
     return (cachedData ?? data) as HeadingType[];
   };
   /**
@@ -401,14 +398,14 @@ export function useCommandHandler<
       onSubmit(postVariables.current);
     } else {
       // FETCH only
-      const { keys, shouldNotFetch, isInitialFetchParams } =
+      const { cacheKey, shouldNotFetch, isInitialFetchParams } =
         resolvedReturnCases(fetchParams);
 
       if (shouldNotFetch || isInitialFetchParams) {
         return;
       }
 
-      const cachedData = queryClient.getQueryData(keys);
+      const cachedData = queryClient.getQueryData(cacheKey);
 
       if (cachedData === undefined) {
         hasStartedCreation.current = true;
@@ -465,18 +462,20 @@ export function useCommandHandler<
  */
 function resolvedReturnCases(fetchParams: FetchParams) {
   const { contentId, url, abortController } = fetchParams;
-  const keys = [contentId, url];
 
   const abortReason = abortController?.signal.reason;
   const isPureCacheAbort = abortReason?.includes(
     "Pure cache - No API fetch for this command",
   );
+
+  const cacheKey = resolveFetchCacheKey(fetchParams);
+
   const shouldNotFetch = url === "none" || isPureCacheAbort;
-  const isInitialFetchParams = keys[1] === "" && keys[0] === "none";
+  const isInitialFetchParams = url === "" && contentId === "none";
 
   return {
     shouldNotFetch,
     isInitialFetchParams,
-    keys,
+    cacheKey,
   };
 }

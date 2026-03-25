@@ -5,9 +5,12 @@ import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import {
   teacherFetched,
   teacherFetched2,
+  teacherFetched2FullName,
+  teacherFetchedFullName,
 } from "@/tests/samples/class-creation-sample-datas";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { rx, stubFetchRoutes } from "@/tests/test-utils/vitest-browser.helpers";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { page } from "vitest/browser";
@@ -31,7 +34,9 @@ function SearchPrimaryTeacherHost() {
     },
   });
   // expose form for assertions
-  mainForm = f;
+  useEffect(() => {
+    mainForm = f;
+  }, [f]);
 
   return <SearchPrimaryTeacher form={f} modalMode={false} />;
 }
@@ -46,7 +51,10 @@ setupUiTestState(
         getRoutes: [
           [
             API_ENDPOINTS.GET.TEACHERS.endpoint,
-            [teacherFetched, teacherFetched2],
+            [
+              { ...teacherFetched, fullName: teacherFetchedFullName },
+              { ...teacherFetched2, fullName: teacherFetched2FullName },
+            ],
           ],
         ],
         defaultGetPayload: [],
@@ -58,7 +66,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe("UI flow: search teachers controller", () => {
   test("displays fetched teachers and allows selection", async () => {
-    const teacherLabel = `${teacherFetched.firstName} ${teacherFetched.lastName}`;
+    const teacherLabel = teacherFetchedFullName;
 
     await expect.element(page.getByText(rx(teacherLabel))).toBeInTheDocument();
 
@@ -70,8 +78,8 @@ describe("UI flow: search teachers controller", () => {
   });
 
   test("re-sélection après déselection — la sélection est bien remplacée", async () => {
-    const label1 = `${teacherFetched.firstName} ${teacherFetched.lastName}`;
-    const label2 = `${teacherFetched2.firstName} ${teacherFetched2.lastName}`;
+    const label1 = teacherFetchedFullName;
+    const label2 = teacherFetched2FullName;
 
     // Première sélection
     await page.getByText(rx(label1)).click();
