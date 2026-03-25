@@ -7,7 +7,8 @@ import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types"
 import { useFetch } from "@/hooks/database/fetches/useFetch";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
 import useDebounce from "@/hooks/useDebounce";
-import type { AppRouteResponseContract } from "@/types/AppResponseInterface";
+import type { ApiError } from "@/types/AppErrorInterface";
+import type { ApiSuccess } from "@/types/AppResponseInterface";
 import { preventDefaultAndStopPropagation } from "@/utils/utils";
 import { useEffect, useEffectEvent, useRef, type ChangeEvent } from "react";
 import type { UseFormReturn } from "react-hook-form";
@@ -19,17 +20,12 @@ import type { UseFormReturn } from "react-hook-form";
  * @returns An object containing the availability error (if any) and the debounced availability check function to be used in input change handlers.
  */
 export function useDebouncedChecker<
-  T extends AppRouteResponseContract<any, any> = AppRouteResponseContract<
-    any,
-    any
-  >,
+  S extends ApiSuccess = ApiSuccess,
+  E extends ApiError = ApiError,
 >(form: UseFormReturn<any>, delay: number = 500) {
-  type Success = T extends AppRouteResponseContract<infer SS, any> ? SS : never;
-  type Error = T extends AppRouteResponseContract<any, infer EE> ? EE : never;
-
   const { response, error, fetchParams, setFetchParams, onSubmit } = useFetch<
-    Success,
-    Error
+    S,
+    E
   >();
 
   const lastErrorRef = useRef<lastErrorType>(null);
@@ -101,7 +97,17 @@ export function useDebouncedChecker<
         silent: true,
         onCacheVerify(cachedData: any) {
           if (cachedData?.available === false) {
-            return Promise.reject({ data: cachedData });
+            const errorDetails = {
+              type: "useDebouncedChecker:onCacheVerify",
+              message: `Ce ${searchParams?.filterBy || "nom"} est déjà utilisé`,
+              data: cachedData,
+            };
+            const cacheError = new Error(
+              "[useDebouncedChecker:onCacheVerify]",
+              { cause: errorDetails },
+            );
+
+            return Promise.reject(cacheError);
           }
         },
       }));
@@ -114,7 +120,7 @@ export function useDebouncedChecker<
    */
   useEffect(() => {
     const notIsAvailable = error?.data?.available === false;
-    const fieldKey = fetchParams.searchParams?.by;
+    const fieldKey = fetchParams.searchParams?.filterBy;
 
     if (notIsAvailable && fieldKey) {
       let fieldLabel = fieldKey;
@@ -135,7 +141,7 @@ export function useDebouncedChecker<
       };
       form.setError(fieldKey, manualError);
     }
-  }, [response, error, form, fetchParams.searchParams?.by]);
+  }, [response, error, form, fetchParams.searchParams?.filterBy]);
 
   return {
     availabilityCheck,
