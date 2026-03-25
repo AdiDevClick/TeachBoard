@@ -1,6 +1,5 @@
 import type { Button } from "@/components/ui/button.tsx";
 import type { LoginButtonsSvgsType } from "@/configs/social.config";
-import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
 import type { ComponentProps } from "react";
 
