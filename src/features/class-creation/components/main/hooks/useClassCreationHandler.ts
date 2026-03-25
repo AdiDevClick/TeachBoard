@@ -3,7 +3,7 @@ import {
   debugLogs,
   taskModalPropsInvalid,
 } from "@/configs/app-components.config";
-import { DEV_MODE, HTTP_METHODS, NO_CACHE_LOGS } from "@/configs/app.config";
+import { HTTP_METHODS } from "@/configs/app.config";
 import { saveKeys } from "@/features/class-creation/components/main/functions/class-creation.functions";
 import type { ClassCreationFormSchema } from "@/features/class-creation/components/main/models/class-creation.models";
 import type { UseClassCreationHandlerProps } from "@/features/class-creation/components/main/types/class-creation.types";
@@ -141,15 +141,14 @@ export function useClassCreationHandler({
    * @param rest - Additional parameters related to the new item
    */
   const handleNewItem = ({ e, ...rest }: HandleAddNewItemParams) => {
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.log("Add new item triggered", {
-        apiEndpoint: rest.apiEndpoint,
-        task: rest.task,
-        selectedDiploma: selectedDiplomaRef.current,
-        selectedStudents: studentsValues,
-        selectedPrimaryTeacher: primaryTeacherValue,
-      });
-    }
+    debugLogs("useClassCreationHandler - Add new item triggered", {
+      type: "cacheLogs",
+      ...rest,
+      selectedDiploma: selectedDiplomaRef.current,
+      selectedStudents: studentsValues,
+      selectedPrimaryTeacher: primaryTeacherValue,
+    });
+
     const task = rest.task;
     rest.form = form;
 
@@ -238,11 +237,11 @@ export function useClassCreationHandler({
     const teacherKey = cachedKeysRef.current["search-primaryteacher"];
 
     if (studentsKey) {
-      queryClient.removeQueries({ queryKey: studentsKey });
+      queryClient.removeQueries({ queryKey: [studentsKey[0]] });
     }
 
     if (teacherKey) {
-      queryClient.removeQueries({ queryKey: teacherKey });
+      queryClient.removeQueries({ queryKey: [teacherKey[0]] });
     }
   });
 
