@@ -97,17 +97,9 @@ export function useDebouncedChecker<
         silent: true,
         onCacheVerify(cachedData: any) {
           if (cachedData?.available === false) {
-            const errorDetails = {
-              type: "useDebouncedChecker:onCacheVerify",
-              message: `Ce ${searchParams?.filterBy || "nom"} est déjà utilisé`,
+            return Promise.reject({
               data: cachedData,
-            };
-            const cacheError = new Error(
-              "[useDebouncedChecker:onCacheVerify]",
-              { cause: errorDetails },
-            );
-
-            return Promise.reject(cacheError);
+            });
           }
         },
       }));
