@@ -98,7 +98,7 @@ describe("DegreeModuleSkill modal integration", () => {
     expect(details).toEqual(
       expect.objectContaining({
         endpoint: skillApiEndpoint,
-        type: "fetch",
+        type: "useFetch",
       }),
     );
 
