@@ -13,12 +13,16 @@ export type LoginButtonProps = ComponentProps<"button"> &
   (LoginButtonsSvgsType | SafeListMapperProp<LoginButtonsSvgsType>);
 
 /** SimpleAddButton types */
-export type SimpleAddButtonWithToolTipProps = Omit<
-  ComponentProps<typeof Button>,
-  "onClick"
-> & {
-  toolTipText?: string;
-  onClick?: (
-    payload: HandleAddNewItemParams & Omit<ComponentProps<typeof Button>, "onClick">
-  ) => void;
-};
+export type SimpleAddButtonProps = ComponentProps<typeof Button>;
+
+// export type SimpleAddButtonProps = Omit<
+//   ComponentProps<typeof Button>,
+//   "onClick"
+// > & {
+//   /** The label to show in the tooltip */
+//   // toolTipText?: string;
+//   onClick?: (
+//     payload: HandleAddNewItemParams &
+//       Omit<ComponentProps<typeof Button>, "onClick">,
+//   ) => void;
+// };
