@@ -15,7 +15,7 @@ const EXCLUDED_KEYS = new Set([
   "__isProxyfied",
 ]);
 
-export function sanitizeDOMProps<T extends Record<string, unknown>>(
+export function sanitizeDOMProps<T extends object>(
   props: T | undefined,
   extraKeysToExclude: string[] = [],
 ): Partial<T> {
