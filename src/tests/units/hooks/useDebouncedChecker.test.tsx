@@ -173,8 +173,9 @@ describe("useDebouncedChecker", () => {
     expect(fakeFetch.setFetchParams).toHaveBeenCalled();
     expect(capturedOnCacheVerify).toBeTypeOf("function");
 
-    // onCacheVerify must reject with { data: cachedData } so useFetch propagates it as an error
-    await expect(capturedOnCacheVerify!({ available: false })).rejects.toEqual({
+    // onCacheVerify must reject with an Error carrying `data` so useFetch
+    // propagates availability information as an error state.
+    await expect(capturedOnCacheVerify!({ available: false })).rejects.toMatchObject({
       data: { available: false },
     });
 
