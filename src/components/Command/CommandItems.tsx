@@ -48,7 +48,10 @@ export function CommandItems(props: CommandsProps) {
         <ListMapper items={commandHeadings ?? []}>
           {(item) => {
             if (commandGroupContainsInvalid(item)) {
-              debugLogs("Skipping invalid CommandGroup", item);
+              debugLogs("Skipping invalid CommandGroup", {
+                type: "propsValidation",
+                item,
+              });
               return null;
             }
             return (
@@ -57,7 +60,10 @@ export function CommandItems(props: CommandsProps) {
                   <ListMapper items={item.items ?? []}>
                     {(command) => {
                       if (commandItemContainsInvalid(command)) {
-                        debugLogs("Rendering CommandItems", command);
+                        debugLogs("Rendering CommandItems", {
+                          type: "propsValidation",
+                          command,
+                        });
                       }
 
                       const itemDetails = {
