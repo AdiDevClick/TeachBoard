@@ -1,0 +1,3952 @@
+[
+  {
+    "id": "eval-001-n4p4bbetta",
+    "className": "BTS SIO SISR 2",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-01-02T09:00:00.000Z",
+    "studentCount": 18,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 2 - 2024-01-02",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 1-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M100",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M101",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M102",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M103",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M104",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M105",
+          "averageScore": 10
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 1-1",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 1-2",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 1-3",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 1-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 1-5",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-002-wg49omu8g3",
+    "className": "BTS SIO SLAM 3",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-01-03T10:00:00.000Z",
+    "studentCount": 21,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 3 - 2024-01-03",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 2-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M100",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M101",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M102",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M103",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M104",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M105",
+          "averageScore": 11
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 2-1",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 2-2",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 2-3",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 2-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 2-5",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-003-hjlzahum18",
+    "className": "BTS SIO SISR 4",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-01-04T11:00:00.000Z",
+    "studentCount": 24,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 4 - 2024-01-04",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 3-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M100",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M101",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M102",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M103",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M104",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M105",
+          "averageScore": 12
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 3-1",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 3-2",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 3-3",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 3-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 3-5",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-004-2guszpxzjv",
+    "className": "BTS SIO SLAM 1",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-01-05T12:00:00.000Z",
+    "studentCount": 16,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 1 - 2024-01-05",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 4-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M100",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M101",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M102",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M103",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M104",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M105",
+          "averageScore": 13
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 4-1",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 4-2",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 4-3",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 4-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 4-5",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-005-g4bypob1ep",
+    "className": "BTS SIO SISR 2",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-01-06T13:00:00.000Z",
+    "studentCount": 19,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 2 - 2024-01-06",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 5-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M100",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M101",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M102",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M103",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M104",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M105",
+          "averageScore": 14
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 5-1",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 5-2",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 5-3",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 5-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 5-5",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-006-i8l7j5iv7",
+    "className": "BTS SIO SLAM 3",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-02-07T14:00:00.000Z",
+    "studentCount": 22,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 3 - 2024-02-07",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 6-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M100",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M101",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M102",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M103",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M104",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M105",
+          "averageScore": 15
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 6-1",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 6-2",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 6-3",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 6-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 6-5",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-007-mbd36nqp3f",
+    "className": "BTS SIO SISR 4",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-02-08T15:00:00.000Z",
+    "studentCount": 25,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 4 - 2024-02-08",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 7-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M100",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M101",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M102",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M103",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M104",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M105",
+          "averageScore": 16
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 7-1",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 7-2",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 7-3",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 7-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 7-5",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-008-4lxw0eak63",
+    "className": "BTS SIO SLAM 1",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-02-09T08:00:00.000Z",
+    "studentCount": 17,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 1 - 2024-02-09",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 8-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M100",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M101",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M102",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M103",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M104",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M105",
+          "averageScore": 17
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 8-1",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 8-2",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 8-3",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 8-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 8-5",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-009-d5nrc93g06",
+    "className": "BTS SIO SISR 2",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-02-10T09:00:00.000Z",
+    "studentCount": 20,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 2 - 2024-02-10",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 9-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M100",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M101",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M102",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M103",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M104",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M105",
+          "averageScore": 18
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 9-1",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 9-2",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 9-3",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 9-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 9-5",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-010-0nqhzodecz",
+    "className": "BTS SIO SLAM 3",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-02-11T10:00:00.000Z",
+    "studentCount": 23,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 3 - 2024-02-11",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 10-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M100",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M101",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M102",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M103",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M104",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M105",
+          "averageScore": 19
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 10-1",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 10-2",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 10-3",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 10-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 10-5",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-011-jlzuql8bxd",
+    "className": "BTS SIO SISR 4",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-03-12T11:00:00.000Z",
+    "studentCount": 15,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 4 - 2024-03-12",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 11-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M100",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M101",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M102",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M103",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M104",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M105",
+          "averageScore": 20
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 11-1",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 11-2",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 11-3",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 11-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 11-5",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-012-h0ndbi0nlu",
+    "className": "BTS SIO SLAM 1",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-03-13T12:00:00.000Z",
+    "studentCount": 18,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 1 - 2024-03-13",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 12-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M100",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M101",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M102",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M103",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M104",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M105",
+          "averageScore": 10
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 12-1",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 12-2",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 12-3",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 12-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 12-5",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-013-090zzikgij",
+    "className": "BTS SIO SISR 2",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-03-14T13:00:00.000Z",
+    "studentCount": 21,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 2 - 2024-03-14",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 13-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M100",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M101",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M102",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M103",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M104",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M105",
+          "averageScore": 11
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 13-1",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 13-2",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 13-3",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 13-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 13-5",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-014-2v0g9eiggd",
+    "className": "BTS SIO SLAM 3",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-03-15T14:00:00.000Z",
+    "studentCount": 24,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 3 - 2024-03-15",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 14-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M100",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M101",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M102",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M103",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M104",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M105",
+          "averageScore": 12
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 14-1",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 14-2",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 14-3",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 14-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 14-5",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-015-jptkopggnc",
+    "className": "BTS SIO SISR 4",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-03-16T15:00:00.000Z",
+    "studentCount": 16,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 4 - 2024-03-16",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 15-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M100",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M101",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M102",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M103",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M104",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M105",
+          "averageScore": 13
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 15-1",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 15-2",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 15-3",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 15-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 15-5",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-016-gtr6fpsela",
+    "className": "BTS SIO SLAM 1",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-04-17T07:00:00.000Z",
+    "studentCount": 19,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 1 - 2024-04-17",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 16-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M100",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M101",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M102",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M103",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M104",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M105",
+          "averageScore": 14
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 16-1",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 16-2",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 16-3",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 16-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 16-5",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-017-7jexp1skb2",
+    "className": "BTS SIO SISR 2",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-04-18T08:00:00.000Z",
+    "studentCount": 22,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 2 - 2024-04-18",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 17-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M100",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M101",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M102",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M103",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M104",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M105",
+          "averageScore": 15
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 17-1",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 17-2",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 17-3",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 17-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 17-5",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-018-v5wgu9djpg",
+    "className": "BTS SIO SLAM 3",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-04-19T09:00:00.000Z",
+    "studentCount": 25,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 3 - 2024-04-19",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 18-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M100",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M101",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M102",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M103",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M104",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M105",
+          "averageScore": 16
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 18-1",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 18-2",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 18-3",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 18-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 18-5",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-019-ulpznnip6v",
+    "className": "BTS SIO SISR 4",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-04-20T10:00:00.000Z",
+    "studentCount": 17,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 4 - 2024-04-20",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 19-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M100",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M101",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M102",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M103",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M104",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M105",
+          "averageScore": 17
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 19-1",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 19-2",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 19-3",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 19-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 19-5",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-020-s1f5nh1jcz",
+    "className": "BTS SIO SLAM 1",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-04-21T11:00:00.000Z",
+    "studentCount": 20,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 1 - 2024-04-21",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 20-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M100",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M101",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M102",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M103",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M104",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M105",
+          "averageScore": 18
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 20-1",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 20-2",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 20-3",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 20-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 20-5",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-021-mst8jvcr3t",
+    "className": "BTS SIO SISR 2",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-05-22T12:00:00.000Z",
+    "studentCount": 23,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 2 - 2024-05-22",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 21-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M100",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M101",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M102",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M103",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M104",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M105",
+          "averageScore": 19
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 21-1",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 21-2",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 21-3",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 21-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 21-5",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-022-n59e5hs2mj",
+    "className": "BTS SIO SLAM 3",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-05-23T13:00:00.000Z",
+    "studentCount": 15,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 3 - 2024-05-23",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 22-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M100",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M101",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M102",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M103",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M104",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M105",
+          "averageScore": 20
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 22-1",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 22-2",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 22-3",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 22-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 22-5",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-023-04k82moo1p",
+    "className": "BTS SIO SISR 4",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-05-24T14:00:00.000Z",
+    "studentCount": 18,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 4 - 2024-05-24",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 23-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M100",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M101",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M102",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M103",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M104",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M105",
+          "averageScore": 10
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 23-1",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 23-2",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 23-3",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 23-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 23-5",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-024-nxu5zfggx2",
+    "className": "BTS SIO SLAM 1",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-05-25T07:00:00.000Z",
+    "studentCount": 21,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 1 - 2024-05-25",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 24-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M100",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M101",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M102",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M103",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M104",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M105",
+          "averageScore": 11
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 24-1",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 24-2",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 24-3",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 24-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 24-5",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-025-luzmlqq5c",
+    "className": "BTS SIO SISR 2",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-05-26T08:00:00.000Z",
+    "studentCount": 24,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 2 - 2024-05-26",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 25-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M100",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M101",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M102",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M103",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M104",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M105",
+          "averageScore": 12
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 25-1",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 25-2",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 25-3",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 25-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 25-5",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-026-39ol1tgai0",
+    "className": "BTS SIO SLAM 3",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-06-27T09:00:00.000Z",
+    "studentCount": 16,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 3 - 2024-06-27",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 26-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M100",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M101",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M102",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M103",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M104",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M105",
+          "averageScore": 13
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 26-1",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 26-2",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 26-3",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 26-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 26-5",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-027-2576qwx343",
+    "className": "BTS SIO SISR 4",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-06-28T10:00:00.000Z",
+    "studentCount": 19,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 4 - 2024-06-28",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 27-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M100",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M101",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M102",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M103",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M104",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M105",
+          "averageScore": 14
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 27-1",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 27-2",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 27-3",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 27-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 27-5",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-028-hdrve154rd",
+    "className": "BTS SIO SLAM 1",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-06-01T11:00:00.000Z",
+    "studentCount": 22,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 1 - 2024-06-01",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 28-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M100",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M101",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M102",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M103",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M104",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M105",
+          "averageScore": 15
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 28-1",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 28-2",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 28-3",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 28-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 28-5",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-029-9rix2nkbml",
+    "className": "BTS SIO SISR 2",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-06-02T12:00:00.000Z",
+    "studentCount": 25,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 2 - 2024-06-02",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 29-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M100",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M101",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M102",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M103",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M104",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M105",
+          "averageScore": 16
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 29-1",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 29-2",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 29-3",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 29-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 29-5",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-030-xjcp6nfzob",
+    "className": "BTS SIO SLAM 3",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-06-03T13:00:00.000Z",
+    "studentCount": 17,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 3 - 2024-06-03",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 30-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M100",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M101",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M102",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M103",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M104",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M105",
+          "averageScore": 17
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 30-1",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 30-2",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 30-3",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 30-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 30-5",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-031-w8c9kaya6l",
+    "className": "BTS SIO SISR 4",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-07-04T14:00:00.000Z",
+    "studentCount": 20,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 4 - 2024-07-04",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 31-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M100",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M101",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M102",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M103",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M104",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M105",
+          "averageScore": 18
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 31-1",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 31-2",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 31-3",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 31-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 31-5",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-032-lrlyqllc6x",
+    "className": "BTS SIO SLAM 1",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-07-05T07:00:00.000Z",
+    "studentCount": 23,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 1 - 2024-07-05",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 32-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M100",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M101",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M102",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M103",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M104",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M105",
+          "averageScore": 19
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 32-1",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 32-2",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 32-3",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 32-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 32-5",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-033-71hw7dc1t7",
+    "className": "BTS SIO SISR 2",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-07-06T08:00:00.000Z",
+    "studentCount": 15,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 2 - 2024-07-06",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 33-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M100",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M101",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M102",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M103",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M104",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M105",
+          "averageScore": 20
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 33-1",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 33-2",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 33-3",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 33-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 33-5",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-034-sb2qw05sd4",
+    "className": "BTS SIO SLAM 3",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-07-07T09:00:00.000Z",
+    "studentCount": 18,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 3 - 2024-07-07",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 34-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M100",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M101",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M102",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M103",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M104",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M105",
+          "averageScore": 10
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 34-1",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 34-2",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 34-3",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 34-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 34-5",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-035-kdrgn9d0o1",
+    "className": "BTS SIO SISR 4",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-07-08T10:00:00.000Z",
+    "studentCount": 21,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 4 - 2024-07-08",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 35-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M100",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M101",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M102",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M103",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M104",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M105",
+          "averageScore": 11
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 35-1",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 35-2",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 35-3",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 35-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 35-5",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-036-ev1hq0t04a",
+    "className": "BTS SIO SLAM 1",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-08-09T11:00:00.000Z",
+    "studentCount": 24,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 1 - 2024-08-09",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 36-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M100",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M101",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M102",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M103",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M104",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M105",
+          "averageScore": 12
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 36-1",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 36-2",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 36-3",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 36-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 36-5",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-037-nhb0hd6za0",
+    "className": "BTS SIO SISR 2",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-08-10T12:00:00.000Z",
+    "studentCount": 16,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 2 - 2024-08-10",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 37-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M100",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M101",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M102",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M103",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M104",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M105",
+          "averageScore": 13
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 37-1",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 37-2",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 37-3",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 37-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 37-5",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-038-9la50lvuab",
+    "className": "BTS SIO SLAM 3",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-08-11T13:00:00.000Z",
+    "studentCount": 19,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 3 - 2024-08-11",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 38-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M100",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M101",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M102",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M103",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M104",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M105",
+          "averageScore": 14
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 38-1",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 38-2",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 38-3",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 38-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 38-5",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-039-j14bxt7dgo",
+    "className": "BTS SIO SISR 4",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-08-12T14:00:00.000Z",
+    "studentCount": 22,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 4 - 2024-08-12",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 39-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M100",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M101",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M102",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M103",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M104",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M105",
+          "averageScore": 15
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 39-1",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 39-2",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 39-3",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 39-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 39-5",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-040-ub1wft71dq",
+    "className": "BTS SIO SLAM 1",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-08-13T07:00:00.000Z",
+    "studentCount": 25,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 1 - 2024-08-13",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 40-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M100",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M101",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M102",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M103",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M104",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M105",
+          "averageScore": 16
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 40-1",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 40-2",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 40-3",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 40-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 40-5",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-041-r93x87rnkt",
+    "className": "BTS SIO SISR 2",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-09-14T08:00:00.000Z",
+    "studentCount": 17,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 2 - 2024-09-14",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 41-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M100",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M101",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M102",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M103",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M104",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M105",
+          "averageScore": 17
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 41-1",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 41-2",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 41-3",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 41-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 41-5",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-042-x18dbyndnm",
+    "className": "BTS SIO SLAM 3",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-09-15T09:00:00.000Z",
+    "studentCount": 20,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 3 - 2024-09-15",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 42-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M100",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M101",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M102",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M103",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M104",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M105",
+          "averageScore": 18
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 42-1",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 42-2",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 42-3",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 42-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 42-5",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-043-26v941r7s1",
+    "className": "BTS SIO SISR 4",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-09-16T10:00:00.000Z",
+    "studentCount": 23,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 4 - 2024-09-16",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 43-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M100",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M101",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M102",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M103",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M104",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M105",
+          "averageScore": 19
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 43-1",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 43-2",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 43-3",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 43-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 43-5",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-044-lpajc4u4up",
+    "className": "BTS SIO SLAM 1",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-09-17T11:00:00.000Z",
+    "studentCount": 15,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 1 - 2024-09-17",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 44-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M100",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M101",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M102",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M103",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M104",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M105",
+          "averageScore": 20
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 44-1",
+          "isPresent": true,
+          "overallScore": 11,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 44-2",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 44-3",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 44-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 44-5",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-045-orixeby2q0",
+    "className": "BTS SIO SISR 2",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-09-18T12:00:00.000Z",
+    "studentCount": 18,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 2 - 2024-09-18",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 45-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M100",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M101",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M102",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M103",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M104",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M105",
+          "averageScore": 10
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 45-1",
+          "isPresent": true,
+          "overallScore": 12,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 45-2",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 45-3",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 45-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 45-5",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-046-n4e1n0mc9t",
+    "className": "BTS SIO SLAM 3",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-10-19T13:00:00.000Z",
+    "studentCount": 21,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 3 - 2024-10-19",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 46-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M100",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M101",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M102",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M103",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M104",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M105",
+          "averageScore": 11
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 46-1",
+          "isPresent": true,
+          "overallScore": 13,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 46-2",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 46-3",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 46-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 46-5",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-047-uylweswwdg",
+    "className": "BTS SIO SISR 4",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-10-20T14:00:00.000Z",
+    "studentCount": 24,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 4 - 2024-10-20",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 47-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M100",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M101",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M102",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M103",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M104",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M105",
+          "averageScore": 12
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 47-1",
+          "isPresent": true,
+          "overallScore": 14,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 47-2",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 47-3",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 47-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 47-5",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-048-hqu7tbu5un",
+    "className": "BTS SIO SLAM 1",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-10-21T07:00:00.000Z",
+    "studentCount": 16,
+    "status": "completed",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 1 - 2024-10-21",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 48-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Réseau",
+          "moduleCode": "M100",
+          "averageScore": 14
+        },
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M101",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M102",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M103",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M104",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M105",
+          "averageScore": 13
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 48-1",
+          "isPresent": true,
+          "overallScore": 15,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 48-2",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 48-3",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 48-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 48-5",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-049-95tfhbk0eu",
+    "className": "BTS SIO SISR 2",
+    "diplomaName": "BTS Négociation et Digitalisation de la Relation Client",
+    "evaluationDate": "2024-10-22T08:00:00.000Z",
+    "studentCount": 19,
+    "status": "draft",
+    "detail": {
+      "title": "Évaluation BTS SIO SISR 2 - 2024-10-22",
+      "comments": "Brouillon en cours de rédaction.",
+      "absentStudents": [
+        "Etudiant 49-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Sécurité",
+          "moduleCode": "M100",
+          "averageScore": 15
+        },
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M101",
+          "averageScore": 17
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M102",
+          "averageScore": 19
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M103",
+          "averageScore": 10
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M104",
+          "averageScore": 12
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M105",
+          "averageScore": 14
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 49-1",
+          "isPresent": true,
+          "overallScore": 16,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 49-2",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 49-3",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 49-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 49-5",
+          "isPresent": true,
+          "overallScore": 20,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "eval-050-2edq3o1mex",
+    "className": "BTS SIO SLAM 3",
+    "diplomaName": "BTS Services Informatiques aux Organisations",
+    "evaluationDate": "2024-10-23T09:00:00.000Z",
+    "studentCount": 22,
+    "status": "in_review",
+    "detail": {
+      "title": "Évaluation BTS SIO SLAM 3 - 2024-10-23",
+      "comments": "Rapport validé, retour pédagogique envoyé.",
+      "absentStudents": [
+        "Etudiant 50-4"
+      ],
+      "moduleSummary": [
+        {
+          "moduleName": "Bases de données",
+          "moduleCode": "M100",
+          "averageScore": 16
+        },
+        {
+          "moduleName": "Développement Web",
+          "moduleCode": "M101",
+          "averageScore": 18
+        },
+        {
+          "moduleName": "Cloud",
+          "moduleCode": "M102",
+          "averageScore": 20
+        },
+        {
+          "moduleName": "DevOps",
+          "moduleCode": "M103",
+          "averageScore": 11
+        },
+        {
+          "moduleName": "Virtualisation",
+          "moduleCode": "M104",
+          "averageScore": 13
+        },
+        {
+          "moduleName": "Algorithmique",
+          "moduleCode": "M105",
+          "averageScore": 15
+        }
+      ],
+      "studentResults": [
+        {
+          "fullName": "Etudiant 50-1",
+          "isPresent": true,
+          "overallScore": 17,
+          "task": "Tâche 2"
+        },
+        {
+          "fullName": "Etudiant 50-2",
+          "isPresent": true,
+          "overallScore": 18,
+          "task": "Tâche 3"
+        },
+        {
+          "fullName": "Etudiant 50-3",
+          "isPresent": true,
+          "overallScore": 19,
+          "task": "Tâche 4"
+        },
+        {
+          "fullName": "Etudiant 50-4",
+          "isPresent": false,
+          "overallScore": null,
+          "task": null
+        },
+        {
+          "fullName": "Etudiant 50-5",
+          "isPresent": true,
+          "overallScore": 10,
+          "task": "Tâche 2"
+        }
+      ]
+    }
+  }
+]
