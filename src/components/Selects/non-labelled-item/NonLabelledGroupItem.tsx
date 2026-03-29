@@ -14,7 +14,7 @@ import {
  */
 export function NonLabelledGroupItem(props: NonLabelledGroupItemProps) {
   if (nonLabelledGroupItemPropsInvalid(props)) {
-    debugLogs("NonLabelledGroupItem", props);
+    debugLogs("NonLabelledGroupItem", { type: "propsValidation", props });
 
     return <div>Loading item...</div>;
   }
