@@ -24,7 +24,12 @@ export function withToolTip<P extends object>(
       debugLogs("Rendering withToolTip", { type: "propsValidation", props });
     }
 
-    const { toolTipText = "No tooltip text", ...rest } = props;
+    const { toolTipText, ...rest } = props;
+    const isToolTipTextEmpty = !toolTipText || toolTipText.trim() === "";
+
+    if (isToolTipTextEmpty) {
+      return <WrappedComponent {...(rest as P)} />;
+    }
 
     return (
       <Tooltip>
