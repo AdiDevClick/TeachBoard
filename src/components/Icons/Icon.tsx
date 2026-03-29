@@ -14,12 +14,12 @@ export function Icon({ iconPath, ...props }: IconPropsTypes) {
   const { SvgIcon, error } = useDynamicSVGImport({ iconPath });
 
   if (error) {
-    return <div>Can't load the icon</div>;
+    return <div>{"Can't load the icon"}</div>;
   }
 
   if (SvgIcon) {
     return <SvgIcon className="social__icon" {...props} />;
   }
 
-  return <div>Loading icon...</div>;
+  return <div>{"Loading icon..."}</div>;
 }
