@@ -10,6 +10,7 @@ import { StepFour } from "@/features/evaluations/create/steps/four/StepFour.tsx"
 import { StepOne } from "@/features/evaluations/create/steps/one/StepOne";
 import { StepThree } from "@/features/evaluations/create/steps/three/StepThree.tsx";
 import { StepTwo } from "@/features/evaluations/create/steps/two/StepTwo.tsx";
+import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
 import { About } from "@/pages/About/About.tsx";
 import EmailValidation from "@/pages/Email/EmailValidation";
 import { PageError } from "@/pages/Error/PageError.tsx";
@@ -121,7 +122,17 @@ export const ROUTES_CHILDREN: RouteObject[] = [
       },
       {
         path: "TP",
-        element: <Evaluations />,
+        element: <EvaluationsMain />,
+        loader: async () => {
+          const title = COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title;
+          setDocumentTitle(title);
+
+          return {
+            pageTitle: title,
+            // loaderData: COMPLETE_SIDEBAR_DATAS.navMain.menus[0],
+            // pageDatas: EvaluationPageTabsDatas,
+          };
+        },
       },
       {
         path: "Atelier",
