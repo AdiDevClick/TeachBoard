@@ -7,7 +7,7 @@ import type {
   VisibilityState,
 } from "@tanstack/react-table";
 
-export interface EvaluationTableState<T> {
+export interface TableState<T> {
   data: T[];
   columns: ColumnDef<T>[];
   rowSelection: RowSelectionState;
