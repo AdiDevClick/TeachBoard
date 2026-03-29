@@ -1,4 +1,5 @@
 import type { UUID } from "@/api/types/openapi/common.types";
+import type { Label } from "@/components/ui/label";
 import type {
   Select,
   SelectContent,
@@ -74,6 +75,7 @@ export type VerticalSelectProps = Omit<SelectRootProps, "onValueChange"> & {
   role?: string;
   /** Extra props forwarded to the SelectTrigger element */
   triggerProps?: ComponentProps<"button">;
+  labelProps?: ComponentProps<typeof Label>;
   fullWidth?: boolean;
   className?: string;
   side?: ComponentProps<typeof SelectContent>["side"];
@@ -130,3 +132,8 @@ export type HandleAddNewParams = {
 };
 
 export type InertSelectItemProps = ComponentProps<typeof SelectItem>;
+
+/**
+ * Props for a generic SelectItem, allowing consumers to pass any props supported by the underlying SelectItem component.
+ */
+export type GenericSelectItemProps = ComponentProps<typeof SelectItem>;
