@@ -1,6 +1,11 @@
 import type { AppDialFooterProps } from "@/components/Footer/types/footer.types.ts";
 import type { HeaderTitleProps } from "@/components/Titles/types/titles.types.ts";
 import type { Card, CardContent, CardFooter } from "@/components/ui/card.tsx";
+import type {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { Separator } from "@/components/ui/separator";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types";
@@ -8,6 +13,7 @@ import type {
   AnyObjectProps,
   PreventDefaultAndStopPropagation,
 } from "@/utils/types/types.utils.ts";
+import type { useSortable } from "@dnd-kit/sortable";
 import type { ComponentProps } from "react";
 
 /**
@@ -68,4 +74,31 @@ export type TitleProps = HeaderTitleProps & SeparatorType;
 
 type SeparatorType = {
   separator?: ComponentProps<typeof Separator> & { displaySeparator?: boolean };
+};
+
+/**
+ * Context type for Dropdown Menu Layout, providing props for the DropdownMenu, DropdownMenuTrigger, and DropdownMenuContent components.
+ */
+export type DropdownMenuLayoutContextType<C> = {
+  dropdown?: ComponentProps<typeof DropdownMenu>;
+  trigger?: ComponentProps<typeof DropdownMenuTrigger>;
+  content?: ComponentProps<typeof DropdownMenuContent>;
+  rest?: C;
+};
+
+/**
+ * Context type for Draggable Row, providing the necessary bindings (attributes and listeners) for making a table row draggable using the useSortable hook from @dnd-kit/sortable.
+ */
+export type DraggableRowBindingsContext = Readonly<
+  Pick<ReturnType<typeof useSortable>, "attributes" | "listeners">
+>;
+
+/**
+ * Type definition for the VerticalDrawer context, which includes properties for title, description, header, and content.
+ */
+export type VerticalDrawerContext = {
+  title?: string;
+  description?: string;
+  header?: AnyObjectProps;
+  content?: AnyObjectProps;
 };
