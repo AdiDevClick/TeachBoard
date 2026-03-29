@@ -1,4 +1,10 @@
-﻿import { useEvaluationTableStore } from "@/features/evaluations/main/api/store/EvaluationTableStore";
+﻿import {
+  DEFAULT_PERSIST_NAME,
+  getTableStore,
+  type RowItemWithId,
+  type TableStoreSelector,
+} from "@/features/evaluations/main/api/store/TableStore";
+import type { EvaluationItem } from "@/features/evaluations/main/types/evaluations-listing.types";
 import {
   KeyboardSensor,
   MouseSensor,
@@ -17,8 +23,53 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  type ColumnDef,
 } from "@tanstack/react-table";
-import { useId, useMemo } from "react";
+import { useEffect, useEffectEvent, useId, useRef } from "react";
+
+type UseDataTableOptions<T extends RowItemWithId> = Readonly<{
+  data?: T[];
+  columns?: ColumnDef<T>[];
+  getItemId?: (item: T) => UniqueIdentifier;
+  onReorder?: (reorderedData: T[]) => void;
+}>;
+
+type EvaluationDataTableInput =
+  | string
+  | Readonly<
+      {
+        storeName?: string;
+      } & UseDataTableOptions<EvaluationItem>
+    >;
+
+function resolveEvaluationDataTableInput(input?: EvaluationDataTableInput): {
+  storeName: string;
+  options: UseDataTableOptions<EvaluationItem>;
+} {
+  if (!input) {
+    return {
+      storeName: DEFAULT_PERSIST_NAME,
+      options: {},
+    };
+  }
+
+  if (typeof input === "string") {
+    return {
+      storeName: input,
+      options: {},
+    };
+  }
+
+  return {
+    storeName: input.storeName ?? DEFAULT_PERSIST_NAME,
+    options: {
+      data: input.data,
+      columns: input.columns,
+      getItemId: input.getItemId,
+      onReorder: input.onReorder,
+    },
+  };
+}
 
 /**
  * Gère l'état complet d'un DataTable : tri, filtrage, pagination, visibilité
@@ -27,15 +78,31 @@ import { useId, useMemo } from "react";
  * Synchroniée automatiquement les données internes lorsque la péop data changà,
  * ce qui évite d'avoir à remoîter le composant pour rafraîchir l'affichage.
  */
-export function useDataTable() {
+export function useDataTableWithStore<T extends RowItemWithId>(
+  useStore: TableStoreSelector<T>,
+  options: UseDataTableOptions<T> = {},
+) {
+  // mandatory
+  "use no memo";
+
+  const {
+    data: initialData,
+    columns: initialColumns,
+    getItemId: getItemIdOverride,
+    onReorder,
+  } = options;
+
+  const isInitialStateHydrated = useRef(false);
+
   const {
     data: storeData,
-    columns,
+    columns: storeColumns,
     sorting,
     columnVisibility,
     rowSelection,
-    getItemId,
+    getItemId: storeGetItemId,
     setData,
+    setColumns,
     setColumnFilters,
     setRowSelection,
     setColumnVisibility,
@@ -43,7 +110,31 @@ export function useDataTable() {
     setSorting,
     columnFilters,
     pagination,
-  } = useEvaluationTableStore();
+  } = useStore();
+
+  const hydrateInitialState = useEffectEvent(() => {
+    if (isInitialStateHydrated.current) {
+      return;
+    }
+
+    if (initialColumns && storeColumns.length === 0) {
+      setColumns(initialColumns);
+    }
+
+    if (initialData && storeData.length === 0) {
+      setData(initialData);
+    }
+
+    if (initialColumns || initialData) {
+      isInitialStateHydrated.current = true;
+    }
+  });
+
+  useEffect(() => {
+    hydrateInitialState();
+  }, [initialColumns, initialData, storeColumns.length, storeData.length]);
+
+  const getItemId = getItemIdOverride ?? storeGetItemId;
 
   const sortableId = useId();
 
@@ -57,14 +148,11 @@ export function useDataTable() {
     useSensor(KeyboardSensor, {}),
   );
 
-  const dataIds = useMemo<UniqueIdentifier[]>(
-    () => storeData.map((item) => getItemId(item)),
-    [getItemId, storeData],
-  );
+  const dataIds = storeData.map((item) => getItemId(item));
 
   const table = useReactTable({
     data: storeData,
-    columns,
+    columns: storeColumns,
     state: {
       sorting,
       columnVisibility,
@@ -96,16 +184,27 @@ export function useDataTable() {
       const reordered = arrayMove(storeData, oldIndex, newIndex);
 
       setData(reordered);
+      onReorder?.(reordered);
     }
   }
 
   return {
     getItemId,
-    columns,
+    columns: storeColumns,
     table,
     dataIds,
     sensors,
     sortableId,
     handleDragEnd,
   };
+}
+
+/**
+ * Backward compatible API for the default evaluation table store.
+ */
+export function useDataTable(input?: EvaluationDataTableInput) {
+  const { storeName, options } = resolveEvaluationDataTableInput(input);
+  const useStore = getTableStore(storeName);
+
+  return useDataTableWithStore(useStore, options);
 }
