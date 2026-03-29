@@ -10,7 +10,7 @@ import {
   createStudentCountColumn,
 } from "@/components/Tables/functions/table-columns.functions";
 import { Button } from "@/components/ui/button";
-import { useEvaluationTableStore } from "@/features/evaluations/main/api/store/EvaluationTableStore";
+import { useEvaluationTableStore } from "@/features/evaluations/main/api/store/TableStore";
 import type { EvaluationItem } from "@/features/evaluations/main/types/evaluations-listing.types";
 import mockData from "@data/evaluations.mock.datas.json";
 import { IconPlus } from "@tabler/icons-react";
