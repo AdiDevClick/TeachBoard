@@ -8,10 +8,12 @@ import { useContext } from "react";
  */
 export function useViewCardContext() {
   const context = useContext(ViewCardContext);
+
   if (!context) {
     throw new Error(
       "[useViewCardContext] must be used within a ViewCardProvider",
     );
   }
+
   return context;
 }
