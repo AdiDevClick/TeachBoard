@@ -1,10 +1,13 @@
 import { useAppStore } from "@/api/store/AppStore";
+import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
+import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import type { SkillDto } from "@/api/types/routes/skills.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import type { HandleSelectionCallbackParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import { renderCommandHook } from "@/tests/hooks/reusable-hooks";
+import { cleanup, render } from "vitest-browser-react";
 import {
   moduleModal,
   skillApiEndpoint,
@@ -284,6 +287,28 @@ describe("useCommandHandler - basic behaviours", () => {
         type: "useFetch",
       }),
     );
+  });
+
+  test("EvaluationsMain should not throw when data is initially undefined and should fetch", async () => {
+    stubFetchRoutes({
+      getRoutes: [[API_ENDPOINTS.GET.EVALUATIONS.endpoints.OVERVIEWS, []]],
+    });
+
+    const { container } = await render(
+      <AppTestWrapper>
+        <EvaluationsMain />
+      </AppTestWrapper>,
+    );
+
+    const cached = await waitForCache([
+      "evaluation-overview",
+      API_ENDPOINTS.GET.EVALUATIONS.endpoints.OVERVIEWS,
+    ]);
+
+    expect(cached).toEqual([]);
+    expect(container.textContent).toContain("Aucune évaluation trouvée.");
+
+    await cleanup();
   });
 
   test("serverData contains business payload for CREATE_CLASS POST", async () => {
