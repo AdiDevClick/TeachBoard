@@ -51,7 +51,7 @@ export function withDropdownLayout<C extends object>(
 
     return (
       <DropdownMenuContent align="end" {...contentProps}>
-        <WrappedComponent {...rest} />
+        <WrappedComponent {...(rest as C)} />
         {props.children}
       </DropdownMenuContent>
     );
