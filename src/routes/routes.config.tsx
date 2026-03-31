@@ -11,6 +11,7 @@ import { StepOne } from "@/features/evaluations/create/steps/one/StepOne";
 import { StepThree } from "@/features/evaluations/create/steps/three/StepThree.tsx";
 import { StepTwo } from "@/features/evaluations/create/steps/two/StepTwo.tsx";
 import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
+import { EvaluationsView } from "@/features/evaluations/main/EvaluationsView";
 import { About } from "@/pages/About/About.tsx";
 import EmailValidation from "@/pages/Email/EmailValidation";
 import { PageError } from "@/pages/Error/PageError.tsx";
@@ -118,6 +119,14 @@ export const ROUTES_CHILDREN: RouteObject[] = [
             pageTitle: COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title,
             loaderData: COMPLETE_SIDEBAR_DATAS.navMain.menus[2],
           };
+        },
+      },
+      {
+        path: ":evaluationId",
+        element: <EvaluationsView />,
+        loader: async () => {
+          const title = COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title;
+          setDocumentTitle(title);
         },
       },
       {
