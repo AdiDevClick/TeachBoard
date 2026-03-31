@@ -283,14 +283,14 @@ export function useCommandHandler<
 
     const isSelected = detailedCommandItem?.isSelected;
 
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.debug("Command selected:", {
-        mainFormField,
-        secondaryFormField,
-        value,
-        detailedCommandItem,
-      });
-    }
+    debugLogs("useCommandHandler:handleSelection", {
+      type: "cacheLogs",
+      value,
+      mainFormField,
+      secondaryFormField,
+      detailedCommandItem,
+      validationMode,
+    });
 
     // Use secondaryFormField if provided (this is the detailed data one), otherwise fallback to mainFormField
     const retrievedFormField = new UniqueSet<
