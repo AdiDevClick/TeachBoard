@@ -2,8 +2,8 @@ import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
 import { DynamicTags } from "@/components/Tags/DynamicTags";
 import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types";
 import { LabelledTextArea } from "@/components/TextAreas/LabelledTextArea";
-import type { AppModalNames } from "@/configs/app.config";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
+import type { AppModalNames } from "@/configs/app.config";
 import { LabelledAccordion } from "@/features/evaluations/create/components/Accordion/LabelledAccordion";
 import { AverageFields } from "@/features/evaluations/create/components/Score/AverageFields";
 import { useStepFourState } from "@/features/evaluations/create/hooks/useStepFourState";
@@ -38,12 +38,14 @@ export function EvaluationsView({
   const { evaluationId } = useParams();
   const parsedEvaluationId = parseToUuid(evaluationId);
 
-  const { openingCallback: fetchEvaluationOpeningCallback, data: evaluationData } =
-    useCommandHandler({
-      pageId: "evaluation-overview",
-      form: null!,
-      submitDataReshapeFn: reshapeEvaluationDetails,
-    });
+  const {
+    openingCallback: fetchEvaluationOpeningCallback,
+    data: evaluationData,
+  } = useCommandHandler({
+    pageId: "evaluation-overview",
+    form: null!,
+    submitDataReshapeFn: reshapeEvaluationDetails,
+  });
 
   const { openingCallback: fetchClassOpeningCallback, data: classData } =
     useCommandHandler({
