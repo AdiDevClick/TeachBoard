@@ -32,7 +32,7 @@ export function withToolTip<P extends object>(
     }
 
     return (
-      <Tooltip>
+      <Tooltip disableHoverableContent>
         <TooltipTrigger asChild>
           <WrappedComponent {...(rest as P)} />
         </TooltipTrigger>
