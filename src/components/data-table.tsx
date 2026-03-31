@@ -37,7 +37,6 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { chartConfig, chartData, columns } from "@/data/mainPageExamples";
-import { createTableStoreGetter } from "@/features/evaluations/main/api/store/TableStore";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
@@ -62,22 +61,12 @@ const schema = z.object({
 
 export type SchemaRow = z.infer<typeof schema>;
 
-const { getStore: getMainPageDataTableStore } =
-  createTableStoreGetter<SchemaRow>();
-
-const useMainPageDataTableStore = getMainPageDataTableStore(
-  "main-page-data-table-store",
-);
-
 export function DataTable({
   data: initialData,
 }: Readonly<{ data: SchemaRow[] }>) {
-  const parsedData = z.array(schema).parse(initialData);
+  z.array(schema).parse(initialData);
   const { table, dataIds, sensors, sortableId, handleDragEnd } =
-    useDataTableWithStore(useMainPageDataTableStore, {
-      data: parsedData,
-      columns,
-    });
+    useDataTableWithStore<SchemaRow>("main-page-data-table-store");
 
   return (
     <Tabs
