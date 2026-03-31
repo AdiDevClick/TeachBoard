@@ -8,17 +8,19 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { EvaluationDetailDrawer } from "@/features/evaluations/main/components/EvaluationDetailDrawer";
-import { useState } from "react";
+import type { EvaluationSchemaRow } from "@/features/evaluations/main/Evaluations";
+import { useState, type ComponentProps } from "react";
 
 /**
  * Actions cell
  *
  * @description A menu with actions for each evaluation: Consulter (opens the detail drawer), Editer, Supprimer.
  */
-export function EvaluationActionsCell({
+
+export function EvaluationActionsCell<T extends EvaluationSchemaRow>({
   item,
   actionsList = ACTIONS_LIST,
-}: EvaluationActionsCellProps) {
+}: EvaluationActionsCellProps<T>) {
   const [open, setOpen] = useState(false);
   const layoutProps = {
     menu: {
@@ -26,7 +28,7 @@ export function EvaluationActionsCell({
         className: "w-fit",
       },
     },
-  };
+  } satisfies ComponentProps<typeof ActionsMenu>;
 
   const handleOnClick = (label: string) => {
     if (label === "Consulter") {
