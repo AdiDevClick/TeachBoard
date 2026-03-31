@@ -2,13 +2,14 @@ import withListMapper from "@/components/HOCs/withListMapper";
 import { DraggableRow } from "@/components/Tables/DraggableRow";
 import { EmptyRow } from "@/components/Tables/EmptyRow";
 import { RowsList } from "@/components/Tables/exports/data-table.exports";
-import { useDataTable } from "@/components/Tables/hooks/useDataTable";
+import { useDataTableWithStore } from "@/components/Tables/hooks/useDataTable";
 import { TableColumnsFilterToggle } from "@/components/Tables/TableColumnsFilterToggle";
 import { TablePagination } from "@/components/Tables/TablePagination";
 import type { EvaluationTableProps } from "@/components/Tables/types/evaluation-table.types";
 import type { DraggableRowProps } from "@/components/Tables/types/table.types";
 import { Table, TableBody, TableHeader } from "@/components/ui/table";
-import type { EvaluationItem } from "@/features/evaluations/main/types/evaluations-listing.types";
+import { EVALUATION_TABLE_STORE_NAME } from "@/features/evaluations/main/configs/evaluations.configs";
+import type { EvaluationSchemaRow } from "@/features/evaluations/main/Evaluations";
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
@@ -34,7 +35,7 @@ export function EvaluationTable({
   "use no memo";
 
   const { dataIds, sensors, sortableId, handleDragEnd, table, getItemId } =
-    useDataTable();
+    useDataTableWithStore<EvaluationSchemaRow>(EVALUATION_TABLE_STORE_NAME);
 
   const { getState, getHeaderGroups, getRowModel, getAllColumns } = table;
 
@@ -44,7 +45,7 @@ export function EvaluationTable({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-end gap-2 px-4 lg:px-6">
-        <TableColumnsFilterToggle />
+        <TableColumnsFilterToggle storeName={EVALUATION_TABLE_STORE_NAME} />
         {toolbarActions}
       </div>
       <div className="overflow-hidden rounded-lg border">
@@ -78,10 +79,10 @@ export function EvaluationTable({
           </Table>
         </DndContext>
       </div>
-      <TablePagination />
+      <TablePagination storeName={EVALUATION_TABLE_STORE_NAME} />
     </div>
   );
 }
 
 const DraggableRowsList =
-  withListMapper<DraggableRowProps<EvaluationItem>>(DraggableRow);
+  withListMapper<DraggableRowProps<EvaluationSchemaRow>>(DraggableRow);
