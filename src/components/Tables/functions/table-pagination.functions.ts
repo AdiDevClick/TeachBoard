@@ -1,4 +1,3 @@
-import type { EvaluationItem } from "@/features/evaluations/main/types/evaluations-listing.types";
 import type { Table } from "@tanstack/react-table";
 
 /**
@@ -9,10 +8,7 @@ import type { Table } from "@tanstack/react-table";
  *
  * @Returns `true` if the button should be disabled, `false` otherwise.
  */
-export function disableButtonHandler(
-  id: string,
-  tableState: Table<EvaluationItem>,
-) {
+export function disableButtonHandler<T>(id: string, tableState: Table<T>) {
   const { getCanPreviousPage, getCanNextPage } = tableState;
 
   if (id === "first" || id === "previous") {
@@ -28,10 +24,7 @@ export function disableButtonHandler(
  * @param id - The identifier of the pagination button that was clicked (e.g., "first", "previous", "next", "last").
  * @param tableState - The current state of the table, used to update the page index accordingly.
  */
-export function paginationClickHandler(
-  id: string,
-  tableState: Table<EvaluationItem>,
-) {
+export function paginationClickHandler<T>(id: string, tableState: Table<T>) {
   const { getPageCount, previousPage, nextPage, setPageIndex } = tableState;
 
   switch (id) {
