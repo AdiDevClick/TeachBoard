@@ -139,7 +139,7 @@ export function VerticalFieldSelect({
       <Select
         onOpenChange={handleOpenChange}
         onValueChange={handleValueChange}
-        value={value}
+        value={value ?? ""}
         defaultValue={value === undefined ? defaultValue : undefined}
         {...selectRootProps}
       >
