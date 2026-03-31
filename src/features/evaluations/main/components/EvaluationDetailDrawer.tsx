@@ -10,21 +10,13 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
-import type {
-  EvaluationDetail,
-  EvaluationItem,
-} from "@/features/evaluations/main/types/evaluations-listing.types";
+import type { EvaluationSchemaRow } from "@/features/evaluations/main/Evaluations";
 import { useIsMobile } from "@/hooks/use-mobile";
-
-const LONG_DATE_FORMAT: Intl.DateTimeFormatOptions = {
-  weekday: "long",
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-};
+import type { PropsWithChildren } from "react";
+import { Link } from "react-router-dom";
 
 type EvaluationDetailDrawerProps = Readonly<{
-  evaluation: EvaluationItem | null;
+  evaluation: EvaluationSchemaRow | null;
   onClose: () => void;
 }>;
 
@@ -45,76 +37,77 @@ function ScoreDisplay({ score }: Readonly<{ score: number }>) {
   );
 }
 
-function DetailContent({ detail }: Readonly<{ detail: EvaluationDetail }>) {
+function DetailContent({
+  evaluation,
+}: Readonly<{ evaluation: EvaluationSchemaRow }>) {
+  const { evaluations, comments, absentStudentNames } = evaluation;
   return (
     <div className="flex flex-col gap-6 overflow-y-auto px-4 py-2 text-sm">
-      {/* Modules */}
-      <section>
-        <h3 className="mb-2 font-semibold">Compétences évaluées</h3>
-        <ul className="flex flex-col gap-2">
-          {detail.moduleSummary.map((mod) => (
-            <li
-              key={mod.moduleCode}
-              className="flex items-center justify-between"
-            >
-              <span>
-                <span className="font-medium">{mod.moduleName}</span>
-                <span className="ml-2 text-xs text-muted-foreground">
-                  ({mod.moduleCode})
-                </span>
-              </span>
-              <ScoreDisplay score={mod.averageScore} />
-            </li>
-          ))}
-        </ul>
-      </section>
-
       <Separator />
 
-      {/* Students */}
-      <section>
-        <h3 className="mb-2 font-semibold">Résultats des élèves</h3>
-        <ul className="flex flex-col gap-1.5">
-          {detail.studentResults.map((student) => (
+      {/* Student evaluations */}
+      <DrawerSection title="Résultats des élèves">
+        <ul className="grid gap-1.5">
+          {evaluations.map((studentEval) => (
             <li
-              key={student.fullName}
+              key={studentEval.studentId}
               className="flex items-center justify-between rounded-md p-1.5 even:bg-muted/40"
             >
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant={student.isPresent ? "default" : "outline"}
-                  className="px-1.5 text-xs"
-                >
-                  {student.isPresent ? "Présent" : "Absent"}
-                </Badge>
-                <span>{student.fullName}</span>
-                {student.task && (
-                  <span className="text-xs text-muted-foreground">
-                    — {student.task}
-                  </span>
-                )}
+              <div className="grid items-center gap-2">
+                <p>{studentEval.studentName}</p>
+                <p className="text-xs text-muted-foreground">
+                  — {studentEval.assignedTaskName}
+                </p>
               </div>
-              {student.isPresent && student.overallScore !== null ? (
-                <ScoreDisplay score={student.overallScore} />
+              {studentEval.isPresent && studentEval.overallScore !== null ? (
+                <ScoreDisplay score={studentEval.overallScore} />
               ) : (
                 <span className="text-xs text-muted-foreground">—</span>
               )}
             </li>
           ))}
         </ul>
-      </section>
+      </DrawerSection>
 
-      {/* Comments */}
-      {detail.comments && (
+      {absentStudentNames && (
         <>
           <Separator />
-          <section>
-            <h3 className="mb-1 font-semibold">Commentaires</h3>
-            <p className="text-muted-foreground">{detail.comments}</p>
-          </section>
+          <DrawerSection title="Absents">
+            <p className="text-muted-foreground">
+              {absentStudentNames.map((name) => (
+                <Badge key={name} variant="outline" className="mr-1 mb-1">
+                  {name}
+                </Badge>
+              ))}
+            </p>
+          </DrawerSection>
+        </>
+      )}
+
+      {comments && (
+        <>
+          <Separator />
+          <DrawerSection title="Commentaires">
+            <p className="text-muted-foreground">{comments}</p>
+          </DrawerSection>
         </>
       )}
     </div>
+  );
+}
+
+type DrawerSectionProps = Readonly<
+  {
+    title: string;
+  } & PropsWithChildren
+>;
+
+function DrawerSection({ title, children }: DrawerSectionProps) {
+  return (
+    <section className="flex flex-col gap-2">
+      <h3 className="font-semibold">{title}</h3>
+      {children}
+    </section>
   );
 }
 
@@ -123,13 +116,6 @@ export function EvaluationDetailDrawer({
   onClose,
 }: EvaluationDetailDrawerProps) {
   const isMobile = useIsMobile();
-
-  const dateLabel = evaluation
-    ? new Date(evaluation.evaluationDate).toLocaleDateString(
-        "fr-FR",
-        LONG_DATE_FORMAT,
-      )
-    : "";
 
   return (
     <Drawer
@@ -142,21 +128,24 @@ export function EvaluationDetailDrawer({
       <DrawerContent>
         <DrawerHeader className="gap-1">
           <DrawerTitle>
-            {evaluation?.detail.title ?? "Détail de l'évaluation"}
+            {evaluation?.title ?? "Détail de l'évaluation"}
           </DrawerTitle>
-          <DrawerDescription>
-            {dateLabel}
-            {evaluation && (
-              <span className="ml-2 text-muted-foreground">
-                — {evaluation.className}
-              </span>
-            )}
+          <DrawerDescription
+            id="evaluation-detail-description"
+            className="ml-2 text-muted-foreground"
+          >
+            {`— ${evaluation?.className}`}
           </DrawerDescription>
         </DrawerHeader>
 
-        {evaluation && <DetailContent detail={evaluation.detail} />}
+        {evaluation && <DetailContent evaluation={evaluation} />}
 
         <DrawerFooter>
+          <Button variant="outline">
+            <Link to={`/evaluations/${evaluation?.id}`}>Ouvrir</Link>
+          </Button>
+          <Button variant="outline">Editer</Button>
+          <Button variant="outline">Supprimer</Button>
           <DrawerClose asChild>
             <Button variant="outline">Fermer</Button>
           </DrawerClose>
