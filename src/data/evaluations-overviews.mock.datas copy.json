@@ -1,0 +1,1533 @@
+[
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c2",
+    "title": "Evaluation du 6 mars 2026 (10)",
+    "comments": "test",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f3f",
+    "className": "BTS-1 1ere annee",
+    "evaluationDate": "2026-03-06T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df8",
+    "absentStudentNames": [
+      "Pierre Martin",
+      "Sophie Laurent",
+      "Lucas Moreau"
+    ],
+    "evaluations": [
+      {
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028328",
+        "studentName": "Jean Trops",
+        "isPresent": true,
+        "overallScore": 15,
+        "taskName": "Tache 2134"
+      },
+      {
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028328",
+        "studentName": "Marie Dupont",
+        "isPresent": true,
+        "overallScore": 15,
+        "taskName": "Tache 2134"
+      }
+    ],
+    "createdAt": "2026-03-06T18:16:59.624128Z"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c01",
+    "title": "Evaluation du 6 mars 2026 (1)",
+    "comments": "Commentaires test 1",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f1",
+    "evaluationDate": "2026-03-02T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df1",
+    "absentStudentNames": [
+      "Jean Trops",
+      "Marie Dupont"
+    ],
+    "evaluations": [
+      {
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028301",
+        "studentName": "George Dupuis",
+        "isPresent": false,
+        "overallScore": 11,
+        "taskName": "Tache 0001"
+      },
+      {
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028351",
+        "studentName": "Florence Moreau",
+        "isPresent": true,
+        "overallScore": 9,
+        "taskName": "Tache 0001"
+      }
+    ],
+    "createdAt": "2026-03-02T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c02",
+    "title": "Evaluation du 6 mars 2026 (2)",
+    "comments": "Commentaires test 2",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f2",
+    "evaluationDate": "2026-03-03T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df2",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 12,
+        "taskName": "Tache 0002",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028302",
+        "studentName": "Étudiant 8302"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 10,
+        "taskName": "Tache 0002",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028352",
+        "studentName": "Étudiant 8352"
+      }
+    ],
+    "createdAt": "2026-03-03T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8302",
+      "Étudiant 8303"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c03",
+    "title": "Evaluation du 6 mars 2026 (3)",
+    "comments": "Commentaires test 3",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f3",
+    "evaluationDate": "2026-03-04T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df3",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 13,
+        "taskName": "Tache 0003",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028303",
+        "studentName": "Étudiant 8303"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 11,
+        "taskName": "Tache 0003",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028353",
+        "studentName": "Étudiant 8353"
+      }
+    ],
+    "createdAt": "2026-03-04T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8303",
+      "Étudiant 8304"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c04",
+    "title": "Evaluation du 6 mars 2026 (4)",
+    "comments": "Commentaires test 4",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f4",
+    "evaluationDate": "2026-03-05T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df4",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 14,
+        "taskName": "Tache 0004",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028304",
+        "studentName": "Étudiant 8304"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 12,
+        "taskName": "Tache 0004",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028354",
+        "studentName": "Étudiant 8354"
+      }
+    ],
+    "createdAt": "2026-03-05T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8304",
+      "Étudiant 8305"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c05",
+    "title": "Evaluation du 6 mars 2026 (5)",
+    "comments": "Commentaires test 5",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f5",
+    "evaluationDate": "2026-03-06T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df5",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 15,
+        "taskName": "Tache 0005",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028305",
+        "studentName": "Étudiant 8305"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 13,
+        "taskName": "Tache 0005",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028355",
+        "studentName": "Étudiant 8355"
+      }
+    ],
+    "createdAt": "2026-03-06T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8305",
+      "Étudiant 8306"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c06",
+    "title": "Evaluation du 6 mars 2026 (6)",
+    "comments": "Commentaires test 6",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f6",
+    "evaluationDate": "2026-03-07T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df6",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 16,
+        "taskName": "Tache 0006",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028306",
+        "studentName": "Étudiant 8306"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 14,
+        "taskName": "Tache 0006",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028356",
+        "studentName": "Étudiant 8356"
+      }
+    ],
+    "createdAt": "2026-03-07T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8306",
+      "Étudiant 8307"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c07",
+    "title": "Evaluation du 6 mars 2026 (7)",
+    "comments": "Commentaires test 7",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f7",
+    "evaluationDate": "2026-03-08T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df7",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 17,
+        "taskName": "Tache 0007",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028307",
+        "studentName": "Étudiant 8307"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 15,
+        "taskName": "Tache 0007",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028357",
+        "studentName": "Étudiant 8357"
+      }
+    ],
+    "createdAt": "2026-03-08T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8307",
+      "Étudiant 8308"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c08",
+    "title": "Evaluation du 6 mars 2026 (8)",
+    "comments": "Commentaires test 8",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f8",
+    "evaluationDate": "2026-03-09T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df8",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 18,
+        "taskName": "Tache 0008",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028308",
+        "studentName": "Étudiant 8308"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 16,
+        "taskName": "Tache 0008",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028358",
+        "studentName": "Étudiant 8358"
+      }
+    ],
+    "createdAt": "2026-03-09T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8308",
+      "Étudiant 8309"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c09",
+    "title": "Evaluation du 6 mars 2026 (9)",
+    "comments": "Commentaires test 9",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f9",
+    "evaluationDate": "2026-03-10T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df9",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 19,
+        "taskName": "Tache 0009",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028309",
+        "studentName": "Étudiant 8309"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 17,
+        "taskName": "Tache 0009",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028359",
+        "studentName": "Étudiant 8359"
+      }
+    ],
+    "createdAt": "2026-03-10T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8309",
+      "Étudiant 8300"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c10",
+    "title": "Evaluation du 6 mars 2026 (10)",
+    "comments": "Commentaires test 10",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f0",
+    "evaluationDate": "2026-03-11T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df0",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 20,
+        "taskName": "Tache 0010",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028310",
+        "studentName": "Étudiant 8310"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 18,
+        "taskName": "Tache 0010",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028360",
+        "studentName": "Étudiant 8360"
+      }
+    ],
+    "createdAt": "2026-03-11T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8300",
+      "Étudiant 8301"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c11",
+    "title": "Evaluation du 6 mars 2026 (11)",
+    "comments": "Commentaires test 11",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f1",
+    "evaluationDate": "2026-03-12T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df1",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 10,
+        "taskName": "Tache 0011",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028311",
+        "studentName": "Étudiant 8311"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 19,
+        "taskName": "Tache 0011",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028361",
+        "studentName": "Étudiant 8361"
+      }
+    ],
+    "createdAt": "2026-03-12T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8301",
+      "Étudiant 8302"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c12",
+    "title": "Evaluation du 6 mars 2026 (12)",
+    "comments": "Commentaires test 12",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f2",
+    "evaluationDate": "2026-03-13T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df2",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 11,
+        "taskName": "Tache 0012",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028312",
+        "studentName": "Étudiant 8312"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 20,
+        "taskName": "Tache 0012",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028362",
+        "studentName": "Étudiant 8362"
+      }
+    ],
+    "createdAt": "2026-03-13T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8302",
+      "Étudiant 8303"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c13",
+    "title": "Evaluation du 6 mars 2026 (13)",
+    "comments": "Commentaires test 13",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f3",
+    "evaluationDate": "2026-03-14T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df3",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 12,
+        "taskName": "Tache 0013",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028313",
+        "studentName": "Étudiant 8313"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 8,
+        "taskName": "Tache 0013",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028363",
+        "studentName": "Étudiant 8363"
+      }
+    ],
+    "createdAt": "2026-03-14T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8303",
+      "Étudiant 8304"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c14",
+    "title": "Evaluation du 6 mars 2026 (14)",
+    "comments": "Commentaires test 14",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f4",
+    "evaluationDate": "2026-03-15T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df4",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 13,
+        "taskName": "Tache 0014",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028314",
+        "studentName": "Étudiant 8314"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 9,
+        "taskName": "Tache 0014",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028364",
+        "studentName": "Étudiant 8364"
+      }
+    ],
+    "createdAt": "2026-03-15T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8304",
+      "Étudiant 8305"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c15",
+    "title": "Evaluation du 6 mars 2026 (15)",
+    "comments": "Commentaires test 15",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f5",
+    "evaluationDate": "2026-03-16T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df5",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 14,
+        "taskName": "Tache 0015",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028315",
+        "studentName": "Étudiant 8315"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 10,
+        "taskName": "Tache 0015",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028365",
+        "studentName": "Étudiant 8365"
+      }
+    ],
+    "createdAt": "2026-03-16T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8305",
+      "Étudiant 8306"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c16",
+    "title": "Evaluation du 6 mars 2026 (16)",
+    "comments": "Commentaires test 16",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f6",
+    "evaluationDate": "2026-03-17T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df6",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 15,
+        "taskName": "Tache 0016",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028316",
+        "studentName": "Étudiant 8316"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 11,
+        "taskName": "Tache 0016",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028366",
+        "studentName": "Étudiant 8366"
+      }
+    ],
+    "createdAt": "2026-03-17T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8306",
+      "Étudiant 8307"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c17",
+    "title": "Evaluation du 6 mars 2026 (17)",
+    "comments": "Commentaires test 17",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f7",
+    "evaluationDate": "2026-03-18T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df7",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 16,
+        "taskName": "Tache 0017",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028317",
+        "studentName": "Étudiant 8317"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 12,
+        "taskName": "Tache 0017",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028367",
+        "studentName": "Étudiant 8367"
+      }
+    ],
+    "createdAt": "2026-03-18T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8307",
+      "Étudiant 8308"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c18",
+    "title": "Evaluation du 6 mars 2026 (18)",
+    "comments": "Commentaires test 18",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f8",
+    "evaluationDate": "2026-03-19T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df8",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 17,
+        "taskName": "Tache 0018",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028318",
+        "studentName": "Étudiant 8318"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 13,
+        "taskName": "Tache 0018",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028368",
+        "studentName": "Étudiant 8368"
+      }
+    ],
+    "createdAt": "2026-03-19T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8308",
+      "Étudiant 8309"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c19",
+    "title": "Evaluation du 6 mars 2026 (19)",
+    "comments": "Commentaires test 19",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f9",
+    "evaluationDate": "2026-03-20T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df9",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 18,
+        "taskName": "Tache 0019",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028319",
+        "studentName": "Étudiant 8319"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 14,
+        "taskName": "Tache 0019",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028369",
+        "studentName": "Étudiant 8369"
+      }
+    ],
+    "createdAt": "2026-03-20T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8309",
+      "Étudiant 8300"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c20",
+    "title": "Evaluation du 6 mars 2026 (20)",
+    "comments": "Commentaires test 20",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f0",
+    "evaluationDate": "2026-03-21T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df0",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 19,
+        "taskName": "Tache 0020",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028320",
+        "studentName": "Étudiant 8320"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 15,
+        "taskName": "Tache 0020",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028370",
+        "studentName": "Étudiant 8370"
+      }
+    ],
+    "createdAt": "2026-03-21T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8300",
+      "Étudiant 8301"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c21",
+    "title": "Evaluation du 6 mars 2026 (21)",
+    "comments": "Commentaires test 21",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f1",
+    "evaluationDate": "2026-03-22T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df1",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 20,
+        "taskName": "Tache 0021",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028321",
+        "studentName": "Étudiant 8321"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 16,
+        "taskName": "Tache 0021",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028371",
+        "studentName": "Étudiant 8371"
+      }
+    ],
+    "createdAt": "2026-03-22T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8301",
+      "Étudiant 8302"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c22",
+    "title": "Evaluation du 6 mars 2026 (22)",
+    "comments": "Commentaires test 22",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f2",
+    "evaluationDate": "2026-03-23T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df2",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 10,
+        "taskName": "Tache 0022",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028322",
+        "studentName": "Étudiant 8322"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 17,
+        "taskName": "Tache 0022",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028372",
+        "studentName": "Étudiant 8372"
+      }
+    ],
+    "createdAt": "2026-03-23T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8302",
+      "Étudiant 8303"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c23",
+    "title": "Evaluation du 6 mars 2026 (23)",
+    "comments": "Commentaires test 23",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f3",
+    "evaluationDate": "2026-03-24T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df3",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 11,
+        "taskName": "Tache 0023",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028323",
+        "studentName": "Étudiant 8323"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 18,
+        "taskName": "Tache 0023",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028373",
+        "studentName": "Étudiant 8373"
+      }
+    ],
+    "createdAt": "2026-03-24T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8303",
+      "Étudiant 8304"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c24",
+    "title": "Evaluation du 6 mars 2026 (24)",
+    "comments": "Commentaires test 24",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f4",
+    "evaluationDate": "2026-03-25T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df4",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 12,
+        "taskName": "Tache 0024",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028324",
+        "studentName": "Étudiant 8324"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 19,
+        "taskName": "Tache 0024",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028374",
+        "studentName": "Étudiant 8374"
+      }
+    ],
+    "createdAt": "2026-03-25T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8304",
+      "Étudiant 8305"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c25",
+    "title": "Evaluation du 6 mars 2026 (25)",
+    "comments": "Commentaires test 25",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f5",
+    "evaluationDate": "2026-03-26T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df5",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 13,
+        "taskName": "Tache 0025",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028325",
+        "studentName": "Étudiant 8325"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 20,
+        "taskName": "Tache 0025",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028375",
+        "studentName": "Étudiant 8375"
+      }
+    ],
+    "createdAt": "2026-03-26T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8305",
+      "Étudiant 8306"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c26",
+    "title": "Evaluation du 6 mars 2026 (26)",
+    "comments": "Commentaires test 26",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f6",
+    "evaluationDate": "2026-03-27T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df6",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 14,
+        "taskName": "Tache 0026",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028326",
+        "studentName": "Étudiant 8326"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 8,
+        "taskName": "Tache 0026",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028376",
+        "studentName": "Étudiant 8376"
+      }
+    ],
+    "createdAt": "2026-03-27T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8306",
+      "Étudiant 8307"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c27",
+    "title": "Evaluation du 6 mars 2026 (27)",
+    "comments": "Commentaires test 27",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f7",
+    "evaluationDate": "2026-03-28T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df7",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 15,
+        "taskName": "Tache 0027",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028327",
+        "studentName": "Étudiant 8327"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 9,
+        "taskName": "Tache 0027",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028377",
+        "studentName": "Étudiant 8377"
+      }
+    ],
+    "createdAt": "2026-03-28T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8307",
+      "Étudiant 8308"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c28",
+    "title": "Evaluation du 6 mars 2026 (28)",
+    "comments": "Commentaires test 28",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f8",
+    "evaluationDate": "2026-03-01T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df8",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 16,
+        "taskName": "Tache 0028",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028328",
+        "studentName": "Jean Trops"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 10,
+        "taskName": "Tache 0028",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028378",
+        "studentName": "Étudiant 8378"
+      }
+    ],
+    "createdAt": "2026-03-01T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8308",
+      "Étudiant 8309"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c29",
+    "title": "Evaluation du 6 mars 2026 (29)",
+    "comments": "Commentaires test 29",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f9",
+    "evaluationDate": "2026-03-02T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df9",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 17,
+        "taskName": "Tache 0029",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028329",
+        "studentName": "Étudiant 8329"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 11,
+        "taskName": "Tache 0029",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028379",
+        "studentName": "Étudiant 8379"
+      }
+    ],
+    "createdAt": "2026-03-02T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8309",
+      "Étudiant 8300"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c30",
+    "title": "Evaluation du 6 mars 2026 (30)",
+    "comments": "Commentaires test 30",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f0",
+    "evaluationDate": "2026-03-03T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df0",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 18,
+        "taskName": "Tache 0030",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028330",
+        "studentName": "Étudiant 8330"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 12,
+        "taskName": "Tache 0030",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028380",
+        "studentName": "Étudiant 8380"
+      }
+    ],
+    "createdAt": "2026-03-03T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8300",
+      "Étudiant 8301"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c31",
+    "title": "Evaluation du 6 mars 2026 (31)",
+    "comments": "Commentaires test 31",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f1",
+    "evaluationDate": "2026-03-04T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df1",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 19,
+        "taskName": "Tache 0031",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028331",
+        "studentName": "Étudiant 8331"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 13,
+        "taskName": "Tache 0031",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028381",
+        "studentName": "Étudiant 8381"
+      }
+    ],
+    "createdAt": "2026-03-04T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8301",
+      "Étudiant 8302"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c32",
+    "title": "Evaluation du 6 mars 2026 (32)",
+    "comments": "Commentaires test 32",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f2",
+    "evaluationDate": "2026-03-05T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df2",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 20,
+        "taskName": "Tache 0032",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028332",
+        "studentName": "Étudiant 8332"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 14,
+        "taskName": "Tache 0032",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028382",
+        "studentName": "Étudiant 8382"
+      }
+    ],
+    "createdAt": "2026-03-05T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8302",
+      "Étudiant 8303"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c33",
+    "title": "Evaluation du 6 mars 2026 (33)",
+    "comments": "Commentaires test 33",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f3",
+    "evaluationDate": "2026-03-06T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df3",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 10,
+        "taskName": "Tache 0033",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028333",
+        "studentName": "Étudiant 8333"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 15,
+        "taskName": "Tache 0033",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028383",
+        "studentName": "Étudiant 8383"
+      }
+    ],
+    "createdAt": "2026-03-06T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8303",
+      "Étudiant 8304"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c34",
+    "title": "Evaluation du 6 mars 2026 (34)",
+    "comments": "Commentaires test 34",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f4",
+    "evaluationDate": "2026-03-07T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df4",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 11,
+        "taskName": "Tache 0034",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028334",
+        "studentName": "Étudiant 8334"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 16,
+        "taskName": "Tache 0034",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028384",
+        "studentName": "Étudiant 8384"
+      }
+    ],
+    "createdAt": "2026-03-07T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8304",
+      "Étudiant 8305"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c35",
+    "title": "Evaluation du 6 mars 2026 (35)",
+    "comments": "Commentaires test 35",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f5",
+    "evaluationDate": "2026-03-08T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df5",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 12,
+        "taskName": "Tache 0035",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028335",
+        "studentName": "Étudiant 8335"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 17,
+        "taskName": "Tache 0035",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028385",
+        "studentName": "Étudiant 8385"
+      }
+    ],
+    "createdAt": "2026-03-08T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8305",
+      "Étudiant 8306"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c36",
+    "title": "Evaluation du 6 mars 2026 (36)",
+    "comments": "Commentaires test 36",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f6",
+    "evaluationDate": "2026-03-09T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df6",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 13,
+        "taskName": "Tache 0036",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028336",
+        "studentName": "Étudiant 8336"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 18,
+        "taskName": "Tache 0036",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028386",
+        "studentName": "Étudiant 8386"
+      }
+    ],
+    "createdAt": "2026-03-09T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8306",
+      "Étudiant 8307"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c37",
+    "title": "Evaluation du 6 mars 2026 (37)",
+    "comments": "Commentaires test 37",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f7",
+    "evaluationDate": "2026-03-10T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df7",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 14,
+        "taskName": "Tache 0037",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028337",
+        "studentName": "Étudiant 8337"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 19,
+        "taskName": "Tache 0037",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028387",
+        "studentName": "Étudiant 8387"
+      }
+    ],
+    "createdAt": "2026-03-10T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8307",
+      "Étudiant 8308"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c38",
+    "title": "Evaluation du 6 mars 2026 (38)",
+    "comments": "Commentaires test 38",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f8",
+    "evaluationDate": "2026-03-11T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df8",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 15,
+        "taskName": "Tache 0038",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028338",
+        "studentName": "Étudiant 8338"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 20,
+        "taskName": "Tache 0038",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028388",
+        "studentName": "Étudiant 8388"
+      }
+    ],
+    "createdAt": "2026-03-11T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8308",
+      "Étudiant 8309"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c39",
+    "title": "Evaluation du 6 mars 2026 (39)",
+    "comments": "Commentaires test 39",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f9",
+    "evaluationDate": "2026-03-12T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df9",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 16,
+        "taskName": "Tache 0039",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028339",
+        "studentName": "Étudiant 8339"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 8,
+        "taskName": "Tache 0039",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028389",
+        "studentName": "Étudiant 8389"
+      }
+    ],
+    "createdAt": "2026-03-12T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8309",
+      "Étudiant 8300"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c40",
+    "title": "Evaluation du 6 mars 2026 (40)",
+    "comments": "Commentaires test 40",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f0",
+    "evaluationDate": "2026-03-13T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df0",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 17,
+        "taskName": "Tache 0040",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028340",
+        "studentName": "Étudiant 8340"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 9,
+        "taskName": "Tache 0040",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028390",
+        "studentName": "Étudiant 8390"
+      }
+    ],
+    "createdAt": "2026-03-13T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8300",
+      "Étudiant 8301"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c41",
+    "title": "Evaluation du 6 mars 2026 (41)",
+    "comments": "Commentaires test 41",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f1",
+    "evaluationDate": "2026-03-14T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df1",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 18,
+        "taskName": "Tache 0041",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028341",
+        "studentName": "Étudiant 8341"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 10,
+        "taskName": "Tache 0041",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028391",
+        "studentName": "Étudiant 8391"
+      }
+    ],
+    "createdAt": "2026-03-14T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8301",
+      "Étudiant 8302"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c42",
+    "title": "Evaluation du 6 mars 2026 (42)",
+    "comments": "Commentaires test 42",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f2",
+    "evaluationDate": "2026-03-15T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df2",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 19,
+        "taskName": "Tache 0042",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028342",
+        "studentName": "Étudiant 8342"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 11,
+        "taskName": "Tache 0042",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028392",
+        "studentName": "Étudiant 8392"
+      }
+    ],
+    "createdAt": "2026-03-15T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8302",
+      "Étudiant 8303"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c43",
+    "title": "Evaluation du 6 mars 2026 (43)",
+    "comments": "Commentaires test 43",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f3",
+    "evaluationDate": "2026-03-16T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df3",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 20,
+        "taskName": "Tache 0043",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028343",
+        "studentName": "Étudiant 8343"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 12,
+        "taskName": "Tache 0043",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028393",
+        "studentName": "Étudiant 8393"
+      }
+    ],
+    "createdAt": "2026-03-16T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8303",
+      "Étudiant 8304"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c44",
+    "title": "Evaluation du 6 mars 2026 (44)",
+    "comments": "Commentaires test 44",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f4",
+    "evaluationDate": "2026-03-17T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df4",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 10,
+        "taskName": "Tache 0044",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028344",
+        "studentName": "Étudiant 8344"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 13,
+        "taskName": "Tache 0044",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028394",
+        "studentName": "Étudiant 8394"
+      }
+    ],
+    "createdAt": "2026-03-17T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8304",
+      "Étudiant 8305"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c45",
+    "title": "Evaluation du 6 mars 2026 (45)",
+    "comments": "Commentaires test 45",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f5",
+    "evaluationDate": "2026-03-18T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df5",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 11,
+        "taskName": "Tache 0045",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028345",
+        "studentName": "Étudiant 8345"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 14,
+        "taskName": "Tache 0045",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028395",
+        "studentName": "Étudiant 8395"
+      }
+    ],
+    "createdAt": "2026-03-18T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8305",
+      "Étudiant 8306"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c46",
+    "title": "Evaluation du 6 mars 2026 (46)",
+    "comments": "Commentaires test 46",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f6",
+    "evaluationDate": "2026-03-19T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df6",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 12,
+        "taskName": "Tache 0046",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028346",
+        "studentName": "Étudiant 8346"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 15,
+        "taskName": "Tache 0046",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028396",
+        "studentName": "Étudiant 8396"
+      }
+    ],
+    "createdAt": "2026-03-19T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8306",
+      "Étudiant 8307"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c47",
+    "title": "Evaluation du 6 mars 2026 (47)",
+    "comments": "Commentaires test 47",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f7",
+    "evaluationDate": "2026-03-20T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df7",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 13,
+        "taskName": "Tache 0047",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028347",
+        "studentName": "Étudiant 8347"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 16,
+        "taskName": "Tache 0047",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028397",
+        "studentName": "Étudiant 8397"
+      }
+    ],
+    "createdAt": "2026-03-20T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8307",
+      "Étudiant 8308"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c48",
+    "title": "Evaluation du 6 mars 2026 (48)",
+    "comments": "Commentaires test 48",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f8",
+    "evaluationDate": "2026-03-21T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df8",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 14,
+        "taskName": "Tache 0048",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028348",
+        "studentName": "Étudiant 8348"
+      },
+      {
+        "isPresent": false,
+        "overallScore": 17,
+        "taskName": "Tache 0048",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028398",
+        "studentName": "Étudiant 8398"
+      }
+    ],
+    "createdAt": "2026-03-21T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8308",
+      "Étudiant 8309"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c49",
+    "title": "Evaluation du 6 mars 2026 (49)",
+    "comments": "Commentaires test 49",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f9",
+    "evaluationDate": "2026-03-22T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df9",
+    "evaluations": [
+      {
+        "isPresent": false,
+        "overallScore": 15,
+        "taskName": "Tache 0049",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028349",
+        "studentName": "Étudiant 8349"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 18,
+        "taskName": "Tache 0049",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f02028399",
+        "studentName": "Étudiant 8399"
+      }
+    ],
+    "createdAt": "2026-03-22T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee",
+    "absentStudentNames": [
+      "Étudiant 8309",
+      "Étudiant 8300"
+    ]
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c50",
+    "title": "Evaluation du 6 mars 2026 (50)",
+    "comments": "Commentaires test 50",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f0",
+    "evaluationDate": "2026-03-23T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df0",
+    "evaluations": [
+      {
+        "isPresent": true,
+        "overallScore": 16,
+        "taskName": "Tache 0050",
+        "studentId": "1f0de94c-8785-62a3-a03b-131f02028350",
+        "studentName": "Étudiant 8350"
+      },
+      {
+        "isPresent": true,
+        "overallScore": 19,
+        "taskName": "Tache 0050",
+        "studentId": "1f0de94c-8d03-66a7-a03b-131f020283100",
+        "studentName": "Étudiant 3100"
+      }
+    ],
+    "createdAt": "2026-03-23T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee",
+    "absentStudentNames": [
+      "Étudiant 8300",
+      "Étudiant 8301"
+    ]
+  }
+]
