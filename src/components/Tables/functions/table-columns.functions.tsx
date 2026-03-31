@@ -1,22 +1,23 @@
 import { DragHandle } from "@/components/Tables/DragHandle";
 import { EvaluationActionsCell } from "@/components/Tables/EvaluationActionsCell";
 import { EvaluationClassCell } from "@/components/Tables/EvaluationClassCell";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { EvaluationItem } from "@/features/evaluations/main/types/evaluations-listing.types";
+import type { EvaluationSchemaRow } from "@/features/evaluations/main/Evaluations";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import type {
   CellContext,
   ColumnDef,
   HeaderContext,
 } from "@tanstack/react-table";
+import { ArrowUpDown } from "lucide-react";
 
 /**
  * Create the drag column for row reordering in the table.
  *
  * @param getItemId - A function that takes an item and returns its unique identifier, used for drag-and-drop operations.
  */
-export function createDragColumn<T>(
+export function createDragColumn<T extends EvaluationSchemaRow>(
   getItemId: (item: T) => UniqueIdentifier,
 ): ColumnDef<T, unknown> {
   return {
@@ -31,7 +32,9 @@ export function createDragColumn<T>(
 /**
  * Create the selection column (checkbox) for multiple row selection.
  */
-export function createSelectionColumn<T>(): ColumnDef<T> {
+export function createSelectionColumn<
+  T extends EvaluationSchemaRow,
+>(): ColumnDef<T> {
   return {
     id: "select",
     header: ({ table }: HeaderContext<T, unknown>) => (
@@ -60,11 +63,22 @@ export function createSelectionColumn<T>(): ColumnDef<T> {
  * Create the class names column for the evaluation table, which renders the class name as a button that opens a detail drawer when clicked.
  */
 export function createClassNamesColumn<
-  T extends EvaluationItem,
+  T extends EvaluationSchemaRow,
 >(): ColumnDef<T> {
   return {
     accessorKey: "className",
-    header: "Classe",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="p-0!"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          {"Classe"}
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }: CellContext<T, unknown>) => (
       <EvaluationClassCell item={row.original} />
     ),
@@ -73,12 +87,25 @@ export function createClassNamesColumn<
 }
 
 /**
- * Create the diploma column for the evaluation table, which displays the name of the diploma associated with each evaluation.
+ * Create the title column for the evaluation table, which displays the title associated with each evaluation.
  */
-export function createDiplomaColumn<T extends EvaluationItem>(): ColumnDef<T> {
+export function createTitleColumn<
+  T extends EvaluationSchemaRow,
+>(): ColumnDef<T> {
   return {
-    accessorKey: "diplomaName",
-    header: "Diplôme",
+    accessorKey: "title",
+    header: ({ column }) => {
+      return (
+        <Button
+          className="p-0!"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Titre
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
   };
 }
 
@@ -86,53 +113,41 @@ export function createDiplomaColumn<T extends EvaluationItem>(): ColumnDef<T> {
  * Create the evaluation date column for the evaluation table, which formats the evaluation date as a localized string in French.
  */
 export function createEvaluationDateColumn<
-  T extends EvaluationItem,
+  T extends EvaluationSchemaRow,
 >(): ColumnDef<T> {
   return {
     accessorKey: "evaluationDate",
-    header: "Date d'évaluation",
-    cell: ({ row }: CellContext<T, unknown>) =>
-      new Date(row.original.evaluationDate).toLocaleDateString("fr-FR"),
-  };
-}
-
-/**
- * Create the student count column for the evaluation table, which displays the number of students evaluated in each evaluation.
- */
-export function createStudentCountColumn<
-  T extends EvaluationItem,
->(): ColumnDef<T> {
-  return {
-    accessorKey: "studentCount",
-    header: "Élèves évalués",
-  };
-}
-
-/**
- * Create the status column for the evaluation table, which displays the status of each evaluation as a badge (e.g., "Terminée" for completed evaluations and "Brouillon" for drafts).
- */
-export function createStatusColumn<T extends EvaluationItem>(): ColumnDef<T> {
-  return {
-    accessorKey: "status",
-    header: "Statut",
-    cell: ({ row }: CellContext<T, unknown>) => {
-      const status = row.original.status;
+    header: ({ column }) => {
       return (
-        <Badge
-          variant={status === "completed" ? "default" : "outline"}
-          className="px-1.5 text-muted-foreground"
+        <Button
+          className="p-0!"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          {status === "completed" ? "Terminée" : "Brouillon"}
-        </Badge>
+          {"Date d'évaluation"}
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
       );
     },
+    cell: ({ row }: CellContext<T, unknown>) => {
+      const date = new Date(row.original.evaluationDate);
+      const hour = date.getHours();
+      const minute = date.getMinutes();
+      const formattedHour = hour.toString().padStart(2, "0");
+      const formattedMinute = minute.toString().padStart(2, "0");
+
+      return `Le ${date.toLocaleDateString("fr-FR")} à ${formattedHour}h${formattedMinute}`;
+    },
+    enableSorting: true,
   };
 }
 
 /**
  * Create the actions column for the evaluation table, which renders a cell with action buttons (e.g., view details, edit, delete) for each evaluation.
  */
-export function createActionsColumn<T extends EvaluationItem>(): ColumnDef<T> {
+export function createActionsColumn<
+  T extends EvaluationSchemaRow,
+>(): ColumnDef<T> {
   return {
     id: "actions",
     cell: ({ row }: CellContext<T, unknown>) => (
