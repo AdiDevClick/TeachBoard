@@ -1,4 +1,5 @@
 import type { DialogContextType } from "@/api/contexts/types/context.types.ts";
+import { UUID_SCHEMA } from "@/api/types/openapi/common.types";
 import { debugLogs } from "@/configs/app-components.config.ts";
 import { LANGUAGE, type AppModalNames } from "@/configs/app.config";
 import type {
@@ -6,6 +7,8 @@ import type {
   AnyObjectProps,
   PreventDefaultAndStopPropagation,
   ProbeProxyResult,
+  PromiseStateResult,
+  PromiseStateSettledResult,
 } from "@/utils/types/types.utils.ts";
 import { clsx, type ClassValue } from "clsx";
 import { type ComponentType } from "react";
@@ -132,15 +135,25 @@ export function waitAndFail(
     }
   });
 }
-type PromiseStateResult<T> =
-  | { status: "pending" }
-  | { status: "fulfilled"; value: T; key?: string }
-  | { status: "rejected"; reason: string; key?: string };
 
-type PromiseStateSettledResult<T> = Exclude<
-  PromiseStateResult<T>,
-  { status: "pending" }
->;
+/**
+ * Parse an ID, ensuring it is a valid UUID string.
+ *
+ * @returns The parsed UUID string if valid.
+ * @throws If the provided ID is not a valid UUID string.
+ *
+ * @example
+ * const validId = "123e4567-e89b-12d3-a456-426614174000";
+ */
+export function parseToUuid(id?: string) {
+  const parsed = UUID_SCHEMA.safeParse(id);
+
+  if (!parsed.success) {
+    throw new Error("Invalid ID");
+  }
+
+  return parsed.data;
+}
 
 /**
  * Track the state of a promise, returning its status and value or reason once it settles.

@@ -258,5 +258,15 @@ export type RemoveStringIndex<T> = {
   [K in keyof T as string extends K ? never : K]: T[K];
 };
 
+export type PromiseStateResult<T> =
+  | { status: "pending" }
+  | { status: "fulfilled"; value: T; key?: string }
+  | { status: "rejected"; reason: string; key?: string };
+
+export type PromiseStateSettledResult<T> = Exclude<
+  PromiseStateResult<T>,
+  { status: "pending" }
+>;
+
 type _GenericSuccess<T extends ResponseInterface> = T;
 type _GenericError<T extends ApiError> = T;
