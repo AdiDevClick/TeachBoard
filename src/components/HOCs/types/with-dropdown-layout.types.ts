@@ -11,10 +11,8 @@ import type { ComponentProps } from "react";
  *
  * @template C - Props type for the wrapped component.
  */
-export type DropdownLayoutProps<C> = {
+export type DropdownLayoutProps<C> = C & {
   menu?: DropdownMenuLayoutContextType<C>;
-  /** Props for the wrapped component */
-  rest?: C;
 } & ComponentProps<typeof DropdownMenu>;
 
 /**
