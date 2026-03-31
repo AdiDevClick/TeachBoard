@@ -101,6 +101,7 @@ export type AppModalNames =
   | "evaluation-attendance"
   | "evaluation-module-selection"
   | "evaluation-summary"
+  | "evaluation-overview"
   | "availability";
 
 /**
