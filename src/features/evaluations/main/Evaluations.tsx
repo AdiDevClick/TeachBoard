@@ -2,20 +2,20 @@ import { EvaluationTable } from "@/components/Tables/EvaluationTable";
 import {
   createActionsColumn,
   createClassNamesColumn,
-  createDiplomaColumn,
   createDragColumn,
   createEvaluationDateColumn,
   createSelectionColumn,
-  createStatusColumn,
-  createStudentCountColumn,
+  createTitleColumn,
 } from "@/components/Tables/functions/table-columns.functions";
 import { Button } from "@/components/ui/button";
-import { useEvaluationTableStore } from "@/features/evaluations/main/api/store/TableStore";
-import type { EvaluationItem } from "@/features/evaluations/main/types/evaluations-listing.types";
-import mockData from "@data/evaluations.mock.datas.json";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
+import { useEvaluationTableStore } from "@/features/evaluations/main/configs/evaluations.configs";
+import type { EvaluationsMainProps } from "@/features/evaluations/main/types/evaluations.types";
+import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import { IconPlus } from "@tabler/icons-react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useEffect } from "react";
+import { useEffect, useEffectEvent } from "react";
+import z from "zod";
 
 /**
  * Columns configuration
@@ -28,35 +28,118 @@ import { useEffect } from "react";
  *
  * @see `table-columns.functions.tsx` for more details on each column definition.
  */
-const columns: ColumnDef<EvaluationItem>[] = [
+const columns: ColumnDef<EvaluationSchemaRow>[] = [
   createDragColumn((item) => item.id),
-  createSelectionColumn<EvaluationItem>(),
-  createClassNamesColumn<EvaluationItem>(),
-  createDiplomaColumn<EvaluationItem>(),
-  createEvaluationDateColumn<EvaluationItem>(),
-  createStudentCountColumn<EvaluationItem>(),
-  createStatusColumn<EvaluationItem>(),
-  createActionsColumn<EvaluationItem>(),
+  createSelectionColumn(),
+  createClassNamesColumn(),
+  createTitleColumn(),
+  createEvaluationDateColumn(),
+  createActionsColumn(),
 ];
+
+const schema = z.object({
+  id: z.string(),
+  title: z.string(),
+  comments: z.string().optional(),
+  classId: z.string(),
+  className: z.string(),
+  evaluationDate: z.string(),
+  userId: z.string(),
+  absentStudentNames: z.array(z.string()),
+  // attendedModules: z.array(
+  //   z.object({
+  //     id: z.string(),
+  //     name: z.string(),
+  //     code: z.string(),
+  //   }),
+  // ),
+  evaluations: z.array(
+    z.object({
+      studentId: z.string(),
+      studentName: z.string(),
+      // id: z.string(),
+      isPresent: z.boolean(),
+      overallScore: z.number().min(0).max(20).nullable(),
+      assignedTaskName: z.string(),
+      // assignedTaskId: z.string(),
+      // modules: z.array(
+      //   z.object({
+      //     id: z.string(),
+      //     subSkills: z.array(
+      //       z.object({
+      //         id: z.string(),
+      //         score: z.number().min(0).max(100),
+      //       }),
+      //     ),
+      //   }),
+      // ),
+    }),
+  ),
+});
+
+export type EvaluationSchemaRow = z.infer<typeof schema>;
 
 /**
  * Evaluation page
  *
- * @description Display a table of evaluations with columns: Classe, Diplôme, Date d'évaluation, Élèves évalués, Statut, Actions.
+ * @description Display a table of evaluations with columns: Classe, Titre, Date d'évaluation, Élèves évalués, Statut, Actions.
  */
-export function EvaluationsMain() {
-  useEvaluationTableStore.setState({ columns });
+export function EvaluationsMain({
+  apiEndpoint = API_ENDPOINTS.GET.EVALUATIONS.endpoints.OVERVIEWS,
+  dataReshapeFn = API_ENDPOINTS.GET.EVALUATIONS.dataReshape,
+  task = "evaluation-overview",
+}: EvaluationsMainProps) {
+  const { openingCallback, data } = useCommandHandler({
+    form: null!,
+    pageId: task,
+    submitDataReshapeFn: dataReshapeFn,
+  });
+
+  /**
+   * Initial data fetch
+   */
+  const fetchInit = useEffectEvent(() => {
+    openingCallback(true, {
+      dataReshapeFn,
+      apiEndpoint,
+      task,
+    });
+  });
 
   /**
    * Init Store data & columns
    */
   useEffect(() => {
+    useEvaluationTableStore.setState({
+      columns,
+    });
+    fetchInit();
+  }, []);
+
+  /**
+   * Data parsing and store initialization
+   *
+   * @description When the data is fetched and updated, it is parsed using the defined Zod schema.
+   *
+   * @see `schema` for the expected data structure.
+   */
+  useEffect(() => {
+    if (data === undefined || data === null) return;
+
+    const parseResult = z.array(schema).safeParse(data);
+    if (!parseResult.success) {
+      throw new Error("EvaluationsMain: response does not match schema", {
+        cause: parseResult.error,
+      });
+    }
+
     const store = useEvaluationTableStore.getState();
+    const parsedData = parseResult.data;
 
     if (store.data.length === 0) {
-      useEvaluationTableStore.setState({ data: mockData as EvaluationItem[] });
+      useEvaluationTableStore.setState({ data: parsedData });
     }
-  }, []);
+  }, [data]);
 
   return (
     <div className="flex flex-col gap-4 px-4 py-6 lg:px-6">
