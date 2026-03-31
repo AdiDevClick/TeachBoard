@@ -1,13 +1,12 @@
 import { useAppStore } from "@/api/store/AppStore";
-import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
-import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import type { SkillDto } from "@/api/types/routes/skills.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
+import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import type { HandleSelectionCallbackParams } from "@/hooks/database/types/use-command-handler.types.ts";
+import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import { renderCommandHook } from "@/tests/hooks/reusable-hooks";
-import { cleanup, render } from "vitest-browser-react";
 import {
   moduleModal,
   skillApiEndpoint,
@@ -27,6 +26,7 @@ import { stubFetchRoutes } from "@/tests/test-utils/vitest-browser.helpers";
 import { UniqueSet } from "@/utils/UniqueSet";
 import { wait } from "@/utils/utils.ts";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import { cleanup, render } from "vitest-browser-react";
 
 const click = () => new MouseEvent("click");
 const baseFields: HandleSelectionCallbackParams["options"] = {
