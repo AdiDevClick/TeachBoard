@@ -17,6 +17,7 @@ import type { TablePaginationProps } from "@/components/Tables/types/table-pagin
  * Component responsible for the pagination controls of the evaluation table, including page size selection and navigation buttons.
  */
 export function TablePagination({
+  storeName,
   label = PAGINATION_SIZE_LABEL,
   paginationButtons = PAGINATION_BUTTONS,
 }: TablePaginationProps) {
@@ -30,7 +31,7 @@ export function TablePagination({
     pageSize,
     onValueChangeHandler,
     pageSizeOptions,
-  } = useTablePagination();
+  } = useTablePagination(storeName);
 
   return (
     <div className="flex items-center justify-between px-4">
