@@ -1,6 +1,9 @@
 import { DEFAULT_PAGE_SIZE } from "@/components/Tables/configs/table.config";
-import type { TableState } from "@/features/evaluations/main/api/store/types/table-store.types";
-import type { EvaluationItem } from "@/features/evaluations/main/types/evaluations-listing.types";
+import type {
+  RowItemWithId,
+  TableState,
+} from "@/features/evaluations/main/api/store/types/table-store.types";
+import { TableStoreRegistry } from "@/utils/TableStoreRegistry";
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -15,24 +18,6 @@ import { create } from "zustand";
 import { combine, devtools, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
-export const DEFAULT_PERSIST_NAME = "evaluation-table-store";
-
-export type RowItemWithId = { id: string | number };
-
-export type TableStoreSlice<T extends RowItemWithId> = TableState<T> & {
-  getItemId: (item: T) => RowItemWithId["id"];
-  setData: (data: T[]) => void;
-  setColumns: (columns: ColumnDef<T>[]) => void;
-  setRowSelection: (rowSelection: Updater<RowSelectionState>) => void;
-  setSorting: (sorting: Updater<SortingState>) => void;
-  setColumnVisibility: (columnVisibility: Updater<VisibilityState>) => void;
-  setColumnFilters: (columnFilters: Updater<ColumnFiltersState>) => void;
-  setPagination: (pagination: Updater<PaginationState>) => void;
-};
-
-export type TableStoreSelector<T extends RowItemWithId> =
-  () => TableStoreSlice<T>;
-
 function createDefaultState<T extends RowItemWithId>(): TableState<T> {
   return {
     data: [],
@@ -46,20 +31,6 @@ function createDefaultState<T extends RowItemWithId>(): TableState<T> {
       pageSize: DEFAULT_PAGE_SIZE,
     },
   };
-}
-
-function resolvePersistName(storeName?: string): string {
-  const normalizedName = storeName?.trim();
-
-  if (!normalizedName || normalizedName === DEFAULT_PERSIST_NAME) {
-    return DEFAULT_PERSIST_NAME;
-  }
-
-  if (normalizedName.startsWith(`${DEFAULT_PERSIST_NAME}:`)) {
-    return normalizedName;
-  }
-
-  return `${DEFAULT_PERSIST_NAME}:${normalizedName}`;
 }
 
 function resolveUpdater<T>(updaterOrValue: Updater<T>, previous: T): T {
@@ -141,48 +112,22 @@ export function createTableStore<T extends RowItemWithId>(storeName: string) {
           })),
         ),
         {
-          name: resolvePersistName(storeName),
+          name: storeName,
         },
       ),
     ),
   );
 }
 
-export function createTableStoreGetter<T extends RowItemWithId>() {
-  const defaultStore = createTableStore<T>(DEFAULT_PERSIST_NAME);
-
-  const tableStoreRegistry = new Map<string, typeof defaultStore>([
-    [DEFAULT_PERSIST_NAME, defaultStore],
-  ]);
-
-  function getStore(storeName: string = DEFAULT_PERSIST_NAME) {
-    const persistName = resolvePersistName(storeName);
-    const existingStore = tableStoreRegistry.get(persistName);
-
-    if (existingStore) {
-      return existingStore;
-    }
-
-    const store = createTableStore<T>(storeName);
-    tableStoreRegistry.set(persistName, store);
-
-    return store;
-  }
-
-  return {
-    defaultStore,
-    getStore,
-  };
-}
-
-const tableStoreGetter = createTableStoreGetter<EvaluationItem>();
+/**
+ * Create and centralise tables stores.
+ */
+export const TABLES_STORES = new TableStoreRegistry();
 
 /**
- * Returns one shared store instance per persistence key.
+ * Custom hook to access a table store state by name
+ *
+ * @param storeName - The name of the table store to access. If not provided, the default store will be used.
  */
-export const getTableStore = tableStoreGetter.getStore;
-
-/**
- * Dedicated store used by the main evaluations table (backward compatible export).
- */
-export const useEvaluationTableStore = tableStoreGetter.defaultStore;
+export const useTablesStores = <T extends RowItemWithId>(storeName?: string) =>
+  TABLES_STORES.getStore<T>(storeName)();
