@@ -1,15 +1,15 @@
 import { GENERATE_PAGINATION_COUNT } from "@/components/Tables/configs/pagination.configs";
 import { PAGE_SIZE_OPTIONS } from "@/components/Tables/configs/table.config";
-import { useDataTable } from "@/components/Tables/hooks/useDataTable";
+import { useDataTableWithStore } from "@/components/Tables/hooks/useDataTable";
 
 /**
  * Hook that encapsulates the logic for managing pagination in the evaluation table, including page size selection, pagination text generation, and selection count. It interacts with the table instance to retrieve and update pagination state.
  */
-export function useTablePagination() {
+export function useTablePagination(storeName?: string) {
   // mandatory
   "use no memo";
 
-  const { table } = useDataTable();
+  const { table } = useDataTableWithStore(storeName);
 
   const {
     getState,
