@@ -1,6 +1,7 @@
 import type { EvaluationClassCellProps } from "@/components/Tables/types/evaluation-table.types";
 import { Button } from "@/components/ui/button";
 import { EvaluationDetailDrawer } from "@/features/evaluations/main/components/EvaluationDetailDrawer";
+import type { EvaluationSchemaRow } from "@/features/evaluations/main/Evaluations";
 import { useState } from "react";
 
 /**
@@ -10,7 +11,10 @@ import { useState } from "react";
  *
  * @param item - The evaluation item containing the class name and other details to be displayed in the drawer.
  */
-export function EvaluationClassCell({ item }: EvaluationClassCellProps) {
+
+export function EvaluationClassCell<T extends EvaluationSchemaRow>({
+  item,
+}: EvaluationClassCellProps<T>) {
   const [open, setOpen] = useState(false);
 
   return (
