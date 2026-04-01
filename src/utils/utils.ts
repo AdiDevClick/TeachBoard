@@ -146,13 +146,17 @@ export function waitAndFail(
  * const validId = "123e4567-e89b-12d3-a456-426614174000";
  */
 export function parseToUuid(id?: string) {
-  const parsed = UUID_SCHEMA.safeParse(id);
+  try {
+    const parsed = UUID_SCHEMA.safeParse(id);
 
-  if (!parsed.success) {
-    throw new Error("Invalid ID");
+    if (!parsed.success) {
+      throw new Error("Invalid ID");
+    }
+
+    return parsed.data;
+  } catch {
+    return null;
   }
-
-  return parsed.data;
 }
 
 /**
