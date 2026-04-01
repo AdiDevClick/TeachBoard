@@ -61,7 +61,7 @@ export function useCommandHandler<
   TForm extends FieldValues,
   TRoute = unknown,
   TSubmitReshapeFn = unknown,
-  S extends ApiSuccess<any> = ApiSuccess<
+  S extends ApiSuccess<object> = ApiSuccess<
     NormalizeMeta<InferServerData<NonNullable<TRoute>, TSubmitReshapeFn>>
   >,
   E extends ApiError = ApiError,
@@ -337,9 +337,9 @@ export function useCommandHandler<
      />
     * ```
    */
-  const handleDataCacheUpdate = (): HeadingType[] => {
+  const handleDataCacheUpdate = <T = HeadingType[]>() => {
     const cacheKey = resolveFetchCacheKey(fetchParams);
-    const cachedData = queryClient.getQueryData(cacheKey);
+    const cachedData = queryClient.getQueryData<T>(cacheKey);
 
     debugLogs("useCommandHandler:handleDataCacheUpdate", {
       type: "cacheLogs",
@@ -347,7 +347,7 @@ export function useCommandHandler<
       cachedData,
     });
 
-    return (cachedData ?? data) as HeadingType[];
+    return cachedData ?? data;
   };
   /**
    * RESULTS - Handle dialog closing after successful submission
