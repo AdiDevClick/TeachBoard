@@ -9,19 +9,23 @@ import type {
   StudentWithPresence,
 } from "@/features/evaluations/create/store/types/steps-creation-store.types";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
+import type { WritableDraft } from "immer";
+
+type StepsCreationDraftState = WritableDraft<StepsCreationState>;
 
 type SetFn = (
   partial:
     | StepsCreationState
-    | ((state: StepsCreationState) => void | StepsCreationState),
-  replace?: boolean,
+    | Partial<StepsCreationState>
+    | ((state: StepsCreationDraftState) => void | StepsCreationState),
+  replace?: false,
   action?: string,
 ) => void;
 
 type GetFn = () => StepsCreationState;
 
 type StepsCreationDebugRehydrators = {
-  ensureCollectionsInDraft: (state: StepsCreationState) => void;
+  ensureCollectionsInDraft: (state: StepsCreationDraftState) => void;
   ensureCollections: () => {
     students: UniqueSet<UUID, StudentWithPresence>;
     tasks: UniqueSet<UUID, ClassTasks>;
@@ -189,7 +193,7 @@ export const createStepsCreationDebugRehydrators = (
     };
   }
 
-  const ensureCollectionsInDraft = (state: StepsCreationState) => {
+  const ensureCollectionsInDraft = (state: StepsCreationDraftState) => {
     if (!(state.students instanceof UniqueSet)) {
       state.students = rehydrateUniqueSet<UUID, StudentWithPresence>(
         state.students,
