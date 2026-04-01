@@ -2,8 +2,8 @@ import type { AppModalNames } from "@/configs/app.config.ts";
 import type { UseCommandHandlerParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 
-type ApiEndpointType = UseCommandHandlerParams["submitRoute"];
-type DataReshapeFn = UseCommandHandlerParams["submitDataReshapeFn"];
+export type ApiEndpointType = UseCommandHandlerParams["submitRoute"];
+export type DataReshapeFn = UseCommandHandlerParams["submitDataReshapeFn"];
 
 /**
  * Base props shared by controller components across the app.
