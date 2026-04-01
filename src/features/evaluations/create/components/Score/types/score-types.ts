@@ -1,5 +1,4 @@
 import type { UUID } from "@/api/types/openapi/common.types";
-import type { useStepFourState } from "@/features/evaluations/create/hooks/useStepFourState";
 import type { StepFourController } from "@/features/evaluations/create/steps/four/controller/StepFourController";
 
 export type ScoreItem = {
@@ -26,8 +25,9 @@ export type LabelledScoreInputProps = Readonly<{
  */
 export type AverageFieldsProps = Readonly<{
   form: Parameters<typeof StepFourController>[0]["form"];
-  students: ReturnType<typeof useStepFourState>["allStudentsAverageScores"];
+  students: ReadonlyArray<readonly [UUID, ScoreItem]>;
   title?: string;
   description?: string;
   placeholder?: string;
+  viewMode?: boolean;
 }>;
