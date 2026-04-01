@@ -129,3 +129,91 @@ export interface StepsCreationState {
 }
 
 export type SelectedClassModulesReturn = ClassModules[];
+
+/**
+ * Sub-skill payload used to rehydrate store state from an evaluation details response.
+ */
+export type EvaluationRehydrationSubSkillPayload = Readonly<{
+  id: string;
+  score: number;
+}>;
+
+/**
+ * Module payload used to rehydrate store state from an evaluation details response.
+ */
+export type EvaluationRehydrationModulePayload = Readonly<{
+  id: string;
+  subSkills?: ReadonlyArray<EvaluationRehydrationSubSkillPayload>;
+}>;
+
+/**
+ * Student payload used to rehydrate store state from an evaluation details response.
+ */
+export type EvaluationRehydrationStudentPayload = Readonly<{
+  studentId: string;
+  studentName?: string;
+  isPresent?: boolean;
+  overallScore?: number | null;
+  assignedTaskId?: string | null;
+  assignedTaskName?: string | null;
+  modules?: ReadonlyArray<EvaluationRehydrationModulePayload>;
+}>;
+
+/**
+ * Evaluation details payload used by the store rehydration action.
+ */
+export type EvaluationRehydrationPayload = Readonly<{
+  id: string;
+  title: string;
+  classId: string;
+  className?: string;
+  evaluationDate: string;
+  userId: string;
+  comments?: string | null;
+  absencesIds?: ReadonlyArray<string>;
+  absence?: ReadonlyArray<string>;
+  absentStudentNames?: ReadonlyArray<string>;
+  attendedModules?: ReadonlyArray<{
+    id: string;
+    name: string;
+    code: string;
+  }>;
+  evaluations?: ReadonlyArray<EvaluationRehydrationStudentPayload>;
+}>;
+
+export type HydrateStudentFromEvaluationPayloadArgs = Readonly<{
+  studentEvaluation: EvaluationRehydrationStudentPayload;
+  absentIds: Set<UUID>;
+  hasTask: (taskId: UUID) => boolean;
+  setStudentTaskAssignment: (taskId: UUID, studentId: UUID) => void;
+  setStudentPresence: (studentId: UUID, isPresent: boolean) => void;
+  setStudentOverallScore: (
+    studentId: UUID,
+    overallScore: number | null,
+  ) => void;
+  getSelectedModule: (moduleId?: UUID) => ClassModules | null;
+  setEvaluationForStudent: (
+    studentId: UUID,
+    evaluation: EvaluationType,
+  ) => void;
+  setSubSkillHasCompleted: (
+    moduleId: UUID,
+    subSkillId: UUID,
+    completed: boolean,
+  ) => void;
+}>;
+
+export type HydrateModulesForStudentArgs = Readonly<{
+  parsedStudentId: UUID;
+  modulesEvaluation: ReadonlyArray<EvaluationRehydrationModulePayload>;
+  getSelectedModule: (moduleId?: UUID) => ClassModules | null;
+  setEvaluationForStudent: (
+    studentId: UUID,
+    evaluation: EvaluationType,
+  ) => void;
+  setSubSkillHasCompleted: (
+    moduleId: UUID,
+    subSkillId: UUID,
+    completed: boolean,
+  ) => void;
+}>;
