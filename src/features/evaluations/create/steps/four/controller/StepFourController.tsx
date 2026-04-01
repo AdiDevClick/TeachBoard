@@ -58,7 +58,7 @@ export function StepFourController({
       >
         <AverageFields
           form={form}
-          students={allStudentsAverageScores}
+          students={Array.from(allStudentsAverageScores.entries())}
           {...inputControllers.scoresAverage}
         />
         <ControlledDynamicTagList
