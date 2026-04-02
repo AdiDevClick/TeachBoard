@@ -6,7 +6,7 @@ import type { Table } from "@tanstack/react-table";
  * @param id - The identifier of the pagination button (e.g., "first", "previous", "next", "last").
  * @param tableState - The current state of the table, used to determine if there are previous or next pages available.
  *
- * @Returns `true` if the button should be disabled, `false` otherwise.
+ * @returns `true` if the button should be disabled, `false` otherwise.
  */
 export function disableButtonHandler<T>(id: string, tableState: Table<T>) {
   const { getCanPreviousPage, getCanNextPage } = tableState;
