@@ -1,7 +1,6 @@
-import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
-import type { EvaluationRehydrationPayload } from "@/features/evaluations/create/store/types/steps-creation-store.types";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/EvaluationsView";
 import {
   selectClassFromStore,
   selectClassMetas,
@@ -38,7 +37,7 @@ export function useEvaluationsView({
     Record<string, never>,
     never,
     never,
-    ApiSuccess<EvaluationRehydrationPayload>
+    ApiSuccess<DetailedEvaluationView>
   >({
     pageId,
     form: null!,
@@ -68,8 +67,7 @@ export function useEvaluationsView({
     ? apiEndpoint(parsedEvaluationId)
     : undefined;
 
-  const evaluationData =
-    evaluationCacheCallback<EvaluationRehydrationPayload>();
+  const evaluationData = evaluationCacheCallback<DetailedEvaluationView>();
   const classData = classCacheCallback();
 
   /**
@@ -189,17 +187,11 @@ export function useEvaluationsView({
   /**
    * Generates a list of absent students names to display.
    */
-  const presenceMemo = useMemo<{
-    students: DynamicTagsItemList;
-  }>(() => {
-    if (!evaluationData) {
-      return {
+  const presence = evaluationData
+    ? studentPresence(nonPresentStudents, evaluationData)
+    : {
         students: [],
       };
-    }
-
-    return studentPresence(nonPresentStudents, evaluationData);
-  }, [evaluationData, nonPresentStudents]);
 
   const studentsAverageScores = Array.from(
     getAllStudentsAverageScores().entries(),
@@ -210,7 +202,7 @@ export function useEvaluationsView({
     studentsAverageScores,
     modules,
     getPresentStudentsWithAssignedTasks,
-    presenceMemo,
+    presence,
     evaluationData,
   };
 }
