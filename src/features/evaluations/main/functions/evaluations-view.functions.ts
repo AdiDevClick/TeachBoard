@@ -1,9 +1,7 @@
 import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types";
 import type { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
-import type {
-  EvaluationRehydrationPayload,
-  NonPresentStudentsResult,
-} from "@/features/evaluations/create/store/types/steps-creation-store.types";
+import type { NonPresentStudentsResult } from "@/features/evaluations/create/store/types/steps-creation-store.types";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/EvaluationsView";
 import { parseToUuid } from "@/utils/utils";
 
 /**
@@ -17,7 +15,7 @@ import { parseToUuid } from "@/utils/utils";
  */
 export function studentPresence(
   students: NonPresentStudentsResult | null,
-  evaluation: EvaluationRehydrationPayload,
+  evaluation: DetailedEvaluationView,
 ): {
   students: DynamicTagsItemList;
 } {
