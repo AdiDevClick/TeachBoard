@@ -139,8 +139,7 @@ export function waitAndFail(
 /**
  * Parse an ID, ensuring it is a valid UUID string.
  *
- * @returns The parsed UUID string if valid.
- * @throws If the provided ID is not a valid UUID string.
+ * @returns The parsed UUID string if valid, or null if invalid.
  *
  * @example
  * const validId = "123e4567-e89b-12d3-a456-426614174000";
