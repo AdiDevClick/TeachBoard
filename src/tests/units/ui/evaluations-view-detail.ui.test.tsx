@@ -26,6 +26,23 @@ type ScoresByModule = Map<string, ScoresBySubSkill>;
 const evaluationPayload = firsteval.data;
 const classPayload = classObj.data;
 const classDetails = classPayload.classe;
+const secondEvaluationSinglePresentStudentId =
+  secondeval.data.evaluations[0]?.studentId ?? classDetails.students[0]?.id;
+
+if (!secondEvaluationSinglePresentStudentId) {
+  throw new TypeError("Expected at least one student in class payload");
+}
+
+const secondEvaluationOnePresentPayload = {
+  ...secondeval.data,
+  absencesIds: classDetails.students
+    .map((student) => student.id)
+    .filter((studentId) => studentId !== secondEvaluationSinglePresentStudentId),
+  evaluations: secondeval.data.evaluations.filter(
+    (studentEvaluation) =>
+      studentEvaluation.studentId === secondEvaluationSinglePresentStudentId,
+  ),
+};
 
 const evaluationEndpoint = API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(
   evaluationPayload.id,
@@ -68,13 +85,15 @@ function buildRoutesWithSwitchHarness(): RouteObject[] {
   ];
 }
 
-function installEvaluationDetailFetchStub() {
+function installEvaluationDetailFetchStub(
+  secondEvaluationPayload = secondeval.data,
+) {
   stubFetchRoutes({
     getRoutes: [
       [evaluationEndpoint, evaluationPayload],
       [
         API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(secondeval.data.id),
-        secondeval.data,
+        secondEvaluationPayload,
       ],
       [classEndpoint, classPayload],
     ],
@@ -221,6 +240,36 @@ function getAbsenceSectionText() {
   const section = document.getElementById("dynamic-tag-roles");
 
   return section?.textContent ?? "";
+}
+
+function getAbsentStudentNames(absenceIds: string[]) {
+  return absenceIds.map(resolveStudentFullName);
+}
+
+async function expectAbsenceSectionToMatch(
+  expectedAbsentIds: string[],
+  unexpectedAbsentIds: string[] = [],
+) {
+  const expectedNames = getAbsentStudentNames(expectedAbsentIds).map(
+    normalizeText,
+  );
+  const unexpectedNames = getAbsentStudentNames(unexpectedAbsentIds).map(
+    normalizeText,
+  );
+
+  await expect
+    .poll(() => {
+      const absenceSectionText = normalizeText(getAbsenceSectionText());
+      const includesExpectedNames = expectedNames.every((name) =>
+        absenceSectionText.includes(name),
+      );
+      const excludesUnexpectedNames = unexpectedNames.every(
+        (name) => !absenceSectionText.includes(name),
+      );
+
+      return includesExpectedNames && excludesUnexpectedNames;
+    })
+    .toBe(true);
 }
 
 function hasStudentOverallScore(studentName: string, score: number) {
@@ -438,5 +487,63 @@ describe("UI flow: evaluations detail view", () => {
         )
         .toBe(true);
     }
+  });
+
+  test("keeps absence names synchronized after 1 -> 2 -> 1 navigation", async () => {
+    installEvaluationDetailFetchStub(secondEvaluationOnePresentPayload);
+
+    const firstEvaluationOnlyPresentStudentId = evaluationPayload.evaluations
+      .map((studentEvaluation) => studentEvaluation.studentId)
+      .find((studentId) =>
+        secondEvaluationOnePresentPayload.absencesIds.includes(studentId),
+      );
+
+    if (!firstEvaluationOnlyPresentStudentId) {
+      throw new TypeError(
+        "Expected one student present in first evaluation and absent in second evaluation",
+      );
+    }
+
+    await render(
+      <AppTestWrapper
+        routes={buildRoutesWithSwitchHarness()}
+        initialEntries={[`/evaluations/${evaluationPayload.id}`]}
+      />,
+    );
+
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(evaluationPayload.title),
+    );
+
+    await expectAbsenceSectionToMatch(evaluationPayload.absencesIds, [
+      firstEvaluationOnlyPresentStudentId,
+    ]);
+
+    await userEvent.click(
+      page.getByRole("link", { name: /voir évaluation 2/i }),
+    );
+
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(secondEvaluationOnePresentPayload.title),
+    );
+
+    await expectAbsenceSectionToMatch(
+      secondEvaluationOnePresentPayload.absencesIds,
+    );
+
+    await userEvent.click(
+      page.getByRole("link", { name: /voir évaluation 1/i }),
+    );
+
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(evaluationPayload.title),
+    );
+
+    await expectAbsenceSectionToMatch(evaluationPayload.absencesIds, [
+      firstEvaluationOnlyPresentStudentId,
+    ]);
   });
 });
