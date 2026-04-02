@@ -141,11 +141,15 @@ export function EvaluationDetailDrawer({
         {evaluation && <DetailContent evaluation={evaluation} />}
 
         <DrawerFooter>
-          <Button variant="outline">
+          <Button variant="outline" asChild>
             <Link to={`/evaluations/${evaluation?.id}`}>Ouvrir</Link>
           </Button>
-          <Button variant="outline">Editer</Button>
-          <Button variant="outline">Supprimer</Button>
+          <Button variant="outline" asChild>
+            <Link to={`/evaluations/${evaluation?.id}/edit`}>Editer</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to={`/evaluations/${evaluation?.id}/delete`}>Supprimer</Link>
+          </Button>
           <DrawerClose asChild>
             <Button variant="outline">Fermer</Button>
           </DrawerClose>
