@@ -2,13 +2,14 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 
 import { EvaluationsView } from "@/features/evaluations/main/EvaluationsView";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
-import type {
+import {
   classObj,
   firsteval,
   secondeval,
 } from "@/tests/samples/evaluations-payload.datas.tests";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import {
+  documentToHaveRoleWithName,
   getFetchCallsByUrl,
   rxExact,
   stubFetchRoutes,
@@ -260,19 +261,17 @@ describe("UI flow: evaluations detail view", () => {
       />,
     );
 
-    await expect
-      .element(
-        page.getByRole("heading", { name: rxExact(evaluationPayload.title) }),
-      )
-      .toBeInTheDocument();
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(evaluationPayload.title),
+    );
+    const callsPoints = [evaluationEndpoint, classEndpoint];
 
-    await expect
-      .poll(() => getFetchCallsByUrl(evaluationEndpoint, "GET").length > 0)
-      .toBe(true);
-
-    await expect
-      .poll(() => getFetchCallsByUrl(classEndpoint, "GET").length > 0)
-      .toBe(true);
+    callsPoints.forEach(async (endpoint) => {
+      await expect
+        .poll(() => getFetchCallsByUrl(endpoint, "GET").length > 0)
+        .toBe(true);
+    });
 
     expect(
       getFetchCallsByUrl(
@@ -282,9 +281,7 @@ describe("UI flow: evaluations detail view", () => {
     ).toHaveLength(0);
 
     for (const module of evaluationPayload.attendedModules) {
-      await expect
-        .element(page.getByRole("button", { name: rxExact(module.name) }))
-        .toBeInTheDocument();
+      await documentToHaveRoleWithName("button", rxExact(module.name));
     }
 
     const secondEvaluationOnlyModule = secondeval.data.attendedModules.find(
@@ -387,37 +384,29 @@ describe("UI flow: evaluations detail view", () => {
       />,
     );
 
-    await expect
-      .element(
-        page.getByRole("heading", { name: rxExact(secondeval.data.title) }),
-      )
-      .toBeInTheDocument();
+    const roles = [
+      ["heading", rxExact(secondeval.data.title)],
+      ["button", rxExact(secondeval.data.title)],
+    ] as const;
 
-    await expect
-      .element(
-        page.getByRole("button", { name: rxExact("conduite de tronçonneuse") }),
-      )
-      .toBeInTheDocument();
+    roles.forEach(async ([role, name]) => {
+      await documentToHaveRoleWithName(role, name);
+    });
 
     await userEvent.click(
       page.getByRole("link", { name: /voir évaluation 1/i }),
     );
 
-    await expect
-      .element(
-        page.getByRole("heading", { name: rxExact(evaluationPayload.title) }),
-      )
-      .toBeInTheDocument();
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(evaluationPayload.title),
+    );
 
     await userEvent.click(
       page.getByRole("link", { name: /voir évaluation 2/i }),
     );
 
-    await expect
-      .element(
-        page.getByRole("heading", { name: rxExact(secondeval.data.title) }),
-      )
-      .toBeInTheDocument();
+    await documentToHaveRoleWithName("heading", rxExact(secondeval.data.title));
 
     const secondOnlyModule = secondeval.data.attendedModules.find(
       (module) =>
@@ -432,11 +421,7 @@ describe("UI flow: evaluations detail view", () => {
       );
     }
 
-    await expect
-      .element(
-        page.getByRole("button", { name: rxExact(secondOnlyModule.name) }),
-      )
-      .toBeInTheDocument();
+    await documentToHaveRoleWithName("button", rxExact(secondOnlyModule.name));
 
     await expect
       .poll(() => hasStudentOverallScore("Raz Fitz", 15), { timeout: 5000 })
