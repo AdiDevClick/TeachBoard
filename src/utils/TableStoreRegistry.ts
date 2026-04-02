@@ -16,7 +16,7 @@ export class TableStoreRegistry {
    *
    * @param storeName - The name of the store to create. If not provided, the default store name will be used.
    */
-  constructor(storeName: string = this.#defaultName) {
+  constructor(storeName: string = DEFAULT_PERSIST_NAME) {
     this.#init(storeName);
   }
 
