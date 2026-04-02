@@ -14,7 +14,6 @@ import {
   isThisStudentAlreadyEvaluatedForThisSubSkill,
   preparedSubSkillsForUpdate,
   removeFromNonPresentStudents,
-  resolveAbsenceIdsFromEvaluationPayload,
   saveNonPresentStudents,
   setModules,
   updateEvaluationScore,
@@ -22,7 +21,6 @@ import {
 } from "@/features/evaluations/create/store/functions/evaluation-store.functions.ts";
 import type {
   ClassModuleSubSkill,
-  EvaluationRehydrationPayload,
   EvaluationType,
   ModulesSelectionType,
   NonPresentStudentsResult,
@@ -30,9 +28,12 @@ import type {
   StudentWithPresence,
   SubskillSelectionType,
 } from "@/features/evaluations/create/store/types/steps-creation-store.types";
+import {
+  detailedEvaluationSchema,
+  type DetailedEvaluationView,
+} from "@/features/evaluations/main/EvaluationsView";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
-import { parseToUuid } from "@/utils/utils.ts";
 import { create } from "zustand";
 import { combine, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
@@ -95,49 +96,32 @@ export const useEvaluationStepsCreationStore = create(
            */
           rehydrateFromEvaluationPayload(
             selectedClass: ClassSummaryDto,
-            evaluation: EvaluationRehydrationPayload,
+            evaluation: DetailedEvaluationView,
           ) {
-            const evaluationClassId = parseToUuid(evaluation.classId);
+            const parsedEvaluation =
+              detailedEvaluationSchema.safeParse(evaluation);
 
-            if (selectedClass.id !== evaluationClassId) {
+            if (
+              !parsedEvaluation.success ||
+              selectedClass.id !== parsedEvaluation.data.classId
+            ) {
               return false;
             }
 
-            // Always reset before hydrating a detail payload to prevent stale
-            // scores/absences when navigating between evaluations of the same class.
-            // ACTIONS.clear(selectedClass.id, true);
+            const evaluationData = parsedEvaluation.data;
+
             const shouldClearClass = ACTIONS.setSelectedClass(selectedClass);
 
             if (!shouldClearClass) {
               ACTIONS.clearStudentsEvaluations();
             }
 
-            set(
-              (state) => {
-                ensureCollectionsInDraft(state);
-                state.nonPresentStudentsResult = new UniqueSet<
-                  StudentWithPresence["id"],
-                  [
-                    StudentWithPresence["fullName"],
-                    { id: StudentWithPresence["id"] },
-                  ]
-                >();
-              },
-              undefined,
-              "rehydrateFromEvaluationPayload/initNonPresent",
-            );
+            const absentIds = new Set(evaluationData.absencesIds);
 
-            const absentIds =
-              resolveAbsenceIdsFromEvaluationPayload(evaluation);
-
-            const hasTask = (taskId: UUID) => get().tasks.has(taskId);
-            const studentEvaluations = evaluation.evaluations ?? [];
-
-            for (const studentEvaluation of studentEvaluations) {
+            for (const studentEvaluation of evaluationData.evaluations) {
               hydrateStudentFromEvaluationPayload({
                 studentEvaluation,
                 absentIds,
-                hasTask,
                 setStudentTaskAssignment: ACTIONS.setStudentTaskAssignment,
                 setStudentPresence: ACTIONS.setStudentPresence,
                 setStudentOverallScore: ACTIONS.setStudentOverallScore,
@@ -148,13 +132,7 @@ export const useEvaluationStepsCreationStore = create(
             }
 
             for (const studentId of absentIds.values()) {
-              ACTIONS.setStudentPresence(studentId, false);
-
-              const absentStudent = get().students.get(studentId);
-
-              if (absentStudent) {
-                ACTIONS.updateNonPresentStudentPresence(absentStudent, false);
-              }
+              ACTIONS.setStudentPresence(studentId as UUID, false);
             }
 
             ACTIONS.setAllNonPresentStudents();
@@ -198,6 +176,7 @@ export const useEvaluationStepsCreationStore = create(
 
             ACTIONS.setStudents(selectedClass.students);
             ACTIONS.setClassTasks(selectedClass.templates);
+            ACTIONS.initNonPresentStudents();
           },
           /**
            * Clear the selected class from the store.
@@ -304,6 +283,25 @@ export const useEvaluationStepsCreationStore = create(
             );
           },
           /**
+           * Initialize the non-present students collection in the store based on the students' presence status.
+           *
+           * @description The shape of the collection isn't the final shape -
+           * This is on purpose as slowly, the user will delete entries or may add them with the proper shape
+           *
+           * @remarks Use `setAllNonPresentStudents` to transform the collection into the final shape needed for the DynamicTags component
+           */
+          initNonPresentStudents() {
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                state.nonPresentStudentsResult =
+                  state.students.clone() as unknown as NonPresentStudentsResult;
+              },
+              undefined,
+              "initNonPresentStudents",
+            );
+          },
+          /**
            * Set the presence status for a student.
            *
            * @description Updates the presence status of the specified student and manages module evaluations(clear) accordingly.
@@ -385,6 +383,8 @@ export const useEvaluationStepsCreationStore = create(
           /**
            * Update the non-present students collection in the store based on a student's presence status.
            *
+           * @description This clones all students of the class and will delete or add the student to the non-present collection based on the isPresent value.
+           *
            * @param student - The student whose presence status has been updated
            * @param isPresent - The updated presence status of the student
            */
@@ -392,24 +392,20 @@ export const useEvaluationStepsCreationStore = create(
             student: StudentWithPresence,
             isPresent: boolean,
           ) {
+            const nonPresentStudents =
+              get().nonPresentStudentsResult ?? this.initNonPresentStudents();
+
+            if (!nonPresentStudents) return;
+
+            if (isPresent) {
+              removeFromNonPresentStudents(student, nonPresentStudents);
+            } else {
+              saveNonPresentStudents(student, nonPresentStudents);
+            }
+
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
-
-                const nonPresentStudents =
-                  state.nonPresentStudentsResult ??
-                  (state.students.clone() as unknown as NonPresentStudentsResult);
-
-                if (!nonPresentStudents) return;
-
-                if (!isPresent) {
-                  saveNonPresentStudents(student, nonPresentStudents);
-                }
-
-                if (isPresent) {
-                  removeFromNonPresentStudents(student, nonPresentStudents);
-                }
-
                 state.nonPresentStudentsResult = nonPresentStudents;
               },
               undefined,
@@ -419,7 +415,7 @@ export const useEvaluationStepsCreationStore = create(
           /**
            * Set all non-present students in the store at once.
            *
-           * @description This needs a set that can search by fullName and one by IDs to be able to update the presence status from both the list of students and the dynamic tags.
+           * @description This will transform nonPresentStudentsResult into a UniqueSet of tuples to be used by the DynamicTags component
            *
            * @param object - The object containing both byId and byName unique sets for non-present students
            */
@@ -428,8 +424,10 @@ export const useEvaluationStepsCreationStore = create(
             const results = get().nonPresentStudentsResult as
               | StepsCreationState["students"]
               | null;
-            // Rebuild cached `nonPresentStudentsResult` as a UniqueSet of tuples
+
             if (!results) return;
+
+            // If it's still a student collection's shaped, we transform
             const next = results.clone() as unknown as NonPresentStudentsResult;
 
             results.forEach((student) => {
