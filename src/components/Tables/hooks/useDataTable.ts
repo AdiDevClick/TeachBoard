@@ -22,11 +22,13 @@ import {
 import { useId } from "react";
 
 /**
- * Gère l'état complet d'un DataTable : tri, filtrage, pagination, visibilité
- * des colonnes, sélection de lignes et réordonnancement drag-and-drop.
+ * Custom hook to create a data table with integrated state management using a specified store.
  *
- * Synchroniée automatiquement les données internes lorsque la péop data changà,
- * ce qui évite d'avoir à remoîter le composant pour rafraîchir l'affichage.
+ * @description This hook sets up the table configuration, including columns, sorting, filtering, pagination, and drag-and-drop reordering functionality.
+ *
+ * @param storeName - The name of the store to use for managing the table's state. Defaults to a predefined constant if not provided.
+ *
+ * @returns An object containing the table instance, columns, data IDs, sensors for drag-and-drop, and a handler for drag end events.
  */
 export function useDataTableWithStore<T extends RowItemWithId>(
   storeName: string = DEFAULT_PERSIST_NAME,
