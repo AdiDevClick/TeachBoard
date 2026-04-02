@@ -4,9 +4,11 @@
  */
 
 import { LoginButton } from "@/components/Buttons/LoginButton";
+import { PaginationButton } from "@/components/Buttons/PaginationButton";
 import { SimpleAddButton } from "@/components/Buttons/SimpleAddButton";
 import withListMapper from "@/components/HOCs/withListMapper";
 import { withToolTip } from "@/components/HOCs/withToolTip";
+import { Button } from "@/components/ui/button";
 import { createComponentName } from "@/utils/utils";
 import { lazy } from "react";
 
@@ -47,3 +49,15 @@ createComponentName(
   "SimpleAddButtonWithToolTip",
   SimpleAddButtonWithToolTip,
 );
+
+/**
+ * Exporting the PaginationButton component wrapped with the withListMapper HOC for use in lists.
+ */
+export const PaginationButtons = withListMapper(PaginationButton);
+createComponentName("withListMapper", "PaginationButtons", PaginationButtons);
+
+/**
+ * A version of the Button component that can display a tooltip on hover, wrapped with the withToolTip HOC.
+ */
+export const ButtonWithTooltip = withToolTip(Button);
+createComponentName("withToolTip", "ButtonWithTooltip", ButtonWithTooltip);

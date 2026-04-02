@@ -30,7 +30,6 @@ export function DynamicTags(props: DynamicTagsProps) {
   const [renderItems, setRenderItems] = useState<DynamicTagsState>(
     new UniqueSet(),
   );
-
   const triggerUpdate = useEffectEvent(() => {
     updateAnimationStack(setRenderItems, itemList, renderItems);
   });

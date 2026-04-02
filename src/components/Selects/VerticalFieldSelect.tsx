@@ -52,6 +52,7 @@ export function VerticalFieldSelect({
   observedRefs,
   id: containerId,
   triggerProps,
+  labelProps,
   ...props
 }: VerticalSelectProps) {
   const {
@@ -61,6 +62,7 @@ export function VerticalFieldSelect({
     role,
     placeholder,
     value,
+    defaultValue,
     ...selectRootProps
   } = props;
 
@@ -122,20 +124,23 @@ export function VerticalFieldSelect({
       id={containerId}
       data-open={state.open}
       ref={(setRef ?? ref) as Ref<HTMLDivElement>}
-      className={cn("flex flex-col items-start gap-2", className)}
+      className={className ?? "flex flex-col items-start gap-2"}
     >
       {label && (
-        <Label className="w-full" htmlFor={id}>
+        <Label
+          {...labelProps}
+          className={labelProps?.className ?? "w-full"}
+          htmlFor={id}
+        >
           {label}
         </Label>
       )}
 
       <Select
-        // open={state.open}
-        // value={props?.onSelect}
         onOpenChange={handleOpenChange}
         onValueChange={handleValueChange}
         value={value ?? ""}
+        defaultValue={value === undefined ? defaultValue : undefined}
         {...selectRootProps}
       >
         <SelectTrigger
@@ -143,9 +148,9 @@ export function VerticalFieldSelect({
           role={role}
           {...triggerProps}
           className={cn(
+            "max-w-70.5 [&_[data-slot=select-value]]:block [&_[data-slot=select-value]]:truncate",
             fullWidth ? "w-full" : "w-fit",
             triggerProps?.className,
-            "max-w-70.5 [&_[data-slot=select-value]]:block [&_[data-slot=select-value]]:truncate",
           )}
           size="default"
         >

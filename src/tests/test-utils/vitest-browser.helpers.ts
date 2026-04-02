@@ -127,6 +127,19 @@ export async function checkFormValidityAndSubmit(
 }
 
 /**
+ * Poll until an element with the given role and name is present in the document.
+ */
+export async function documentToHaveRoleWithName(
+  role: string,
+  name: string | RegExp,
+  timeout = 500,
+) {
+  await expect
+    .poll(() => page.getByRole(role, { name }).element(), { timeout })
+    .toBeInTheDocument();
+}
+
+/**
  * Assert that the submit button with the given name is disabled.
  *
  * @param name - The exact name of the submit button.

@@ -61,7 +61,7 @@ export function useCommandHandler<
   TForm extends FieldValues,
   TRoute = unknown,
   TSubmitReshapeFn = unknown,
-  S extends ApiSuccess<any> = ApiSuccess<
+  S extends ApiSuccess<object> = ApiSuccess<
     NormalizeMeta<InferServerData<NonNullable<TRoute>, TSubmitReshapeFn>>
   >,
   E extends ApiError = ApiError,
@@ -283,14 +283,14 @@ export function useCommandHandler<
 
     const isSelected = detailedCommandItem?.isSelected;
 
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.debug("Command selected:", {
-        mainFormField,
-        secondaryFormField,
-        value,
-        detailedCommandItem,
-      });
-    }
+    debugLogs("useCommandHandler:handleSelection", {
+      type: "cacheLogs",
+      value,
+      mainFormField,
+      secondaryFormField,
+      detailedCommandItem,
+      validationMode,
+    });
 
     // Use secondaryFormField if provided (this is the detailed data one), otherwise fallback to mainFormField
     const retrievedFormField = new UniqueSet<
@@ -337,9 +337,9 @@ export function useCommandHandler<
      />
     * ```
    */
-  const handleDataCacheUpdate = (): HeadingType[] => {
+  const handleDataCacheUpdate = <T = HeadingType[]>() => {
     const cacheKey = resolveFetchCacheKey(fetchParams);
-    const cachedData = queryClient.getQueryData(cacheKey);
+    const cachedData = queryClient.getQueryData<T>(cacheKey);
 
     debugLogs("useCommandHandler:handleDataCacheUpdate", {
       type: "cacheLogs",
@@ -347,7 +347,7 @@ export function useCommandHandler<
       cachedData,
     });
 
-    return (cachedData ?? data) as HeadingType[];
+    return cachedData ?? data;
   };
   /**
    * RESULTS - Handle dialog closing after successful submission

@@ -46,7 +46,7 @@ export function SearchStudentsController({
     commandItemDetails: CommandItemType,
   ) => {
     if (!validSearchTeacherOrStudentProps(commandItemDetails)) {
-      debugLogs("SearchPrimaryTeacherController:handleOnSelect", {
+      debugLogs("SearchStudentsController:handleOnSelect", {
         type: "componentHandler",
         message: "Selected command item has no ID, selection ignored",
         commandItemDetails,

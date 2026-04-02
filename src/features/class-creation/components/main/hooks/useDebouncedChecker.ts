@@ -23,10 +23,7 @@ export function useDebouncedChecker<
   S extends ApiSuccess = ApiSuccess,
   E extends ApiError = ApiError,
 >(form: UseFormReturn<any>, delay: number = 500) {
-  const { response, error, fetchParams, setFetchParams, onSubmit } = useFetch<
-    S,
-    E
-  >();
+  const { error, fetchParams, setFetchParams, onSubmit } = useFetch<S, E>();
 
   const lastErrorRef = useRef<lastErrorType>(null);
 
@@ -97,17 +94,11 @@ export function useDebouncedChecker<
         silent: true,
         onCacheVerify(cachedData: any) {
           if (cachedData?.available === false) {
-            const errorDetails = {
-              type: "useDebouncedChecker:onCacheVerify",
-              message: `Ce ${searchParams?.filterBy || "nom"} est déjà utilisé`,
-              data: cachedData,
-            };
-            const cacheError = new Error(
-              "[useDebouncedChecker:onCacheVerify]",
-              { cause: errorDetails },
-            );
-
-            return Promise.reject(cacheError);
+            const err = new Error(
+              "Cached availability result indicates unavailable value",
+            ) as Error & { data?: unknown };
+            err.data = cachedData;
+            return Promise.reject(err);
           }
         },
       }));
@@ -141,7 +132,7 @@ export function useDebouncedChecker<
       };
       form.setError(fieldKey, manualError);
     }
-  }, [response, error, form, fetchParams.searchParams?.filterBy]);
+  }, [error, form, fetchParams.searchParams?.filterBy]);
 
   return {
     availabilityCheck,

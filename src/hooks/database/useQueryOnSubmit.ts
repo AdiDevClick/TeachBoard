@@ -109,9 +109,10 @@ export function useQueryOnSubmit<
 
         return await mutateAsync(payload);
       } catch (err) {
-        debugLogs("useQueryOnSubmit mutation rejected", {
+        debugLogs("useQueryOnSubmit:onSubmit", {
           type: "queryLogs",
           error: err,
+          message: "Mutation rejected",
         });
 
         return err;

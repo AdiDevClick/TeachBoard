@@ -1,0 +1,4106 @@
+[
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c2",
+    "title": "Evaluation du 6 mars 2026 (10)",
+    "comments": "test",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f3f",
+    "className": "BTS-1 1ere annee",
+    "evaluationDate": "2026-03-06T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df8",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028328",
+      "1f0de94c-9763-6aaf-a03b-131f02028328",
+      "1f0de94c-920c-67ab-a03b-131f02028328",
+      "1f0de94c-c689-6fb0-a03b-131f02028328",
+      "1f0de94c-cbba-61b1-a03b-131f02028328"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c2134",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c2134",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c2134",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c2134",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028328",
+        "isPresent": true,
+        "overallScore": 15,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c2134",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c2134",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c2134",
+                "score": 75
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c2134",
+                "score": 100
+              },
+              {
+                "id": "1f0f2e6b-ef99-62e6-a64a-2b3a294c2134",
+                "score": 50
+              },
+              {
+                "id": "1f0f2e6b-80d1-6ce5-a64a-2b3a294c2134",
+                "score": 75
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028328",
+        "isPresent": true,
+        "overallScore": 15,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c2134",
+        "modules": [
+          {
+            "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c2134",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c2134",
+                "score": 75
+              },
+              {
+                "id": "1f0f2e6c-6c43-63e7-a64a-2b3a294c2134",
+                "score": 75
+              },
+              {
+                "id": "1f0f2e6d-6b15-69e9-a64a-2b3a294c2134",
+                "score": 75
+              }
+            ]
+          },
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c2134",
+            "subSkills": [
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c2134",
+                "score": 75
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-06T18:16:59.624128Z"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c01",
+    "title": "Evaluation du 6 mars 2026 (1)",
+    "comments": "Commentaires test 1",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f1",
+    "evaluationDate": "2026-03-02T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df1",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028301",
+      "1f0de94c-9763-6aaf-a03b-131f02028302"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0001",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0002",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0003",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0004",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028301",
+        "isPresent": false,
+        "overallScore": 11,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0001",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0002",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0001",
+                "score": 61
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0002",
+                "score": 71
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028351",
+        "isPresent": true,
+        "overallScore": 9,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0001",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0003",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0001",
+                "score": 56
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0003",
+                "score": 66
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-02T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c02",
+    "title": "Evaluation du 6 mars 2026 (2)",
+    "comments": "Commentaires test 2",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f2",
+    "evaluationDate": "2026-03-03T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df2",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028302",
+      "1f0de94c-9763-6aaf-a03b-131f02028303"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0002",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0003",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0004",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0005",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028302",
+        "isPresent": true,
+        "overallScore": 12,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0002",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0003",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0002",
+                "score": 62
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0003",
+                "score": 72
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028352",
+        "isPresent": true,
+        "overallScore": 10,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0002",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0004",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0002",
+                "score": 57
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0004",
+                "score": 67
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-03T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c03",
+    "title": "Evaluation du 6 mars 2026 (3)",
+    "comments": "Commentaires test 3",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f3",
+    "evaluationDate": "2026-03-04T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df3",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028303",
+      "1f0de94c-9763-6aaf-a03b-131f02028304"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0003",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0004",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0005",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0006",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028303",
+        "isPresent": false,
+        "overallScore": 13,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0003",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0004",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0003",
+                "score": 63
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0004",
+                "score": 73
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028353",
+        "isPresent": false,
+        "overallScore": 11,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0003",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0005",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0003",
+                "score": 58
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0005",
+                "score": 68
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-04T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c04",
+    "title": "Evaluation du 6 mars 2026 (4)",
+    "comments": "Commentaires test 4",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f4",
+    "evaluationDate": "2026-03-05T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df4",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028304",
+      "1f0de94c-9763-6aaf-a03b-131f02028305"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0004",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0005",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0006",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0007",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028304",
+        "isPresent": true,
+        "overallScore": 14,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0004",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0005",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0004",
+                "score": 64
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0005",
+                "score": 74
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028354",
+        "isPresent": true,
+        "overallScore": 12,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0004",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0006",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0004",
+                "score": 59
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0006",
+                "score": 69
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-05T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c05",
+    "title": "Evaluation du 6 mars 2026 (5)",
+    "comments": "Commentaires test 5",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f5",
+    "evaluationDate": "2026-03-06T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df5",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028305",
+      "1f0de94c-9763-6aaf-a03b-131f02028306"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0005",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0006",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0007",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0008",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028305",
+        "isPresent": false,
+        "overallScore": 15,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0005",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0006",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0005",
+                "score": 65
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0006",
+                "score": 75
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028355",
+        "isPresent": true,
+        "overallScore": 13,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0005",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0007",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0005",
+                "score": 60
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0007",
+                "score": 70
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-06T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c06",
+    "title": "Evaluation du 6 mars 2026 (6)",
+    "comments": "Commentaires test 6",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f6",
+    "evaluationDate": "2026-03-07T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df6",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028306",
+      "1f0de94c-9763-6aaf-a03b-131f02028307"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0006",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0007",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0008",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0009",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028306",
+        "isPresent": true,
+        "overallScore": 16,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0006",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0007",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0006",
+                "score": 66
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0007",
+                "score": 76
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028356",
+        "isPresent": false,
+        "overallScore": 14,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0006",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0008",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0006",
+                "score": 61
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0008",
+                "score": 71
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-07T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c07",
+    "title": "Evaluation du 6 mars 2026 (7)",
+    "comments": "Commentaires test 7",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f7",
+    "evaluationDate": "2026-03-08T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df7",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028307",
+      "1f0de94c-9763-6aaf-a03b-131f02028308"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0007",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0008",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0009",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0010",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028307",
+        "isPresent": false,
+        "overallScore": 17,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0007",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0008",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0007",
+                "score": 67
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0008",
+                "score": 77
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028357",
+        "isPresent": true,
+        "overallScore": 15,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0007",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0009",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0007",
+                "score": 62
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0009",
+                "score": 72
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-08T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c08",
+    "title": "Evaluation du 6 mars 2026 (8)",
+    "comments": "Commentaires test 8",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f8",
+    "evaluationDate": "2026-03-09T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df8",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028308",
+      "1f0de94c-9763-6aaf-a03b-131f02028309"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0008",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0009",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0010",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0011",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028308",
+        "isPresent": true,
+        "overallScore": 18,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0008",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0009",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0008",
+                "score": 68
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0009",
+                "score": 78
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028358",
+        "isPresent": true,
+        "overallScore": 16,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0008",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0010",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0008",
+                "score": 63
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0010",
+                "score": 73
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-09T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c09",
+    "title": "Evaluation du 6 mars 2026 (9)",
+    "comments": "Commentaires test 9",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f9",
+    "evaluationDate": "2026-03-10T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df9",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028309",
+      "1f0de94c-9763-6aaf-a03b-131f02028300"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0009",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0010",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0011",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0012",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028309",
+        "isPresent": false,
+        "overallScore": 19,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0009",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0010",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0009",
+                "score": 69
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0010",
+                "score": 79
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028359",
+        "isPresent": false,
+        "overallScore": 17,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0009",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0011",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0009",
+                "score": 64
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0011",
+                "score": 74
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-10T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c10",
+    "title": "Evaluation du 6 mars 2026 (10)",
+    "comments": "Commentaires test 10",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f0",
+    "evaluationDate": "2026-03-11T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df0",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028300",
+      "1f0de94c-9763-6aaf-a03b-131f02028301"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0010",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0011",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0012",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0013",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028310",
+        "isPresent": true,
+        "overallScore": 20,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0010",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0011",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0010",
+                "score": 70
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0011",
+                "score": 80
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028360",
+        "isPresent": true,
+        "overallScore": 18,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0010",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0012",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0010",
+                "score": 65
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0012",
+                "score": 75
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-11T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c11",
+    "title": "Evaluation du 6 mars 2026 (11)",
+    "comments": "Commentaires test 11",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f1",
+    "evaluationDate": "2026-03-12T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df1",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028301",
+      "1f0de94c-9763-6aaf-a03b-131f02028302"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0011",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0012",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0013",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0014",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028311",
+        "isPresent": false,
+        "overallScore": 10,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0011",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0012",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0011",
+                "score": 71
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0012",
+                "score": 81
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028361",
+        "isPresent": true,
+        "overallScore": 19,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0011",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0013",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0011",
+                "score": 66
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0013",
+                "score": 76
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-12T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c12",
+    "title": "Evaluation du 6 mars 2026 (12)",
+    "comments": "Commentaires test 12",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f2",
+    "evaluationDate": "2026-03-13T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df2",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028302",
+      "1f0de94c-9763-6aaf-a03b-131f02028303"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0012",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0013",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0014",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0015",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028312",
+        "isPresent": true,
+        "overallScore": 11,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0012",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0013",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0012",
+                "score": 72
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0013",
+                "score": 82
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028362",
+        "isPresent": false,
+        "overallScore": 20,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0012",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0014",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0012",
+                "score": 67
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0014",
+                "score": 77
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-13T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c13",
+    "title": "Evaluation du 6 mars 2026 (13)",
+    "comments": "Commentaires test 13",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f3",
+    "evaluationDate": "2026-03-14T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df3",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028303",
+      "1f0de94c-9763-6aaf-a03b-131f02028304"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0013",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0014",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0015",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0016",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028313",
+        "isPresent": false,
+        "overallScore": 12,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0013",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0014",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0013",
+                "score": 73
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0014",
+                "score": 83
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028363",
+        "isPresent": true,
+        "overallScore": 8,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0013",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0015",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0013",
+                "score": 68
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0015",
+                "score": 78
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-14T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c14",
+    "title": "Evaluation du 6 mars 2026 (14)",
+    "comments": "Commentaires test 14",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f4",
+    "evaluationDate": "2026-03-15T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df4",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028304",
+      "1f0de94c-9763-6aaf-a03b-131f02028305"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0014",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0015",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0016",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0017",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028314",
+        "isPresent": true,
+        "overallScore": 13,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0014",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0015",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0014",
+                "score": 74
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0015",
+                "score": 84
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028364",
+        "isPresent": true,
+        "overallScore": 9,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0014",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0016",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0014",
+                "score": 69
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0016",
+                "score": 79
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-15T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c15",
+    "title": "Evaluation du 6 mars 2026 (15)",
+    "comments": "Commentaires test 15",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f5",
+    "evaluationDate": "2026-03-16T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df5",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028305",
+      "1f0de94c-9763-6aaf-a03b-131f02028306"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0015",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0016",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0017",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0018",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028315",
+        "isPresent": false,
+        "overallScore": 14,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0015",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0016",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0015",
+                "score": 75
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0016",
+                "score": 85
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028365",
+        "isPresent": false,
+        "overallScore": 10,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0015",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0017",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0015",
+                "score": 70
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0017",
+                "score": 80
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-16T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c16",
+    "title": "Evaluation du 6 mars 2026 (16)",
+    "comments": "Commentaires test 16",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f6",
+    "evaluationDate": "2026-03-17T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df6",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028306",
+      "1f0de94c-9763-6aaf-a03b-131f02028307"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0016",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0017",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0018",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0019",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028316",
+        "isPresent": true,
+        "overallScore": 15,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0016",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0017",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0016",
+                "score": 76
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0017",
+                "score": 86
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028366",
+        "isPresent": true,
+        "overallScore": 11,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0016",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0018",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0016",
+                "score": 71
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0018",
+                "score": 81
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-17T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c17",
+    "title": "Evaluation du 6 mars 2026 (17)",
+    "comments": "Commentaires test 17",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f7",
+    "evaluationDate": "2026-03-18T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df7",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028307",
+      "1f0de94c-9763-6aaf-a03b-131f02028308"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0017",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0018",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0019",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0020",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028317",
+        "isPresent": false,
+        "overallScore": 16,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0017",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0018",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0017",
+                "score": 77
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0018",
+                "score": 87
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028367",
+        "isPresent": true,
+        "overallScore": 12,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0017",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0019",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0017",
+                "score": 72
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0019",
+                "score": 82
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-18T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c18",
+    "title": "Evaluation du 6 mars 2026 (18)",
+    "comments": "Commentaires test 18",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f8",
+    "evaluationDate": "2026-03-19T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df8",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028308",
+      "1f0de94c-9763-6aaf-a03b-131f02028309"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0018",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0019",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0020",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0021",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028318",
+        "isPresent": true,
+        "overallScore": 17,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0018",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0019",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0018",
+                "score": 78
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0019",
+                "score": 88
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028368",
+        "isPresent": false,
+        "overallScore": 13,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0018",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0020",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0018",
+                "score": 73
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0020",
+                "score": 83
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-19T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c19",
+    "title": "Evaluation du 6 mars 2026 (19)",
+    "comments": "Commentaires test 19",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f9",
+    "evaluationDate": "2026-03-20T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df9",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028309",
+      "1f0de94c-9763-6aaf-a03b-131f02028300"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0019",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0020",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0021",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0022",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028319",
+        "isPresent": false,
+        "overallScore": 18,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0019",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0020",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0019",
+                "score": 79
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0020",
+                "score": 89
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028369",
+        "isPresent": true,
+        "overallScore": 14,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0019",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0021",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0019",
+                "score": 74
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0021",
+                "score": 84
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-20T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c20",
+    "title": "Evaluation du 6 mars 2026 (20)",
+    "comments": "Commentaires test 20",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f0",
+    "evaluationDate": "2026-03-21T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df0",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028300",
+      "1f0de94c-9763-6aaf-a03b-131f02028301"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0020",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0021",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0022",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0023",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028320",
+        "isPresent": true,
+        "overallScore": 19,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0020",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0021",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0020",
+                "score": 80
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0021",
+                "score": 90
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028370",
+        "isPresent": true,
+        "overallScore": 15,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0020",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0022",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0020",
+                "score": 75
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0022",
+                "score": 85
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-21T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c21",
+    "title": "Evaluation du 6 mars 2026 (21)",
+    "comments": "Commentaires test 21",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f1",
+    "evaluationDate": "2026-03-22T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df1",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028301",
+      "1f0de94c-9763-6aaf-a03b-131f02028302"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0021",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0022",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0023",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0024",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028321",
+        "isPresent": false,
+        "overallScore": 20,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0021",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0022",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0021",
+                "score": 81
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0022",
+                "score": 91
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028371",
+        "isPresent": false,
+        "overallScore": 16,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0021",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0023",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0021",
+                "score": 76
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0023",
+                "score": 86
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-22T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c22",
+    "title": "Evaluation du 6 mars 2026 (22)",
+    "comments": "Commentaires test 22",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f2",
+    "evaluationDate": "2026-03-23T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df2",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028302",
+      "1f0de94c-9763-6aaf-a03b-131f02028303"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0022",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0023",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0024",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0025",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028322",
+        "isPresent": true,
+        "overallScore": 10,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0022",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0023",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0022",
+                "score": 82
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0023",
+                "score": 92
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028372",
+        "isPresent": true,
+        "overallScore": 17,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0022",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0024",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0022",
+                "score": 77
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0024",
+                "score": 87
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-23T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c23",
+    "title": "Evaluation du 6 mars 2026 (23)",
+    "comments": "Commentaires test 23",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f3",
+    "evaluationDate": "2026-03-24T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df3",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028303",
+      "1f0de94c-9763-6aaf-a03b-131f02028304"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0023",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0024",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0025",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0026",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028323",
+        "isPresent": false,
+        "overallScore": 11,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0023",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0024",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0023",
+                "score": 83
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0024",
+                "score": 93
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028373",
+        "isPresent": true,
+        "overallScore": 18,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0023",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0025",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0023",
+                "score": 78
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0025",
+                "score": 88
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-24T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c24",
+    "title": "Evaluation du 6 mars 2026 (24)",
+    "comments": "Commentaires test 24",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f4",
+    "evaluationDate": "2026-03-25T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df4",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028304",
+      "1f0de94c-9763-6aaf-a03b-131f02028305"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0024",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0025",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0026",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0027",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028324",
+        "isPresent": true,
+        "overallScore": 12,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0024",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0025",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0024",
+                "score": 84
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0025",
+                "score": 94
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028374",
+        "isPresent": false,
+        "overallScore": 19,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0024",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0026",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0024",
+                "score": 79
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0026",
+                "score": 89
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-25T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c25",
+    "title": "Evaluation du 6 mars 2026 (25)",
+    "comments": "Commentaires test 25",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f5",
+    "evaluationDate": "2026-03-26T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df5",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028305",
+      "1f0de94c-9763-6aaf-a03b-131f02028306"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0025",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0026",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0027",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0028",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028325",
+        "isPresent": false,
+        "overallScore": 13,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0025",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0026",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0025",
+                "score": 85
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0026",
+                "score": 95
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028375",
+        "isPresent": true,
+        "overallScore": 20,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0025",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0027",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0025",
+                "score": 80
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0027",
+                "score": 90
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-26T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c26",
+    "title": "Evaluation du 6 mars 2026 (26)",
+    "comments": "Commentaires test 26",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f6",
+    "evaluationDate": "2026-03-27T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df6",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028306",
+      "1f0de94c-9763-6aaf-a03b-131f02028307"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0026",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0027",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0028",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0029",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028326",
+        "isPresent": true,
+        "overallScore": 14,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0026",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0027",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0026",
+                "score": 86
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0027",
+                "score": 96
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028376",
+        "isPresent": true,
+        "overallScore": 8,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0026",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0028",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0026",
+                "score": 81
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0028",
+                "score": 91
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-27T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c27",
+    "title": "Evaluation du 6 mars 2026 (27)",
+    "comments": "Commentaires test 27",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f7",
+    "evaluationDate": "2026-03-28T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df7",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028307",
+      "1f0de94c-9763-6aaf-a03b-131f02028308"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0027",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0028",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0029",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0030",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028327",
+        "isPresent": false,
+        "overallScore": 15,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0027",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0028",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0027",
+                "score": 87
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0028",
+                "score": 97
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028377",
+        "isPresent": false,
+        "overallScore": 9,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0027",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0029",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0027",
+                "score": 82
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0029",
+                "score": 92
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-28T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c28",
+    "title": "Evaluation du 6 mars 2026 (28)",
+    "comments": "Commentaires test 28",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f8",
+    "evaluationDate": "2026-03-01T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df8",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028308",
+      "1f0de94c-9763-6aaf-a03b-131f02028309"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0028",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0029",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0030",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0031",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028328",
+        "isPresent": true,
+        "overallScore": 16,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0028",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0029",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0028",
+                "score": 88
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0029",
+                "score": 98
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028378",
+        "isPresent": true,
+        "overallScore": 10,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0028",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0030",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0028",
+                "score": 83
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0030",
+                "score": 93
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-01T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c29",
+    "title": "Evaluation du 6 mars 2026 (29)",
+    "comments": "Commentaires test 29",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f9",
+    "evaluationDate": "2026-03-02T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df9",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028309",
+      "1f0de94c-9763-6aaf-a03b-131f02028300"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0029",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0030",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0031",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0032",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028329",
+        "isPresent": false,
+        "overallScore": 17,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0029",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0030",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0029",
+                "score": 89
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0030",
+                "score": 99
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028379",
+        "isPresent": true,
+        "overallScore": 11,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0029",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0031",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0029",
+                "score": 84
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0031",
+                "score": 94
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-02T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c30",
+    "title": "Evaluation du 6 mars 2026 (30)",
+    "comments": "Commentaires test 30",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f0",
+    "evaluationDate": "2026-03-03T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df0",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028300",
+      "1f0de94c-9763-6aaf-a03b-131f02028301"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0030",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0031",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0032",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0033",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028330",
+        "isPresent": true,
+        "overallScore": 18,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0030",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0031",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0030",
+                "score": 90
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0031",
+                "score": 100
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028380",
+        "isPresent": false,
+        "overallScore": 12,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0030",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0032",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0030",
+                "score": 85
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0032",
+                "score": 95
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-03T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c31",
+    "title": "Evaluation du 6 mars 2026 (31)",
+    "comments": "Commentaires test 31",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f1",
+    "evaluationDate": "2026-03-04T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df1",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028301",
+      "1f0de94c-9763-6aaf-a03b-131f02028302"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0031",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0032",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0033",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0034",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028331",
+        "isPresent": false,
+        "overallScore": 19,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0031",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0032",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0031",
+                "score": 91
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0032",
+                "score": 70
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028381",
+        "isPresent": true,
+        "overallScore": 13,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0031",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0033",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0031",
+                "score": 86
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0033",
+                "score": 96
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-04T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c32",
+    "title": "Evaluation du 6 mars 2026 (32)",
+    "comments": "Commentaires test 32",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f2",
+    "evaluationDate": "2026-03-05T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df2",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028302",
+      "1f0de94c-9763-6aaf-a03b-131f02028303"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0032",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0033",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0034",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0035",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028332",
+        "isPresent": true,
+        "overallScore": 20,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0032",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0033",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0032",
+                "score": 92
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0033",
+                "score": 71
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028382",
+        "isPresent": true,
+        "overallScore": 14,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0032",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0034",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0032",
+                "score": 87
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0034",
+                "score": 97
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-05T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c33",
+    "title": "Evaluation du 6 mars 2026 (33)",
+    "comments": "Commentaires test 33",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f3",
+    "evaluationDate": "2026-03-06T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df3",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028303",
+      "1f0de94c-9763-6aaf-a03b-131f02028304"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0033",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0034",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0035",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0036",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028333",
+        "isPresent": false,
+        "overallScore": 10,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0033",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0034",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0033",
+                "score": 93
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0034",
+                "score": 72
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028383",
+        "isPresent": false,
+        "overallScore": 15,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0033",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0035",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0033",
+                "score": 88
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0035",
+                "score": 98
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-06T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c34",
+    "title": "Evaluation du 6 mars 2026 (34)",
+    "comments": "Commentaires test 34",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f4",
+    "evaluationDate": "2026-03-07T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df4",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028304",
+      "1f0de94c-9763-6aaf-a03b-131f02028305"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0034",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0035",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0036",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0037",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028334",
+        "isPresent": true,
+        "overallScore": 11,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0034",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0035",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0034",
+                "score": 94
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0035",
+                "score": 73
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028384",
+        "isPresent": true,
+        "overallScore": 16,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0034",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0036",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0034",
+                "score": 89
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0036",
+                "score": 99
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-07T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c35",
+    "title": "Evaluation du 6 mars 2026 (35)",
+    "comments": "Commentaires test 35",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f5",
+    "evaluationDate": "2026-03-08T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df5",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028305",
+      "1f0de94c-9763-6aaf-a03b-131f02028306"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0035",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0036",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0037",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0038",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028335",
+        "isPresent": false,
+        "overallScore": 12,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0035",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0036",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0035",
+                "score": 95
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0036",
+                "score": 74
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028385",
+        "isPresent": true,
+        "overallScore": 17,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0035",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0037",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0035",
+                "score": 90
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0037",
+                "score": 100
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-08T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c36",
+    "title": "Evaluation du 6 mars 2026 (36)",
+    "comments": "Commentaires test 36",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f6",
+    "evaluationDate": "2026-03-09T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df6",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028306",
+      "1f0de94c-9763-6aaf-a03b-131f02028307"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0036",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0037",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0038",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0039",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028336",
+        "isPresent": true,
+        "overallScore": 13,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0036",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0037",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0036",
+                "score": 96
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0037",
+                "score": 75
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028386",
+        "isPresent": false,
+        "overallScore": 18,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0036",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0038",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0036",
+                "score": 91
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0038",
+                "score": 65
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-09T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c37",
+    "title": "Evaluation du 6 mars 2026 (37)",
+    "comments": "Commentaires test 37",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f7",
+    "evaluationDate": "2026-03-10T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df7",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028307",
+      "1f0de94c-9763-6aaf-a03b-131f02028308"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0037",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0038",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0039",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0040",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028337",
+        "isPresent": false,
+        "overallScore": 14,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0037",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0038",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0037",
+                "score": 97
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0038",
+                "score": 76
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028387",
+        "isPresent": true,
+        "overallScore": 19,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0037",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0039",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0037",
+                "score": 92
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0039",
+                "score": 66
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-10T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c38",
+    "title": "Evaluation du 6 mars 2026 (38)",
+    "comments": "Commentaires test 38",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f8",
+    "evaluationDate": "2026-03-11T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df8",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028308",
+      "1f0de94c-9763-6aaf-a03b-131f02028309"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0038",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0039",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0040",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0041",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028338",
+        "isPresent": true,
+        "overallScore": 15,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0038",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0039",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0038",
+                "score": 98
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0039",
+                "score": 77
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028388",
+        "isPresent": true,
+        "overallScore": 20,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0038",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0040",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0038",
+                "score": 93
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0040",
+                "score": 67
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-11T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c39",
+    "title": "Evaluation du 6 mars 2026 (39)",
+    "comments": "Commentaires test 39",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f9",
+    "evaluationDate": "2026-03-12T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df9",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028309",
+      "1f0de94c-9763-6aaf-a03b-131f02028300"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0039",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0040",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0041",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0042",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028339",
+        "isPresent": false,
+        "overallScore": 16,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0039",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0040",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0039",
+                "score": 99
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0040",
+                "score": 78
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028389",
+        "isPresent": false,
+        "overallScore": 8,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0039",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0041",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0039",
+                "score": 94
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0041",
+                "score": 68
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-12T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c40",
+    "title": "Evaluation du 6 mars 2026 (40)",
+    "comments": "Commentaires test 40",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f0",
+    "evaluationDate": "2026-03-13T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df0",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028300",
+      "1f0de94c-9763-6aaf-a03b-131f02028301"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0040",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0041",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0042",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0043",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028340",
+        "isPresent": true,
+        "overallScore": 17,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0040",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0041",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0040",
+                "score": 100
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0041",
+                "score": 79
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028390",
+        "isPresent": true,
+        "overallScore": 9,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0040",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0042",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0040",
+                "score": 95
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0042",
+                "score": 69
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-13T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c41",
+    "title": "Evaluation du 6 mars 2026 (41)",
+    "comments": "Commentaires test 41",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f1",
+    "evaluationDate": "2026-03-14T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df1",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028301",
+      "1f0de94c-9763-6aaf-a03b-131f02028302"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0041",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0042",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0043",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0044",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028341",
+        "isPresent": false,
+        "overallScore": 18,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0041",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0042",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0041",
+                "score": 60
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0042",
+                "score": 80
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028391",
+        "isPresent": true,
+        "overallScore": 10,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0041",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0043",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0041",
+                "score": 96
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0043",
+                "score": 70
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-14T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c42",
+    "title": "Evaluation du 6 mars 2026 (42)",
+    "comments": "Commentaires test 42",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f2",
+    "evaluationDate": "2026-03-15T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df2",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028302",
+      "1f0de94c-9763-6aaf-a03b-131f02028303"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0042",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0043",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0044",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0045",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028342",
+        "isPresent": true,
+        "overallScore": 19,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0042",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0043",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0042",
+                "score": 61
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0043",
+                "score": 81
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028392",
+        "isPresent": false,
+        "overallScore": 11,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0042",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0044",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0042",
+                "score": 97
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0044",
+                "score": 71
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-15T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c43",
+    "title": "Evaluation du 6 mars 2026 (43)",
+    "comments": "Commentaires test 43",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f3",
+    "evaluationDate": "2026-03-16T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df3",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028303",
+      "1f0de94c-9763-6aaf-a03b-131f02028304"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0043",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0044",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0045",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0046",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028343",
+        "isPresent": false,
+        "overallScore": 20,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0043",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0044",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0043",
+                "score": 62
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0044",
+                "score": 82
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028393",
+        "isPresent": true,
+        "overallScore": 12,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0043",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0045",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0043",
+                "score": 98
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0045",
+                "score": 72
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-16T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c44",
+    "title": "Evaluation du 6 mars 2026 (44)",
+    "comments": "Commentaires test 44",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f4",
+    "evaluationDate": "2026-03-17T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df4",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028304",
+      "1f0de94c-9763-6aaf-a03b-131f02028305"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0044",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0045",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0046",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0047",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028344",
+        "isPresent": true,
+        "overallScore": 10,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0044",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0045",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0044",
+                "score": 63
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0045",
+                "score": 83
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028394",
+        "isPresent": true,
+        "overallScore": 13,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0044",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0046",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0044",
+                "score": 99
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0046",
+                "score": 73
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-17T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c45",
+    "title": "Evaluation du 6 mars 2026 (45)",
+    "comments": "Commentaires test 45",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f5",
+    "evaluationDate": "2026-03-18T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df5",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028305",
+      "1f0de94c-9763-6aaf-a03b-131f02028306"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0045",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0046",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0047",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0048",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028345",
+        "isPresent": false,
+        "overallScore": 11,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0045",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0046",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0045",
+                "score": 64
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0046",
+                "score": 84
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028395",
+        "isPresent": false,
+        "overallScore": 14,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0045",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0047",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0045",
+                "score": 100
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0047",
+                "score": 74
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-18T18:16:59.624128Z",
+    "className": "BTS-2 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c46",
+    "title": "Evaluation du 6 mars 2026 (46)",
+    "comments": "Commentaires test 46",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f6",
+    "evaluationDate": "2026-03-19T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df6",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028306",
+      "1f0de94c-9763-6aaf-a03b-131f02028307"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0046",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0047",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0048",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0049",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028346",
+        "isPresent": true,
+        "overallScore": 12,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0046",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0047",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0046",
+                "score": 65
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0047",
+                "score": 85
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028396",
+        "isPresent": true,
+        "overallScore": 15,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0046",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0048",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0046",
+                "score": 55
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0048",
+                "score": 75
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-19T18:16:59.624128Z",
+    "className": "BTS-3 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c47",
+    "title": "Evaluation du 6 mars 2026 (47)",
+    "comments": "Commentaires test 47",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f7",
+    "evaluationDate": "2026-03-20T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df7",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028307",
+      "1f0de94c-9763-6aaf-a03b-131f02028308"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0047",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0048",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0049",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0050",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028347",
+        "isPresent": false,
+        "overallScore": 13,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0047",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0048",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0047",
+                "score": 66
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0048",
+                "score": 86
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028397",
+        "isPresent": true,
+        "overallScore": 16,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0047",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0049",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0047",
+                "score": 56
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0049",
+                "score": 76
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-20T18:16:59.624128Z",
+    "className": "BTS-3 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c48",
+    "title": "Evaluation du 6 mars 2026 (48)",
+    "comments": "Commentaires test 48",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f8",
+    "evaluationDate": "2026-03-21T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df8",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028308",
+      "1f0de94c-9763-6aaf-a03b-131f02028309"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0048",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0049",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0050",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0051",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028348",
+        "isPresent": true,
+        "overallScore": 14,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0048",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0049",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0048",
+                "score": 67
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0049",
+                "score": 87
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028398",
+        "isPresent": false,
+        "overallScore": 17,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0048",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0050",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0048",
+                "score": 57
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0050",
+                "score": 77
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-21T18:16:59.624128Z",
+    "className": "BTS-1 1ere annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c49",
+    "title": "Evaluation du 6 mars 2026 (49)",
+    "comments": "Commentaires test 49",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f9",
+    "evaluationDate": "2026-03-22T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df9",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028309",
+      "1f0de94c-9763-6aaf-a03b-131f02028300"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0049",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0050",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0051",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0052",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028349",
+        "isPresent": false,
+        "overallScore": 15,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0049",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0050",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0049",
+                "score": 68
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0050",
+                "score": 88
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f02028399",
+        "isPresent": true,
+        "overallScore": 18,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0049",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0051",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0049",
+                "score": 58
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0051",
+                "score": 78
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-22T18:16:59.624128Z",
+    "className": "BTS-1 2eme annee"
+  },
+  {
+    "id": "1f11988a-ac6a-61ba-94c1-03cd09b771c50",
+    "title": "Evaluation du 6 mars 2026 (50)",
+    "comments": "Commentaires test 50",
+    "classId": "1f1022ee-3d9b-6efc-b662-d77014b42f0",
+    "evaluationDate": "2026-03-23T18:15:33.348Z",
+    "userId": "1f0de94e-a442-6895-bb6a-6baf81233df0",
+    "absence": [
+      "1f0de94c-412d-6579-a03b-131f02028300",
+      "1f0de94c-9763-6aaf-a03b-131f02028301"
+    ],
+    "attendedModules": [
+      {
+        "id": "1f0f2e76-9398-6efc-a64a-2b3a294c0050",
+        "name": "abattage et choix darbre",
+        "code": "ABT"
+      },
+      {
+        "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0051",
+        "name": "sécurité et secourisme",
+        "code": "SFT"
+      },
+      {
+        "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0052",
+        "name": "entretien et outillage",
+        "code": "OUT"
+      },
+      {
+        "id": "1f0f2e77-90bd-69fd-a64a-2b3a294c0053",
+        "name": "conduite de tronçonneuse",
+        "code": "TRS"
+      }
+    ],
+    "evaluations": [
+      {
+        "id": "1f0de94c-8785-62a3-a03b-131f02028350",
+        "isPresent": true,
+        "overallScore": 16,
+        "assignedTaskId": "1f0f2f15-14af-650c-a64a-2b3a294c0050",
+        "modules": [
+          {
+            "id": "1f0f2e79-9f52-64ff-a64a-2b3a294c0051",
+            "subSkills": [
+              {
+                "id": "1f0f2e6f-4fdb-62ed-a64a-2b3a294c0050",
+                "score": 69
+              },
+              {
+                "id": "1f0f2e6b-0a90-65e4-a64a-2b3a294c0051",
+                "score": 89
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1f0de94c-8d03-66a7-a03b-131f020283100",
+        "isPresent": true,
+        "overallScore": 19,
+        "assignedTaskId": "1f0f2f1a-440c-600d-a64a-2b3a294c0050",
+        "modules": [
+          {
+            "id": "1f0f2e7b-915e-6501-a64a-2b3a294c0052",
+            "subSkills": [
+              {
+                "id": "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c0050",
+                "score": 59
+              },
+              {
+                "id": "1f0f2e71-c436-68f3-a64a-2b3a294c0052",
+                "score": 79
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "createdAt": "2026-03-23T18:16:59.624128Z",
+    "className": "BTS-2 1ere annee"
+  }
+]

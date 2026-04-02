@@ -22,7 +22,10 @@ export function StepThreeStudentsEvaluationController(
   const { calculatedScoreValue, handleValueChange } = useStudentEvaluation();
 
   if (stepThreeControllerPropsInvalid(props)) {
-    debugLogs("StepThreeStudentsEvaluationController", props);
+    debugLogs("StepThreeStudentsEvaluationController", {
+      type: "propsValidation",
+      props,
+    });
     return null;
   }
 

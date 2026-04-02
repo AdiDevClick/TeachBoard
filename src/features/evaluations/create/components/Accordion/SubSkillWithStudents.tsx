@@ -20,7 +20,7 @@ import type { SubSkillWithStudentsProps } from "@/features/evaluations/create/co
  */
 export function SubSkillWithStudents(props: SubSkillWithStudentsProps) {
   if (subSkillWithStudentsPropsInvalid(props)) {
-    debugLogs("SubSkillWithStudents", props);
+    debugLogs("SubSkillWithStudents", { type: "propsValidation", props });
     return null;
   }
   const {

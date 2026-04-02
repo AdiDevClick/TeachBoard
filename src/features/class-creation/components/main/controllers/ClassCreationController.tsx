@@ -41,7 +41,7 @@ const defaultSchoolYear = year + " - " + (year + 1);
  */
 export function ClassCreationController(props: ClassCreationControllerProps) {
   if (classCreationControllerPropsInvalid(props)) {
-    debugLogs("ClassCreationController", props);
+    debugLogs("ClassCreationController", { type: "propsValidation", props });
   }
 
   const {

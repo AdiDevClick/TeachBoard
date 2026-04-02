@@ -9,10 +9,12 @@ import {
   addNewEvaluationScore,
   filterSubSkillsBasedOnStudentsAvailability,
   getStudentAverageScore,
+  hydrateStudentFromEvaluationPayload,
   isSubSkillCompletedOrDisabled,
   isThisStudentAlreadyEvaluatedForThisSubSkill,
   preparedSubSkillsForUpdate,
   removeFromNonPresentStudents,
+  resolveAbsenceIdsFromEvaluationPayload,
   saveNonPresentStudents,
   setModules,
   updateEvaluationScore,
@@ -20,6 +22,7 @@ import {
 } from "@/features/evaluations/create/store/functions/evaluation-store.functions.ts";
 import type {
   ClassModuleSubSkill,
+  EvaluationRehydrationPayload,
   EvaluationType,
   ModulesSelectionType,
   NonPresentStudentsResult,
@@ -29,6 +32,7 @@ import type {
 } from "@/features/evaluations/create/store/types/steps-creation-store.types";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
+import { parseToUuid } from "@/utils/utils.ts";
 import { create } from "zustand";
 import { combine, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
@@ -85,6 +89,80 @@ export const useEvaluationStepsCreationStore = create(
             return true;
           },
           /**
+           * Rehydrate steps creation store from an evaluation details payload.
+           *
+           * @returns true when rehydration is applied, false when payload class mismatch is detected.
+           */
+          rehydrateFromEvaluationPayload(
+            selectedClass: ClassSummaryDto,
+            evaluation: EvaluationRehydrationPayload,
+          ) {
+            const evaluationClassId = parseToUuid(evaluation.classId);
+
+            if (selectedClass.id !== evaluationClassId) {
+              return false;
+            }
+
+            // Always reset before hydrating a detail payload to prevent stale
+            // scores/absences when navigating between evaluations of the same class.
+            // ACTIONS.clear(selectedClass.id, true);
+            const shouldClearClass = ACTIONS.setSelectedClass(selectedClass);
+
+            if (!shouldClearClass) {
+              ACTIONS.clearStudentsEvaluations();
+            }
+
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                state.nonPresentStudentsResult = new UniqueSet<
+                  StudentWithPresence["id"],
+                  [
+                    StudentWithPresence["fullName"],
+                    { id: StudentWithPresence["id"] },
+                  ]
+                >();
+              },
+              undefined,
+              "rehydrateFromEvaluationPayload/initNonPresent",
+            );
+
+            const absentIds =
+              resolveAbsenceIdsFromEvaluationPayload(evaluation);
+
+            const hasTask = (taskId: UUID) => get().tasks.has(taskId);
+            const studentEvaluations = evaluation.evaluations ?? [];
+
+            for (const studentEvaluation of studentEvaluations) {
+              hydrateStudentFromEvaluationPayload({
+                studentEvaluation,
+                absentIds,
+                hasTask,
+                setStudentTaskAssignment: ACTIONS.setStudentTaskAssignment,
+                setStudentPresence: ACTIONS.setStudentPresence,
+                setStudentOverallScore: ACTIONS.setStudentOverallScore,
+                getSelectedModule: ACTIONS.getSelectedModule,
+                setEvaluationForStudent: ACTIONS.setEvaluationForStudent,
+                setSubSkillHasCompleted: ACTIONS.setSubSkillHasCompleted,
+              });
+            }
+
+            for (const studentId of absentIds.values()) {
+              ACTIONS.setStudentPresence(studentId, false);
+
+              const absentStudent = get().students.get(studentId);
+
+              if (absentStudent) {
+                ACTIONS.updateNonPresentStudentPresence(absentStudent, false);
+              }
+            }
+
+            ACTIONS.setAllNonPresentStudents();
+            ACTIONS.checkForCompletedModules();
+
+            return true;
+          },
+          /**
            * INITIALIZE STORE ACTION
            *
            * Set the selected class and load its students and tasks into the store.
@@ -99,7 +177,7 @@ export const useEvaluationStepsCreationStore = create(
 
             shouldClear = ACTIONS.clear(selectedClass.id);
 
-            if (!shouldClear) return;
+            if (!shouldClear) return false;
 
             set(
               (state) => {
@@ -137,6 +215,25 @@ export const useEvaluationStepsCreationStore = create(
               },
               undefined,
               "clearSelectedClass",
+            );
+          },
+          /**
+           * Clear all students' evaluations from the store.
+           *
+           * @description This is useful to reset the evaluation scores when changing students' presence or task assignment.
+           */
+          clearStudentsEvaluations() {
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                for (const student of state.students.values()) {
+                  if (student.evaluations) {
+                    student.evaluations = null;
+                  }
+                }
+              },
+              undefined,
+              "clearStudentsEvaluations",
             );
           },
           /**
@@ -198,7 +295,7 @@ export const useEvaluationStepsCreationStore = create(
                       student.firstName + " " + student.lastName,
                     isPresent: false,
                     assignedTask: null,
-                  };
+                  } satisfies StudentWithPresence;
                   state.students.set(student.id, details);
                 });
               },
@@ -521,18 +618,10 @@ export const useEvaluationStepsCreationStore = create(
           setModuleSelectionIsClicked(isClicked: boolean) {
             set(
               (state) => {
-                // create a new object so that selectors depending on
-                // `moduleSelection` receive a new reference. previously we
-                // mutated the existing object which meant hooks such as
-                // `useTabContentState` could read the same reference and
-                // never re-render. this led to the "next button"
-                // interactivity not updating when only the `isClicked`
-                // // flag changed (see evaluation-next-button.ui.test.tsx).
                 state.moduleSelection = {
                   ...state.moduleSelection,
                   isClicked,
                 };
-                // state.moduleSelection.isClicked = isClicked;
               },
               undefined,
               "setModuleSelectionIsClicked",
@@ -797,9 +886,9 @@ export const useEvaluationStepsCreationStore = create(
 
               const averageScore = getStudentAverageScore(student);
               const score =
-                student.overallScore != null
-                  ? student.overallScore * 5
-                  : averageScore;
+                student.overallScore == null
+                  ? averageScore
+                  : student.overallScore * 5;
 
               scores.set(student.id, {
                 name: student.fullName,
@@ -1047,7 +1136,7 @@ export const useEvaluationStepsCreationStore = create(
       // anonymousActionTypes: false,
       serialize: { options: { map: true, set: true } },
       enabled: DEV_MODE,
-      predicate: (_state, action) =>
+      predicate: (_state: StepsCreationState, action?: { type?: string }) =>
         !/^evalSteps\/debug\/rehydrateCollections$/.test(action?.type ?? ""),
       store: "evalSteps",
     },

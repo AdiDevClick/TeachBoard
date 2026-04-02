@@ -1,7 +1,6 @@
 import type { UUID } from "@/api/types/openapi/common.types";
 import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types";
 import { debugLogs } from "@/configs/app-components.config";
-import { DEV_MODE } from "@/configs/app.config";
 import { useStepFourState } from "@/features/evaluations/create/hooks/useStepFourState";
 import type { UseStepFourHandlerProps } from "@/features/evaluations/create/steps/four/hooks/types/use-step-four-handler.types";
 import {
@@ -131,12 +130,11 @@ export function useStepFourHandler({
       const parsed = JSON.parse(JSON.stringify(getAllPresentStudents));
       setValue("evaluations", parsed);
     } catch (error) {
-      if (DEV_MODE) {
-        debugLogs(
-          "StepFourController — invalid evaluations parsing from store:",
-          error,
-        );
-      }
+      debugLogs("StepFourController:triggerScoreUpdate", {
+        type: "componentHandler",
+        error,
+        message: "Failed to parse evaluated students for form submission",
+      });
       setValue("evaluations", []);
     }
   });

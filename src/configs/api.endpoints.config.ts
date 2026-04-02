@@ -131,6 +131,14 @@ export const API_ENDPOINTS = Object.freeze({
           .assign([["description", "value"]])
           .newShape(),
     },
+    EVALUATIONS: {
+      endpoints: {
+        ALL: EVALUATIONS,
+        OVERVIEWS: `${EVALUATIONS}/overviews`,
+        BY_ID: (id: number | string) => `${EVALUATIONS}/${id}`,
+      },
+      dataReshape: (data: unknown) => data,
+    },
     TASKSTEMPLATES: {
       endpoints: {
         ALL: TASK_TEMPLATES,

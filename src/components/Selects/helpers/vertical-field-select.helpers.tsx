@@ -26,12 +26,11 @@ type Props<C extends object> = C & PropsWithListings<NonLabelledGroupItemProps>;
 export function WithListings<C extends object>(Wrapped: ComponentType<C>) {
   return function Component(props: Props<C>) {
     if (withListingsPropsInvalid(props)) {
-      debugLogs(
-        "[WithListings for VerticalFieldSelect] - invalid items provided",
-        {
-          items: props.items,
-        },
-      );
+      debugLogs("[WithListings for VerticalFieldSelect]", {
+        type: "propsValidation",
+        items: props.items,
+        message: "Expected an array of items with 'id' and 'name' properties",
+      });
 
       return <Wrapped {...(props as C)}>{props.children}</Wrapped>;
     }

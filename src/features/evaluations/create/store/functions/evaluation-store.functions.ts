@@ -10,7 +10,10 @@ import type { SkillsType } from "@/api/types/routes/skills.types.ts";
 import type {
   ClassModules,
   ClassModuleSubSkill,
+  EvaluationRehydrationPayload,
   EvaluationType,
+  HydrateModulesForStudentArgs,
+  HydrateStudentFromEvaluationPayloadArgs,
   NonPresentStudentsResult,
   StepsCreationState,
   StudentEvaluationModuleType,
@@ -18,6 +21,7 @@ import type {
   StudentWithPresence,
 } from "@/features/evaluations/create/store/types/steps-creation-store.types.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
+import { parseToUuid } from "@/utils/utils";
 import type { WritableDraft } from "immer";
 
 /**
@@ -38,6 +42,8 @@ export function buildLinkedSubSkills(
       return {
         ...subSkill,
         isLinkedToTasks: new Set([taskId]),
+        isCompleted: false,
+        isDisabled: false,
       };
     });
 }
@@ -64,8 +70,21 @@ export function upsertModuleSubSkills(
       module.subSkills.set(subSkill.id, {
         ...subSkill,
         isLinkedToTasks: new Set([taskId]),
+        isCompleted: false,
+        isDisabled: false,
       });
       continue;
+    }
+
+    if (
+      existingSubSkill.isCompleted === undefined ||
+      existingSubSkill.isDisabled === undefined
+    ) {
+      module.subSkills.set(subSkill.id, {
+        ...existingSubSkill,
+        isCompleted: existingSubSkill.isCompleted ?? false,
+        isDisabled: existingSubSkill.isDisabled ?? false,
+      });
     }
 
     const savedIsLinkedToTasks = existingSubSkill.isLinkedToTasks;
@@ -79,6 +98,8 @@ export function upsertModuleSubSkills(
       const newSubSkill = {
         ...existingSubSkill,
         isLinkedToTasks: new Set([taskId]),
+        isCompleted: existingSubSkill.isCompleted ?? false,
+        isDisabled: existingSubSkill.isDisabled ?? false,
       };
 
       module.subSkills.delete(subSkill.id).set(subSkill.id, newSubSkill);
@@ -202,6 +223,7 @@ export function filterSubSkillsBasedOnStudentsAvailability(
 ) {
   const newObject = {
     ...subSkill,
+    isCompleted: subSkill.isCompleted ?? false,
     isDisabled: noStudentsAvailable,
   };
 
@@ -343,4 +365,120 @@ export function removeFromNonPresentStudents(
   uniqueSet: WritableDraft<NonPresentStudentsResult>,
 ) {
   uniqueSet.delete(student.id);
+}
+
+export function hydrateModulesForStudentFromEvaluationPayload(
+  args: HydrateModulesForStudentArgs,
+) {
+  const {
+    parsedStudentId,
+    modulesEvaluation,
+    getSelectedModule,
+    setEvaluationForStudent,
+    setSubSkillHasCompleted,
+  } = args;
+
+  for (const moduleEvaluation of modulesEvaluation) {
+    const parsedModuleId = parseToUuid(moduleEvaluation.id);
+
+    if (!parsedModuleId) {
+      continue;
+    }
+
+    const selectedModule = getSelectedModule(parsedModuleId);
+
+    if (!selectedModule) {
+      continue;
+    }
+
+    const subSkillsEvaluation = moduleEvaluation.subSkills ?? [];
+
+    for (const subSkillEvaluation of subSkillsEvaluation) {
+      const parsedSubSkillId = parseToUuid(subSkillEvaluation.id);
+
+      if (!parsedSubSkillId) {
+        continue;
+      }
+
+      const selectedSubSkill = selectedModule.subSkills.get(parsedSubSkillId);
+
+      if (!selectedSubSkill) {
+        continue;
+      }
+
+      setEvaluationForStudent(parsedStudentId, {
+        module: selectedModule,
+        subSkill: selectedSubSkill,
+        score: subSkillEvaluation.score,
+      });
+
+      setSubSkillHasCompleted(selectedModule.id, selectedSubSkill.id, true);
+    }
+  }
+}
+
+export function hydrateStudentFromEvaluationPayload(
+  args: HydrateStudentFromEvaluationPayloadArgs,
+) {
+  const {
+    studentEvaluation,
+    absentIds,
+    hasTask,
+    setStudentTaskAssignment,
+    setStudentPresence,
+    setStudentOverallScore,
+    getSelectedModule,
+    setEvaluationForStudent,
+    setSubSkillHasCompleted,
+  } = args;
+
+  const parsedStudentId = parseToUuid(studentEvaluation.studentId);
+
+  if (!parsedStudentId) {
+    return;
+  }
+
+  const {
+    assignedTaskId,
+    overallScore,
+    modules: modulesEvaluation = [],
+  } = studentEvaluation;
+  const shouldBePresent =
+    (studentEvaluation.isPresent ?? true) && !absentIds.has(parsedStudentId);
+
+  if (!assignedTaskId) {
+    return;
+  }
+
+  const parsedTaskId = parseToUuid(assignedTaskId);
+
+  if (parsedTaskId && hasTask(parsedTaskId)) {
+    setStudentTaskAssignment(parsedTaskId, parsedStudentId);
+  }
+
+  setStudentPresence(parsedStudentId, shouldBePresent);
+
+  if (overallScore) {
+    setStudentOverallScore(parsedStudentId, overallScore);
+  }
+
+  hydrateModulesForStudentFromEvaluationPayload({
+    parsedStudentId,
+    modulesEvaluation,
+    getSelectedModule,
+    setEvaluationForStudent,
+    setSubSkillHasCompleted,
+  });
+}
+
+export function resolveAbsenceIdsFromEvaluationPayload(
+  evaluation: EvaluationRehydrationPayload,
+): Set<UUID> {
+  const absences = evaluation.absencesIds ?? [];
+
+  return new Set(
+    absences
+      .map((studentId) => parseToUuid(studentId))
+      .filter((studentId): studentId is UUID => studentId !== null),
+  );
 }

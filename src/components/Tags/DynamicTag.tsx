@@ -1,4 +1,4 @@
-import { withPopoverCRUD } from "@/components/Popovers/PopoverCRUD";
+import { withPopoverCRUD } from "@/components/HOCs/withPopoverCRUD";
 import type { DynamicTagProps } from "@/components/Tags/types/tags.types";
 import { Button } from "@/components/ui/button";
 import { ItemActions } from "@/components/ui/item";

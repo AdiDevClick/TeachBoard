@@ -2,7 +2,135 @@ import {
   DEFAULT_VALUES_STEPS_CREATION_STATE,
   useEvaluationStepsCreationStore,
 } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
+import type { EvaluationRehydrationPayload } from "@/features/evaluations/create/store/types/steps-creation-store.types";
 import { beforeEach, describe, expect, it } from "vitest";
+
+const CLASS_ID = "11111111-1111-4111-8111-111111111111";
+const STUDENT_ONE_ID = "22222222-2222-4222-8222-222222222222";
+const STUDENT_TWO_ID = "33333333-3333-4333-8333-333333333333";
+const TASK_ID = "44444444-4444-4444-8444-444444444444";
+const MODULE_ID = "55555555-5555-4555-8555-555555555555";
+const SUBSKILL_ID = "66666666-6666-4666-8666-666666666666";
+const EVALUATION_ID = "77777777-7777-4777-8777-777777777777";
+const USER_ID = "88888888-8888-4888-8888-888888888888";
+
+const CLASS_SUMMARY_FIXTURE = {
+  id: CLASS_ID,
+  name: "BTS SIO",
+  degreeLevel: "BTS",
+  degreeYearCode: "S1",
+  degreeYearName: "Semestre 1",
+  evaluations: [],
+  students: [
+    {
+      id: STUDENT_ONE_ID,
+      firstName: "John",
+      lastName: "Doe",
+      fullName: "John Doe",
+    },
+    {
+      id: STUDENT_TWO_ID,
+      firstName: "Jane",
+      lastName: "Doe",
+      fullName: "Jane Doe",
+    },
+  ],
+  templates: [
+    {
+      id: TASK_ID,
+      taskName: "TP 1",
+      task: {
+        id: TASK_ID,
+        name: "TP 1",
+        description: "Exercice",
+      },
+      modules: [
+        {
+          id: MODULE_ID,
+          code: "M1",
+          name: "Module 1",
+          subSkills: [
+            {
+              id: SUBSKILL_ID,
+              code: "S1",
+              name: "SubSkill 1",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+const EVALUATION_PAYLOAD_FIXTURE: EvaluationRehydrationPayload = {
+  id: EVALUATION_ID,
+  title: "Evaluation reconstruite",
+  classId: CLASS_ID,
+  evaluationDate: "2026-03-31T00:00:00.000Z",
+  userId: USER_ID,
+  absencesIds: [STUDENT_TWO_ID],
+  evaluations: [
+    {
+      studentId: STUDENT_ONE_ID,
+      isPresent: true,
+      overallScore: 15,
+      assignedTaskId: TASK_ID,
+      modules: [
+        {
+          id: MODULE_ID,
+          subSkills: [
+            {
+              id: SUBSKILL_ID,
+              score: 80,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      studentId: STUDENT_TWO_ID,
+      isPresent: false,
+      overallScore: null,
+      assignedTaskId: TASK_ID,
+      modules: [],
+    },
+  ],
+};
+
+const SECOND_EVALUATION_PAYLOAD_FIXTURE: EvaluationRehydrationPayload = {
+  id: "99999999-9999-4999-8999-999999999999",
+  title: "Evaluation rechargée",
+  classId: CLASS_ID,
+  evaluationDate: "2026-04-01T00:00:00.000Z",
+  userId: USER_ID,
+  absencesIds: [STUDENT_ONE_ID],
+  evaluations: [
+    {
+      studentId: STUDENT_ONE_ID,
+      isPresent: false,
+      overallScore: null,
+      assignedTaskId: TASK_ID,
+      modules: [],
+    },
+    {
+      studentId: STUDENT_TWO_ID,
+      isPresent: true,
+      overallScore: 12,
+      assignedTaskId: TASK_ID,
+      modules: [
+        {
+          id: MODULE_ID,
+          subSkills: [
+            {
+              id: SUBSKILL_ID,
+              score: 50,
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
 
 describe("StepsCreationStore - students reshape", () => {
   beforeEach(() => {
@@ -133,5 +261,105 @@ describe("StepsCreationStore - students reshape", () => {
 
     expect(signal).toContain("1:1:t1");
     expect(studentsAfter.map((s) => s.id)).toEqual(initialOrder);
+  });
+
+  it("rehydrates evaluation payload with the same state semantics as StepOne->StepFour flow", () => {
+    const result = useEvaluationStepsCreationStore
+      .getState()
+      .rehydrateFromEvaluationPayload(
+        CLASS_SUMMARY_FIXTURE,
+        EVALUATION_PAYLOAD_FIXTURE,
+      );
+
+    expect(result).toBe(true);
+
+    const state = useEvaluationStepsCreationStore.getState();
+    const studentOne = state.students.get(STUDENT_ONE_ID);
+    const studentTwo = state.students.get(STUDENT_TWO_ID);
+
+    expect(state.selectedClass?.id).toBe(CLASS_ID);
+    expect(studentOne?.isPresent).toBe(true);
+    expect(studentOne?.assignedTask?.id).toBe(TASK_ID);
+    expect(studentOne?.overallScore).toBe(15);
+
+    const studentOneScore = studentOne?.evaluations?.modules
+      .get(MODULE_ID)
+      ?.subSkills.get(SUBSKILL_ID)?.score;
+    expect(studentOneScore).toBe(80);
+
+    expect(studentTwo?.isPresent).toBe(false);
+    expect(studentTwo?.assignedTask?.id).toBe(TASK_ID);
+
+    const presentStudents = state.getAllPresentStudents();
+    expect(presentStudents.map((student) => student.id)).toEqual([
+      STUDENT_ONE_ID,
+    ]);
+  });
+
+  it("keeps nonPresentStudentsResult in tuple format after rehydration", () => {
+    useEvaluationStepsCreationStore
+      .getState()
+      .rehydrateFromEvaluationPayload(
+        CLASS_SUMMARY_FIXTURE,
+        EVALUATION_PAYLOAD_FIXTURE,
+      );
+
+    const values = Array.from(
+      useEvaluationStepsCreationStore
+        .getState()
+        .nonPresentStudentsResult?.values() ?? [],
+    );
+
+    expect(values.length).toBe(1);
+    expect(Array.isArray(values[0])).toBe(true);
+    expect(values[0]?.[0]).toBe("Jane Doe");
+    expect(values[0]?.[1]).toEqual({ id: STUDENT_TWO_ID });
+    expect(values.some((value) => !Array.isArray(value))).toBe(false);
+  });
+
+  it("replaces previous same-class rehydration data without keeping old scores", () => {
+    useEvaluationStepsCreationStore
+      .getState()
+      .rehydrateFromEvaluationPayload(
+        CLASS_SUMMARY_FIXTURE,
+        EVALUATION_PAYLOAD_FIXTURE,
+      );
+
+    useEvaluationStepsCreationStore
+      .getState()
+      .rehydrateFromEvaluationPayload(
+        CLASS_SUMMARY_FIXTURE,
+        SECOND_EVALUATION_PAYLOAD_FIXTURE,
+      );
+
+    const state = useEvaluationStepsCreationStore.getState();
+    const studentOne = state.students.get(STUDENT_ONE_ID);
+    const studentTwo = state.students.get(STUDENT_TWO_ID);
+
+    expect(studentOne?.isPresent).toBe(false);
+    expect(studentTwo?.isPresent).toBe(true);
+    expect(studentTwo?.overallScore).toBe(12);
+
+    const studentOneScore = studentOne?.evaluations?.modules
+      .get(MODULE_ID)
+      ?.subSkills.get(SUBSKILL_ID)?.score;
+    const studentTwoScore = studentTwo?.evaluations?.modules
+      .get(MODULE_ID)
+      ?.subSkills.get(SUBSKILL_ID)?.score;
+
+    expect(studentOneScore).toBeUndefined();
+    expect(studentTwoScore).toBe(50);
+
+    const absentValues = Array.from(
+      state.nonPresentStudentsResult?.values() ?? [],
+    );
+
+    expect(absentValues).toEqual([["John Doe", { id: STUDENT_ONE_ID }]]);
+
+    const presentScoresIds = Array.from(
+      state.getAllStudentsAverageScores().entries(),
+    ).map(([id]) => id);
+
+    expect(presentScoresIds).toEqual([STUDENT_TWO_ID]);
   });
 });

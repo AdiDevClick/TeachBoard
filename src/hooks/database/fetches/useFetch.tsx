@@ -54,7 +54,7 @@ const defaultStateParameters: FetchParams = {
  */
 
 export function useFetch<
-  S extends ApiSuccess = ApiSuccess<any>,
+  S extends ApiSuccess<object> = ApiSuccess<Record<string, never>>,
   E extends ApiError = ApiError,
   TViewData = S extends { data: infer M } ? M : never,
 >() {

@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/item";
 import { LabelledScoreInputList } from "@/features/evaluations/create/components/Score/exports/labelled-score-input.exports";
 import type { AverageFieldsProps } from "@/features/evaluations/create/components/Score/types/score-types";
+import { formatParseFloat } from "@/utils/utils";
 
 /**
  * Component to display the average scores of students in an evaluation.
@@ -22,27 +23,25 @@ import type { AverageFieldsProps } from "@/features/evaluations/create/component
 export function AverageFields({
   form,
   students,
+  title = "Moyenne",
+  description = "Note générale",
+  placeholder = "Aucune note",
+  viewMode = false,
   ...props
 }: AverageFieldsProps) {
-  const {
-    title = "Moyenne",
-    description = "Note générale",
-    placeholder = "Aucune note",
-  } = props;
-
   return (
     <Item className="flex-col items-start p-0 gap-2" {...props}>
       <ItemTitle>{title}</ItemTitle>
       <ItemDescription>{description}</ItemDescription>
-      {students.size < 1 && (
+      {students.length < 1 && (
         <Badge variant="outline" className="mx-auto">
           {placeholder}
         </Badge>
       )}
       <ItemGroup className="mx-auto">
-        {students.size > 0 && (
+        {students.length > 0 && !viewMode && (
           <LabelledScoreInputList
-            items={Array.from(students.entries())}
+            items={students}
             form={form}
             optional={(tuple) => {
               return {
@@ -52,6 +51,22 @@ export function AverageFields({
             }}
           />
         )}
+        {students.length > 0 &&
+          viewMode &&
+          students.map(([, student]) => (
+            <Item
+              key={student.name}
+              className="w-full items-center justify-between rounded-md border"
+              variant="outline"
+              size="sm"
+            >
+              <Badge>{student.name}</Badge>
+              <p className="tabular-nums text-sm">
+                {formatParseFloat(student.score / 5)}
+                {" /20"}
+              </p>
+            </Item>
+          ))}
       </ItemGroup>
     </Item>
   );
