@@ -106,7 +106,11 @@ export const useEvaluationStepsCreationStore = create(
             // Always reset before hydrating a detail payload to prevent stale
             // scores/absences when navigating between evaluations of the same class.
             // ACTIONS.clear(selectedClass.id, true);
-            ACTIONS.setSelectedClass(selectedClass);
+            const shouldClearClass = ACTIONS.setSelectedClass(selectedClass);
+
+            if (!shouldClearClass) {
+              ACTIONS.clearStudentsEvaluations();
+            }
 
             set(
               (state) => {
@@ -173,7 +177,7 @@ export const useEvaluationStepsCreationStore = create(
 
             shouldClear = ACTIONS.clear(selectedClass.id);
 
-            if (!shouldClear) return;
+            if (!shouldClear) return false;
 
             set(
               (state) => {
@@ -211,6 +215,25 @@ export const useEvaluationStepsCreationStore = create(
               },
               undefined,
               "clearSelectedClass",
+            );
+          },
+          /**
+           * Clear all students' evaluations from the store.
+           *
+           * @description This is useful to reset the evaluation scores when changing students' presence or task assignment.
+           */
+          clearStudentsEvaluations() {
+            set(
+              (state) => {
+                ensureCollectionsInDraft(state);
+                for (const student of state.students.values()) {
+                  if (student.evaluations) {
+                    student.evaluations = null;
+                  }
+                }
+              },
+              undefined,
+              "clearStudentsEvaluations",
             );
           },
           /**
@@ -272,7 +295,7 @@ export const useEvaluationStepsCreationStore = create(
                       student.firstName + " " + student.lastName,
                     isPresent: false,
                     assignedTask: null,
-                  };
+                  } satisfies StudentWithPresence;
                   state.students.set(student.id, details);
                 });
               },
