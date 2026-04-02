@@ -10,7 +10,6 @@ import type { SkillsType } from "@/api/types/routes/skills.types.ts";
 import type {
   ClassModules,
   ClassModuleSubSkill,
-  EvaluationRehydrationPayload,
   EvaluationType,
   HydrateModulesForStudentArgs,
   HydrateStudentFromEvaluationPayloadArgs,
@@ -21,7 +20,6 @@ import type {
   StudentWithPresence,
 } from "@/features/evaluations/create/store/types/steps-creation-store.types.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
-import { parseToUuid } from "@/utils/utils";
 import type { WritableDraft } from "immer";
 
 /**
@@ -371,7 +369,7 @@ export function hydrateModulesForStudentFromEvaluationPayload(
   args: HydrateModulesForStudentArgs,
 ) {
   const {
-    parsedStudentId,
+    studentId,
     modulesEvaluation,
     getSelectedModule,
     setEvaluationForStudent,
@@ -379,34 +377,29 @@ export function hydrateModulesForStudentFromEvaluationPayload(
   } = args;
 
   for (const moduleEvaluation of modulesEvaluation) {
-    const parsedModuleId = parseToUuid(moduleEvaluation.id);
+    const moduleId = moduleEvaluation.id as UUID;
+    const selectedModule = getSelectedModule(moduleId);
 
-    if (!parsedModuleId) {
-      continue;
-    }
-
-    const selectedModule = getSelectedModule(parsedModuleId);
-
-    if (!selectedModule) {
+    if (!selectedModule || !moduleId) {
       continue;
     }
 
     const subSkillsEvaluation = moduleEvaluation.subSkills ?? [];
 
     for (const subSkillEvaluation of subSkillsEvaluation) {
-      const parsedSubSkillId = parseToUuid(subSkillEvaluation.id);
+      const subSkillId = subSkillEvaluation.id as UUID;
 
-      if (!parsedSubSkillId) {
+      if (!subSkillId) {
         continue;
       }
 
-      const selectedSubSkill = selectedModule.subSkills.get(parsedSubSkillId);
+      const selectedSubSkill = selectedModule.subSkills.get(subSkillId);
 
       if (!selectedSubSkill) {
         continue;
       }
 
-      setEvaluationForStudent(parsedStudentId, {
+      setEvaluationForStudent(studentId, {
         module: selectedModule,
         subSkill: selectedSubSkill,
         score: subSkillEvaluation.score,
@@ -423,7 +416,6 @@ export function hydrateStudentFromEvaluationPayload(
   const {
     studentEvaluation,
     absentIds,
-    hasTask,
     setStudentTaskAssignment,
     setStudentPresence,
     setStudentOverallScore,
@@ -432,9 +424,9 @@ export function hydrateStudentFromEvaluationPayload(
     setSubSkillHasCompleted,
   } = args;
 
-  const parsedStudentId = parseToUuid(studentEvaluation.studentId);
+  const studentId = studentEvaluation.studentId as UUID;
 
-  if (!parsedStudentId) {
+  if (!studentId) {
     return;
   }
 
@@ -443,42 +435,26 @@ export function hydrateStudentFromEvaluationPayload(
     overallScore,
     modules: modulesEvaluation = [],
   } = studentEvaluation;
+
   const shouldBePresent =
-    (studentEvaluation.isPresent ?? true) && !absentIds.has(parsedStudentId);
+    (studentEvaluation.isPresent ?? true) && !absentIds.has(studentId);
 
   if (!assignedTaskId) {
     return;
   }
 
-  const parsedTaskId = parseToUuid(assignedTaskId);
-
-  if (parsedTaskId && hasTask(parsedTaskId)) {
-    setStudentTaskAssignment(parsedTaskId, parsedStudentId);
-  }
-
-  setStudentPresence(parsedStudentId, shouldBePresent);
+  setStudentTaskAssignment(assignedTaskId as UUID, studentId);
+  setStudentPresence(studentId, shouldBePresent);
 
   if (overallScore) {
-    setStudentOverallScore(parsedStudentId, overallScore);
+    setStudentOverallScore(studentId, overallScore);
   }
 
   hydrateModulesForStudentFromEvaluationPayload({
-    parsedStudentId,
+    studentId,
     modulesEvaluation,
     getSelectedModule,
     setEvaluationForStudent,
     setSubSkillHasCompleted,
   });
-}
-
-export function resolveAbsenceIdsFromEvaluationPayload(
-  evaluation: EvaluationRehydrationPayload,
-): Set<UUID> {
-  const absences = evaluation.absencesIds ?? [];
-
-  return new Set(
-    absences
-      .map((studentId) => parseToUuid(studentId))
-      .filter((studentId): studentId is UUID => studentId !== null),
-  );
 }
