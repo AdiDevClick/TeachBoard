@@ -159,32 +159,9 @@ export type EvaluationRehydrationStudentPayload = Readonly<{
   modules?: ReadonlyArray<EvaluationRehydrationModulePayload>;
 }>;
 
-/**
- * Evaluation details payload used by the store rehydration action.
- */
-export type EvaluationRehydrationPayload = Readonly<{
-  id: string;
-  title: string;
-  classId: string;
-  className?: string;
-  evaluationDate: string;
-  userId: string;
-  comments?: string | null;
-  absencesIds?: ReadonlyArray<string>;
-  absence?: ReadonlyArray<string>;
-  absentStudentNames?: ReadonlyArray<string>;
-  attendedModules?: ReadonlyArray<{
-    id: string;
-    name: string;
-    code: string;
-  }>;
-  evaluations?: ReadonlyArray<EvaluationRehydrationStudentPayload>;
-}>;
-
 export type HydrateStudentFromEvaluationPayloadArgs = Readonly<{
   studentEvaluation: EvaluationRehydrationStudentPayload;
-  absentIds: Set<UUID>;
-  hasTask: (taskId: UUID) => boolean;
+  absentIds: Set<string>;
   setStudentTaskAssignment: (taskId: UUID, studentId: UUID) => void;
   setStudentPresence: (studentId: UUID, isPresent: boolean) => void;
   setStudentOverallScore: (
@@ -204,7 +181,7 @@ export type HydrateStudentFromEvaluationPayloadArgs = Readonly<{
 }>;
 
 export type HydrateModulesForStudentArgs = Readonly<{
-  parsedStudentId: UUID;
+  studentId: UUID;
   modulesEvaluation: ReadonlyArray<EvaluationRehydrationModulePayload>;
   getSelectedModule: (moduleId?: UUID) => ClassModules | null;
   setEvaluationForStudent: (

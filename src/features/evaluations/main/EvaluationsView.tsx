@@ -6,6 +6,48 @@ import { AverageFields } from "@/features/evaluations/create/components/Score/Av
 import { STEP_FOUR_INPUT_CONTROLLERS } from "@/features/evaluations/create/steps/four/config/step-four.configs";
 import { useEvaluationsView } from "@/features/evaluations/main/hooks/useEvaluationsView";
 import type { EvaluationsViewProps } from "@/features/evaluations/main/types/evaluations.types";
+import z from "zod";
+
+export const detailedEvaluationSchema = z.object({
+  id: z.uuid(),
+  title: z.string(),
+  comments: z.string().optional(),
+  classId: z.uuid(),
+  className: z.string().optional(),
+  evaluationDate: z.iso.datetime(),
+  userId: z.uuid(),
+  absencesIds: z.array(z.uuid()),
+  attendedModules: z
+    .array(
+      z.object({
+        id: z.uuid(),
+        name: z.string(),
+        code: z.string(),
+      }),
+    )
+    .optional(),
+  evaluations: z.array(
+    z.object({
+      studentId: z.uuid(),
+      isPresent: z.boolean(),
+      overallScore: z.number().min(0).max(20).gt(0).nullable(),
+      assignedTaskId: z.uuid(),
+      modules: z.array(
+        z.object({
+          id: z.uuid(),
+          subSkills: z.array(
+            z.object({
+              id: z.uuid(),
+              score: z.number().min(0).max(100).gt(0),
+            }),
+          ),
+        }),
+      ),
+    }),
+  ),
+});
+
+export type DetailedEvaluationView = z.infer<typeof detailedEvaluationSchema>;
 
 /**
  * EvaluationsView component that displays the details of an evaluation, including modules, student scores, and comments.
@@ -27,7 +69,7 @@ export function EvaluationsView({
     getPresentStudentsWithAssignedTasks,
     studentsAverageScores,
     scoreValue,
-    presenceMemo,
+    presence,
   } = useEvaluationsView({
     pageId,
     apiEndpoint,
@@ -50,8 +92,9 @@ export function EvaluationsView({
       />
       <DynamicTags
         {...controllers.absence}
-        itemList={presenceMemo.students}
+        itemList={presence.students}
         displayCRUD={false}
+        disableAnimation
       />
       <LabelledTextArea
         {...controllers.comments}
