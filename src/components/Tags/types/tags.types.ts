@@ -34,6 +34,8 @@ export type DynamicTagsProps = Readonly<
     pageId?: string;
     title?: string;
     itemList: DynamicTagsItemList;
+    /** Make sure not to animate - Useful when a render will be triggered as exiting directly */
+    disableAnimation?: boolean;
   } & DynamicTagProps
 >;
 
