@@ -2,7 +2,7 @@ import {
   DEFAULT_VALUES_STEPS_CREATION_STATE,
   useEvaluationStepsCreationStore,
 } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
-import type { EvaluationRehydrationPayload } from "@/features/evaluations/create/store/types/steps-creation-store.types";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/EvaluationsView";
 import { beforeEach, describe, expect, it } from "vitest";
 
 const CLASS_ID = "11111111-1111-4111-8111-111111111111";
@@ -62,7 +62,7 @@ const CLASS_SUMMARY_FIXTURE = {
   ],
 };
 
-const EVALUATION_PAYLOAD_FIXTURE: EvaluationRehydrationPayload = {
+const EVALUATION_PAYLOAD_FIXTURE: DetailedEvaluationView = {
   id: EVALUATION_ID,
   title: "Evaluation reconstruite",
   classId: CLASS_ID,
@@ -97,7 +97,7 @@ const EVALUATION_PAYLOAD_FIXTURE: EvaluationRehydrationPayload = {
   ],
 };
 
-const SECOND_EVALUATION_PAYLOAD_FIXTURE: EvaluationRehydrationPayload = {
+const SECOND_EVALUATION_PAYLOAD_FIXTURE: DetailedEvaluationView = {
   id: "99999999-9999-4999-8999-999999999999",
   title: "Evaluation rechargée",
   classId: CLASS_ID,
