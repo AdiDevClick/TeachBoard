@@ -174,7 +174,6 @@ export function TabContent({
   const handlerTransitionEnd = (e: TransitionEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
     const dataset = target.dataset;
-
     if (
       (dataset.stepId === "Archiver" || dataset.stepId === "Elèves") &&
       e.propertyName === "transform"
@@ -195,7 +194,7 @@ export function TabContent({
       id={id}
       data-step-id={tabName}
       data-active-transitioning={
-        (tabValue === "Archiver" || tabValue === "Elèves") &&
+        (tabValue === "Archiver" || tabValue === "Evaluation") &&
         tabName === tabValue
       }
       value={tabName}
