@@ -22,6 +22,7 @@ import {
   NO_COMPONENT_HANDLER_WARNING_LOGS,
   NO_COMPONENT_PROPS_WARNING_LOGS,
   NO_QUERY_LOGS,
+  NO_SESSION_CHECK_LOGS,
 } from "@/configs/app.config.ts";
 import type { LoginFormControllerProps } from "@/features/auth/components/login/controller/types/login-form-controller.types";
 import type { ClassCreationControllerProps } from "@/features/class-creation/components/main/types/class-creation.types";
@@ -506,9 +507,11 @@ export const validSearchTeacherOrStudentProps = (props: CommandItemType) => {
 
 //                    ------------
 
-type DebugDetails = {
+export type DebugDetails = {
   type:
+    | "all"
     | "componentHandler"
+    | "sessionCheck"
     | "propsValidation"
     | "animation"
     | "forbiddenProp"
@@ -516,6 +519,7 @@ type DebugDetails = {
     | "cacheLogs";
   [key: string]: unknown;
 };
+type DebugFnType = "debug" | "warn" | "error";
 /**
  * Logs debug information for a component when in development mode.
  *
@@ -528,47 +532,54 @@ export function debugLogs(componentName: string, details?: DebugDetails) {
   if (!DEV_MODE) return;
   const { type, ...allDetails } = details || {};
 
+  let debugType = "";
+  let callFn: DebugFnType = "debug";
+
   switch (type) {
     case "propsValidation":
       if (!NO_COMPONENT_PROPS_WARNING_LOGS) {
-        console.error(
-          `[${componentName}] - Invalid props detected. Please check the component configuration.`,
-          allDetails,
-        );
+        debugType =
+          "Invalid props detected. Please check the component configuration.";
+        callFn = "error";
       }
       break;
     case "componentHandler":
       if (!NO_COMPONENT_HANDLER_WARNING_LOGS) {
-        console.warn(
-          `[${componentName}] - Component handler verifications.`,
-          allDetails,
-        );
+        debugType = "Component handler verifications.";
+        callFn = "warn";
       }
       break;
     case "animation":
       if (!NO_ANIMATIONS_LOGS) {
-        console.log(`[${componentName}] - Animation state change.`, allDetails);
+        debugType = "Animation state change.";
       }
       break;
     case "forbiddenProp":
       if (!NO_COMPONENT_PROPS_WARNING_LOGS) {
-        console.error(
-          `[${componentName}] - Forbidden prop detected. Please check the component configuration.`,
-          allDetails,
-        );
+        debugType =
+          "Forbidden prop detected. Please check the component configuration.";
+        callFn = "error";
       }
       break;
     case "queryLogs":
       if (!NO_QUERY_LOGS) {
-        console.debug(`[${componentName}] - Query logs.`, allDetails);
+        debugType = "Query logs.";
       }
       break;
     case "cacheLogs":
       if (!NO_CACHE_LOGS) {
-        console.debug(`[${componentName}] - Cache logs.`, allDetails);
+        debugType = "Cache logs.";
       }
       break;
+    case "sessionCheck":
+      if (!NO_SESSION_CHECK_LOGS) {
+        debugType = "Session check logs.";
+      }
+      break;
+
     default:
-      console.log(`[${componentName}] - Debug log.`, allDetails);
+      debugType = "General debug log.";
   }
+
+  console[callFn](`[${componentName}] - ${debugType}`, allDetails);
 }
