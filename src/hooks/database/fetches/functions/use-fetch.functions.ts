@@ -14,9 +14,15 @@ import type { useNavigate } from "react-router-dom";
 export function navigateOnForbiddenError(
   status: number,
   navigate: ReturnType<typeof useNavigate>,
+  from?: string,
 ) {
   if (status === 403) {
-    navigate("/login", { replace: true });
+    navigate("/login", {
+      replace: true,
+      state: {
+        from: from ?? "/",
+      },
+    });
   }
 }
 
@@ -30,11 +36,12 @@ export function navigateOnForbiddenError(
 export function createSearchParamsEndpoint(params: FetchParams) {
   const { searchParams = {}, url } = params;
   let builtEndpoint = url;
+  const entries = Object.entries(searchParams) ?? [];
 
-  if (Object.entries(searchParams).length !== 0) {
+  if (entries.length !== 0) {
     const createdPath = new URL(url, globalThis.location.origin);
 
-    Object.entries(searchParams ?? {}).forEach(([key, value]) => {
+    entries.forEach(([key, value]) => {
       createdPath.searchParams.set(key, String(value));
     });
 
