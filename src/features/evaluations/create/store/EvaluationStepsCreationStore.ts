@@ -29,9 +29,9 @@ import type {
   SubskillSelectionType,
 } from "@/features/evaluations/create/store/types/steps-creation-store.types";
 import {
-  detailedEvaluationSchema,
   type DetailedEvaluationView,
-} from "@/features/evaluations/main/EvaluationsView";
+  detailedEvaluationSchema,
+} from "@/features/evaluations/main/models/evaluations-view.models";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { create } from "zustand";
