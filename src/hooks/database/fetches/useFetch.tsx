@@ -1,7 +1,10 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { debugLogs } from "@/configs/app-components.config";
-import { USER_ACTIVITIES } from "@/configs/app.config.ts";
+import {
+  forceRedirectionIfNeeded,
+  USER_ACTIVITIES,
+} from "@/configs/app.config.ts";
 import {
   cacheFetchResult,
   createSearchParamsEndpoint,
@@ -99,9 +102,10 @@ export function useFetch<
           response,
         );
 
-        debugLogs("[useFetch:onSuccess] endpoint:", {
+        debugLogs("useFetch:onSuccess", {
           type: "queryLogs",
-          url: fetchParams.url,
+          url: params.url,
+          newUrl: newUrl,
           responseData: response.data,
           reshapedResult: cachingDatas,
           message: "Fetch successful",
@@ -143,17 +147,20 @@ export function useFetch<
           // cached value as authoritative.
           setViewData(cachedData as TViewData);
 
-          debugLogs("[useFetch:onError] endpoint:", {
+          debugLogs("useFetch:onError", {
             type: "queryLogs",
-            url: fetchParams.url,
+            url: params.url,
+            newUrl,
             responseData: error.data,
             reshapedResult: cachedData,
             message: error.message,
           });
         }
 
-        // !! IMPORTANT !! Handle forbidden error by navigating to login page
-        navigateOnForbiddenError(error.status, navigate);
+        // !! IMPORTANT !! Handle forbidden error by force navigating to login page
+        if (forceRedirectionIfNeeded(contentId)) {
+          navigateOnForbiddenError(error.status, navigate, pathname);
+        }
       },
     },
   ]);

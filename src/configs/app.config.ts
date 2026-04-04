@@ -153,5 +153,27 @@ export const ifThisPageIsInRedirectList = (path: string) => {
   );
 };
 
+const DO_NOT_FORCE_REDIRECT_IF_ACTIONS_ARE = [
+  USER_ACTIVITIES.sessionCheck,
+] as const;
+
+/**
+ * Determine if a redirection should be forced based on the user activity.
+ *
+ * @description Used by the useFetch hook to decide whether to navigate to the login page on a 403 Forbidden error, depending on the user activity that triggered the fetch.
+ *
+ * @param action - The user activity to check against the list of actions that do not require redirection.
+ *
+ * @returns - True if a redirection should be forced, false otherwise.
+ *
+ * @example For instance, if the user activity is a session check, we do not want to force a redirection to the login page on a 403 error, as this could create a loop of failed session checks and redirections.
+ * In contrast, for other activities like fetching data for a protected resource, we would want to redirect the user to the login page if they are not properly authenticated.
+ */
+export const forceRedirectionIfNeeded = (action: string) => {
+  return DO_NOT_FORCE_REDIRECT_IF_ACTIONS_ARE.every(
+    (excludedAction) => excludedAction !== action,
+  );
+};
+
 export const APP_REDIRECT_TIMEOUT = 1500;
 export const APP_REDIRECT_TIMEOUT_SUCCESS = 500;
