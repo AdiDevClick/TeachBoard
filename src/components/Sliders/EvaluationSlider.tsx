@@ -24,7 +24,7 @@ import { useEffect, useEffectEvent, useState, type CSSProperties } from "react";
  * @param fullName - Full name of the student.
  */
 export function EvaluationSlider(props: EvaluationSliderProps) {
-  const { fullName, onValueChange, value, ...rest } = props;
+  const { fullName, onValueChange, value, id, ...rest } = props;
   const safeSliderProps = sanitizeDOMProps(rest, [
     "isPresent",
     "assignedTask",
@@ -69,7 +69,11 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
   }
 
   return (
-    <Item className={evaluationStudentContainer}>
+    <Item
+      data-slot="evaluation-student"
+      data-student-id={id}
+      className={evaluationStudentContainer}
+    >
       <Badge className={evaluationStudentBadge}>{fullName}</Badge>
       <Slider
         step={25}
