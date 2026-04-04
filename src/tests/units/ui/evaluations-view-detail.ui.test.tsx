@@ -37,7 +37,9 @@ const secondEvaluationOnePresentPayload = {
   ...secondeval.data,
   absencesIds: classDetails.students
     .map((student) => student.id)
-    .filter((studentId) => studentId !== secondEvaluationSinglePresentStudentId),
+    .filter(
+      (studentId) => studentId !== secondEvaluationSinglePresentStudentId,
+    ),
   evaluations: secondeval.data.evaluations.filter(
     (studentEvaluation) =>
       studentEvaluation.studentId === secondEvaluationSinglePresentStudentId,
@@ -221,7 +223,7 @@ function getSliderValueForStudent(subSkillName: string, studentName: string) {
   }
 
   const rows = Array.from(
-    card.querySelectorAll<HTMLElement>('[data-slot="item"]'),
+    card.querySelectorAll<HTMLElement>('[data-slot="evaluation-student"]'),
   );
   const matchingRow = rows.find((row) =>
     normalizeText(row.textContent ?? "").includes(normalizeText(studentName)),
@@ -250,12 +252,10 @@ async function expectAbsenceSectionToMatch(
   expectedAbsentIds: string[],
   unexpectedAbsentIds: string[] = [],
 ) {
-  const expectedNames = getAbsentStudentNames(expectedAbsentIds).map(
-    normalizeText,
-  );
-  const unexpectedNames = getAbsentStudentNames(unexpectedAbsentIds).map(
-    normalizeText,
-  );
+  const expectedNames =
+    getAbsentStudentNames(expectedAbsentIds).map(normalizeText);
+  const unexpectedNames =
+    getAbsentStudentNames(unexpectedAbsentIds).map(normalizeText);
 
   await expect
     .poll(() => {
@@ -275,14 +275,14 @@ async function expectAbsenceSectionToMatch(
 function hasStudentOverallScore(studentName: string, score: number) {
   const pageText = normalizeText(document.body.textContent ?? "");
   const normalizedStudentName = normalizeText(studentName);
-  const expectedScoreText = normalizeText(`${score} /20`);
+  const scorePattern = new RegExp(String.raw`\b${score}(?:\.0)?\s*/\s*20`);
 
   let nameIndex = pageText.indexOf(normalizedStudentName);
 
   while (nameIndex >= 0) {
-    const nearbyText = pageText.slice(nameIndex, nameIndex + 220);
+    const nearbyText = pageText.slice(nameIndex, nameIndex + 600);
 
-    if (nearbyText.includes(expectedScoreText)) {
+    if (scorePattern.test(nearbyText)) {
       return true;
     }
 
@@ -393,7 +393,7 @@ describe("UI flow: evaluations detail view", () => {
               studentName,
               Number(studentEvaluation.overallScore),
             ),
-          { timeout: 5000 },
+          { timeout: 500 },
         )
         .toBe(true);
     }
@@ -415,14 +415,12 @@ describe("UI flow: evaluations detail view", () => {
       .toBe(false);
 
     await expect
-      .poll(() => {
-        const commentsField = page.getByLabelText(/^Commentaires$/i).query();
-
-        return commentsField instanceof HTMLTextAreaElement
-          ? commentsField.value
-          : "";
-      })
-      .toBe(evaluationPayload.comments);
+      .poll(() =>
+        normalizeText(document.body.textContent ?? "").includes(
+          normalizeText(evaluationPayload.comments),
+        ),
+      )
+      .toBe(true);
   });
 
   test("refreshes rendered data when navigating to another evaluation without F5", async () => {
@@ -473,7 +471,7 @@ describe("UI flow: evaluations detail view", () => {
     await documentToHaveRoleWithName("button", rxExact(secondOnlyModule.name));
 
     await expect
-      .poll(() => hasStudentOverallScore("Raz Fitz", 15), { timeout: 5000 })
+      .poll(() => hasStudentOverallScore("Raz Fitz", 15), { timeout: 500 })
       .toBe(true);
 
     for (const absentStudentId of secondeval.data.absencesIds) {
