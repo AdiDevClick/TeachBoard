@@ -64,7 +64,7 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
   }, [value]);
 
   if (evaluationSliderPropsValid(props)) {
-    debugLogs("[EvaluationSlider]", props);
+    debugLogs("[EvaluationSlider]", { type: "propsValidation", props });
     return null;
   }
 
