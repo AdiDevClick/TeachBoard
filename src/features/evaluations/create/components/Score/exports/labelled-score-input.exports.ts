@@ -1,4 +1,5 @@
 import withListMapper from "@/components/HOCs/withListMapper";
+import { LabelledScore } from "@/features/evaluations/create/components/Score/LabelledScore";
 import { LabelledScoreInput } from "@/features/evaluations/create/components/Score/LabelledScoreInput";
 import { createComponentName } from "@/utils/utils";
 
@@ -17,3 +18,10 @@ createComponentName(
   "LabelledScoreInputList",
   LabelledScoreInputList,
 );
+
+/**
+ * A version of the LabelledScore component that can be used to display a list of average scores for multiple students with no inputs fields.
+ */
+export const LabelledScoreList = withListMapper(LabelledScore);
+
+createComponentName("withListMapper", "LabelledScoreList", LabelledScoreList);
