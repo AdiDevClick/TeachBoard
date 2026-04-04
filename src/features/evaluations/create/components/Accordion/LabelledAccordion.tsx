@@ -1,7 +1,6 @@
 import { Accordion } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { Item } from "@/components/ui/item";
-import { Label } from "@/components/ui/label";
+import { Item, ItemTitle } from "@/components/ui/item";
 import { AccordionItemWithSubSkillWithStudentsList } from "@/features/evaluations/create/components/Accordion/exports/accordion.export";
 import type { LabelledAccordionProps } from "@/features/evaluations/create/components/Accordion/types/labelled-accordion";
 import type { ClassModules } from "@/features/evaluations/create/store/types/steps-creation-store.types";
@@ -32,8 +31,8 @@ export function LabelledAccordion(props: LabelledAccordionProps) {
   });
 
   return (
-    <>
-      <Label>{title}</Label>
+    <Item className="grid gap-(--app-overall-gap) p-0">
+      <ItemTitle>{title}</ItemTitle>
       <Accordion {...inputController}>
         {accordionItems.length < 1 && (
           <Item>
@@ -53,6 +52,6 @@ export function LabelledAccordion(props: LabelledAccordionProps) {
           />
         )}
       </Accordion>
-    </>
+    </Item>
   );
 }
