@@ -53,15 +53,14 @@ export function useAppForm<T extends FieldValues = FieldValues>({
     // !! IMPORTANT !! - Use startTransition to avoid blocking UI updates
     startTransition(() => {
       if (!open) setOpen(true);
-      // form.reset();
     });
 
     if (!ifThisPageIsInRedirectList(location.pathname)) {
       // If the current page is in the no-redirect list, just reset the form without navigating
       return;
     }
-    const previousUrl = lastActivity?.values().next().value?.previousUrl;
 
+    const previousUrl = lastActivity?.values().next().value?.previousUrl;
     navigate(previousUrl || "/", { replace: true });
   };
 
