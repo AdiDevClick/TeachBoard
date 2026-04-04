@@ -391,20 +391,29 @@ export function useCommandHandler<
    */
   const triggerSubmit = useEffectEvent((fetchParams: FetchParams) => {
     if (isLoading || hasStartedCreation.current) return;
+    const fetchType = fetchParams.method ?? "GET";
 
-    if (postVariables.current) {
-      // POST only
-      hasStartedCreation.current = true;
-      onSubmit(postVariables.current);
-    } else {
-      // FETCH only
+    if (fetchType === "POST") {
+      // With viarables
+      if (postVariables.current) {
+        hasStartedCreation.current = true;
+        onSubmit(postVariables.current);
+      } else {
+        // A POST could be a submission without variables (eg. a delete action)
+        onSubmit();
+      }
+    }
+
+    if (fetchType === "GET") {
       const { cacheKey, shouldNotFetch, isInitialFetchParams } =
         resolvedReturnCases(fetchParams);
 
+      // The useEffect already guards but this one is deeper, please keep it for safety
       if (shouldNotFetch || isInitialFetchParams) {
         return;
       }
 
+      // For GET requests, check cache first
       const cachedData = queryClient.getQueryData(cacheKey);
 
       if (cachedData === undefined) {
@@ -420,6 +429,8 @@ export function useCommandHandler<
    * @description Triggers when fetchParams are updated with {@link handleOpening}
    */
   useEffect(() => {
+    if (fetchParams.contentId === "none") return;
+
     triggerSubmit(fetchParams);
   }, [fetchParams]);
 
