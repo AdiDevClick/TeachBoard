@@ -1,12 +1,12 @@
 import { ListMapper } from "@/components/Lists/ListMapper";
 import type {
+  ListMapperInjectedMeta,
   ListMapperItem,
   ListMapperOptionalInput,
   ListMapperOptionalValue,
 } from "@/components/Lists/types/ListsTypes";
 import type {
   AnyObjectProps,
-  MergeProvided,
   RemoveStringIndex,
 } from "@/utils/types/types.utils";
 import { createNameForHOC } from "@/utils/utils";
@@ -14,9 +14,9 @@ import type { ComponentType, ReactElement } from "react";
 
 type TBaseProps<TProps extends object> = RemoveStringIndex<TProps>;
 
-type OmittedByMerge<TProps extends object, TItem, TOptionalValue> = Omit<
+type OmittedByMerge<TProps extends object, TProvided, TOptionalValue> = Omit<
   TBaseProps<TProps>,
-  keyof RemoveStringIndex<MergeProvided<TItem, TOptionalValue>>
+  keyof RemoveStringIndex<TProvided>
 >;
 
 type MergeAllRemainingProps<
@@ -25,8 +25,11 @@ type MergeAllRemainingProps<
   TOptionalInput,
 > = OmittedByMerge<
   T,
-  ListMapperItem<TItems>,
-  NoInfer<ListMapperOptionalValue<TOptionalInput>>
+  ListMapperInjectedMeta<
+    ListMapperItem<TItems>,
+    ListMapperOptionalValue<TOptionalInput>
+  >,
+  ListMapperOptionalValue<TOptionalInput>
 >;
 
 /**
@@ -62,7 +65,10 @@ type WithListMapperFuncOptionalSig<T extends object> = <
       ) => Partial<RemoveStringIndex<T>>);
   } & OmittedByMerge<
     T,
-    ListMapperItem<TItems>,
+    ListMapperInjectedMeta<
+      ListMapperItem<TItems>,
+      TOptionalFn extends (...args: never[]) => infer R ? R : never
+    >,
     TOptionalFn extends (...args: never[]) => infer R ? R : never
   >,
 ) => ReactElement | null;
