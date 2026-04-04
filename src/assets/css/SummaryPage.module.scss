@@ -9,7 +9,7 @@
 *:is([data-slot="card"]) {
 
   & [data-slot="card-content"]> :has([data-slot="accordion"]) {
-    max-width: 80%;
+    max-width: min(850px, 50vw);
     width: 100%;
     // @extend .card-content-max-height-with-animation;
   }
