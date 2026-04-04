@@ -25,22 +25,6 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
   >(new UniqueSet());
   const { setRef, observedRefs, deleteRef } = useMutationObserver({});
 
-  const openDialog = useCallback(
-    (
-      e: PreventDefaultAndStopPropagation,
-      id: AppModalNames,
-      options?: AnyObjectProps,
-    ) => {
-      preventDefaultAndStopPropagation(e);
-      setOpenDialogs((prev) => {
-        const next = prev.clone();
-        next.set(id, options ?? {});
-        return next;
-      });
-    },
-    [],
-  );
-
   const closeDialog = useCallback(
     (e: PreventDefaultAndStopPropagation, id?: AppModalNames) => {
       preventDefaultAndStopPropagation(e);
@@ -74,6 +58,25 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
       return openDialogs.has(id);
     },
     [openDialogs],
+  );
+
+  const openDialog = useCallback(
+    (
+      e: PreventDefaultAndStopPropagation,
+      id: AppModalNames,
+      options?: AnyObjectProps,
+    ) => {
+      preventDefaultAndStopPropagation(e);
+
+      if (isDialogOpen(id)) return;
+
+      setOpenDialogs((prev) => {
+        const next = prev.clone();
+        next.set(id, options ?? {});
+        return next;
+      });
+    },
+    [isDialogOpen],
   );
 
   const onOpenChange = useCallback((id: AppModalNames) => {
