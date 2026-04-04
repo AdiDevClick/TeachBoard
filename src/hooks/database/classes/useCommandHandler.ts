@@ -337,7 +337,7 @@ export function useCommandHandler<
      />
     * ```
    */
-  const handleDataCacheUpdate = <T = HeadingType[]>() => {
+  const handleDataCacheUpdate = <T = HeadingType[]>(): T | undefined => {
     const cacheKey = resolveFetchCacheKey(fetchParams);
     const cachedData = queryClient.getQueryData<T>(cacheKey);
 
@@ -347,7 +347,7 @@ export function useCommandHandler<
       cachedData,
     });
 
-    return cachedData ?? data;
+    return cachedData ?? (data as T | undefined);
   };
   /**
    * RESULTS - Handle dialog closing after successful submission
