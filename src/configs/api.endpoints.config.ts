@@ -4,6 +4,7 @@ import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 import type {
   ClasseNameAvailabilityResponse,
   ClassesFetch,
+  ClassSummaryDto,
   CreateClassResponseData,
 } from "@/api/types/routes/classes.types";
 import type {
@@ -75,10 +76,13 @@ export const API_ENDPOINTS = Object.freeze({
         // use "code" and transform to "value" for selects
         // data.classes is the actual array of classes from the server response
         dataReshaper(data)
-          // .rename("classes", "items")
           .transformTuplesToGroups("groupTitle", "items")
-          // .assignSourceTo("items")
-          // .addToRoot({ groupTitle: "Tous" })
+          .assign([["name", "value"]])
+          .newShape(),
+      dataReshapeSingle: (data: ClassSummaryDto) =>
+        // use "code" and transform to "value" for selects
+        // data
+        dataReshaper(data)
           .assign([["name", "value"]])
           .newShape(),
     },
