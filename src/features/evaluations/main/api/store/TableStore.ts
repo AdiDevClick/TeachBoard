@@ -45,10 +45,23 @@ export function createTableStore<T extends RowItemWithId>(storeName: string) {
     devtools(
       persist(
         immer(
-          combine(createDefaultState<T>(), (set) => ({
+          combine(createDefaultState<T>(), (set, get) => ({
             // GETTERS
             getItemId: (item: T) => item.id,
+            hasItem: (itemId: string) => {
+              const item = get().data.find((d) => d.id === itemId);
+              return item !== undefined;
+            },
             // SETTERS
+            addItem(item: T) {
+              set(
+                (state) => {
+                  state.data.unshift(item);
+                },
+                false,
+                "addItem",
+              );
+            },
             setData(data: T[]) {
               set({ data }, false, "setData");
             },
