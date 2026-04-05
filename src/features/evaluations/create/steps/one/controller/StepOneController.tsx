@@ -1,16 +1,17 @@
 import { useAppStore } from "@/api/store/AppStore";
+import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
 import type { CommandItemType } from "@/components/Command/types/command.types.ts";
 import { PopoverFieldWithCommands } from "@/components/Popovers/exports/popover-field.exports";
-import {
-  DEV_MODE,
-  NO_CACHE_LOGS,
-  NO_QUERY_LOGS,
-} from "@/configs/app.config.ts";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
+import { debugLogs } from "@/configs/app-components.config";
+import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
 import { stepOneInputControllers } from "@/features/evaluations/create/steps/one/forms/step-one-inputs.ts";
 import type { StepOneControllerProps } from "@/features/evaluations/create/steps/one/types/step-one.types.ts";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
+import { saveFetchResultInCache } from "@/hooks/database/fetches/functions/use-fetch.functions";
 import type { HandleAddNewItemParams } from "@/hooks/database/types/use-command-handler.types.ts";
+import { parseFromObject } from "@/utils/utils";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
@@ -39,6 +40,7 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
     isLoading,
     data,
     error,
+    queryClient,
   } = useCommandHandler({
     form: null!,
     pageId,
@@ -69,12 +71,11 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
    * @param rest - Additional parameters related to the new item
    */
   const handleNewItem = ({ e, ...rest }: HandleAddNewItemParams) => {
-    if (DEV_MODE && !NO_CACHE_LOGS) {
-      console.debug("Add new item triggered", {
-        apiEndpoint: rest.apiEndpoint,
-        task: rest.task,
-      });
-    }
+    debugLogs("StepOneController:handleNewItem", {
+      type: "cacheLogs",
+      apiEndpoint: rest.apiEndpoint,
+      task: rest.task,
+    });
 
     rest.userId = user?.userId;
 
@@ -93,7 +94,19 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
    * @param commandItem - The details of the selected command item
    */
   const handleOnSelect = (_value: string, commandItem: CommandItemType) => {
-    setSelectedClass(JSON.parse(JSON.stringify(commandItem)));
+    const parsed = parseFromObject(commandItem);
+    if (parsed === null) return;
+
+    // Save the fetched class data in the cache for later use and to avoid refetching when navigating to the evaluation overview page, as we already have the necessary data at hand.
+    saveFetchResultInCache(
+      queryClient,
+      "evaluation-class-selection",
+      API_ENDPOINTS.GET.CLASSES.endPoints.BY_ID(parsed.id),
+      API_ENDPOINTS.GET.CLASSES.dataReshapeSingle,
+      parsed,
+    );
+
+    setSelectedClass(parsed as unknown as ClassSummaryDto);
   };
 
   return (
