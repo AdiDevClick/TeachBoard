@@ -49,6 +49,13 @@ export type LastUserActivityDetails = {
   type?: string;
   status?: number;
 };
+
+export type SyncValues = {
+  shouldSyncEvaluations: boolean;
+  // shouldSyncClasses: boolean;
+  // shouldSyncStudents: boolean;
+};
+
 /**
  * Persisting Application store.
  *
@@ -59,4 +66,5 @@ export interface AppStore {
   isLoggedIn: boolean;
   user: User | null;
   sessionSynced: boolean;
+  syncValues: SyncValues;
 }
