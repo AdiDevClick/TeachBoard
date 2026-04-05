@@ -1,5 +1,6 @@
 import type { UUID } from "@/api/types/openapi/common.types";
 import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import { debugLogs } from "@/configs/app-components.config";
 import { useStepFourState } from "@/features/evaluations/create/hooks/useStepFourState";
 import type { UseStepFourHandlerProps } from "@/features/evaluations/create/steps/four/hooks/types/use-step-four-handler.types";
@@ -7,7 +8,10 @@ import {
   type StepFourFormSchema,
   stepFourInputSchema,
 } from "@/features/evaluations/create/steps/four/models/step-four.models";
+import { useEvaluationTableStore } from "@/features/evaluations/main/configs/evaluations.configs";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
+import { saveObjectInCache } from "@/hooks/database/fetches/functions/use-fetch.functions";
+import { parseFromObject } from "@/utils/utils";
 import { useEffect, useEffectEvent, useMemo } from "react";
 import { useWatch } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -37,13 +41,19 @@ export function useStepFourHandler({
     clear,
   } = useStepFourState();
 
-  const { submitCallback, invalidSubmitCallback, isLoading, error, response } =
-    useCommandHandler({
-      pageId,
-      form,
-      submitRoute,
-      submitDataReshapeFn,
-    });
+  const {
+    submitCallback,
+    invalidSubmitCallback,
+    queryClient,
+    isLoading,
+    error,
+    response,
+  } = useCommandHandler({
+    pageId,
+    form,
+    submitRoute,
+    submitDataReshapeFn,
+  });
 
   const { setValue, reset } = form;
   const navigate = useNavigate();
@@ -127,7 +137,9 @@ export function useStepFourHandler({
    */
   const triggerScoreUpdate = useEffectEvent(() => {
     try {
-      const parsed = JSON.parse(JSON.stringify(getAllPresentStudents));
+      const stringified = JSON.stringify(getAllPresentStudents);
+      const parsed = JSON.parse(stringified);
+
       setValue("evaluations", parsed);
     } catch (error) {
       debugLogs("StepFourController:triggerScoreUpdate", {
@@ -175,6 +187,26 @@ export function useStepFourHandler({
         toast.success("Évaluation créée avec succès !", {
           id: toastId,
         });
+        const store = useEvaluationTableStore.getState();
+        const parsedResponse = parseFromObject(response.data);
+
+        if (parsedResponse && !store.hasItem(parsedResponse.id as UUID)) {
+          // Save in local persisted store to avoid fetching
+          store.addItem(parsedResponse as any);
+
+          // While we have access to the data, cache it in case the user navigates to the evaluation overview, to avoid a fetch there.
+          saveObjectInCache(
+            queryClient,
+            [
+              "evaluation-overview",
+              API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(
+                parsedResponse.id as UUID,
+              ),
+            ],
+            parsedResponse,
+          );
+        }
+
         clear(selectedClass?.id as UUID, true);
         navigate("/evaluations");
       }
