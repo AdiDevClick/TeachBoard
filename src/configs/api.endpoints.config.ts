@@ -73,14 +73,14 @@ export const API_ENDPOINTS = Object.freeze({
       },
       dataAvailable: (data: ClasseNameAvailabilityResponse) => data,
       dataReshape: (data: ClassesFetch) =>
-        // use "code" and transform to "value" for selects
+        // use "name" and transform to "value" for selects
         // data.classes is the actual array of classes from the server response
         dataReshaper(data)
           .transformTuplesToGroups("groupTitle", "items")
           .assign([["name", "value"]])
           .newShape(),
       dataReshapeSingle: (data: ClassSummaryDto) =>
-        // use "code" and transform to "value" for selects
+        // use "name" and transform to "value" for selects
         // data
         dataReshaper(data)
           .assign([["name", "value"]])
