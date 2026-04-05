@@ -21,23 +21,19 @@ export function useStepFourState() {
     useShallow((state) => state.getAttendedModules()),
   );
 
-  const getEvaluatedStudentsForSubSkill = useEvaluationStepsCreationStore(
-    useShallow((state) => state.getPresentStudentsWithAssignedTasks),
-  );
-
   const allStudentsAverageScores = useEvaluationStepsCreationStore(
     useShallow((state) => state.getAllStudentsAverageScores()),
-  );
-
-  const scoreValue = useEvaluationStepsCreationStore(
-    useShallow((state) => state.getStudentScoreForSubSkill),
   );
 
   const getAllPresentStudents = useEvaluationStepsCreationStore(
     useShallow((state) => state.getAllPresentStudents()),
   );
 
-  const { clear } = useEvaluationStepsCreationStore();
+  const {
+    clear,
+    getStudentScoreForSubSkill: scoreValue,
+    getPresentStudentsWithAssignedTasks: getEvaluatedStudentsForSubSkill,
+  } = useEvaluationStepsCreationStore();
 
   return {
     scoreValue,
