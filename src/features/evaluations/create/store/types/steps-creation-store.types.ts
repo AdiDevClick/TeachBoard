@@ -116,6 +116,9 @@ export interface StepsCreationState {
   diplomaName?: string | null;
   className?: string | null;
   id?: UUID | null;
+  /**
+   * Optional description for the evaluation, can be set during the creation process or retrieved from an existing evaluation when rehydrating the store state.
+   */
   description?: string | null;
   students: UniqueSet<UUID, StudentWithPresence>;
   allPresent: boolean;
@@ -126,6 +129,8 @@ export interface StepsCreationState {
   subSkillSelection: SubskillSelectionType;
   /** Cached result for non-present students to preserve referential equality (key = studentId, value = student details) */
   nonPresentStudentsResult: NonPresentStudentsResult | null;
+  /** Optional title for the evaluation, can be set during the creation process or retrieved from an existing evaluation when rehydrating the store state. */
+  title?: string;
 }
 
 export type SelectedClassModulesReturn = ClassModules[];
