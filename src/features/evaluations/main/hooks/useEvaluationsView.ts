@@ -4,7 +4,7 @@ import {
   studentPresence,
 } from "@/features/evaluations/main/functions/evaluations-view.functions";
 import type { UseEvaluationsViewProps } from "@/features/evaluations/main/hooks/types/use-evaluations-view.types";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import { useShallow } from "zustand/shallow";
 
 /**
@@ -16,8 +16,6 @@ export function useEvaluationsView({
   selectedClass,
   evaluationData,
 }: UseEvaluationsViewProps) {
-  const lastHydrationKeyRef = useRef<string>("");
-
   const modules = useEvaluationStepsCreationStore(
     useShallow((state) => state.getAttendedModules()),
   );
@@ -52,22 +50,12 @@ export function useEvaluationsView({
       return;
     }
 
-    const hydrationKey = `${evaluationData.id}:${selectedClassForHydration.id}`;
-
-    if (lastHydrationKeyRef.current === hydrationKey) {
-      return;
-    }
-
-    const isHydrated = useEvaluationStepsCreationStore
+    useEvaluationStepsCreationStore
       .getState()
       .rehydrateFromEvaluationPayload(
         selectedClassForHydration,
         evaluationData,
       );
-
-    if (isHydrated) {
-      lastHydrationKeyRef.current = hydrationKey;
-    }
   }, [evaluationData, selectedClassForHydration]);
 
   /**
