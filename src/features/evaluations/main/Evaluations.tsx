@@ -1,3 +1,4 @@
+import { useAppStore } from "@/api/store/AppStore";
 import { EvaluationTable } from "@/components/Tables/EvaluationTable";
 import {
   createActionsColumn,
@@ -16,6 +17,7 @@ import { IconPlus } from "@tabler/icons-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useEffectEvent } from "react";
 import z from "zod";
+import { useShallow } from "zustand/shallow";
 
 /**
  * Columns configuration
@@ -89,11 +91,17 @@ export function EvaluationsMain({
   dataReshapeFn = API_ENDPOINTS.GET.EVALUATIONS.dataReshape,
   task = "evaluation-overview",
 }: EvaluationsMainProps) {
+  const store = useEvaluationTableStore.getState();
   const { openingCallback, data } = useCommandHandler({
     form: null!,
     pageId: task,
     submitDataReshapeFn: dataReshapeFn,
   });
+  const { setShouldResyncEvals } = useAppStore();
+  const shouldResyncEvals = useAppStore(
+    useShallow((state) => state.shouldResyncEvals()),
+  );
+  const isStoreEmpty = store.data.length === 0;
 
   /**
    * Initial data fetch
@@ -113,8 +121,10 @@ export function EvaluationsMain({
     useEvaluationTableStore.setState({
       columns,
     });
-    fetchInit();
-  }, []);
+    if (isStoreEmpty || shouldResyncEvals) {
+      fetchInit();
+    }
+  }, [isStoreEmpty, shouldResyncEvals]);
 
   /**
    * Data parsing and store initialization
@@ -133,13 +143,13 @@ export function EvaluationsMain({
       });
     }
 
-    const store = useEvaluationTableStore.getState();
     const parsedData = parseResult.data;
 
-    if (store.data.length === 0) {
+    if (isStoreEmpty || shouldResyncEvals) {
       useEvaluationTableStore.setState({ data: parsedData });
+      setShouldResyncEvals(false);
     }
-  }, [data]);
+  }, [data, isStoreEmpty, shouldResyncEvals, setShouldResyncEvals]);
 
   return (
     <div className="flex flex-col gap-4 px-4 py-6 lg:px-6">
