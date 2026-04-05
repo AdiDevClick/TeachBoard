@@ -14,7 +14,7 @@ export function EvaluationsView({
   evalEndpoint = API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID,
   evalDataReshapeFn = API_ENDPOINTS.GET.EVALUATIONS.dataReshape,
   classEndpoint = API_ENDPOINTS.GET.CLASSES.endPoints.BY_ID,
-  classDataReshapeFn = API_ENDPOINTS.GET.CLASSES.dataReshape,
+  classDataReshapeFn = API_ENDPOINTS.GET.CLASSES.dataReshapeSingle,
   pageId = "evaluation-overview",
   classTask = "evaluation-class-selection",
   inputControllers = STEP_FOUR_INPUT_CONTROLLERS,
