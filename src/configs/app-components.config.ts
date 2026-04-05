@@ -581,5 +581,7 @@ export function debugLogs(componentName: string, details?: DebugDetails) {
       debugType = "General debug log.";
   }
 
+  if (!debugType) return;
+
   console[callFn](`[${componentName}] - ${debugType}`, allDetails);
 }
