@@ -1,9 +1,9 @@
+import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
-import { selectClassMetas } from "@/features/evaluations/main/functions/evaluations-view.functions";
 import type { UseEvaluationsViewFetchProps } from "@/features/evaluations/main/hooks/types/use-evaluations-view-fetch.types";
 import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
-import { parseToUuid } from "@/utils/utils";
+import { parseFromObject, parseToUuid } from "@/utils/utils";
 import { useEffect, useEffectEvent, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
@@ -90,8 +90,16 @@ export function useEvaluationsViewFetch({
     if (!classData) {
       return null;
     }
+    const parsedClass = parseFromObject(classData) as ClassSummaryDto | null;
 
-    return selectClassMetas(classData);
+    if (!parsedClass?.id) {
+      return null;
+    }
+
+    return {
+      id: parsedClass.id,
+      selectedClass: parsedClass,
+    };
   }, [classData]);
 
   /**
