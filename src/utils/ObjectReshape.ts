@@ -69,7 +69,9 @@ export class ObjectReshape<T extends Record<string, unknown>> {
   #init() {
     this.#isArray = this.#isValidArray(this.#dataSource);
     this.#isPlainObject = this.#isValidObject(this.#dataSource);
-    this.#firstSourceElement = (this.#dataSource as T[])[0];
+    this.#firstSourceElement = this.#isArray
+      ? (this.#dataSource as T[])[0]
+      : undefined;
     this.#initShapedItem();
   }
 
