@@ -58,6 +58,7 @@ export const USER_ACTIVITIES = Object.freeze({
   none: "none",
   sessionCheck: "session-check",
   classes: "classes",
+  evaluationClassSelection: "evaluation-class-selection",
   classCreation: "class-creation",
   signup: "signup",
   signupValidation: "signup-validation",
@@ -67,6 +68,7 @@ export const USER_ACTIVITIES = Object.freeze({
   degreeCreation: "degree-creation",
   degreeModuleCreation: "degree-module-creation",
   degreeModuleSkillCreation: "new-degree-module-skill",
+  evaluationOverview: "evaluation-overview",
 });
 
 /**
