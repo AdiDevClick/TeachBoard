@@ -1,5 +1,11 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 
+import { UUID_SCHEMA } from "@/api/types/openapi/common.types";
+import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
+import {
+  DEFAULT_VALUES_STEPS_CREATION_STATE,
+  useEvaluationStepsCreationStore,
+} from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
 import { EvaluationsView } from "@/features/evaluations/main/EvaluationsView";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import {
@@ -8,6 +14,7 @@ import {
   secondeval,
 } from "@/tests/samples/evaluations-payload.datas.tests";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
+import { testQueryClient } from "@/tests/test-utils/testQueryClient";
 import {
   documentToHaveRoleWithName,
   getFetchCallsByUrl,
@@ -24,8 +31,8 @@ type ScoresBySubSkill = Map<string, Map<string, number>>;
 type ScoresByModule = Map<string, ScoresBySubSkill>;
 
 const evaluationPayload = firsteval.data;
-const classPayload = classObj.data;
-const classDetails = classPayload.classe;
+const classPayload = classObj.data.classe;
+const classDetails = classPayload;
 const secondEvaluationSinglePresentStudentId =
   secondeval.data.evaluations[0]?.studentId ?? classDetails.students[0]?.id;
 
@@ -52,6 +59,46 @@ const evaluationEndpoint = API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(
 const classEndpoint = API_ENDPOINTS.GET.CLASSES.endPoints.BY_ID(
   evaluationPayload.classId,
 );
+
+function buildStoreClassSummary(payload: typeof classPayload): ClassSummaryDto {
+  return {
+    id: UUID_SCHEMA.parse(payload.id),
+    name: payload.name,
+    description: payload.description,
+    degreeLevel: payload.degreeLevel,
+    degreeYearCode: payload.degreeYearCode,
+    degreeYearName: payload.degreeYearName,
+    evaluations: [],
+    students: payload.students.map((student) => ({
+      id: UUID_SCHEMA.parse(student.id),
+      firstName: student.firstName,
+      lastName: student.lastName,
+      fullName: student.fullName,
+    })),
+    templates: payload.templates.map((template) => ({
+      id: UUID_SCHEMA.parse(template.id),
+      name: template.name,
+      taskName: template.taskName,
+      task: {
+        id: UUID_SCHEMA.parse(template.task.id),
+        name: template.task.name,
+        description: template.task.description,
+      },
+      modules: (template.modules ?? []).map((module) => ({
+        id: UUID_SCHEMA.parse(module.id),
+        code: module.code,
+        name: module.name,
+        subSkills: (module.subSkills ?? []).map((subSkill) => ({
+          id: UUID_SCHEMA.parse(subSkill.id),
+          code: subSkill.code,
+          name: subSkill.name,
+        })),
+      })),
+    })),
+  };
+}
+
+const classSummaryForStore = buildStoreClassSummary(classPayload);
 
 function normalizeText(value: string) {
   return value.replaceAll(/\s+/g, " ").trim().toLowerCase();
@@ -101,6 +148,27 @@ function installEvaluationDetailFetchStub(
     ],
     defaultGetPayload: [],
   });
+}
+
+function seedEvaluationDetailCache(
+  evalPayload = evaluationPayload,
+  detailsPayload: ClassSummaryDto = classSummaryForStore,
+) {
+  testQueryClient.setQueryData(
+    [
+      "evaluation-overview",
+      API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(evalPayload.id),
+    ],
+    API_ENDPOINTS.GET.EVALUATIONS.dataReshape(evalPayload),
+  );
+
+  testQueryClient.setQueryData(
+    [
+      "evaluation-class-selection",
+      API_ENDPOINTS.GET.CLASSES.endPoints.BY_ID(evalPayload.classId),
+    ],
+    API_ENDPOINTS.GET.CLASSES.dataReshapeSingle(detailsPayload),
+  );
 }
 
 function resolveStudentFullName(studentId: string) {
@@ -297,6 +365,9 @@ function hasStudentOverallScore(studentName: string, score: number) {
 
 setupUiTestState(null, {
   beforeEach: async () => {
+    useEvaluationStepsCreationStore.setState(
+      DEFAULT_VALUES_STEPS_CREATION_STATE,
+    );
     installEvaluationDetailFetchStub();
   },
 });
@@ -316,11 +387,11 @@ describe("UI flow: evaluations detail view", () => {
     );
     const callsPoints = [evaluationEndpoint, classEndpoint];
 
-    callsPoints.forEach(async (endpoint) => {
+    for (const endpoint of callsPoints) {
       await expect
         .poll(() => getFetchCallsByUrl(endpoint, "GET").length > 0)
         .toBe(true);
-    });
+    }
 
     expect(
       getFetchCallsByUrl(
@@ -431,14 +502,7 @@ describe("UI flow: evaluations detail view", () => {
       />,
     );
 
-    const roles = [
-      ["heading", rxExact(secondeval.data.title)],
-      ["button", rxExact(secondeval.data.title)],
-    ] as const;
-
-    roles.forEach(async ([role, name]) => {
-      await documentToHaveRoleWithName(role, name);
-    });
+    await documentToHaveRoleWithName("heading", rxExact(secondeval.data.title));
 
     await userEvent.click(
       page.getByRole("link", { name: /voir évaluation 1/i }),
@@ -485,6 +549,62 @@ describe("UI flow: evaluations detail view", () => {
         )
         .toBe(true);
     }
+  });
+
+  test("renders properly from cached evaluation and cached class without extra fetches", async () => {
+    // Simulate StepOne transient store shape (students cloned into
+    // nonPresentStudentsResult), then clear selectedClass so EvaluationsViewFetch
+    // still resolves class from cache-path as in real detail navigation.
+    const store = useEvaluationStepsCreationStore.getState();
+    store.setSelectedClass(classSummaryForStore);
+    store.clearSelectedClass();
+
+    seedEvaluationDetailCache(evaluationPayload, classSummaryForStore);
+
+    await render(
+      <AppTestWrapper
+        routes={buildRoutes()}
+        initialEntries={[`/evaluations/${evaluationPayload.id}`]}
+      />,
+    );
+
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(evaluationPayload.title),
+    );
+
+    await expect
+      .poll(() => getFetchCallsByUrl(evaluationEndpoint, "GET").length)
+      .toBe(0);
+    await expect
+      .poll(() => getFetchCallsByUrl(classEndpoint, "GET").length)
+      .toBe(0);
+
+    await expect
+      .poll(
+        () =>
+          evaluationPayload.attendedModules.every((module) =>
+            Boolean(
+              page.getByRole("button", { name: rxExact(module.name) }).query(),
+            ),
+          ),
+        { timeout: 500 },
+      )
+      .toBe(true);
+
+    for (const module of evaluationPayload.attendedModules) {
+      await documentToHaveRoleWithName("button", rxExact(module.name));
+    }
+
+    await expectAbsenceSectionToMatch(evaluationPayload.absencesIds);
+
+    await expect
+      .poll(() =>
+        normalizeText(document.body.textContent ?? "").includes(
+          normalizeText(evaluationPayload.comments),
+        ),
+      )
+      .toBe(true);
   });
 
   test("keeps absence names synchronized after 1 -> 2 -> 1 navigation", async () => {
