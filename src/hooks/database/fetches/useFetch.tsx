@@ -14,6 +14,7 @@ import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
 import type { ApiError } from "@/types/AppErrorInterface";
 import type { ApiSuccess } from "@/types/AppResponseInterface";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -95,11 +96,11 @@ export function useFetch<
         });
         successCallback?.(response);
 
-        // reuse shared caching logic
+        // Save the fetched (and potentially reshaped) data in the cache and get the reshaped result
         const cachingDatas = cacheFetchResult(
           queryClient,
           fetchParams,
-          response,
+          response as unknown as AnyObjectProps,
         );
 
         debugLogs("useFetch:onSuccess", {
