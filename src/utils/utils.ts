@@ -136,6 +136,21 @@ export function waitAndFail(
   });
 }
 
+export function parseFromObject<T>(obj: T): T | null {
+  try {
+    const stringified = JSON.stringify(obj);
+    const parsed = JSON.parse(stringified);
+
+    if (!parsed) {
+      throw new Error("Something went wrong while parsing the object");
+    }
+
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Parse an ID, ensuring it is a valid UUID string.
  *
