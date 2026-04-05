@@ -451,6 +451,7 @@ export function useCommandHandler<
     dialogOptions,
     onOpenChange,
     postVariables,
+    queryClient,
     newItemCallback: handleAddNewItem,
     submitCallback: handleSubmit,
     openingCallback: handleOpening,
