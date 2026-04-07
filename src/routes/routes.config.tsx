@@ -10,6 +10,7 @@ import { StepFour } from "@/features/evaluations/create/steps/four/StepFour.tsx"
 import { StepOne } from "@/features/evaluations/create/steps/one/StepOne";
 import { StepThree } from "@/features/evaluations/create/steps/three/StepThree.tsx";
 import { StepTwo } from "@/features/evaluations/create/steps/two/StepTwo.tsx";
+import { EvaluationDetailDrawerRoute } from "@/features/evaluations/main/components/EvaluationDetailDrawer";
 import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
 import { EvaluationsView } from "@/features/evaluations/main/EvaluationsView";
 import { About } from "@/pages/About/About.tsx";
@@ -34,7 +35,7 @@ const EVALUATION_ELEMENTS = [
     element: <StepFour />,
     title: "hidden",
   },
-] as const;
+];
 
 /**
  * Application route children configuration.
@@ -142,6 +143,16 @@ export const ROUTES_CHILDREN: RouteObject[] = [
             // pageDatas: EvaluationPageTabsDatas,
           };
         },
+        children: [
+          {
+            path: "opened/:evaluationId",
+            element: <EvaluationDetailDrawerRoute />,
+            loader: async () => {
+              const title = COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title;
+              setDocumentTitle(title);
+            },
+          },
+        ],
       },
       {
         path: "Atelier",
