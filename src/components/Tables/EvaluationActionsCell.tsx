@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { EvaluationDetailDrawer } from "@/features/evaluations/main/components/EvaluationDetailDrawer";
-import type { EvaluationSchemaRow } from "@/features/evaluations/main/Evaluations";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { useState, type ComponentProps } from "react";
 
 /**
@@ -17,7 +17,7 @@ import { useState, type ComponentProps } from "react";
  * @description A menu with actions for each evaluation: Consulter (opens the detail drawer), Editer, Supprimer.
  */
 
-export function EvaluationActionsCell<T extends EvaluationSchemaRow>({
+export function EvaluationActionsCell<T extends DetailedEvaluationView>({
   item,
   actionsList = ACTIONS_LIST,
 }: EvaluationActionsCellProps<T>) {
