@@ -13,6 +13,7 @@ import type {
 import { clsx, type ClassValue } from "clsx";
 import { type ComponentType } from "react";
 import { twMerge } from "tailwind-merge";
+import type z from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -171,6 +172,19 @@ export function parseToUuid(id?: string) {
   } catch {
     return null;
   }
+}
+
+/**
+ * Parse an object using a Zod schema, throwing an error if validation fails.
+ */
+export function zodParseFromObject<T>(obj: unknown, schema: z.ZodType<T>): T {
+  const parsed = schema.safeParse(obj);
+
+  if (!parsed.success) {
+    throw new Error("Invalid data", { cause: parsed.error });
+  }
+
+  return parsed.data;
 }
 
 /**
