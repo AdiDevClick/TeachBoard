@@ -4,5 +4,5 @@ import type { EvaluationsViewControllerProps } from "@/features/evaluations/main
  * Type definition for the properties accepted by the useEvaluationsView hook.
  */
 export type UseEvaluationsViewProps = Readonly<
-  Pick<EvaluationsViewControllerProps, "selectedClass" | "evaluationData">
+  Pick<EvaluationsViewControllerProps, "evaluationData">
 >;
