@@ -192,7 +192,7 @@ export function useStepFourHandler({
 
         if (parsedResponse && !store.hasItem(parsedResponse.id as UUID)) {
           // Save in local persisted store to avoid fetching
-          store.addItemToTop(parsedResponse as T);
+          store.addItemToTop(parsedResponse as any);
 
           // While we have access to the data, cache it in case the user navigates to the evaluation overview, to avoid a fetch there.
           saveObjectInCache(
