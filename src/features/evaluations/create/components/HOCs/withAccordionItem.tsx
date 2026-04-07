@@ -1,7 +1,3 @@
-import type {
-  AnyComponentLike,
-  ComponentPropsOf,
-} from "@/utils/types/types.utils";
 import {
   AccordionContent,
   AccordionItem,
@@ -12,6 +8,10 @@ import {
   withAccordionItemPropsInvalid,
 } from "@/configs/app-components.config";
 import type { AccordionItemProps } from "@/features/evaluations/create/components/HOCs/types/with-accordion-item.types";
+import type {
+  AnyComponentLike,
+  ComponentPropsOf,
+} from "@/utils/types/types.utils";
 
 /**
  * Higher-order component that creates an AccordionItem with a given wrapper component.
@@ -26,7 +26,7 @@ export function withAccordionItem<C extends AnyComponentLike>(Wrapper: C) {
     props: ComponentPropsOf<C> & AccordionItemProps,
   ) {
     if (withAccordionItemPropsInvalid(props)) {
-      debugLogs("withAccordionItem HOC", props);
+      debugLogs("withAccordionItem HOC", { type: "propsValidation", props });
       return null;
     }
 
