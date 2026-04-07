@@ -1,5 +1,4 @@
 import type { UUID } from "@/api/types/openapi/common.types";
-import type { LabelledScoreProps } from "@/features/evaluations/create/components/Score/LabelledScore";
 import type { StepFourController } from "@/features/evaluations/create/steps/four/controller/StepFourController";
 import type { PropsWithChildren } from "react";
 
