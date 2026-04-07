@@ -8,22 +8,34 @@ export const detailedEvaluationSchema = z.object({
   className: z.string().optional(),
   evaluationDate: z.iso.datetime(),
   userId: z.uuid(),
-  absencesIds: z.array(z.uuid()),
+  absentStudents: z.array(z.object({ id: z.uuid(), name: z.string() })),
   attendedModules: z
     .array(
       z.object({
         id: z.uuid(),
         name: z.string(),
         code: z.string(),
+        subSkills: z.array(
+          z.object({
+            id: z.uuid(),
+            name: z.string(),
+            code: z.string(),
+            isDisabled: z.boolean(),
+          }),
+        ),
       }),
     )
     .optional(),
   evaluations: z.array(
     z.object({
-      studentId: z.uuid(),
+      id: z.uuid(),
+      name: z.string(),
       isPresent: z.boolean(),
       overallScore: z.number().min(0).max(20).gt(0).nullable(),
-      assignedTaskId: z.uuid(),
+      assignedTask: z.object({
+        id: z.uuid(),
+        name: z.string(),
+      }),
       modules: z.array(
         z.object({
           id: z.uuid(),
