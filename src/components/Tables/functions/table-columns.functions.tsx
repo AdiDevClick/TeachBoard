@@ -3,7 +3,7 @@ import { EvaluationActionsCell } from "@/components/Tables/EvaluationActionsCell
 import { EvaluationClassCell } from "@/components/Tables/EvaluationClassCell";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { EvaluationSchemaRow } from "@/features/evaluations/main/Evaluations";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import type {
   CellContext,
@@ -17,7 +17,7 @@ import { ArrowUpDown } from "lucide-react";
  *
  * @param getItemId - A function that takes an item and returns its unique identifier, used for drag-and-drop operations.
  */
-export function createDragColumn<T extends EvaluationSchemaRow>(
+export function createDragColumn<T>(
   getItemId: (item: T) => UniqueIdentifier,
 ): ColumnDef<T, unknown> {
   return {
@@ -32,9 +32,7 @@ export function createDragColumn<T extends EvaluationSchemaRow>(
 /**
  * Create the selection column (checkbox) for multiple row selection.
  */
-export function createSelectionColumn<
-  T extends EvaluationSchemaRow,
->(): ColumnDef<T> {
+export function createSelectionColumn<T>(): ColumnDef<T> {
   return {
     id: "select",
     header: ({ table }: HeaderContext<T, unknown>) => (
@@ -63,7 +61,7 @@ export function createSelectionColumn<
  * Create the class names column for the evaluation table, which renders the class name as a button that opens a detail drawer when clicked.
  */
 export function createClassNamesColumn<
-  T extends EvaluationSchemaRow,
+  T extends DetailedEvaluationView,
 >(): ColumnDef<T> {
   return {
     accessorKey: "className",
@@ -89,9 +87,7 @@ export function createClassNamesColumn<
 /**
  * Create the title column for the evaluation table, which displays the title associated with each evaluation.
  */
-export function createTitleColumn<
-  T extends EvaluationSchemaRow,
->(): ColumnDef<T> {
+export function createTitleColumn<T>(): ColumnDef<T> {
   return {
     accessorKey: "title",
     header: ({ column }) => {
@@ -113,7 +109,7 @@ export function createTitleColumn<
  * Create the evaluation date column for the evaluation table, which formats the evaluation date as a localized string in French.
  */
 export function createEvaluationDateColumn<
-  T extends EvaluationSchemaRow,
+  T extends DetailedEvaluationView,
 >(): ColumnDef<T> {
   return {
     accessorKey: "evaluationDate",
@@ -146,7 +142,7 @@ export function createEvaluationDateColumn<
  * Create the actions column for the evaluation table, which renders a cell with action buttons (e.g., view details, edit, delete) for each evaluation.
  */
 export function createActionsColumn<
-  T extends EvaluationSchemaRow,
+  T extends DetailedEvaluationView,
 >(): ColumnDef<T> {
   return {
     id: "actions",
