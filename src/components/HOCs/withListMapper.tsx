@@ -115,7 +115,6 @@ function withListMapper<T extends object>(Wrapped: ComponentType<T>) {
     TOptionalInput = undefined,
   >(props: WithListMapperImplProps<T, TItems, TOptionalInput>) {
     const { items, optional, ...rest } = props;
-
     return (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       <ListMapper items={items} optional={optional as any}>
