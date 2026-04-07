@@ -16,13 +16,15 @@ export class TableStoreRegistry {
    *
    * @param storeName - The name of the store to create. If not provided, the default store name will be used.
    */
-  constructor(storeName: string = DEFAULT_PERSIST_NAME) {
+  constructor(storeName?: string) {
+    if (!storeName) return;
+
     this.#init(storeName);
   }
 
   #init(storeName: string) {
     if (!storeName) {
-      throw new Error("Store name must be provided.");
+      return;
     }
 
     return this.#createStore(storeName);
