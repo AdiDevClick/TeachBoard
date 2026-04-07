@@ -30,7 +30,7 @@ export function studentPresence(
     isHydratationNotYetInitialized
   ) {
     return {
-      students: [["Aucun", { id: "none" }] as const],
+      students: [["Aucun", { id: "none" }]],
     };
   }
 
