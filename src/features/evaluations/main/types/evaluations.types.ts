@@ -1,4 +1,3 @@
-import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
 import type { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import type { AppModalNames } from "@/configs/app.config";
 import type { STEP_FOUR_INPUT_CONTROLLERS } from "@/features/evaluations/create/steps/four/config/step-four.configs";
@@ -22,7 +21,6 @@ export type EvaluationsViewControllerProps = Readonly<
   Omit<Parameters<typeof EvaluationsView>[0], "modalMode"> & {
     evaluationData?: DetailedEvaluationView | null;
     classData?: unknown;
-    selectedClass?: ClassSummaryDto | null;
   }
 >;
 
