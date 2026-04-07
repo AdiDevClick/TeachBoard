@@ -15,6 +15,7 @@ export interface TableState<T> {
   columnVisibility: VisibilityState;
   columnFilters: ColumnFiltersState;
   pagination: PaginationState;
+  hasHydrated: boolean;
 }
 
 /**
