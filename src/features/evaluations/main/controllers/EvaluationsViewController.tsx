@@ -13,16 +13,14 @@ export function EvaluationsViewController({
   inputControllers,
   className,
   evaluationData,
-  selectedClass,
 }: EvaluationsViewControllerProps) {
   const {
     modules,
-    getPresentStudentsWithAssignedTasks,
+    getStudentSubskillsForModule,
     studentsAverageScores,
     scoreValue,
     presence,
   } = useEvaluationsView({
-    selectedClass,
     evaluationData,
   });
   return (
@@ -31,7 +29,7 @@ export function EvaluationsViewController({
       <LabelledAccordion
         inputController={inputControllers!.modules}
         accordionItems={modules}
-        storeGetter={getPresentStudentsWithAssignedTasks}
+        storeGetter={getStudentSubskillsForModule}
         valueGetter={scoreValue}
       />
       <Separator className="mx-auto my-2 max-w-1/3" orientation="horizontal" />
