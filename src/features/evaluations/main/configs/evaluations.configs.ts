@@ -1,5 +1,5 @@
 import { TABLES_STORES } from "@/features/evaluations/main/api/store/TableStore";
-import type { EvaluationSchemaRow } from "@/features/evaluations/main/Evaluations";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 
 /**
  * Name of the store for the evaluation table.
@@ -11,6 +11,5 @@ export const EVALUATION_TABLE_STORE_NAME = "evaluation-table";
 /**
  * Export the store getter function for the evaluation table as a hook.
  */
-export const useEvaluationTableStore = TABLES_STORES.getStore<
-  EvaluationSchemaRow
->(EVALUATION_TABLE_STORE_NAME);
+export const useEvaluationTableStore =
+  TABLES_STORES.getStore<DetailedEvaluationView>(EVALUATION_TABLE_STORE_NAME);
