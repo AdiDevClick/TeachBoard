@@ -142,8 +142,6 @@ const SUBSKILLS_WITH_STUDENTS_REQUIRES = [
   "module",
   "valueGetter",
   "index",
-  "isCompleted",
-  "isDisabled",
 ];
 
 export const subSkillWithStudentsPropsInvalid = (props: AnyObjectProps) =>
