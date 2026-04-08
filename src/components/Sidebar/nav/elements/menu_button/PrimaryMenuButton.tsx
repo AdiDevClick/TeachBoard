@@ -19,27 +19,48 @@ import { Link } from "react-router-dom";
  */
 export default function PrimaryMenuButton(props: MenuContentProps) {
   if (menuButtonContainsInvalid(props as unknown as Record<string, unknown>)) {
-    debugLogs("PrimaryMenuButton");
+    debugLogs("PrimaryMenuButton", {
+      type: "propsValidation",
+      message: "Will render null due to invalid props",
+      props,
+    });
     return null;
   }
 
-  const { item, setStyle = () => "", ...rest } = props;
+  const {
+    item: {
+      url,
+      tooltip,
+      title,
+      quickButton,
+      isActivated,
+      subMenus,
+      icon: Icon,
+    },
+    setStyle = () => "",
+    ...rest
+  } = props;
+  const isQuickButtonEnabled = quickButton?.enabled;
 
-  const isQuickButtonEnabled = item.quickButton?.enabled;
+  if (isActivated === false) {
+    return null;
+  }
+
+  const style = setStyle({
+    isQuickButtonEnabled,
+    isMenu: false,
+  });
 
   return (
-    <Link to={item.url ?? "#"} className="w-full">
+    <Link to={url ?? "#"} className="w-full">
       <SidebarMenuButton
         {...rest}
-        className={`sidebarButton--menu ${setStyle({
-          isQuickButtonEnabled,
-          isMenu: false,
-        })} ${rest.className ?? ""}`}
-        title={item.tooltip}
+        className={`sidebarButton--menu ${style} ${rest.className ?? ""}`}
+        title={tooltip}
       >
-        {item.icon && <item.icon className="sidebarButton--menu-icon" />}
-        <p>{item.title}</p>
-        {item.subMenus && <ChevronRight className="sidebarButton--submenu" />}
+        {Icon && <Icon className="sidebarButton--menu-icon" />}
+        <p>{title}</p>
+        {subMenus && <ChevronRight className="sidebarButton--submenu" />}
       </SidebarMenuButton>
     </Link>
   );
