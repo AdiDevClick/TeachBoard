@@ -34,9 +34,12 @@ import {
 } from "@/features/evaluations/main/models/evaluations-view.models";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
+import { enableMapSet } from "immer";
 import { create } from "zustand";
 import { combine, devtools } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+
+enableMapSet();
 
 const createDefaultStepsCreationState = (): StepsCreationState => ({
   id: null,
