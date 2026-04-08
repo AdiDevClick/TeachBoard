@@ -233,19 +233,28 @@ describe("useCommandHandler - basic behaviours", () => {
     expect(dialogOptions(skillModuleModal)).toBeUndefined();
 
     // The fetch flow should have recorded the last user activity in a UniqueSet.
-    const lastActivity = useAppStore.getState().lastUserActivity;
-    const postActivity = [...lastActivity.values()].find(
-      (a: any) => a.method === "POST",
-    );
+    await expect
+      .poll(
+        () => {
+          const lastActivity = useAppStore.getState().lastUserActivity;
 
-    expect(postActivity).toBeTruthy();
-    expect(postActivity).toEqual(
-      expect.objectContaining({
-        endpoint: skillApiEndpoint,
-        method: "POST",
-        type: "useFetch",
-      }),
-    );
+          return [...lastActivity.values()].find((activity) => {
+            if (!activity) {
+              return false;
+            }
+
+            return activity.method === "POST";
+          });
+        },
+        { timeout: 1200 },
+      )
+      .toEqual(
+        expect.objectContaining({
+          endpoint: skillApiEndpoint,
+          method: "POST",
+          type: "useFetch",
+        }),
+      );
   });
 
   test("openingCallback performs a GET and caches data", async () => {

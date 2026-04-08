@@ -1,18 +1,13 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 
-import { UUID_SCHEMA } from "@/api/types/openapi/common.types";
-import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
 import {
   DEFAULT_VALUES_STEPS_CREATION_STATE,
   useEvaluationStepsCreationStore,
 } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { EvaluationsView } from "@/features/evaluations/main/EvaluationsView";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
-import {
-  classObj,
-  firsteval,
-  secondeval,
-} from "@/tests/samples/evaluations-payload.datas.tests";
+import { firsteval, secondeval } from "@/tests/samples/evaluations-payload.datas.tests";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { testQueryClient } from "@/tests/test-utils/testQueryClient";
 import {
@@ -27,31 +22,99 @@ import { describe, expect, test } from "vitest";
 import { render } from "vitest-browser-react";
 import { page, userEvent } from "vitest/browser";
 
-type ScoresBySubSkill = Map<string, Map<string, number>>;
-type ScoresByModule = Map<string, ScoresBySubSkill>;
+type EvaluationPayload = DetailedEvaluationView;
 
-const evaluationPayload = firsteval.data;
-const classPayload = classObj.data.classe;
-const classDetails = classPayload;
-const secondEvaluationSinglePresentStudentId =
-  secondeval.data.evaluations[0]?.studentId ?? classDetails.students[0]?.id;
+const evaluationPayload: EvaluationPayload = firsteval;
+const secondPayload: EvaluationPayload = secondeval;
+const evaluationModules = evaluationPayload.attendedModules ?? [];
+const secondModules = secondPayload.attendedModules ?? [];
 
-if (!secondEvaluationSinglePresentStudentId) {
-  throw new TypeError("Expected at least one student in class payload");
+function buildSecondEvaluationOnePresentPayload(): EvaluationPayload {
+  const studentForcedAbsent = evaluationPayload.evaluations[0];
+
+  if (!studentForcedAbsent) {
+    return secondPayload;
+  }
+
+  const absentStudents = [...secondPayload.absentStudents];
+
+  if (!absentStudents.some((student) => student.id === studentForcedAbsent.id)) {
+    absentStudents.push({
+      id: studentForcedAbsent.id,
+      name: studentForcedAbsent.name,
+    });
+  }
+
+  return {
+    ...secondPayload,
+    absentStudents,
+    evaluations: secondPayload.evaluations.filter(
+      (student) => student.id !== studentForcedAbsent.id,
+    ),
+  };
 }
 
-const secondEvaluationOnePresentPayload = {
-  ...secondeval.data,
-  absencesIds: classDetails.students
-    .map((student) => student.id)
-    .filter(
-      (studentId) => studentId !== secondEvaluationSinglePresentStudentId,
-    ),
-  evaluations: secondeval.data.evaluations.filter(
-    (studentEvaluation) =>
-      studentEvaluation.studentId === secondEvaluationSinglePresentStudentId,
-  ),
-};
+const secondEvaluationOnePresentPayload =
+  buildSecondEvaluationOnePresentPayload();
+
+function getAbsentStudentIds(payload: EvaluationPayload) {
+  return payload.absentStudents.map((student) => student.id);
+}
+
+function getAbsentStudentNames(
+  payload: EvaluationPayload,
+  studentIds: string[],
+) {
+  const namesById = new Map(
+    payload.absentStudents.map((student) => [student.id, student.name]),
+  );
+
+  return studentIds.map((studentId) => namesById.get(studentId) ?? studentId);
+}
+
+function resolveAbsenceNameById(payload: EvaluationPayload, studentId: string) {
+  const student = payload.absentStudents.find((item) => item.id === studentId);
+
+  return student?.name ?? studentId;
+}
+
+function buildExpectedScoresFromPayload(payload: EvaluationPayload) {
+  const expectedScores = new Map<string, Map<string, Map<string, number>>>();
+
+  for (const module of payload.attendedModules ?? []) {
+    const moduleScores = new Map<string, Map<string, number>>();
+
+    for (const subSkill of module.subSkills) {
+      const matchedStudent = payload.evaluations.find((studentEvaluation) => {
+        const matchedModule = studentEvaluation.modules.find(
+          (evaluatedModule) => evaluatedModule.id === module.id,
+        );
+
+        return matchedModule?.subSkills.some((item) => item.id === subSkill.id);
+      });
+
+      if (!matchedStudent) {
+        continue;
+      }
+
+      const matchedScore = matchedStudent.modules
+        .find((evaluatedModule) => evaluatedModule.id === module.id)
+        ?.subSkills.find((item) => item.id === subSkill.id)?.score;
+
+      if (matchedScore == null) {
+        continue;
+      }
+
+      moduleScores.set(subSkill.name, new Map([[matchedStudent.name, matchedScore]]));
+    }
+
+    if (moduleScores.size > 0) {
+      expectedScores.set(module.name, moduleScores);
+    }
+  }
+
+  return expectedScores;
+}
 
 const evaluationEndpoint = API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(
   evaluationPayload.id,
@@ -59,46 +122,6 @@ const evaluationEndpoint = API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(
 const classEndpoint = API_ENDPOINTS.GET.CLASSES.endPoints.BY_ID(
   evaluationPayload.classId,
 );
-
-function buildStoreClassSummary(payload: typeof classPayload): ClassSummaryDto {
-  return {
-    id: UUID_SCHEMA.parse(payload.id),
-    name: payload.name,
-    description: payload.description,
-    degreeLevel: payload.degreeLevel,
-    degreeYearCode: payload.degreeYearCode,
-    degreeYearName: payload.degreeYearName,
-    evaluations: [],
-    students: payload.students.map((student) => ({
-      id: UUID_SCHEMA.parse(student.id),
-      firstName: student.firstName,
-      lastName: student.lastName,
-      fullName: student.fullName,
-    })),
-    templates: payload.templates.map((template) => ({
-      id: UUID_SCHEMA.parse(template.id),
-      name: template.name,
-      taskName: template.taskName,
-      task: {
-        id: UUID_SCHEMA.parse(template.task.id),
-        name: template.task.name,
-        description: template.task.description,
-      },
-      modules: (template.modules ?? []).map((module) => ({
-        id: UUID_SCHEMA.parse(module.id),
-        code: module.code,
-        name: module.name,
-        subSkills: (module.subSkills ?? []).map((subSkill) => ({
-          id: UUID_SCHEMA.parse(subSkill.id),
-          code: subSkill.code,
-          name: subSkill.name,
-        })),
-      })),
-    })),
-  };
-}
-
-const classSummaryForStore = buildStoreClassSummary(classPayload);
 
 function normalizeText(value: string) {
   return value.replaceAll(/\s+/g, " ").trim().toLowerCase();
@@ -119,7 +142,7 @@ function EvaluationSwitchHarness() {
   return (
     <>
       <Link to={`/evaluations/${evaluationPayload.id}`}>Voir évaluation 1</Link>
-      <Link to={`/evaluations/${secondeval.data.id}`}>Voir évaluation 2</Link>
+      <Link to={`/evaluations/${secondPayload.id}`}>Voir évaluation 2</Link>
       <EvaluationsView key={evaluationId} />
     </>
   );
@@ -135,130 +158,28 @@ function buildRoutesWithSwitchHarness(): RouteObject[] {
 }
 
 function installEvaluationDetailFetchStub(
-  secondEvaluationPayload = secondeval.data,
+  secondEvaluationPayload = secondPayload,
 ) {
   stubFetchRoutes({
     getRoutes: [
       [evaluationEndpoint, evaluationPayload],
       [
-        API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(secondeval.data.id),
+        API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(secondPayload.id),
         secondEvaluationPayload,
       ],
-      [classEndpoint, classPayload],
     ],
     defaultGetPayload: [],
   });
 }
 
-function seedEvaluationDetailCache(
-  evalPayload = evaluationPayload,
-  detailsPayload: ClassSummaryDto = classSummaryForStore,
-) {
+function seedEvaluationDetailCache(payload = evaluationPayload) {
   testQueryClient.setQueryData(
     [
-      "evaluation-overview",
-      API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(evalPayload.id),
+      "evaluation-summary",
+      API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(payload.id),
     ],
-    API_ENDPOINTS.GET.EVALUATIONS.dataReshape(evalPayload),
+    API_ENDPOINTS.GET.EVALUATIONS.dataReshape(payload),
   );
-
-  testQueryClient.setQueryData(
-    [
-      "evaluation-class-selection",
-      API_ENDPOINTS.GET.CLASSES.endPoints.BY_ID(evalPayload.classId),
-    ],
-    API_ENDPOINTS.GET.CLASSES.dataReshapeSingle(detailsPayload),
-  );
-}
-
-function resolveStudentFullName(studentId: string) {
-  const student = classDetails.students.find((item) => item.id === studentId);
-
-  if (!student) {
-    throw new TypeError(`Student '${studentId}' not found in class payload`);
-  }
-
-  return student.fullName;
-}
-
-function buildClassModuleLookup() {
-  const modulesById = new Map<
-    string,
-    {
-      name: string;
-      subSkillsById: Map<string, string>;
-    }
-  >();
-
-  for (const template of classDetails.templates) {
-    for (const module of template.modules) {
-      const existing = modulesById.get(module.id);
-
-      if (existing) {
-        for (const subSkill of module.subSkills) {
-          existing.subSkillsById.set(subSkill.id, subSkill.name);
-        }
-
-        continue;
-      }
-
-      modulesById.set(module.id, {
-        name: module.name,
-        subSkillsById: new Map(
-          module.subSkills.map((subSkill) => [subSkill.id, subSkill.name]),
-        ),
-      });
-    }
-  }
-
-  return modulesById;
-}
-
-function buildExpectedScoresFromPayload(): ScoresByModule {
-  const modulesById = buildClassModuleLookup();
-  const expectedScores: ScoresByModule = new Map();
-
-  for (const studentEvaluation of evaluationPayload.evaluations) {
-    if (!studentEvaluation.isPresent) {
-      continue;
-    }
-
-    const studentFullName = resolveStudentFullName(studentEvaluation.studentId);
-
-    for (const moduleEvaluation of studentEvaluation.modules) {
-      const moduleMeta = modulesById.get(moduleEvaluation.id);
-
-      if (!moduleMeta) {
-        throw new TypeError(
-          `Module '${moduleEvaluation.id}' not found in class payload`,
-        );
-      }
-
-      const moduleScores =
-        expectedScores.get(moduleMeta.name) ??
-        new Map<string, Map<string, number>>();
-      expectedScores.set(moduleMeta.name, moduleScores);
-
-      for (const subSkillEvaluation of moduleEvaluation.subSkills) {
-        const subSkillName = moduleMeta.subSkillsById.get(
-          subSkillEvaluation.id,
-        );
-
-        if (!subSkillName) {
-          throw new TypeError(
-            `SubSkill '${subSkillEvaluation.id}' not found for module '${moduleMeta.name}'`,
-          );
-        }
-
-        const studentsScores =
-          moduleScores.get(subSkillName) ?? new Map<string, number>();
-        moduleScores.set(subSkillName, studentsScores);
-        studentsScores.set(studentFullName, subSkillEvaluation.score);
-      }
-    }
-  }
-
-  return expectedScores;
 }
 
 function findSubSkillCard(subSkillName: string) {
@@ -312,18 +233,18 @@ function getAbsenceSectionText() {
   return section?.textContent ?? "";
 }
 
-function getAbsentStudentNames(absenceIds: string[]) {
-  return absenceIds.map(resolveStudentFullName);
-}
-
 async function expectAbsenceSectionToMatch(
+  payload: EvaluationPayload,
   expectedAbsentIds: string[],
   unexpectedAbsentIds: string[] = [],
 ) {
-  const expectedNames =
-    getAbsentStudentNames(expectedAbsentIds).map(normalizeText);
-  const unexpectedNames =
-    getAbsentStudentNames(unexpectedAbsentIds).map(normalizeText);
+  const expectedNames = getAbsentStudentNames(payload, expectedAbsentIds).map(
+    normalizeText,
+  );
+  const unexpectedNames = getAbsentStudentNames(
+    payload,
+    unexpectedAbsentIds,
+  ).map(normalizeText);
 
   await expect
     .poll(() => {
@@ -385,30 +306,29 @@ describe("UI flow: evaluations detail view", () => {
       "heading",
       rxExact(evaluationPayload.title),
     );
-    const callsPoints = [evaluationEndpoint, classEndpoint];
 
-    for (const endpoint of callsPoints) {
-      await expect
-        .poll(() => getFetchCallsByUrl(endpoint, "GET").length > 0)
-        .toBe(true);
-    }
+    await expect
+      .poll(() => getFetchCallsByUrl(evaluationEndpoint, "GET").length > 0)
+      .toBe(true);
+
+    await expect
+      .poll(() => getFetchCallsByUrl(classEndpoint, "GET").length)
+      .toBe(0);
 
     expect(
       getFetchCallsByUrl(
-        API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(secondeval.data.id),
+        API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(secondPayload.id),
         "GET",
       ),
     ).toHaveLength(0);
 
-    for (const module of evaluationPayload.attendedModules) {
+    for (const module of evaluationModules) {
       await documentToHaveRoleWithName("button", rxExact(module.name));
     }
 
-    const secondEvaluationOnlyModule = secondeval.data.attendedModules.find(
+    const secondEvaluationOnlyModule = secondModules.find(
       (module) =>
-        !evaluationPayload.attendedModules.some(
-          (item) => item.id === module.id,
-        ),
+        !evaluationModules.some((item) => item.id === module.id),
     );
 
     if (!secondEvaluationOnlyModule) {
@@ -423,7 +343,7 @@ describe("UI flow: evaluations detail view", () => {
         .query(),
     ).toBeNull();
 
-    const expectedScores = buildExpectedScoresFromPayload();
+    const expectedScores = buildExpectedScoresFromPayload(evaluationPayload);
 
     for (const [moduleName, subSkills] of expectedScores.entries()) {
       const moduleTrigger = page.getByRole("button", {
@@ -455,7 +375,7 @@ describe("UI flow: evaluations detail view", () => {
         continue;
       }
 
-      const studentName = resolveStudentFullName(studentEvaluation.studentId);
+      const studentName = studentEvaluation.name;
 
       await expect
         .poll(
@@ -469,8 +389,11 @@ describe("UI flow: evaluations detail view", () => {
         .toBe(true);
     }
 
-    for (const absentStudentId of evaluationPayload.absencesIds) {
-      const absentStudentName = resolveStudentFullName(absentStudentId);
+    for (const absentStudentId of getAbsentStudentIds(evaluationPayload)) {
+      const absentStudentName = resolveAbsenceNameById(
+        evaluationPayload,
+        absentStudentId,
+      );
 
       await expect
         .poll(() =>
@@ -488,7 +411,7 @@ describe("UI flow: evaluations detail view", () => {
     await expect
       .poll(() =>
         normalizeText(document.body.textContent ?? "").includes(
-          normalizeText(evaluationPayload.comments),
+          normalizeText(evaluationPayload.comments ?? ""),
         ),
       )
       .toBe(true);
@@ -498,11 +421,11 @@ describe("UI flow: evaluations detail view", () => {
     await render(
       <AppTestWrapper
         routes={buildRoutesWithSwitchHarness()}
-        initialEntries={[`/evaluations/${secondeval.data.id}`]}
+        initialEntries={[`/evaluations/${secondPayload.id}`]}
       />,
     );
 
-    await documentToHaveRoleWithName("heading", rxExact(secondeval.data.title));
+    await documentToHaveRoleWithName("heading", rxExact(secondPayload.title));
 
     await userEvent.click(
       page.getByRole("link", { name: /voir évaluation 1/i }),
@@ -517,13 +440,11 @@ describe("UI flow: evaluations detail view", () => {
       page.getByRole("link", { name: /voir évaluation 2/i }),
     );
 
-    await documentToHaveRoleWithName("heading", rxExact(secondeval.data.title));
+    await documentToHaveRoleWithName("heading", rxExact(secondPayload.title));
 
-    const secondOnlyModule = secondeval.data.attendedModules.find(
+    const secondOnlyModule = secondModules.find(
       (module) =>
-        !evaluationPayload.attendedModules.some(
-          (item) => item.id === module.id,
-        ),
+        !evaluationModules.some((item) => item.id === module.id),
     );
 
     if (!secondOnlyModule) {
@@ -538,8 +459,11 @@ describe("UI flow: evaluations detail view", () => {
       .poll(() => hasStudentOverallScore("Raz Fitz", 15), { timeout: 500 })
       .toBe(true);
 
-    for (const absentStudentId of secondeval.data.absencesIds) {
-      const absentStudentName = resolveStudentFullName(absentStudentId);
+    for (const absentStudentId of getAbsentStudentIds(secondPayload)) {
+      const absentStudentName = resolveAbsenceNameById(
+        secondPayload,
+        absentStudentId,
+      );
 
       await expect
         .poll(() =>
@@ -551,15 +475,8 @@ describe("UI flow: evaluations detail view", () => {
     }
   });
 
-  test("renders properly from cached evaluation and cached class without extra fetches", async () => {
-    // Simulate StepOne transient store shape (students cloned into
-    // nonPresentStudentsResult), then clear selectedClass so EvaluationsViewFetch
-    // still resolves class from cache-path as in real detail navigation.
-    const store = useEvaluationStepsCreationStore.getState();
-    store.setSelectedClass(classSummaryForStore);
-    store.clearSelectedClass();
-
-    seedEvaluationDetailCache(evaluationPayload, classSummaryForStore);
+  test("renders properly from cached evaluation payload without extra fetches", async () => {
+    seedEvaluationDetailCache(evaluationPayload);
 
     await render(
       <AppTestWrapper
@@ -583,7 +500,7 @@ describe("UI flow: evaluations detail view", () => {
     await expect
       .poll(
         () =>
-          evaluationPayload.attendedModules.every((module) =>
+          evaluationModules.every((module) =>
             Boolean(
               page.getByRole("button", { name: rxExact(module.name) }).query(),
             ),
@@ -592,16 +509,19 @@ describe("UI flow: evaluations detail view", () => {
       )
       .toBe(true);
 
-    for (const module of evaluationPayload.attendedModules) {
+    for (const module of evaluationModules) {
       await documentToHaveRoleWithName("button", rxExact(module.name));
     }
 
-    await expectAbsenceSectionToMatch(evaluationPayload.absencesIds);
+    await expectAbsenceSectionToMatch(
+      evaluationPayload,
+      getAbsentStudentIds(evaluationPayload),
+    );
 
     await expect
       .poll(() =>
         normalizeText(document.body.textContent ?? "").includes(
-          normalizeText(evaluationPayload.comments),
+          normalizeText(evaluationPayload.comments ?? ""),
         ),
       )
       .toBe(true);
@@ -611,9 +531,11 @@ describe("UI flow: evaluations detail view", () => {
     installEvaluationDetailFetchStub(secondEvaluationOnePresentPayload);
 
     const firstEvaluationOnlyPresentStudentId = evaluationPayload.evaluations
-      .map((studentEvaluation) => studentEvaluation.studentId)
+      .map((studentEvaluation) => studentEvaluation.id)
       .find((studentId) =>
-        secondEvaluationOnePresentPayload.absencesIds.includes(studentId),
+        getAbsentStudentIds(secondEvaluationOnePresentPayload).includes(
+          studentId,
+        ),
       );
 
     if (!firstEvaluationOnlyPresentStudentId) {
@@ -634,9 +556,11 @@ describe("UI flow: evaluations detail view", () => {
       rxExact(evaluationPayload.title),
     );
 
-    await expectAbsenceSectionToMatch(evaluationPayload.absencesIds, [
-      firstEvaluationOnlyPresentStudentId,
-    ]);
+    await expectAbsenceSectionToMatch(
+      evaluationPayload,
+      getAbsentStudentIds(evaluationPayload),
+      [firstEvaluationOnlyPresentStudentId],
+    );
 
     await userEvent.click(
       page.getByRole("link", { name: /voir évaluation 2/i }),
@@ -648,7 +572,8 @@ describe("UI flow: evaluations detail view", () => {
     );
 
     await expectAbsenceSectionToMatch(
-      secondEvaluationOnePresentPayload.absencesIds,
+      secondEvaluationOnePresentPayload,
+      getAbsentStudentIds(secondEvaluationOnePresentPayload),
     );
 
     await userEvent.click(
@@ -660,8 +585,10 @@ describe("UI flow: evaluations detail view", () => {
       rxExact(evaluationPayload.title),
     );
 
-    await expectAbsenceSectionToMatch(evaluationPayload.absencesIds, [
-      firstEvaluationOnlyPresentStudentId,
-    ]);
+    await expectAbsenceSectionToMatch(
+      evaluationPayload,
+      getAbsentStudentIds(evaluationPayload),
+      [firstEvaluationOnlyPresentStudentId],
+    );
   });
 });
