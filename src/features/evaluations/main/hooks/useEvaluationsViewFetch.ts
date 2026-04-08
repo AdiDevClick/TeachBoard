@@ -1,5 +1,6 @@
 import { useEvaluationTableStore } from "@/features/evaluations/main/configs/evaluations.configs";
 import type { UseEvaluationsViewFetchProps } from "@/features/evaluations/main/hooks/types/use-evaluations-view-fetch.types";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import { parseToUuid } from "@/utils/utils";
 import { useEffect, useEffectEvent } from "react";
@@ -25,19 +26,24 @@ export function useEvaluationsViewFetch({
 
   const parsedEvalId = parseToUuid(evaluationId) ?? "";
   const endPoint = endpoint(parsedEvalId);
+  const storeEvaluationData = getReadyData(parsedEvalId);
+  const cachedEvaluationData = evaluationCacheCallback<
+    DetailedEvaluationView | undefined
+  >();
+  const resolvedEvaluationData = storeEvaluationData ?? cachedEvaluationData;
 
   /**
-   * Store first, then cached query, then fetch
+   * Sync evaluation to the store -
    */
-  const evaluationData = () => {
-    let data = getReadyData(parsedEvalId);
+  const syncResolvedEvaluationData = useEffectEvent(
+    (dataToSync: DetailedEvaluationView | undefined) => {
+      if (!parsedEvalId || storeEvaluationData || !dataToSync) {
+        return;
+      }
 
-    if (!data) {
-      data = evaluationCacheCallback();
-      updateItem(parsedEvalId, data!);
-    }
-    return data;
-  };
+      updateItem(parsedEvalId, dataToSync);
+    },
+  );
 
   /**
    * Fetch evaluation -
@@ -45,7 +51,7 @@ export function useEvaluationsViewFetch({
    * @description Triggers setFetchParams
    */
   const tryFetchEvaluation = useEffectEvent((endpoint: string) => {
-    if (!endPoint || evaluationData()) {
+    if (!endpoint || resolvedEvaluationData) {
       return;
     }
 
@@ -65,7 +71,16 @@ export function useEvaluationsViewFetch({
     tryFetchEvaluation(endPoint);
   }, [endPoint]);
 
+  /**
+   * Sync resolved evaluation data to the store -
+   *
+   * @description When resolvedEvaluationData changes
+   */
+  useEffect(() => {
+    syncResolvedEvaluationData(resolvedEvaluationData);
+  }, [resolvedEvaluationData, parsedEvalId, storeEvaluationData]);
+
   return {
-    evaluationData: evaluationData(),
+    evaluationData: resolvedEvaluationData,
   };
 }
