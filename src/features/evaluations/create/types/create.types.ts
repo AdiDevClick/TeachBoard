@@ -7,6 +7,7 @@ import type {
   TabContentHandlerState,
   TabEvalState,
 } from "@/features/evaluations/create/hooks/types/use-tab-content-handler.types";
+import type { useEvaluationNavigationHandler } from "@/features/evaluations/create/hooks/useEvaluationNavigationHandler";
 import type {
   Dispatch,
   MouseEvent,
@@ -27,6 +28,22 @@ export type LeftContentProps = Readonly<
     isClicked: boolean;
   } & PropsWithChildren
 >;
+
+export type NavigationResult = {
+  nextIndex: number;
+  incomingDirection: SlideDirection;
+  outgoingDirection: SlideDirection;
+};
+
+/**
+ * Types for the createTabsTriggers function props
+ */
+export type CreateTabsTriggersProps = Pick<
+  Required<ReturnType<typeof useEvaluationNavigationHandler>>,
+  "pageDatas" | "tabEvalState"
+>;
+
+export type SlideDirection = "left" | "right";
 
 /**
  * Types for the create evaluations arrow click handler props
