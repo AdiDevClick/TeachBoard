@@ -36,10 +36,6 @@ export type EvaluationsViewProps = Readonly<
     evalEndpoint?: typeof API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID;
     /** Data reshape function for processing fetched evaluation data */
     evalDataReshapeFn?: typeof API_ENDPOINTS.GET.EVALUATIONS.dataReshape;
-    /** Class endpoint for fetching class data */
-    classEndpoint?: typeof API_ENDPOINTS.GET.CLASSES.endPoints.BY_ID;
-    /** Data reshape function for processing fetched class data */
-    classDataReshapeFn?: typeof API_ENDPOINTS.GET.CLASSES.dataReshapeSingle;
     /** Defined metadatas for the evaluation view - Part of the step four inputs */
     inputControllers?: typeof STEP_FOUR_INPUT_CONTROLLERS;
     /** The modal name for the class task */

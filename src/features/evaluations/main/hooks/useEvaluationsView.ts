@@ -78,13 +78,11 @@ export function useEvaluationsView({
   }, [evaluationData]);
 
   const scoreValue = (studentId: UUID, subSkillId: UUID, moduleId: UUID) => {
-    if (!subSkillId || !moduleId) {
-      return [0];
-    }
+    if (!subSkillId || !moduleId) return [0];
 
     const subSkill = evaluationData?.evaluations
-      .find((evaluation) => evaluation.id === studentId)
-      ?.modules.find((evaluationModule) => evaluationModule.id === moduleId)
+      .find((evaluated) => evaluated.id === studentId)
+      ?.modules.find((module) => module.id === moduleId)
       ?.subSkills?.find((subSkill) => subSkill.id === subSkillId);
 
     return [subSkill?.score ?? 0];
