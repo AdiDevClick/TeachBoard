@@ -10,6 +10,7 @@ import { StepFour } from "@/features/evaluations/create/steps/four/StepFour.tsx"
 import { StepOne } from "@/features/evaluations/create/steps/one/StepOne";
 import { StepThree } from "@/features/evaluations/create/steps/three/StepThree.tsx";
 import { StepTwo } from "@/features/evaluations/create/steps/two/StepTwo.tsx";
+import { EvaluationEdit } from "@/features/evaluations/edit/EvaluationEdit";
 import { EvaluationDetailDrawerRoute } from "@/features/evaluations/main/components/EvaluationDetailDrawer";
 import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
 import { EvaluationsView } from "@/features/evaluations/main/EvaluationsView";
@@ -114,11 +115,13 @@ export const ROUTES_CHILDREN: RouteObject[] = [
         index: true,
         element: <Evaluations />,
         loader: async () => {
-          setDocumentTitle(COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title);
+          const menu = COMPLETE_SIDEBAR_DATAS.navMain.menus[2];
+          const { title: pageTitle } = menu;
+          setDocumentTitle(pageTitle);
 
           return {
-            pageTitle: COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title,
-            loaderData: COMPLETE_SIDEBAR_DATAS.navMain.menus[2],
+            pageTitle,
+            loaderData: menu,
           };
         },
       },
@@ -134,11 +137,11 @@ export const ROUTES_CHILDREN: RouteObject[] = [
         path: "TP",
         element: <EvaluationsMain />,
         loader: async () => {
-          const title = COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title;
-          setDocumentTitle(title);
+          const pageTitle = COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title;
+          setDocumentTitle(pageTitle);
 
           return {
-            pageTitle: title,
+            pageTitle,
             // loaderData: COMPLETE_SIDEBAR_DATAS.navMain.menus[0],
             // pageDatas: EvaluationPageTabsDatas,
           };
@@ -169,11 +172,34 @@ export const ROUTES_CHILDREN: RouteObject[] = [
         path: "create",
         element: <CreateEvaluations />,
         loader: async () => {
-          setDocumentTitle(COMPLETE_SIDEBAR_DATAS.navMain.menus[0].title);
+          const { title } = COMPLETE_SIDEBAR_DATAS.navMain.menus[0];
+          setDocumentTitle(title);
 
           return {
             pageTitle: EVALUATION_PAGE_TITLE,
-            loaderData: COMPLETE_SIDEBAR_DATAS.navMain.menus[0],
+            loaderData: title,
+            pageDatas: EvaluationPageTabsDatas,
+          };
+        },
+        children: EVALUATION_ELEMENTS.map((elem) => ({
+          path: elem.path,
+          element: elem.element,
+          loader: async () => ({
+            pageTitle: elem.title ?? EVALUATION_PAGE_TITLE,
+          }),
+        })),
+      },
+
+      {
+        path: "edit/:evaluationId",
+        element: <EvaluationEdit />,
+        loader: async () => {
+          const title = COMPLETE_SIDEBAR_DATAS.navMain.menus[4].title;
+          setDocumentTitle(title);
+
+          return {
+            pageTitle: EVALUATION_PAGE_TITLE,
+            loaderData: title,
             pageDatas: EvaluationPageTabsDatas,
           };
         },
