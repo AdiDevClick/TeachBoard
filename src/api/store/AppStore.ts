@@ -54,14 +54,13 @@ export const useAppStore = create(
 
               const isNeedingResync = Object.entries(shouldResyncEvals).some(
                 ([key, value]) => {
-                  // Any sync value that is false while the session is not synced indicates a need for resync
-                  if (!value) {
+                  // Any sync value that is true while the session is not synced indicates a need for resync
+                  if (value) {
                     console.warn(
                       `Data for "${key}" is marked as needing resync but session is not synced. Current sessionSynced: ${sessionSynced}`,
                     );
-                    return true;
                   }
-                  return false;
+                  return value;
                 },
               );
 
