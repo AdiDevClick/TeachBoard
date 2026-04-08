@@ -365,44 +365,32 @@ export function removeFromNonPresentStudents(
   uniqueSet.delete(student.id);
 }
 
-export function hydrateModulesForStudentFromEvaluationPayload(
-  args: HydrateModulesForStudentArgs,
-) {
-  const {
-    studentId,
-    modulesEvaluation,
-    getSelectedModule,
-    setEvaluationForStudent,
-    setSubSkillHasCompleted,
-  } = args;
-
+export function hydrateModulesForStudentFromEvaluationPayload({
+  studentId,
+  modulesEvaluation,
+  getSelectedModule,
+  setEvaluationForStudent,
+  setSubSkillHasCompleted,
+}: HydrateModulesForStudentArgs) {
   for (const moduleEvaluation of modulesEvaluation) {
-    const moduleId = moduleEvaluation.id as UUID;
-    const selectedModule = getSelectedModule(moduleId);
+    const { id, subSkills = [] } = moduleEvaluation;
+    const selectedModule = getSelectedModule(id as UUID);
 
-    if (!selectedModule || !moduleId) {
-      continue;
-    }
+    if (!selectedModule || !id) continue;
 
-    const subSkillsEvaluation = moduleEvaluation.subSkills ?? [];
+    for (const subSkillEvaluation of subSkills) {
+      const { id: subSkillId, score } = subSkillEvaluation;
 
-    for (const subSkillEvaluation of subSkillsEvaluation) {
-      const subSkillId = subSkillEvaluation.id as UUID;
+      if (!subSkillId) continue;
 
-      if (!subSkillId) {
-        continue;
-      }
+      const selectedSubSkill = selectedModule.subSkills.get(subSkillId as UUID);
 
-      const selectedSubSkill = selectedModule.subSkills.get(subSkillId);
-
-      if (!selectedSubSkill) {
-        continue;
-      }
+      if (!selectedSubSkill) continue;
 
       setEvaluationForStudent(studentId, {
         module: selectedModule,
         subSkill: selectedSubSkill,
-        score: subSkillEvaluation.score,
+        score,
       });
 
       setSubSkillHasCompleted(selectedModule.id, selectedSubSkill.id, true);
@@ -410,45 +398,33 @@ export function hydrateModulesForStudentFromEvaluationPayload(
   }
 }
 
-export function hydrateStudentFromEvaluationPayload(
-  args: HydrateStudentFromEvaluationPayloadArgs,
-) {
-  const {
-    studentEvaluation,
-    absentIds,
-    setStudentTaskAssignment,
-    setStudentPresence,
-    setStudentOverallScore,
-    getSelectedModule,
-    setEvaluationForStudent,
-    setSubSkillHasCompleted,
-  } = args;
-
-  const studentId = studentEvaluation.studentId as UUID;
-
-  if (!studentId) {
-    return;
-  }
+export function hydrateStudentFromEvaluationPayload({
+  studentEvaluation,
+  absentIds,
+  setStudentTaskAssignment,
+  setStudentPresence,
+  setStudentOverallScore,
+  getSelectedModule,
+  setEvaluationForStudent,
+  setSubSkillHasCompleted,
+}: HydrateStudentFromEvaluationPayloadArgs) {
+  const studentId = studentEvaluation.id as UUID;
+  if (!studentId) return;
 
   const {
-    assignedTaskId,
+    assignedTask: { id: assignedTaskId },
     overallScore,
     modules: modulesEvaluation = [],
+    isPresent = true,
   } = studentEvaluation;
 
-  const shouldBePresent =
-    (studentEvaluation.isPresent ?? true) && !absentIds.has(studentId);
+  const shouldBePresent = isPresent && !absentIds.has(studentId);
 
-  if (!assignedTaskId) {
-    return;
-  }
+  if (!assignedTaskId) return;
 
   setStudentTaskAssignment(assignedTaskId as UUID, studentId);
   setStudentPresence(studentId, shouldBePresent);
-
-  if (overallScore) {
-    setStudentOverallScore(studentId, overallScore);
-  }
+  setStudentOverallScore(studentId, overallScore);
 
   hydrateModulesForStudentFromEvaluationPayload({
     studentId,

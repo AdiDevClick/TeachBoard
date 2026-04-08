@@ -4,6 +4,7 @@ import type {
   SkillsType,
   SkillsViewDto,
 } from "@/api/types/routes/skills.types.ts";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import type { UniqueSet } from "@/utils/UniqueSet.ts";
 
 export type StudentEvaluationSubSkillType = { score: number } & SkillsType;
@@ -135,37 +136,8 @@ export interface StepsCreationState {
 
 export type SelectedClassModulesReturn = ClassModules[];
 
-/**
- * Sub-skill payload used to rehydrate store state from an evaluation details response.
- */
-export type EvaluationRehydrationSubSkillPayload = Readonly<{
-  id: string;
-  score: number;
-}>;
-
-/**
- * Module payload used to rehydrate store state from an evaluation details response.
- */
-export type EvaluationRehydrationModulePayload = Readonly<{
-  id: string;
-  subSkills?: ReadonlyArray<EvaluationRehydrationSubSkillPayload>;
-}>;
-
-/**
- * Student payload used to rehydrate store state from an evaluation details response.
- */
-export type EvaluationRehydrationStudentPayload = Readonly<{
-  studentId: string;
-  studentName?: string;
-  isPresent?: boolean;
-  overallScore?: number | null;
-  assignedTaskId?: string | null;
-  assignedTaskName?: string | null;
-  modules?: ReadonlyArray<EvaluationRehydrationModulePayload>;
-}>;
-
 export type HydrateStudentFromEvaluationPayloadArgs = Readonly<{
-  studentEvaluation: EvaluationRehydrationStudentPayload;
+  studentEvaluation: DetailedEvaluationView["evaluations"][number];
   absentIds: Set<string>;
   setStudentTaskAssignment: (taskId: UUID, studentId: UUID) => void;
   setStudentPresence: (studentId: UUID, isPresent: boolean) => void;
@@ -187,7 +159,9 @@ export type HydrateStudentFromEvaluationPayloadArgs = Readonly<{
 
 export type HydrateModulesForStudentArgs = Readonly<{
   studentId: UUID;
-  modulesEvaluation: ReadonlyArray<EvaluationRehydrationModulePayload>;
+  modulesEvaluation: ReadonlyArray<
+    DetailedEvaluationView["evaluations"][number]["modules"][number]
+  >;
   getSelectedModule: (moduleId?: UUID) => ClassModules | null;
   setEvaluationForStudent: (
     studentId: UUID,

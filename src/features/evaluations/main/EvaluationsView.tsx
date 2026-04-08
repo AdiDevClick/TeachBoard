@@ -13,24 +13,17 @@ import { type ComponentProps } from "react";
 export function EvaluationsView({
   evalEndpoint = API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID,
   evalDataReshapeFn = API_ENDPOINTS.GET.EVALUATIONS.dataReshape,
-  classEndpoint = API_ENDPOINTS.GET.CLASSES.endPoints.BY_ID,
-  classDataReshapeFn = API_ENDPOINTS.GET.CLASSES.dataReshapeSingle,
-  pageId = "evaluation-overview",
-  classTask = "evaluation-class-selection",
+  pageId = "evaluation-summary",
   inputControllers = STEP_FOUR_INPUT_CONTROLLERS,
   modalMode = false,
   className = "grid gap-6",
 }: EvaluationsViewProps) {
-  // Fetch Class + Evaluation datas
-  const { evaluationData, classData, selectedClassDatasMemo } =
-    useEvaluationsViewFetch({
-      pageId,
-      evalEndpoint,
-      evalDataReshapeFn,
-      classEndpoint,
-      classDataReshapeFn,
-      classTask,
-    });
+  // Fetch Evaluation datas
+  const { evaluationData } = useEvaluationsViewFetch({
+    task: pageId,
+    endpoint: evalEndpoint,
+    reshapeFn: evalDataReshapeFn,
+  });
 
   const cardProps = {
     pageId,
@@ -39,8 +32,6 @@ export function EvaluationsView({
     inputControllers,
     modalMode,
     evaluationData,
-    classData,
-    selectedClass: selectedClassDatasMemo?.selectedClass,
     className,
     card: {
       card: {
