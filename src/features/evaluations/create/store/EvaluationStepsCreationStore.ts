@@ -117,7 +117,9 @@ export const useEvaluationStepsCreationStore = create(
               ACTIONS.clearStudentsEvaluations();
             }
 
-            const absentIds = new Set(evaluationData.absencesIds);
+            const absentIds = new Set(
+              evaluationData.absentStudents.map((student) => student.id),
+            );
 
             for (const studentEvaluation of evaluationData.evaluations) {
               hydrateStudentFromEvaluationPayload({
@@ -457,6 +459,7 @@ export const useEvaluationStepsCreationStore = create(
            * @note This score can be overwritten by the teacher and will be saved as is.
            */
           setStudentOverallScore(studentId: UUID, overallScore: number | null) {
+            if (!overallScore || overallScore < 0) return;
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
