@@ -9,6 +9,7 @@ import {
   cacheFetchResult,
   createSearchParamsEndpoint,
   navigateOnForbiddenError,
+  resolveFetchCacheKey,
 } from "@/hooks/database/fetches/functions/use-fetch.functions";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
@@ -110,6 +111,10 @@ export function useFetch<
           responseData: response.data,
           reshapedResult: cachingDatas,
           message: "Fetch successful",
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: resolveFetchCacheKey(fetchParams),
         });
 
         setViewData(cachingDatas as TViewData);
