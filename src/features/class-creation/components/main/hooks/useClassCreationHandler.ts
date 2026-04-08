@@ -114,7 +114,10 @@ export function useClassCreationHandler({
       if (!linkedDiploma || taskModalPropsInvalid(linkedDiploma)) {
         const message =
           "Tried to open task template modal without a selected diploma.";
-        debugLogs("[ClassCreationController] - " + message);
+        debugLogs("ClassCreationController", {
+          type: "componentHandler",
+          message,
+        });
         throw new Error(message);
       }
 
@@ -141,8 +144,9 @@ export function useClassCreationHandler({
    * @param rest - Additional parameters related to the new item
    */
   const handleNewItem = ({ e, ...rest }: HandleAddNewItemParams) => {
-    debugLogs("useClassCreationHandler - Add new item triggered", {
+    debugLogs("useClassCreationHandler", {
       type: "cacheLogs",
+      message: "Add new item triggered",
       ...rest,
       selectedDiploma: selectedDiplomaRef.current,
       selectedStudents: studentsValues,
