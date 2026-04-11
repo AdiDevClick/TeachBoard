@@ -41,23 +41,24 @@ export function StepFour({
 }: StepFourProps) {
   const user = useAppStore((state) => state.user);
   const navigate = useNavigate();
-  const { selectedClass, getAttendedModules } =
+  const { selectedClass, getAttendedModules, title, comments } =
     useEvaluationStepsCreationStore();
+
   const form = useForm<StepFourFormSchema>({
     resolver: zodResolver(stepFourInputSchema),
     mode: "onTouched",
     defaultValues: {
       userId: user?.userId,
-      title: "Evaluation du " + STEP_FOUR_CARD_PROPS.title.description,
+      title: title ?? "Evaluation du " + STEP_FOUR_CARD_PROPS.title.description,
       evaluations: [],
       overallScore: {},
       absence: ["none"],
-      comments: "",
+      comments: comments ?? "",
       evaluationDate: new Date().toISOString(),
     },
   });
 
-  /**
+  /**o
    * INIT - REDIRECT IF NO CLASS OR NO ATTENDED MODULES
    */
   useEffect(() => {

@@ -17,6 +17,9 @@ export function useStepFourState() {
     (state) => state.selectedClass,
   );
 
+  const title = useEvaluationStepsCreationStore((state) => state.title);
+  const comments = useEvaluationStepsCreationStore((state) => state.comments);
+
   const modules = useEvaluationStepsCreationStore(
     useShallow((state) => state.getAttendedModules()),
   );
@@ -43,6 +46,8 @@ export function useStepFourState() {
     getEvaluatedStudentsForSubSkill,
     getAllPresentStudents,
     selectedClass,
+    title,
+    comments,
     clear,
   };
 }

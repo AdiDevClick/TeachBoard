@@ -88,14 +88,20 @@ export function createTableStore<T extends RowItemWithId>(storeName: string) {
               },
               // SETTERS
               updateItem(itemId: string, updatedItem: Partial<T>) {
-                if (!itemId || !updatedItem || !ACTIONS.hasItem(itemId)) {
+                if (!itemId || !updatedItem) {
                   debugLogs(`TableStore - ${storeName}`, {
                     type: "all",
-                    message: `Trying to update item with id ${itemId} that does not exist in the store or providing invalid data.`,
+                    message: `Trying to update item with id ${itemId} that is not correctly defined. Update skipped.`,
                     data: { itemId, updatedItem },
                   });
                   return;
                 }
+
+                if (!ACTIONS.hasItem(itemId)) {
+                  ACTIONS.addItemToTop(updatedItem as T);
+                  return;
+                }
+
                 set(
                   (state) => {
                     const index = state.data.findIndex((d) => d.id === itemId);

@@ -4,6 +4,7 @@ import type {
   SkillsType,
   SkillsViewDto,
 } from "@/api/types/routes/skills.types.ts";
+import type { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
 import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import type { UniqueSet } from "@/utils/UniqueSet.ts";
 
@@ -132,44 +133,38 @@ export interface StepsCreationState {
   nonPresentStudentsResult: NonPresentStudentsResult | null;
   /** Optional title for the evaluation, can be set during the creation process or retrieved from an existing evaluation when rehydrating the store state. */
   title?: string;
+  /**
+   * Optional comments for the evaluation, can be set during the creation process or retrieved from an existing evaluation when rehydrating the store state.
+   */
+  comments?: string;
 }
 
 export type SelectedClassModulesReturn = ClassModules[];
+type StoreActions = Pick<
+  ReturnType<typeof useEvaluationStepsCreationStore.getState>,
+  | "setStudentTaskAssignment"
+  | "setStudentPresence"
+  | "setStudentOverallScore"
+  | "getSelectedModule"
+  | "setEvaluationForStudent"
+  | "setSubSkillHasCompleted"
+>;
 
-export type HydrateStudentFromEvaluationPayloadArgs = Readonly<{
-  studentEvaluation: DetailedEvaluationView["evaluations"][number];
-  absentIds: Set<string>;
-  setStudentTaskAssignment: (taskId: UUID, studentId: UUID) => void;
-  setStudentPresence: (studentId: UUID, isPresent: boolean) => void;
-  setStudentOverallScore: (
-    studentId: UUID,
-    overallScore: number | null,
-  ) => void;
-  getSelectedModule: (moduleId?: UUID) => ClassModules | null;
-  setEvaluationForStudent: (
-    studentId: UUID,
-    evaluation: EvaluationType,
-  ) => void;
-  setSubSkillHasCompleted: (
-    moduleId: UUID,
-    subSkillId: UUID,
-    completed: boolean,
-  ) => void;
-}>;
+export type HydrateStudentFromEvaluationPayloadArgs = Readonly<
+  {
+    studentEvaluation: DetailedEvaluationView["evaluations"][number];
+    absentIds: Set<string>;
+  } & StoreActions
+>;
 
-export type HydrateModulesForStudentArgs = Readonly<{
-  studentId: UUID;
-  modulesEvaluation: ReadonlyArray<
-    DetailedEvaluationView["evaluations"][number]["modules"][number]
-  >;
-  getSelectedModule: (moduleId?: UUID) => ClassModules | null;
-  setEvaluationForStudent: (
-    studentId: UUID,
-    evaluation: EvaluationType,
-  ) => void;
-  setSubSkillHasCompleted: (
-    moduleId: UUID,
-    subSkillId: UUID,
-    completed: boolean,
-  ) => void;
-}>;
+export type HydrateModulesForStudentArgs = Readonly<
+  {
+    studentId: UUID;
+    modulesEvaluation: ReadonlyArray<
+      DetailedEvaluationView["evaluations"][number]["modules"][number]
+    >;
+  } & Pick<
+    StoreActions,
+    "getSelectedModule" | "setEvaluationForStudent" | "setSubSkillHasCompleted"
+  >
+>;

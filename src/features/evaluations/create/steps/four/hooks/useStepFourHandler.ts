@@ -8,6 +8,7 @@ import {
   type StepFourFormSchema,
   stepFourInputSchema,
 } from "@/features/evaluations/create/steps/four/models/step-four.models";
+import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
 import { useEvaluationTableStore } from "@/features/evaluations/main/configs/evaluations.configs";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import { saveObjectInCache } from "@/hooks/database/fetches/functions/use-fetch.functions";
@@ -39,6 +40,8 @@ export function useStepFourHandler({
     getAllPresentStudents,
     selectedClass,
     clear,
+    title: titleFromStore,
+    comments: commentsFromStore,
   } = useStepFourState();
 
   const {
@@ -55,13 +58,33 @@ export function useStepFourHandler({
     submitDataReshapeFn,
   });
 
-  const { setValue, reset } = form;
+  const { setValue, reset, control } = form;
   const navigate = useNavigate();
 
   // Existing watch for overallScore
   const overallScoreWatch = useWatch({
-    control: form.control,
+    control,
     name: "overallScore",
+  });
+
+  useWatch({
+    control,
+    name: "title",
+    compute: (title) => {
+      if (title !== titleFromStore) {
+        useEvaluationStepsCreationStore.setState({ title });
+      }
+    },
+  });
+
+  useWatch({
+    control,
+    name: "comments",
+    compute: (comments) => {
+      if (comments !== commentsFromStore) {
+        useEvaluationStepsCreationStore.setState({ comments });
+      }
+    },
   });
 
   /**

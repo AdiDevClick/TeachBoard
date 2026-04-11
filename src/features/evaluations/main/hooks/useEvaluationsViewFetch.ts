@@ -17,8 +17,8 @@ export function useEvaluationsViewFetch({
   const { evaluationId } = useParams();
   const { getReadyData, updateItem } = useEvaluationTableStore();
   const {
-    openingCallback: fetchEvaluationCallback,
     resultsCallback: evaluationCacheCallback,
+    openingCallback: fetchEvaluationCallback,
   } = useCommandHandler({
     pageId: task,
     form: null!,
@@ -27,10 +27,16 @@ export function useEvaluationsViewFetch({
   const parsedEvalId = parseToUuid(evaluationId) ?? "";
   const endPoint = endpoint(parsedEvalId);
   const storeEvaluationData = getReadyData(parsedEvalId);
-  const cachedEvaluationData = evaluationCacheCallback<
-    DetailedEvaluationView | undefined
-  >();
-  const resolvedEvaluationData = storeEvaluationData ?? cachedEvaluationData;
+  const shouldFetch = !!endPoint && !storeEvaluationData;
+
+  fetchEvaluationCallback(shouldFetch, {
+    apiEndpoint: endPoint,
+    dataReshapeFn: reshapeFn,
+    task,
+  });
+
+  const resolvedEvaluationData =
+    storeEvaluationData ?? evaluationCacheCallback();
 
   /**
    * Sync evaluation to the store -
@@ -46,39 +52,13 @@ export function useEvaluationsViewFetch({
   );
 
   /**
-   * Fetch evaluation -
-   *
-   * @description Triggers setFetchParams
-   */
-  const tryFetchEvaluation = useEffectEvent((endpoint: string) => {
-    if (!endpoint || resolvedEvaluationData) {
-      return;
-    }
-
-    fetchEvaluationCallback(true, {
-      apiEndpoint: endpoint,
-      dataReshapeFn: reshapeFn,
-      task,
-    });
-  });
-
-  /**
-   * Fetch evaluation -
-   *
-   * @description On component mount or when evaluationId changes.
-   */
-  useEffect(() => {
-    tryFetchEvaluation(endPoint);
-  }, [endPoint]);
-
-  /**
    * Sync resolved evaluation data to the store -
    *
    * @description When resolvedEvaluationData changes
    */
   useEffect(() => {
     syncResolvedEvaluationData(resolvedEvaluationData);
-  }, [resolvedEvaluationData, parsedEvalId, storeEvaluationData]);
+  }, [resolvedEvaluationData, storeEvaluationData]);
 
   return {
     evaluationData: resolvedEvaluationData,
