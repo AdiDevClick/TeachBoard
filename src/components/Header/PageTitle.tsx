@@ -1,24 +1,19 @@
 import type { PageTitleProps } from "@/components/Header/types/header.types";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { cn } from "@/utils/utils";
 import { CheckIcon, Pencil } from "lucide-react";
-import { Activity, useRef, useState, type MouseEvent } from "react";
+import { Activity, useRef, type MouseEvent } from "react";
 
 /**
- * @todo: Intentionnaly left the contentEditable functionality commented out for now as it needs some adjustments to work properly.
- * Functionnality works but the state should be refined
- * Will be re-enabled once those issues are resolved.
- *
  * PageTitle component
  *
- * @description Component to display a page title with an icon
+ * @description Displays a page title with an icon for editing the title.
  *
  * @param props - forwarded to the root container (accepts `data-page-title`)
  */
 export function PageTitle(props: PageTitleProps) {
-  const [titleState, setTitleState] = useState({
-    isEditing: false,
-    title: props.children,
-  });
+  const { setIsEditing, isEditing, setTitle, title, isTitleHidden } =
+    usePageTitle();
   const ref = useRef<HTMLHeadingElement>(null);
   const { className, ...restProps } = props;
 
@@ -29,34 +24,39 @@ export function PageTitle(props: PageTitleProps) {
    */
   const handlePencilClick = (event: MouseEvent<SVGSVGElement>) => {
     event.stopPropagation();
-    setTitleState((prev) => ({ ...prev, isEditing: !prev.isEditing }));
+    setIsEditing();
+  };
 
-    if (!titleState.isEditing && ref.current?.textContent) {
-      ref.current.onblur = () => {
-        setTitleState((prev) => ({
-          ...prev,
-          title: ref.current?.textContent || prev.title,
-          isEditing: false,
-        }));
-      };
+  const handleBlur = () => {
+    saveTitle();
+  };
+
+  const saveTitle = () => {
+    if (isEditing && ref.current?.textContent) {
+      setIsEditing(false);
+      setTitle(ref.current.textContent);
     }
   };
 
   return (
-    <div className={cn("page__title-container", className)} {...restProps}>
+    <div
+      data-page-title={!isTitleHidden}
+      className={cn("page__title-container", className)}
+      {...restProps}
+    >
       <h1
         ref={ref}
-        // contentEditable={titleState.isEditing}
+        contentEditable={isEditing}
         suppressContentEditableWarning
+        onBlur={handleBlur}
       >
-        {props.children}
-        {/* {titleState.title} */}
+        {props.children ?? title}
       </h1>
-      <Activity mode={titleState.isEditing ? "hidden" : "visible"}>
+      <Activity mode={isEditing ? "hidden" : "visible"}>
         <Pencil className="title__icon w-3" onClick={handlePencilClick} />
       </Activity>
-      <Activity mode={titleState.isEditing ? "visible" : "hidden"}>
-        <CheckIcon className="title__icon w-3" onClick={handlePencilClick} />
+      <Activity mode={isEditing ? "visible" : "hidden"}>
+        <CheckIcon className="title__icon w-3" onClick={saveTitle} />
       </Activity>
     </div>
   );
