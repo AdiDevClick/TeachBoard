@@ -64,6 +64,7 @@ const createDefaultStepsCreationState = (): StepsCreationState => ({
   nonPresentStudentsResult: null,
   allPresent: false,
   title: undefined,
+  comments: undefined,
 });
 
 export const DEFAULT_VALUES_STEPS_CREATION_STATE: StepsCreationState =
