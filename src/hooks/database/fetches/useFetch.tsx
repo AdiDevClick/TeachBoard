@@ -33,6 +33,7 @@ const defaultStateParameters: FetchParams = {
   onError: undefined,
   cachedFetchKey: undefined,
   resetParams: false,
+  enabled: true,
 };
 
 /**
@@ -148,9 +149,7 @@ export function useFetch<
 
         if (error?.data !== undefined) {
           const cachedData = cacheFetchResult(queryClient, fetchParams, error);
-          // we do not normally expose error data through `viewData`, but
-          // having it available can be handy for callers that treat the
-          // cached value as authoritative.
+
           setViewData(cachedData as TViewData);
 
           debugLogs("useFetch:onError", {
