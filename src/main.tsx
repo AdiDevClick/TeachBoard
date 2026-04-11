@@ -29,7 +29,6 @@ import {
   Outlet,
   RouterProvider,
   useLocation,
-  useMatches,
 } from "react-router-dom";
 
 const queryClient = new QueryClient();
@@ -63,10 +62,6 @@ createRoot(document.getElementById("root")!).render(
     </DialogProvider>
   </StrictMode>,
 );
-type MatchWithTitle = {
-  loaderData?: { pageTitle?: string };
-  pathname?: string;
-};
 
 /**
  * Root component to wrap all pages
@@ -83,12 +78,6 @@ export function Root({ contentType }: Readonly<RootProps>) {
 
   const location = decodeURI(useLocation().pathname);
   const { data, isLoading, error } = useSessionChecker();
-
-  const matches = useMatches().find(
-    (m) => m.loaderData && m.pathname === location,
-  ) as MatchWithTitle;
-  const title = matches?.loaderData?.pageTitle ?? "TeachBoard";
-  const isTitleHidden = title === "hidden";
 
   /**
    * Show login modal to user when no active session is found
@@ -160,7 +149,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
         <AppSidebar variant="inset" />
         <PageView className="main-app-container">
           <PageHeader />
-          <PageTitle data-page-title={!isTitleHidden}>{title}</PageTitle>
+          <PageTitle />
           <App>
             {errorContent ? (
               <PageError />
