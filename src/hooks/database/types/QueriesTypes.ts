@@ -105,6 +105,10 @@ export type QueryKeyDescriptor<TSuccess, TError> = [
      */
     silent?: boolean;
     /**
+     * Whether the query should be enabled or not. This is useful for queries that depend on certain conditions to be met before they can be executed (e.g., waiting for user input, dependent data to be loaded, etc.). @default true
+     */
+    enabled?: boolean;
+    /**
      * Your custom callback for handling successful query responses. This is where you can perform any side effects or state updates based on the successful response data.
      */
     onSuccess?: (data: TSuccess) => void;
