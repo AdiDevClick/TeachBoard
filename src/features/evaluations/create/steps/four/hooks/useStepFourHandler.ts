@@ -71,7 +71,10 @@ export function useStepFourHandler({
     control,
     name: "title",
     compute: (title) => {
-      if (title !== titleFromStore) {
+      if (
+        (titleFromStore && title !== titleFromStore) ||
+        (!titleFromStore && title)
+      ) {
         useEvaluationStepsCreationStore.setState({ title });
       }
     },
@@ -81,7 +84,10 @@ export function useStepFourHandler({
     control,
     name: "comments",
     compute: (comments) => {
-      if (comments !== commentsFromStore) {
+      if (
+        (commentsFromStore && comments !== commentsFromStore) ||
+        (!commentsFromStore && comments)
+      ) {
         useEvaluationStepsCreationStore.setState({ comments });
       }
     },
@@ -215,7 +221,7 @@ export function useStepFourHandler({
 
         if (parsedResponse && !store.hasItem(parsedResponse.id as UUID)) {
           // Save in local persisted store to avoid fetching
-          store.addItemToTop(parsedResponse as any);
+          store.addItemToTop(parsedResponse as never);
 
           // While we have access to the data, cache it in case the user navigates to the evaluation overview, to avoid a fetch there.
           saveObjectInCache(

@@ -1,4 +1,4 @@
-import type { UUID } from "@/api/types/openapi/common.types.ts";
+import type { OffsetDateTime, UUID } from "@/api/types/openapi/common.types.ts";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
 import type {
   SkillsType,
@@ -137,6 +137,10 @@ export interface StepsCreationState {
    * Optional comments for the evaluation, can be set during the creation process or retrieved from an existing evaluation when rehydrating the store state.
    */
   comments?: string;
+  /**
+   * Optional evaluation date, retrieved from an existing evaluation when rehydrating the store state.
+   */
+  evaluationDate?: string;
 }
 
 export type SelectedClassModulesReturn = ClassModules[];

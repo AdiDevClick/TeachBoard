@@ -4,29 +4,47 @@ import {
 } from "@/hooks/functions/use-page-title.functions";
 import { type PageTitleState } from "@/hooks/types/use-page-title.types";
 import { UniqueSet } from "@/utils/UniqueSet";
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useEffectEvent, useSyncExternalStore } from "react";
 import { useLocation, useMatches } from "react-router-dom";
 
 const DEFAULT_TITLE = "TeachBoard";
+
+const pageTitleStore = (() => {
+  let state: PageTitleState = {
+    isEditing: false,
+    routesTitles: new UniqueSet(null),
+  };
+  const listeners = new Set<() => void>();
+
+  return {
+    getState: () => state,
+    subscribe: (listener: () => void) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    setState: (updater: (prev: PageTitleState) => PageTitleState) => {
+      state = updater(state);
+      listeners.forEach((listener) => listener());
+    },
+  };
+})();
 
 /**
  * Hook to manage the page title state and editing
  *
  * @description It uses the route loader data to initialize the title as the original title for the route and allows to edit it.
  *
- * @remarks The title is stored in a state with the route id as key to keep track of titles for different routes.
+ * @remarks The title is stored in a shared state so that both the page header and page content can read and update the same title.
  */
 export function usePageTitle() {
   const location = decodeURI(useLocation().pathname);
   const matchingLoader = getMatchingLoader(useMatches, location);
   const routeId = matchingLoader?.id ?? location;
 
-  const [state, setState] = useState<PageTitleState>(() => ({
-    isEditing: false,
-    routesTitles: new UniqueSet(null, [
-      [routeId, { title: null, originalTitle: null }],
-    ]),
-  }));
+  const state = useSyncExternalStore(
+    pageTitleStore.subscribe,
+    pageTitleStore.getState,
+  );
 
   const currentTitle = matchingLoader?.loaderData?.pageTitle ?? DEFAULT_TITLE;
   const isTitleHidden = currentTitle === "hidden";
@@ -38,7 +56,7 @@ export function usePageTitle() {
    * It will save the loader title as the original title for the route and set the current title to it if not already set
    */
   const triggerTitleChange = useEffectEvent((currentTitle: string) => {
-    setState((prev) => ({
+    pageTitleStore.setState((prev) => ({
       ...prev,
       routesTitles: prev.routesTitles
         .set(routeId, getPrevsTitles(routeId, currentTitle, prev))
@@ -59,14 +77,15 @@ export function usePageTitle() {
     isTitleHidden,
     isEditing: state.isEditing,
     setTitle: (title: string) => {
-      setState((prev) => {
+      pageTitleStore.setState((prev) => {
         const previous = prev.routesTitles.get(routeId);
 
         return {
           ...prev,
           routesTitles: prev.routesTitles
             .set(routeId, {
-              ...previous!,
+              originalTitle: previous?.originalTitle ?? currentTitle,
+              // ...previous!,
               title,
             })
             .clone(),
@@ -74,12 +93,10 @@ export function usePageTitle() {
       });
     },
     setIsEditing: (isEdit?: boolean) => {
-      if (isEdit !== undefined) {
-        setState((prev) => ({ ...prev, isEditing: isEdit }));
-        return;
-      }
-
-      setState((prev) => ({ ...prev, isEditing: !prev.isEditing }));
+      pageTitleStore.setState((prev) => ({
+        ...prev,
+        isEditing: isEdit ?? !prev.isEditing,
+      }));
     },
   };
 }

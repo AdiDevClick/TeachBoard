@@ -65,6 +65,7 @@ const createDefaultStepsCreationState = (): StepsCreationState => ({
   allPresent: false,
   title: undefined,
   comments: undefined,
+  evaluationDate: undefined,
 });
 
 export const DEFAULT_VALUES_STEPS_CREATION_STATE: StepsCreationState =
@@ -113,7 +114,13 @@ export const useEvaluationStepsCreationStore = create(
               return false;
             }
 
-            const evaluationData = parsedEvaluation.data;
+            const {
+              title,
+              comments,
+              evaluations,
+              absentStudents,
+              evaluationDate,
+            } = parsedEvaluation.data;
 
             const shouldClearClass = ACTIONS.setSelectedClass(selectedClass);
 
@@ -122,10 +129,10 @@ export const useEvaluationStepsCreationStore = create(
             }
 
             const absentIds = new Set(
-              evaluationData.absentStudents.map((student) => student.id),
+              absentStudents.map((student) => student.id),
             );
 
-            for (const studentEvaluation of evaluationData.evaluations) {
+            for (const studentEvaluation of evaluations) {
               hydrateStudentFromEvaluationPayload({
                 studentEvaluation,
                 absentIds,
@@ -145,6 +152,12 @@ export const useEvaluationStepsCreationStore = create(
             ACTIONS.setAllNonPresentStudents();
             ACTIONS.checkForCompletedModules();
 
+            set({
+              title,
+              comments,
+              evaluationDate,
+            });
+
             return true;
           },
           /**
@@ -158,9 +171,7 @@ export const useEvaluationStepsCreationStore = create(
            * @returns
            */
           setSelectedClass(selectedClass: ClassSummaryDto) {
-            let shouldClear = false;
-
-            shouldClear = ACTIONS.clear(selectedClass.id);
+            const shouldClear = ACTIONS.clear(selectedClass.id);
 
             if (!shouldClear) return false;
 

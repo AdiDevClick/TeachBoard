@@ -198,8 +198,6 @@ export const ROUTES_CHILDREN: RouteObject[] = [
           setDocumentTitle(title);
 
           return {
-            pageTitle: EVALUATION_PAGE_TITLE,
-            loaderData: title,
             pageDatas: EvaluationPageTabsDatas,
           };
         },
