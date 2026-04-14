@@ -53,15 +53,9 @@ export function useStepsTitleHandler() {
     syncPageTitleToStore(pageTitle);
 
     return () => {
-      console.log("return from useEffect");
-      isSyncingFromStoreRef.current = false;
+      if (isSyncingFromStoreRef.current) {
+        isSyncingFromStoreRef.current = false;
+      }
     };
   }, [pageTitle, storeTitle]);
-
-  // useEffect(() => {
-  //   return () => {
-  //     console.log("return from useEffect");
-  //     isSyncingFromStoreRef.current = false;
-  //   };
-  // }, []);
 }
