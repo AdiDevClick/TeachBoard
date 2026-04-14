@@ -96,30 +96,23 @@ function buildExpectedScoresFromPayload(payload: EvaluationPayload) {
     const moduleScores = new Map<string, Map<string, number>>();
 
     for (const subSkill of module.subSkills) {
-      const matchedStudent = payload.evaluations.find((studentEvaluation) => {
-        const matchedModule = studentEvaluation.modules.find(
-          (evaluatedModule) => evaluatedModule.id === module.id,
-        );
+      const scoresByStudent = new Map<string, number>();
 
-        return matchedModule?.subSkills.some((item) => item.id === subSkill.id);
-      });
+      for (const studentEvaluation of payload.evaluations) {
+        const matchedScore = studentEvaluation.modules
+          .find((evaluatedModule) => evaluatedModule.id === module.id)
+          ?.subSkills.find((item) => item.id === subSkill.id)?.score;
 
-      if (!matchedStudent) {
-        continue;
+        if (matchedScore == null) {
+          continue;
+        }
+
+        scoresByStudent.set(studentEvaluation.name, matchedScore);
       }
 
-      const matchedScore = matchedStudent.modules
-        .find((evaluatedModule) => evaluatedModule.id === module.id)
-        ?.subSkills.find((item) => item.id === subSkill.id)?.score;
-
-      if (matchedScore == null) {
-        continue;
+      if (scoresByStudent.size > 0) {
+        moduleScores.set(subSkill.name, scoresByStudent);
       }
-
-      moduleScores.set(
-        subSkill.name,
-        new Map([[matchedStudent.name, matchedScore]]),
-      );
     }
 
     if (moduleScores.size > 0) {

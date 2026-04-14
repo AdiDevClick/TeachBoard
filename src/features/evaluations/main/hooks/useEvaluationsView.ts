@@ -1,7 +1,6 @@
 import type { UUID } from "@/api/types/openapi/common.types";
 import type { DynamicItemTuple } from "@/components/Tags/types/tags.types";
 import type { ScoreItem } from "@/features/evaluations/create/components/Score/types/score-types";
-import type { StudentWithPresence } from "@/features/evaluations/create/store/types/steps-creation-store.types";
 import { evaluationContainsSubSkill } from "@/features/evaluations/main/hooks/functions/use-evaluations-view.functions";
 import type { UseEvaluationsViewProps } from "@/features/evaluations/main/hooks/types/use-evaluations-view.types";
 import { useMemo } from "react";
@@ -55,16 +54,14 @@ export function useEvaluationsView({
   const getStudentSubskillsForModule = (subskillId: UUID, moduleId: UUID) => {
     const evaluations = evaluationData?.evaluations ?? [];
 
-    const student = evaluations.find((evaluation) =>
+    const students = evaluations.filter((evaluation) =>
       evaluationContainsSubSkill(evaluation, subskillId, moduleId),
     );
 
-    return [
-      {
-        ...student,
-        fullName: student?.name ?? "Inconnu",
-      },
-    ] as StudentWithPresence[];
+    return students.map((student) => ({
+      ...student,
+      fullName: student.name,
+    }));
   };
 
   /**
