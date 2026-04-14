@@ -17,7 +17,7 @@ export function useEvaluationsViewFetch({
   const { evaluationId } = useParams();
   const parsedEvalId = parseToUuid(evaluationId) ?? "";
 
-  const { updateItem, hasHydrated } = useEvaluationTableStore();
+  const { hasHydrated, updateItem } = useEvaluationTableStore();
   const storeEvaluationData = useEvaluationTableStore((state) =>
     state.getReadyData(parsedEvalId),
   );
@@ -34,14 +34,32 @@ export function useEvaluationsViewFetch({
   const shouldFetch =
     hasHydrated && !!endPoint && storeEvaluationData === undefined;
 
-  fetchEvaluationCallback(shouldFetch, {
-    apiEndpoint: endPoint,
-    dataReshapeFn: reshapeFn,
-    task,
+  /**
+   * Fetch Evaluation -
+   */
+  const triggerFetchEvaluation = useEffectEvent(() => {
+    fetchEvaluationCallback(shouldFetch, {
+      apiEndpoint: endPoint,
+      dataReshapeFn: reshapeFn,
+      task,
+    });
   });
 
   const resolvedEvaluationData =
     storeEvaluationData ?? evaluationCacheCallback();
+
+  /**
+   * Fetch -
+   *
+   * @description When `storeEvaluationData` is undefined
+   */
+  useEffect(() => {
+    if (!shouldFetch) {
+      return;
+    }
+
+    triggerFetchEvaluation();
+  }, [shouldFetch]);
 
   /**
    * Sync evaluation to the store -
