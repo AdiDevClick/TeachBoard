@@ -76,17 +76,22 @@ export function usePageTitle() {
     title: state.routesTitles.get(routeId)?.title,
     isTitleHidden,
     isEditing: state.isEditing,
-    setTitle: (title: string) => {
+    setTitle: (title: string = "default") => {
       pageTitleStore.setState((prev) => {
-        const previous = prev.routesTitles.get(routeId);
+        const { title: previousTitle, originalTitle } =
+          prev.routesTitles.get(routeId) ?? {};
+        const selectedTitle = title === "default" ? currentTitle : title;
+
+        if (selectedTitle === previousTitle) {
+          return prev;
+        }
 
         return {
           ...prev,
           routesTitles: prev.routesTitles
             .set(routeId, {
-              originalTitle: previous?.originalTitle ?? currentTitle,
-              // ...previous!,
-              title,
+              originalTitle: originalTitle ?? currentTitle,
+              title: selectedTitle,
             })
             .clone(),
         };
