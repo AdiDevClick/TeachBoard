@@ -21,4 +21,4 @@ export interface TableState<T> {
 /**
  * A type representing a row item with a unique identifier, which can be either a string or a number. This is used to ensure that each row in the table has a unique ID for proper state management and operations like sorting, filtering, and selection.
  */
-export type RowItemWithId = { id: string | number };
+export type RowItemWithId = { id: string | number; [key: string]: any };

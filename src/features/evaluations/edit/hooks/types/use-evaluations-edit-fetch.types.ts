@@ -1,19 +1,10 @@
-import type { EvaluationEdit } from "@/features/evaluations/edit/EvaluationEdit";
+import type { EvaluationEditProps } from "@/features/evaluations/edit/types/evaluation-edit.types";
 
 /**
  * Props for the useEvaluationEditFetch hook, combining necessary parameters for fetching evaluation and class data.
  */
-export type UseEvaluationEditFetchProps = {
-  endpoints: Pick<
-    Required<Parameters<typeof EvaluationEdit>[0]>,
-    "evalEndpoint" | "classEndpoint"
-  >;
-  reshapeFns: Pick<
-    NonNullable<Parameters<typeof EvaluationEdit>[0]>,
-    "evalDataReshapeFn" | "classDataReshapeFn"
-  >;
-  tasks: Pick<
-    Required<NonNullable<Parameters<typeof EvaluationEdit>[0]>>,
-    "evalTask" | "classTask"
-  >;
-};
+export type UseEvaluationEditFetchProps = Readonly<{
+  endpoints: Required<NonNullable<EvaluationEditProps["endpoints"]>>;
+  reshapeFns: Required<NonNullable<EvaluationEditProps["reshapeFns"]>>;
+  tasks: Required<NonNullable<EvaluationEditProps["tasks"]>>;
+}>;

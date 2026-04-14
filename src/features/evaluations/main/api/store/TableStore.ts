@@ -42,6 +42,7 @@ function createDefaultState<T extends RowItemWithId>(): TableState<T> {
     hasHydrated: false,
   };
 }
+
 const idbStorage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
     return (await get(name)) || null;
@@ -73,21 +74,28 @@ export function createTableStore<T extends RowItemWithId>(storeName: string) {
               },
               // GETTERS
               /**
-               * If the item exists in the store and has attendedModules data, it is then ready for a view. Otherwise, return undefined to trigger a fetch in the component.
+               * Return persisted item when hydration is complete.
+               * If no item exists for the id, return undefined to trigger a fetch.
                */
               getReadyData(itemId: string) {
-                const existingData = ACTIONS.getDataFromId(itemId);
-                const wasSaved =
-                  existingData && existingData.attendedModules?.length > 0;
+                const isHydrated = get().hasHydrated;
 
-                return wasSaved ? existingData : undefined;
+                if (!isHydrated || !itemId) {
+                  return undefined;
+                }
+
+                const existingItem = ACTIONS.getDataFromId(itemId);
+
+                const hasDetailedPayload = existingItem?.evaluations;
+
+                return hasDetailedPayload ? existingItem : undefined;
               },
               getItemId: (item: T) => item.id,
               getDataFromId: (itemId: string) => {
                 return get().data.find((d) => d.id === itemId);
               },
               // SETTERS
-              updateItem(itemId: string, updatedItem: Partial<T>) {
+              updateItem(itemId: string, updatedItem: T) {
                 if (!itemId || !updatedItem) {
                   debugLogs(`TableStore - ${storeName}`, {
                     type: "all",
@@ -98,7 +106,7 @@ export function createTableStore<T extends RowItemWithId>(storeName: string) {
                 }
 
                 if (!ACTIONS.hasItem(itemId)) {
-                  ACTIONS.addItemToTop(updatedItem as T);
+                  ACTIONS.addItemToTop(updatedItem);
                   return;
                 }
 

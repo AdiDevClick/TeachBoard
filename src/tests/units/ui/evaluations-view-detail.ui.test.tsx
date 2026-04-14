@@ -4,10 +4,17 @@ import {
   DEFAULT_VALUES_STEPS_CREATION_STATE,
   useEvaluationStepsCreationStore,
 } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
-import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
+import {
+  EVALUATION_TABLE_STORE_NAME,
+  useEvaluationTableStore,
+} from "@/features/evaluations/main/configs/evaluations.configs";
 import { EvaluationsView } from "@/features/evaluations/main/EvaluationsView";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
-import { firsteval, secondeval } from "@/tests/samples/evaluations-payload.datas.tests";
+import {
+  firsteval,
+  secondeval,
+} from "@/tests/samples/evaluations-payload.datas.tests";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { testQueryClient } from "@/tests/test-utils/testQueryClient";
 import {
@@ -16,6 +23,8 @@ import {
   rxExact,
   stubFetchRoutes,
 } from "@/tests/test-utils/vitest-browser.helpers";
+import { DEFAULT_PERSIST_NAME } from "@/utils/TableStoreRegistry";
+import { set } from "idb-keyval";
 import type { RouteObject } from "react-router-dom";
 import { Link, useParams } from "react-router-dom";
 import { describe, expect, test } from "vitest";
@@ -38,7 +47,9 @@ function buildSecondEvaluationOnePresentPayload(): EvaluationPayload {
 
   const absentStudents = [...secondPayload.absentStudents];
 
-  if (!absentStudents.some((student) => student.id === studentForcedAbsent.id)) {
+  if (
+    !absentStudents.some((student) => student.id === studentForcedAbsent.id)
+  ) {
     absentStudents.push({
       id: studentForcedAbsent.id,
       name: studentForcedAbsent.name,
@@ -105,7 +116,10 @@ function buildExpectedScoresFromPayload(payload: EvaluationPayload) {
         continue;
       }
 
-      moduleScores.set(subSkill.name, new Map([[matchedStudent.name, matchedScore]]));
+      moduleScores.set(
+        subSkill.name,
+        new Map([[matchedStudent.name, matchedScore]]),
+      );
     }
 
     if (moduleScores.size > 0) {
@@ -122,6 +136,7 @@ const evaluationEndpoint = API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(
 const classEndpoint = API_ENDPOINTS.GET.CLASSES.endPoints.BY_ID(
   evaluationPayload.classId,
 );
+const evaluationTablePersistKey = `${DEFAULT_PERSIST_NAME}:${EVALUATION_TABLE_STORE_NAME}`;
 
 function normalizeText(value: string) {
   return value.replaceAll(/\s+/g, " ").trim().toLowerCase();
@@ -180,6 +195,31 @@ function seedEvaluationDetailCache(payload = evaluationPayload) {
     ],
     API_ENDPOINTS.GET.EVALUATIONS.dataReshape(payload),
   );
+}
+
+async function seedEvaluationDetailInIdb(payload = evaluationPayload) {
+  useEvaluationTableStore.setState({ data: [], hasHydrated: false });
+
+  await set(
+    evaluationTablePersistKey,
+    JSON.stringify({
+      state: { data: [payload] },
+      version: 0,
+    }),
+  );
+
+  await useEvaluationTableStore.persistMap.idb.rehydrate();
+}
+
+function getEvaluationDetailGetCallsCount(evaluationId = evaluationPayload.id) {
+  return getFetchCallsByUrl(
+    API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(evaluationId),
+    "GET",
+  ).length;
+}
+
+function getClassGetCallsCount() {
+  return getFetchCallsByUrl(classEndpoint, "GET").length;
 }
 
 function findSubSkillCard(subSkillName: string) {
@@ -289,12 +329,16 @@ setupUiTestState(null, {
     useEvaluationStepsCreationStore.setState(
       DEFAULT_VALUES_STEPS_CREATION_STATE,
     );
+    useEvaluationTableStore.persistMap.idb.clearStorage();
+    useEvaluationTableStore.setState({ data: [], hasHydrated: true });
     installEvaluationDetailFetchStub();
   },
 });
 
 describe("UI flow: evaluations detail view", () => {
   test("fetches correct ids and renders modules, scores, absences, and comments from payload", async () => {
+    const initialEvaluationGetCalls = getEvaluationDetailGetCallsCount();
+
     await render(
       <AppTestWrapper
         routes={buildRoutes()}
@@ -308,7 +352,9 @@ describe("UI flow: evaluations detail view", () => {
     );
 
     await expect
-      .poll(() => getFetchCallsByUrl(evaluationEndpoint, "GET").length > 0)
+      .poll(
+        () => getEvaluationDetailGetCallsCount() > initialEvaluationGetCalls,
+      )
       .toBe(true);
 
     await expect
@@ -327,8 +373,7 @@ describe("UI flow: evaluations detail view", () => {
     }
 
     const secondEvaluationOnlyModule = secondModules.find(
-      (module) =>
-        !evaluationModules.some((item) => item.id === module.id),
+      (module) => !evaluationModules.some((item) => item.id === module.id),
     );
 
     if (!secondEvaluationOnlyModule) {
@@ -443,8 +488,7 @@ describe("UI flow: evaluations detail view", () => {
     await documentToHaveRoleWithName("heading", rxExact(secondPayload.title));
 
     const secondOnlyModule = secondModules.find(
-      (module) =>
-        !evaluationModules.some((item) => item.id === module.id),
+      (module) => !evaluationModules.some((item) => item.id === module.id),
     );
 
     if (!secondOnlyModule) {
@@ -477,6 +521,8 @@ describe("UI flow: evaluations detail view", () => {
 
   test("renders properly from cached evaluation payload without extra fetches", async () => {
     seedEvaluationDetailCache(evaluationPayload);
+    const initialEvaluationGetCalls = getEvaluationDetailGetCallsCount();
+    const initialClassGetCalls = getClassGetCallsCount();
 
     await render(
       <AppTestWrapper
@@ -491,11 +537,9 @@ describe("UI flow: evaluations detail view", () => {
     );
 
     await expect
-      .poll(() => getFetchCallsByUrl(evaluationEndpoint, "GET").length)
-      .toBe(0);
-    await expect
-      .poll(() => getFetchCallsByUrl(classEndpoint, "GET").length)
-      .toBe(0);
+      .poll(() => getEvaluationDetailGetCallsCount())
+      .toBe(initialEvaluationGetCalls);
+    await expect.poll(() => getClassGetCallsCount()).toBe(initialClassGetCalls);
 
     await expect
       .poll(
@@ -525,6 +569,83 @@ describe("UI flow: evaluations detail view", () => {
         ),
       )
       .toBe(true);
+  });
+
+  test("does not fetch when idb already contains detailed evaluation", async () => {
+    await seedEvaluationDetailInIdb(evaluationPayload);
+    const initialEvaluationGetCalls = getEvaluationDetailGetCallsCount();
+    const initialClassGetCalls = getClassGetCallsCount();
+
+    await render(
+      <AppTestWrapper
+        routes={buildRoutes()}
+        initialEntries={[`/evaluations/${evaluationPayload.id}`]}
+      />,
+    );
+
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(evaluationPayload.title),
+    );
+
+    await expect
+      .poll(() => getEvaluationDetailGetCallsCount())
+      .toBe(initialEvaluationGetCalls);
+    await expect.poll(() => getClassGetCallsCount()).toBe(initialClassGetCalls);
+  });
+
+  test("does not fetch on reload when idb contains same id without detailed modules", async () => {
+    await seedEvaluationDetailInIdb({
+      ...evaluationPayload,
+      attendedModules: [],
+    });
+    const initialEvaluationGetCalls = getEvaluationDetailGetCallsCount();
+    const initialClassGetCalls = getClassGetCallsCount();
+
+    await render(
+      <AppTestWrapper
+        routes={buildRoutes()}
+        initialEntries={[`/evaluations/${evaluationPayload.id}`]}
+      />,
+    );
+
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(evaluationPayload.title),
+    );
+
+    await expect
+      .poll(() => getEvaluationDetailGetCallsCount())
+      .toBe(initialEvaluationGetCalls);
+    await expect.poll(() => getClassGetCallsCount()).toBe(initialClassGetCalls);
+  });
+
+  test("fetches on reload when id is missing from idb", async () => {
+    await seedEvaluationDetailInIdb({
+      ...evaluationPayload,
+      id: secondPayload.id,
+    });
+    const initialEvaluationGetCalls = getEvaluationDetailGetCallsCount();
+    const initialClassGetCalls = getClassGetCallsCount();
+
+    await render(
+      <AppTestWrapper
+        routes={buildRoutes()}
+        initialEntries={[`/evaluations/${evaluationPayload.id}`]}
+      />,
+    );
+
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(evaluationPayload.title),
+    );
+
+    await expect
+      .poll(
+        () => getEvaluationDetailGetCallsCount() > initialEvaluationGetCalls,
+      )
+      .toBe(true);
+    await expect.poll(() => getClassGetCallsCount()).toBe(initialClassGetCalls);
   });
 
   test("keeps absence names synchronized after 1 -> 2 -> 1 navigation", async () => {

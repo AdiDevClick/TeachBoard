@@ -6,13 +6,14 @@ import { useEvaluationsViewFetch } from "@/features/evaluations/main/hooks/useEv
 import type { EvaluationsViewProps } from "@/features/evaluations/main/types/evaluations.types";
 import { cn } from "@/utils/utils";
 import { type ComponentProps } from "react";
+const { endpoints, dataReshape } = API_ENDPOINTS.GET.EVALUATIONS;
 
 /**
  * EvaluationsView component that displays the details of an evaluation, including modules, student scores, and comments.
  */
 export function EvaluationsView({
-  evalEndpoint = API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID,
-  evalDataReshapeFn = API_ENDPOINTS.GET.EVALUATIONS.dataReshape,
+  evalEndpoint = endpoints.BY_ID,
+  evalDataReshapeFn = dataReshape,
   pageId = "evaluation-summary",
   inputControllers = STEP_FOUR_INPUT_CONTROLLERS,
   modalMode = false,

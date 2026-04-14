@@ -15,7 +15,13 @@ export function useEvaluationsViewFetch({
   reshapeFn,
 }: UseEvaluationsViewFetchProps) {
   const { evaluationId } = useParams();
-  const { getReadyData, updateItem } = useEvaluationTableStore();
+  const parsedEvalId = parseToUuid(evaluationId) ?? "";
+
+  const { updateItem, hasHydrated } = useEvaluationTableStore();
+  const storeEvaluationData = useEvaluationTableStore((state) =>
+    state.getReadyData(parsedEvalId),
+  );
+
   const {
     resultsCallback: evaluationCacheCallback,
     openingCallback: fetchEvaluationCallback,
@@ -24,10 +30,9 @@ export function useEvaluationsViewFetch({
     form: null!,
   });
 
-  const parsedEvalId = parseToUuid(evaluationId) ?? "";
   const endPoint = endpoint(parsedEvalId);
-  const storeEvaluationData = getReadyData(parsedEvalId);
-  const shouldFetch = !!endPoint && !storeEvaluationData;
+  const shouldFetch =
+    hasHydrated && !!endPoint && storeEvaluationData === undefined;
 
   fetchEvaluationCallback(shouldFetch, {
     apiEndpoint: endPoint,
