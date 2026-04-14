@@ -71,6 +71,7 @@ export function useDataTableWithStore<T extends RowItemWithId>(
   const table = useReactTable({
     data: storeData,
     columns: storeColumns,
+    autoResetPageIndex: false,
     state: {
       sorting,
       columnVisibility,
@@ -102,7 +103,6 @@ export function useDataTableWithStore<T extends RowItemWithId>(
       const reordered = arrayMove(storeData, oldIndex, newIndex);
 
       setData(reordered);
-      // onReorder?.(reordered);
     }
   }
 
