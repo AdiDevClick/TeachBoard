@@ -5,6 +5,7 @@ import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/label
 import { LabelledAccordion } from "@/features/evaluations/create/components/Accordion/LabelledAccordion";
 import { AverageFields } from "@/features/evaluations/create/components/Score/AverageFields";
 import type { StepFourControllerProps } from "@/features/evaluations/create/steps/four/controller/types/step-four-controller.types";
+import { useFormWatchers } from "@/features/evaluations/create/steps/four/hooks/useFormWatchers";
 import { useStepFourHandler } from "@/features/evaluations/create/steps/four/hooks/useStepFourHandler";
 
 /**
@@ -34,6 +35,8 @@ export function StepFourController({
     handleValidSubmit,
     invalidSubmitCallback,
   } = useStepFourHandler({ form, pageId, submitRoute, submitDataReshapeFn });
+
+  useFormWatchers({ form });
 
   return (
     <>
