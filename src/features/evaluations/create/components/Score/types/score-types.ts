@@ -3,8 +3,12 @@ import type { StepFourController } from "@/features/evaluations/create/steps/fou
 import type { PropsWithChildren } from "react";
 
 export type ScoreItem = {
+  /** The name of the student associated with this score. */
   name: string;
+  /** The final score for the student. This can be overridden by the user or will be the same as the original score. */
   score: number;
+  /** A saved version of the student's original score. Calculated average based on their performance. */
+  originalScore: number;
 };
 
 /**
