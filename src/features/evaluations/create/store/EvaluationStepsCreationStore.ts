@@ -474,14 +474,25 @@ export const useEvaluationStepsCreationStore = create(
            * @note This score can be overwritten by the teacher and will be saved as is.
            */
           setStudentOverallScore(studentId: UUID, overallScore: number | null) {
-            if (!overallScore || overallScore < 0) return;
+            if (
+              !overallScore ||
+              overallScore < 0 ||
+              !Number.isFinite(overallScore)
+            )
+              return;
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
                 const student = state.students.get(studentId);
 
-                if (student && student.overallScore !== overallScore) {
-                  student.overallScore = overallScore;
+                if (student) {
+                  if (student.overallScore !== overallScore) {
+                    student.overallScore = overallScore;
+                  }
+
+                  if (!student.originalScore) {
+                    student.originalScore = overallScore;
+                  }
                 }
               },
               undefined,
@@ -892,6 +903,11 @@ export const useEvaluationStepsCreationStore = create(
           },
           /**
            * Get all students' scores for average calculation.
+           *
+           * @description This will return a number ranging from 0 > 100.
+           *
+           * @remarks If the student overall score is set, it is prefered since it can be overriden by the user.
+           * @remarks If no score is available, the average score will be used.
            */
           getAllStudentsAverageScores() {
             ensureCollections();
@@ -900,16 +916,20 @@ export const useEvaluationStepsCreationStore = create(
 
             for (const student of students.values()) {
               if (!student.isPresent) continue;
+              let score = 0;
+              let averageScore = 0;
 
-              const averageScore = getStudentAverageScore(student);
-              const score =
-                student.overallScore == null
-                  ? averageScore
-                  : student.overallScore * 5;
+              if (student.overallScore) {
+                score = student.overallScore;
+              } else {
+                averageScore = getStudentAverageScore(student);
+                score = averageScore;
+              }
 
               scores.set(student.id, {
                 name: student.fullName,
                 score,
+                originalScore: student.originalScore ?? averageScore,
               });
             }
 
