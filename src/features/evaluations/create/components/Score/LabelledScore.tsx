@@ -1,8 +1,9 @@
 import {
   labelledScoreInput,
+  labelledScoreInputAverage,
   labelledScoreInputBadge,
   labelledScoreInputInput,
-  labelledScoreInputText,
+  labelledScoreInputOriginal,
 } from "@/assets/css/LabelledScoreInput.module.scss";
 import { Badge } from "@/components/ui/badge";
 import { Item } from "@/components/ui/item";
@@ -18,7 +19,10 @@ export function LabelledScore({ item, children }: LabelledScoreProps) {
   return (
     <Item className={labelledScoreInput}>
       <Badge className={labelledScoreInputBadge}>{item.name}</Badge>
-      <p className={labelledScoreInputText}>{"Moyenne : "}</p>
+      <p className={labelledScoreInputOriginal}>
+        {`Originale : ${item.originalScore / 5}`}
+      </p>
+      <p className={labelledScoreInputAverage}>{"Moyenne : "}</p>
       <div className={labelledScoreInputInput}>
         {children}
         <p>{"/20"}</p>

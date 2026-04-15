@@ -29,6 +29,7 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
     "isPresent",
     "assignedTask",
     "overallScore",
+    "originalScore",
   ]);
 
   const [internalValue, setInternalValue] = useState<number[]>(value ?? [0]);

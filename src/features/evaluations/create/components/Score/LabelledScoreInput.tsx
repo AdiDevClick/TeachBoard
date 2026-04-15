@@ -8,6 +8,8 @@ import { useWatch } from "react-hook-form";
 /**
  * LabelledScoreInput component for displaying and editing the average score of a student.
  *
+ * @description A watcher is used to directly modify the overall score in the store as the teacher updates the input, ensuring that the latest score is always available in the store for submission to the server.
+ *
  * @param item - The score item containing the student's name and their average score.
  * @param id - The unique identifier for the student.
  * @param form - The react-hook-form instance for managing form state.
@@ -27,8 +29,9 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
     control: form?.control,
     name: watchId,
     compute: (score) => {
-      if (Number.isFinite(score)) {
-        setStudentOverallScore(id, score as number);
+      const parsedScore = Number.parseFloat(String(score));
+      if (Number.isFinite(parsedScore)) {
+        setStudentOverallScore(id, parsedScore * 5);
       }
     },
   });
