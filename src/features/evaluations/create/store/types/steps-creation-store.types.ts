@@ -20,7 +20,10 @@ export type StudentEvaluationModuleType = {
 export type StudentWithPresence = {
   id: UUID;
   fullName: string;
+  /** Potential overall score for the student modified by the user */
   overallScore?: number | null;
+  /** Original score for the student not modified by the user */
+  originalScore?: number | null;
   isPresent: boolean;
   assignedTask?: Pick<ClassTasks, "id" | "name"> | null;
   evaluations?: {
