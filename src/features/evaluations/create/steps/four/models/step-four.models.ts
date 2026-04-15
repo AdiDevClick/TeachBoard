@@ -88,13 +88,7 @@ const stepFourSchema = (data: typeof fieldData) =>
         z.string(data.scoreAverageInvalidTypeMessage),
         z.preprocess(
           (val) => {
-            if (typeof val === "string") {
-              const trimmed = val.trim();
-              if (trimmed === "") return 0;
-              const n = Number(trimmed);
-              return Number.isNaN(n) ? val : n;
-            }
-            return val;
+            return checkIfNumberIsString(val);
           },
           z
             .number()
@@ -138,13 +132,7 @@ const stepFourSchema = (data: typeof fieldData) =>
           isPresent: z.boolean(),
           overallScore: z.preprocess(
             (val) => {
-              if (typeof val === "string") {
-                const trimmed = val.trim();
-                if (trimmed === "") return undefined;
-                const n = Number(trimmed);
-                return Number.isNaN(n) ? val : n;
-              }
-              return val;
+              return checkIfNumberIsString(val);
             },
             z
               .number()
@@ -204,3 +192,13 @@ export type StepFourFormSchema = z.input<typeof stepFourInputSchema>;
 export type StepFourInputItem = FetchingInputItem<StepFourFormSchema>;
 
 export const stepFourInputSchema = stepFourSchema(fieldData);
+
+function checkIfNumberIsString(val: unknown) {
+  if (typeof val === "string") {
+    const trimmed = String(val).trim();
+    if (trimmed === "") return 0;
+    const n = Number(trimmed);
+    return Number.isNaN(n) ? val : n;
+  }
+  return val;
+}
