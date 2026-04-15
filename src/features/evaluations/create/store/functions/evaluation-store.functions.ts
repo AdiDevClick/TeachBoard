@@ -7,6 +7,7 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
 import type { SkillsType } from "@/api/types/routes/skills.types.ts";
+import type { StudentEvaluationModuleLike } from "@/features/evaluations/create/store/functions/types/evaluation-store-functions.types";
 import type {
   ClassModules,
   ClassModuleSubSkill,
@@ -324,12 +325,27 @@ export const getStudentAverageScore = (
     return 0;
   }
 
+  return calculateStudentOverallScore(studentEvaluations.modules.values());
+};
+
+/**
+ * Calculate the overall score for a student based on their module evaluations.
+ *
+ * @param studentEvaluationsModules - An iterable of the student's module evaluations, which can be either the full module evaluation type or a simplified version containing only sub-skill scores.
+ */
+export function calculateStudentOverallScore(
+  studentEvaluationsModules: Iterable<StudentEvaluationModuleLike>,
+) {
   let totalScore = 0;
   let scoreCount = 0;
 
-  for (const module of studentEvaluations.modules.values()) {
-    for (const subSkill of module.subSkills.values()) {
-      if (typeof subSkill.score === "number") {
+  for (const module of studentEvaluationsModules) {
+    const subSkills = Array.isArray(module.subSkills)
+      ? module.subSkills
+      : module.subSkills.values();
+
+    for (const subSkill of subSkills) {
+      if (Number.isFinite(subSkill.score)) {
         totalScore += subSkill.score;
         scoreCount += 1;
       }
@@ -337,7 +353,7 @@ export const getStudentAverageScore = (
   }
 
   return scoreCount > 0 ? totalScore / scoreCount : 0;
-};
+}
 
 /**
  * Save non-present students into the unique sets for both byId and byName.
