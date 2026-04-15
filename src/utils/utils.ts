@@ -139,6 +139,10 @@ export function waitAndFail(
 
 export function parseFromObject<T>(obj: T): T | null {
   try {
+    if (typeof obj !== "object" || !obj) {
+      throw new Error("Input is not a valid object");
+    }
+
     const stringified = JSON.stringify(obj);
     const parsed = JSON.parse(stringified);
 
