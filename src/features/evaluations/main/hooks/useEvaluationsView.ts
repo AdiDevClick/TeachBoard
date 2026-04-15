@@ -1,6 +1,7 @@
 import type { UUID } from "@/api/types/openapi/common.types";
 import type { DynamicItemTuple } from "@/components/Tags/types/tags.types";
 import type { ScoreItem } from "@/features/evaluations/create/components/Score/types/score-types";
+import { calculateStudentOverallScore } from "@/features/evaluations/create/store/functions/evaluation-store.functions";
 import { evaluationContainsSubSkill } from "@/features/evaluations/main/hooks/functions/use-evaluations-view.functions";
 import type { UseEvaluationsViewProps } from "@/features/evaluations/main/hooks/types/use-evaluations-view.types";
 import { useMemo } from "react";
@@ -39,13 +40,18 @@ export function useEvaluationsView({
       return scores;
     }
 
-    return evaluationData.evaluations.map((student) => [
-      student.id,
-      {
-        name: student.name,
-        score: (student.overallScore ?? 0) * 5,
-      },
-    ]);
+    return evaluationData.evaluations.map((student) => {
+      const originalScore = calculateStudentOverallScore(student.modules);
+
+      return [
+        student.id,
+        {
+          name: student.name,
+          score: (student.overallScore ?? 0) * 5,
+          originalScore,
+        },
+      ];
+    });
   }, [evaluationData]);
 
   /**
