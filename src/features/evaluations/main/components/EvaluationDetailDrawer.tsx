@@ -1,3 +1,4 @@
+import withListMapper from "@/components/HOCs/withListMapper";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +12,8 @@ import {
 } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
+import { EvaluationDetailDrawerButton } from "@/features/evaluations/main/components/EvaluationDetailDrawerButton";
+import type { EvaluationDetailDrawerButtonProps } from "@/features/evaluations/main/components/types/evaluation-detail-drawer-button";
 import { useEvaluationsViewFetch } from "@/features/evaluations/main/hooks/useEvaluationsViewFetch";
 import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -22,7 +25,7 @@ import {
   type ComponentProps,
   type PropsWithChildren,
 } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type EvaluationDetailDrawerProps = Readonly<
   {
@@ -122,6 +125,18 @@ function DrawerSection({ title, children }: DrawerSectionProps) {
   );
 }
 
+const buttonsData = [
+  { label: "Ouvrir", getLink: (id: number | string) => `/evaluations/${id}` },
+  {
+    label: "Editer",
+    getLink: (id: number | string) => `/evaluations/edit/${id}`,
+  },
+  {
+    label: "Supprimer",
+    getLink: (id: number | string) => `/evaluations/delete/${id}`,
+  },
+] satisfies EvaluationDetailDrawerButtonProps[];
+
 export function EvaluationDetailDrawer({
   evaluation,
   onClose,
@@ -154,15 +169,12 @@ export function EvaluationDetailDrawer({
         {evaluation && <DetailContent evaluation={evaluation} />}
 
         <DrawerFooter>
-          <Button variant="outline" asChild>
-            <Link to={`/evaluations/${evaluation?.id}`}>Ouvrir</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link to={`/evaluations/edit/${evaluation?.id}`}>Editer</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link to={`/evaluations/delete/${evaluation?.id}`}>Supprimer</Link>
-          </Button>
+          <ButtonsGroup
+            items={buttonsData}
+            optional={(button) => ({
+              to: button.getLink(evaluation?.id ?? ""),
+            })}
+          />
           <DrawerClose asChild>
             <Button variant="outline">Fermer</Button>
           </DrawerClose>
@@ -171,6 +183,8 @@ export function EvaluationDetailDrawer({
     </Drawer>
   );
 }
+
+const ButtonsGroup = withListMapper(EvaluationDetailDrawerButton);
 
 export function EvaluationDetailDrawerRoute() {
   const [open, setOpen] = useState(true);
@@ -186,7 +200,7 @@ export function EvaluationDetailDrawerRoute() {
     if (!open) navigate("..");
   };
 
-  const evaluation = open ? evaluationData : null;
+  const evaluation = open ? (evaluationData ?? null) : null;
 
   return (
     <EvaluationDetailDrawer
