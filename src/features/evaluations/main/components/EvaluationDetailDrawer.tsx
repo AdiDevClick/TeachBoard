@@ -14,6 +14,7 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import { useEvaluationsViewFetch } from "@/features/evaluations/main/hooks/useEvaluationsViewFetch";
 import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { preventDefaultAndStopPropagation } from "@/utils/utils";
 import {
   useState,
@@ -127,6 +128,7 @@ export function EvaluationDetailDrawer({
   ...props
 }: EvaluationDetailDrawerProps) {
   const isMobile = useIsMobile();
+  usePageTitle(evaluation?.title);
 
   return (
     <Drawer
