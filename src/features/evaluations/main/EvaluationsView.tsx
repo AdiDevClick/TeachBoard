@@ -4,6 +4,7 @@ import { STEP_FOUR_INPUT_CONTROLLERS } from "@/features/evaluations/create/steps
 import { EvaluationsViewController } from "@/features/evaluations/main/controllers/EvaluationsViewController";
 import { useEvaluationsViewFetch } from "@/features/evaluations/main/hooks/useEvaluationsViewFetch";
 import type { EvaluationsViewProps } from "@/features/evaluations/main/types/evaluations.types";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { cn } from "@/utils/utils";
 import { type ComponentProps } from "react";
 const { endpoints, dataReshape } = API_ENDPOINTS.GET.EVALUATIONS;
@@ -25,6 +26,8 @@ export function EvaluationsView({
     endpoint: evalEndpoint,
     reshapeFn: evalDataReshapeFn,
   });
+
+  usePageTitle(evaluationData?.title);
 
   const cardProps = {
     pageId,

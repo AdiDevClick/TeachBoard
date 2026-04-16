@@ -25,7 +25,6 @@ export function EvaluationsViewController({
   });
   return (
     <ItemGroup>
-      <h1>{evaluationData?.title}</h1>
       <LabelledAccordion
         inputController={inputControllers!.modules}
         accordionItems={modules}
