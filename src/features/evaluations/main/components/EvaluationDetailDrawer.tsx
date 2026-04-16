@@ -70,7 +70,7 @@ function DetailContent({
                 </p>
               </div>
               {studentEval.isPresent && studentEval.overallScore !== null ? (
-                <ScoreDisplay score={studentEval.overallScore} />
+                <ScoreDisplay score={studentEval.overallScore / 5} />
               ) : (
                 <span className="text-xs text-muted-foreground">—</span>
               )}

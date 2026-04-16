@@ -47,7 +47,7 @@ export function useEvaluationsView({
         student.id,
         {
           name: student.name,
-          score: (student.overallScore ?? 0) * 5,
+          score: student.overallScore ?? 0,
           originalScore,
         },
       ];

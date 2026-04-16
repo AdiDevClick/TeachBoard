@@ -137,7 +137,7 @@ const stepFourSchema = (data: typeof fieldData) =>
             z
               .number()
               .min(0, data.scoreAverageInvalidMinMessage)
-              .max(20, data.scoreAverageInvalidMaxMessage)
+              .max(100, data.scoreAverageInvalidMaxMessage)
               .meta({ description: "Overall score for the student" }),
           ),
           assignedTask: z
