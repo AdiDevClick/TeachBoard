@@ -2,7 +2,6 @@ import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import DegreeModule from "@/features/class-creation/components/DegreeModule/DegreeModule";
 import { degreeModuleCreationInputControllers } from "@/features/class-creation/components/DegreeModule/forms/degree-module-inputs";
 import { DEGREE_MODULE_SKILL_CARD_TITLE } from "@/features/class-creation/components/DegreeModuleSkill/config/degree-module-skill.configs";
-import { degreeSubSkillsCreationInputControllers } from "@/features/class-creation/components/DegreeModuleSkill/forms/degree-module-skill-inputs";
 import { AppModals } from "@/pages/AllModals/AppModals";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import {
@@ -25,6 +24,7 @@ import {
 } from "@/tests/test-utils/vitest-browser.helpers";
 import { openModalAndAssertItsOpenedAndReady } from "@/tests/units/ui/functions/useful-ui.functions";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import { page } from "vitest/browser";
 
 const skillsController = degreeModuleCreationInputControllers.find(
   (c) => c.name === "skillList",
@@ -68,19 +68,41 @@ describe("DegreeModuleSkill modal UI interaction", () => {
     );
 
     // Match the stubbed POST payload/response shape
+    const modalForm = document.getElementById("new-degree-module-skill-form");
+
+    if (!(modalForm instanceof HTMLFormElement)) {
+      throw new TypeError("new-degree-module-skill-form introuvable");
+    }
+
+    const modalInputs = Array.from(
+      modalForm.querySelectorAll<HTMLInputElement>(
+        'input[type="text"], input:not([type])',
+      ),
+    ).filter((input) => !input.disabled && input.type !== "hidden");
+
+    const [nameInput, codeInput] = modalInputs;
+
+    if (!nameInput || !codeInput) {
+      throw new TypeError("Champs name/code introuvables dans le modal");
+    }
+
     const fills = [
       {
-        label: rx(degreeSubSkillsCreationInputControllers[0].title),
+        locator: page.elementLocator(nameInput),
         value: "new",
       },
       {
-        label: rx(degreeSubSkillsCreationInputControllers[1].title),
+        locator: page.elementLocator(codeInput),
         value: "NEW",
       },
     ];
 
     await fillFieldsEnsuringSubmitDisabled("Ajouter", fills);
     // Last tab blurs the final field so RHF (onTouched) can compute validity
+
+    await expect
+      .poll(() => page.getByRole("button", { name: /^Ajouter$/i }).query())
+      .toBeEnabled();
 
     // Ensure there are no form validation alerts, then submit
     await checkFormValidityAndSubmit("Ajouter");
