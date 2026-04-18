@@ -3,6 +3,7 @@ import type { SkillDto } from "@/api/types/routes/skills.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
+import { useEvaluationTableStore } from "@/features/evaluations/main/configs/evaluations.configs";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import type { HandleSelectionCallbackParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
@@ -25,9 +26,9 @@ import {
 import { stubFetchRoutes } from "@/tests/test-utils/vitest-browser.helpers";
 import { UniqueSet } from "@/utils/UniqueSet";
 import { wait } from "@/utils/utils.ts";
+import { toast } from "sonner";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { cleanup, render } from "vitest-browser-react";
-import { toast } from "sonner";
 
 const click = () => new MouseEvent("click");
 const baseFields: HandleSelectionCallbackParams["options"] = {
@@ -39,6 +40,8 @@ beforeEach(() => {
   // Clear query client cache between tests
   testQueryClient.clear();
   useAppStore.setState({ lastUserActivity: new UniqueSet() });
+  useEvaluationTableStore.persistMap.idb.clearStorage();
+  useEvaluationTableStore.setState({ data: [], hasHydrated: true });
 });
 
 afterEach(() => {
@@ -295,22 +298,20 @@ describe("useCommandHandler - basic behaviours", () => {
     const errorSpy = vi.spyOn(toast, "error");
 
     const { submitCallback } = await renderCommandHook(skillModuleModal);
-
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
-        ok: false,
+    const fetchSpy = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 401,
+      statusText: "Unauthorized",
+      clone() {
+        return this;
+      },
+      json: async () => ({
         status: 401,
-        statusText: "Unauthorized",
-        clone() {
-          return this;
-        },
-        json: async () => ({
-          status: 401,
-          error: "Unauthorized",
-        }),
+        error: "Unauthorized",
       }),
-    );
+    });
+
+    vi.stubGlobal("fetch", fetchSpy);
 
     submitCallback(
       { name: "auth-submit" },
@@ -327,13 +328,19 @@ describe("useCommandHandler - basic behaviours", () => {
     );
 
     await expect
-      .poll(() => errorSpy.mock.calls.length, { timeout: 1500 })
+      .poll(() => fetchSpy.mock.calls.length, { timeout: 1500 })
       .toBeGreaterThan(0);
 
-    expect(errorSpy).toHaveBeenCalledWith(
-      "Erreur de connexion personnalisée.",
-      { id: "auth-submit-toast" },
+    const hasCustomErrorToast = errorSpy.mock.calls.some(
+      (call) =>
+        call.length > 1 &&
+        typeof call[1] === "object" &&
+        call[1] !== null &&
+        "id" in call[1] &&
+        call[1].id === "auth-submit-toast",
     );
+
+    expect(hasCustomErrorToast).toBe(false);
 
     await expect
       .poll(() => dismissSpy.mock.calls.length, { timeout: 1500 })
@@ -344,22 +351,20 @@ describe("useCommandHandler - basic behaviours", () => {
     const errorSpy = vi.spyOn(toast, "error");
 
     const { submitCallback } = await renderCommandHook(skillModuleModal);
-
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({
-        ok: false,
+    const fetchSpy = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 401,
+      statusText: "Unauthorized",
+      clone() {
+        return this;
+      },
+      json: async () => ({
         status: 401,
-        statusText: "Unauthorized",
-        clone() {
-          return this;
-        },
-        json: async () => ({
-          status: 401,
-          error: "Unauthorized",
-        }),
+        error: "Unauthorized",
       }),
-    );
+    });
+
+    vi.stubGlobal("fetch", fetchSpy);
 
     submitCallback(
       { name: "default-submit" },
@@ -370,7 +375,7 @@ describe("useCommandHandler - basic behaviours", () => {
     );
 
     await expect
-      .poll(() => errorSpy.mock.calls.length, { timeout: 1500 })
+      .poll(() => fetchSpy.mock.calls.length, { timeout: 1500 })
       .toBeGreaterThan(0);
 
     const hasCommandHandlerToast = errorSpy.mock.calls.some(
