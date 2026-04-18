@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import type { EvaluationDetailDrawerButtonProps } from "@/features/evaluations/main/components/types/evaluation-detail-drawer-button";
-import { Link } from "lucide-react";
+import { Link } from "react-router-dom";
 
 /**
  * A button component that navigates to a specified link when clicked.
