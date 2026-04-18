@@ -16,6 +16,7 @@ import {
   submitButtonShouldBeDisabled,
 } from "@/tests/test-utils/vitest-browser.helpers";
 import { beforeEach, describe, expect, test } from "vitest";
+import { render } from "vitest-browser-react";
 import { page, userEvent } from "vitest/browser";
 
 const resetClassId = UUID_SCHEMA.parse("123e4567-e89b-12d3-a456-426614179991");
@@ -30,6 +31,27 @@ function getActivePanel(): HTMLElement {
   const panel = document.querySelector<HTMLElement>(
     '[role="tabpanel"][data-state="active"]',
   );
+  // document.querySelector<HTMLElement>(
+  //   '[data-slot="tabs-content"][data-state="active"]',
+  // ) ??
+  // Array.from(document.querySelectorAll<HTMLElement>("[data-step-id]")).find(
+  //   (candidate) => {
+  //     if (candidate.hidden) {
+  //       return false;
+  //     }
+
+  //     const ariaHidden = candidate.getAttribute("aria-hidden");
+
+  //     if (ariaHidden === "true") {
+  //       return false;
+  //     }
+
+  //     const style = globalThis.getComputedStyle(candidate);
+
+  //     return style.display !== "none" && style.visibility !== "hidden";
+  //   },
+  // ) ??
+  // null;
 
   if (!panel) {
     throw new TypeError("No active tab panel found");
@@ -134,7 +156,7 @@ async function selectClass(className: string) {
 
   try {
     await openPopoverByLabelText(/Classes disponibles/i, {
-      timeout: 4000,
+      timeout: 700,
       items: classPattern,
     });
   } catch {
@@ -334,20 +356,21 @@ async function setupToStepFour() {
   await submitButtonShouldBeDisabled("enregistrer", false);
 }
 
-setupUiTestState(
-  () => (
+setupUiTestState(undefined, {
+  beforeEach: () => {
+    useEvaluationStepsCreationStore.getState().clear(resetClassId);
+    fetchControl = installEvaluationFlowFetchStub();
+  },
+});
+
+beforeEach(async () => {
+  await render(
     <AppTestWrapper
       routes={buildEvaluationCreateRoutes()}
       initialEntries={["/evaluations/create/classe"]}
-    />
-  ),
-  {
-    beforeEach: () => {
-      useEvaluationStepsCreationStore.getState().clear(resetClassId);
-      fetchControl = installEvaluationFlowFetchStub();
-    },
-  },
-);
+    />,
+  );
+});
 
 describe("UI flow: evaluations step1 -> step4", () => {
   beforeEach(() => {
@@ -733,7 +756,7 @@ describe("UI flow: evaluations step1 -> step4", () => {
 
     const postBodies = fetchControl.getStats().postBodies;
     expect(postBodies.length).toBe(beforeSpam + 1);
-  }, 30000);
+  }, 20000);
 });
 
 describe("UI flow: step-four focused", () => {
@@ -799,5 +822,5 @@ describe("UI flow: step-four focused", () => {
     for (const absentId of absentStudentIds) {
       expect(absenceValue as string[]).toContain(absentId);
     }
-  }, 30000);
+  }, 20000);
 });
