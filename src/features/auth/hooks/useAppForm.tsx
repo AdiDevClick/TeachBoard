@@ -5,12 +5,10 @@ import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import type { AppControllerInterface } from "@/types/AppControllerInterface";
 import type { DataReshapeFn } from "@/types/AppInputControllerInterface";
 import { wait } from "@/utils/utils";
-import { startTransition, useEffect } from "react";
+import { startTransition } from "react";
 import type { FieldValues } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-
-const toastId = "login-loading";
 interface UseAppFormProps<T extends FieldValues = FieldValues> extends Pick<
   AppControllerInterface<T>,
   "form" | "pageId" | "submitRoute"
@@ -43,7 +41,6 @@ export function useAppForm<T extends FieldValues = FieldValues>({
     submitRoute,
     submitDataReshapeFn,
   });
-  const { response, error, isLoading } = rest;
   const login = useAppStore((state) => state.login);
   const lastActivity = useAppStore((state) => state.lastUserActivity);
 
@@ -75,33 +72,17 @@ export function useAppForm<T extends FieldValues = FieldValues>({
       endpointUrl: String(submitRoute),
       dataReshapeFn: submitDataReshapeFn,
       reshapeOptions: { login },
+      // Disable default error handling from useQueryOnSubmit
       silent: true,
+      onError(error) {
+        if (error?.status === 400 || error?.status === 401) {
+          toast.error(
+            "Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations et réessayer.",
+          );
+        }
+      },
     });
   };
-
-  /**
-   * Effect to handle loading, success, and error states
-   *
-   * @description It will open the sidebar upon successful login and navigate to the home page.
-   */
-  useEffect(() => {
-    if (isLoading && !toast.getToasts().some((t) => t.id === toastId)) {
-      toast.dismiss();
-      toast.loading("Connexion en cours...", {
-        id: toastId,
-      });
-    }
-
-    if (error || response) {
-      toast.dismiss(toastId);
-      // If there's an error, show an error toast
-      if (error?.status === 400 || error?.status === 401) {
-        toast.error(
-          "Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations et réessayer.",
-        );
-      }
-    }
-  }, [isLoading, error, response]);
 
   return {
     ...rest,
