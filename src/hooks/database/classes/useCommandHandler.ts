@@ -372,7 +372,7 @@ export function useCommandHandler<
    * @remark The saves the previous state but unlocks the ability to submit again
    */
   const resetFormAfterSubmitError = useEffectEvent(() => {
-    form.reset(undefined, {
+    form?.reset(undefined, {
       keepValues: true,
       keepErrors: true,
       keepDirty: true,
