@@ -17,7 +17,7 @@ export function useEvaluationsEditFetch({
   const { evaluationData } = useEvaluationsViewFetch({
     task: evalTask,
     endpoint: evalEndpoint,
-    reshapeFn: evalDataReshapeFn!,
+    reshapeFn: evalDataReshapeFn,
   });
 
   const {
