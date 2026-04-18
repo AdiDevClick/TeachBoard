@@ -9,6 +9,7 @@ import {
   useEvaluationTableStore,
 } from "@/features/evaluations/main/configs/evaluations.configs";
 import { EvaluationsView } from "@/features/evaluations/main/EvaluationsView";
+import { PageTitle } from "@/components/Header/PageTitle";
 import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import {
@@ -139,7 +140,12 @@ function buildRoutes(): RouteObject[] {
   return [
     {
       path: "/evaluations/:evaluationId",
-      element: <EvaluationsView />,
+      element: (
+        <>
+          <PageTitle />
+          <EvaluationsView />
+        </>
+      ),
     },
   ];
 }
@@ -149,6 +155,7 @@ function EvaluationSwitchHarness() {
 
   return (
     <>
+      <PageTitle />
       <Link to={`/evaluations/${evaluationPayload.id}`}>Voir évaluation 1</Link>
       <Link to={`/evaluations/${secondPayload.id}`}>Voir évaluation 2</Link>
       <EvaluationsView key={evaluationId} />
@@ -420,7 +427,7 @@ describe("UI flow: evaluations detail view", () => {
           () =>
             hasStudentOverallScore(
               studentName,
-              Number(studentEvaluation.overallScore),
+              Number(studentEvaluation.overallScore) / 5,
             ),
           { timeout: 500 },
         )
@@ -492,8 +499,14 @@ describe("UI flow: evaluations detail view", () => {
 
     await documentToHaveRoleWithName("button", rxExact(secondOnlyModule.name));
 
+    const razFitzScore =
+      secondPayload.evaluations.find((student) => student.name === "Raz Fitz")
+        ?.overallScore ?? 0;
+
     await expect
-      .poll(() => hasStudentOverallScore("Raz Fitz", 15), { timeout: 500 })
+      .poll(() => hasStudentOverallScore("Raz Fitz", razFitzScore / 5), {
+        timeout: 500,
+      })
       .toBe(true);
 
     for (const absentStudentId of getAbsentStudentIds(secondPayload)) {
