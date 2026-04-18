@@ -79,6 +79,8 @@ export const USER_ACTIVITIES = Object.freeze({
 export type AppModalNames =
   | "login"
   | "apple-login"
+  | "google-login"
+  | "logout"
   | "none"
   | "signup"
   | "pw-recovery"

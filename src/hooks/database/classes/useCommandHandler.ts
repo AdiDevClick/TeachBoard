@@ -400,7 +400,7 @@ export function useCommandHandler<
       toast.loading(loadingMessage, { id: toastId });
     }
 
-    if (data || error) {
+    if (response || error) {
       hasStartedCreation.current = false;
 
       if (showLoadingToast) {
@@ -408,10 +408,10 @@ export function useCommandHandler<
       }
     }
 
-    if (data) {
+    if (response) {
       debugLogs("useCommandHandler:handleResults", {
         type: "cacheLogs",
-        data,
+        response,
         message: "Submission successful, closing dialog",
         pageId,
       });
@@ -430,7 +430,7 @@ export function useCommandHandler<
     if (error && isSubmission) {
       resetFormAfterSubmitError();
     }
-  }, [isLoading, isLoaded, error, data, pageId]);
+  }, [isLoading, isLoaded, error, data, response, pageId]);
 
   /**
    * FETCH / SUBMIT - Trigger submission or fetching when fetchParams are set
