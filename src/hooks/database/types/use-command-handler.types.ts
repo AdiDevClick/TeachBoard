@@ -118,10 +118,20 @@ export type HandleOpeningCallbackParams<T extends CommandHandlerMetaData> = {
 /**
  * Parameters for the handleSubmitCallback function
  */
+export type SubmissionToastOptions = {
+  toastId?: string;
+  loadingMessage?: string;
+  showLoadingToast?: boolean;
+};
+
+/**
+ * Parameters for the handleSubmitCallback function
+ */
 export type HandleSubmitCallbackParams = {
   variables: MutationVariables;
   submitOpts?: {
     endpointUrl?: string;
+    toastOptions?: SubmissionToastOptions;
   } & Partial<FetchParams>;
 };
 
