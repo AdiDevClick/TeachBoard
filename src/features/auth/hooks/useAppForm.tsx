@@ -79,6 +79,11 @@ export function useAppForm<T extends FieldValues = FieldValues>({
           toast.error(
             "Identifiant ou mot de passe incorrect. Veuillez vérifier vos informations et réessayer.",
           );
+        } else {
+          toast.error(
+            error?.message ??
+              "Une erreur est survenue. Veuillez réessayer plus tard.",
+          );
         }
       },
     });
