@@ -31,27 +31,6 @@ function getActivePanel(): HTMLElement {
   const panel = document.querySelector<HTMLElement>(
     '[role="tabpanel"][data-state="active"]',
   );
-  // document.querySelector<HTMLElement>(
-  //   '[data-slot="tabs-content"][data-state="active"]',
-  // ) ??
-  // Array.from(document.querySelectorAll<HTMLElement>("[data-step-id]")).find(
-  //   (candidate) => {
-  //     if (candidate.hidden) {
-  //       return false;
-  //     }
-
-  //     const ariaHidden = candidate.getAttribute("aria-hidden");
-
-  //     if (ariaHidden === "true") {
-  //       return false;
-  //     }
-
-  //     const style = globalThis.getComputedStyle(candidate);
-
-  //     return style.display !== "none" && style.visibility !== "hidden";
-  //   },
-  // ) ??
-  // null;
 
   if (!panel) {
     throw new TypeError("No active tab panel found");
