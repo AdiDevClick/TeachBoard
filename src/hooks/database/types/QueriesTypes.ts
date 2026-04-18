@@ -6,6 +6,7 @@ import type { USER_ACTIVITIES } from "@/configs/app.config.ts";
 import type { AnyObjectProps } from "@/utils/types/types.utils";
 import type { QueryClient } from "@tanstack/react-query";
 import type { FormMethod } from "react-router-dom";
+import type { toast } from "sonner";
 
 export type MutationViolation = AnyObjectProps & {
   propertyPath?: string;
@@ -98,7 +99,11 @@ export type QueryKeyDescriptor<TSuccess, TError> = [
     /**
      * A description to show in the success toast notification when the query succeeds. This is optional, and if not provided, a default "Success" message will be shown.
      */
-    successDescription?: string;
+    successDescription?: (success: TSuccess) => SuccessDescription;
+    /**
+     * A custom error message to show in the error toast notification when the query fails. This is optional, and if not provided, the error message from the response will be shown.
+     */
+    errorMessage?: (error: TError) => string;
     /**
      * Silence any toaster notification for this query, whether on success or error. Useful for queries that are expected to fail or succeed frequently and where you don't want to spam the user with notifications.
      * This way, you can handle notifications manually in the onSuccess and onError callbacks if needed.
@@ -148,6 +153,15 @@ export type QueryKeyDescriptor<TSuccess, TError> = [
     onCacheVerify?: (cachedData: unknown) => Promise<any> | void;
   },
 ];
+
+/**
+ * Description for success toast notifications, allowing customization of the message and type.
+ */
+export type SuccessDescription = {
+  type: keyof Pick<typeof toast, "success" | "info" | "message">;
+  descriptionMessage?: string;
+  customSuccessMessage?: string;
+};
 
 /**
  * Custom hook for managing fetch operations with React Query.
