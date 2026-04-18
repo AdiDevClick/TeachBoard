@@ -6,10 +6,6 @@ import {
 } from "@/data/inputs-controllers.data.ts";
 import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
 import { CreateEvaluations } from "@/features/evaluations/create/CreateEvaluations.tsx";
-import { StepFour } from "@/features/evaluations/create/steps/four/StepFour.tsx";
-import { StepOne } from "@/features/evaluations/create/steps/one/StepOne";
-import { StepThree } from "@/features/evaluations/create/steps/three/StepThree.tsx";
-import { StepTwo } from "@/features/evaluations/create/steps/two/StepTwo.tsx";
 import { EvaluationEdit } from "@/features/evaluations/edit/EvaluationEdit";
 import { EvaluationDetailDrawerRoute } from "@/features/evaluations/main/components/EvaluationDetailDrawer";
 import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
@@ -22,21 +18,11 @@ import { Home } from "@/pages/Home/Home.tsx";
 import { Login } from "@/pages/Login/Login.tsx";
 import { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
 import { Signup } from "@/pages/Signup/Signup";
+import {
+  ALL_STEPS,
+  EVALUATION_PAGE_TITLE,
+} from "@/routes/config/routes.configs";
 import { Navigate, type RouteObject } from "react-router-dom";
-
-const DATE = new Date().toLocaleDateString();
-const EVALUATION_PAGE_TITLE = "Evaluation - " + DATE;
-
-const EVALUATION_ELEMENTS = [
-  { path: EvaluationPageTabsDatas.step1.name, element: <StepOne /> },
-  { path: EvaluationPageTabsDatas.step2.name, element: <StepTwo /> },
-  { path: EvaluationPageTabsDatas.step3.name, element: <StepThree /> },
-  {
-    path: EvaluationPageTabsDatas.step4.name,
-    element: <StepFour />,
-    title: "hidden",
-  },
-];
 
 /**
  * Application route children configuration.
@@ -181,13 +167,7 @@ export const ROUTES_CHILDREN: RouteObject[] = [
             pageDatas: EvaluationPageTabsDatas,
           };
         },
-        children: EVALUATION_ELEMENTS.map((elem) => ({
-          path: elem.path,
-          element: elem.element,
-          loader: async () => ({
-            pageTitle: elem.title ?? EVALUATION_PAGE_TITLE,
-          }),
-        })),
+        children: ALL_STEPS("create"),
       },
 
       {
@@ -201,13 +181,7 @@ export const ROUTES_CHILDREN: RouteObject[] = [
             pageDatas: EvaluationPageTabsDatas,
           };
         },
-        children: EVALUATION_ELEMENTS.map((elem) => ({
-          path: elem.path,
-          element: elem.element,
-          loader: async () => ({
-            pageTitle: elem.title ?? EVALUATION_PAGE_TITLE,
-          }),
-        })),
+        children: ALL_STEPS("edit"),
       },
     ],
   },

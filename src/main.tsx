@@ -12,7 +12,7 @@ import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
 import { AppModals } from "@/pages/AllModals/AppModals.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
-import { ROUTES_CHILDREN } from "@/routes/routes.config";
+import { ROUTES_CHILDREN } from "@/routes/routes";
 import type { RootProps } from "@/types/MainTypes";
 import "@css/MainContainer.scss";
 import "@css/Toaster.scss";
