@@ -72,6 +72,12 @@ export function useClassCreationHandler({
   const handleValidSubmit = (variables: ClassCreationFormSchema) => {
     submitCallback(variables, {
       method: HTTP_METHODS.POST,
+      successDescription(success) {
+        return {
+          type: "success",
+          descriptionMessage: `La classe "${success?.data?.name}" pour l'année ${success?.data?.schoolYear} a été créée avec succès.`,
+        };
+      },
     });
   };
 

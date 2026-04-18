@@ -153,6 +153,12 @@ export function TaskTemplateCreationController({
   const handleSubmit = (variables: MutationVariables) => {
     submitCallback(variables, {
       method: HTTP_METHODS.POST,
+      successDescription(success) {
+        return {
+          type: "success",
+          descriptionMessage: `La configuration "${success?.data?.name} pour la tâche ${success?.data?.taskName}" a été créée avec succès.`,
+        };
+      },
     });
   };
 
@@ -169,10 +175,11 @@ export function TaskTemplateCreationController({
     const isTask = Object.hasOwn(commandItemDetails, "description");
     if (isTask) {
       if (commandSelectionDoesNotContainId(commandItemDetails)) {
-        debugLogs(
-          `TaskTemplateCreationController Selected task item has no ID, selection ignored`,
+        debugLogs(`TaskTemplateCreationController:handleCommandSelection`, {
+          type: "componentHandler",
           commandItemDetails,
-        );
+          message: "Selected task item has no ID, selection ignored",
+        });
       }
       form.setValue("taskId", commandItemDetails.id, { shouldValidate: true });
       return;

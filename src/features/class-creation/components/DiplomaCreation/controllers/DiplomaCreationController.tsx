@@ -62,6 +62,13 @@ export function DiplomaCreationController({
   const handleSubmit = (variables: DiplomaCreationFormState) => {
     submitCallback(variables, {
       method: HTTP_METHODS.POST,
+      successDescription(success) {
+        const { data } = success ?? {};
+        return {
+          type: "success",
+          descriptionMessage: `Le diplôme "${data?.degreeLevel} ${data?.degreeYear}" a été créé avec succès.`,
+        };
+      },
     });
   };
 

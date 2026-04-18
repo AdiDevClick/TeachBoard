@@ -9,10 +9,6 @@ import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
 import { type ChangeEvent } from "react";
-import { toast } from "sonner";
-
-const loaderToasterId = "degree-item-creation-loader-toast";
-const creationToasterId = "degree-item-created-toast";
 
 /**
  * Controller component for creating a new degree item.
@@ -37,35 +33,14 @@ export function DegreeItemController({
   form,
   submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_DEGREE.dataReshape,
 }: DegreeItemControllerProps) {
-  const {
-    setRef,
-    observedRefs,
-    submitCallback,
-    serverData,
-    isLoading,
-    invalidSubmitCallback,
-  } = useCommandHandler({
-    form,
-    pageId,
-    submitDataReshapeFn,
-  });
+  const { setRef, observedRefs, submitCallback, invalidSubmitCallback } =
+    useCommandHandler({
+      form,
+      pageId,
+      submitDataReshapeFn,
+    });
 
   const { availabilityCheck } = useDebouncedChecker(form, 300);
-
-  if (isLoading) {
-    toast.loading("Création en cours...", { id: loaderToasterId });
-  }
-
-  if (serverData?.degree) {
-    toast.dismiss(loaderToasterId);
-    const type = serverData.degree.type ?? "UNKNOWN";
-
-    const { typeMessage, defaultGenre } = getTypeMessage(type);
-
-    toast.success(`${typeMessage} ${defaultGenre} avec succès !`, {
-      id: creationToasterId,
-    });
-  }
 
   /**
    * Handle form submission
@@ -75,6 +50,15 @@ export function DegreeItemController({
   const handleSubmit = (variables: MutationVariables) => {
     submitCallback(variables, {
       dataReshapeFn: submitDataReshapeFn,
+      successDescription(success) {
+        const type = success?.degree?.type ?? "UNKNOWN";
+
+        const { typeMessage, defaultGenre } = getTypeMessage(type);
+        return {
+          type: "success",
+          descriptionMessage: `${typeMessage} ${defaultGenre} avec succès !`,
+        };
+      },
     });
   };
 
