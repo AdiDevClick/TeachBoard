@@ -1,4 +1,3 @@
-import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 
 import type {
@@ -17,7 +16,6 @@ import type {
 } from "@/api/types/routes/diplomas.types";
 import type {
   CreateSkillResponseData,
-  SkillDto,
   SkillsFetch,
 } from "@/api/types/routes/skills.types";
 import type { StudentsFetch } from "@/api/types/routes/students.types";
@@ -30,11 +28,10 @@ import type {
   TasksFetch,
 } from "@/api/types/routes/tasks.types";
 import type { TeachersFetch } from "@/api/types/routes/teachers.types";
+import { debugLogs } from "@/configs/app-components.config";
 import type { AnyObjectProps } from "@/utils/types/types.utils";
 
 const BASE_API_URL = "/api";
-
-//
 
 const AUTH = `${BASE_API_URL}/auth`;
 const DEGREES = `${BASE_API_URL}/degrees`;
@@ -217,11 +214,12 @@ export const API_ENDPOINTS = Object.freeze({
         data: CreateClassResponseData,
         cachedDatas: CachedQueriesData | undefined,
       ) => {
-        const newItem = {
-          ...data,
-          value: data?.name,
-        };
-        return reshapeItemToCachedData(newItem, cachedDatas, data.degreeLevel);
+        return reshapeItemToCachedData(
+          data,
+          cachedDatas,
+          data.degreeLevel,
+          (reshaper) => reshaper.assign([["name", "value"]]),
+        );
       },
     },
     AUTH: {
@@ -307,10 +305,7 @@ export const API_ENDPOINTS = Object.freeze({
         cachedDatas: CachedQueriesData | undefined,
       ) => {
         // Extract the actual skill data from the response
-        const skillData =
-          data && typeof data === "object" && "skill" in data
-            ? (data as { skill: SkillDto }).skill
-            : data;
+        const skillData = data && "skill" in data ? data.skill : data;
         // Mapping code -> value
         const newItem = {
           ...skillData,
@@ -319,16 +314,12 @@ export const API_ENDPOINTS = Object.freeze({
 
         const res = reshapeItemToCachedData(newItem, cachedDatas, "Tous");
 
-        if (DEV_MODE && !NO_QUERY_LOGS) {
-          console.debug(
-            "[API_ENDPOINTS.POST.CREATE_SKILL.dataReshape] data:",
-            data,
-            "cachedDatas:",
-            cachedDatas,
-            "result:",
-            res,
-          );
-        }
+        debugLogs("API_ENDPOINTS.POST.CREATE_SKILL.dataReshape", {
+          type: "queryLogs",
+          data,
+          cachedDatas,
+          result: res,
+        });
 
         return res;
       },
@@ -396,21 +387,14 @@ export const API_ENDPOINTS = Object.freeze({
     },
     CREATE_EVALUATION: {
       endpoint: EVALUATIONS,
-      dataReshape: (
-        data: Record<string, unknown>,
-        cachedDatas: CachedQueriesData | undefined,
-      ) => {
-        const newItem = {
-          ...data,
-          value: data.name as string | undefined,
-        };
-
-        return reshapeItemToCachedData(
-          newItem,
-          cachedDatas,
-          (data.classId as string) ?? "Tous",
-        );
-      },
+      dataReshape: evaluationDataReshape,
+    },
+  },
+  PUT: {
+    METHOD: "PUT",
+    UPDATE_EVALUATION: {
+      endpoint: (id: number | string) => `${EVALUATIONS}/${id}`,
+      dataReshape: evaluationDataReshape,
     },
   },
 } as const);
@@ -449,6 +433,10 @@ function getCachedDatas(cachedDatas: CachedQueriesData | undefined) {
   return maybeIndexed?.[0] ?? [];
 }
 
+type ReshapeItemToCachedDataFn = (
+  reshaper: ObjectReshape<AnyObjectProps>,
+) => ObjectReshape<AnyObjectProps> | void;
+
 /**
  * Reshape a new item into the cached data structure
  *
@@ -459,13 +447,42 @@ function getCachedDatas(cachedDatas: CachedQueriesData | undefined) {
  * @param groupConditionValue The group condition value for grouping items
  * @returns The reshaped data structure with the new item added
  */
-function reshapeItemToCachedData<T extends AnyObjectProps>(
+function reshapeItemToCachedData<T extends object>(
   newItem: T,
   cachedDatas: CachedQueriesData | undefined,
   groupConditionValue: string,
+  reshapeFn?: ReshapeItemToCachedDataFn,
 ) {
   const existingData = getCachedDatas(cachedDatas);
-  return dataReshaper(existingData)
-    .addTo(newItem, "items", "groupTitle", groupConditionValue)
-    .newShape();
+  const itemReshaper = dataReshaper(existingData).addTo(
+    newItem as AnyObjectProps,
+    "items",
+    "groupTitle",
+    groupConditionValue,
+  );
+
+  reshapeFn?.(itemReshaper);
+
+  return itemReshaper.newShape();
+}
+
+/**
+ * Reshape evaluation data for caching
+ *
+ * @description Created to avoid redundancies
+ */
+function evaluationDataReshape(
+  data: AnyObjectProps,
+  cachedDatas: CachedQueriesData | undefined,
+) {
+  const newItem = {
+    ...data,
+    value: data.name,
+  };
+
+  return reshapeItemToCachedData(
+    newItem,
+    cachedDatas,
+    (data.classId as string) ?? "Tous",
+  );
 }
