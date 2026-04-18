@@ -5,7 +5,6 @@ import {
   debugLogs,
   loginFormControllerPropsInvalid,
 } from "@/configs/app-components.config";
-import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
 import { loginButtonsSvgs } from "@/configs/social.config.ts";
 import type { LoginFormControllerProps } from "@/features/auth/components/login/controller/types/login-form-controller.types";
 import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
@@ -30,7 +29,7 @@ import { toast } from "sonner";
  */
 export function LoginFormController(props: LoginFormControllerProps) {
   if (loginFormControllerPropsInvalid(props)) {
-    debugLogs("LoginFormController", props);
+    debugLogs("LoginFormController", { type: "propsValidation", props });
   }
 
   const {
@@ -82,9 +81,10 @@ export function LoginFormController(props: LoginFormControllerProps) {
 
       triggerNavigation();
 
-      if (DEV_MODE && !NO_QUERY_LOGS) {
-        console.debug("Query success in LoginView", data);
-      }
+      debugLogs("LoginFormController:LoginSuccess", {
+        type: "queryLogs",
+        data,
+      });
     }
   }, [data]);
 
