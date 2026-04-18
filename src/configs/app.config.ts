@@ -18,7 +18,7 @@ export const NO_QUERY_LOGS = true;
 /**
  * Disable component props validation warnings in the console.
  */
-export const NO_COMPONENT_PROPS_WARNING_LOGS = false;
+export const NO_COMPONENT_PROPS_WARNING_LOGS = true;
 /**
  * Disable component handler warnings in the console.
  */
