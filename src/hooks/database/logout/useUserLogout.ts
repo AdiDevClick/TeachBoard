@@ -1,39 +1,53 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { DEV_MODE, USER_ACTIVITIES } from "@/configs/app.config.ts";
-import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
+import { debugLogs } from "@/configs/app-components.config";
+import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
+import type { UseUserLogoutProps } from "@/hooks/database/logout/types/use-user-logout.types";
 
 /**
  * Hook for logging out the user.
  */
-export function useUserLogout() {
+export function useUserLogout({ pageId = "logout" }: UseUserLogoutProps = {}) {
   const logout = useAppStore((state) => state.logout);
 
-  const { data, isLoading, onSubmit, isLoaded, error } = useQueryOnSubmit([
-    USER_ACTIVITIES.logout,
-    {
-      url: API_ENDPOINTS.POST.AUTH.LOGOUT,
+  const { submitCallback, data, isLoading, isLoaded, error } =
+    useCommandHandler({
+      pageId,
+      form: null!,
+    });
+
+  function handleSubmit() {
+    return submitCallback(undefined, {
+      endpointUrl: API_ENDPOINTS.POST.AUTH.LOGOUT,
       method: API_ENDPOINTS.POST.METHOD,
-      successDescription: "Logout successful.",
-      // silent: true,
-      onSuccess: (data) => {
+      successDescription() {
+        return {
+          type: "success",
+          customSuccessMessage: "Logout successful.",
+        };
+      },
+      onSuccess: (responseData) => {
         logout();
-        if (DEV_MODE) {
-          console.debug("Logout onSuccess:", data);
-        }
+        debugLogs("useUserLogout", {
+          type: "all",
+          responseData,
+          message: "Logout onSuccess",
+        });
       },
-      onError: (error) => {
-        if (DEV_MODE) {
-          console.error("Logout onError:", error);
-        }
+      onError: (submitError) => {
+        debugLogs("useUserLogout", {
+          type: "all",
+          error: submitError,
+          message: "Logout onError",
+        });
       },
-    },
-  ]);
+    });
+  }
 
   return {
     data,
     isLoading,
-    onSubmit,
+    onSubmit: handleSubmit,
     isLoaded,
     error,
   };
