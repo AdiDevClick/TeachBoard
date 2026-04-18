@@ -111,7 +111,7 @@ export function useQueryOnSubmit<
           method: queryKeysArr?.[1]?.method,
         });
 
-        if (enabled) {
+        if (enabled ?? true) {
           return await mutateAsync(payload);
         }
       } catch (err) {
