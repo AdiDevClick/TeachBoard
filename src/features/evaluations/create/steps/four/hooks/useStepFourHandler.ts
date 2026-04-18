@@ -3,7 +3,6 @@ import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import { useStepFourState } from "@/features/evaluations/create/hooks/useStepFourState";
 import type { UseStepFourHandlerProps } from "@/features/evaluations/create/steps/four/hooks/types/use-step-four-handler.types";
-import { useFormWatchers } from "@/features/evaluations/create/steps/four/hooks/useFormWatchers";
 import {
   type StepFourFormSchema,
   stepFourInputSchema,
@@ -13,7 +12,7 @@ import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import { saveObjectInCache } from "@/hooks/database/fetches/functions/use-fetch.functions";
 import { parseFromObject } from "@/utils/utils";
 import { useEffect, useEffectEvent, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const toastId = "step-four-submit-toast";
@@ -56,6 +55,7 @@ export function useStepFourHandler({
 
   const { setValue, reset } = form;
   const navigate = useNavigate();
+  const { mode } = useLoaderData();
 
   /**
    * Generates a list of absent students names to display
@@ -90,7 +90,7 @@ export function useStepFourHandler({
     delete parsedVariables["overallScore"];
     submitCallback(parsedVariables, {
       abortController: new AbortController(),
-      method: "POST",
+      method: mode === "create" ? "POST" : "PUT",
     });
   };
 

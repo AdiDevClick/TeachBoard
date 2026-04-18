@@ -17,7 +17,7 @@ import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/s
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, type ComponentProps } from "react";
 import { useForm, useFormState } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useLoaderData, useNavigate, useParams } from "react-router-dom";
 
 /**
  * STEP FOUR - Summary and Confirmation Component
@@ -39,6 +39,8 @@ export function StepFour({
   inputControllers = STEP_FOUR_INPUT_CONTROLLERS,
   ...props
 }: StepFourProps) {
+  const { evaluationId } = useParams();
+  const mode = useLoaderData().mode;
   const user = useAppStore((state) => state.user);
   const navigate = useNavigate();
   const { selectedClass, getAttendedModules, title, comments, evaluationDate } =
@@ -79,7 +81,10 @@ export function StepFour({
     card: STEP_FOUR_CARD_PROPS,
     ...props,
     form,
-    submitRoute: API_ENDPOINTS.POST.CREATE_EVALUATION.endpoint,
+    submitRoute:
+      mode === "create"
+        ? API_ENDPOINTS.POST.CREATE_EVALUATION.endpoint
+        : API_ENDPOINTS.PUT.UPDATE_EVALUATION.endpoint(evaluationId as string),
     submitDataReshapeFn: API_ENDPOINTS.POST.CREATE_EVALUATION.dataReshape,
   } satisfies ComponentProps<typeof ShowSummary>;
 
