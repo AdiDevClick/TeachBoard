@@ -27,6 +27,7 @@ import { UniqueSet } from "@/utils/UniqueSet";
 import { wait } from "@/utils/utils.ts";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { cleanup, render } from "vitest-browser-react";
+import { toast } from "sonner";
 
 const click = () => new MouseEvent("click");
 const baseFields: HandleSelectionCallbackParams["options"] = {
@@ -43,6 +44,7 @@ beforeEach(() => {
 afterEach(() => {
   // Restore any global fetch stubs
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe("useCommandHandler - basic behaviours", () => {
@@ -255,6 +257,131 @@ describe("useCommandHandler - basic behaviours", () => {
           type: "useFetch",
         }),
       );
+  });
+
+  test("submitCallback POST falls back to dialog apiEndpoint when submitRoute is missing", async () => {
+    const { submitCallback, openDialog, dialogOptions } =
+      await renderCommandHook(skillModuleModal);
+
+    const fetchDatas = {
+      apiEndpoint: skillApiEndpoint,
+      queryKey: skillQueryKey,
+      task: skillModuleModal,
+      dataReshapeFn: (d: unknown) => ({ items: [d] }),
+    };
+
+    openDialog(click(), skillModuleModal, fetchDatas);
+
+    await waitForQueryKey(() => dialogOptions(skillModuleModal));
+
+    stubFetchRoutes({
+      postRoutes: [[skillApiEndpoint, skillCreated]],
+    });
+
+    submitCallback(
+      { name: "fallback-post" },
+      {
+        method: API_ENDPOINTS.POST.METHOD,
+      },
+    );
+
+    const cached = await waitForCache(skillQueryKey);
+
+    expect(cached).toEqual({ items: [skillCreated] });
+  });
+
+  test("submitCallback uses custom toast options when query toasts are silenced", async () => {
+    const dismissSpy = vi.spyOn(toast, "dismiss");
+    const errorSpy = vi.spyOn(toast, "error");
+
+    const { submitCallback } = await renderCommandHook(skillModuleModal);
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 401,
+        statusText: "Unauthorized",
+        clone() {
+          return this;
+        },
+        json: async () => ({
+          status: 401,
+          error: "Unauthorized",
+        }),
+      }),
+    );
+
+    submitCallback(
+      { name: "auth-submit" },
+      {
+        method: API_ENDPOINTS.POST.METHOD,
+        endpointUrl: skillApiEndpoint,
+        silent: true,
+        toastOptions: {
+          toastId: "auth-submit-toast",
+          loadingMessage: "Connexion en cours...",
+          errorMessage: () => "Erreur de connexion personnalisée.",
+        },
+      },
+    );
+
+    await expect
+      .poll(() => errorSpy.mock.calls.length, { timeout: 1500 })
+      .toBeGreaterThan(0);
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "Erreur de connexion personnalisée.",
+      { id: "auth-submit-toast" },
+    );
+
+    await expect
+      .poll(() => dismissSpy.mock.calls.length, { timeout: 1500 })
+      .toBeGreaterThan(0);
+  });
+
+  test("submitCallback does not add command-handler error toast when silent is false", async () => {
+    const errorSpy = vi.spyOn(toast, "error");
+
+    const { submitCallback } = await renderCommandHook(skillModuleModal);
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 401,
+        statusText: "Unauthorized",
+        clone() {
+          return this;
+        },
+        json: async () => ({
+          status: 401,
+          error: "Unauthorized",
+        }),
+      }),
+    );
+
+    submitCallback(
+      { name: "default-submit" },
+      {
+        method: API_ENDPOINTS.POST.METHOD,
+        endpointUrl: skillApiEndpoint,
+      },
+    );
+
+    await expect
+      .poll(() => errorSpy.mock.calls.length, { timeout: 1500 })
+      .toBeGreaterThan(0);
+
+    const hasCommandHandlerToast = errorSpy.mock.calls.some(
+      (call) =>
+        call.length > 1 &&
+        typeof call[1] === "object" &&
+        call[1] !== null &&
+        "id" in call[1],
+    );
+
+    expect(hasCommandHandlerToast).toBe(false);
   });
 
   test("openingCallback performs a GET and caches data", async () => {
