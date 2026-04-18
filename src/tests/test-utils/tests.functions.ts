@@ -52,12 +52,12 @@ export async function waitForCache(key: readonly unknown[]) {
   while (true) {
     const cached = testQueryClient.getQueryData(key);
 
-    if (cached) return cached;
+    if (cached !== undefined) return cached;
 
     if (Date.now() - start > 1000)
       throw new Error("Timed out waiting for cache");
 
-    await wait(20);
+    await wait(200);
   }
 }
 

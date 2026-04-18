@@ -1,11 +1,11 @@
 import type { ACTIONS_LIST } from "@/components/Tables/configs/table.config";
 import type { DataTableProps } from "@/components/Tables/types/table.types";
-import type { EvaluationSchemaRow } from "@/features/evaluations/main/Evaluations";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 
 /**
  * Props for the EvaluationTable component, extending the generic DataTableProps with specific types for evaluation items.
  */
-export type EvaluationTableProps = DataTableProps<EvaluationSchemaRow>;
+export type EvaluationTableProps = DataTableProps<DetailedEvaluationView>;
 
 /**
  * Props for the EvaluationClassCell component, which is a custom cell renderer for the "className" column in the evaluation table.

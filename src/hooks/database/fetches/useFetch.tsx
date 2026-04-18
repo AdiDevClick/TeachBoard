@@ -1,16 +1,21 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { debugLogs } from "@/configs/app-components.config";
-import { USER_ACTIVITIES } from "@/configs/app.config.ts";
+import {
+  forceRedirectionIfNeeded,
+  USER_ACTIVITIES,
+} from "@/configs/app.config.ts";
 import {
   cacheFetchResult,
   createSearchParamsEndpoint,
   navigateOnForbiddenError,
+  resolveFetchCacheKey,
 } from "@/hooks/database/fetches/functions/use-fetch.functions";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
 import type { ApiError } from "@/types/AppErrorInterface";
 import type { ApiSuccess } from "@/types/AppResponseInterface";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -28,6 +33,7 @@ const defaultStateParameters: FetchParams = {
   onError: undefined,
   cachedFetchKey: undefined,
   resetParams: false,
+  enabled: true,
 };
 
 /**
@@ -92,19 +98,24 @@ export function useFetch<
         });
         successCallback?.(response);
 
-        // reuse shared caching logic
+        // Save the fetched (and potentially reshaped) data in the cache and get the reshaped result
         const cachingDatas = cacheFetchResult(
           queryClient,
           fetchParams,
-          response,
+          response as unknown as AnyObjectProps,
         );
 
-        debugLogs("[useFetch:onSuccess] endpoint:", {
+        debugLogs("useFetch:onSuccess", {
           type: "queryLogs",
-          url: fetchParams.url,
+          url: params.url,
+          newUrl: newUrl,
           responseData: response.data,
           reshapedResult: cachingDatas,
           message: "Fetch successful",
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: resolveFetchCacheKey(fetchParams),
         });
 
         setViewData(cachingDatas as TViewData);
@@ -138,22 +149,23 @@ export function useFetch<
 
         if (error?.data !== undefined) {
           const cachedData = cacheFetchResult(queryClient, fetchParams, error);
-          // we do not normally expose error data through `viewData`, but
-          // having it available can be handy for callers that treat the
-          // cached value as authoritative.
+
           setViewData(cachedData as TViewData);
 
-          debugLogs("[useFetch:onError] endpoint:", {
+          debugLogs("useFetch:onError", {
             type: "queryLogs",
-            url: fetchParams.url,
+            url: params.url,
+            newUrl,
             responseData: error.data,
             reshapedResult: cachedData,
             message: error.message,
           });
         }
 
-        // !! IMPORTANT !! Handle forbidden error by navigating to login page
-        navigateOnForbiddenError(error.status, navigate);
+        // !! IMPORTANT !! Handle forbidden error by force navigating to login page
+        if (forceRedirectionIfNeeded(contentId)) {
+          navigateOnForbiddenError(error.status, navigate, pathname);
+        }
       },
     },
   ]);

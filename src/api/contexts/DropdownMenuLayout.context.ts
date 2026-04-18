@@ -6,5 +6,6 @@ import { createContext } from "react";
  *
  * This context is designed to be used with the Compound Component pattern, allowing components like DropdownMenu, DropdownMenuTrigger, and DropdownMenuContent to access shared state and properties related to dropdown menu layouts.
  */
-export const DropdownLayoutContext =
-  createContext<DropdownMenuLayoutContextType>(null!);
+export const DropdownLayoutContext = createContext<
+  DropdownMenuLayoutContextType<any>
+>(null!);

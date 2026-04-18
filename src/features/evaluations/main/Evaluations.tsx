@@ -1,3 +1,4 @@
+import { useAppStore } from "@/api/store/AppStore";
 import { EvaluationTable } from "@/components/Tables/EvaluationTable";
 import {
   createActionsColumn,
@@ -10,12 +11,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import { useEvaluationTableStore } from "@/features/evaluations/main/configs/evaluations.configs";
+import {
+  evaluationOverviewsSchema,
+  type EvaluationOverview,
+} from "@/features/evaluations/main/models/evaluations-overviews.models";
 import type { EvaluationsMainProps } from "@/features/evaluations/main/types/evaluations.types";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
+import { zodParseFromObject } from "@/utils/utils";
 import { IconPlus } from "@tabler/icons-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useEffectEvent } from "react";
-import z from "zod";
+import { Outlet } from "react-router-dom";
+import { useShallow } from "zustand/shallow";
 
 /**
  * Columns configuration
@@ -28,56 +35,14 @@ import z from "zod";
  *
  * @see `table-columns.functions.tsx` for more details on each column definition.
  */
-const columns: ColumnDef<EvaluationSchemaRow>[] = [
-  createDragColumn((item) => item.id),
+const columns = [
+  createDragColumn((item: EvaluationOverview) => item.id),
   createSelectionColumn(),
   createClassNamesColumn(),
   createTitleColumn(),
   createEvaluationDateColumn(),
   createActionsColumn(),
-];
-
-const schema = z.object({
-  id: z.string(),
-  title: z.string(),
-  comments: z.string().optional(),
-  classId: z.string(),
-  className: z.string(),
-  evaluationDate: z.string(),
-  userId: z.string(),
-  absentStudentNames: z.array(z.string()),
-  // attendedModules: z.array(
-  //   z.object({
-  //     id: z.string(),
-  //     name: z.string(),
-  //     code: z.string(),
-  //   }),
-  // ),
-  evaluations: z.array(
-    z.object({
-      studentId: z.string(),
-      studentName: z.string(),
-      // id: z.string(),
-      isPresent: z.boolean(),
-      overallScore: z.number().min(0).max(20).nullable(),
-      assignedTaskName: z.string(),
-      // assignedTaskId: z.string(),
-      // modules: z.array(
-      //   z.object({
-      //     id: z.string(),
-      //     subSkills: z.array(
-      //       z.object({
-      //         id: z.string(),
-      //         score: z.number().min(0).max(100),
-      //       }),
-      //     ),
-      //   }),
-      // ),
-    }),
-  ),
-});
-
-export type EvaluationSchemaRow = z.infer<typeof schema>;
+] as ColumnDef<EvaluationOverview>[];
 
 /**
  * Evaluation page
@@ -89,14 +54,23 @@ export function EvaluationsMain({
   dataReshapeFn = API_ENDPOINTS.GET.EVALUATIONS.dataReshape,
   task = "evaluation-overview",
 }: EvaluationsMainProps) {
+  const { setState } = useEvaluationTableStore;
   const { openingCallback, data } = useCommandHandler({
     form: null!,
     pageId: task,
     submitDataReshapeFn: dataReshapeFn,
   });
+  const { setShouldResyncEvals } = useAppStore();
+  const shouldResyncEvals = useAppStore(
+    useShallow((state) => state.shouldResyncEvals()),
+  );
+  const isIdbHydrated = useEvaluationTableStore((state) => state.hasHydrated);
+  const isStoreEmpty = useEvaluationTableStore(
+    (state) => state.data.length === 0,
+  );
 
   /**
-   * Initial data fetch
+   * Fetch data trigger -
    */
   const fetchInit = useEffectEvent(() => {
     openingCallback(true, {
@@ -107,39 +81,42 @@ export function EvaluationsMain({
   });
 
   /**
-   * Init Store data & columns
+   * 1 - Init store columns once and fetch initial data after hydration.
    */
   useEffect(() => {
     useEvaluationTableStore.setState({
       columns,
     });
-    fetchInit();
   }, []);
 
   /**
-   * Data parsing and store initialization
+   * 2 - Fetch data -
+   *
+   * @description After hydration if the store is empty or if a resync is needed.
+   */
+  useEffect(() => {
+    if ((isIdbHydrated && isStoreEmpty) || shouldResyncEvals) {
+      fetchInit();
+    }
+  }, [isIdbHydrated, isStoreEmpty, shouldResyncEvals]);
+
+  /**
+   * 3 - After Fetch - Data parsing after fetch & store initialization
    *
    * @description When the data is fetched and updated, it is parsed using the defined Zod schema.
    *
-   * @see `schema` for the expected data structure.
+   * @see `evaluationOverviewsSchema` for the expected data structure.
    */
   useEffect(() => {
     if (data === undefined || data === null) return;
 
-    const parseResult = z.array(schema).safeParse(data);
-    if (!parseResult.success) {
-      throw new Error("EvaluationsMain: response does not match schema", {
-        cause: parseResult.error,
-      });
-    }
+    const parsedResult = zodParseFromObject(data, evaluationOverviewsSchema);
 
-    const store = useEvaluationTableStore.getState();
-    const parsedData = parseResult.data;
-
-    if (store.data.length === 0) {
-      useEvaluationTableStore.setState({ data: parsedData });
+    if (isStoreEmpty || shouldResyncEvals) {
+      setState({ data: parsedResult });
+      setShouldResyncEvals(false);
     }
-  }, [data]);
+  }, [data, isStoreEmpty, shouldResyncEvals]);
 
   return (
     <div className="flex flex-col gap-4 px-4 py-6 lg:px-6">
@@ -150,6 +127,7 @@ export function EvaluationsMain({
         </Button>
       </div>
       <EvaluationTable />
+      <Outlet />
     </div>
   );
 }

@@ -1,9 +1,7 @@
 import type { DynamicTagsItemList } from "@/components/Tags/types/tags.types";
 import type { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
-import type {
-  EvaluationRehydrationPayload,
-  NonPresentStudentsResult,
-} from "@/features/evaluations/create/store/types/steps-creation-store.types";
+import type { NonPresentStudentsResult } from "@/features/evaluations/create/store/types/steps-creation-store.types";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { parseToUuid } from "@/utils/utils";
 
 /**
@@ -17,49 +15,28 @@ import { parseToUuid } from "@/utils/utils";
  */
 export function studentPresence(
   students: NonPresentStudentsResult | null,
-  evaluation: EvaluationRehydrationPayload,
+  evaluation: DetailedEvaluationView,
 ): {
   students: DynamicTagsItemList;
 } {
+  const firstEntry = students?.entries().next().value;
   const studentsPresence = Array.from(students?.values() ?? []);
   const absenceIds = evaluation?.absencesIds ?? [];
-
-  if (absenceIds.length === 0) {
+  const isHydratationNotYetInitialized =
+    firstEntry?.[1]?.isPresent !== undefined;
+  if (
+    absenceIds.length === 0 ||
+    studentsPresence.length === 0 ||
+    isHydratationNotYetInitialized
+  ) {
     return {
-      students: [["Aucun", { id: "none" }] as const],
+      students: [["Aucun", { id: "none" }]],
     };
   }
 
   return {
     students: studentsPresence,
   };
-}
-
-/**
- * Selects and formats class metadata for display and store hydration.
- *
- * @param classData - The raw class data to extract metadata from.
- *
- * @returns An object containing the selected class ID and details, or null if the data is invalid.
- */
-export function selectClassMetas(classData: unknown) {
-  try {
-    const serializedClassData = JSON.stringify(classData);
-    const parsedClass = JSON.parse(serializedClassData);
-
-    const selectedClass = parsedClass[0]?.items;
-
-    if (!selectedClass?.id) {
-      throw new Error("Selected class data does not contain an id");
-    }
-
-    return {
-      id: selectedClass.id,
-      selectedClass,
-    };
-  } catch {
-    return null;
-  }
 }
 
 /**

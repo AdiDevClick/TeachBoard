@@ -26,6 +26,15 @@ export type AnimationsOptions = {
 };
 
 /**
+ * Prettify a type by flattening its structure, improving readability in IDEs and error messages.
+ *
+ * This is especially useful for complex intersection types or mapped types where the resulting type can be difficult to read.
+ */
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
+/**
  * Union of common event types where we want to call preventDefault/stopPropagation safely.
  */
 export type PreventDefaultAndStopPropagation =

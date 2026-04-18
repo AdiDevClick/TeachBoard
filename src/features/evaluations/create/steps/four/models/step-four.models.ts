@@ -79,22 +79,20 @@ const stepFourSchema = (data: typeof fieldData) =>
       .optional()
       .meta({ description: "General comments for the evaluation" }),
     absence: z
-      .array(z.uuid(data.UUIDValidMessage))
+      .array(z.union([z.uuid(data.UUIDValidMessage), z.literal("none")]))
       .nonempty(data.absenceInvalidMessage)
-      .refine((value) => value[0] !== "none", data.absenceInvalidMessage)
+      .refine((value) => {
+        if (!value.includes("none")) return true;
+
+        return value.length === 1 && value[0] === "none";
+      }, data.absenceInvalidMessage)
       .meta({ description: "List of absent students during the evaluation" }),
     overallScore: z
       .record(
         z.string(data.scoreAverageInvalidTypeMessage),
         z.preprocess(
           (val) => {
-            if (typeof val === "string") {
-              const trimmed = val.trim();
-              if (trimmed === "") return 0;
-              const n = Number(trimmed);
-              return Number.isNaN(n) ? val : n;
-            }
-            return val;
+            return checkIfNumberIsString(val);
           },
           z
             .number()
@@ -138,18 +136,12 @@ const stepFourSchema = (data: typeof fieldData) =>
           isPresent: z.boolean(),
           overallScore: z.preprocess(
             (val) => {
-              if (typeof val === "string") {
-                const trimmed = val.trim();
-                if (trimmed === "") return undefined;
-                const n = Number(trimmed);
-                return Number.isNaN(n) ? val : n;
-              }
-              return val;
+              return checkIfNumberIsString(val);
             },
             z
               .number()
               .min(0, data.scoreAverageInvalidMinMessage)
-              .max(20, data.scoreAverageInvalidMaxMessage)
+              .max(100, data.scoreAverageInvalidMaxMessage)
               .meta({ description: "Overall score for the student" }),
           ),
           assignedTask: z
@@ -204,3 +196,13 @@ export type StepFourFormSchema = z.input<typeof stepFourInputSchema>;
 export type StepFourInputItem = FetchingInputItem<StepFourFormSchema>;
 
 export const stepFourInputSchema = stepFourSchema(fieldData);
+
+function checkIfNumberIsString(val: unknown) {
+  if (typeof val === "string") {
+    const trimmed = String(val).trim();
+    if (trimmed === "") return 0;
+    const n = Number(trimmed);
+    return Number.isNaN(n) ? val : n;
+  }
+  return val;
+}

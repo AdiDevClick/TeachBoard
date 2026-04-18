@@ -23,6 +23,7 @@ export function SubSkillWithStudents(props: SubSkillWithStudentsProps) {
     debugLogs("SubSkillWithStudents", { type: "propsValidation", props });
     return null;
   }
+
   const {
     storeGetter,
     module,
@@ -32,9 +33,9 @@ export function SubSkillWithStudents(props: SubSkillWithStudentsProps) {
     color2 = "bg-green-50",
     ...subSkill
   } = props;
-  const { isCompleted, isDisabled } = subSkill;
+  const { isDisabled } = subSkill;
 
-  const shouldDisplaySubSkill = isCompleted && !isDisabled;
+  const shouldDisplaySubSkill = isDisabled !== true;
 
   if (!shouldDisplaySubSkill) {
     return null;

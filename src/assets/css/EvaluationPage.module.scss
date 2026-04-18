@@ -29,7 +29,6 @@
     --incoming-offset: 20rem;
     --outgoing-offset: -20rem;
     --left-number-offset: -3rem;
-    --gap-spacing: calc(var(--spacing) * 6);
 
     min-height: 100%;
     max-height: calc(100vh - var(--content-offset, 134px));
@@ -73,11 +72,10 @@
       .content {
         // overflow-y: auto;
         overflow-x: hidden;
-        scrollbar-gutter: stable;
         position: relative;
         display: grid;
         grid-template-columns: 1.5fr 0fr 3fr;
-        gap: var(--gap-spacing);
+        gap: var(--app-overall-gap);
         width: 100%;
         align-items: center;
         padding: 0;
@@ -94,7 +92,7 @@
           display: grid;
           align-items: center;
           place-self: center;
-          gap: var(--gap-spacing);
+          gap: var(--app-overall-gap);
           width: calc(100% - 20%);
 
           &--number {
@@ -113,7 +111,7 @@
 
             grid-row: 2;
             transition: var(--transform-transition);
-            margin-bottom: var(--gap-spacing);
+            margin-bottom: var(--app-overall-gap);
             font-weight: bold;
 
             @starting-style {
@@ -212,12 +210,12 @@
 
             display: grid;
             place-self: center;
-            gap: calc(var(--spacing) * 3);
+            gap: var(--app-overall-gap);
             width: 100%;
 
             & .right__content {
               display: grid;
-              gap: calc(var(--spacing) * 6);
+              gap: var(--app-overall-gap);
             }
           }
 

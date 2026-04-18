@@ -1,9 +1,11 @@
-import type { UUID } from "@/api/types/openapi/common.types.ts";
+import type { OffsetDateTime, UUID } from "@/api/types/openapi/common.types.ts";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
 import type {
   SkillsType,
   SkillsViewDto,
 } from "@/api/types/routes/skills.types.ts";
+import type { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import type { UniqueSet } from "@/utils/UniqueSet.ts";
 
 export type StudentEvaluationSubSkillType = { score: number } & SkillsType;
@@ -18,7 +20,10 @@ export type StudentEvaluationModuleType = {
 export type StudentWithPresence = {
   id: UUID;
   fullName: string;
+  /** Potential overall score for the student modified by the user */
   overallScore?: number | null;
+  /** Original score for the student not modified by the user */
+  originalScore?: number | null;
   isPresent: boolean;
   assignedTask?: Pick<ClassTasks, "id" | "name"> | null;
   evaluations?: {
@@ -116,6 +121,9 @@ export interface StepsCreationState {
   diplomaName?: string | null;
   className?: string | null;
   id?: UUID | null;
+  /**
+   * Optional description for the evaluation, can be set during the creation process or retrieved from an existing evaluation when rehydrating the store state.
+   */
   description?: string | null;
   students: UniqueSet<UUID, StudentWithPresence>;
   allPresent: boolean;
@@ -126,94 +134,44 @@ export interface StepsCreationState {
   subSkillSelection: SubskillSelectionType;
   /** Cached result for non-present students to preserve referential equality (key = studentId, value = student details) */
   nonPresentStudentsResult: NonPresentStudentsResult | null;
+  /** Optional title for the evaluation, can be set during the creation process or retrieved from an existing evaluation when rehydrating the store state. */
+  title?: string;
+  /**
+   * Optional comments for the evaluation, can be set during the creation process or retrieved from an existing evaluation when rehydrating the store state.
+   */
+  comments?: string;
+  /**
+   * Optional evaluation date, retrieved from an existing evaluation when rehydrating the store state.
+   */
+  evaluationDate?: string;
 }
 
 export type SelectedClassModulesReturn = ClassModules[];
+type StoreActions = Pick<
+  ReturnType<typeof useEvaluationStepsCreationStore.getState>,
+  | "setStudentTaskAssignment"
+  | "setStudentPresence"
+  | "setStudentOverallScore"
+  | "getSelectedModule"
+  | "setEvaluationForStudent"
+  | "setSubSkillHasCompleted"
+>;
 
-/**
- * Sub-skill payload used to rehydrate store state from an evaluation details response.
- */
-export type EvaluationRehydrationSubSkillPayload = Readonly<{
-  id: string;
-  score: number;
-}>;
+export type HydrateStudentFromEvaluationPayloadArgs = Readonly<
+  {
+    studentEvaluation: DetailedEvaluationView["evaluations"][number];
+    absentIds: Set<string>;
+  } & StoreActions
+>;
 
-/**
- * Module payload used to rehydrate store state from an evaluation details response.
- */
-export type EvaluationRehydrationModulePayload = Readonly<{
-  id: string;
-  subSkills?: ReadonlyArray<EvaluationRehydrationSubSkillPayload>;
-}>;
-
-/**
- * Student payload used to rehydrate store state from an evaluation details response.
- */
-export type EvaluationRehydrationStudentPayload = Readonly<{
-  studentId: string;
-  studentName?: string;
-  isPresent?: boolean;
-  overallScore?: number | null;
-  assignedTaskId?: string | null;
-  assignedTaskName?: string | null;
-  modules?: ReadonlyArray<EvaluationRehydrationModulePayload>;
-}>;
-
-/**
- * Evaluation details payload used by the store rehydration action.
- */
-export type EvaluationRehydrationPayload = Readonly<{
-  id: string;
-  title: string;
-  classId: string;
-  className?: string;
-  evaluationDate: string;
-  userId: string;
-  comments?: string | null;
-  absencesIds?: ReadonlyArray<string>;
-  absence?: ReadonlyArray<string>;
-  absentStudentNames?: ReadonlyArray<string>;
-  attendedModules?: ReadonlyArray<{
-    id: string;
-    name: string;
-    code: string;
-  }>;
-  evaluations?: ReadonlyArray<EvaluationRehydrationStudentPayload>;
-}>;
-
-export type HydrateStudentFromEvaluationPayloadArgs = Readonly<{
-  studentEvaluation: EvaluationRehydrationStudentPayload;
-  absentIds: Set<UUID>;
-  hasTask: (taskId: UUID) => boolean;
-  setStudentTaskAssignment: (taskId: UUID, studentId: UUID) => void;
-  setStudentPresence: (studentId: UUID, isPresent: boolean) => void;
-  setStudentOverallScore: (
-    studentId: UUID,
-    overallScore: number | null,
-  ) => void;
-  getSelectedModule: (moduleId?: UUID) => ClassModules | null;
-  setEvaluationForStudent: (
-    studentId: UUID,
-    evaluation: EvaluationType,
-  ) => void;
-  setSubSkillHasCompleted: (
-    moduleId: UUID,
-    subSkillId: UUID,
-    completed: boolean,
-  ) => void;
-}>;
-
-export type HydrateModulesForStudentArgs = Readonly<{
-  parsedStudentId: UUID;
-  modulesEvaluation: ReadonlyArray<EvaluationRehydrationModulePayload>;
-  getSelectedModule: (moduleId?: UUID) => ClassModules | null;
-  setEvaluationForStudent: (
-    studentId: UUID,
-    evaluation: EvaluationType,
-  ) => void;
-  setSubSkillHasCompleted: (
-    moduleId: UUID,
-    subSkillId: UUID,
-    completed: boolean,
-  ) => void;
-}>;
+export type HydrateModulesForStudentArgs = Readonly<
+  {
+    studentId: UUID;
+    modulesEvaluation: ReadonlyArray<
+      DetailedEvaluationView["evaluations"][number]["modules"][number]
+    >;
+  } & Pick<
+    StoreActions,
+    "getSelectedModule" | "setEvaluationForStudent" | "setSubSkillHasCompleted"
+  >
+>;

@@ -1,63 +1,66 @@
-import { DynamicTags } from "@/components/Tags/DynamicTags";
-import { LabelledTextArea } from "@/components/TextAreas/LabelledTextArea";
+import withTitledCard from "@/components/HOCs/withTitledCard";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
-import { LabelledAccordion } from "@/features/evaluations/create/components/Accordion/LabelledAccordion";
-import { AverageFields } from "@/features/evaluations/create/components/Score/AverageFields";
 import { STEP_FOUR_INPUT_CONTROLLERS } from "@/features/evaluations/create/steps/four/config/step-four.configs";
-import { useEvaluationsView } from "@/features/evaluations/main/hooks/useEvaluationsView";
+import { EvaluationsViewController } from "@/features/evaluations/main/controllers/EvaluationsViewController";
+import { useEvaluationsViewFetch } from "@/features/evaluations/main/hooks/useEvaluationsViewFetch";
 import type { EvaluationsViewProps } from "@/features/evaluations/main/types/evaluations.types";
+import { usePageTitle } from "@/hooks/usePageTitle";
+import { cn } from "@/utils/utils";
+import { type ComponentProps } from "react";
+const { endpoints, dataReshape } = API_ENDPOINTS.GET.EVALUATIONS;
 
 /**
  * EvaluationsView component that displays the details of an evaluation, including modules, student scores, and comments.
- *
- * @param apiEndpoint - Optional function to generate the API endpoint for fetching evaluation data by ID.
- * @param dataReshapeFn - Optional function to reshape the fetched evaluation data.
- * @param pageId - Optional ID for the page.
- * @param controllers - Optional input controllers for the step four inputs.
  */
 export function EvaluationsView({
-  apiEndpoint = API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID,
-  dataReshapeFn = API_ENDPOINTS.GET.EVALUATIONS.dataReshape,
-  pageId = "evaluation-overview",
-  controllers = STEP_FOUR_INPUT_CONTROLLERS,
+  evalEndpoint = endpoints.BY_ID,
+  evalDataReshapeFn = dataReshape,
+  pageId = "evaluation-summary",
+  inputControllers = STEP_FOUR_INPUT_CONTROLLERS,
+  modalMode = false,
+  className = "grid gap-6",
 }: EvaluationsViewProps) {
-  const {
-    evaluationData,
-    modules,
-    getPresentStudentsWithAssignedTasks,
-    studentsAverageScores,
-    scoreValue,
-    presenceMemo,
-  } = useEvaluationsView({
-    pageId,
-    apiEndpoint,
-    dataReshapeFn,
+  // Fetch Evaluation datas
+  const { evaluationData } = useEvaluationsViewFetch({
+    task: pageId,
+    endpoint: evalEndpoint,
+    reshapeFn: evalDataReshapeFn,
   });
+
+  usePageTitle(evaluationData?.title);
+
+  const cardProps = {
+    pageId,
+    evalEndpoint,
+    evalDataReshapeFn,
+    inputControllers,
+    modalMode,
+    evaluationData,
+    className,
+    card: {
+      card: {
+        className: cn(
+          className,
+          "w-full max-w-[850px] mx-auto border-none bg-transparent shadow-none",
+        ),
+      },
+      title: {
+        title: "",
+        description: "Details de l'évaluation",
+        separator: { displaySeparator: true },
+      },
+      content: {
+        className,
+      },
+    },
+  } satisfies ComponentProps<typeof Card>;
+
   return (
-    <div>
-      <h1>{evaluationData?.title}</h1>
-      <LabelledAccordion
-        inputController={controllers.modules}
-        accordionItems={modules}
-        storeGetter={getPresentStudentsWithAssignedTasks}
-        valueGetter={scoreValue}
-      />
-      <AverageFields
-        form={null!}
-        students={studentsAverageScores}
-        {...controllers.scoresAverage}
-        viewMode={true}
-      />
-      <DynamicTags
-        {...controllers.absence}
-        itemList={presenceMemo.students}
-        displayCRUD={false}
-      />
-      <LabelledTextArea
-        {...controllers.comments}
-        defaultValue={evaluationData?.comments ?? ""}
-        readOnly
-      />
-    </div>
+    <Card {...cardProps}>
+      <Card.Title />
+      <Card.Content />
+    </Card>
   );
 }
+
+const Card = withTitledCard(EvaluationsViewController);

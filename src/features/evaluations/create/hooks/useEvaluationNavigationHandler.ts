@@ -1,4 +1,8 @@
 import { debugLogs } from "@/configs/app-components.config";
+import {
+  computeUriSegment,
+  retrieveCurrentTabValue,
+} from "@/features/evaluations/create/functions/eval-create-functions";
 import type { TabEvalState } from "@/features/evaluations/create/hooks/types/use-tab-content-handler.types";
 import type { CreateEvaluationsLoaderData } from "@/routes/types/routes-config.types";
 import { useEffect, useEffectEvent, useMemo, useState } from "react";
@@ -6,8 +10,6 @@ import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
 
 /**
  * Custom hook to manage the navigation logic for the Create Evaluations page.
- *
- * @returns
  */
 export function useEvaluationNavigationHandler() {
   const [tabEvalState, setTabEvalState] = useState<TabEvalState>({
@@ -16,10 +18,10 @@ export function useEvaluationNavigationHandler() {
   });
 
   const { pageDatas } = useLoaderData<CreateEvaluationsLoaderData>();
-  const tabItems = Object.values(pageDatas ?? {});
-
   const navigate = useNavigate();
   const location = useLocation();
+
+  const tabItems = Object.values(pageDatas ?? {});
 
   /**
    * Grab values names only so they match the url segments for navigation and redirection purposes
@@ -28,6 +30,15 @@ export function useEvaluationNavigationHandler() {
     () => tabItems.map((item) => item.name),
     [tabItems],
   );
+
+  const currentPathSegment = computeUriSegment(location);
+
+  /**
+   * Defaults to the first tab if no match is found
+   */
+  const tabValue =
+    retrieveCurrentTabValue(tabValues, currentPathSegment) ??
+    pageDatas?.step1.name;
 
   /**
    * Triggers the navigation
@@ -43,20 +54,6 @@ export function useEvaluationNavigationHandler() {
     });
     navigate(nextTabValue?.toLocaleLowerCase() ?? "");
   };
-
-  const pathSegments = location.pathname.split("/").filter(Boolean);
-  const currentPathSegment = decodeURIComponent(pathSegments.at(-1) ?? "");
-
-  /**
-   * Retrieve the current tab value -
-   *
-   * @description Defaults to the first tab if no match is found with the current URL segment.
-   */
-  const tabValue =
-    tabValues.find(
-      (value) =>
-        value.toLocaleLowerCase() === currentPathSegment.toLocaleLowerCase(),
-    ) ?? pageDatas?.step1.name;
 
   /**
    * INIT - CHECKER

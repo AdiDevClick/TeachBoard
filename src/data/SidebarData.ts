@@ -15,6 +15,7 @@ import {
   IconMail,
   IconMoon,
   IconNotification,
+  IconPencil,
   IconReport,
   IconSearch,
   IconSettings,
@@ -93,6 +94,7 @@ export const sidebarDatas = {
           enabled: true,
           icon: IconMail,
         },
+        isActive: false,
       },
       {
         title: "Mon Calendrier",
@@ -159,6 +161,15 @@ export const sidebarDatas = {
         //   url: "#",
         //   icon: IconUsers,
         //   isActive: false,
+      },
+
+      {
+        title: "Editer une évaluation",
+        tooltip: "Récupérer et modifier une évaluation existante",
+        url: "evaluations/edit/:evaluationId",
+        icon: IconPencil,
+        isActive: false,
+        isActivated: false,
       },
     ],
   },

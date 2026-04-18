@@ -16,7 +16,7 @@
     inset: 0;
 
     &--separator {
-      margin-inline: var(--app-overall-gap);
+      margin-inline: var(--app-overall-very-small-gap);
 
       &[data-orientation="vertical"] {
         height: calc(var(--spacing) * 4);
@@ -28,11 +28,11 @@
     display: flex;
     width: 100%;
     align-items: center;
-    gap: var(--app-overall-gap);
-    padding-inline: calc(var(--spacing) * 3);
+    gap: var(--app-overall-very-small-gap);
+    padding-inline: var(--app-overall-very-small-gap);
 
     @include for-size(desktop) {
-      padding-inline: calc(var(--spacing) * 6);
+      padding-inline: var(--app-overall-gap);
     }
   }
 

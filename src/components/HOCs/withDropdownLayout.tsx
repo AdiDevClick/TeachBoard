@@ -29,7 +29,7 @@ export function withDropdownLayout<C extends object>(
 
     return (
       <DropdownLayoutProvider value={contextValue}>
-        <DropdownMenu {...menu}>{children}</DropdownMenu>
+        <DropdownMenu {...rest}>{children}</DropdownMenu>
       </DropdownLayoutProvider>
     );
   };

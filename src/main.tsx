@@ -1,22 +1,18 @@
 import { DialogProvider } from "@/api/providers/DialogProvider.tsx";
 import { SidebarDataProvider } from "@/api/providers/SidebarDataProvider.tsx";
-import { useAppStore } from "@/api/store/AppStore";
 import App from "@/App.tsx";
 import { PageHeader } from "@/components/Header/PageHeader";
+import { PageTitle } from "@/components/Header/PageTitle";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { Toaster } from "@/components/ui/sonner";
-import {
-  DEV_MODE,
-  doesContainNoSessionPage,
-  NO_SESSION_CHECK_LOGS,
-} from "@/configs/app.config.ts";
+import { debugLogs } from "@/configs/app-components.config";
 import { COMPLETE_SIDEBAR_DATAS } from "@/configs/main.configs";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
 import { AppModals } from "@/pages/AllModals/AppModals.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
-import { ROUTES_CHILDREN } from "@/routes/routes.config";
+import { ROUTES_CHILDREN } from "@/routes/routes";
 import type { RootProps } from "@/types/MainTypes";
 import "@css/MainContainer.scss";
 import "@css/Toaster.scss";
@@ -78,15 +74,10 @@ createRoot(document.getElementById("root")!).render(
 export function Root({ contentType }: Readonly<RootProps>) {
   const errorContent = contentType === "error";
 
-  const lastUserActivity = useAppStore((state) => state.lastUserActivity);
-  const sessionSynced = useAppStore((state) => state.sessionSynced);
   const { openDialog } = useDialog();
-  const location = useLocation();
-  const { data, isLoading, onSubmit, isLoaded, error } = useSessionChecker();
 
-  const triggerSessionCheck = useEffectEvent(() => {
-    onSubmit();
-  });
+  const location = decodeURI(useLocation().pathname);
+  const { data, isLoading, error } = useSessionChecker();
 
   /**
    * Show login modal to user when no active session is found
@@ -98,74 +89,48 @@ export function Root({ contentType }: Readonly<RootProps>) {
    * @important Please, use the useSessionChecker hook in your critical components and ensure a check before fetching as the server will immediately return an error uppon invalid session, which will force trigger a redirection to the login page.
    */
   const showLoginModalToUser = useEffectEvent(() => {
-    if (location.pathname === "/login") return;
+    if (location === "/login") return;
 
-    if (DEV_MODE) {
-      console.debug(
-        "No active session found. A dialog has been opened for login.",
-      );
-    }
+    debugLogs("Root:showLoginModalToUser", {
+      type: "all",
+      location,
+      message: "No active session found. A dialog has been opened for login.",
+    });
+
     openDialog(null, "login");
   });
 
   /**
-   * Automatically check session on app load unless the last user activity was a logout
+   * Show login modal on error
+   *
+   * @description This will log errors or success
    */
   useEffect(() => {
-    const path = location.pathname;
+    let message = "";
 
-    const lastEntry = lastUserActivity.entries().next().value;
-
-    const isPublicPage = doesContainNoSessionPage(path);
-    const lastActivityWasLogout = lastEntry?.[0] === "logout";
-    const lastActivityWasForbidden = lastEntry?.[1]?.status === 403;
-
-    switch (true) {
-      case lastActivityWasForbidden && isPublicPage:
-      case lastActivityWasLogout && isPublicPage:
-      case isPublicPage:
-        if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
-          console.debug(
-            "Current page is public. No session check needed.",
-            path,
-          );
-        }
-        break;
-      case sessionSynced:
-        if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
-          console.debug(
-            "Session is already synced. No session check needed.",
-            path,
-          );
-        }
-        break;
-      default:
-        if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
-          console.debug("Checking session on app load...", path);
-        }
-        triggerSessionCheck();
-    }
-  }, [isLoaded, lastUserActivity, sessionSynced, location.pathname]);
-
-  useEffect(() => {
     if (isLoading) {
-      if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
-        console.debug("Session Check Loading...");
-      }
+      message = "Session check is loading...";
     }
 
     if (data) {
-      if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
-        console.debug("Session Check Data:", data);
-      }
+      message = "Session check completed successfully. User is authenticated.";
     }
 
     if (error && !isLoading) {
       showLoginModalToUser();
+      message =
+        "Session check failed. No active session found. Showing login modal.";
+    }
 
-      if (DEV_MODE && !NO_SESSION_CHECK_LOGS) {
-        console.error("Session Check Error:", error);
-      }
+    if (message !== "") {
+      debugLogs("Root:SessionCheck", {
+        type: "sessionCheck",
+        location,
+        message: message,
+        data,
+        error,
+        isLoading,
+      });
     }
   }, [data, error, isLoading]);
 
@@ -182,8 +147,9 @@ export function Root({ contentType }: Readonly<RootProps>) {
     >
       <SidebarDataProvider value={COMPLETE_SIDEBAR_DATAS}>
         <AppSidebar variant="inset" />
-        <SidebarInset className="main-app-container">
+        <PageView className="main-app-container">
           <PageHeader />
+          <PageTitle />
           <App>
             {errorContent ? (
               <PageError />
@@ -191,9 +157,11 @@ export function Root({ contentType }: Readonly<RootProps>) {
               <Outlet context={COMPLETE_SIDEBAR_DATAS} />
             )}
           </App>
-        </SidebarInset>
+        </PageView>
       </SidebarDataProvider>
       <AppModals />
     </SidebarProvider>
   );
 }
+
+const PageView = SidebarInset;

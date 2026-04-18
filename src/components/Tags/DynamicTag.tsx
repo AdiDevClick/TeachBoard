@@ -16,53 +16,54 @@ import { ItemActions } from "@/components/ui/item";
 export function DynamicTag(props: DynamicTagProps) {
   const {
     onRemove,
-    value,
+    value = "Dynamic-Tag(untitled)",
     itemDetails,
     displayCRUD = true,
     onExitComplete,
     ...rest
   } = props;
-  const valueStr = value ?? "Dynamic-Tag(untitled)";
-  const itemId = itemDetails?.id;
+
+  const id = itemDetails?.id;
+  const isExiting = itemDetails?.isExiting ?? false;
 
   /**
    * Handle animation end to notify parent that exit animation is complete
    */
   const handleAnimationEnd = () => {
-    if (itemDetails?.isExiting) {
-      onExitComplete?.(valueStr);
+    if (isExiting) {
+      onExitComplete?.(value);
     }
   };
 
   return (
     <ItemActions
-      className={itemDetails?.isExiting ? "closed" : "opened"}
+      className={isExiting ? "closed" : "opened"}
       onAnimationEnd={handleAnimationEnd}
-      id={itemId}
-      data-role-id={valueStr}
+      id={id}
+      data-role-id={value}
       ref={(el) => {
         rest.setRef?.(el, {
           type: "tag",
-          name: itemId,
-          id: itemId,
+          name: id,
+          id: id,
         });
       }}
     >
       {displayCRUD && (
         <ButtonWithPopoverCRUD
-          id={valueStr}
+          id={value}
           size="sm"
           variant="outline"
           onRemove={onRemove}
-          value={valueStr}
+          value={value}
           itemDetails={itemDetails}
         >
-          {valueStr}
+          {value}
         </ButtonWithPopoverCRUD>
       )}
       {!displayCRUD && (
         <Button type="button" size="sm" variant="outline">
-          {valueStr}
+          {value}
         </Button>
       )}
     </ItemActions>

@@ -1,4 +1,5 @@
 import { useAppStore } from "@/api/store/AppStore.ts";
+import { useStepsTitleHandler } from "@/features/evaluations/create/hooks/useStepsTitleHandler";
 import { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState.ts";
 import {
   ShowModuleSelection,
@@ -42,6 +43,8 @@ export function StepThree({
   inputControllers = attendanceRecordCreationBaseControllers,
   ...props
 }: Readonly<PageWithControllers<AttendanceRecordCreationInputItem>>) {
+  useStepsTitleHandler();
+
   const {
     selectedClass,
     tasks,

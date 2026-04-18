@@ -1,219 +1,341 @@
-export const firsteval = {
-  success: "Evaluation retrieved successfully",
-  data: {
-    id: "1f110210-2a47-6315-b529-4bb63878560d",
-    title: "Evaluation du 22 février 2026 (1)",
-    comments: "dqsdqs",
-    classId: "1f1022ee-3d9b-6efc-b662-d77014b42f3f",
-    className: "bucheron - test",
-    evaluationDate: "2026-02-22T19:02:12.708Z",
-    userId: "1f0de94e-a442-6895-bb6a-6baf81233df8",
-    absencesIds: [
-      "1f0de94c-920c-67ab-a03b-131f02028328",
-      "1f0de94c-c689-6fb0-a03b-131f02028328",
-      "1f0de94c-cbba-61b1-a03b-131f02028328",
-      "1f0de94c-412d-6579-a03b-131f02028328",
-      "1f0de94c-9763-6aaf-a03b-131f02028328",
-    ],
-    attendedModules: [
-      {
-        id: "1f0f2e76-9398-6efc-a64a-2b3a294c2134",
-        name: "abattage et choix darbre",
-        code: "ABT",
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
+
+export const firsteval: DetailedEvaluationView = {
+  id: "1f110210-2a47-6315-b529-4bb63878560d",
+  title: "Evaluation du 22 février 2026 (1)",
+  comments: "dqsdqs",
+  classId: "1f1022ee-3d9b-6efc-b662-d77014b42f3f",
+  className: "bucheron - test",
+  evaluationDate: "2026-02-22T19:02:12.708Z",
+  userId: "1f0de94e-a442-6895-bb6a-6baf81233df8",
+  absentStudents: [
+    {
+      id: "1f0de94c-920c-67ab-a03b-131f02028328",
+      name: "Trov Roa",
+    },
+    {
+      id: "1f0de94c-c689-6fb0-a03b-131f02028328",
+      name: "Jean Trops",
+    },
+    {
+      id: "1f0de94c-cbba-61b1-a03b-131f02028328",
+      name: "José Sciq",
+    },
+    {
+      id: "1f0de94c-412d-6579-a03b-131f02028328",
+      name: "Eloise Cartoon",
+    },
+    {
+      id: "1f0de94c-9763-6aaf-a03b-131f02028328",
+      name: "Richard Triz",
+    },
+  ],
+  attendedModules: [
+    {
+      id: "1f0f2e76-9398-6efc-a64a-2b3a294c2134",
+      name: "abattage et choix darbre",
+      code: "ABT",
+      subSkills: [
+        {
+          id: "1f0f2e6b-ef99-62e6-a64a-2b3a294c2134",
+          name: "technique dabattage directionnel",
+          code: "TEC",
+          isDisabled: false,
+        },
+        {
+          id: "1f0f2e6b-80d1-6ce5-a64a-2b3a294c2134",
+          name: "sélection des essences",
+          code: "ESS",
+          isDisabled: false,
+        },
+        {
+          id: "1f0f2e6b-0a90-65e4-a64a-2b3a294c2134",
+          name: "évaluation des risques",
+          code: "EVR",
+          isDisabled: false,
+        },
+      ],
+    },
+    {
+      id: "1f0f2e79-9f52-64ff-a64a-2b3a294c2134",
+      name: "sécurité et secourisme",
+      code: "SFT",
+      subSkills: [
+        {
+          id: "1f0f2e6f-4fdb-62ed-a64a-2b3a294c2134",
+          name: "équipements de protection",
+          code: "EPI",
+          isDisabled: false,
+        },
+      ],
+    },
+  ],
+  evaluations: [
+    {
+      id: "1f0de94c-8785-62a3-a03b-131f02028328",
+      name: "Raz Fitz",
+      isPresent: true,
+      overallScore: 13,
+      assignedTask: {
+        id: "1f0f2f15-14af-650c-a64a-2b3a294c2134",
+        name: "Opérations dabattage et préparation des grumes",
       },
-      {
-        id: "1f0f2e79-9f52-64ff-a64a-2b3a294c2134",
-        name: "sécurité et secourisme",
-        code: "SFT",
+      modules: [
+        {
+          id: "1f0f2e79-9f52-64ff-a64a-2b3a294c2134",
+          subSkills: [
+            {
+              id: "1f0f2e6f-4fdb-62ed-a64a-2b3a294c2134",
+              score: 50,
+            },
+          ],
+        },
+        {
+          id: "1f0f2e76-9398-6efc-a64a-2b3a294c2134",
+          subSkills: [
+            {
+              id: "1f0f2e6b-ef99-62e6-a64a-2b3a294c2134",
+              score: 75,
+            },
+            {
+              id: "1f0f2e6b-80d1-6ce5-a64a-2b3a294c2134",
+              score: 75,
+            },
+            {
+              id: "1f0f2e6b-0a90-65e4-a64a-2b3a294c2134",
+              score: 50,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "1f0de94c-8d03-66a7-a03b-131f02028328",
+      name: "Goul Anemo",
+      isPresent: true,
+      overallScore: 15,
+      assignedTask: {
+        id: "1f0f2f15-14af-650c-a64a-2b3a294c2134",
+        name: "Opérations dabattage et préparation des grumes",
       },
-    ],
-    evaluations: [
-      {
-        modules: [
-          {
-            id: "1f0f2e79-9f52-64ff-a64a-2b3a294c2134",
-            subSkills: [
-              {
-                id: "1f0f2e6f-4fdb-62ed-a64a-2b3a294c2134",
-                score: 50,
-              },
-            ],
-          },
-          {
-            id: "1f0f2e76-9398-6efc-a64a-2b3a294c2134",
-            subSkills: [
-              {
-                id: "1f0f2e6b-ef99-62e6-a64a-2b3a294c2134",
-                score: 75,
-              },
-              {
-                id: "1f0f2e6b-80d1-6ce5-a64a-2b3a294c2134",
-                score: 75,
-              },
-              {
-                id: "1f0f2e6b-0a90-65e4-a64a-2b3a294c2134",
-                score: 50,
-              },
-            ],
-          },
-        ],
-        studentId: "1f0de94c-8785-62a3-a03b-131f02028328",
-        isPresent: true,
-        overallScore: 13,
-        assignedTaskId: "1f0f2f15-14af-650c-a64a-2b3a294c2134",
-      },
-      {
-        modules: [
-          {
-            id: "1f0f2e79-9f52-64ff-a64a-2b3a294c2134",
-            subSkills: [
-              {
-                id: "1f0f2e6f-4fdb-62ed-a64a-2b3a294c2134",
-                score: 75,
-              },
-            ],
-          },
-          {
-            id: "1f0f2e76-9398-6efc-a64a-2b3a294c2134",
-            subSkills: [
-              {
-                id: "1f0f2e6b-ef99-62e6-a64a-2b3a294c2134",
-                score: 75,
-              },
-              {
-                id: "1f0f2e6b-80d1-6ce5-a64a-2b3a294c2134",
-                score: 75,
-              },
-              {
-                id: "1f0f2e6b-0a90-65e4-a64a-2b3a294c2134",
-                score: 75,
-              },
-            ],
-          },
-        ],
-        studentId: "1f0de94c-8d03-66a7-a03b-131f02028328",
-        isPresent: true,
-        overallScore: 15,
-        assignedTaskId: "1f0f2f15-14af-650c-a64a-2b3a294c2134",
-      },
-    ],
-    createdAt: "2026-02-22T19:02:18.932205Z",
-  },
-  status: "200",
+      modules: [
+        {
+          id: "1f0f2e79-9f52-64ff-a64a-2b3a294c2134",
+          subSkills: [
+            {
+              id: "1f0f2e6f-4fdb-62ed-a64a-2b3a294c2134",
+              score: 75,
+            },
+          ],
+        },
+        {
+          id: "1f0f2e76-9398-6efc-a64a-2b3a294c2134",
+          subSkills: [
+            {
+              id: "1f0f2e6b-ef99-62e6-a64a-2b3a294c2134",
+              score: 75,
+            },
+            {
+              id: "1f0f2e6b-80d1-6ce5-a64a-2b3a294c2134",
+              score: 75,
+            },
+            {
+              id: "1f0f2e6b-0a90-65e4-a64a-2b3a294c2134",
+              score: 75,
+            },
+          ],
+        },
+      ],
+    },
+  ],
 };
 
-export const secondeval = {
-  success: "Evaluation retrieved successfully",
-  data: {
-    id: "1f119889-fa58-627a-94c1-03cd09b771c2",
-    title: "Evaluation du 6 mars 2026 (6)",
-    comments: "test",
-    classId: "1f1022ee-3d9b-6efc-b662-d77014b42f3f",
-    className: "bucheron - test",
-    evaluationDate: "2026-03-06T18:15:33.348Z",
-    userId: "1f0de94e-a442-6895-bb6a-6baf81233df8",
-    absencesIds: [
-      "1f0de94c-920c-67ab-a03b-131f02028328",
-      "1f0de94c-c689-6fb0-a03b-131f02028328",
-      "1f0de94c-cbba-61b1-a03b-131f02028328",
-      "1f0de94c-412d-6579-a03b-131f02028328",
-      "1f0de94c-9763-6aaf-a03b-131f02028328",
-    ],
-    attendedModules: [
-      {
-        id: "1f0f2e76-9398-6efc-a64a-2b3a294c2134",
-        name: "abattage et choix darbre",
-        code: "ABT",
+export const secondeval: DetailedEvaluationView = {
+  id: "1f119889-fa58-627a-94c1-03cd09b771c2",
+  title: "Evaluation du 6 mars 2026 (6)",
+  comments: "test",
+  classId: "1f1022ee-3d9b-6efc-b662-d77014b42f3f",
+  className: "bucheron - test",
+  evaluationDate: "2026-03-06T18:15:33.348Z",
+  userId: "1f0de94e-a442-6895-bb6a-6baf81233df8",
+  absentStudents: [
+    {
+      id: "1f0de94c-920c-67ab-a03b-131f02028328",
+      name: "Trov Roa",
+    },
+    {
+      id: "1f0de94c-c689-6fb0-a03b-131f02028328",
+      name: "Jean Trops",
+    },
+    {
+      id: "1f0de94c-cbba-61b1-a03b-131f02028328",
+      name: "José Sciq",
+    },
+    {
+      id: "1f0de94c-412d-6579-a03b-131f02028328",
+      name: "Eloise Cartoon",
+    },
+    {
+      id: "1f0de94c-9763-6aaf-a03b-131f02028328",
+      name: "Richard Triz",
+    },
+  ],
+  attendedModules: [
+    {
+      id: "1f0f2e76-9398-6efc-a64a-2b3a294c2134",
+      name: "abattage et choix darbre",
+      code: "ABT",
+      subSkills: [
+        {
+          id: "1f0f2e6b-ef99-62e6-a64a-2b3a294c2134",
+          name: "technique dabattage directionnel",
+          code: "TEC",
+          isDisabled: false,
+        },
+        {
+          id: "1f0f2e6b-80d1-6ce5-a64a-2b3a294c2134",
+          name: "sélection des essences",
+          code: "ESS",
+          isDisabled: false,
+        },
+        {
+          id: "1f0f2e6b-0a90-65e4-a64a-2b3a294c2134",
+          name: "évaluation des risques",
+          code: "EVR",
+          isDisabled: false,
+        },
+      ],
+    },
+    {
+      id: "1f0f2e79-9f52-64ff-a64a-2b3a294c2134",
+      name: "sécurité et secourisme",
+      code: "SFT",
+      subSkills: [
+        {
+          id: "1f0f2e6f-4fdb-62ed-a64a-2b3a294c2134",
+          name: "équipements de protection",
+          code: "EPI",
+          isDisabled: false,
+        },
+      ],
+    },
+    {
+      id: "1f0f2e77-90bd-69fd-a64a-2b3a294c2134",
+      name: "conduite de tronçonneuse",
+      code: "TRS",
+      subSkills: [
+        {
+          id: "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c2134",
+          name: "technique de coupe et guidage",
+          code: "COU",
+          isDisabled: false,
+        },
+        {
+          id: "1f0f2e6d-6b15-69e9-a64a-2b3a294c2134",
+          name: "entretien quotidien chaîne et filtre",
+          code: "ENT",
+          isDisabled: false,
+        },
+        {
+          id: "1f0f2e6c-6c43-63e7-a64a-2b3a294c2134",
+          name: "démarrage et arrêt sûrs",
+          code: "DMS",
+          isDisabled: false,
+        },
+      ],
+    },
+    {
+      id: "1f0f2e7b-915e-6501-a64a-2b3a294c2134",
+      name: "entretien et outillage",
+      code: "OUT",
+      subSkills: [
+        {
+          id: "1f0f2e71-c436-68f3-a64a-2b3a294c2134",
+          name: "affûtage des chaînes",
+          code: "AFF",
+          isDisabled: false,
+        },
+      ],
+    },
+  ],
+  evaluations: [
+    {
+      id: "1f0de94c-8785-62a3-a03b-131f02028328",
+      name: "Raz Fitz",
+      isPresent: true,
+      overallScore: 15,
+      assignedTask: {
+        id: "1f0f2f15-14af-650c-a64a-2b3a294c2134",
+        name: "Opérations dabattage et préparation des grumes",
       },
-      {
-        id: "1f0f2e79-9f52-64ff-a64a-2b3a294c2134",
-        name: "sécurité et secourisme",
-        code: "SFT",
+      modules: [
+        {
+          id: "1f0f2e79-9f52-64ff-a64a-2b3a294c2134",
+          subSkills: [
+            {
+              id: "1f0f2e6f-4fdb-62ed-a64a-2b3a294c2134",
+              score: 75,
+            },
+          ],
+        },
+        {
+          id: "1f0f2e76-9398-6efc-a64a-2b3a294c2134",
+          subSkills: [
+            {
+              id: "1f0f2e6b-ef99-62e6-a64a-2b3a294c2134",
+              score: 50,
+            },
+            {
+              id: "1f0f2e6b-80d1-6ce5-a64a-2b3a294c2134",
+              score: 75,
+            },
+            {
+              id: "1f0f2e6b-0a90-65e4-a64a-2b3a294c2134",
+              score: 100,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "1f0de94c-8d03-66a7-a03b-131f02028328",
+      name: "Goul Anemo",
+      isPresent: true,
+      overallScore: 15,
+      assignedTask: {
+        id: "1f0f2f1a-440c-600d-a64a-2b3a294c2134",
+        name: "Conduite de tronçonneuse maintenance de premier niveau",
       },
-      {
-        id: "1f0f2e77-90bd-69fd-a64a-2b3a294c2134",
-        name: "conduite de tronçonneuse",
-        code: "TRS",
-      },
-      {
-        id: "1f0f2e7b-915e-6501-a64a-2b3a294c2134",
-        name: "entretien et outillage",
-        code: "OUT",
-      },
-    ],
-    evaluations: [
-      {
-        modules: [
-          {
-            id: "1f0f2e79-9f52-64ff-a64a-2b3a294c2134",
-            subSkills: [
-              {
-                id: "1f0f2e6f-4fdb-62ed-a64a-2b3a294c2134",
-                score: 75,
-              },
-            ],
-          },
-          {
-            id: "1f0f2e76-9398-6efc-a64a-2b3a294c2134",
-            subSkills: [
-              {
-                id: "1f0f2e6b-ef99-62e6-a64a-2b3a294c2134",
-                score: 50,
-              },
-              {
-                id: "1f0f2e6b-80d1-6ce5-a64a-2b3a294c2134",
-                score: 75,
-              },
-              {
-                id: "1f0f2e6b-0a90-65e4-a64a-2b3a294c2134",
-                score: 100,
-              },
-            ],
-          },
-        ],
-        studentId: "1f0de94c-8785-62a3-a03b-131f02028328",
-        isPresent: true,
-        overallScore: 15,
-        assignedTaskId: "1f0f2f15-14af-650c-a64a-2b3a294c2134",
-      },
-      {
-        modules: [
-          {
-            id: "1f0f2e77-90bd-69fd-a64a-2b3a294c2134",
-            subSkills: [
-              {
-                id: "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c2134",
-                score: 75,
-              },
-              {
-                id: "1f0f2e6d-6b15-69e9-a64a-2b3a294c2134",
-                score: 75,
-              },
-              {
-                id: "1f0f2e6c-6c43-63e7-a64a-2b3a294c2134",
-                score: 75,
-              },
-            ],
-          },
-          {
-            id: "1f0f2e7b-915e-6501-a64a-2b3a294c2134",
-            subSkills: [
-              {
-                id: "1f0f2e71-c436-68f3-a64a-2b3a294c2134",
-                score: 75,
-              },
-            ],
-          },
-        ],
-        studentId: "1f0de94c-8d03-66a7-a03b-131f02028328",
-        isPresent: true,
-        overallScore: 15,
-        assignedTaskId: "1f0f2f1a-440c-600d-a64a-2b3a294c2134",
-      },
-    ],
-    createdAt: "2026-03-06T18:16:40.938735Z",
-  },
-  status: "200",
+      modules: [
+        {
+          id: "1f0f2e77-90bd-69fd-a64a-2b3a294c2134",
+          subSkills: [
+            {
+              id: "1f0f2e6c-c7a9-6ae8-a64a-2b3a294c2134",
+              score: 75,
+            },
+            {
+              id: "1f0f2e6d-6b15-69e9-a64a-2b3a294c2134",
+              score: 75,
+            },
+            {
+              id: "1f0f2e6c-6c43-63e7-a64a-2b3a294c2134",
+              score: 75,
+            },
+          ],
+        },
+        {
+          id: "1f0f2e7b-915e-6501-a64a-2b3a294c2134",
+          subSkills: [
+            {
+              id: "1f0f2e71-c436-68f3-a64a-2b3a294c2134",
+              score: 75,
+            },
+          ],
+        },
+      ],
+    },
+  ],
 };
 
 export const classObj = {

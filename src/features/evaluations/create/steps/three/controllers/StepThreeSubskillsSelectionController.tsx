@@ -27,7 +27,10 @@ export function StepThreeSubskillsSelectionController(
   const selectedId = selectedSubSkillId ?? subSkills[0]?.id ?? null;
 
   if (stepThreeSubskillsSelectionControllerPropsInvalid(props)) {
-    debugLogs("StepThreeSubskillsSelectionController", props);
+    debugLogs("StepThreeSubskillsSelectionController", {
+      type: "propsValidation",
+      props,
+    });
     return null;
   }
 

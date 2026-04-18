@@ -1,7 +1,6 @@
 import { DEV_MODE } from "@/configs/app.config";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types";
-import type { ApiError } from "@/types/AppErrorInterface";
-import type { ApiSuccess } from "@/types/AppResponseInterface";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 import type { QueryClient } from "@tanstack/react-query";
 import type { useNavigate } from "react-router-dom";
 
@@ -14,9 +13,15 @@ import type { useNavigate } from "react-router-dom";
 export function navigateOnForbiddenError(
   status: number,
   navigate: ReturnType<typeof useNavigate>,
+  from?: string,
 ) {
   if (status === 403) {
-    navigate("/login", { replace: true });
+    navigate("/login", {
+      replace: true,
+      state: {
+        from: from ?? "/",
+      },
+    });
   }
 }
 
@@ -30,11 +35,12 @@ export function navigateOnForbiddenError(
 export function createSearchParamsEndpoint(params: FetchParams) {
   const { searchParams = {}, url } = params;
   let builtEndpoint = url;
+  const entries = Object.entries(searchParams) ?? [];
 
-  if (Object.entries(searchParams).length !== 0) {
+  if (entries.length !== 0) {
     const createdPath = new URL(url, globalThis.location.origin);
 
-    Object.entries(searchParams ?? {}).forEach(([key, value]) => {
+    entries.forEach(([key, value]) => {
       createdPath.searchParams.set(key, String(value));
     });
 
@@ -68,23 +74,26 @@ export function resolveFetchCacheKey(fetchParams: FetchParams) {
 export function cacheFetchResult(
   queryClient: QueryClient,
   fetchParams: FetchParams,
-  response: ApiSuccess<any> | ApiError<any>,
+  response: AnyObjectProps,
 ) {
   const { dataReshapeFn, reshapeOptions, contentId } = fetchParams;
 
   const cachedKey = resolveFetchCacheKey(fetchParams);
   const urlWithParams = cachedKey[1];
 
+  // Get cached data
   const rawCachedDatas = queryClient.getQueriesData({
     queryKey: cachedKey,
   });
 
+  // Reshape/transform the data
   const cachingDatas = dataReshapeFn
-    ? dataReshapeFn(response?.data, rawCachedDatas, reshapeOptions)
+    ? dataReshapeFn(response?.data ?? response, rawCachedDatas, reshapeOptions)
     : response?.data;
 
-  // Caching under [contentId, url] keys
+  // Re-Caching the data under [contentId, url] keys
   queryClient.setQueryData(cachedKey, cachingDatas);
+
   // Convenience metadata for debug if needed (for example to know what params led to the cached value without having to inspect the network tab)
   if (DEV_MODE) {
     queryClient.setQueryData([contentId, `${urlWithParams}:meta`], {
@@ -94,4 +103,46 @@ export function cacheFetchResult(
   }
 
   return cachingDatas;
+}
+
+/**
+ * Helper function to save fetch results in cache, used for example after a mutation to update the relevant queries with the new data.
+ *
+ * @param queryClient - The React Query client instance used for caching the data.
+ * @param contentId - The content ID used as part of the cache key.
+ * @param apiEndpoint - The API endpoint used as part of the cache key.
+ * @param dataReshapeFn - An optional function to reshape the data before caching.
+ * @param response - The raw response from the API that may need to be reshaped before caching.
+ */
+export function saveFetchResultInCache(
+  queryClient: QueryClient,
+  contentId: FetchParams["contentId"],
+  apiEndpoint: string,
+  dataReshapeFn: FetchParams["dataReshapeFn"],
+  objectToSave: AnyObjectProps,
+) {
+  const fetchParams = {
+    contentId,
+    cachedFetchKey: [contentId, apiEndpoint],
+    dataReshapeFn,
+  } as FetchParams;
+
+  return cacheFetchResult(queryClient, fetchParams, objectToSave);
+}
+
+/**
+ * Helper function to save any object in cache under a specific key, used for example to store selected items that need to be accessed across different pages or components.
+ *
+ * @description This functions does not use the data reshaping functionality of `cacheFetchResult`.
+ *
+ * @param queryClient - The React Query client instance used for caching the data.
+ * @param cacheKey - The key under which the object should be cached, typically an array containing identifiers related to the content and API endpoint.
+ * @param objectToSave - The object that you want to save in the cache, which can be of any shape depending on your needs.
+ */
+export function saveObjectInCache(
+  queryClient: QueryClient,
+  cacheKey: [string, string],
+  objectToSave: AnyObjectProps,
+) {
+  queryClient.setQueryData(cacheKey, objectToSave);
 }

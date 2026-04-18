@@ -2,16 +2,11 @@ import type {
   CommandSelectionItemProps,
   HeadingType,
 } from "@/components/Command/types/command.types.ts";
-import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import {
   debugLogs,
   fetchParamsPropsInvalid,
 } from "@/configs/app-components.config.ts";
-import {
-  DEV_MODE,
-  NO_CACHE_LOGS,
-  NO_QUERY_LOGS,
-} from "@/configs/app.config.ts";
+import { DEV_MODE, NO_CACHE_LOGS } from "@/configs/app.config.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import {
   retrieveValuesByMode,
@@ -33,10 +28,7 @@ import type {
 } from "@/hooks/database/types/use-command-handler.types.ts";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import type { ApiError } from "@/types/AppErrorInterface";
-import type {
-  ApiEndpointType,
-  DataReshapeFn,
-} from "@/types/AppInputControllerInterface";
+import type { DataReshapeFn } from "@/types/AppInputControllerInterface";
 import type { ApiSuccess } from "@/types/AppResponseInterface";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { useQueryClient } from "@tanstack/react-query";
@@ -47,6 +39,9 @@ import type {
   Path,
   PathValue,
 } from "react-hook-form";
+import { toast } from "sonner";
+const DEFAULT_SUBMISSION_LOADING_MESSAGE = "Demande en cours...";
+const SUBMISSION_TOAST_ID_PREFIX = "command-handler-submit";
 
 /**
  * Custom hook to handle command operations including data fetching, dialog management, and form submissions.
@@ -56,6 +51,11 @@ import type {
  */
 type NormalizeMeta<T> = T extends object ? T : Record<string, never>;
 type TMeta = CommandHandlerMetaData;
+type ResolvedSubmissionToastOptions = {
+  toastId: string;
+  loadingMessage: string;
+  showLoadingToast: boolean;
+};
 
 export function useCommandHandler<
   TForm extends FieldValues,
@@ -93,6 +93,9 @@ export function useCommandHandler<
 
   const hasStartedCreation = useRef(false);
   const postVariables = useRef<MutationVariables>(null);
+  const submissionToastOptionsRef = useRef<ResolvedSubmissionToastOptions>(
+    createDefaultSubmissionToastOptions(String(pageId)),
+  );
 
   /**
    * Handle adding a new item/feature
@@ -130,24 +133,29 @@ export function useCommandHandler<
     const options = dialogOptions(pageId) as
       | (CommandHandlerMetaData & { queryKey?: FetchParams["cachedFetchKey"] })
       | undefined;
+
     const {
       dataReshapeFn,
       endpointUrl,
-      method = "GET",
+      method = "POST",
+      toastOptions,
       ...rest
     } = submitOpts ?? {};
 
-    // Default to GET
-    // It will grab information from the input controller's apiEndpoint and dataReshapeFn
-    let reshapeFn = dataReshapeFn ?? options?.dataReshapeFn;
-    let endpointUrlFinal = endpointUrl ?? options?.apiEndpoint;
+    // Update toast options for this submission
+    submissionToastOptionsRef.current = {
+      ...submissionToastOptionsRef.current,
+      ...toastOptions,
+    };
 
-    // For non-GET methods, override with provided endpoint and reshaper
-    if (method !== "GET") {
-      reshapeFn =
-        dataReshapeFn ?? (params.submitDataReshapeFn as DataReshapeFn);
-      endpointUrlFinal = endpointUrl ?? (params.submitRoute as ApiEndpointType);
-    }
+    // In order :
+    // Direct submitOpts (hardcoded by the call) -> defaults hook params (hardcoded on hook mount) -> dialog options (dialog options should be a GET endpoint since data sharing is called on opening most of the time) -> "none" (default fallback to avoid undefined endpoint)
+    const reshapeFn =
+      dataReshapeFn ??
+      (params.submitDataReshapeFn as DataReshapeFn) ??
+      options?.dataReshapeFn;
+    const endpointUrlFinal =
+      endpointUrl ?? params.submitRoute ?? options?.apiEndpoint;
 
     // Store variables for deferred submission
     postVariables.current = variables;
@@ -167,7 +175,7 @@ export function useCommandHandler<
       silent: false,
       url: String(endpointUrlFinal ?? "none"),
       cachedFetchKey: options?.queryKey,
-      method: API_ENDPOINTS.POST.METHOD,
+      method,
       contentId: pageId as FetchParams["contentId"],
       dataReshapeFn: reshapeFn,
       abortController: new AbortController(),
@@ -337,7 +345,7 @@ export function useCommandHandler<
      />
     * ```
    */
-  const handleDataCacheUpdate = <T = HeadingType[]>() => {
+  const handleDataCacheUpdate = <T = HeadingType[]>(): T | undefined => {
     const cacheKey = resolveFetchCacheKey(fetchParams);
     const cachedData = queryClient.getQueryData<T>(cacheKey);
 
@@ -347,7 +355,7 @@ export function useCommandHandler<
       cachedData,
     });
 
-    return cachedData ?? data;
+    return cachedData ?? (data as T | undefined);
   };
   /**
    * RESULTS - Handle dialog closing after successful submission
@@ -359,21 +367,55 @@ export function useCommandHandler<
   });
 
   /**
+   * Resets forms after a submission error to allow users to correct their input and resubmit.
+   *
+   * @remark The saves the previous state but unlocks the ability to submit again
+   */
+  const resetFormAfterSubmitError = useEffectEvent(() => {
+    form.reset(undefined, {
+      keepValues: true,
+      keepErrors: true,
+      keepDirty: true,
+      keepTouched: true,
+      keepIsSubmitted: false,
+    });
+  });
+
+  /**
    * RESULTS - Handle form results
    *
    * @description Close dialog on success and reset form
    */
   useEffect(() => {
     const isSubmission = postVariables.current !== null;
+    const { toastId, loadingMessage, showLoadingToast } =
+      submissionToastOptionsRef.current;
 
-    if (data || error) {
-      hasStartedCreation.current = false;
+    if (
+      isLoading &&
+      isSubmission &&
+      showLoadingToast &&
+      !toast.getToasts().some((currentToast) => currentToast.id === toastId)
+    ) {
+      toast.loading(loadingMessage, { id: toastId });
     }
 
-    if (data) {
-      if (DEV_MODE && !NO_QUERY_LOGS) {
-        console.debug(pageId, " created:", data);
+    if (response || error) {
+      hasStartedCreation.current = false;
+
+      if (showLoadingToast) {
+        toast.dismiss(toastId);
       }
+    }
+
+    if (response) {
+      debugLogs("useCommandHandler:handleResults", {
+        type: "cacheLogs",
+        response,
+        message: "Submission successful, closing dialog",
+        pageId,
+      });
+
       if (isSubmission) {
         postVariables.current = null;
         // NOTE: form.reset() is intentionally NOT called here.
@@ -384,27 +426,40 @@ export function useCommandHandler<
         afterAnimationClose();
       }
     }
-  }, [isLoaded, error, data, pageId]);
+
+    if (error && isSubmission) {
+      resetFormAfterSubmitError();
+    }
+  }, [isLoading, isLoaded, error, data, response, pageId]);
 
   /**
    * FETCH / SUBMIT - Trigger submission or fetching when fetchParams are set
    */
   const triggerSubmit = useEffectEvent((fetchParams: FetchParams) => {
     if (isLoading || hasStartedCreation.current) return;
+    const fetchType = fetchParams.method ?? "GET";
 
-    if (postVariables.current) {
-      // POST only
-      hasStartedCreation.current = true;
-      onSubmit(postVariables.current);
-    } else {
-      // FETCH only
+    if (fetchType === "POST" || fetchType === "PUT" || fetchType === "DELETE") {
+      // With viarables
+      if (postVariables.current) {
+        hasStartedCreation.current = true;
+        onSubmit(postVariables.current);
+      } else {
+        // A POST could be a submission without variables (eg. a delete action)
+        onSubmit();
+      }
+    }
+
+    if (fetchType === "GET") {
       const { cacheKey, shouldNotFetch, isInitialFetchParams } =
         resolvedReturnCases(fetchParams);
 
+      // The useEffect already guards but this one is deeper, please keep it for safety
       if (shouldNotFetch || isInitialFetchParams) {
         return;
       }
 
+      // For GET requests, check cache first
       const cachedData = queryClient.getQueryData(cacheKey);
 
       if (cachedData === undefined) {
@@ -420,6 +475,8 @@ export function useCommandHandler<
    * @description Triggers when fetchParams are updated with {@link handleOpening}
    */
   useEffect(() => {
+    if (fetchParams.contentId === "none") return;
+
     triggerSubmit(fetchParams);
   }, [fetchParams]);
 
@@ -440,6 +497,7 @@ export function useCommandHandler<
     dialogOptions,
     onOpenChange,
     postVariables,
+    queryClient,
     newItemCallback: handleAddNewItem,
     submitCallback: handleSubmit,
     openingCallback: handleOpening,
@@ -477,5 +535,26 @@ function resolvedReturnCases(fetchParams: FetchParams) {
     shouldNotFetch,
     isInitialFetchParams,
     cacheKey,
+  };
+}
+
+/**
+ * Create default toast options for form submission feedback
+ *
+ * @description Makes sure that there is always a toastId (to avoid multiple toasts piling up on multiple submits) and a loading message.
+ *
+ * @remark The default loading message can be overridden by passing `toastOptions` in the `handleSubmit` options.
+ *
+ * @param pageId - The identifier for the current page or module, used to create a unique toast ID
+ *
+ * @returns An object containing default toast options for form submission feedback
+ */
+function createDefaultSubmissionToastOptions(
+  pageId: string,
+): ResolvedSubmissionToastOptions {
+  return {
+    toastId: `${SUBMISSION_TOAST_ID_PREFIX}-${pageId}`,
+    loadingMessage: DEFAULT_SUBMISSION_LOADING_MESSAGE,
+    showLoadingToast: true,
   };
 }

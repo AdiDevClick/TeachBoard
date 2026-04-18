@@ -8,13 +8,13 @@
   &--container {
     display: flex;
     flex-wrap: nowrap;
-    gap: var(--gap);
+    gap: var(--app-overall-gap);
     justify-content: space-between;
-    padding: var(--gap);
+    padding: var(--app-overall-smaller-gap);
   }
 
   &__badge {
-    margin: var(--spacing);
+    margin: unset;
   }
 
   &__slider {

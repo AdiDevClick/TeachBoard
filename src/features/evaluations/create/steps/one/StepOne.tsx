@@ -1,4 +1,5 @@
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import { useStepsTitleHandler } from "@/features/evaluations/create/hooks/useStepsTitleHandler";
 import { STEP_ONE_CARD_PROPS } from "@/features/evaluations/create/steps/one/config/step-one.configs.ts";
 import { StepOneController } from "@/features/evaluations/create/steps/one/controller/StepOneController.tsx";
 import { stepOneInputControllers } from "@/features/evaluations/create/steps/one/forms/step-one-inputs.ts";
@@ -21,6 +22,8 @@ export function StepOne({
   inputControllers = stepOneInputControllers,
   ...props
 }: Readonly<PageWithControllers<StepOneInputItem>>) {
+  useStepsTitleHandler();
+
   const commonProps = {
     pageId,
     modalMode,

@@ -5,7 +5,6 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { type PropsWithChildren } from "react";
 import {
   createMemoryRouter,
-  MemoryRouter,
   RouterProvider,
   type RouteObject,
 } from "react-router-dom";
@@ -27,23 +26,24 @@ export function AppTestWrapper({
   routes,
   initialEntries = ["/"],
 }: Readonly<AppTestWrapperProps>) {
-  const router = routes
-    ? createMemoryRouter(routes, {
-        initialEntries,
-      })
-    : null;
+  const resolvedRoutes =
+    routes ??
+    [
+      {
+        path: "*",
+        element: <>{children}</>,
+      },
+    ];
+
+  const router = createMemoryRouter(resolvedRoutes, {
+    initialEntries,
+  });
 
   return (
     <DialogProvider>
       <QueryClientProvider client={testQueryClient}>
         <SidebarProvider>
-          {routes && router ? (
-            <RouterProvider router={router} />
-          ) : (
-            <MemoryRouter initialEntries={initialEntries}>
-              {children}
-            </MemoryRouter>
-          )}
+          <RouterProvider router={router} />
         </SidebarProvider>
       </QueryClientProvider>
     </DialogProvider>

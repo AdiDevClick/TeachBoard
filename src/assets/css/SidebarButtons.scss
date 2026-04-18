@@ -79,6 +79,10 @@
     color: var(--primary-foreground-hover);
   }
 
+  &--effect {
+    margin: auto;
+  }
+
   &:active,
   &--effect:active {
     transform: scale(0.95);

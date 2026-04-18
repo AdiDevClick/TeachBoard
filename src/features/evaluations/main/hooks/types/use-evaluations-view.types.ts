@@ -1,10 +1,8 @@
-import type { AppModalNames } from "@/configs/app.config";
+import type { EvaluationsViewControllerProps } from "@/features/evaluations/main/types/evaluations.types";
 
 /**
  * Type definition for the properties accepted by the useEvaluationsView hook.
  */
-export type UseEvaluationsViewProps = Readonly<{
-  apiEndpoint?: (id: string) => string;
-  pageId?: AppModalNames;
-  dataReshapeFn?: (data: unknown) => unknown;
-}>;
+export type UseEvaluationsViewProps = Readonly<
+  Pick<EvaluationsViewControllerProps, "evaluationData">
+>;

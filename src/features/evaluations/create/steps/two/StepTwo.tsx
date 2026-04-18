@@ -1,6 +1,7 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { rightContent } from "@/assets/css/EvaluationPage.module.scss";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
+import { useStepsTitleHandler } from "@/features/evaluations/create/hooks/useStepsTitleHandler";
 import { attendanceRecordCreationBaseControllers } from "@/features/evaluations/create/steps/three/forms/step-two-inputs.ts";
 import { STEP_TWO_CARD_PROPS } from "@/features/evaluations/create/steps/two/config/step-two.configs";
 import { StepTwoController } from "@/features/evaluations/create/steps/two/controller/StepTwoController.tsx";
@@ -45,6 +46,8 @@ export function StepTwo({
   const moduleSelectionState = useEvaluationStepsCreationStore(
     (state) => state.moduleSelection,
   );
+
+  useStepsTitleHandler();
   const { setModuleSelection } = useEvaluationStepsCreationStore();
 
   const form = useForm<AttendanceRecordCreationFormSchema & FieldValues>({

@@ -1,19 +1,14 @@
 import { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input.exports";
-import { Badge } from "@/components/ui/badge";
-import { Item } from "@/components/ui/item";
+import { LabelledScore } from "@/features/evaluations/create/components/Score/LabelledScore";
 import type { LabelledScoreInputProps } from "@/features/evaluations/create/components/Score/types/score-types";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
 import { formatParseFloat } from "@/utils/utils";
-import {
-  labelledScoreInput,
-  labelledScoreInputBadge,
-  labelledScoreInputInput,
-  labelledScoreInputText,
-} from "@css/LabelledScoreInput.module.scss";
 import { useWatch } from "react-hook-form";
 
 /**
  * LabelledScoreInput component for displaying and editing the average score of a student.
+ *
+ * @description A watcher is used to directly modify the overall score in the store as the teacher updates the input, ensuring that the latest score is always available in the store for submission to the server.
  *
  * @param item - The score item containing the student's name and their average score.
  * @param id - The unique identifier for the student.
@@ -34,28 +29,24 @@ export function LabelledScoreInput(props: LabelledScoreInputProps) {
     control: form?.control,
     name: watchId,
     compute: (score) => {
-      if (Number.isFinite(score)) {
-        setStudentOverallScore(id, score as number);
+      const parsedScore = Number.parseFloat(String(score));
+      if (Number.isFinite(parsedScore)) {
+        setStudentOverallScore(id, parsedScore * 5);
       }
     },
   });
 
   return (
-    <Item className={labelledScoreInput}>
-      <Badge className={labelledScoreInputBadge}>{item.name}</Badge>
-      <p className={labelledScoreInputText}>{"Moyenne : "}</p>
-      <div className={labelledScoreInputInput}>
-        <ControlledLabelledInput
-          name={watchId}
-          control={form?.control}
-          type="number"
-          min={0}
-          max={20}
-          step={0.25}
-          defaultValue={formatParseFloat(item.score / 5)}
-        />
-        <p>{"/20"}</p>
-      </div>
-    </Item>
+    <LabelledScore item={item}>
+      <ControlledLabelledInput
+        name={watchId}
+        control={form?.control}
+        type="number"
+        min={0}
+        max={20}
+        step={0.25}
+        defaultValue={formatParseFloat(item.score / 5)}
+      />
+    </LabelledScore>
   );
 }

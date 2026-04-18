@@ -287,6 +287,10 @@ export const evaluationFlowFixture: EvaluationFlowFixture = {
 
 export function buildEvaluationCreateRoutes(): RouteObject[] {
   const tabs = EvaluationPageTabsDatas;
+  const step1Path = tabs.step1.name.toLocaleLowerCase();
+  const step2Path = tabs.step2.name.toLocaleLowerCase();
+  const step3Path = tabs.step3.name.toLocaleLowerCase();
+  const step4Path = tabs.step4.name.toLocaleLowerCase();
 
   return [
     {
@@ -300,12 +304,16 @@ export function buildEvaluationCreateRoutes(): RouteObject[] {
       children: [
         {
           index: true,
-          element: <Navigate to={tabs.step1.name.toLocaleLowerCase()} replace />,
+          element: <Navigate to={step1Path} replace />,
         },
-        { path: tabs.step1.name, element: <StepOne /> },
-        { path: tabs.step2.name, element: <StepTwo /> },
-        { path: tabs.step3.name, element: <StepThree /> },
-        { path: tabs.step4.name, element: <StepFour /> },
+        { path: step1Path, element: <StepOne /> },
+        { path: step2Path, element: <StepTwo /> },
+        { path: step3Path, element: <StepThree /> },
+        {
+          path: step4Path,
+          element: <StepFour />,
+          loader: async () => ({ mode: "create" as const }),
+        },
       ],
     },
   ];
@@ -369,11 +377,11 @@ export function installEvaluationFlowFetchStub(
         if (mode === "error") {
           return jsonResponse(
             {
-              error: "Internal Server Error",
+              error: "Bad Request",
               message: "Simulated evaluation submit failure",
             },
-            500,
-            "Internal Server Error",
+            400,
+            "Bad Request",
           );
         }
 

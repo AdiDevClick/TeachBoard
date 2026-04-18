@@ -1,8 +1,6 @@
 import { PopoverFieldProvider } from "@/api/providers/Popover.provider.tsx";
-import type {
-  PopoverFieldProps,
-  PopoverFieldState,
-} from "@/components/Popovers/types/popover.types.ts";
+import { useFieldStore } from "@/api/store/FieldStore.ts";
+import type { PopoverFieldProps } from "@/components/Popovers/types/popover.types.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import {
@@ -13,8 +11,6 @@ import {
 import { cn } from "@/utils/utils.ts";
 import { LucideChevronDown } from "lucide-react";
 import { useEffect, useId, useState, type Ref } from "react";
-
-const defaultValue = new Set<string>();
 
 /**
  * Popover Field component
@@ -36,34 +32,28 @@ export function PopoverField({
   fullWidth = true,
   className,
   side = "bottom",
+  resetKey,
   setRef,
   id: containerId,
-  resetKey,
-  ...props
+  onOpenChange,
+  children,
+  role,
+  multiSelection,
+  ...rest
 }: PopoverFieldProps) {
-  const { onOpenChange, children, role, multiSelection, ...rest } = props;
+  const { getValue, resetByKey, updateValue, setValue, resetValues } =
+    useFieldStore(multiSelection, resetKey, rest.name);
+  const [state, setState] = useState(false);
+
+  const selectedValue = getValue(rest.defaultValue);
+
   const id = useId();
 
-  const [state, setState] = useState<PopoverFieldState>({
-    open: false,
-    fieldName: rest?.name,
-    selectedValue: multiSelection
-      ? defaultValue
-      : (rest.defaultValue ?? undefined),
-  });
-
   useEffect(() => {
-    function resetSelectedValue() {
-      setState((prev) => ({
-        ...prev,
-        selectedValue: multiSelection ? defaultValue : undefined,
-      }));
-    }
-
     if (resetKey !== undefined) {
-      resetSelectedValue();
+      resetByKey(resetKey);
     }
-  }, [resetKey, multiSelection]);
+  }, [resetKey, resetByKey]);
 
   /**
    * Callback to handle selection of a value
@@ -72,19 +62,12 @@ export function PopoverField({
    */
   const setSelectedValueCallback = (nextValue: string) => {
     if (multiSelection) {
-      setState((prev) => {
-        const newSet = new Set(prev.selectedValue);
-        if (newSet.has(nextValue)) {
-          newSet.delete(nextValue);
-        } else {
-          newSet.add(nextValue);
-        }
-        return { ...prev, selectedValue: newSet };
-      });
+      updateValue(nextValue);
       return;
     }
 
-    setState((prev) => ({ ...prev, selectedValue: nextValue, open: false }));
+    setValue(nextValue);
+    setState(false);
   };
 
   /**
@@ -95,18 +78,24 @@ export function PopoverField({
    * @param isOpen - Whether the popover is open or not
    */
   const handleOpenChange = (isOpen: boolean) => {
-    setState((prev) => ({ ...prev, open: isOpen }));
+    setState(isOpen);
     onOpenChange?.(isOpen);
   };
 
+  useEffect(() => {
+    return () => {
+      resetValues();
+    };
+  }, [resetValues]);
+
   const selectValue = multiSelection
     ? placeholder
-    : (state.selectedValue ?? placeholder);
+    : (selectedValue ?? placeholder);
 
   return (
     <div
       id={containerId}
-      ref={(setRef ?? props.ref) as Ref<HTMLDivElement>}
+      ref={(setRef ?? rest.ref) as Ref<HTMLDivElement>}
       className={cn("flex flex-col items-start gap-2", className)}
     >
       {label && (
@@ -115,7 +104,7 @@ export function PopoverField({
         </Label>
       )}
 
-      <Popover open={state.open} onOpenChange={handleOpenChange}>
+      <Popover open={state} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <Button
             type="button"
@@ -125,7 +114,7 @@ export function PopoverField({
             className={cn(
               "justify-between",
               fullWidth ? "w-full" : "w-fit",
-              state.selectedValue
+              selectedValue
                 ? "font-normal"
                 : "text-muted-foreground font-normal",
             )}
@@ -137,7 +126,7 @@ export function PopoverField({
         <PopoverContent side={side} className="p-0">
           <PopoverFieldProvider
             onSelect={setSelectedValueCallback}
-            selectedValue={state.selectedValue}
+            selectedValue={selectedValue}
           >
             {children}
           </PopoverFieldProvider>

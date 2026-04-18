@@ -1,6 +1,5 @@
 import { withDropdownLayout } from "@/components/HOCs/withDropdownLayout";
 import { useDataTableWithStore } from "@/components/Tables/hooks/useDataTable";
-import type { ComponentProps } from "react";
 import type {
   TableColumnsFilterToggleProps,
   TableColumnsSelectionsProps,
@@ -8,12 +7,15 @@ import type {
 import { Button } from "@/components/ui/button";
 import { DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu";
 import { IconChevronDown, IconLayoutColumns } from "@tabler/icons-react";
+import type { ComponentProps } from "react";
 
 /**
  * Dropdown menu component to toggle table columns visibility.
+ *
+ * @param storeName - The name of the table store to access column visibility state and toggle functions.
  */
 export function TableColumnsFilterToggle({
-  storeName = "default",
+  storeName,
 }: Readonly<TableColumnsFilterToggleProps>) {
   const props = {
     storeName,

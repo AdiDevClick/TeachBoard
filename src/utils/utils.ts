@@ -13,6 +13,7 @@ import type {
 import { clsx, type ClassValue } from "clsx";
 import { type ComponentType } from "react";
 import { twMerge } from "tailwind-merge";
+import type z from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -136,11 +137,29 @@ export function waitAndFail(
   });
 }
 
+export function parseFromObject<T>(obj: T): T | null {
+  try {
+    if (typeof obj !== "object" || !obj) {
+      throw new Error("Input is not a valid object");
+    }
+
+    const stringified = JSON.stringify(obj);
+    const parsed = JSON.parse(stringified);
+
+    if (!parsed) {
+      throw new Error("Something went wrong while parsing the object");
+    }
+
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Parse an ID, ensuring it is a valid UUID string.
  *
- * @returns The parsed UUID string if valid.
- * @throws If the provided ID is not a valid UUID string.
+ * @returns The parsed UUID string if valid, or null if invalid.
  *
  * @example
  * const validId = "123e4567-e89b-12d3-a456-426614174000";
@@ -157,6 +176,19 @@ export function parseToUuid(id?: string) {
   } catch {
     return null;
   }
+}
+
+/**
+ * Parse an object using a Zod schema, throwing an error if validation fails.
+ */
+export function zodParseFromObject<T>(obj: unknown, schema: z.ZodType<T>): T {
+  const parsed = schema.safeParse(obj);
+
+  if (!parsed.success) {
+    throw new Error("Invalid data", { cause: parsed.error });
+  }
+
+  return parsed.data;
 }
 
 /**

@@ -16,6 +16,11 @@ const DEFAULT_VALUES: AppStore = {
   lastUserActivity: new UniqueSet(),
   sessionSynced: false,
   isLoggedIn: false,
+  syncValues: {
+    shouldSyncEvaluations: true,
+    // shouldSyncClasses: false,
+    // shouldSyncStudents: false,
+  },
 };
 
 /**
@@ -27,160 +32,201 @@ export const useAppStore = create(
   devtools(
     persist(
       immer(
-        combine(DEFAULT_VALUES, (set, get) => ({
-          // SIMPLE STATE UPDATERS
-          updateLoggedStatus(isLoggedIn: boolean) {
-            const currentUser = get().user;
-            set((state) => {
-              state.isLoggedIn = currentUser ? isLoggedIn : false;
-            });
-          },
-          setLastUserActivity(
-            activity: LastUserActivityType,
-            details: LastUserActivityDetails,
-          ) {
-            const usAct = new UniqueSet() as LastUserActivity;
-
-            const rawLastActivity = get().lastUserActivity;
-            const lastActivityEntry =
-              rawLastActivity instanceof UniqueSet
-                ? rawLastActivity.values().next().value
-                : null;
-            const lastActivityUrl = lastActivityEntry?.url ?? null;
-
-            // verify if the new activity is the same as the last one to avoid redundant updates
-            const isSameActivity =
-              lastActivityUrl === details.url &&
-              lastActivityEntry?.endpoint === details.endpoint;
-
-            if (isSameActivity) {
-              return;
-            }
-
-            set((state) => {
-              state.lastUserActivity = usAct.set(activity, {
-                ...details,
-                previousUrl: lastActivityUrl ?? "none",
+        combine(DEFAULT_VALUES, (set, get) => {
+          const ACTIONS = {
+            // SIMPLE STATE UPDATERS
+            updateLoggedStatus(isLoggedIn: boolean) {
+              const currentUser = get().user;
+              set((state) => {
+                state.isLoggedIn = currentUser ? isLoggedIn : false;
               });
-            });
-          },
-          // CRITICAL STATE MODIFIERS // CASCADING
-          clearUser() {
-            set((state) => {
-              state.user = null;
-            });
-          },
-          signup() {
-            const usAct = new UniqueSet() as LastUserActivity;
+            },
+            shouldResyncEvals() {
+              const isSynced = get().sessionSynced;
+              const shouldSyncEvaluations =
+                get().syncValues.shouldSyncEvaluations;
 
-            set((state) => {
-              const lastActivity = state.lastUserActivity?.values().next()
-                .value?.previousUrl;
+              return isSynced && shouldSyncEvaluations;
+            },
+            verifySyncStatus() {
+              const sessionSynced = get().sessionSynced;
+              const shouldResyncEvals = get().syncValues;
 
-              state.lastUserActivity = usAct.set(USER_ACTIVITIES.signup, {
-                url: "/signup",
-                previousUrl: lastActivity,
-              });
-
-              state.isLoggedIn = false;
-            });
-          },
-          signupValidation() {
-            const usAct = new UniqueSet() as LastUserActivity;
-
-            set((state) => {
-              const lastActivity = state.lastUserActivity?.values().next()
-                .value?.previousUrl;
-
-              state.lastUserActivity = usAct.set(
-                USER_ACTIVITIES.signupValidation,
-                {
-                  url: "/signup-validation",
-                  previousUrl: lastActivity,
+              const isNeedingResync = Object.entries(shouldResyncEvals).some(
+                ([key, value]) => {
+                  // Any sync value that is true while the session is not synced indicates a need for resync
+                  if (value) {
+                    console.warn(
+                      `Data for "${key}" is marked as needing resync but session is not synced. Current sessionSynced: ${sessionSynced}`,
+                    );
+                  }
+                  return value;
                 },
               );
 
-              state.isLoggedIn = false;
-            });
-          },
-          passwordCreation() {
-            const usAct = new UniqueSet() as LastUserActivity;
+              if (!isNeedingResync) {
+                set({ sessionSynced: true });
+              }
+            },
+            setLastUserActivity(
+              activity: LastUserActivityType,
+              details: LastUserActivityDetails,
+            ) {
+              const usAct = new UniqueSet() as LastUserActivity;
 
-            set((state) => {
-              const lastActivity = state.lastUserActivity?.values().next()
-                .value?.previousUrl;
+              const rawLastActivity = get().lastUserActivity;
+              const lastActivityEntry =
+                rawLastActivity instanceof UniqueSet
+                  ? rawLastActivity.values().next().value
+                  : null;
+              const lastActivityUrl = lastActivityEntry?.url ?? null;
 
-              state.lastUserActivity = usAct.set(
-                USER_ACTIVITIES.passwordCreation,
-                {
-                  url: "/password-creation",
+              // verify if the new activity is the same as the last one to avoid redundant updates
+              const isSameActivity =
+                lastActivityUrl === details.url &&
+                lastActivityEntry?.endpoint === details.endpoint;
+
+              if (isSameActivity) {
+                return;
+              }
+
+              set((state) => {
+                state.lastUserActivity = usAct.set(activity, {
+                  ...details,
+                  previousUrl: lastActivityUrl ?? "none",
+                });
+              });
+            },
+            // CRITICAL STATE MODIFIERS // CASCADING
+            clearUser() {
+              set((state) => {
+                state.user = null;
+              });
+            },
+            signup() {
+              const usAct = new UniqueSet() as LastUserActivity;
+
+              set((state) => {
+                const lastActivity = state.lastUserActivity?.values().next()
+                  .value?.previousUrl;
+
+                state.lastUserActivity = usAct.set(USER_ACTIVITIES.signup, {
+                  url: "/signup",
                   previousUrl: lastActivity,
+                });
+
+                state.isLoggedIn = false;
+              });
+            },
+            signupValidation() {
+              const usAct = new UniqueSet() as LastUserActivity;
+
+              set((state) => {
+                const lastActivity = state.lastUserActivity?.values().next()
+                  .value?.previousUrl;
+
+                state.lastUserActivity = usAct.set(
+                  USER_ACTIVITIES.signupValidation,
+                  {
+                    url: "/signup-validation",
+                    previousUrl: lastActivity,
+                  },
+                );
+
+                state.isLoggedIn = false;
+              });
+            },
+            passwordCreation() {
+              const usAct = new UniqueSet() as LastUserActivity;
+
+              set((state) => {
+                const lastActivity = state.lastUserActivity?.values().next()
+                  .value?.previousUrl;
+
+                state.lastUserActivity = usAct.set(
+                  USER_ACTIVITIES.passwordCreation,
+                  {
+                    url: "/password-creation",
+                    previousUrl: lastActivity,
+                  },
+                );
+
+                state.isLoggedIn = false;
+              });
+            },
+            login(user: User) {
+              const usAct = new UniqueSet() as LastUserActivity;
+              set((state) => {
+                const lastActivity = state.lastUserActivity?.values().next()
+                  .value?.previousUrl;
+
+                state.lastUserActivity = usAct.set(USER_ACTIVITIES.login, {
+                  url: "/login",
+                  previousUrl: lastActivity,
+                });
+
+                state.isLoggedIn = true;
+                state.user = user;
+              });
+            },
+            logout() {
+              const usAct = new UniqueSet() as LastUserActivity;
+
+              set((state) => {
+                const lastActivity = state.lastUserActivity?.values().next()
+                  .value?.previousUrl;
+
+                state.user = null;
+                state.isLoggedIn = false;
+                state.sessionSynced = false;
+
+                state.lastUserActivity = usAct.set(USER_ACTIVITIES.logout, {
+                  url: "/logout",
+                  previousUrl: lastActivity,
+                });
+              });
+            },
+            clearUserStateOnError() {
+              set((state) => {
+                state.user = null;
+                state.isLoggedIn = false;
+                state.sessionSynced = false;
+              });
+            },
+            setShouldResyncEvals(shouldResync: boolean) {
+              set(
+                (state) => {
+                  state.syncValues.shouldSyncEvaluations = shouldResync;
                 },
+                undefined,
+                "setShouldResyncEvals",
               );
 
-              state.isLoggedIn = false;
-            });
-          },
-          login(user: User) {
-            const usAct = new UniqueSet() as LastUserActivity;
-            set((state) => {
-              const lastActivity = state.lastUserActivity?.values().next()
-                .value?.previousUrl;
+              ACTIONS.verifySyncStatus();
+            },
+            updateSession(
+              isSynced: boolean,
+              activity: LastUserActivityType,
+              details: LastUserActivityDetails,
+            ) {
+              const currentUser = get().user;
+              const usAct = new UniqueSet() as LastUserActivity;
 
-              state.lastUserActivity = usAct.set(USER_ACTIVITIES.login, {
-                url: "/login",
-                previousUrl: lastActivity,
+              set((state) => {
+                const lastActivity = state.lastUserActivity?.values().next()
+                  .value?.previousUrl;
+
+                state.lastUserActivity = usAct.set(activity, {
+                  ...details,
+                  previousUrl: lastActivity,
+                });
+
+                state.sessionSynced = currentUser ? isSynced : false;
               });
-
-              state.isLoggedIn = true;
-              state.user = user;
-            });
-          },
-          logout() {
-            const usAct = new UniqueSet() as LastUserActivity;
-
-            set((state) => {
-              const lastActivity = state.lastUserActivity?.values().next()
-                .value?.previousUrl;
-
-              state.user = null;
-              state.isLoggedIn = false;
-              state.sessionSynced = false;
-
-              state.lastUserActivity = usAct.set(USER_ACTIVITIES.logout, {
-                url: "/logout",
-                previousUrl: lastActivity,
-              });
-            });
-          },
-          clearUserStateOnError() {
-            set((state) => {
-              state.user = null;
-              state.isLoggedIn = false;
-              state.sessionSynced = false;
-            });
-          },
-          updateSession(
-            isSynced: boolean,
-            activity: LastUserActivityType,
-            details: LastUserActivityDetails,
-          ) {
-            const currentUser = get().user;
-            const usAct = new UniqueSet() as LastUserActivity;
-
-            set((state) => {
-              const lastActivity = state.lastUserActivity?.values().next()
-                .value?.previousUrl;
-
-              state.lastUserActivity = usAct.set(activity, {
-                ...details,
-                previousUrl: lastActivity,
-              });
-
-              state.sessionSynced = currentUser ? isSynced : false;
-            });
-          },
-        })),
+            },
+          };
+          return ACTIONS;
+        }),
       ),
       { name: "app-store" },
     ),

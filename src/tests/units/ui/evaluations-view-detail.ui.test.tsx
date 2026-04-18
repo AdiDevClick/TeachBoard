@@ -1,31 +1,128 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 
+import {
+  DEFAULT_VALUES_STEPS_CREATION_STATE,
+  useEvaluationStepsCreationStore,
+} from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
+import {
+  EVALUATION_TABLE_STORE_NAME,
+  useEvaluationTableStore,
+} from "@/features/evaluations/main/configs/evaluations.configs";
 import { EvaluationsView } from "@/features/evaluations/main/EvaluationsView";
+import { PageTitle } from "@/components/Header/PageTitle";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import {
-  classObj,
   firsteval,
   secondeval,
 } from "@/tests/samples/evaluations-payload.datas.tests";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
+import { testQueryClient } from "@/tests/test-utils/testQueryClient";
 import {
   documentToHaveRoleWithName,
   getFetchCallsByUrl,
   rxExact,
   stubFetchRoutes,
 } from "@/tests/test-utils/vitest-browser.helpers";
+import { DEFAULT_PERSIST_NAME } from "@/utils/TableStoreRegistry";
+import { set } from "idb-keyval";
 import type { RouteObject } from "react-router-dom";
 import { Link, useParams } from "react-router-dom";
 import { describe, expect, test } from "vitest";
 import { render } from "vitest-browser-react";
 import { page, userEvent } from "vitest/browser";
 
-type ScoresBySubSkill = Map<string, Map<string, number>>;
-type ScoresByModule = Map<string, ScoresBySubSkill>;
+type EvaluationPayload = DetailedEvaluationView;
 
-const evaluationPayload = firsteval.data;
-const classPayload = classObj.data;
-const classDetails = classPayload.classe;
+const evaluationPayload: EvaluationPayload = firsteval;
+const secondPayload: EvaluationPayload = secondeval;
+const evaluationModules = evaluationPayload.attendedModules ?? [];
+const secondModules = secondPayload.attendedModules ?? [];
+
+function buildSecondEvaluationOnePresentPayload(): EvaluationPayload {
+  const studentForcedAbsent = evaluationPayload.evaluations[0];
+
+  if (!studentForcedAbsent) {
+    return secondPayload;
+  }
+
+  const absentStudents = [...secondPayload.absentStudents];
+
+  if (
+    !absentStudents.some((student) => student.id === studentForcedAbsent.id)
+  ) {
+    absentStudents.push({
+      id: studentForcedAbsent.id,
+      name: studentForcedAbsent.name,
+    });
+  }
+
+  return {
+    ...secondPayload,
+    absentStudents,
+    evaluations: secondPayload.evaluations.filter(
+      (student) => student.id !== studentForcedAbsent.id,
+    ),
+  };
+}
+
+const secondEvaluationOnePresentPayload =
+  buildSecondEvaluationOnePresentPayload();
+
+function getAbsentStudentIds(payload: EvaluationPayload) {
+  return payload.absentStudents.map((student) => student.id);
+}
+
+function getAbsentStudentNames(
+  payload: EvaluationPayload,
+  studentIds: string[],
+) {
+  const namesById = new Map(
+    payload.absentStudents.map((student) => [student.id, student.name]),
+  );
+
+  return studentIds.map((studentId) => namesById.get(studentId) ?? studentId);
+}
+
+function resolveAbsenceNameById(payload: EvaluationPayload, studentId: string) {
+  const student = payload.absentStudents.find((item) => item.id === studentId);
+
+  return student?.name ?? studentId;
+}
+
+function buildExpectedScoresFromPayload(payload: EvaluationPayload) {
+  const expectedScores = new Map<string, Map<string, Map<string, number>>>();
+
+  for (const module of payload.attendedModules ?? []) {
+    const moduleScores = new Map<string, Map<string, number>>();
+
+    for (const subSkill of module.subSkills) {
+      const scoresByStudent = new Map<string, number>();
+
+      for (const studentEvaluation of payload.evaluations) {
+        const matchedScore = studentEvaluation.modules
+          .find((evaluatedModule) => evaluatedModule.id === module.id)
+          ?.subSkills.find((item) => item.id === subSkill.id)?.score;
+
+        if (matchedScore == null) {
+          continue;
+        }
+
+        scoresByStudent.set(studentEvaluation.name, matchedScore);
+      }
+
+      if (scoresByStudent.size > 0) {
+        moduleScores.set(subSkill.name, scoresByStudent);
+      }
+    }
+
+    if (moduleScores.size > 0) {
+      expectedScores.set(module.name, moduleScores);
+    }
+  }
+
+  return expectedScores;
+}
 
 const evaluationEndpoint = API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(
   evaluationPayload.id,
@@ -33,6 +130,7 @@ const evaluationEndpoint = API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(
 const classEndpoint = API_ENDPOINTS.GET.CLASSES.endPoints.BY_ID(
   evaluationPayload.classId,
 );
+const evaluationTablePersistKey = `${DEFAULT_PERSIST_NAME}:${EVALUATION_TABLE_STORE_NAME}`;
 
 function normalizeText(value: string) {
   return value.replaceAll(/\s+/g, " ").trim().toLowerCase();
@@ -42,7 +140,12 @@ function buildRoutes(): RouteObject[] {
   return [
     {
       path: "/evaluations/:evaluationId",
-      element: <EvaluationsView />,
+      element: (
+        <>
+          <PageTitle />
+          <EvaluationsView />
+        </>
+      ),
     },
   ];
 }
@@ -52,8 +155,9 @@ function EvaluationSwitchHarness() {
 
   return (
     <>
+      <PageTitle />
       <Link to={`/evaluations/${evaluationPayload.id}`}>Voir évaluation 1</Link>
-      <Link to={`/evaluations/${secondeval.data.id}`}>Voir évaluation 2</Link>
+      <Link to={`/evaluations/${secondPayload.id}`}>Voir évaluation 2</Link>
       <EvaluationsView key={evaluationId} />
     </>
   );
@@ -68,108 +172,54 @@ function buildRoutesWithSwitchHarness(): RouteObject[] {
   ];
 }
 
-function installEvaluationDetailFetchStub() {
+function installEvaluationDetailFetchStub(
+  secondEvaluationPayload = secondPayload,
+) {
   stubFetchRoutes({
     getRoutes: [
       [evaluationEndpoint, evaluationPayload],
       [
-        API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(secondeval.data.id),
-        secondeval.data,
+        API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(secondPayload.id),
+        secondEvaluationPayload,
       ],
-      [classEndpoint, classPayload],
     ],
     defaultGetPayload: [],
   });
 }
 
-function resolveStudentFullName(studentId: string) {
-  const student = classDetails.students.find((item) => item.id === studentId);
-
-  if (!student) {
-    throw new TypeError(`Student '${studentId}' not found in class payload`);
-  }
-
-  return student.fullName;
+function seedEvaluationDetailCache(payload = evaluationPayload) {
+  testQueryClient.setQueryData(
+    [
+      "evaluation-summary",
+      API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(payload.id),
+    ],
+    API_ENDPOINTS.GET.EVALUATIONS.dataReshape(payload),
+  );
 }
 
-function buildClassModuleLookup() {
-  const modulesById = new Map<
-    string,
-    {
-      name: string;
-      subSkillsById: Map<string, string>;
-    }
-  >();
+async function seedEvaluationDetailInIdb(payload = evaluationPayload) {
+  useEvaluationTableStore.setState({ data: [], hasHydrated: false });
 
-  for (const template of classDetails.templates) {
-    for (const module of template.modules) {
-      const existing = modulesById.get(module.id);
+  await set(
+    evaluationTablePersistKey,
+    JSON.stringify({
+      state: { data: [payload] },
+      version: 0,
+    }),
+  );
 
-      if (existing) {
-        for (const subSkill of module.subSkills) {
-          existing.subSkillsById.set(subSkill.id, subSkill.name);
-        }
-
-        continue;
-      }
-
-      modulesById.set(module.id, {
-        name: module.name,
-        subSkillsById: new Map(
-          module.subSkills.map((subSkill) => [subSkill.id, subSkill.name]),
-        ),
-      });
-    }
-  }
-
-  return modulesById;
+  await useEvaluationTableStore.persistMap.idb.rehydrate();
 }
 
-function buildExpectedScoresFromPayload(): ScoresByModule {
-  const modulesById = buildClassModuleLookup();
-  const expectedScores: ScoresByModule = new Map();
+function getEvaluationDetailGetCallsCount(evaluationId = evaluationPayload.id) {
+  return getFetchCallsByUrl(
+    API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(evaluationId),
+    "GET",
+  ).length;
+}
 
-  for (const studentEvaluation of evaluationPayload.evaluations) {
-    if (!studentEvaluation.isPresent) {
-      continue;
-    }
-
-    const studentFullName = resolveStudentFullName(studentEvaluation.studentId);
-
-    for (const moduleEvaluation of studentEvaluation.modules) {
-      const moduleMeta = modulesById.get(moduleEvaluation.id);
-
-      if (!moduleMeta) {
-        throw new TypeError(
-          `Module '${moduleEvaluation.id}' not found in class payload`,
-        );
-      }
-
-      const moduleScores =
-        expectedScores.get(moduleMeta.name) ??
-        new Map<string, Map<string, number>>();
-      expectedScores.set(moduleMeta.name, moduleScores);
-
-      for (const subSkillEvaluation of moduleEvaluation.subSkills) {
-        const subSkillName = moduleMeta.subSkillsById.get(
-          subSkillEvaluation.id,
-        );
-
-        if (!subSkillName) {
-          throw new TypeError(
-            `SubSkill '${subSkillEvaluation.id}' not found for module '${moduleMeta.name}'`,
-          );
-        }
-
-        const studentsScores =
-          moduleScores.get(subSkillName) ?? new Map<string, number>();
-        moduleScores.set(subSkillName, studentsScores);
-        studentsScores.set(studentFullName, subSkillEvaluation.score);
-      }
-    }
-  }
-
-  return expectedScores;
+function getClassGetCallsCount() {
+  return getFetchCallsByUrl(classEndpoint, "GET").length;
 }
 
 function findSubSkillCard(subSkillName: string) {
@@ -202,7 +252,7 @@ function getSliderValueForStudent(subSkillName: string, studentName: string) {
   }
 
   const rows = Array.from(
-    card.querySelectorAll<HTMLElement>('[data-slot="item"]'),
+    card.querySelectorAll<HTMLElement>('[data-slot="evaluation-student"]'),
   );
   const matchingRow = rows.find((row) =>
     normalizeText(row.textContent ?? "").includes(normalizeText(studentName)),
@@ -223,17 +273,45 @@ function getAbsenceSectionText() {
   return section?.textContent ?? "";
 }
 
+async function expectAbsenceSectionToMatch(
+  payload: EvaluationPayload,
+  expectedAbsentIds: string[],
+  unexpectedAbsentIds: string[] = [],
+) {
+  const expectedNames = getAbsentStudentNames(payload, expectedAbsentIds).map(
+    normalizeText,
+  );
+  const unexpectedNames = getAbsentStudentNames(
+    payload,
+    unexpectedAbsentIds,
+  ).map(normalizeText);
+
+  await expect
+    .poll(() => {
+      const absenceSectionText = normalizeText(getAbsenceSectionText());
+      const includesExpectedNames = expectedNames.every((name) =>
+        absenceSectionText.includes(name),
+      );
+      const excludesUnexpectedNames = unexpectedNames.every(
+        (name) => !absenceSectionText.includes(name),
+      );
+
+      return includesExpectedNames && excludesUnexpectedNames;
+    })
+    .toBe(true);
+}
+
 function hasStudentOverallScore(studentName: string, score: number) {
   const pageText = normalizeText(document.body.textContent ?? "");
   const normalizedStudentName = normalizeText(studentName);
-  const expectedScoreText = normalizeText(`${score} /20`);
+  const scorePattern = new RegExp(String.raw`\b${score}(?:\.0)?\s*/\s*20`);
 
   let nameIndex = pageText.indexOf(normalizedStudentName);
 
   while (nameIndex >= 0) {
-    const nearbyText = pageText.slice(nameIndex, nameIndex + 220);
+    const nearbyText = pageText.slice(nameIndex, nameIndex + 600);
 
-    if (nearbyText.includes(expectedScoreText)) {
+    if (scorePattern.test(nearbyText)) {
       return true;
     }
 
@@ -248,12 +326,19 @@ function hasStudentOverallScore(studentName: string, score: number) {
 
 setupUiTestState(null, {
   beforeEach: async () => {
+    useEvaluationStepsCreationStore.setState(
+      DEFAULT_VALUES_STEPS_CREATION_STATE,
+    );
+    useEvaluationTableStore.persistMap.idb.clearStorage();
+    useEvaluationTableStore.setState({ data: [], hasHydrated: true });
     installEvaluationDetailFetchStub();
   },
 });
 
 describe("UI flow: evaluations detail view", () => {
   test("fetches correct ids and renders modules, scores, absences, and comments from payload", async () => {
+    const initialEvaluationGetCalls = getEvaluationDetailGetCallsCount();
+
     await render(
       <AppTestWrapper
         routes={buildRoutes()}
@@ -265,30 +350,30 @@ describe("UI flow: evaluations detail view", () => {
       "heading",
       rxExact(evaluationPayload.title),
     );
-    const callsPoints = [evaluationEndpoint, classEndpoint];
 
-    callsPoints.forEach(async (endpoint) => {
-      await expect
-        .poll(() => getFetchCallsByUrl(endpoint, "GET").length > 0)
-        .toBe(true);
-    });
+    await expect
+      .poll(
+        () => getEvaluationDetailGetCallsCount() > initialEvaluationGetCalls,
+      )
+      .toBe(true);
+
+    await expect
+      .poll(() => getFetchCallsByUrl(classEndpoint, "GET").length)
+      .toBe(0);
 
     expect(
       getFetchCallsByUrl(
-        API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(secondeval.data.id),
+        API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(secondPayload.id),
         "GET",
       ),
     ).toHaveLength(0);
 
-    for (const module of evaluationPayload.attendedModules) {
+    for (const module of evaluationModules) {
       await documentToHaveRoleWithName("button", rxExact(module.name));
     }
 
-    const secondEvaluationOnlyModule = secondeval.data.attendedModules.find(
-      (module) =>
-        !evaluationPayload.attendedModules.some(
-          (item) => item.id === module.id,
-        ),
+    const secondEvaluationOnlyModule = secondModules.find(
+      (module) => !evaluationModules.some((item) => item.id === module.id),
     );
 
     if (!secondEvaluationOnlyModule) {
@@ -303,7 +388,7 @@ describe("UI flow: evaluations detail view", () => {
         .query(),
     ).toBeNull();
 
-    const expectedScores = buildExpectedScoresFromPayload();
+    const expectedScores = buildExpectedScoresFromPayload(evaluationPayload);
 
     for (const [moduleName, subSkills] of expectedScores.entries()) {
       const moduleTrigger = page.getByRole("button", {
@@ -335,22 +420,25 @@ describe("UI flow: evaluations detail view", () => {
         continue;
       }
 
-      const studentName = resolveStudentFullName(studentEvaluation.studentId);
+      const studentName = studentEvaluation.name;
 
       await expect
         .poll(
           () =>
             hasStudentOverallScore(
               studentName,
-              Number(studentEvaluation.overallScore),
+              Number(studentEvaluation.overallScore) / 5,
             ),
-          { timeout: 5000 },
+          { timeout: 500 },
         )
         .toBe(true);
     }
 
-    for (const absentStudentId of evaluationPayload.absencesIds) {
-      const absentStudentName = resolveStudentFullName(absentStudentId);
+    for (const absentStudentId of getAbsentStudentIds(evaluationPayload)) {
+      const absentStudentName = resolveAbsenceNameById(
+        evaluationPayload,
+        absentStudentId,
+      );
 
       await expect
         .poll(() =>
@@ -366,32 +454,23 @@ describe("UI flow: evaluations detail view", () => {
       .toBe(false);
 
     await expect
-      .poll(() => {
-        const commentsField = page.getByLabelText(/^Commentaires$/i).query();
-
-        return commentsField instanceof HTMLTextAreaElement
-          ? commentsField.value
-          : "";
-      })
-      .toBe(evaluationPayload.comments);
+      .poll(() =>
+        normalizeText(document.body.textContent ?? "").includes(
+          normalizeText(evaluationPayload.comments ?? ""),
+        ),
+      )
+      .toBe(true);
   });
 
   test("refreshes rendered data when navigating to another evaluation without F5", async () => {
     await render(
       <AppTestWrapper
         routes={buildRoutesWithSwitchHarness()}
-        initialEntries={[`/evaluations/${secondeval.data.id}`]}
+        initialEntries={[`/evaluations/${secondPayload.id}`]}
       />,
     );
 
-    const roles = [
-      ["heading", rxExact(secondeval.data.title)],
-      ["button", rxExact(secondeval.data.title)],
-    ] as const;
-
-    roles.forEach(async ([role, name]) => {
-      await documentToHaveRoleWithName(role, name);
-    });
+    await documentToHaveRoleWithName("heading", rxExact(secondPayload.title));
 
     await userEvent.click(
       page.getByRole("link", { name: /voir évaluation 1/i }),
@@ -406,13 +485,10 @@ describe("UI flow: evaluations detail view", () => {
       page.getByRole("link", { name: /voir évaluation 2/i }),
     );
 
-    await documentToHaveRoleWithName("heading", rxExact(secondeval.data.title));
+    await documentToHaveRoleWithName("heading", rxExact(secondPayload.title));
 
-    const secondOnlyModule = secondeval.data.attendedModules.find(
-      (module) =>
-        !evaluationPayload.attendedModules.some(
-          (item) => item.id === module.id,
-        ),
+    const secondOnlyModule = secondModules.find(
+      (module) => !evaluationModules.some((item) => item.id === module.id),
     );
 
     if (!secondOnlyModule) {
@@ -423,12 +499,21 @@ describe("UI flow: evaluations detail view", () => {
 
     await documentToHaveRoleWithName("button", rxExact(secondOnlyModule.name));
 
+    const razFitzScore =
+      secondPayload.evaluations.find((student) => student.name === "Raz Fitz")
+        ?.overallScore ?? 0;
+
     await expect
-      .poll(() => hasStudentOverallScore("Raz Fitz", 15), { timeout: 5000 })
+      .poll(() => hasStudentOverallScore("Raz Fitz", razFitzScore / 5), {
+        timeout: 500,
+      })
       .toBe(true);
 
-    for (const absentStudentId of secondeval.data.absencesIds) {
-      const absentStudentName = resolveStudentFullName(absentStudentId);
+    for (const absentStudentId of getAbsentStudentIds(secondPayload)) {
+      const absentStudentName = resolveAbsenceNameById(
+        secondPayload,
+        absentStudentId,
+      );
 
       await expect
         .poll(() =>
@@ -438,5 +523,199 @@ describe("UI flow: evaluations detail view", () => {
         )
         .toBe(true);
     }
+  });
+
+  test("renders properly from cached evaluation payload without extra fetches", async () => {
+    seedEvaluationDetailCache(evaluationPayload);
+    const initialEvaluationGetCalls = getEvaluationDetailGetCallsCount();
+    const initialClassGetCalls = getClassGetCallsCount();
+
+    await render(
+      <AppTestWrapper
+        routes={buildRoutes()}
+        initialEntries={[`/evaluations/${evaluationPayload.id}`]}
+      />,
+    );
+
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(evaluationPayload.title),
+    );
+
+    await expect
+      .poll(() => getEvaluationDetailGetCallsCount())
+      .toBe(initialEvaluationGetCalls);
+    await expect.poll(() => getClassGetCallsCount()).toBe(initialClassGetCalls);
+
+    await expect
+      .poll(
+        () =>
+          evaluationModules.every((module) =>
+            Boolean(
+              page.getByRole("button", { name: rxExact(module.name) }).query(),
+            ),
+          ),
+        { timeout: 500 },
+      )
+      .toBe(true);
+
+    for (const module of evaluationModules) {
+      await documentToHaveRoleWithName("button", rxExact(module.name));
+    }
+
+    await expectAbsenceSectionToMatch(
+      evaluationPayload,
+      getAbsentStudentIds(evaluationPayload),
+    );
+
+    await expect
+      .poll(() =>
+        normalizeText(document.body.textContent ?? "").includes(
+          normalizeText(evaluationPayload.comments ?? ""),
+        ),
+      )
+      .toBe(true);
+  });
+
+  test("does not fetch when idb already contains detailed evaluation", async () => {
+    await seedEvaluationDetailInIdb(evaluationPayload);
+    const initialEvaluationGetCalls = getEvaluationDetailGetCallsCount();
+    const initialClassGetCalls = getClassGetCallsCount();
+
+    await render(
+      <AppTestWrapper
+        routes={buildRoutes()}
+        initialEntries={[`/evaluations/${evaluationPayload.id}`]}
+      />,
+    );
+
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(evaluationPayload.title),
+    );
+
+    await expect
+      .poll(() => getEvaluationDetailGetCallsCount())
+      .toBe(initialEvaluationGetCalls);
+    await expect.poll(() => getClassGetCallsCount()).toBe(initialClassGetCalls);
+  });
+
+  test("does not fetch on reload when idb contains same id without detailed modules", async () => {
+    await seedEvaluationDetailInIdb({
+      ...evaluationPayload,
+      attendedModules: [],
+    });
+    const initialEvaluationGetCalls = getEvaluationDetailGetCallsCount();
+    const initialClassGetCalls = getClassGetCallsCount();
+
+    await render(
+      <AppTestWrapper
+        routes={buildRoutes()}
+        initialEntries={[`/evaluations/${evaluationPayload.id}`]}
+      />,
+    );
+
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(evaluationPayload.title),
+    );
+
+    await expect
+      .poll(() => getEvaluationDetailGetCallsCount())
+      .toBe(initialEvaluationGetCalls);
+    await expect.poll(() => getClassGetCallsCount()).toBe(initialClassGetCalls);
+  });
+
+  test("fetches on reload when id is missing from idb", async () => {
+    await seedEvaluationDetailInIdb({
+      ...evaluationPayload,
+      id: secondPayload.id,
+    });
+    const initialEvaluationGetCalls = getEvaluationDetailGetCallsCount();
+    const initialClassGetCalls = getClassGetCallsCount();
+
+    await render(
+      <AppTestWrapper
+        routes={buildRoutes()}
+        initialEntries={[`/evaluations/${evaluationPayload.id}`]}
+      />,
+    );
+
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(evaluationPayload.title),
+    );
+
+    await expect
+      .poll(
+        () => getEvaluationDetailGetCallsCount() > initialEvaluationGetCalls,
+      )
+      .toBe(true);
+    await expect.poll(() => getClassGetCallsCount()).toBe(initialClassGetCalls);
+  });
+
+  test("keeps absence names synchronized after 1 -> 2 -> 1 navigation", async () => {
+    installEvaluationDetailFetchStub(secondEvaluationOnePresentPayload);
+
+    const firstEvaluationOnlyPresentStudentId = evaluationPayload.evaluations
+      .map((studentEvaluation) => studentEvaluation.id)
+      .find((studentId) =>
+        getAbsentStudentIds(secondEvaluationOnePresentPayload).includes(
+          studentId,
+        ),
+      );
+
+    if (!firstEvaluationOnlyPresentStudentId) {
+      throw new TypeError(
+        "Expected one student present in first evaluation and absent in second evaluation",
+      );
+    }
+
+    await render(
+      <AppTestWrapper
+        routes={buildRoutesWithSwitchHarness()}
+        initialEntries={[`/evaluations/${evaluationPayload.id}`]}
+      />,
+    );
+
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(evaluationPayload.title),
+    );
+
+    await expectAbsenceSectionToMatch(
+      evaluationPayload,
+      getAbsentStudentIds(evaluationPayload),
+      [firstEvaluationOnlyPresentStudentId],
+    );
+
+    await userEvent.click(
+      page.getByRole("link", { name: /voir évaluation 2/i }),
+    );
+
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(secondEvaluationOnePresentPayload.title),
+    );
+
+    await expectAbsenceSectionToMatch(
+      secondEvaluationOnePresentPayload,
+      getAbsentStudentIds(secondEvaluationOnePresentPayload),
+    );
+
+    await userEvent.click(
+      page.getByRole("link", { name: /voir évaluation 1/i }),
+    );
+
+    await documentToHaveRoleWithName(
+      "heading",
+      rxExact(evaluationPayload.title),
+    );
+
+    await expectAbsenceSectionToMatch(
+      evaluationPayload,
+      getAbsentStudentIds(evaluationPayload),
+      [firstEvaluationOnlyPresentStudentId],
+    );
   });
 });

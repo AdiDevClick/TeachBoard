@@ -1,9 +1,11 @@
 import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs";
-import type { InpageTabsProps } from "@/components/InPageNavTabs/types/navtabs.types";
 import { Tabs } from "@/components/ui/tabs";
 import { debugLogs } from "@/configs/app-components.config";
 import { TabContentList } from "@/features/evaluations/create/components/Tabs/exports/tab-content.exports";
-import { resolveNavigation } from "@/features/evaluations/create/functions/eval-create-functions";
+import {
+  createTabsTriggers,
+  resolveNavigation,
+} from "@/features/evaluations/create/functions/eval-create-functions";
 import { useEvaluationNavigationHandler } from "@/features/evaluations/create/hooks/useEvaluationNavigationHandler";
 import type { CreateEvaluationArrowsClickHandlerProps } from "@/features/evaluations/create/types/create.types";
 import "@css/PageContent.scss";
@@ -30,16 +32,10 @@ export function CreateEvaluations() {
    * Memoized tab trigger data with disabled state based on whether the tab has been seen or not.
    */
   const tabsTriggersMemo = useMemo(() => {
-    if (!pageDatas) {
-      return {};
-    }
-
-    return Object.fromEntries(
-      Object.entries(pageDatas).map(([key, item]) => {
-        const disabled = !tabEvalState.tabsSeen.has(item.name);
-        return [key, { ...item, disabled }];
-      }),
-    ) satisfies InpageTabsProps["datas"];
+    return createTabsTriggers({
+      pageDatas,
+      tabEvalState,
+    });
   }, [pageDatas, tabEvalState]);
 
   if (!pageDatas || tabItems.length === 0) {

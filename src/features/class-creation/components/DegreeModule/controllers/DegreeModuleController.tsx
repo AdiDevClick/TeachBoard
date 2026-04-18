@@ -65,6 +65,12 @@ export function DegreeModuleController({
   const handleSubmit = (variables: MutationVariables) => {
     submitCallback(variables, {
       method: HTTP_METHODS.POST,
+      successDescription(success) {
+        return {
+          type: "success",
+          descriptionMessage: `Le module "${success?.data?.code}" a été créé avec succès.`,
+        };
+      },
     });
   };
 

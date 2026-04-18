@@ -1,9 +1,8 @@
 import { Accordion } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { Item } from "@/components/ui/item";
-import { Label } from "@/components/ui/label";
+import { Item, ItemTitle } from "@/components/ui/item";
 import { AccordionItemWithSubSkillWithStudentsList } from "@/features/evaluations/create/components/Accordion/exports/accordion.export";
-import type { LabelledAccordionProps } from "@/features/evaluations/create/components/Accordion/types/labelled-accordion";
+import type { LabelledAccordionProps } from "@/features/evaluations/create/components/Accordion/types/labelled-accordion.types";
 import type { ClassModules } from "@/features/evaluations/create/store/types/steps-creation-store.types";
 
 /**
@@ -26,14 +25,19 @@ export function LabelledAccordion(props: LabelledAccordionProps) {
    *
    * @returns An object containing the list of sub-skills and the module information to be passed as optional prop to the AccordionItem.
    */
-  const modulesOptional = (module: ClassModules) => ({
-    items: Array.from(module.subSkills.values()),
-    module,
-  });
+  const modulesOptional = (module: ClassModules) => {
+    const items = Array.isArray(module.subSkills)
+      ? module.subSkills
+      : Array.from(module.subSkills?.values?.() ?? []);
+    return {
+      items,
+      module,
+    };
+  };
 
   return (
-    <>
-      <Label>{title}</Label>
+    <Item className="grid gap-(--app-overall-gap) p-0">
+      <ItemTitle>{title}</ItemTitle>
       <Accordion {...inputController}>
         {accordionItems.length < 1 && (
           <Item>
@@ -53,6 +57,6 @@ export function LabelledAccordion(props: LabelledAccordionProps) {
           />
         )}
       </Accordion>
-    </>
+    </Item>
   );
 }

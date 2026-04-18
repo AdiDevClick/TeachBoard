@@ -1,3 +1,4 @@
+import { FormWithDebug } from "@/components/Form/FormWithDebug";
 import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { HTTP_METHODS } from "@/configs/app.config.ts";
@@ -30,12 +31,13 @@ export function DegreeModuleSkillController({
   submitRoute = API_ENDPOINTS.POST.CREATE_SKILL.endPoints.SUBSKILL,
   submitDataReshapeFn = API_ENDPOINTS.POST.CREATE_SKILL.dataReshape,
 }: DegreeModuleSkillControllerProps) {
-  const { setRef, observedRefs, submitCallback } = useCommandHandler({
-    form,
-    pageId,
-    submitRoute,
-    submitDataReshapeFn,
-  });
+  const { setRef, observedRefs, submitCallback, invalidSubmitCallback } =
+    useCommandHandler({
+      form,
+      pageId,
+      submitRoute,
+      submitDataReshapeFn,
+    });
 
   const { availabilityCheck } = useDebouncedChecker(form, 300);
 
@@ -47,6 +49,12 @@ export function DegreeModuleSkillController({
   const handleSubmit = (variables: MutationVariables) => {
     submitCallback(variables, {
       method: HTTP_METHODS.POST,
+      successDescription(success) {
+        return {
+          type: "success",
+          descriptionMessage: `La compétence "${success?.data?.code}" a été créée avec succès.`,
+        };
+      },
     });
   };
 
@@ -73,10 +81,13 @@ export function DegreeModuleSkillController({
   };
 
   return (
-    <form
-      id={formId}
+    <FormWithDebug
+      form={form}
+      formId={formId}
+      pageId={pageId}
       className={className}
-      onSubmit={form.handleSubmit(handleSubmit)}
+      onValidSubmit={handleSubmit}
+      onInvalidSubmit={invalidSubmitCallback}
     >
       <ControlledInputList
         items={inputControllers}
@@ -85,6 +96,6 @@ export function DegreeModuleSkillController({
         observedRefs={observedRefs}
         onChange={handleValueChange}
       />
-    </form>
+    </FormWithDebug>
   );
 }

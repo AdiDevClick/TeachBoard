@@ -6,10 +6,8 @@ import {
 } from "@/data/inputs-controllers.data.ts";
 import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
 import { CreateEvaluations } from "@/features/evaluations/create/CreateEvaluations.tsx";
-import { StepFour } from "@/features/evaluations/create/steps/four/StepFour.tsx";
-import { StepOne } from "@/features/evaluations/create/steps/one/StepOne";
-import { StepThree } from "@/features/evaluations/create/steps/three/StepThree.tsx";
-import { StepTwo } from "@/features/evaluations/create/steps/two/StepTwo.tsx";
+import { EvaluationEdit } from "@/features/evaluations/edit/EvaluationEdit";
+import { EvaluationDetailDrawerRoute } from "@/features/evaluations/main/components/EvaluationDetailDrawer";
 import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
 import { EvaluationsView } from "@/features/evaluations/main/EvaluationsView";
 import { About } from "@/pages/About/About.tsx";
@@ -20,21 +18,11 @@ import { Home } from "@/pages/Home/Home.tsx";
 import { Login } from "@/pages/Login/Login.tsx";
 import { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
 import { Signup } from "@/pages/Signup/Signup";
+import {
+  ALL_STEPS,
+  EVALUATION_PAGE_TITLE,
+} from "@/routes/config/routes.configs";
 import { Navigate, type RouteObject } from "react-router-dom";
-
-const DATE = new Date().toLocaleDateString();
-const EVALUATION_PAGE_TITLE = "Evaluation - " + DATE;
-
-const EVALUATION_ELEMENTS = [
-  { path: EvaluationPageTabsDatas.step1.name, element: <StepOne /> },
-  { path: EvaluationPageTabsDatas.step2.name, element: <StepTwo /> },
-  { path: EvaluationPageTabsDatas.step3.name, element: <StepThree /> },
-  {
-    path: EvaluationPageTabsDatas.step4.name,
-    element: <StepFour />,
-    title: "hidden",
-  },
-] as const;
 
 /**
  * Application route children configuration.
@@ -113,11 +101,13 @@ export const ROUTES_CHILDREN: RouteObject[] = [
         index: true,
         element: <Evaluations />,
         loader: async () => {
-          setDocumentTitle(COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title);
+          const menu = COMPLETE_SIDEBAR_DATAS.navMain.menus[2];
+          const { title: pageTitle } = menu;
+          setDocumentTitle(pageTitle);
 
           return {
-            pageTitle: COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title,
-            loaderData: COMPLETE_SIDEBAR_DATAS.navMain.menus[2],
+            pageTitle,
+            loaderData: menu,
           };
         },
       },
@@ -133,15 +123,25 @@ export const ROUTES_CHILDREN: RouteObject[] = [
         path: "TP",
         element: <EvaluationsMain />,
         loader: async () => {
-          const title = COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title;
-          setDocumentTitle(title);
+          const pageTitle = COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title;
+          setDocumentTitle(pageTitle);
 
           return {
-            pageTitle: title,
+            pageTitle,
             // loaderData: COMPLETE_SIDEBAR_DATAS.navMain.menus[0],
             // pageDatas: EvaluationPageTabsDatas,
           };
         },
+        children: [
+          {
+            path: "opened/:evaluationId",
+            element: <EvaluationDetailDrawerRoute />,
+            loader: async () => {
+              const title = COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title;
+              setDocumentTitle(title);
+            },
+          },
+        ],
       },
       {
         path: "Atelier",
@@ -158,21 +158,30 @@ export const ROUTES_CHILDREN: RouteObject[] = [
         path: "create",
         element: <CreateEvaluations />,
         loader: async () => {
-          setDocumentTitle(COMPLETE_SIDEBAR_DATAS.navMain.menus[0].title);
+          const { title } = COMPLETE_SIDEBAR_DATAS.navMain.menus[0];
+          setDocumentTitle(title);
 
           return {
             pageTitle: EVALUATION_PAGE_TITLE,
-            loaderData: COMPLETE_SIDEBAR_DATAS.navMain.menus[0],
+            loaderData: title,
             pageDatas: EvaluationPageTabsDatas,
           };
         },
-        children: EVALUATION_ELEMENTS.map((elem) => ({
-          path: elem.path,
-          element: elem.element,
-          loader: async () => ({
-            pageTitle: elem.title ?? EVALUATION_PAGE_TITLE,
-          }),
-        })),
+        children: ALL_STEPS("create"),
+      },
+
+      {
+        path: "edit/:evaluationId",
+        element: <EvaluationEdit />,
+        loader: async () => {
+          const title = COMPLETE_SIDEBAR_DATAS.navMain.menus[4].title;
+          setDocumentTitle(title);
+
+          return {
+            pageDatas: EvaluationPageTabsDatas,
+          };
+        },
+        children: ALL_STEPS("edit"),
       },
     ],
   },

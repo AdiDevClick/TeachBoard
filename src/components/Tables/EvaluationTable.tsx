@@ -9,7 +9,7 @@ import type { EvaluationTableProps } from "@/components/Tables/types/evaluation-
 import type { DraggableRowProps } from "@/components/Tables/types/table.types";
 import { Table, TableBody, TableHeader } from "@/components/ui/table";
 import { EVALUATION_TABLE_STORE_NAME } from "@/features/evaluations/main/configs/evaluations.configs";
-import type { EvaluationSchemaRow } from "@/features/evaluations/main/Evaluations";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
@@ -35,7 +35,7 @@ export function EvaluationTable({
   "use no memo";
 
   const { dataIds, sensors, sortableId, handleDragEnd, table, getItemId } =
-    useDataTableWithStore<EvaluationSchemaRow>(EVALUATION_TABLE_STORE_NAME);
+    useDataTableWithStore<DetailedEvaluationView>(EVALUATION_TABLE_STORE_NAME);
 
   const { getState, getHeaderGroups, getRowModel, getAllColumns } = table;
 
@@ -85,4 +85,4 @@ export function EvaluationTable({
 }
 
 const DraggableRowsList =
-  withListMapper<DraggableRowProps<EvaluationSchemaRow>>(DraggableRow);
+  withListMapper<DraggableRowProps<DetailedEvaluationView>>(DraggableRow);

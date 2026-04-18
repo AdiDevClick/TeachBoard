@@ -24,11 +24,12 @@ import { useEffect, useEffectEvent, useState, type CSSProperties } from "react";
  * @param fullName - Full name of the student.
  */
 export function EvaluationSlider(props: EvaluationSliderProps) {
-  const { fullName, onValueChange, value, ...rest } = props;
+  const { fullName, onValueChange, value, id, ...rest } = props;
   const safeSliderProps = sanitizeDOMProps(rest, [
     "isPresent",
     "assignedTask",
     "overallScore",
+    "originalScore",
   ]);
 
   const [internalValue, setInternalValue] = useState<number[]>(value ?? [0]);
@@ -64,12 +65,16 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
   }, [value]);
 
   if (evaluationSliderPropsValid(props)) {
-    debugLogs("[EvaluationSlider]", props);
+    debugLogs("[EvaluationSlider]", { type: "propsValidation", props });
     return null;
   }
 
   return (
-    <Item className={evaluationStudentContainer}>
+    <Item
+      data-slot="evaluation-student"
+      data-student-id={id}
+      className={evaluationStudentContainer}
+    >
       <Badge className={evaluationStudentBadge}>{fullName}</Badge>
       <Slider
         step={25}

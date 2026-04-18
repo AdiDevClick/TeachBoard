@@ -59,6 +59,7 @@ export function useQueryOnSubmit<
    */
   const options = useMemo(() => {
     const [key, descriptor] = queryKeysArr;
+
     const extendedDescriptor = {
       ...descriptor,
       reset,
@@ -100,14 +101,19 @@ export function useQueryOnSubmit<
           abortController: abortControllerRef.current,
         };
 
+        const enabled = queryKeysArr?.[1]?.enabled;
+
         debugLogs("useQueryOnSubmit:onSubmit", {
           type: "queryLogs",
           key: queryKeysArr?.[0],
           url: queryKeysArr?.[1]?.url,
+          enabled,
           method: queryKeysArr?.[1]?.method,
         });
 
-        return await mutateAsync(payload);
+        if (enabled ?? true) {
+          return await mutateAsync(payload);
+        }
       } catch (err) {
         debugLogs("useQueryOnSubmit:onSubmit", {
           type: "queryLogs",

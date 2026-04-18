@@ -75,7 +75,7 @@ function _getLastUiAction(): UiLastAction | null {
   return (globalThis as GlobalWithUiLastAction).__TB_UI_LAST_ACTION__ ?? null;
 }
 
-async function expectFormToHaveNoErrors(timeout = 1000) {
+async function expectFormToHaveNoErrors(timeout = 700) {
   await expect
     .poll(
       () =>
@@ -99,7 +99,7 @@ export async function expectElementTextToMatch(
     | ReturnType<typeof page.getByLabelText>
     | any,
   pattern: RegExp | string,
-  timeout = 1000,
+  timeout = 700,
 ) {
   const patt = pattern instanceof RegExp ? pattern : rx(pattern);
   await expect
@@ -132,7 +132,7 @@ export async function checkFormValidityAndSubmit(
 export async function documentToHaveRoleWithName(
   role: string,
   name: string | RegExp,
-  timeout = 500,
+  timeout = 700,
 ) {
   await expect
     .poll(() => page.getByRole(role, { name }).element(), { timeout })
@@ -378,7 +378,7 @@ export function queryKeyFor(controller: {
  */
 export async function expectOpenPopoverToContain(
   items: Array<string | RegExp>,
-  timeout = 1000,
+  timeout = 700,
 ) {
   for (const it of items) {
     const pattern = it instanceof RegExp ? it : rx(it);
@@ -413,7 +413,7 @@ export async function openPopoverAndExpectByLabel(
 export async function openPopoverAndExpectByTrigger(
   trigger: RegExp,
   items: Array<string | RegExp>,
-  timeout = 1000,
+  timeout = 700,
 ) {
   console.log("TRIGGER CATCHED : ", trigger);
   console.log("ITEMS CATCHED : ", items);
@@ -458,10 +458,7 @@ export function isDialogOpen(): boolean {
   return getLastVisibleDialogContent() !== null;
 }
 
-export async function waitForDialogState(
-  expectedOpen: boolean,
-  timeout = 1000,
-) {
+export async function waitForDialogState(expectedOpen: boolean, timeout = 700) {
   await expect.poll(isDialogOpen, { timeout }).toBe(expectedOpen);
 }
 
@@ -478,7 +475,7 @@ export async function waitForDialogAndAssertText(
   label: string | RegExp,
   opts?: { present?: boolean; timeout?: number; withinDialog?: boolean },
 ) {
-  const timeout = opts?.timeout ?? 1000;
+  const timeout = opts?.timeout ?? 700;
   const present = opts?.present ?? true;
 
   // First, make sure the dialog reaches the expected open/closed state.
@@ -501,7 +498,7 @@ export async function waitForTextToBeAbsent(
   label: string | RegExp,
   opts?: { present?: boolean; timeout?: number; withinDialog?: boolean },
 ) {
-  const timeout = opts?.timeout ?? 1000;
+  const timeout = opts?.timeout ?? 700;
   const present = opts?.present ?? false;
 
   const scope = opts?.withinDialog
@@ -525,7 +522,7 @@ export async function waitForTextToBeAbsent(
 
 export async function waitForPopoverState(
   expectedOpen: boolean,
-  timeout = 500,
+  timeout = 700,
 ) {
   await expect.poll(isPopoverOpen, { timeout }).toBe(expectedOpen);
 }
@@ -656,7 +653,7 @@ async function closeOpenPopoverIfAny() {
   }
 }
 
-async function detectCmdkInOpenPopover(timeout = 250): Promise<boolean> {
+async function detectCmdkInOpenPopover(timeout = 700): Promise<boolean> {
   const initial = getOpenPopoverContent();
 
   try {
@@ -678,7 +675,7 @@ async function detectCmdkInOpenPopover(timeout = 250): Promise<boolean> {
 
 async function waitForPopoverToCloseOrChange(
   previous: HTMLElement,
-  timeout = 400,
+  timeout = 700,
 ) {
   await expect
     .poll(
@@ -708,7 +705,7 @@ function resetCmdkInput(container: HTMLElement): void {
   }
 }
 
-async function waitForCmdkReady(timeout = 1500) {
+async function waitForCmdkReady(timeout = 700) {
   await expect
     .poll(
       () => {
@@ -898,7 +895,7 @@ export async function clickControlByLabelText(
 export async function selectCommandItemInContainer(
   container: HTMLElement,
   pattern: RegExp,
-  timeout = 500,
+  timeout = 700,
 ) {
   setLastUiAction("selectCommandItemInContainer", {
     pattern: String(pattern),
@@ -994,7 +991,7 @@ async function selectItemsByPatterns(
     if (opts?.beforeEachSelect) {
       await opts.beforeEachSelect();
     }
-    await selectCommandItemInContainer(popover, pattern, opts?.timeout ?? 500);
+    await selectCommandItemInContainer(popover, pattern, opts?.timeout ?? 700);
 
     const stillOpen = getOpenPopoverContent() === popover;
     if (!stillOpen && i !== patterns.length - 1) {
@@ -1028,7 +1025,7 @@ export async function openPopoverByLabelText(
   const labelElement = findLabelElementScoped(label, opts?.withinDialog);
   if (!labelElement) throw new TypeError(`Popover label not found: ${label}`);
   const trigger = getTriggerFromLabelElement(labelElement, label);
-  await openPopover(trigger, opts?.timeout ?? 500);
+  await openPopover(trigger, opts?.timeout ?? 700);
 
   // If no items to select, we're done.
   if (!opts?.items) return;
@@ -1070,7 +1067,7 @@ export async function selectCommandItemInContainerEnsuringSubmitDisabled(
   submitName: string,
   container: HTMLElement,
   pattern: RegExp,
-  timeout = 500,
+  timeout = 700,
 ) {
   await submitButtonShouldBeDisabled(submitName);
   return selectCommandItemInContainer(container, pattern, timeout);
@@ -1126,7 +1123,7 @@ export async function openPopoverByContainerId(containerId: string) {
 
 async function openPopover(
   trigger: Parameters<typeof userEvent.click>[0] | null,
-  timeout = 500,
+  timeout = 700,
 ) {
   // If it's already open (e.g. dialog opened on top), close first so we can
   // re-open and force a re-render with updated cached data.
@@ -1191,7 +1188,7 @@ async function openPopover(
       // non-fatal
     }
 
-    await waitForCmdkReady(1500);
+    await waitForCmdkReady(1700);
   }
 }
 

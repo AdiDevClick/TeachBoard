@@ -330,11 +330,11 @@ describe("withListMapper types", () => {
     const { container: badContainer } = await render(
       // compile-time check: passing an item that contains an unexpected field
       // should no longer compile. the line below is intentionally erroneous.
-      // @ts-expect-error extra props that isn't allowed should be rejected
       <PopoverFieldWithControllerAndCommandsList
         items={[
           {
             ...legitimateControlledPayload,
+            // @ts-expect-error extra props that isn't allowed should be rejected
             type: "button",
             myFunnyPropThatShouldNotExist,
           },
@@ -391,6 +391,35 @@ describe("withListMapper types", () => {
         onValueChange={handleValueChange}
       />,
     );
+    expect(container).toBeDefined();
+  });
+
+  it("Case 4.5 : ListMapper should inject index automatically and not require it on the wrapped component", async () => {
+    function Dummy({
+      id,
+      index,
+      value,
+    }: Readonly<{
+      id: string;
+      index: number;
+      value: number;
+    }>) {
+      return (
+        <div>
+          {id}-{index}-{value}
+        </div>
+      );
+    }
+
+    const DummyList = withListMapper(Dummy);
+
+    const { container } = await render(
+      <DummyList
+        items={[{ id: "item-1" }]}
+        optional={(item) => ({ value: item.id.length })}
+      />,
+    );
+
     expect(container).toBeDefined();
   });
 

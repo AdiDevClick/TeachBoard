@@ -2,6 +2,7 @@ import withListMapper from "@/components/HOCs/withListMapper";
 import { DynamicTag } from "@/components/Tags/DynamicTag";
 import { updateAnimationStack } from "@/components/Tags/functions/dynamic-tags-functions";
 import type {
+  DynamicTagItemDetails,
   DynamicTagsProps,
   DynamicTagsState,
 } from "@/components/Tags/types/tags.types";
@@ -25,24 +26,44 @@ import { useEffect, useEffectEvent, useState } from "react";
  * @param itemList - The list of tag items to render
  */
 export function DynamicTags(props: DynamicTagsProps) {
-  const { pageId, itemList, title, ...rest } = props;
-  const scopedPageId = pageId ?? "dynamic-tag";
   const [renderItems, setRenderItems] = useState<DynamicTagsState>(
     new UniqueSet(),
   );
+
+  const {
+    pageId = "dynamic-tag",
+    itemList,
+    title,
+    disableAnimation = false,
+    ...rest
+  } = props;
+
+  const entries = Array.isArray(itemList)
+    ? itemList
+    : Object.entries(itemList ?? {});
+
   const triggerUpdate = useEffectEvent(() => {
-    updateAnimationStack(setRenderItems, itemList, renderItems);
+    if (disableAnimation) {
+      const next = new UniqueSet<string, DynamicTagItemDetails>();
+
+      for (const [value, itemDetails] of entries) {
+        next.set(value, itemDetails);
+      }
+
+      setRenderItems(() => next);
+    } else {
+      updateAnimationStack(setRenderItems, entries, renderItems);
+    }
   });
 
   /**
    * Synchronize renderItems with itemList prop
    *
-   * @description Update the renderItems state when the itemList changes.
-   * It ensures that new items are added, and present items are no longer marked for exit animation.
+   * @description For animated mode, update through animation stack. For disabled animation, keep sync directly.
    */
   useEffect(() => {
     triggerUpdate();
-  }, [itemList]);
+  }, [itemList, disableAnimation]);
 
   /**
    * Handle exit complete for a tag
@@ -61,7 +82,7 @@ export function DynamicTags(props: DynamicTagsProps) {
   };
 
   return (
-    <ItemGroup id={`${scopedPageId}-roles`} className="grid gap-2">
+    <ItemGroup id={`${pageId}-roles`} className="grid gap-2">
       <ItemTitle>{title}</ItemTitle>
       <Item variant={"default"} className="p-0">
         <ItemContent className="flex-row flex-wrap gap-2">

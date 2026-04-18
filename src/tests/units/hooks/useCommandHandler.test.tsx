@@ -3,6 +3,7 @@ import type { SkillDto } from "@/api/types/routes/skills.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
+import { useEvaluationTableStore } from "@/features/evaluations/main/configs/evaluations.configs";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import type { HandleSelectionCallbackParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
@@ -25,6 +26,7 @@ import {
 import { stubFetchRoutes } from "@/tests/test-utils/vitest-browser.helpers";
 import { UniqueSet } from "@/utils/UniqueSet";
 import { wait } from "@/utils/utils.ts";
+import { toast } from "sonner";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { cleanup, render } from "vitest-browser-react";
 
@@ -38,11 +40,14 @@ beforeEach(() => {
   // Clear query client cache between tests
   testQueryClient.clear();
   useAppStore.setState({ lastUserActivity: new UniqueSet() });
+  useEvaluationTableStore.persistMap.idb.clearStorage();
+  useEvaluationTableStore.setState({ data: [], hasHydrated: true });
 });
 
 afterEach(() => {
   // Restore any global fetch stubs
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe("useCommandHandler - basic behaviours", () => {
@@ -233,19 +238,155 @@ describe("useCommandHandler - basic behaviours", () => {
     expect(dialogOptions(skillModuleModal)).toBeUndefined();
 
     // The fetch flow should have recorded the last user activity in a UniqueSet.
-    const lastActivity = useAppStore.getState().lastUserActivity;
-    const postActivity = [...lastActivity.values()].find(
-      (a: any) => a.method === "POST",
+    await expect
+      .poll(
+        () => {
+          const lastActivity = useAppStore.getState().lastUserActivity;
+
+          return [...lastActivity.values()].find((activity) => {
+            if (!activity) {
+              return false;
+            }
+
+            return activity.method === "POST";
+          });
+        },
+        { timeout: 1200 },
+      )
+      .toEqual(
+        expect.objectContaining({
+          endpoint: skillApiEndpoint,
+          method: "POST",
+          type: "useFetch",
+        }),
+      );
+  });
+
+  test("submitCallback POST falls back to dialog apiEndpoint when submitRoute is missing", async () => {
+    const { submitCallback, openDialog, dialogOptions } =
+      await renderCommandHook(skillModuleModal);
+
+    const fetchDatas = {
+      apiEndpoint: skillApiEndpoint,
+      queryKey: skillQueryKey,
+      task: skillModuleModal,
+      dataReshapeFn: (d: unknown) => ({ items: [d] }),
+    };
+
+    openDialog(click(), skillModuleModal, fetchDatas);
+
+    await waitForQueryKey(() => dialogOptions(skillModuleModal));
+
+    stubFetchRoutes({
+      postRoutes: [[skillApiEndpoint, skillCreated]],
+    });
+
+    submitCallback(
+      { name: "fallback-post" },
+      {
+        method: API_ENDPOINTS.POST.METHOD,
+      },
     );
 
-    expect(postActivity).toBeTruthy();
-    expect(postActivity).toEqual(
-      expect.objectContaining({
-        endpoint: skillApiEndpoint,
-        method: "POST",
-        type: "useFetch",
+    const cached = await waitForCache(skillQueryKey);
+
+    expect(cached).toEqual({ items: [skillCreated] });
+  });
+
+  test("submitCallback uses custom toast options when query toasts are silenced", async () => {
+    const dismissSpy = vi.spyOn(toast, "dismiss");
+    const errorSpy = vi.spyOn(toast, "error");
+
+    const { submitCallback } = await renderCommandHook(skillModuleModal);
+    const fetchSpy = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 401,
+      statusText: "Unauthorized",
+      clone() {
+        return this;
+      },
+      json: async () => ({
+        status: 401,
+        error: "Unauthorized",
       }),
+    });
+
+    vi.stubGlobal("fetch", fetchSpy);
+
+    submitCallback(
+      { name: "auth-submit" },
+      {
+        method: API_ENDPOINTS.POST.METHOD,
+        endpointUrl: skillApiEndpoint,
+        silent: true,
+        toastOptions: {
+          toastId: "auth-submit-toast",
+          loadingMessage: "Connexion en cours...",
+          errorMessage: () => "Erreur de connexion personnalisée.",
+        },
+      },
     );
+
+    await expect
+      .poll(() => fetchSpy.mock.calls.length, { timeout: 1500 })
+      .toBeGreaterThan(0);
+
+    const hasCustomErrorToast = errorSpy.mock.calls.some(
+      (call) =>
+        call.length > 1 &&
+        typeof call[1] === "object" &&
+        call[1] !== null &&
+        "id" in call[1] &&
+        call[1].id === "auth-submit-toast",
+    );
+
+    expect(hasCustomErrorToast).toBe(false);
+
+    await expect
+      .poll(() => dismissSpy.mock.calls.length, { timeout: 1500 })
+      .toBeGreaterThan(0);
+  });
+
+  test("submitCallback does not add command-handler error toast when silent is false", async () => {
+    const errorSpy = vi.spyOn(toast, "error");
+
+    const { submitCallback } = await renderCommandHook(skillModuleModal);
+    const fetchSpy = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 401,
+      statusText: "Unauthorized",
+      clone() {
+        return this;
+      },
+      json: async () => ({
+        status: 401,
+        error: "Unauthorized",
+      }),
+    });
+
+    vi.stubGlobal("fetch", fetchSpy);
+
+    submitCallback(
+      { name: "default-submit" },
+      {
+        method: API_ENDPOINTS.POST.METHOD,
+        endpointUrl: skillApiEndpoint,
+      },
+    );
+
+    await expect
+      .poll(() => fetchSpy.mock.calls.length, { timeout: 1500 })
+      .toBeGreaterThan(0);
+
+    const hasCommandHandlerToast = errorSpy.mock.calls.some(
+      (call) =>
+        call.length > 1 &&
+        typeof call[1] === "object" &&
+        call[1] !== null &&
+        "id" in call[1],
+    );
+
+    expect(hasCommandHandlerToast).toBe(false);
   });
 
   test("openingCallback performs a GET and caches data", async () => {

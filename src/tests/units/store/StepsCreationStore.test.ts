@@ -2,7 +2,7 @@ import {
   DEFAULT_VALUES_STEPS_CREATION_STATE,
   useEvaluationStepsCreationStore,
 } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
-import type { EvaluationRehydrationPayload } from "@/features/evaluations/create/store/types/steps-creation-store.types";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { beforeEach, describe, expect, it } from "vitest";
 
 const CLASS_ID = "11111111-1111-4111-8111-111111111111";
@@ -62,19 +62,39 @@ const CLASS_SUMMARY_FIXTURE = {
   ],
 };
 
-const EVALUATION_PAYLOAD_FIXTURE: EvaluationRehydrationPayload = {
+const EVALUATION_PAYLOAD_FIXTURE: DetailedEvaluationView = {
   id: EVALUATION_ID,
   title: "Evaluation reconstruite",
+  className: "BTS SIO",
   classId: CLASS_ID,
   evaluationDate: "2026-03-31T00:00:00.000Z",
   userId: USER_ID,
-  absencesIds: [STUDENT_TWO_ID],
+  absentStudents: [{ id: STUDENT_TWO_ID, name: "Jane Doe" }],
+  attendedModules: [
+    {
+      id: MODULE_ID,
+      code: "M1",
+      name: "Module 1",
+      subSkills: [
+        {
+          id: SUBSKILL_ID,
+          code: "S1",
+          name: "SubSkill 1",
+          isDisabled: false,
+        },
+      ],
+    },
+  ],
   evaluations: [
     {
-      studentId: STUDENT_ONE_ID,
+      id: STUDENT_ONE_ID,
+      name: "John Doe",
       isPresent: true,
       overallScore: 15,
-      assignedTaskId: TASK_ID,
+      assignedTask: {
+        id: TASK_ID,
+        name: "TP 1",
+      },
       modules: [
         {
           id: MODULE_ID,
@@ -88,35 +108,63 @@ const EVALUATION_PAYLOAD_FIXTURE: EvaluationRehydrationPayload = {
       ],
     },
     {
-      studentId: STUDENT_TWO_ID,
+      id: STUDENT_TWO_ID,
+      name: "Jane Doe",
       isPresent: false,
       overallScore: null,
-      assignedTaskId: TASK_ID,
+      assignedTask: {
+        id: TASK_ID,
+        name: "TP 1",
+      },
       modules: [],
     },
   ],
 };
 
-const SECOND_EVALUATION_PAYLOAD_FIXTURE: EvaluationRehydrationPayload = {
+const SECOND_EVALUATION_PAYLOAD_FIXTURE: DetailedEvaluationView = {
   id: "99999999-9999-4999-8999-999999999999",
   title: "Evaluation rechargée",
+  className: "BTS SIO",
   classId: CLASS_ID,
   evaluationDate: "2026-04-01T00:00:00.000Z",
   userId: USER_ID,
-  absencesIds: [STUDENT_ONE_ID],
+  absentStudents: [{ id: STUDENT_ONE_ID, name: "John Doe" }],
+  attendedModules: [
+    {
+      id: MODULE_ID,
+      code: "M1",
+      name: "Module 1",
+      subSkills: [
+        {
+          id: SUBSKILL_ID,
+          code: "S1",
+          name: "SubSkill 1",
+          isDisabled: false,
+        },
+      ],
+    },
+  ],
   evaluations: [
     {
-      studentId: STUDENT_ONE_ID,
+      id: STUDENT_ONE_ID,
+      name: "John Doe",
       isPresent: false,
       overallScore: null,
-      assignedTaskId: TASK_ID,
+      assignedTask: {
+        id: TASK_ID,
+        name: "TP 1",
+      },
       modules: [],
     },
     {
-      studentId: STUDENT_TWO_ID,
+      id: STUDENT_TWO_ID,
+      name: "Jane Doe",
       isPresent: true,
-      overallScore: 12,
-      assignedTaskId: TASK_ID,
+      overallScore: 50,
+      assignedTask: {
+        id: TASK_ID,
+        name: "TP 1",
+      },
       modules: [
         {
           id: MODULE_ID,
@@ -338,7 +386,7 @@ describe("StepsCreationStore - students reshape", () => {
 
     expect(studentOne?.isPresent).toBe(false);
     expect(studentTwo?.isPresent).toBe(true);
-    expect(studentTwo?.overallScore).toBe(12);
+    expect(studentTwo?.overallScore).toBe(50);
 
     const studentOneScore = studentOne?.evaluations?.modules
       .get(MODULE_ID)

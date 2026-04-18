@@ -5,6 +5,7 @@ import type {
   FetchArgs,
   InternalMutationVariables,
   QueryKeyDescriptor,
+  SuccessDescription,
 } from "@/hooks/database/types/QueriesTypes";
 import type { ApiError } from "@/types/AppErrorInterface";
 import type { ApiSuccess } from "@/types/AppResponseInterface";
@@ -153,8 +154,9 @@ export function shouldRetry(status: number, retry: number): boolean {
  */
 export function onQueryError<TError extends ApiError>(
   error: FetchJSONError<TError>,
+  customMessage?: (error: TError) => string,
 ) {
-  toast.error(error.message ?? error.error);
+  toast.error(customMessage?.(error) ?? error.message ?? error.error);
 }
 
 /**
@@ -166,11 +168,16 @@ export function onQueryError<TError extends ApiError>(
  */
 export function onQuerySuccess<TSuccess extends ApiSuccess>(
   response: FetchJSONSuccess<TSuccess>,
-  querySuccessDescription?: string,
+  querySuccessDescription?: (success: TSuccess) => SuccessDescription,
 ) {
+  const {
+    type = "message",
+    descriptionMessage,
+    customSuccessMessage,
+  } = querySuccessDescription?.(response) ?? {};
   const successMessage = response.success ?? undefined;
-  toast(successMessage ?? "Success", {
-    description: querySuccessDescription,
+  toast[type](customSuccessMessage ?? successMessage ?? "Success", {
+    description: descriptionMessage,
     position: "top-right",
   });
 }
@@ -198,6 +205,7 @@ export const mutationOptions = <
     url,
     method = "GET",
     successDescription,
+    errorMessage,
     silent,
     headers,
     onSuccess,
@@ -252,7 +260,7 @@ export const mutationOptions = <
       onError?.(error);
       localState?.({ success: null, error: error });
       if (silent) return;
-      onQueryError<E>(error);
+      onQueryError<E>(error, errorMessage);
     },
   };
 };
