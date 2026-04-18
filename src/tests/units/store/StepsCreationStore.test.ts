@@ -160,7 +160,7 @@ const SECOND_EVALUATION_PAYLOAD_FIXTURE: DetailedEvaluationView = {
       id: STUDENT_TWO_ID,
       name: "Jane Doe",
       isPresent: true,
-      overallScore: 12,
+      overallScore: 50,
       assignedTask: {
         id: TASK_ID,
         name: "TP 1",
@@ -386,7 +386,7 @@ describe("StepsCreationStore - students reshape", () => {
 
     expect(studentOne?.isPresent).toBe(false);
     expect(studentTwo?.isPresent).toBe(true);
-    expect(studentTwo?.overallScore).toBe(12);
+    expect(studentTwo?.overallScore).toBe(50);
 
     const studentOneScore = studentOne?.evaluations?.modules
       .get(MODULE_ID)
