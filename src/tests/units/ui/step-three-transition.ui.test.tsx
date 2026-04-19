@@ -1,5 +1,3 @@
-import { UUID_SCHEMA } from "@/api/types/openapi/common.types";
-import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
 import {
   content,
   evaluationPageContentContainer,
@@ -7,6 +5,7 @@ import {
 import { StepThree } from "@/features/evaluations/create/steps/three/StepThree";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
+import { getEvaluationStepClassSummaryFixture } from "@/tests/samples/ui-fixtures/evaluation-next-step.ui.fixtures";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import { Outlet, type RouteObject } from "react-router-dom";
 import { describe, expect, test } from "vitest";
@@ -34,42 +33,8 @@ const routes: RouteObject[] = [
   },
 ];
 
-const studentId = UUID_SCHEMA.parse("123e4567-e89b-12d3-a456-426614174001");
-const taskId = UUID_SCHEMA.parse("123e4567-e89b-12d3-a456-426614174010");
-const moduleId = UUID_SCHEMA.parse("123e4567-e89b-12d3-a456-426614174100");
-const subSkillId = UUID_SCHEMA.parse("123e4567-e89b-12d3-a456-426614171000");
-const resetClassId = UUID_SCHEMA.parse("123e4567-e89b-12d3-a456-426614179999");
-
-const selectedClass: ClassSummaryDto = {
-  id: UUID_SCHEMA.parse("123e4567-e89b-12d3-a456-426614174050"),
-  name: "Classe test",
-  description: "Classe pour test transition step 3",
-  degreeConfigName: "CAP Cuisine 2A",
-  degreeLevel: "CAP",
-  degreeYearCode: "2A",
-  degreeYearName: "Deuxième année",
-  evaluations: [],
-  students: [{ id: studentId, firstName: "John", lastName: "Stud" }],
-  templates: [
-    {
-      id: taskId,
-      taskName: "T1",
-      task: {
-        id: taskId,
-        name: "Task 1",
-        description: "Template task",
-      },
-      modules: [
-        {
-          id: moduleId,
-          name: "Module 1",
-          code: "M1",
-          subSkills: [{ id: subSkillId, name: "Sub 1", code: "SS1" }],
-        },
-      ],
-    },
-  ],
-};
+const { selectedClass, studentId, taskId, moduleId, resetClassId } =
+  getEvaluationStepClassSummaryFixture();
 
 setupUiTestState(
   () => {
@@ -182,7 +147,11 @@ describe("StepThree transitions UI", () => {
         const evaluationCard = document.querySelector<HTMLElement>(
           "#step-three-evaluation",
         );
-        return evaluationCard?.style.animation.includes("step-three-evaluation-in") ?? false;
+        return (
+          evaluationCard?.style.animation.includes(
+            "step-three-evaluation-in",
+          ) ?? false
+        );
       })
       .toBe(true);
 
@@ -203,7 +172,9 @@ describe("StepThree transitions UI", () => {
       .poll(() => {
         const moduleCard =
           document.querySelector<HTMLElement>("#step-three-module");
-        return moduleCard?.style.animation.includes("step-three-module-out") ?? false;
+        return (
+          moduleCard?.style.animation.includes("step-three-module-out") ?? false
+        );
       })
       .toBe(true);
 
@@ -222,8 +193,9 @@ describe("StepThree transitions UI", () => {
         if (!moduleCard || !evaluationCard) return false;
 
         return (
-          evaluationCard.style.animation.includes("step-three-evaluation-out") &&
-          moduleCard.style.animation.includes("step-three-module-in")
+          evaluationCard.style.animation.includes(
+            "step-three-evaluation-out",
+          ) && moduleCard.style.animation.includes("step-three-module-in")
         );
       })
       .toBe(true);

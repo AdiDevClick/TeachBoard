@@ -72,6 +72,32 @@ describe("buildNewEvaluation", () => {
     expect(result.isModified).toBe(false);
   });
 
+  it("accepts already-normalized values up to 100 and keeps same score unchanged", () => {
+    const studentA = UUID_SCHEMA.parse("123e4567-e89b-12d3-a456-426614174031");
+
+    const allPresentStudents = [createEvaluation(studentA, 75)];
+
+    const scoreEntries: [string, unknown][] = [[studentA, 75]];
+
+    const result = buildNewEvaluation(scoreEntries, allPresentStudents);
+
+    expect(result.isModified).toBe(false);
+    expect(result.evaluations[0]?.overallScore).toBe(75);
+  });
+
+  it("ignores values greater than 100 and keeps prior overallScore", () => {
+    const studentA = UUID_SCHEMA.parse("123e4567-e89b-12d3-a456-426614174041");
+
+    const allPresentStudents = [createEvaluation(studentA, 65)];
+
+    const scoreEntries: [string, unknown][] = [[studentA, 101]];
+
+    const result = buildNewEvaluation(scoreEntries, allPresentStudents);
+
+    expect(result.isModified).toBe(false);
+    expect(result.evaluations[0]?.overallScore).toBe(65);
+  });
+
   it("ignores invalid score entries and keeps existing overallScore", () => {
     const studentA = UUID_SCHEMA.parse("123e4567-e89b-12d3-a456-426614174021");
 

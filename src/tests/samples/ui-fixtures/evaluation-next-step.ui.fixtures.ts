@@ -1,6 +1,7 @@
-import { UUID_SCHEMA, type UUID } from "@/api/types/openapi/common.types";
+import type { UUID } from "@/api/types/openapi/common.types";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
 import { evaluationFlowFixture } from "@/tests/samples/ui-fixtures/evaluation-flow.ui.fixtures";
+import { EvaluationFlowFixtureCreator } from "@/utils/FixtureCreator";
 
 type EvaluationStepClassSummaryFixture = {
   selectedClass: ClassSummaryDto;
@@ -9,6 +10,8 @@ type EvaluationStepClassSummaryFixture = {
   moduleId: UUID;
   resetClassId: UUID;
 };
+
+const resetClassId = new EvaluationFlowFixtureCreator().generateUUID();
 
 export function getEvaluationStepClassSummaryFixture(): EvaluationStepClassSummaryFixture {
   const baseClass = structuredClone(evaluationFlowFixture.classes.classA);
@@ -33,6 +36,6 @@ export function getEvaluationStepClassSummaryFixture(): EvaluationStepClassSumma
     studentId: firstStudent.id,
     taskId: firstTemplate.id,
     moduleId: firstModule.id,
-    resetClassId: UUID_SCHEMA.parse("123e4567-e89b-12d3-a456-426614179999"),
+    resetClassId,
   };
 }
