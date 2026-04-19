@@ -475,9 +475,9 @@ export const useEvaluationStepsCreationStore = create(
            */
           setStudentOverallScore(studentId: UUID, overallScore: number | null) {
             if (
-              overallScore !== null &&
-              overallScore < 0 &&
-              !Number.isFinite(overallScore)
+              !Number.isFinite(overallScore) ||
+              overallScore < 0 ||
+              overallScore > 100
             ) {
               return;
             }
