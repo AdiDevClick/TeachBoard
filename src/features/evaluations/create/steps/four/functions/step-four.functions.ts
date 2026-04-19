@@ -1,18 +1,31 @@
 import type { StepFourFormSchema } from "@/features/evaluations/create/steps/four/models/step-four.models";
 
 /**
- * Normalize the score value by converting it to a number and ensuring it's within the valid range.
+ * Normalize the score value by converting it to a number and ensuring it's within the supported range.
+ *
+ * Scores from 0 to 20 are treated as raw scores and converted to a percentage scale.
+ * Scores above 20 and up to 100 are treated as already normalized percentages.
  *
  * @param score The raw score value from the form, which can be a number or a string.
  *
- * @returns The normalized score as a number and ensures that it's between 0 and 100. If the input is invalid (e.g., negative, non-numeric), it returns null.
+ * @returns The normalized score as a number between 0 and 100. If the input is invalid
+ * (e.g., negative, non-numeric, or greater than 100), it returns null.
  */
 function normalizeScore(score: unknown): number | null {
   const parsedScore = Number(score);
   if (!Number.isFinite(parsedScore) || parsedScore < 0) {
     return null;
   }
-  return parsedScore <= 20 ? parsedScore * 5 : parsedScore;
+
+  if (parsedScore <= 20) {
+    return parsedScore * 5;
+  }
+
+  if (parsedScore <= 100) {
+    return parsedScore;
+  }
+
+  return null;
 }
 
 /**
