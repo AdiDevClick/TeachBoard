@@ -54,7 +54,7 @@ const schema = (data: typeof dataErrors) =>
         id: z.uuid(data.id),
         name: z.string(data.title),
         isPresent: z.boolean(),
-        overallScore: z.number().min(0).max(100).gt(0).nullable(),
+        overallScore: z.number().min(0).max(100).nullable(),
         assignedTask: z.object({
           id: z.uuid(data.id),
           name: z.string(data.title),
@@ -65,7 +65,7 @@ const schema = (data: typeof dataErrors) =>
             subSkills: z.array(
               z.object({
                 id: z.uuid(data.subSkillId),
-                score: z.number().min(0).max(100).gt(0),
+                score: z.number().min(0).max(100),
               }),
             ),
           }),

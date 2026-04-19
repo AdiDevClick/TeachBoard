@@ -475,24 +475,25 @@ export const useEvaluationStepsCreationStore = create(
            */
           setStudentOverallScore(studentId: UUID, overallScore: number | null) {
             if (
-              !overallScore ||
-              overallScore < 0 ||
+              overallScore !== null &&
+              overallScore < 0 &&
               !Number.isFinite(overallScore)
-            )
+            ) {
               return;
+            }
             set(
               (state) => {
                 ensureCollectionsInDraft(state);
                 const student = state.students.get(studentId);
+                if (!student) return;
 
-                if (student) {
-                  if (student.overallScore !== overallScore) {
-                    student.overallScore = overallScore;
-                  }
+                if (overallScore === null) {
+                  student.overallScore = null;
+                  return;
+                }
 
-                  if (!student.originalScore) {
-                    student.originalScore = overallScore;
-                  }
+                if (student.overallScore !== overallScore) {
+                  student.overallScore = overallScore;
                 }
               },
               undefined,
@@ -916,20 +917,20 @@ export const useEvaluationStepsCreationStore = create(
 
             for (const student of students.values()) {
               if (!student.isPresent) continue;
-              let score = 0;
-              let averageScore = 0;
+              const averageScore = getStudentAverageScore(student);
 
-              if (student.overallScore) {
-                score = student.overallScore;
-              } else {
-                averageScore = getStudentAverageScore(student);
-                score = averageScore;
-              }
+              // !! IMPORTANT !!Score can be 0
+              const score =
+                student.overallScore !== null &&
+                student.overallScore !== undefined &&
+                Number.isFinite(student.overallScore)
+                  ? student.overallScore
+                  : averageScore;
 
               scores.set(student.id, {
                 name: student.fullName,
                 score,
-                originalScore: student.originalScore ?? averageScore,
+                originalScore: averageScore,
               });
             }
 
