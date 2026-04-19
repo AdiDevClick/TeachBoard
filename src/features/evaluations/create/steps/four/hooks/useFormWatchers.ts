@@ -1,10 +1,7 @@
-import { debugLogs } from "@/configs/app-components.config";
 import { useStepFourState } from "@/features/evaluations/create/hooks/useStepFourState";
 import { buildNewEvaluation } from "@/features/evaluations/create/steps/four/functions/step-four.functions";
 import type { UseFormWatchersProps } from "@/features/evaluations/create/steps/four/hooks/types/use-form-watcher.types";
-import type { StepFourFormSchema } from "@/features/evaluations/create/steps/four/models/step-four.models";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
-import { parseFromObject } from "@/utils/utils";
 import { useWatch } from "react-hook-form";
 
 /**
@@ -17,11 +14,8 @@ import { useWatch } from "react-hook-form";
 export function useFormWatchers({
   form: { control, setValue, getValues },
 }: UseFormWatchersProps) {
-  const {
-    getAllPresentStudents,
-    title: titleFromStore,
-    comments: commentsFromStore,
-  } = useStepFourState();
+  const { title: titleFromStore, comments: commentsFromStore } =
+    useStepFourState();
 
   /**
    * SCORE UPDATES - UPDATE EVALUATIONS IN THE FORM
@@ -36,35 +30,26 @@ export function useFormWatchers({
     control,
     name: "overallScore",
     compute: (overallScore) => {
+      const currentEvaluations = getValues().evaluations;
+
       // Let it init first
-      if (getValues().evaluations?.length === 0) {
+      if (currentEvaluations?.length === 0) {
         return;
       }
 
       const entries = Object.entries(overallScore ?? {});
+
       if (entries.length > 0) {
         const { isModified, evaluations: newEvaluations } = buildNewEvaluation(
           entries,
-          getAllPresentStudents,
+          currentEvaluations,
         );
 
         if (!isModified) {
           return;
         }
 
-        const parsed = parseFromObject(
-          newEvaluations,
-        ) as unknown as StepFourFormSchema["evaluations"];
-
-        if (!parsed) {
-          debugLogs("StepFourController:triggerScoreUpdate", {
-            type: "componentHandler",
-            message: "Failed to parse evaluated students for form submission",
-          });
-          setValue("evaluations", []);
-        }
-
-        setValue("evaluations", parsed);
+        setValue("evaluations", newEvaluations);
       }
     },
   });

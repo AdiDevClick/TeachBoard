@@ -180,6 +180,75 @@ const SECOND_EVALUATION_PAYLOAD_FIXTURE: DetailedEvaluationView = {
   ],
 };
 
+const ZERO_SCORE_EVALUATION_PAYLOAD_FIXTURE: DetailedEvaluationView = {
+  id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  title: "Evaluation avec score zéro",
+  className: "BTS SIO",
+  classId: CLASS_ID,
+  evaluationDate: "2026-04-02T00:00:00.000Z",
+  userId: USER_ID,
+  absentStudents: [],
+  attendedModules: [
+    {
+      id: MODULE_ID,
+      code: "M1",
+      name: "Module 1",
+      subSkills: [
+        {
+          id: SUBSKILL_ID,
+          code: "S1",
+          name: "SubSkill 1",
+          isDisabled: false,
+        },
+      ],
+    },
+  ],
+  evaluations: [
+    {
+      id: STUDENT_ONE_ID,
+      name: "John Doe",
+      isPresent: true,
+      overallScore: 0,
+      assignedTask: {
+        id: TASK_ID,
+        name: "TP 1",
+      },
+      modules: [
+        {
+          id: MODULE_ID,
+          subSkills: [
+            {
+              id: SUBSKILL_ID,
+              score: 0,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: STUDENT_TWO_ID,
+      name: "Jane Doe",
+      isPresent: true,
+      overallScore: null,
+      assignedTask: {
+        id: TASK_ID,
+        name: "TP 1",
+      },
+      modules: [
+        {
+          id: MODULE_ID,
+          subSkills: [
+            {
+              id: SUBSKILL_ID,
+              score: 25,
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
 describe("StepsCreationStore - students reshape", () => {
   beforeEach(() => {
     // reset relevant parts of the store
@@ -385,6 +454,7 @@ describe("StepsCreationStore - students reshape", () => {
     const studentTwo = state.students.get(STUDENT_TWO_ID);
 
     expect(studentOne?.isPresent).toBe(false);
+    expect(studentOne?.overallScore).toBeNull();
     expect(studentTwo?.isPresent).toBe(true);
     expect(studentTwo?.overallScore).toBe(50);
 
@@ -409,5 +479,83 @@ describe("StepsCreationStore - students reshape", () => {
     ).map(([id]) => id);
 
     expect(presentScoresIds).toEqual([STUDENT_TWO_ID]);
+  });
+
+  it("keeps original score based on sliders when override changes", () => {
+    const store = useEvaluationStepsCreationStore.getState();
+
+    store.setSelectedClass(CLASS_SUMMARY_FIXTURE);
+    store.setStudentPresence(STUDENT_ONE_ID, true);
+    store.setStudentTaskAssignment(TASK_ID, STUDENT_ONE_ID);
+
+    const module = store.getSelectedModule(MODULE_ID);
+    const subSkill = module?.subSkills.get(SUBSKILL_ID);
+
+    if (!module || !subSkill) {
+      throw new Error("Fixture module/sub-skill not found in test state");
+    }
+
+    store.setEvaluationForStudent(STUDENT_ONE_ID, {
+      module,
+      subSkill,
+      score: 80,
+    });
+
+    const beforeOverride = useEvaluationStepsCreationStore
+      .getState()
+      .getAllStudentsAverageScores()
+      .get(STUDENT_ONE_ID);
+
+    expect(beforeOverride?.score).toBe(80);
+    expect(beforeOverride?.originalScore).toBe(80);
+
+    useEvaluationStepsCreationStore
+      .getState()
+      .setStudentOverallScore(STUDENT_ONE_ID, 60);
+
+    useEvaluationStepsCreationStore
+      .getState()
+      .setEvaluationForStudent(STUDENT_ONE_ID, {
+        module,
+        subSkill,
+        score: 100,
+      });
+
+    const afterOverride = useEvaluationStepsCreationStore
+      .getState()
+      .getAllStudentsAverageScores()
+      .get(STUDENT_ONE_ID);
+
+    expect(afterOverride?.score).toBe(60);
+    expect(afterOverride?.originalScore).toBe(100);
+  });
+
+  it("rehydrates payloads containing zero slider scores", () => {
+    const result = useEvaluationStepsCreationStore
+      .getState()
+      .rehydrateFromEvaluationPayload(
+        CLASS_SUMMARY_FIXTURE,
+        ZERO_SCORE_EVALUATION_PAYLOAD_FIXTURE,
+      );
+
+    expect(result).toBe(true);
+
+    const state = useEvaluationStepsCreationStore.getState();
+    const studentOne = state.students.get(STUDENT_ONE_ID);
+
+    expect(studentOne?.overallScore).toBe(0);
+
+    const studentOneSubSkillScore = studentOne?.evaluations?.modules
+      .get(MODULE_ID)
+      ?.subSkills.get(SUBSKILL_ID)?.score;
+
+    expect(studentOneSubSkillScore).toBe(0);
+
+    const studentOneAverages = state
+      .getAllStudentsAverageScores()
+      .get(STUDENT_ONE_ID);
+
+    expect(studentOneAverages?.score).toBe(0);
+    expect(studentOneAverages?.originalScore).toBe(0);
   });
 });

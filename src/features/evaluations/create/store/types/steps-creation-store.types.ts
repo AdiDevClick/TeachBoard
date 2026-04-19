@@ -1,4 +1,4 @@
-import type { OffsetDateTime, UUID } from "@/api/types/openapi/common.types.ts";
+import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
 import type {
   SkillsType,
@@ -22,8 +22,6 @@ export type StudentWithPresence = {
   fullName: string;
   /** Potential overall score for the student modified by the user */
   overallScore?: number | null;
-  /** Original score for the student not modified by the user */
-  originalScore?: number | null;
   isPresent: boolean;
   assignedTask?: Pick<ClassTasks, "id" | "name"> | null;
   evaluations?: {

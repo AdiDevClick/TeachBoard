@@ -10,12 +10,11 @@ import {
 import { useEvaluationTableStore } from "@/features/evaluations/main/configs/evaluations.configs";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import { saveObjectInCache } from "@/hooks/database/fetches/functions/use-fetch.functions";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 import { parseFromObject } from "@/utils/utils";
 import { useEffect, useEffectEvent, useMemo } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 
-const toastId = "step-four-submit-toast";
 /**
  * Custom hook to handle the logic for Step Four of the evaluation creation process, which includes managing the state of scores, evaluated students, and form submission.
  *
@@ -39,21 +38,15 @@ export function useStepFourHandler({
     clear,
   } = useStepFourState();
 
-  const {
-    submitCallback,
-    invalidSubmitCallback,
-    queryClient,
-    isLoading,
-    error,
-    response,
-  } = useCommandHandler({
-    pageId,
-    form,
-    submitRoute,
-    submitDataReshapeFn,
-  });
+  const { submitCallback, invalidSubmitCallback, queryClient, response } =
+    useCommandHandler({
+      pageId,
+      form,
+      submitRoute,
+      submitDataReshapeFn,
+    });
 
-  const { setValue, reset } = form;
+  const { setValue } = form;
   const navigate = useNavigate();
   const { mode } = useLoaderData();
 
@@ -88,9 +81,28 @@ export function useStepFourHandler({
     const parsedVariables = stepFourInputSchema.parse(variables);
 
     delete parsedVariables["overallScore"];
+
+    const isEditMode = mode === "edit";
+    const customSuccessMessage = isEditMode
+      ? "Évaluation mise à jour avec succès !"
+      : "Évaluation créée avec succès !";
+
+    const loadingMessage = isEditMode
+      ? "Mise à jour de l'évaluation en cours..."
+      : "Création de l'évaluation en cours...";
+
     submitCallback(parsedVariables, {
       abortController: new AbortController(),
-      method: mode === "create" ? "POST" : "PUT",
+      method: isEditMode ? "PUT" : "POST",
+      toastOptions: {
+        loadingMessage,
+      },
+      successDescription() {
+        return {
+          type: "success",
+          customSuccessMessage,
+        };
+      },
     });
   };
 
@@ -125,57 +137,50 @@ export function useStepFourHandler({
   }, [presenceMemo, selectedClass?.id]);
 
   /**
+   * RESULTS - Clear & navigate
+   */
+  const clearAndNavigate = useEffectEvent(
+    (evalId: UUID, parsedResponse: AnyObjectProps) => {
+      saveObjectInCache(
+        queryClient,
+        [
+          "evaluation-overview",
+          API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(evalId),
+        ],
+        parsedResponse,
+      );
+
+      clear(selectedClass?.id as UUID, true);
+      navigate(`/evaluations/${evalId}`);
+    },
+  );
+
+  /**
    * RESULTS - Show toasts on loading, success and error states
    */
   useEffect(() => {
-    if (isLoading && !toast.getToasts().some((t) => t.id === toastId)) {
-      toast.dismiss();
-      toast.loading("Envoi en cours...", {
-        id: toastId,
-      });
-    }
-    if (error || response) {
-      toast.dismiss(toastId);
+    if (response) {
+      const store = useEvaluationTableStore.getState();
+      const parsedResponse = parseFromObject(response.data);
+      const evalId = parsedResponse?.id as UUID;
 
-      if (error) {
-        reset(undefined, {
-          keepValues: true,
-          keepErrors: true,
-          keepDirty: true,
-          keepTouched: true,
-          keepIsSubmitted: false,
-        });
-      }
-
-      if (response) {
-        toast.success("Évaluation créée avec succès !", {
-          id: toastId,
-        });
-        const store = useEvaluationTableStore.getState();
-        const parsedResponse = parseFromObject(response.data);
-
-        if (parsedResponse && !store.hasItem(parsedResponse.id as UUID)) {
+      if (parsedResponse) {
+        const itemInStore = store.hasItem(evalId);
+        if (!itemInStore) {
           // Save in local persisted store to avoid fetching
           store.addItemToTop(parsedResponse as never);
-
-          // While we have access to the data, cache it in case the user navigates to the evaluation overview, to avoid a fetch there.
-          saveObjectInCache(
-            queryClient,
-            [
-              "evaluation-overview",
-              API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID(
-                parsedResponse.id as UUID,
-              ),
-            ],
-            parsedResponse,
-          );
         }
 
-        clear(selectedClass?.id as UUID, true);
-        navigate("/evaluations");
+        if (itemInStore) {
+          // Refresh IDB data
+          store.updateItem(evalId, parsedResponse as never);
+        }
+
+        // While we have access to the data, cache it in case the user navigates to the evaluation overview, to avoid a fetch there.
+        clearAndNavigate(evalId, parsedResponse);
       }
     }
-  }, [isLoading, error, response]);
+  }, [response]);
 
   return {
     scoreValue,
