@@ -1,6 +1,9 @@
-import { UUID_SCHEMA, type UUID } from "@/api/types/openapi/common.types";
+import type { UUID } from "@/api/types/openapi/common.types";
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
-import type { SkillsType, SkillsViewDto } from "@/api/types/routes/skills.types";
+import type {
+  SkillsType,
+  SkillsViewDto,
+} from "@/api/types/routes/skills.types";
 import type { StudentDto } from "@/api/types/routes/students.types";
 import type { TaskTemplateDto } from "@/api/types/routes/task-templates.types";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
@@ -10,10 +13,9 @@ import { StepFour } from "@/features/evaluations/create/steps/four/StepFour";
 import { StepOne } from "@/features/evaluations/create/steps/one/StepOne";
 import { StepThree } from "@/features/evaluations/create/steps/three/StepThree";
 import { StepTwo } from "@/features/evaluations/create/steps/two/StepTwo";
-import { vi } from "vitest";
+import { EvaluationFlowFixtureCreator } from "@/utils/FixtureCreator";
 import { Navigate, type RouteObject } from "react-router-dom";
-
-const toUuid = (value: string): UUID => UUID_SCHEMA.parse(value);
+import { vi } from "vitest";
 
 type PostMode = "success" | "error" | "slow-success";
 
@@ -59,13 +61,9 @@ type EvaluationFlowFixture = {
   };
 };
 
-const makeSkill = (id: UUID, code: string, name: string): SkillsType => ({
-  id,
-  code,
-  name,
-});
+const fixtureBuilder = new EvaluationFlowFixtureCreator();
 
-const makeStudents = (prefix: string, base: number): StudentDto[] => {
+const makeStudents = (prefix: string): StudentDto[] => {
   const names = [
     "Alice",
     "Bruno",
@@ -80,133 +78,86 @@ const makeStudents = (prefix: string, base: number): StudentDto[] => {
   ];
 
   return names.map((firstName, index) => {
-    const suffix = String(base + index).padStart(4, "0");
-    const id = toUuid(`00000000-0000-4000-8000-00000000${suffix}`);
+    const lastName = `${prefix}${index + 1}`;
 
-    return {
-      id,
+    return fixtureBuilder.createStudentDto(
+      fixtureBuilder.generateUUID(),
       firstName,
-      lastName: `${prefix}${index + 1}`,
-      email: `${firstName.toLowerCase()}.${prefix.toLowerCase()}${index + 1}@example.com`,
-    };
+      lastName,
+      `${firstName} ${lastName}`,
+    );
   });
 };
 
-const sharedModuleId = toUuid("10000000-0000-4000-8000-000000000001");
-const moduleBId = toUuid("10000000-0000-4000-8000-000000000002");
-const moduleCId = toUuid("10000000-0000-4000-8000-000000000003");
+const makeSkill = (code: string, name: string): SkillsType =>
+  fixtureBuilder.createSkillType(fixtureBuilder.generateUUID(), code, name);
 
-const task1Id = toUuid("20000000-0000-4000-8000-000000000001");
-const task2Id = toUuid("20000000-0000-4000-8000-000000000002");
-const task3Id = toUuid("20000000-0000-4000-8000-000000000003");
-const task4Id = toUuid("20000000-0000-4000-8000-000000000004");
+const makeModule = (
+  code: string,
+  name: string,
+  subSkills: SkillsType[],
+  id?: UUID,
+): SkillsViewDto =>
+  fixtureBuilder.createSkillsView(
+    id ?? fixtureBuilder.generateUUID(),
+    code,
+    name,
+    subSkills,
+  );
 
-const sharedSubSkill = makeSkill(
-  toUuid("30000000-0000-4000-8000-000000000001"),
-  "SS-COMMON",
-  "SubSkill commun",
-);
-const task1Sub1 = makeSkill(
-  toUuid("30000000-0000-4000-8000-000000000002"),
-  "SS-T1-A",
-  "Task1 Sub A",
-);
-const task1Sub2 = makeSkill(
-  toUuid("30000000-0000-4000-8000-000000000003"),
-  "SS-T1-B",
-  "Task1 Sub B",
-);
-const task2Sub1 = makeSkill(
-  toUuid("30000000-0000-4000-8000-000000000004"),
-  "SS-T2-A",
-  "Task2 Sub A",
-);
-const task2Sub2 = makeSkill(
-  toUuid("30000000-0000-4000-8000-000000000005"),
-  "SS-T2-B",
-  "Task2 Sub B",
+const sharedSubSkill = makeSkill("SS-COMMON", "SubSkill commun");
+const sharedModuleId = fixtureBuilder.generateUUID();
+
+const sharedModuleForTask1 = makeModule(
+  "MOD-SHARED",
+  "Module partagé",
+  [
+    sharedSubSkill,
+    makeSkill("SS-T1-A", "Task1 Sub A"),
+    makeSkill("SS-T1-B", "Task1 Sub B"),
+  ],
+  sharedModuleId,
 );
 
-const moduleBSub1 = makeSkill(
-  toUuid("30000000-0000-4000-8000-000000000006"),
-  "SS-MB-A",
-  "ModuleB Sub A",
-);
-const moduleBSub2 = makeSkill(
-  toUuid("30000000-0000-4000-8000-000000000007"),
-  "SS-MB-B",
-  "ModuleB Sub B",
-);
-const moduleBSub3 = makeSkill(
-  toUuid("30000000-0000-4000-8000-000000000008"),
-  "SS-MB-C",
-  "ModuleB Sub C",
+const sharedModuleForTask2 = makeModule(
+  "MOD-SHARED",
+  "Module partagé",
+  [
+    sharedSubSkill,
+    makeSkill("SS-T2-A", "Task2 Sub A"),
+    makeSkill("SS-T2-B", "Task2 Sub B"),
+  ],
+  sharedModuleId,
 );
 
-const moduleCSub1 = makeSkill(
-  toUuid("30000000-0000-4000-8000-000000000009"),
-  "SS-MC-A",
-  "ModuleC Sub A",
-);
-const moduleCSub2 = makeSkill(
-  toUuid("30000000-0000-4000-8000-000000000010"),
-  "SS-MC-B",
-  "ModuleC Sub B",
-);
-const moduleCSub3 = makeSkill(
-  toUuid("30000000-0000-4000-8000-000000000011"),
-  "SS-MC-C",
-  "ModuleC Sub C",
-);
+const uniqueModuleB = makeModule("MOD-B", "Module B", [
+  makeSkill("SS-MB-A", "ModuleB Sub A"),
+  makeSkill("SS-MB-B", "ModuleB Sub B"),
+  makeSkill("SS-MB-C", "ModuleB Sub C"),
+]);
 
-const sharedModuleForTask1: SkillsViewDto = {
-  id: sharedModuleId,
-  code: "MOD-SHARED",
-  name: "Module partagé",
-  subSkills: [sharedSubSkill, task1Sub1, task1Sub2],
-};
-
-const sharedModuleForTask2: SkillsViewDto = {
-  id: sharedModuleId,
-  code: "MOD-SHARED",
-  name: "Module partagé",
-  subSkills: [sharedSubSkill, task2Sub1, task2Sub2],
-};
-
-const uniqueModuleB: SkillsViewDto = {
-  id: moduleBId,
-  code: "MOD-B",
-  name: "Module B",
-  subSkills: [moduleBSub1, moduleBSub2, moduleBSub3],
-};
-
-const uniqueModuleC: SkillsViewDto = {
-  id: moduleCId,
-  code: "MOD-C",
-  name: "Module C",
-  subSkills: [moduleCSub1, moduleCSub2, moduleCSub3],
-};
+const uniqueModuleC = makeModule("MOD-C", "Module C", [
+  makeSkill("SS-MC-A", "ModuleC Sub A"),
+  makeSkill("SS-MC-B", "ModuleC Sub B"),
+  makeSkill("SS-MC-C", "ModuleC Sub C"),
+]);
 
 const makeTemplate = (
-  id: UUID,
   taskName: string,
   modules: SkillsViewDto[],
-): TaskTemplateDto => ({
-  id,
-  taskName,
-  task: {
-    id,
-    name: taskName,
+): TaskTemplateDto =>
+  fixtureBuilder.createTaskTemplateWithModules({
+    id: fixtureBuilder.generateUUID(),
+    taskName,
+    modules,
     description: `Description ${taskName}`,
-  },
-  modules,
-});
+  });
 
 const templatesBase = {
-  task1: makeTemplate(task1Id, "Task 1", [sharedModuleForTask1]),
-  task2: makeTemplate(task2Id, "Task 2", [sharedModuleForTask2]),
-  task3: makeTemplate(task3Id, "Task 3", [uniqueModuleB]),
-  task4: makeTemplate(task4Id, "Task 4", [uniqueModuleC]),
+  task1: makeTemplate("Task 1", [sharedModuleForTask1]),
+  task2: makeTemplate("Task 2", [sharedModuleForTask2]),
+  task3: makeTemplate("Task 3", [uniqueModuleB]),
+  task4: makeTemplate("Task 4", [uniqueModuleC]),
 };
 
 const cloneTemplates = (): TaskTemplateDto[] => [
@@ -216,46 +167,32 @@ const cloneTemplates = (): TaskTemplateDto[] => [
   structuredClone(templatesBase.task4),
 ];
 
-const classAStudents = makeStudents("A", 1);
-const classBStudents = makeStudents("B", 101);
-const classCStudents = makeStudents("C", 201);
+const classAStudents = makeStudents("A");
+const classBStudents = makeStudents("B");
+const classCStudents = makeStudents("C");
 
 const makeClass = (
-  id: UUID,
   name: string,
   degreeLevel: string,
   students: StudentDto[],
-): ClassSummaryDto => ({
-  id,
-  name,
-  description: `Classe ${name}`,
-  degreeConfigName: `${degreeLevel} - config`,
-  degreeLevel,
-  degreeYearCode: "2A",
-  degreeYearName: "Deuxième année",
-  evaluations: [],
-  students,
-  templates: cloneTemplates(),
-});
+): ClassSummaryDto =>
+  fixtureBuilder.createClassSummary(
+    fixtureBuilder.generateUUID(),
+    students,
+    cloneTemplates(),
+    {
+      name,
+      description: `Classe ${name}`,
+      degreeConfigName: `${degreeLevel} - config`,
+      degreeLevel,
+      degreeYearCode: "2A",
+      degreeYearName: "Deuxième année",
+    },
+  );
 
-const classA = makeClass(
-  toUuid("40000000-0000-4000-8000-000000000001"),
-  "Classe A",
-  "CAP",
-  classAStudents,
-);
-const classB = makeClass(
-  toUuid("40000000-0000-4000-8000-000000000002"),
-  "Classe B",
-  "CAP",
-  classBStudents,
-);
-const classC = makeClass(
-  toUuid("40000000-0000-4000-8000-000000000003"),
-  "Classe C",
-  "BTS",
-  classCStudents,
-);
+const classA = makeClass("Classe A", "CAP", classAStudents);
+const classB = makeClass("Classe B", "CAP", classBStudents);
+const classC = makeClass("Classe C", "BTS", classCStudents);
 
 export const evaluationFlowFixture: EvaluationFlowFixture = {
   classesGrouped: {
@@ -319,7 +256,11 @@ export function buildEvaluationCreateRoutes(): RouteObject[] {
   ];
 }
 
-function jsonResponse(body: unknown, status = 200, statusText = "OK"): JsonResponseLike {
+function jsonResponse(
+  body: unknown,
+  status = 200,
+  statusText = "OK",
+): JsonResponseLike {
   return {
     ok: status >= 200 && status < 300,
     status,
@@ -340,6 +281,71 @@ export function installEvaluationFlowFetchStub(
     postBodies: [] as unknown[],
   };
 
+  const pushPostBody = (rawBody: RequestInit["body"]) => {
+    if (typeof rawBody === "string") {
+      try {
+        stats.postBodies.push(JSON.parse(rawBody));
+      } catch {
+        stats.postBodies.push(rawBody);
+      }
+
+      return;
+    }
+
+    stats.postBodies.push(rawBody ?? null);
+  };
+
+  const handleGetRequest = (urlStr: string): JsonResponseLike => {
+    stats.getCalls += 1;
+
+    if (urlStr.includes(API_ENDPOINTS.GET.CLASSES.endPoints.ALL)) {
+      return jsonResponse({ data: fixture.classesGrouped }, 200);
+    }
+
+    return jsonResponse({ data: [] }, 200);
+  };
+
+  const handlePostRequest = async (
+    urlStr: string,
+    init?: RequestInit,
+  ): Promise<JsonResponseLike> => {
+    stats.postCalls += 1;
+    pushPostBody(init?.body);
+
+    if (!urlStr.includes(API_ENDPOINTS.POST.CREATE_EVALUATION.endpoint)) {
+      return jsonResponse({ data: {} }, 200);
+    }
+
+    if (mode === "error") {
+      return jsonResponse(
+        {
+          error: "Bad Request",
+          message: "Simulated evaluation submit failure",
+        },
+        400,
+        "Bad Request",
+      );
+    }
+
+    if (mode === "slow-success") {
+      await new Promise<void>((resolve) => {
+        releaseSlowPostResolver = resolve;
+      });
+    }
+
+    return jsonResponse(
+      {
+        success: "Evaluation saved",
+        data: {
+          id: fixtureBuilder.generateUUID(),
+          classId: fixture.classes.classA.id,
+          name: "Evaluation de test",
+        },
+      },
+      200,
+    );
+  };
+
   vi.stubGlobal(
     "fetch",
     vi.fn(async (url: string, init?: RequestInit) => {
@@ -347,61 +353,11 @@ export function installEvaluationFlowFetchStub(
       const method = String(init?.method ?? "GET").toUpperCase();
 
       if (method === "GET") {
-        stats.getCalls += 1;
-
-        if (urlStr.includes(API_ENDPOINTS.GET.CLASSES.endPoints.ALL)) {
-          return jsonResponse({ data: fixture.classesGrouped }, 200);
-        }
-
-        return jsonResponse({ data: [] }, 200);
+        return handleGetRequest(urlStr);
       }
 
       if (method === "POST") {
-        stats.postCalls += 1;
-
-        const rawBody = init?.body;
-        if (typeof rawBody === "string") {
-          try {
-            stats.postBodies.push(JSON.parse(rawBody));
-          } catch {
-            stats.postBodies.push(rawBody);
-          }
-        } else {
-          stats.postBodies.push(rawBody ?? null);
-        }
-
-        if (!urlStr.includes(API_ENDPOINTS.POST.CREATE_EVALUATION.endpoint)) {
-          return jsonResponse({ data: {} }, 200);
-        }
-
-        if (mode === "error") {
-          return jsonResponse(
-            {
-              error: "Bad Request",
-              message: "Simulated evaluation submit failure",
-            },
-            400,
-            "Bad Request",
-          );
-        }
-
-        if (mode === "slow-success") {
-          await new Promise<void>((resolve) => {
-            releaseSlowPostResolver = resolve;
-          });
-        }
-
-        return jsonResponse(
-          {
-            success: "Evaluation saved",
-            data: {
-              id: toUuid("50000000-0000-4000-8000-000000000001"),
-              classId: fixture.classes.classA.id,
-              name: "Evaluation de test",
-            },
-          },
-          200,
-        );
+        return handlePostRequest(urlStr, init);
       }
 
       return jsonResponse({ data: [] }, 200);

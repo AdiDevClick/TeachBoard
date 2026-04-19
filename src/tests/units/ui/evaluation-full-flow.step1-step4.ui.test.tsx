@@ -667,19 +667,31 @@ describe("UI flow: evaluations step1 -> step4", () => {
         locator: getCommentsLocator(),
         value: "Commentaire valide",
       },
+    ]);
+
+    await fillFieldsEnsuringSubmitDisabled("enregistrer", [
       {
         locator: page.elementLocator(getOverallScoreInput(student1Id)),
         value: "21",
         isSubmitDisabled: false,
       },
+    ]);
+
+    await fillFieldsEnsuringSubmitDisabled("enregistrer", [
       {
         locator: page.elementLocator(getOverallScoreInput(student1Id)),
         value: "-1",
       },
+    ]);
+
+    await fillFieldsEnsuringSubmitDisabled("enregistrer", [
       {
         locator: page.elementLocator(getOverallScoreInput(student1Id)),
         value: "16",
       },
+    ]);
+
+    await fillFieldsEnsuringSubmitDisabled("enregistrer", [
       {
         locator: getCommentsLocator(),
         clearInput: true,

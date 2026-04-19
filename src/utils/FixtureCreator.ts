@@ -1,6 +1,7 @@
 import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type {
   ClassDto,
+  ClassSummaryDto,
   CreateClassResponseData,
 } from "@/api/types/routes/classes.types.ts";
 import type {
@@ -11,6 +12,7 @@ import type {
 import type { DiplomaConfigDto } from "@/api/types/routes/diplomas.types.ts";
 import type {
   SkillDto,
+  SkillsType,
   SkillsViewDto,
   SkillType,
 } from "@/api/types/routes/skills.types.ts";
@@ -23,6 +25,7 @@ import type {
 } from "@/api/types/routes/task-templates.types.ts";
 import type { TaskDto } from "@/api/types/routes/tasks.types.ts";
 import type { TeacherDto } from "@/api/types/routes/teachers.types.ts";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 
 /**
  * Base class for all fixture creators, providing common utilities.
@@ -66,6 +69,10 @@ export class FixtureCreatorBase {
 
   get id(): UUID {
     return this.#id;
+  }
+
+  generateUUID(): UUID {
+    return this.#generateId();
   }
 
   /**
@@ -117,7 +124,7 @@ export class FixtureCreatorBase {
         const r = Math.trunc(Math.random() * 16),
           v = c === "x" ? r : (r & 0x3) | 0x8;
         return v.toString(16);
-      }
+      },
     );
   }
 
@@ -183,12 +190,12 @@ export class FixtureCreatorBase {
   emailFromNames(
     firstName: string,
     lastName: string,
-    domain = "example.com"
+    domain = "example.com",
   ): string {
     const emailLocal = `${this.stripDiacritics(
-      firstName
+      firstName,
     ).toLowerCase()}.${this.stripDiacritics(
-      lastName
+      lastName,
     ).toLowerCase()}`.replaceAll(/[^a-z0-9.]/g, "");
     return `${emailLocal}@${domain}`;
   }
@@ -221,7 +228,7 @@ export class FixtureCreatorBase {
   }): DiplomaConfigDto {
     // Return the fixture instance (its properties are own, enumerable values)
     return new DiplomaConfigFixtureCreator(
-      params
+      params,
     ) as unknown as DiplomaConfigDto;
   }
 }
@@ -293,7 +300,7 @@ export class DegreeFixtureCreator
       yearNameFormatter?: (yearNumber: number, yearCode: string) => string;
       nameGenerator?: (type: DegreeType) => string;
       codeGenerator?: (type: DegreeType, name: string) => string;
-    }
+    },
   ) {
     super(params?.id);
     this.#type = type;
@@ -323,7 +330,7 @@ export class DegreeFixtureCreator
     params?: {
       yearNumber?: number;
       yearNameFormatter?: (yearNumber: number, yearCode: string) => string;
-    }
+    },
   ): string {
     if (type === "YEAR") {
       const yearNumber = params?.yearNumber ?? this.randomInt(1, 5);
@@ -340,7 +347,7 @@ export class DegreeFixtureCreator
   #generateDefaultCode(
     type: DegreeType,
     name: string,
-    params?: { yearNumber?: number }
+    params?: { yearNumber?: number },
   ): string {
     if (type === "YEAR") {
       const match = /(\d+)/.exec(this.stripDiacritics(name));
@@ -595,7 +602,7 @@ export class ClassFixtureCreator
     this.#name =
       params?.name ??
       `${this.randomInt(1, 5)}${String.fromCodePoint(
-        65 + this.randomInt(0, 3)
+        65 + this.randomInt(0, 3),
       )}`;
     this.#description = params?.description;
     this.#degreeLevel = params?.degreeLevel;
@@ -637,7 +644,7 @@ export class CreateClassResponseFixtureCreator
     this.#name =
       params?.name ??
       `${this.randomInt(1, 5)}${String.fromCodePoint(
-        65 + this.randomInt(0, 3)
+        65 + this.randomInt(0, 3),
       )}`;
     this.#description = params?.description;
     this.#degreeLevel =
@@ -702,6 +709,251 @@ export class CreateDegreeResponseFixtureCreator
     this.exposeGettersAsValues({
       degree: this.#degree,
     });
+  }
+}
+
+type DetailedEvaluationStudent = DetailedEvaluationView["evaluations"][number];
+type DetailedEvaluationModule = DetailedEvaluationStudent["modules"][number];
+type DetailedEvaluationSubSkill = DetailedEvaluationModule["subSkills"][number];
+type DetailedEvaluationAssignedTask = DetailedEvaluationStudent["assignedTask"];
+type DetailedEvaluationAbsentStudent =
+  DetailedEvaluationView["absentStudents"][number];
+type DetailedEvaluationAttendedModule = NonNullable<
+  DetailedEvaluationView["attendedModules"]
+>[number];
+type DetailedEvaluationAttendedSubSkill =
+  DetailedEvaluationAttendedModule["subSkills"][number];
+
+export class EvaluationFlowFixtureCreator extends FixtureCreatorBase {
+  readonly #classId: UUID;
+  readonly #userId: UUID;
+  readonly #className: string;
+  readonly #evaluationDate: string;
+
+  constructor(params?: {
+    classId?: UUID;
+    userId?: UUID;
+    className?: string;
+    evaluationDate?: string;
+  }) {
+    super();
+    this.#classId = params?.classId ?? this.generateUUID();
+    this.#userId = params?.userId ?? this.generateUUID();
+    this.#className = params?.className ?? "BTS SIO";
+    this.#evaluationDate = params?.evaluationDate ?? "2026-03-31T00:00:00.000Z";
+  }
+
+  createStudentDto(
+    id: UUID,
+    firstName: string,
+    lastName: string,
+    fullName: string,
+  ): StudentDto {
+    return {
+      id,
+      firstName,
+      lastName,
+      fullName,
+    };
+  }
+
+  createSkillType(id: UUID, code: string, name: string): SkillsType {
+    return {
+      id,
+      code,
+      name,
+    };
+  }
+
+  createSkillsView(
+    id: UUID,
+    code: string,
+    name: string,
+    subSkills: SkillsType[],
+  ): SkillsViewDto {
+    return {
+      id,
+      code,
+      name,
+      subSkills,
+    };
+  }
+
+  createTaskTemplate(
+    id: UUID,
+    moduleId: UUID,
+    subSkillId: UUID,
+  ): TaskTemplateDto {
+    const module = this.createSkillsView(moduleId, "M1", "Module 1", [
+      this.createSkillType(subSkillId, "S1", "SubSkill 1"),
+    ]);
+
+    return this.createTaskTemplateWithModules({
+      id,
+      taskName: "TP 1",
+      description: "Exercice",
+      modules: [module],
+    });
+  }
+
+  createTaskTemplateWithModules(params: {
+    id: UUID;
+    taskName: string;
+    modules: SkillsViewDto[];
+    taskId?: UUID;
+    description?: string;
+    name?: string;
+  }): TaskTemplateDto {
+    const taskId = params.taskId ?? params.id;
+
+    return {
+      id: params.id,
+      name: params.name,
+      taskName: params.taskName,
+      task: {
+        id: taskId,
+        name: params.taskName,
+        description: params.description,
+      },
+      modules: params.modules,
+    };
+  }
+
+  createAssignedTask(id: UUID, name = "TP 1"): DetailedEvaluationAssignedTask {
+    return {
+      id,
+      name,
+    };
+  }
+
+  createEvaluationSubSkill(
+    id: UUID,
+    score: number,
+  ): DetailedEvaluationSubSkill {
+    return {
+      id,
+      score,
+    };
+  }
+
+  createEvaluationModule(
+    id: UUID,
+    subSkills: DetailedEvaluationSubSkill[],
+  ): DetailedEvaluationModule {
+    return {
+      id,
+      subSkills,
+    };
+  }
+
+  createEvaluationStudent(
+    id: UUID,
+    name: string,
+    isPresent: boolean,
+    overallScore: number | null,
+    modules: DetailedEvaluationModule[],
+    assignedTaskId?: UUID,
+    assignedTaskName?: string,
+  ): DetailedEvaluationStudent {
+    return {
+      id,
+      name,
+      isPresent,
+      overallScore,
+      assignedTask: this.createAssignedTask(
+        assignedTaskId ?? this.generateUUID(),
+        assignedTaskName,
+      ),
+      modules,
+    };
+  }
+
+  createAttendedSubSkill(
+    id: UUID,
+    code: string,
+    name: string,
+    isDisabled = false,
+  ): DetailedEvaluationAttendedSubSkill {
+    return {
+      id,
+      code,
+      name,
+      isDisabled,
+    };
+  }
+
+  createAttendedModule(
+    id: UUID,
+    subSkillId: UUID,
+    params?: {
+      code?: string;
+      name?: string;
+      subSkills?: DetailedEvaluationAttendedSubSkill[];
+    },
+  ): DetailedEvaluationAttendedModule {
+    return {
+      id,
+      code: params?.code ?? "M1",
+      name: params?.name ?? "Module 1",
+      subSkills: params?.subSkills ?? [
+        this.createAttendedSubSkill(subSkillId, "S1", "SubSkill 1"),
+      ],
+    };
+  }
+
+  createDetailedEvaluationView(
+    id: UUID,
+    title: string,
+    absentStudents: DetailedEvaluationAbsentStudent[],
+    evaluations: DetailedEvaluationStudent[],
+    attendedModules: DetailedEvaluationAttendedModule[],
+    params?: {
+      className?: string;
+      classId?: UUID;
+      evaluationDate?: string;
+      userId?: UUID;
+      comments?: string;
+    },
+  ): DetailedEvaluationView {
+    return {
+      id,
+      title,
+      className: params?.className ?? this.#className,
+      classId: params?.classId ?? this.#classId,
+      evaluationDate: params?.evaluationDate ?? this.#evaluationDate,
+      userId: params?.userId ?? this.#userId,
+      comments: params?.comments,
+      absentStudents,
+      attendedModules,
+      evaluations,
+    };
+  }
+
+  createClassSummary(
+    id: UUID,
+    students: StudentDto[],
+    templates: TaskTemplateDto[],
+    params?: {
+      name?: string;
+      description?: string;
+      degreeConfigName?: string;
+      degreeLevel?: string;
+      degreeYearCode?: string;
+      degreeYearName?: string;
+    },
+  ): ClassSummaryDto {
+    return {
+      id,
+      name: params?.name ?? this.#className,
+      description: params?.description,
+      degreeConfigName: params?.degreeConfigName,
+      degreeLevel: params?.degreeLevel ?? "BTS",
+      degreeYearCode: params?.degreeYearCode ?? "S1",
+      degreeYearName: params?.degreeYearName ?? "Semestre 1",
+      evaluations: [],
+      students,
+      templates,
+    };
   }
 }
 
