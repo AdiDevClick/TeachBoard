@@ -2,6 +2,7 @@ import type {
   FetchJSONError,
   FetchJSONOptions,
   FetchJSONResult,
+  FetchJSONSuccess,
 } from "@/api/types/api.types";
 import type { ApiError } from "@/types/AppErrorInterface";
 import type { ApiSuccess } from "@/types/AppResponseInterface";
@@ -62,6 +63,14 @@ export async function fetchJSON<
           cause: filteredObject,
         },
       );
+    }
+
+    if (response.status === 204) {
+      return {
+        ...response,
+        ok: response.ok,
+        status: response.status,
+      } as unknown as FetchJSONSuccess<TData>;
     }
 
     return { ...(await response.json()), ok: response.ok };
