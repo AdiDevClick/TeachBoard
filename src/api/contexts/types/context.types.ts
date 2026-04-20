@@ -1,3 +1,7 @@
+import type {
+  AppDialogOptions,
+  DialogState,
+} from "@/api/providers/DialogProvider";
 import type { AppDialFooterProps } from "@/components/Footer/types/footer.types.ts";
 import type { HeaderTitleProps } from "@/components/Titles/types/titles.types.ts";
 import type { Card, CardContent, CardFooter } from "@/components/ui/card.tsx";
@@ -24,16 +28,16 @@ export type DialogContextType = {
   openDialog: (
     e: PreventDefaultAndStopPropagation,
     id: AppModalNames,
-    options?: AnyObjectProps,
+    options?: AppDialogOptions,
   ) => void;
   closeDialog: (
     e: PreventDefaultAndStopPropagation,
     id?: AppModalNames,
   ) => void;
   onOpenChange: (id: AppModalNames) => void;
-  dialogOptions: (dialog: AppModalNames) => AnyObjectProps | undefined;
-  dialogsOptions: Map<AppModalNames, AnyObjectProps>;
-  setDialogOptions: (id: AppModalNames, options: AnyObjectProps) => void;
+  dialogOptions: (dialog: AppModalNames) => AppDialogOptions | undefined;
+  dialogsOptions: DialogState;
+  setDialogOptions: (id: AppModalNames, options: AppDialogOptions) => void;
   closeAllDialogs: () => void;
   deleteRef: (id: AppModalNames) => void;
   // setRef: (ref: Element | null) => void;

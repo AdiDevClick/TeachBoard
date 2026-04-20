@@ -1,13 +1,16 @@
 import { DialogContext } from "@/api/contexts/Dialog.context";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
-import type {
-  AnyObjectProps,
-  PreventDefaultAndStopPropagation,
-} from "@/utils/types/types.utils.ts";
+import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
 import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
+
+export type AppDialogOptions = {
+  onClose?: () => void;
+  [key: string]: unknown;
+};
+export type DialogState = UniqueSet<AppModalNames, AppDialogOptions>;
 
 /**
  * Provider for Dialog component.
@@ -20,9 +23,7 @@ import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
  * @returns The DialogProvider component that wraps its children with Dialog context.
  */
 export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
-  const [openDialogs, setOpenDialogs] = useState<
-    UniqueSet<AppModalNames, AnyObjectProps>
-  >(new UniqueSet());
+  const [openDialogs, setOpenDialogs] = useState<DialogState>(new UniqueSet());
   const { setRef, observedRefs, deleteRef } = useMutationObserver({});
 
   const closeDialog = useCallback(
@@ -64,7 +65,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
     (
       e: PreventDefaultAndStopPropagation,
       id: AppModalNames,
-      options?: AnyObjectProps,
+      options?: AppDialogOptions,
     ) => {
       preventDefaultAndStopPropagation(e);
 
@@ -79,16 +80,21 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
     [isDialogOpen],
   );
 
-  const onOpenChange = useCallback((id: AppModalNames) => {
-    setOpenDialogs((prev) => {
-      const next = prev.clone();
-      next.delete(id);
-      return next;
-    });
-  }, []);
+  const onOpenChange = useCallback(
+    (id: AppModalNames) => {
+      openDialogs.get(id)?.onClose?.();
+
+      setOpenDialogs((prev) => {
+        const next = prev.clone();
+        next.delete(id);
+        return next;
+      });
+    },
+    [openDialogs],
+  );
 
   const setDialogOptions = useCallback(
-    (id: AppModalNames, options: AnyObjectProps) => {
+    (id: AppModalNames, options: AppDialogOptions) => {
       setOpenDialogs((prev) => {
         const next = prev.clone();
         if (next.has(id)) {
