@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import type { EvaluationDetailDrawerButtonProps } from "@/features/evaluations/main/components/types/evaluation-detail-drawer-button";
+import sanitizeDOMProps from "@/utils/props";
 import { Link } from "react-router-dom";
 
 /**
@@ -16,8 +17,10 @@ export function EvaluationDetailDrawerButton({
   to,
   ...buttonProps
 }: EvaluationDetailDrawerButtonProps) {
+  const sanitizedProps = sanitizeDOMProps(buttonProps, ["getLink"]);
+
   return (
-    <Button variant="outline" asChild {...buttonProps}>
+    <Button variant="outline" asChild {...sanitizedProps}>
       <Link to={to ?? "#"}>{label}</Link>
     </Button>
   );
