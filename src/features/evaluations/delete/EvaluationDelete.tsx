@@ -1,6 +1,5 @@
 import { Spinner } from "@/components/ui/spinner";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
-import type { EvaluationDeleteProps } from "@/features/evaluations/delete/types/evaluation-delete.types";
 import { useEvaluationTableStore } from "@/features/evaluations/main/configs/evaluations.configs";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types";
@@ -38,7 +37,7 @@ export function EvaluationDelete({
    */
   const triggerSubmit = useEffectEvent((url: string) => {
     setFetchParams({
-      enabled: Boolean(url),
+      enabled: url !== "",
       contentId: pageId as FetchParams["contentId"],
       url,
       method: API_ENDPOINTS.DELETE.METHOD,
@@ -57,8 +56,10 @@ export function EvaluationDelete({
    * @description When the endpoint is ready
    */
   useEffect(() => {
+    if (!evaluationId) return;
+
     triggerSubmit(deleteEvaluationUrl);
-  }, [deleteEvaluationUrl]);
+  }, [deleteEvaluationUrl, evaluationId]);
 
   /**
    * RESPONSE HANDLING -
