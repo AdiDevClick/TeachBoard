@@ -84,7 +84,7 @@ export function Root({ contentType }: Readonly<RootProps>) {
             {errorContent ? (
               <PageError />
             ) : !safeToDisplay ? (
-              <div className="-z-0 flex fixed justify-center items-center min-w-screen min-h-screen ">
+              <div className="inset-0 flex fixed justify-center items-center min-w-screen min-h-screen ">
                 <Spinner
                   role="status"
                   aria-label="Loading"

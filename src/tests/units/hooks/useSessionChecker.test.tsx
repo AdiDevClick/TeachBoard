@@ -178,6 +178,61 @@ describe("useSessionChecker", () => {
     });
   });
 
+  test("ignores stale session check responses after navigation", async () => {
+    currentPath = "/evaluations/delete/123";
+
+    const hook = await renderHook(() => useSessionChecker());
+    const result = getHookResults(hook);
+
+    await result.act(async () => {
+      await Promise.resolve();
+    });
+
+    const params = mockSetFetchParams.mock.calls.at(-1)?.[0];
+
+    currentPath = "/";
+    hook.rerender();
+
+    await result.act(async () => {
+      params.onError({ status: 401 });
+    });
+
+    expect(mockOpenDialog).not.toHaveBeenCalled();
+    expect(result.safeToDisplay).toBe(true);
+  });
+
+  test("redirects to home if the user logs in before login modal close", async () => {
+    currentPath = "/evaluations/delete/123";
+
+    const hook = await renderHook(() => useSessionChecker());
+    const result = getHookResults(hook);
+
+    await result.act(async () => {
+      await Promise.resolve();
+    });
+
+    const params = mockSetFetchParams.mock.calls.at(-1)?.[0];
+
+    await result.act(async () => {
+      params.onError({ status: 401 });
+    });
+
+    const onClose = mockOpenDialog.mock.calls[0][2].onClose;
+
+    await result.act(async () => {
+      useAppStore.setState({ isLoggedIn: true });
+      await Promise.resolve();
+    });
+
+    await result.act(async () => {
+      onClose();
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith("/", {
+      replace: true,
+    });
+  });
+
   test("re-runs secure session check after login and unlocks content on success", async () => {
     currentPath = "/evaluations/delete/123";
 

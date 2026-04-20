@@ -35,8 +35,11 @@ export function useSessionChecker({
   const safeToDisplay =
     mode !== "secure" || (secureAllowed && (isLoggedIn || sessionSynced));
   const navigate = useNavigate();
-  const serverCallRef = useRef(false);
-  const previousLoggedInRef = useRef(isLoggedIn);
+  const sessionCheckRef = useRef({
+    latestLocation: location,
+    lastCheckedPath: null as string | null,
+    previousIsLoggedIn: isLoggedIn,
+  });
 
   const { setFetchParams, openDialog, data, isLoading, isLoaded, error } =
     useCommandHandler({
@@ -48,7 +51,8 @@ export function useSessionChecker({
    * Modify the fetch parameters to trigger a session check query.
    */
   function triggerSessionCheck() {
-    const currentMode = getSessionCheckMode(location);
+    const requestLocation = location;
+    const requestMode = getSessionCheckMode(requestLocation);
 
     setFetchParams({
       contentId,
@@ -56,13 +60,18 @@ export function useSessionChecker({
       method,
       silent: true,
       onSuccess(data: unknown) {
-        updateSession(true, contentId, { url: location });
-        if (currentMode === "secure") {
+        updateSession(true, contentId, { url: requestLocation });
+
+        if (
+          requestMode === "secure" &&
+          requestLocation === sessionCheckRef.current.latestLocation
+        ) {
           setSecureAllowedByLocation((previous) => ({
             ...previous,
-            [location]: true,
+            [requestLocation]: true,
           }));
         }
+
         sessionDebugs({
           data,
           message:
@@ -70,18 +79,20 @@ export function useSessionChecker({
         });
       },
       onError(error: unknown) {
-        if (currentMode === "secure") {
-          setSecureAllowedByLocation((previous) => ({
-            ...previous,
-            [location]: false,
-          }));
-        }
+        if (requestLocation === sessionCheckRef.current.latestLocation) {
+          if (requestMode === "secure") {
+            setSecureAllowedByLocation((previous) => ({
+              ...previous,
+              [requestLocation]: false,
+            }));
+          }
 
-        showLoginModalToUser(currentMode);
+          showLoginModalToUser(requestMode, requestLocation);
+        }
 
         sessionDebugs({
           error,
-          message: `Session check failed in '${currentMode}' mode. Showing login modal.`,
+          message: `Session check failed in '${requestMode}' mode. Showing login modal.`,
         });
 
         clearUserStateOnError();
@@ -104,13 +115,16 @@ export function useSessionChecker({
    *
    * @important Please, use the useSessionChecker hook in your critical components and ensure a check before fetching as the server will immediately return an error uppon invalid session, which will force trigger a redirection to the login page.
    */
-  const showLoginModalToUser = (currentMode: SessionCheckMode) => {
-    if (location === "/login") {
+  const showLoginModalToUser = (
+    currentMode: SessionCheckMode,
+    requestLocation: string,
+  ) => {
+    if (requestLocation === "/login") {
       return;
     }
 
     sessionDebugs({
-      location,
+      location: requestLocation,
       message: "No active session found. A dialog has been opened for login.",
     });
 
@@ -120,7 +134,7 @@ export function useSessionChecker({
           return;
         }
 
-        const destination = isLoggedIn ? "/" : "/login";
+        const destination = useAppStore.getState().isLoggedIn ? "/" : "/login";
         navigate(destination, { replace: true });
       },
     });
@@ -164,8 +178,6 @@ export function useSessionChecker({
       }));
     }
 
-    serverCallRef.current = false;
-
     sessionDebugs({
       location,
       message: result.message,
@@ -182,16 +194,20 @@ export function useSessionChecker({
    * @description On every page load
    */
   useEffect(() => {
-    if (!serverCallRef.current) {
-      serverCallRef.current = true;
-      verifyActivities(location);
+    sessionCheckRef.current.latestLocation = location;
+
+    if (sessionCheckRef.current.lastCheckedPath === location) {
+      return;
     }
+
+    verifyActivities(location);
   }, [location]);
 
   useEffect(() => {
-    const hasJustLoggedIn = !previousLoggedInRef.current && isLoggedIn;
+    const hasJustLoggedIn =
+      !sessionCheckRef.current.previousIsLoggedIn && isLoggedIn;
 
-    previousLoggedInRef.current = isLoggedIn;
+    sessionCheckRef.current.previousIsLoggedIn = isLoggedIn;
 
     if (!hasJustLoggedIn || mode !== "secure" || safeToDisplay || isLoading) {
       return;
