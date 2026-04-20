@@ -1,5 +1,6 @@
 import { Spinner } from "@/components/ui/spinner";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
+import type { EvaluationDeleteProps } from "@/features/evaluations/delete/types/evaluation-delete.types";
 import { useEvaluationTableStore } from "@/features/evaluations/main/configs/evaluations.configs";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types";

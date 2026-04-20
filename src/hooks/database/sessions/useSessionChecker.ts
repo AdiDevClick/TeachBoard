@@ -200,6 +200,8 @@ export function useSessionChecker({
       return;
     }
 
+    sessionCheckRef.current.lastCheckedPath = location;
+
     verifyActivities(location);
   }, [location]);
 
