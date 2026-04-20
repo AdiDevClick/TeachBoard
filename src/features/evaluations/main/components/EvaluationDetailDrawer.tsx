@@ -51,10 +51,13 @@ function ScoreDisplay({ score }: Readonly<{ score: number }>) {
   );
 }
 
-function DetailContent({
-  evaluation,
-}: Readonly<{ evaluation: DetailedEvaluationView }>) {
-  const { evaluations, comments, absentStudents } = evaluation;
+type DetailContentProps = Readonly<{
+  evaluation: DetailedEvaluationView;
+}>;
+
+function DetailContent({ evaluation }: DetailContentProps) {
+  const { evaluations, comments, absentStudents, updatedAt, createdAt } =
+    evaluation;
   return (
     <div className="flex flex-col gap-6 overflow-y-auto px-4 py-2 text-sm">
       <Separator />
@@ -106,6 +109,21 @@ function DetailContent({
           </DrawerSection>
         </>
       )}
+
+      {createdAt || updatedAt ? <Separator /> : null}
+
+      <DrawerSection title="Infos">
+        {createdAt && (
+          <p className="text-muted-foreground text-xs italic">
+            {`Créée le ${new Date(createdAt).toLocaleString("fr-FR").replace(" ", " à ").split(":").slice(0, 2).join(":")} \n`}
+          </p>
+        )}
+        {updatedAt && (
+          <p className="text-muted-foreground text-xs italic">
+            {`Dernière mise à jour le ${new Date(updatedAt).toLocaleString("fr-FR").replace(" ", " à ").split(":").slice(0, 2).join(":")}`}
+          </p>
+        )}
+      </DrawerSection>
     </div>
   );
 }
