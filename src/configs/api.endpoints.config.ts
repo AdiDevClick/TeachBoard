@@ -397,6 +397,10 @@ export const API_ENDPOINTS = Object.freeze({
       dataReshape: evaluationDataReshape,
     },
   },
+  DELETE: {
+    METHOD: "DELETE",
+    DELETE_EVALUATION: (id: number | string) => `${EVALUATIONS}/${id}`,
+  },
 } as const);
 
 type CachedQueriesData = Array<[unknown, unknown]>;
