@@ -1,21 +1,18 @@
 import { type DebugDetails, debugLogs } from "@/configs/app-components.config";
-import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types";
 import type { SwitchSessionCasesProps } from "@/hooks/database/sessions/types/use-session-checker.types";
-import type { Dispatch, SetStateAction } from "react";
 
 /**
  * Will determine if the session check should be submitted based on the last user activity and the current page.
  *
  * @param lastEntry - The last user activity entry, containing the activity type and details.
- * @param isPublicPage - A boolean indicating if the current page is public (does not require a session).
+ * @param mode - The current session check mode for the page.
  * @param sessionSynced - A boolean indicating if the session is already synced.
- * 
+ *
  * @returns A message describing the decision made regarding the session check.
-
  */
 export function switchSessionCases({
   lastEntry,
-  isPublicPage,
+  mode,
   sessionSynced,
 }: SwitchSessionCasesProps) {
   const [activityName, activityDetails] = lastEntry ?? [
@@ -25,6 +22,7 @@ export function switchSessionCases({
 
   const lastActivityWasLogout = activityName === "logout";
   const lastActivityWasForbidden = activityDetails?.status === 403;
+  const isPublicPage = mode === "publique";
 
   let message = "";
   let shouldTriggerQuery = false;
@@ -44,23 +42,6 @@ export function switchSessionCases({
   }
 
   return { message, shouldTriggerQuery };
-}
-
-/**
- * A simple helper to set the fetch parameters
- *
- * @param props - An object containing the fetch parameters and a function to set them.
- */
-export function activateSessionCheck(
-  props: FetchParams & { setState: Dispatch<SetStateAction<FetchParams>> },
-) {
-  const { setState, ...rest } = props;
-
-  setState({
-    ...rest,
-    successDescription: "Session checked successfully.",
-    silent: true,
-  });
 }
 
 /**

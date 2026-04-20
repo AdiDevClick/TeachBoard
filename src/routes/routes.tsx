@@ -6,6 +6,7 @@ import {
 } from "@/data/inputs-controllers.data.ts";
 import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
 import { CreateEvaluations } from "@/features/evaluations/create/CreateEvaluations.tsx";
+import { EvaluationDelete } from "@/features/evaluations/delete/EvaluationDelete";
 import { EvaluationEdit } from "@/features/evaluations/edit/EvaluationEdit";
 import { EvaluationDetailDrawerRoute } from "@/features/evaluations/main/components/EvaluationDetailDrawer";
 import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
@@ -126,11 +127,7 @@ export const ROUTES_CHILDREN: RouteObject[] = [
           const pageTitle = COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title;
           setDocumentTitle(pageTitle);
 
-          return {
-            pageTitle,
-            // loaderData: COMPLETE_SIDEBAR_DATAS.navMain.menus[0],
-            // pageDatas: EvaluationPageTabsDatas,
-          };
+          return { pageTitle };
         },
         children: [
           {
@@ -177,11 +174,19 @@ export const ROUTES_CHILDREN: RouteObject[] = [
           const title = COMPLETE_SIDEBAR_DATAS.navMain.menus[4].title;
           setDocumentTitle(title);
 
-          return {
-            pageDatas: EvaluationPageTabsDatas,
-          };
+          return { pageDatas: EvaluationPageTabsDatas };
         },
         children: ALL_STEPS("edit"),
+      },
+      {
+        path: "delete/:evaluationId",
+        element: <EvaluationDelete />,
+        loader: async () => {
+          const title = COMPLETE_SIDEBAR_DATAS.navMain.menus[4].title;
+          setDocumentTitle(title);
+
+          return { pageTitle: "hidden" };
+        },
       },
     ],
   },

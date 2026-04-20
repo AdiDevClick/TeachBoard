@@ -6,9 +6,8 @@ import { PageTitle } from "@/components/Header/PageTitle";
 import { AppSidebar } from "@/components/Sidebar/Sidebar.tsx";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { Toaster } from "@/components/ui/sonner";
-import { debugLogs } from "@/configs/app-components.config";
+import { Spinner } from "@/components/ui/spinner";
 import { COMPLETE_SIDEBAR_DATAS } from "@/configs/main.configs";
-import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
 import { AppModals } from "@/pages/AllModals/AppModals.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
@@ -17,19 +16,9 @@ import type { RootProps } from "@/types/MainTypes";
 import "@css/MainContainer.scss";
 import "@css/Toaster.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  StrictMode,
-  useEffect,
-  useEffectEvent,
-  type CSSProperties,
-} from "react";
+import { StrictMode, type CSSProperties } from "react";
 import { createRoot } from "react-dom/client";
-import {
-  createBrowserRouter,
-  Outlet,
-  RouterProvider,
-  useLocation,
-} from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
@@ -73,66 +62,7 @@ createRoot(document.getElementById("root")!).render(
  */
 export function Root({ contentType }: Readonly<RootProps>) {
   const errorContent = contentType === "error";
-
-  const { openDialog } = useDialog();
-
-  const location = decodeURI(useLocation().pathname);
-  const { data, isLoading, error } = useSessionChecker();
-
-  /**
-   * Show login modal to user when no active session is found
-   *
-   * @description This is a gentle reminder for users to log in without redirecting them away from the current page, providing a smoother user experience.
-   *
-   * @remark !!! IMPORTANT !! Keep in mind that this approach assumes the users will interact with the login modal when it appears or they may continue exploring the site.
-   *
-   * @important Please, use the useSessionChecker hook in your critical components and ensure a check before fetching as the server will immediately return an error uppon invalid session, which will force trigger a redirection to the login page.
-   */
-  const showLoginModalToUser = useEffectEvent(() => {
-    if (location === "/login") return;
-
-    debugLogs("Root:showLoginModalToUser", {
-      type: "all",
-      location,
-      message: "No active session found. A dialog has been opened for login.",
-    });
-
-    openDialog(null, "login");
-  });
-
-  /**
-   * Show login modal on error
-   *
-   * @description This will log errors or success
-   */
-  useEffect(() => {
-    let message = "";
-
-    if (isLoading) {
-      message = "Session check is loading...";
-    }
-
-    if (data) {
-      message = "Session check completed successfully. User is authenticated.";
-    }
-
-    if (error && !isLoading) {
-      showLoginModalToUser();
-      message =
-        "Session check failed. No active session found. Showing login modal.";
-    }
-
-    if (message !== "") {
-      debugLogs("Root:SessionCheck", {
-        type: "sessionCheck",
-        location,
-        message: message,
-        data,
-        error,
-        isLoading,
-      });
-    }
-  }, [data, error, isLoading]);
+  const { safeToDisplay } = useSessionChecker();
 
   return (
     <SidebarProvider
@@ -153,6 +83,14 @@ export function Root({ contentType }: Readonly<RootProps>) {
           <App>
             {errorContent ? (
               <PageError />
+            ) : !safeToDisplay ? (
+              <div className="-z-0 flex fixed justify-center items-center min-w-screen min-h-screen ">
+                <Spinner
+                  role="status"
+                  aria-label="Loading"
+                  className="size-5 animate-spin"
+                />
+              </div>
             ) : (
               <Outlet context={COMPLETE_SIDEBAR_DATAS} />
             )}

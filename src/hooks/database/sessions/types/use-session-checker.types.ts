@@ -4,13 +4,14 @@ import type {
 } from "@/api/store/types/app-store.types";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types";
 import type { QueryKeyDescriptor } from "@/hooks/database/types/QueriesTypes";
+import type { SessionCheckMode } from "@/configs/app.config.ts";
 
 /**
  * Props for the switchSessionCases function, which determines the session state and triggers a session check if necessary.
  */
 export type SwitchSessionCasesProps = {
   lastEntry?: [LastUserActivityType, LastUserActivityDetails];
-  isPublicPage: boolean;
+  mode: SessionCheckMode;
   sessionSynced: boolean;
 };
 

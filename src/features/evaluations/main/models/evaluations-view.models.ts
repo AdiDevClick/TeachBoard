@@ -15,6 +15,7 @@ const dataErrors = {
   subSkillName: "Invalid sub-skill name",
   subSkillCode: "Invalid sub-skill code",
   subSkillIsDisabled: "Invalid sub-skill isDisabled value",
+  updatedAt: "Invalid updatedAt date format",
 };
 
 const schema = (data: typeof dataErrors) =>
@@ -72,6 +73,8 @@ const schema = (data: typeof dataErrors) =>
         ),
       }),
     ),
+    createdAt: z.iso.datetime(data.date),
+    updatedAt: z.iso.datetime(data.updatedAt).optional(),
   });
 
 export type DetailedEvaluationView = z.infer<typeof detailedEvaluationSchema>;

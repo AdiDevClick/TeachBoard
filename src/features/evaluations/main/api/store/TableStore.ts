@@ -124,6 +124,23 @@ export function createTableStore<T extends RowItemWithId>(storeName: string) {
                   "updateItem",
                 );
               },
+              deleteItem(itemId: string) {
+                if (!itemId) {
+                  debugLogs(`TableStore - ${storeName}`, {
+                    type: "all",
+                    message: `Trying to delete item with id ${itemId} that is not correctly defined. Delete skipped.`,
+                    data: { itemId },
+                  });
+                  return;
+                }
+                set(
+                  (state) => {
+                    state.data = state.data.filter((d) => d.id !== itemId);
+                  },
+                  false,
+                  "deleteItem",
+                );
+              },
               addItemToTop(item: T) {
                 set(
                   (state) => {

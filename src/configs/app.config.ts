@@ -83,6 +83,7 @@ export type AppModalNames =
   | "logout"
   | "none"
   | "signup"
+  | "session-check"
   | "pw-recovery"
   | "pw-recovery-email-sent"
   | "class-creation"
@@ -101,6 +102,7 @@ export type AppModalNames =
   | "add-school-year"
   | "search-students"
   | "search-primaryteacher"
+  | "evaluation-delete"
   | "evaluation-class-selection"
   | "evaluation-attendance"
   | "evaluation-module-selection"
@@ -109,11 +111,16 @@ export type AppModalNames =
   | "availability";
 
 /**
- * Pages that do not require session checks
- *
- * @description List of routes where session checks are bypassed.
+ * Session check modes for page categories.
  */
-const NO_SESSIONS_CHECK_PAGES = [
+export type SessionCheckMode = "publique" | "soft" | "safe" | "secure";
+
+/**
+ * Pages that do not require a session check.
+ *
+ * Users can access these pages without being logged in nor will be asked to do so, and no session check will be performed.
+ */
+const PUBLIC_PAGES = [
   "/",
   "/login",
   "/logout",
@@ -124,19 +131,59 @@ const NO_SESSIONS_CHECK_PAGES = [
 ] as const;
 
 /**
- * Check if the given path is in the list of pages that do not require session checks.
- *
- * @param path - The current path to check against the no-session-check list.
- * @returns - True if the path is in the no-session-check list, false otherwise.
+ * Pages where a soft login prompt is allowed and the content remains visible.
+ * Closing the modal on these pages will not redirect the user, allowing them to continue browsing with limited functionality until they choose to log in.
+ */
+const SOFT_SESSION_CHECK_PAGES = [
+  "/about",
+  "/evaluations/TP",
+  // "/evaluations/create",
+] as const;
+
+/**
+ * Pages where a login prompt is shown and the content remains visible, but
+ * closing the modal redirects the user based on authentication state.
+ */
+const SAFE_SESSION_CHECK_PAGES = [
+  "/evaluations/Atelier",
+  "/evaluations/Techno",
+] as const;
+
+/**
+ * Determine whether a path is in the public page list.
  */
 export const doesContainNoSessionPage = (path: string) => {
-  return NO_SESSIONS_CHECK_PAGES.some((page) => {
+  return PUBLIC_PAGES.some((page) => {
     if (page === "/" && path === "/") {
       return true;
     }
 
     if (page !== "/") return path.startsWith(page);
   });
+};
+
+export const doesContainSoftSessionPage = (path: string) => {
+  return SOFT_SESSION_CHECK_PAGES.some((page) => path.startsWith(page));
+};
+
+export const doesContainSafeSessionPage = (path: string) => {
+  return SAFE_SESSION_CHECK_PAGES.some((page) => path.startsWith(page));
+};
+
+export const getSessionCheckMode = (path: string): SessionCheckMode => {
+  if (doesContainNoSessionPage(path)) {
+    return "publique";
+  }
+
+  if (doesContainSoftSessionPage(path)) {
+    return "soft";
+  }
+
+  if (doesContainSafeSessionPage(path)) {
+    return "safe";
+  }
+
+  return "secure";
 };
 
 const REDIRECT_AFTER_LOGIN_PAGES_LIST = [
