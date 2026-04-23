@@ -2,8 +2,22 @@ import type {
   ArrayPath,
   FieldArray,
   FieldValues,
+  UseFieldArrayRemove,
   UseFormReturn,
 } from "react-hook-form";
+
+export type DynamicInjectedBaseProps = Readonly<{
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic row components must accept any schema-specific RHF instance
+  form: UseFormReturn<any>;
+  name: string;
+  remove: UseFieldArrayRemove;
+  arrayLength: number;
+}>;
+
+export type DynamicInjectedProps = DynamicInjectedBaseProps &
+  Readonly<{
+    index: number;
+  }>;
 
 /**
  * @description Props for the withDynamicFieldArray HOC, which provides functionality for managing dynamic field arrays in forms.
