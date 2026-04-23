@@ -18,6 +18,8 @@ const data = {
     "Le code de la compétence ne doit pas contenir de caractères spéciaux.",
   criteriasRequiredMessage:
     "Une justification est requise pour chaque palier de note.",
+  criteriaRegexMessage:
+    "La description de chaque critère ne peut pas être vide et doit respecter le format requis.",
   criteriasLengthMessage:
     "Les 5 paliers (100, 75, 50, 25, 0) doivent etre renseignés.",
   criteriasDescriptionRequiredMessage:
@@ -33,23 +35,16 @@ export const DEGREE_MODULE_SKILL_REQUIRED_SCORES = Object.freeze([
   100, 75, 50, 25, 0,
 ]);
 
-const degreeModuleSkillRequiredScoreSet = new Set(
-  DEGREE_MODULE_SKILL_REQUIRED_SCORES,
-);
-
 const scoreJustificationSchema = z.object({
   score: z
     .number()
     .int()
     .min(0, data.criteriasScoreInvalidMessage)
-    .max(100, data.criteriasScoreInvalidMessage)
-    .refine(
-      (score) => degreeModuleSkillRequiredScoreSet.has(score),
-      data.criteriasScoreInvalidMessage,
-    ),
+    .max(100, data.criteriasScoreInvalidMessage),
   description: z
     .string()
     .trim()
+    .regex(formsRegex.serverDescription, data.criteriaRegexMessage)
     .min(1, data.criteriasDescriptionRequiredMessage)
     .max(
       data.criteriasDescriptionMaxLength,
@@ -93,19 +88,9 @@ const moduleSkillSchema = z.object({
       DEGREE_MODULE_SKILL_REQUIRED_SCORES.length,
       data.criteriasLengthMessage,
     ),
-  // .refine((criterias) => {
-  //   const uniqueScores = new Set(criterias.map((item) => item.score));
-  //   return DEGREE_MODULE_SKILL_REQUIRED_SCORES.every((score) =>
-  //     uniqueScores.has(score),
-  //   );
-  // }, data.criteriasRequiredMessage),
 });
 
 export type DegreeModuleSkillFormSchema = z.infer<typeof moduleSkillSchema>;
-
-export type DegreeModuleSkillJustification = z.infer<
-  typeof scoreJustificationSchema
->;
 
 export type DegreeModuleSkillInputItem =
   FetchingInputItem<DegreeModuleSkillFormSchema>;
