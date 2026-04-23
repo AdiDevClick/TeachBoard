@@ -19,6 +19,7 @@ export type WithControllerInjectedProps = {
    * or `control` must be provided (the runtime helper will log a debug error
    * if neither is present).
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic HOC accepts any schema-specific control instance
   control: Control<any> | undefined;
   /** The name of the field to be controlled. */
   name: string;
@@ -29,7 +30,6 @@ export type WithControllerInjectedProps = {
   defaultValue?: unknown;
 } & WithEventEnrichedMetadatasEvents &
   UseMutationObserverReturn;
-//@deprecated : the use of NoExtraProps types or similar : <T extends object> = T & { [K in Exclude<string, keyof T>]?: never; } is FORBIDDEN
 
 /**
  * Props accepted by a controlled component.
