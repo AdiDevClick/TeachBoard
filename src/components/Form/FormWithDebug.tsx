@@ -45,6 +45,7 @@ export function FormWithDebug<T extends FieldValues>(
   };
 
   const debouncedSubmit = useDebounce(onValidSubmit, debounceDelay);
+  const shouldDisplayDebug = DEV_MODE && !isValid;
 
   return (
     <form
@@ -53,7 +54,7 @@ export function FormWithDebug<T extends FieldValues>(
       className={className}
       onSubmit={form.handleSubmit(debouncedSubmit, onInvalidSubmit)}
     >
-      {DEV_MODE && !isValid && (
+      {shouldDisplayDebug && (
         <Item
           className={cn(
             "relative mb-4 px-4 py-2 border rounded bg-slate-50 text-slate-700 w-full flex flex-wrap gap-4",
