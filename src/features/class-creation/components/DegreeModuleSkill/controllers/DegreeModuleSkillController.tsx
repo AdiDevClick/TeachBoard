@@ -2,7 +2,13 @@ import { FormWithDebug } from "@/components/Form/FormWithDebug";
 import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import { HTTP_METHODS } from "@/configs/app.config.ts";
+import { DynamicCriteriaList } from "@/features/class-creation/components/DegreeModuleSkill/exports/degree-module-skill-justification.exports";
 import { degreeSubSkillsCreationInputControllers } from "@/features/class-creation/components/DegreeModuleSkill/forms/degree-module-skill-inputs";
+import {
+  degreeSubSkillsCreationCriteriasDescriptionInputControllers,
+  degreeSubSkillsCreationCriteriasScoreInputControllers,
+  dynamicCriteriasListController,
+} from "@/features/class-creation/components/DegreeModuleSkill/forms/degree-module-skill-justification-inputs";
 import type { DegreeModuleSkillControllerProps } from "@/features/class-creation/components/DegreeModuleSkill/types/degree-module-skill.types.ts";
 import { useDebouncedChecker } from "@/features/class-creation/components/main/hooks/useDebouncedChecker";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
@@ -95,6 +101,14 @@ export function DegreeModuleSkillController({
         setRef={setRef}
         observedRefs={observedRefs}
         onChange={handleValueChange}
+      />
+      <DynamicCriteriaList
+        form={form}
+        {...dynamicCriteriasListController}
+        scoreProps={degreeSubSkillsCreationCriteriasScoreInputControllers}
+        descriptionProps={
+          degreeSubSkillsCreationCriteriasDescriptionInputControllers
+        }
       />
     </FormWithDebug>
   );
