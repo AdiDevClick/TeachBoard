@@ -2,7 +2,6 @@ import type {
   ControlledCriteriaInput,
   ControlledTextArea,
 } from "@/features/class-creation/components/DegreeModuleSkill/exports/degree-module-skill-justification.exports";
-import type { DegreeModuleSkillFormSchema } from "@/features/class-creation/components/DegreeModuleSkill/models/degree-module-skill.model";
 import type { ComponentProps } from "react";
 import type { useFieldArray, UseFormReturn } from "react-hook-form";
 
@@ -11,9 +10,9 @@ import type { useFieldArray, UseFormReturn } from "react-hook-form";
  */
 export type ScoreCriteriaProps = Readonly<{
   /** The name of the criteria, used as a prefix for form fields */
-  name: `criterias.${number}`;
+  name: string;
   /** The form instance, to retrieve control and values */
-  form: UseFormReturn<DegreeModuleSkillFormSchema>;
+  form: UseFormReturn<any>;
   /** The index from the field array */
   index: number;
   /** A function to remove this criteria */
