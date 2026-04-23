@@ -3,20 +3,27 @@ import type {
   ControlledTextArea,
 } from "@/features/class-creation/components/DegreeModuleSkill/exports/degree-module-skill-justification.exports";
 import type { ComponentProps } from "react";
-import type { useFieldArray, UseFormReturn } from "react-hook-form";
+import type {
+  FieldValues,
+  UseFieldArrayRemove,
+  UseFormReturn,
+} from "react-hook-form";
 
 /**
  * Props for the ScoreCriteria component
  */
-export type ScoreCriteriaProps = Readonly<{
+export type ScoreCriteriaProps<
+  TField extends FieldValues = FieldValues,
+  TName extends string = string,
+> = Readonly<{
   /** The name of the criteria, used as a prefix for form fields */
-  name: string;
+  name: TName;
   /** The form instance, to retrieve control and values */
-  form: UseFormReturn<any>;
+  form: UseFormReturn<TField>;
   /** The index from the field array */
   index: number;
   /** A function to remove this criteria */
-  remove: ReturnType<typeof useFieldArray>["remove"];
+  remove: UseFieldArrayRemove;
   /** Props for the score input */
   scoreProps: Omit<
     ComponentProps<typeof ControlledCriteriaInput>,
