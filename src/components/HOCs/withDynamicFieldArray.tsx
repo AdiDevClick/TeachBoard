@@ -60,7 +60,7 @@ export function withDynamicFieldArray<C extends object>(
         <FieldLegend variant="label">{title}</FieldLegend>
         <FieldDescription>{description}</FieldDescription>
         <FieldGroup>
-          <WrappedListList
+          <WrappedComponentList
             {...(componentProps as C)}
             items={fields}
             optional={(_field, index) => ({
