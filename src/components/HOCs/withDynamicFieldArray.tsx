@@ -1,6 +1,8 @@
-import type { WithDynamicFieldArrayProps } from "@/components/HOCs/types/with-dynamic-field-array.types";
-import withController from "@/components/HOCs/withController";
-import withListMapper from "@/components/HOCs/withListMapper";
+import type {
+  DynamicInjectedProps,
+  WithDynamicFieldArrayProps,
+} from "@/components/HOCs/types/with-dynamic-field-array.types";
+import { ListMapper } from "@/components/Lists/ListMapper";
 import { Button } from "@/components/ui/button";
 import {
   FieldDescription,
@@ -10,6 +12,7 @@ import {
 } from "@/components/ui/field";
 import { createNameForHOC } from "@/utils/utils";
 import type { ComponentType } from "react";
+import type { FieldValues } from "react-hook-form";
 import { useFieldArray } from "react-hook-form";
 
 /**
@@ -23,13 +26,15 @@ import { useFieldArray } from "react-hook-form";
  * - name: The name of the field array in the form schema.
  * - Your component MUST use the Controller component from react-hook-form.
  */
-export function withDynamicFieldArray<C extends object>(
-  WrappedComponent: ComponentType<C>,
+export function withDynamicFieldArray<TExtra extends object>(
+  WrappedComponent: ComponentType<
+    DynamicInjectedProps & Omit<TExtra, keyof DynamicInjectedProps>
+  >,
 ) {
-  // A list of controlled components from the wrapped
-  const WrappedComponentList = withListMapper(withController(WrappedComponent));
-
-  function Component(props: C & WithDynamicFieldArrayProps) {
+  function Component<TField extends FieldValues = FieldValues>(
+    props: Omit<TExtra, keyof DynamicInjectedProps> &
+      WithDynamicFieldArrayProps<TField>,
+  ) {
     const {
       form,
       name: fieldName,
@@ -49,7 +54,6 @@ export function withDynamicFieldArray<C extends object>(
     const componentProps = {
       ...restProps,
       form,
-      control: form.control,
       name: fieldName,
       arrayLength: fields.length,
       remove,
@@ -60,14 +64,16 @@ export function withDynamicFieldArray<C extends object>(
         <FieldLegend variant="label">{title}</FieldLegend>
         <FieldDescription>{description}</FieldDescription>
         <FieldGroup>
-          <WrappedComponentList
-            {...(componentProps as C)}
-            items={fields}
-            optional={(_field, index) => ({
-              name: `${fieldName}.${index}`,
-            })}
-          />
-
+          <ListMapper items={fields}>
+            {(_field, index) => (
+              <WrappedComponent
+                {...props}
+                {...componentProps}
+                index={index}
+                name={`${fieldName}.${index}`}
+              />
+            )}
+          </ListMapper>
           <Button
             type="button"
             variant="outline"
