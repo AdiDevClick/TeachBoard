@@ -27,7 +27,7 @@ export function ScoreCriteria({
 }: ScoreCriteriaProps) {
   const scoreName = `${name}.score`;
   const descriptionName = `${name}.description`;
-  const scoreValue = form.watch(scoreName as `criterias.${number}.score`);
+  const scoreValue = form.watch(scoreName);
 
   return (
     <ItemGroup className="gap-3 rounded-md border border-border/60 p-3">
