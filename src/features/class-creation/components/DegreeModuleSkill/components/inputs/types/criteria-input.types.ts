@@ -15,7 +15,7 @@ export type CriteriaInputProps = Readonly<
     /** An array of numbers representing the predefined score steps for each criteria, used to set the default value of the slider. */
     scoreSteps: ReadonlyArray<number>;
     /** The current score value for this criteria, which will be clamped between 0 and 100 and displayed in the title. */
-    value: number;
+    value?: number;
     /** A callback function that is called when the slider value changes, receiving the new score value as an argument. */
     onValueChange?: (nextScore: number) => void;
     /** A callback function that is called when the input value changes, receiving the change event as an argument. */
