@@ -1,6 +1,6 @@
+import type { SkillCriterionDto } from "@/api/types/routes/skills.types";
 import type { Slider } from "@/components/ui/slider";
 import type { StudentWithPresence } from "@/features/evaluations/create/store/types/steps-creation-store.types.ts";
-import type { SkillCriterionDto } from "@/api/types/routes/skills.types";
 import type { ComponentProps } from "react";
 
 /**
