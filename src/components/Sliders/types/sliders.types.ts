@@ -1,5 +1,6 @@
 import type { Slider } from "@/components/ui/slider";
 import type { StudentWithPresence } from "@/features/evaluations/create/store/types/steps-creation-store.types.ts";
+import type { SkillCriterionDto } from "@/api/types/routes/skills.types";
 import type { ComponentProps } from "react";
 
 /**
@@ -11,6 +12,8 @@ export type EvaluationSliderProps = Readonly<
   ComponentProps<typeof Slider> & {
     /** Current evaluation value as an array of numbers */
     value: number[];
+    /** Criteria used to display hover guidance by score palier */
+    criteria?: SkillCriterionDto[];
     /** Handler for when the slider value changes */
     onValueChange?: (value: number[], props: EvaluationSliderProps) => void;
   } & Pick<StudentWithPresence, "fullName" | "id">
