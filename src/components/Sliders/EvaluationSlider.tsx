@@ -1,5 +1,9 @@
 import "@/assets/css/Slider.scss";
-import { sliderRangeColor } from "@/components/Sliders/functions/sliders.functions.ts";
+import { withToolTip } from "@/components/HOCs/withToolTip";
+import {
+  buildSliderHoverZones,
+  sliderRangeColor,
+} from "@/components/Sliders/functions/sliders.functions.ts";
 import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
 import { Badge } from "@/components/ui/badge.tsx";
 import { Item } from "@/components/ui/item.tsx";
@@ -9,12 +13,20 @@ import {
   evaluationSliderPropsValid,
 } from "@/configs/app-components.config.ts";
 import sanitizeDOMProps from "@/utils/props";
+import { cn } from "@/utils/utils";
 import {
   evaluationStudentBadge,
   evaluationStudentContainer,
   evaluationStudentSlider,
 } from "@css/EvaluationStudent.module.scss";
-import { useEffect, useEffectEvent, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useState,
+  type ComponentProps,
+  type CSSProperties,
+} from "react";
 
 /**
  * EvaluationSlider component for evaluating students.
@@ -24,7 +36,7 @@ import { useEffect, useEffectEvent, useState, type CSSProperties } from "react";
  * @param fullName - Full name of the student.
  */
 export function EvaluationSlider(props: EvaluationSliderProps) {
-  const { fullName, onValueChange, value, id, ...rest } = props;
+  const { fullName, onValueChange, value, id, criteria, ...rest } = props;
   const safeSliderProps = sanitizeDOMProps(rest, [
     "isPresent",
     "assignedTask",
@@ -64,6 +76,20 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
     triggerExternalChange(value);
   }, [value]);
 
+  const hoverZones = useMemo(() => buildSliderHoverZones(criteria), [criteria]);
+  const visibleHoverZones =
+    hoverZones.length > 0
+      ? hoverZones
+      : [
+          {
+            id,
+            score: internalValue[0] ?? 0,
+            criterion: fullName,
+            left: 0,
+            width: 100,
+          },
+        ];
+
   if (evaluationSliderPropsValid(props)) {
     debugLogs("[EvaluationSlider]", { type: "propsValidation", props });
     return null;
@@ -76,18 +102,56 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
       className={evaluationStudentContainer}
     >
       <Badge className={evaluationStudentBadge}>{fullName}</Badge>
-      <Slider
-        step={25}
-        value={internalValue}
-        className={evaluationStudentSlider}
-        style={
-          {
-            "--slider-rangeColor": sliderRangeColor(internalValue[0]),
-          } as CSSProperties
-        }
-        {...safeSliderProps}
-        onValueChange={handleValueChange}
-      />
+      <div className="basis-full min-w-0 w-full pt-6">
+        <div className="relative w-full">
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 -top-6 h-5"
+            data-slot="slider-hover-zones"
+          >
+            {visibleHoverZones.map((zone) => (
+              <SliderHoverZoneWithTooltip
+                key={zone.id}
+                toolTipText={zone.criterion}
+                className="absolute top-0 h-full opacity-0"
+                data-slot="slider-hover-zone"
+                style={{
+                  left: `${zone.left}%`,
+                  width: `${zone.width}%`,
+                }}
+              />
+            ))}
+          </div>
+          <Slider
+            step={25}
+            value={internalValue}
+            className={cn(evaluationStudentSlider, "w-full")}
+            style={
+              {
+                "--slider-rangeColor": sliderRangeColor(internalValue[0]),
+              } as CSSProperties
+            }
+            {...safeSliderProps}
+            onValueChange={handleValueChange}
+          />
+        </div>
+      </div>
     </Item>
   );
 }
+
+type SliderHoverZoneProps = ComponentProps<"button">;
+
+const SliderHoverZone = ({ className, ...props }: SliderHoverZoneProps) => (
+  <button
+    type="button"
+    aria-hidden="true"
+    tabIndex={-1}
+    className={cn("rounded-sm border-0 bg-transparent p-0", className)}
+    {...props}
+  />
+);
+
+SliderHoverZone.displayName = "SliderHoverZone";
+
+const SliderHoverZoneWithTooltip = withToolTip(SliderHoverZone);
