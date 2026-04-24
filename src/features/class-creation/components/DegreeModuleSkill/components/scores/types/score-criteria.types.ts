@@ -4,9 +4,9 @@ import type {
 } from "@/features/class-creation/components/DegreeModuleSkill/exports/degree-module-skill-justification.exports";
 import type { ComponentProps } from "react";
 import type {
+  Control,
   FieldValues,
   UseFieldArrayRemove,
-  UseFormReturn,
 } from "react-hook-form";
 
 /**
@@ -18,8 +18,8 @@ export type ScoreCriteriaProps<
 > = Readonly<{
   /** The name of the criteria, used as a prefix for form fields */
   name: TName;
-  /** The form instance, to retrieve control and values */
-  form: UseFormReturn<TField>;
+  /** The control instance, to manage form fields */
+  control: Control<TField>;
   /** The index from the field array */
   index: number;
   /** A function to remove this criteria */
@@ -29,8 +29,8 @@ export type ScoreCriteriaProps<
     ComponentProps<typeof ControlledCriteriaInput>,
     "name" | "control" | "index" | "remove" | "value"
   >;
-  /** Props for the description input */
-  descriptionProps: Omit<
+  /** Props for the criterion input */
+  criterionProps: Omit<
     ComponentProps<typeof ControlledTextArea>,
     "name" | "control"
   >;
