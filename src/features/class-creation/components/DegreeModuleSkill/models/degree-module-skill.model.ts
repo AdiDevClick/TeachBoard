@@ -16,18 +16,15 @@ const data = {
     "Le nom de la compétence ne doit pas contenir de caractères spéciaux.",
   codeRegexMessage:
     "Le code de la compétence ne doit pas contenir de caractères spéciaux.",
-  criteriasRequiredMessage:
-    "Une justification est requise pour chaque palier de note.",
-  criteriaRegexMessage:
+  criterionRequiredMessage:
+    "Un critère est requise pour chaque palier de note.",
+  criterionRegexMessage:
     "La description de chaque critère ne peut pas être vide et doit respecter le format requis.",
-  criteriasLengthMessage:
+  criteriaLengthMessage:
     "Les 5 paliers (100, 75, 50, 25, 0) doivent etre renseignés.",
-  criteriasDescriptionRequiredMessage:
-    "Chaque palier doit contenir une description.",
-  criteriasDescriptionMaxLength: 500,
-  criteriasDescriptionMaxLengthMessage:
-    "Une justification ne peut pas dépasser 500 caractères.",
-  criteriasScoreInvalidMessage:
+  criterionMaxLength: 500,
+  criterionMaxLengthMessage: "Un critère ne peut pas dépasser 500 caractères.",
+  criterionScoreInvalidMessage:
     "Les scores autorisés sont 100, 75, 50, 25 et 0.",
 };
 
@@ -38,24 +35,20 @@ export const DEGREE_MODULE_SKILL_REQUIRED_SCORES = Object.freeze([
 const scoreJustificationSchema = z.object({
   score: z
     .number()
-    .int()
-    .min(0, data.criteriasScoreInvalidMessage)
-    .max(100, data.criteriasScoreInvalidMessage),
-  description: z
+    .min(0, data.criterionScoreInvalidMessage)
+    .max(100, data.criterionScoreInvalidMessage),
+  criterion: z
     .string()
     .trim()
-    .regex(formsRegex.serverDescription, data.criteriaRegexMessage)
-    .min(1, data.criteriasDescriptionRequiredMessage)
-    .max(
-      data.criteriasDescriptionMaxLength,
-      data.criteriasDescriptionMaxLengthMessage,
-    ),
+    .regex(formsRegex.serverDescription, data.criterionRegexMessage)
+    .min(1, data.criterionRequiredMessage)
+    .max(data.criterionMaxLength, data.criterionMaxLengthMessage),
 });
 
 export const createDefaultDegreeModuleSkillJustifications = () =>
   DEGREE_MODULE_SKILL_REQUIRED_SCORES.map((score) => ({
     score,
-    description: "",
+    criterion: "",
   }));
 
 /**
@@ -78,15 +71,12 @@ const moduleSkillSchema = z.object({
     .toUpperCase()
     .trim()
     .nonoptional(),
-  criterias: z
+  criteria: z
     .array(scoreJustificationSchema)
-    .min(
-      DEGREE_MODULE_SKILL_REQUIRED_SCORES.length,
-      data.criteriasLengthMessage,
-    )
+    .min(DEGREE_MODULE_SKILL_REQUIRED_SCORES.length, data.criteriaLengthMessage)
     .max(
       DEGREE_MODULE_SKILL_REQUIRED_SCORES.length,
-      data.criteriasLengthMessage,
+      data.criteriaLengthMessage,
     ),
 });
 
