@@ -29,7 +29,7 @@ export function FormWithDebug<T extends FieldValues>(
     debounceDelay = 200,
     children,
   } = props;
-  const { errors, isValid } = useFormState({ control: form.control });
+  const { errors } = useFormState({ control: form.control });
 
   /**
    * VERIFICATION - Triggers the debug validation manually
@@ -45,7 +45,7 @@ export function FormWithDebug<T extends FieldValues>(
   };
 
   const debouncedSubmit = useDebounce(onValidSubmit, debounceDelay);
-  const shouldDisplayDebug = DEV_MODE && !isValid;
+  const shouldDisplayDebug = DEV_MODE && Object.keys(errors).length > 0;
 
   return (
     <form
