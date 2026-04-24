@@ -32,7 +32,7 @@ import { Controller, type ControllerRenderProps } from "react-hook-form";
 function withController<P extends object>(Wrapped: ComponentType<P>) {
   function Component(props: WithControllerProps<P>) {
     if (controllerPropsInvalid(props)) {
-      debugLogs("withController");
+      debugLogs("withController", { type: "propsValidation", props });
       return null;
     }
 
