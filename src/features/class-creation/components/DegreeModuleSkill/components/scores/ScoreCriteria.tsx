@@ -10,7 +10,7 @@ import {
  *
  * @description Use this component within a dynamic field array to allow users to add multiple criteria for different score thresholds when justifying degree skills.
  *
- * @param form - The react-hook-form instance to manage form state and control.
+ * @param control - The react-hook-form control instance to manage form state and control.
  * @param index - The index of this criteria in the field array, used for naming form fields.
  * @param remove - A function to remove this criteria from the field array.
  * @param scoreProps - Props to pass to the score input component, excluding name and control which are managed internally.
@@ -18,32 +18,32 @@ import {
  * @param name - The base name for this criteria, used to construct the full field names for score and description.
  */
 export function ScoreCriteria({
-  form,
+  control,
   index,
   remove,
   scoreProps,
-  descriptionProps,
+  criterionProps,
   name,
 }: ScoreCriteriaProps) {
   const scoreName = `${name}.score`;
-  const descriptionName = `${name}.description`;
-  const scoreValue = form.watch(scoreName);
+  const criterionName = `${name}.criterion`;
+  const scoreLabel = scoreProps.scoreSteps[index] ?? 0;
 
   return (
     <ItemGroup className="gap-3 rounded-md border border-border/60 p-3">
       <ControlledCriteriaInput
         {...scoreProps}
         name={scoreName}
-        control={form.control}
+        control={control}
         index={index}
         remove={remove}
       />
       <ControlledTextArea
-        {...descriptionProps}
-        name={descriptionName}
-        control={form.control}
+        {...criterionProps}
+        name={criterionName}
+        control={control}
         rows={3}
-        aria-label={`Critère pour la note ${scoreValue ?? 0}/100`}
+        aria-label={`Critère pour la note ${scoreLabel}/100`}
       />
     </ItemGroup>
   );
