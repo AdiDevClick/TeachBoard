@@ -33,11 +33,11 @@ export function DegreeModuleSkill({
 }: Readonly<PageWithControllers<DegreeModuleSkillInputItem>>) {
   const form = useForm<DegreeModuleSkillFormSchema>({
     resolver: zodResolver(moduleSkillSchema),
-    mode: "onTouched",
+    mode: "all",
     defaultValues: {
       name: "",
       code: "",
-      criterias: [],
+      criteria: [],
     },
   });
 
