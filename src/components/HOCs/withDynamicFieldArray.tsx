@@ -11,9 +11,8 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { createNameForHOC } from "@/utils/utils";
-import type { ComponentType } from "react";
-import type { FieldValues } from "react-hook-form";
-import { useFieldArray } from "react-hook-form";
+import { type ComponentType } from "react";
+import { useFieldArray, type FieldValues } from "react-hook-form";
 
 /**
  * Higher-order component with dynamic field array functionality using react-hook-form's useFieldArray.
@@ -27,16 +26,15 @@ import { useFieldArray } from "react-hook-form";
  * - Your component MUST use the Controller component from react-hook-form.
  */
 export function withDynamicFieldArray<TExtra extends object>(
-  WrappedComponent: ComponentType<
-    DynamicInjectedProps & Omit<TExtra, keyof DynamicInjectedProps>
-  >,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic row HOC must accept schema-specific injected props across forms
+  WrappedComponent: ComponentType<any>,
 ) {
   function Component<TField extends FieldValues = FieldValues>(
     props: Omit<TExtra, keyof DynamicInjectedProps> &
       WithDynamicFieldArrayProps<TField>,
   ) {
     const {
-      form,
+      form: { control },
       name: fieldName,
       title = "Une légende pour le groupe de champs",
       description = "Une description pour le groupe de champs",
@@ -47,17 +45,9 @@ export function withDynamicFieldArray<TExtra extends object>(
     } = props;
 
     const { fields, append, remove } = useFieldArray({
-      control: form.control,
+      control: control,
       name: fieldName,
     });
-
-    const componentProps = {
-      ...restProps,
-      form,
-      name: fieldName,
-      arrayLength: fields.length,
-      remove,
-    };
 
     return (
       <FieldSet>
@@ -67,8 +57,10 @@ export function withDynamicFieldArray<TExtra extends object>(
           <ListMapper items={fields}>
             {(_field, index) => (
               <WrappedComponent
-                {...props}
-                {...componentProps}
+                {...restProps}
+                control={control}
+                remove={remove}
+                arrayLength={fields.length}
                 index={index}
                 name={`${fieldName}.${index}`}
               />
