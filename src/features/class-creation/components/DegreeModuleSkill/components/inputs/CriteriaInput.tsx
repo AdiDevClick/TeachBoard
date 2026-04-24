@@ -8,6 +8,7 @@ import { Slider } from "@/components/ui/slider";
 import { clampScore } from "@/features/class-creation/components/DegreeModuleSkill/components/inputs/functions/criteria-input.functions";
 import type { CriteriaInputProps } from "@/features/class-creation/components/DegreeModuleSkill/components/inputs/types/criteria-input.types";
 import sanitizeDOMProps from "@/utils/props";
+import { preventDefaultAndStopPropagation } from "@/utils/utils";
 import { XIcon } from "lucide-react";
 import type { CSSProperties } from "react";
 
@@ -26,15 +27,17 @@ export function CriteriaInput({
   index,
   removeButtonLabel,
   remove,
-  scoreSteps,
   value,
   onValueChange,
   ...props
 }: CriteriaInputProps) {
-  const currentScore = clampScore(value ?? 0);
   const { onChange: ignoredOnChange, ...sliderProps } = props;
+  const currentScore = clampScore(value ?? 0);
 
-  const safeSliderProps = sanitizeDOMProps(sliderProps, ["fieldState"]);
+  const safeSliderProps = sanitizeDOMProps(sliderProps, [
+    "fieldState",
+    "scoreSteps",
+  ]);
 
   if (ignoredOnChange) {
     // Slider updates are normalized through onValueChange only.
@@ -42,6 +45,11 @@ export function CriteriaInput({
 
   const handleSliderValueChange = (nextValues: ReadonlyArray<number>) => {
     const [nextValue = 0] = nextValues;
+
+    if (nextValue === currentScore) {
+      return;
+    }
+
     onValueChange?.(nextValue);
   };
 
@@ -54,7 +62,10 @@ export function CriteriaInput({
             type="button"
             variant="ghost"
             size="icon-sm"
-            onClick={() => remove(index)}
+            onClick={(e) => {
+              preventDefaultAndStopPropagation(e);
+              remove(index);
+            }}
             aria-label={`${removeButtonLabel} ${index + 1}`}
           >
             <XIcon />
@@ -62,7 +73,6 @@ export function CriteriaInput({
         </ItemActions>
       </div>
       <Slider
-        {...safeSliderProps}
         value={[currentScore]}
         className={evaluationStudentSlider}
         style={
@@ -70,7 +80,7 @@ export function CriteriaInput({
             "--slider-rangeColor": sliderRangeColor(currentScore),
           } as CSSProperties
         }
-        defaultValue={[scoreSteps[index]]}
+        {...safeSliderProps}
         onValueChange={handleSliderValueChange}
         aria-label={`Palier de la justification ${index + 1}`}
       />
