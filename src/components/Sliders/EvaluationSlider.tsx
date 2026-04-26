@@ -1,11 +1,9 @@
 import "@/assets/css/Slider.scss";
 import { withToolTip } from "@/components/HOCs/withToolTip";
-import {
-  buildSliderHoverZones,
-  sliderRangeColor,
-} from "@/components/Sliders/functions/sliders.functions.ts";
+import { sliderRangeColor } from "@/components/Sliders/functions/sliders.functions.ts";
 import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
 import { Badge } from "@/components/ui/badge.tsx";
+import { Button } from "@/components/ui/button";
 import { Item } from "@/components/ui/item.tsx";
 import { Slider } from "@/components/ui/slider.tsx";
 import {
@@ -13,7 +11,7 @@ import {
   evaluationSliderPropsValid,
 } from "@/configs/app-components.config.ts";
 import sanitizeDOMProps from "@/utils/props";
-import { cn } from "@/utils/utils";
+import { cn, preventDefaultAndStopPropagation } from "@/utils/utils";
 import {
   evaluationStudentBadge,
   evaluationStudentContainer,
@@ -22,10 +20,12 @@ import {
 import {
   useEffect,
   useEffectEvent,
-  useMemo,
+  useRef,
   useState,
-  type ComponentProps,
+  type BaseSyntheticEvent,
+  type ComponentType,
   type CSSProperties,
+  type PointerEventHandler,
 } from "react";
 
 /**
@@ -45,6 +45,7 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
   ]);
 
   const [internalValue, setInternalValue] = useState<number[]>(value ?? [0]);
+  const sliderRef = useRef<HTMLSpanElement>(null);
 
   /**
    * Handles value change from the slider component.
@@ -76,19 +77,22 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
     triggerExternalChange(value);
   }, [value]);
 
-  const hoverZones = useMemo(() => buildSliderHoverZones(criteria), [criteria]);
-  const visibleHoverZones =
-    hoverZones.length > 0
-      ? hoverZones
-      : [
-          {
-            id,
-            score: internalValue[0] ?? 0,
-            criterion: fullName,
-            left: 0,
-            width: 100,
-          },
-        ];
+  /**
+   * Forwards pointer down events from the hover zones to the slider to trigger the slider's native tooltip and guidance features.
+   *
+   * @param event - The pointer event from the hover zone.
+   */
+  const forwardZonePointerDownToSlider: PointerEventHandler<
+    HTMLButtonElement
+  > = (event) => {
+    preventDefaultAndStopPropagation(event);
+
+    sliderRef.current?.dispatchEvent(
+      new globalThis.PointerEvent("pointerdown", {
+        ...(event as BaseSyntheticEvent),
+      }),
+    );
+  };
 
   if (evaluationSliderPropsValid(props)) {
     debugLogs("[EvaluationSlider]", { type: "propsValidation", props });
@@ -102,56 +106,45 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
       className={evaluationStudentContainer}
     >
       <Badge className={evaluationStudentBadge}>{fullName}</Badge>
-      <div className="basis-full min-w-0 w-full pt-6">
-        <div className="relative w-full">
-          <div
-            aria-hidden="true"
-            className="absolute inset-x-0 -top-6 h-5"
-            data-slot="slider-hover-zones"
-          >
-            {visibleHoverZones.map((zone) => (
-              <SliderHoverZoneWithTooltip
-                key={zone.id}
-                toolTipText={zone.criterion}
-                className="absolute top-0 h-full opacity-0"
-                data-slot="slider-hover-zone"
-                style={{
-                  left: `${zone.left}%`,
-                  width: `${zone.width}%`,
-                }}
-              />
-            ))}
-          </div>
-          <Slider
-            step={25}
-            value={internalValue}
-            className={cn(evaluationStudentSlider, "w-full")}
-            style={
-              {
-                "--slider-rangeColor": sliderRangeColor(internalValue[0]),
-              } as CSSProperties
-            }
-            {...safeSliderProps}
-            onValueChange={handleValueChange}
-          />
+      <div className="relative w-full">
+        <div
+          className="absolute inset-0 flex items-center justify-between"
+          // className="absolute -inset-x-2 -inset-y-0 flex items-center justify-between"
+          data-slot="slider-hover-zones"
+        >
+          {criteria?.map((zone) => (
+            <SliderHoverZoneWithTooltip
+              type="button"
+              key={zone.id}
+              toolTipText={zone.criterion}
+              data-slot="slider-hover-zone"
+              onPointerDown={forwardZonePointerDownToSlider}
+              className={cn(
+                "z-1 size-2 rounded-full p-2 group border-border/50 bg-background/70 text-foreground/70 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.35)] transition-[transform,background-color,border-color,box-shadow] duration-200 hover:scale-125 hover:border-primary/40 hover:bg-primary/70 hover:text-primary-foreground hover:shadow-[0_0_0_4px_rgba(var(--primary),0.08)]",
+              )}
+              // className={cn("rounded-sm border-0 bg-transparent p-0", className)}
+              {...props}
+            />
+          ))}
         </div>
+        <Slider
+          ref={sliderRef}
+          step={25}
+          value={internalValue}
+          className={cn(evaluationStudentSlider, "min-w-full")}
+          style={
+            {
+              "--slider-rangeColor": sliderRangeColor(internalValue[0]),
+            } as CSSProperties
+          }
+          {...safeSliderProps}
+          onValueChange={handleValueChange}
+        />
       </div>
     </Item>
   );
 }
 
-type SliderHoverZoneProps = ComponentProps<"button">;
-
-const SliderHoverZone = ({ className, ...props }: SliderHoverZoneProps) => (
-  <button
-    type="button"
-    aria-hidden="true"
-    tabIndex={-1}
-    className={cn("rounded-sm border-0 bg-transparent p-0", className)}
-    {...props}
-  />
-);
-
-SliderHoverZone.displayName = "SliderHoverZone";
-
-const SliderHoverZoneWithTooltip = withToolTip(SliderHoverZone);
+const SliderHoverZoneWithTooltip: ComponentType<
+  Record<string, unknown> & { toolTipText: string }
+> = withToolTip(Button);
