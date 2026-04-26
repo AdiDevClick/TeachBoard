@@ -15,8 +15,8 @@ import type { ComponentProps } from "react";
  * @param formState - The form state object to determine if the form is valid.
  */
 export function AppDialFooter({
-  cancelText,
-  submitText,
+  cancelText = "Annuler",
+  submitText = "Créer",
   formState,
   formId,
   displaySubmitButton = true,
@@ -30,9 +30,6 @@ export function AppDialFooter({
     errors = {},
   } = formState || {};
 
-  const cancelTextValue = cancelText || "Annuler";
-  const submitTextValue = submitText || "Créer";
-
   const hasAnyErrors = Object.keys(errors).length > 0;
 
   const isDisabledCondition =
@@ -42,7 +39,7 @@ export function AppDialFooter({
     <DialogFooter {...props}>
       {displayCancelButton && (
         <DialogClose asChild className="justify-end">
-          <Button variant="outline">{cancelTextValue}</Button>
+          <Button variant="outline">{cancelText}</Button>
         </DialogClose>
       )}
       {displaySubmitButton && (
@@ -53,7 +50,7 @@ export function AppDialFooter({
           disabled={isDisabledCondition}
           form={formId}
         >
-          {submitTextValue}
+          {submitText}
         </Button>
       )}
       {props.children}
