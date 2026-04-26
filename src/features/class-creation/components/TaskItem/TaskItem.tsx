@@ -33,7 +33,7 @@ export function TaskItem({
 }: Readonly<PageWithControllers<TaskItemCreationInputItem>>) {
   const form = useForm<TaskItemFormSchema>({
     resolver: zodResolver(taskItemCreationSchema),
-    mode: "onChange",
+    mode: "all",
     defaultValues: {
       name: "",
       description: "",
