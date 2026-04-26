@@ -80,6 +80,12 @@ export function useStepFourHandler({
   const handleValidSubmit = (variables: StepFourFormSchema) => {
     const parsedVariables = stepFourInputSchema.parse(variables);
 
+    const hasNone = parsedVariables.absence.includes("none");
+
+    if (hasNone) {
+      parsedVariables.absence = [];
+    }
+
     delete parsedVariables["overallScore"];
 
     const isEditMode = mode === "edit";
