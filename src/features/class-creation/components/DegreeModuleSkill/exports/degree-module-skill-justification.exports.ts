@@ -33,3 +33,11 @@ createComponentName(
   "DynamicCriteriaList",
   DynamicCriteriaList,
 );
+
+export const ControlledDynamicCriteriaList =
+  withController(DynamicCriteriaList);
+createComponentName(
+  "withController",
+  "ControlledDynamicCriteriaList",
+  ControlledDynamicCriteriaList,
+);
