@@ -115,7 +115,16 @@ describe("DegreeModuleSkill modal integration", () => {
     expect(moduleSkill.default.safeParse(invalid).success).toBe(false);
 
     // Valid payload
-    const valid = { name: "Valid Name", code: "VC1" };
+    const valid = {
+      name: "Valid Name",
+      code: "VC1",
+      criteria: moduleSkill
+        .createDefaultDegreeModuleSkillJustifications()
+        .map(({ score }) => ({
+          score,
+          description: `Critere du palier ${score}`,
+        })),
+    };
     expect(moduleSkill.default.safeParse(valid).success).toBe(true);
   });
 
