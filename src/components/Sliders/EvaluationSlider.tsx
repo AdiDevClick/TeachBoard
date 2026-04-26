@@ -106,7 +106,7 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
       className={evaluationStudentContainer}
     >
       <Badge className={evaluationStudentBadge}>{fullName}</Badge>
-      <div className="relative w-full">
+      <div className="relative w-full max-w-2/3">
         <div
           className="absolute inset-0 flex items-center justify-between"
           // className="absolute -inset-x-2 -inset-y-0 flex items-center justify-between"
