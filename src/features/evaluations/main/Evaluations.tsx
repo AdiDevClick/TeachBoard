@@ -11,10 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import { useEvaluationTableStore } from "@/features/evaluations/main/configs/evaluations.configs";
-import {
-  evaluationOverviewsSchema,
-  type EvaluationOverview,
-} from "@/features/evaluations/main/models/evaluations-overviews.models";
+import { evaluationOverviewsSchema } from "@/features/evaluations/main/models/evaluations-overviews.models";
+import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import type { EvaluationsMainProps } from "@/features/evaluations/main/types/evaluations.types";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import { zodParseFromObject } from "@/utils/utils";
@@ -36,13 +34,13 @@ import { useShallow } from "zustand/shallow";
  * @see `table-columns.functions.tsx` for more details on each column definition.
  */
 const columns = [
-  createDragColumn((item: EvaluationOverview) => item.id),
+  createDragColumn((item: DetailedEvaluationView) => item.id),
   createSelectionColumn(),
   createClassNamesColumn(),
   createTitleColumn(),
   createEvaluationDateColumn(),
   createActionsColumn(),
-] as ColumnDef<EvaluationOverview>[];
+] as ColumnDef<DetailedEvaluationView>[];
 
 /**
  * Evaluation page
@@ -80,6 +78,13 @@ export function EvaluationsMain({
     });
   });
 
+  const syncOverviewData = useEffectEvent(() => {
+    const parsedResult = zodParseFromObject(data, evaluationOverviewsSchema);
+
+    setState({ data: parsedResult as DetailedEvaluationView[] });
+    setShouldResyncEvals(false);
+  });
+
   /**
    * 1 - Init store columns once and fetch initial data after hydration.
    */
@@ -110,11 +115,8 @@ export function EvaluationsMain({
   useEffect(() => {
     if (data === undefined || data === null) return;
 
-    const parsedResult = zodParseFromObject(data, evaluationOverviewsSchema);
-
     if (isStoreEmpty || shouldResyncEvals) {
-      setState({ data: parsedResult });
-      setShouldResyncEvals(false);
+      syncOverviewData();
     }
   }, [data, isStoreEmpty, shouldResyncEvals]);
 
