@@ -29,11 +29,10 @@ export function CriteriaInput({
   remove,
   value,
   onValueChange,
-  ...props
+  onChange: ignoredOnChange,
+  ...sliderProps
 }: CriteriaInputProps) {
-  const { onChange: ignoredOnChange, ...sliderProps } = props;
   const currentScore = clampScore(value ?? 0);
-
   const safeSliderProps = sanitizeDOMProps(sliderProps, [
     "fieldState",
     "scoreSteps",
@@ -57,20 +56,22 @@ export function CriteriaInput({
     <>
       <div className="flex w-full justify-between">
         <FieldTitle>Palier {currentScore}/100</FieldTitle>
-        <ItemActions>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            onClick={(e) => {
-              preventDefaultAndStopPropagation(e);
-              remove(index);
-            }}
-            aria-label={`${removeButtonLabel} ${index + 1}`}
-          >
-            <XIcon />
-          </Button>
-        </ItemActions>
+        {index > 0 && (
+          <ItemActions>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              onClick={(e) => {
+                preventDefaultAndStopPropagation(e);
+                remove(index);
+              }}
+              aria-label={`${removeButtonLabel} ${index + 1}`}
+            >
+              <XIcon />
+            </Button>
+          </ItemActions>
+        )}
       </div>
       <Slider
         value={[currentScore]}
