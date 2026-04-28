@@ -51,7 +51,10 @@ export function StepThreeModuleSelectionController(
   }, [moduleSelectionState]);
 
   if (stepThreeModuleSelectionControllerPropsInvalid(props)) {
-    debugLogs("StepThreeModuleSelectionController", props);
+    debugLogs("StepThreeModuleSelectionController", {
+      type: "propsValidation",
+      props,
+    });
     return null;
   }
 
