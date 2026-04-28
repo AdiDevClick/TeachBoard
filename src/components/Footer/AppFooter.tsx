@@ -2,7 +2,7 @@ import type { AppDialFooterProps } from "@/components/Footer/types/footer.types.
 import { Button } from "@/components/ui/button.tsx";
 import { CardFooter } from "@/components/ui/card.tsx";
 import { DialogClose, DialogFooter } from "@/components/ui/dialog.tsx";
-import type { ComponentProps } from "react";
+import { useMemo, type ComponentProps } from "react";
 
 /**
  * A Footer component for App Dialogs with a submit button and a cancel button.
@@ -12,28 +12,29 @@ import type { ComponentProps } from "react";
  * @param submitText - Text for the submit button. Defaults to "Créer".
  * @param formId - The id of the form to be submitted.
  * @param displaySubmitButton - Whether to display the submit button. Defaults to true.
- * @param formState - The form state object to determine if the form is valid.
+ * @param formState - The form state object allowing to verify the form's validity.
  */
 export function AppDialFooter({
   cancelText = "Annuler",
   submitText = "Créer",
-  formState,
   formId,
+  formState,
   displaySubmitButton = true,
   displayCancelButton = true,
+  children,
   ...props
 }: AppDialFooterProps) {
-  const {
-    isDirty,
-    isSubmitting,
-    isSubmitSuccessful,
-    errors = {},
-  } = formState || {};
+  const isDisabled = useMemo(() => {
+    const hasAnyErrors = Object.keys(formState.errors).length > 0;
 
-  const hasAnyErrors = Object.keys(errors).length > 0;
-
-  const isDisabledCondition =
-    isSubmitSuccessful || isSubmitting || hasAnyErrors || !isDirty;
+    return (
+      formState.isSubmitSuccessful ||
+      formState.isSubmitting ||
+      hasAnyErrors ||
+      !formState.isValid ||
+      formState.isValidating
+    );
+  }, [formState]);
 
   return (
     <DialogFooter {...props}>
@@ -47,13 +48,13 @@ export function AppDialFooter({
           variant="outline"
           className="justify-end mr-6"
           type="submit"
-          disabled={isDisabledCondition}
+          disabled={isDisabled}
           form={formId}
         >
           {submitText}
         </Button>
       )}
-      {props.children}
+      {children}
     </DialogFooter>
   );
 }

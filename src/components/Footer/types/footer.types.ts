@@ -8,8 +8,8 @@ export type AppDialFooterProps = Readonly<
     cancelText?: string;
     /** An object containing text for the submit button */
     submitText?: string;
-    /** The form state object to determine if the form is valid */
-    formState?: FormState<any>;
+    /** The form state object allowing to verify the form's validity */
+    formState: FormState<any>;
     /** The id of the form to be submitted */
     formId?: string;
     /** Whether to display the submit button */
