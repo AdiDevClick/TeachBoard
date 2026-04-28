@@ -1,4 +1,5 @@
 import "@/assets/css/Slider.scss";
+import withListMapper from "@/components/HOCs/withListMapper";
 import { withToolTip } from "@/components/HOCs/withToolTip";
 import { sliderRangeColor } from "@/components/Sliders/functions/sliders.functions.ts";
 import type { EvaluationSliderProps } from "@/components/Sliders/types/sliders.types.ts";
@@ -20,6 +21,7 @@ import {
 import {
   useEffect,
   useEffectEvent,
+  useMemo,
   useRef,
   useState,
   type BaseSyntheticEvent,
@@ -43,6 +45,8 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
     "overallScore",
     "originalScore",
   ]);
+
+  const { inert, ...buttonRest } = safeSliderProps;
 
   const [internalValue, setInternalValue] = useState<number[]>(value ?? [0]);
   const sliderRef = useRef<HTMLSpanElement>(null);
@@ -87,12 +91,19 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
   > = (event) => {
     preventDefaultAndStopPropagation(event);
 
+    if (inert) return;
+
     sliderRef.current?.dispatchEvent(
       new globalThis.PointerEvent("pointerdown", {
         ...(event as BaseSyntheticEvent),
       }),
     );
   };
+
+  const sortedCriteriaMemo = useMemo(
+    () => Object.values(criteria || {}).sort((a, b) => a.score - b.score),
+    [criteria],
+  );
 
   if (evaluationSliderPropsValid(props)) {
     debugLogs("[EvaluationSlider]", { type: "propsValidation", props });
@@ -112,20 +123,19 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
           // className="absolute -inset-x-2 -inset-y-0 flex items-center justify-between"
           data-slot="slider-hover-zones"
         >
-          {criteria?.map((zone) => (
-            <SliderHoverZoneWithTooltip
-              type="button"
-              key={zone.id}
-              toolTipText={zone.criterion}
-              data-slot="slider-hover-zone"
-              onPointerDown={forwardZonePointerDownToSlider}
-              className={cn(
-                "z-1 size-2 rounded-full p-2 group border-border/50 bg-background/70 text-foreground/70 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.35)] transition-[transform,background-color,border-color,box-shadow] duration-200 hover:scale-125 hover:border-primary/40 hover:bg-primary/70 hover:text-primary-foreground hover:shadow-[0_0_0_4px_rgba(var(--primary),0.08)]",
-              )}
-              // className={cn("rounded-sm border-0 bg-transparent p-0", className)}
-              {...props}
-            />
-          ))}
+          <SliderHoverZoneWithTooltipList
+            items={sortedCriteriaMemo}
+            type="button"
+            optional={(zone) => ({
+              toolTipText: zone?.criterion,
+            })}
+            data-slot="slider-hover-zone"
+            onPointerDown={forwardZonePointerDownToSlider}
+            className={cn(
+              "z-1 size-2 rounded-full p-2 group border-border/50 bg-background/70 text-foreground/70 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.35)] transition-[transform,background-color,border-color,box-shadow] duration-200 hover:scale-125 hover:border-primary/40 hover:bg-primary/70 hover:text-primary-foreground hover:shadow-[0_0_0_4px_rgba(var(--primary),0.08)]",
+            )}
+            {...buttonRest}
+          />
         </div>
         <Slider
           ref={sliderRef}
@@ -148,3 +158,7 @@ export function EvaluationSlider(props: EvaluationSliderProps) {
 const SliderHoverZoneWithTooltip: ComponentType<
   Record<string, unknown> & { toolTipText: string }
 > = withToolTip(Button);
+
+const SliderHoverZoneWithTooltipList = withListMapper(
+  SliderHoverZoneWithTooltip,
+);
