@@ -1,3 +1,4 @@
+import { useAppStore } from "@/api/store/AppStore";
 import { useEvaluationTableStore } from "@/features/evaluations/main/configs/evaluations.configs";
 import type { UseEvaluationsViewFetchProps } from "@/features/evaluations/main/hooks/types/use-evaluations-view-fetch.types";
 import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
@@ -16,6 +17,10 @@ export function useEvaluationsViewFetch({
 }: UseEvaluationsViewFetchProps) {
   const { evaluationId } = useParams();
   const parsedEvalId = parseToUuid(evaluationId) ?? "";
+  const { setShouldResyncEvals } = useAppStore();
+  const isStoreEmpty = useEvaluationTableStore(
+    (state) => state.data.length === 0,
+  );
 
   const { hasHydrated, updateItem } = useEvaluationTableStore();
   const storeEvaluationData = useEvaluationTableStore((state) =>
@@ -71,6 +76,11 @@ export function useEvaluationsViewFetch({
       }
 
       updateItem(parsedEvalId, dataToSync);
+
+      // !! IMPORTANT !!Keep the resync flag up to date in case the store was initially empty (one entry can mess the syncing) -
+      if (isStoreEmpty) {
+        setShouldResyncEvals(true);
+      }
     },
   );
 
@@ -81,7 +91,7 @@ export function useEvaluationsViewFetch({
    */
   useEffect(() => {
     syncResolvedEvaluationData(resolvedEvaluationData);
-  }, [resolvedEvaluationData, storeEvaluationData]);
+  }, [resolvedEvaluationData]);
 
   return {
     evaluationData: resolvedEvaluationData,
