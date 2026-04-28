@@ -194,6 +194,12 @@ export const useAppStore = create(
               });
             },
             setShouldResyncEvals(shouldResync: boolean) {
+              const currentSyncValue = get().syncValues.shouldSyncEvaluations;
+
+              if (currentSyncValue === shouldResync) {
+                return;
+              }
+
               set(
                 (state) => {
                   state.syncValues.shouldSyncEvaluations = shouldResync;
