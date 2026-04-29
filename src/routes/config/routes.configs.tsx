@@ -1,8 +1,10 @@
 import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas";
-import { StepFour } from "@/features/evaluations/create/steps/four/StepFour";
-import { StepOne } from "@/features/evaluations/create/steps/one/StepOne";
-import { StepThree } from "@/features/evaluations/create/steps/three/StepThree";
-import { StepTwo } from "@/features/evaluations/create/steps/two/StepTwo";
+import {
+  LazyStepFour,
+  LazyStepOne,
+  LazyStepThree,
+  LazyStepTwo,
+} from "@/features/evaluations/create/steps/exports/steps.exports";
 
 const DATE = new Date().toLocaleDateString();
 
@@ -14,12 +16,12 @@ export const EVALUATION_PAGE_TITLE = "Evaluation - " + DATE;
  * This configuration defines the paths, components, and loaders for each step of the evaluation creation process.
  */
 const EVALUATION_ELEMENTS = [
-  { path: EvaluationPageTabsDatas.step1.name, element: <StepOne /> },
-  { path: EvaluationPageTabsDatas.step2.name, element: <StepTwo /> },
-  { path: EvaluationPageTabsDatas.step3.name, element: <StepThree /> },
+  { path: EvaluationPageTabsDatas.step1.name, element: <LazyStepOne /> },
+  { path: EvaluationPageTabsDatas.step2.name, element: <LazyStepTwo /> },
+  { path: EvaluationPageTabsDatas.step3.name, element: <LazyStepThree /> },
   {
     path: EvaluationPageTabsDatas.step4.name,
-    element: <StepFour />,
+    element: <LazyStepFour />,
     title: "hidden",
   },
 ];

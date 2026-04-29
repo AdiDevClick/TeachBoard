@@ -5,20 +5,22 @@ import {
   passwordCreationInputControllers,
 } from "@/data/inputs-controllers.data.ts";
 import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
-import { CreateEvaluations } from "@/features/evaluations/create/CreateEvaluations.tsx";
-import { EvaluationDelete } from "@/features/evaluations/delete/EvaluationDelete";
-import { EvaluationEdit } from "@/features/evaluations/edit/EvaluationEdit";
-import { EvaluationDetailDrawerRoute } from "@/features/evaluations/main/components/drawer-detail/EvaluationDetailDrawer";
-import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
-import { EvaluationsView } from "@/features/evaluations/main/EvaluationsView";
-import { About } from "@/pages/About/About.tsx";
-import EmailValidation from "@/pages/Email/EmailValidation";
+import { LazyCreateEvaluations } from "@/features/evaluations/create/exports/create-evaluations.exports";
+import { LazyEvaluationDelete } from "@/features/evaluations/delete/exports/evaluation-delete.exports";
+import { LazyEvaluationEdit } from "@/features/evaluations/edit/exports/evaluation-edit.exports";
+import { LazyEvaluationsList } from "@/features/evaluations/main/exports/evaluation-list.exports";
+import {
+  LazyEvaluationDetailDrawerRoute,
+  LazyEvaluationsView,
+} from "@/features/evaluations/main/exports/evaluation-view.exports";
+import { LazyAbout } from "@/pages/About/exports/about.exports";
+import { LazyEmailValidation } from "@/pages/Email/exports/email-validation.exports";
 import { PageError } from "@/pages/Error/PageError.tsx";
 import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
-import { Login } from "@/pages/Login/Login.tsx";
-import { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
-import { Signup } from "@/pages/Signup/Signup";
+import { LazyLogin } from "@/pages/Login/exports/login.exports";
+import { LazyPasswordCreation } from "@/pages/Password/exports/password-creation.exports";
+import { LazySignup } from "@/pages/Signup/exports/signup.exports";
 import {
   ALL_STEPS,
   EVALUATION_PAGE_TITLE,
@@ -53,7 +55,7 @@ export const ROUTES_CHILDREN: RouteObject[] = [
   },
   {
     path: "login",
-    element: <Login inputControllers={inputLoginControllers} />,
+    element: <LazyLogin inputControllers={inputLoginControllers} />,
     loader: async () => {
       setDocumentTitle("Login");
 
@@ -65,7 +67,7 @@ export const ROUTES_CHILDREN: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <Signup inputControllers={inputSignupControllers} />,
+        element: <LazySignup inputControllers={inputSignupControllers} />,
         loader: async () => {
           setDocumentTitle("S'enregistrer");
           return { pageTitle: "hidden" };
@@ -73,7 +75,7 @@ export const ROUTES_CHILDREN: RouteObject[] = [
       },
       {
         path: "verify/:referral/:referralCode",
-        element: <EmailValidation />,
+        element: <LazyEmailValidation />,
         loader: async () => {
           setDocumentTitle("Vérification de l'inscription");
           return { pageTitle: "hidden" };
@@ -84,7 +86,9 @@ export const ROUTES_CHILDREN: RouteObject[] = [
   {
     path: "password-creation",
     element: (
-      <PasswordCreation inputControllers={passwordCreationInputControllers} />
+      <LazyPasswordCreation
+        inputControllers={passwordCreationInputControllers}
+      />
     ),
     loader: async () => {
       setDocumentTitle("Création du mot de passe");
@@ -93,7 +97,7 @@ export const ROUTES_CHILDREN: RouteObject[] = [
   },
   {
     path: "about",
-    element: <About />,
+    element: <LazyAbout />,
   },
   {
     path: "evaluations",
@@ -114,7 +118,7 @@ export const ROUTES_CHILDREN: RouteObject[] = [
       },
       {
         path: ":evaluationId",
-        element: <EvaluationsView />,
+        element: <LazyEvaluationsView />,
         loader: async () => {
           const title = COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title;
           setDocumentTitle(title);
@@ -122,7 +126,7 @@ export const ROUTES_CHILDREN: RouteObject[] = [
       },
       {
         path: "TP",
-        element: <EvaluationsMain />,
+        element: <LazyEvaluationsList />,
         loader: async () => {
           const pageTitle = COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title;
           setDocumentTitle(pageTitle);
@@ -132,7 +136,7 @@ export const ROUTES_CHILDREN: RouteObject[] = [
         children: [
           {
             path: "opened/:evaluationId",
-            element: <EvaluationDetailDrawerRoute />,
+            element: <LazyEvaluationDetailDrawerRoute />,
             loader: async () => {
               const title = COMPLETE_SIDEBAR_DATAS.navMain.menus[2].title;
               setDocumentTitle(title);
@@ -153,7 +157,7 @@ export const ROUTES_CHILDREN: RouteObject[] = [
       // - Right zone : Evaluation and module selection
       {
         path: "create",
-        element: <CreateEvaluations />,
+        element: <LazyCreateEvaluations />,
         loader: async () => {
           const { title } = COMPLETE_SIDEBAR_DATAS.navMain.menus[0];
           setDocumentTitle(title);
@@ -169,7 +173,7 @@ export const ROUTES_CHILDREN: RouteObject[] = [
 
       {
         path: "edit/:evaluationId",
-        element: <EvaluationEdit />,
+        element: <LazyEvaluationEdit />,
         loader: async () => {
           const title = COMPLETE_SIDEBAR_DATAS.navMain.menus[4].title;
           setDocumentTitle(title);
@@ -180,7 +184,7 @@ export const ROUTES_CHILDREN: RouteObject[] = [
       },
       {
         path: "delete/:evaluationId",
-        element: <EvaluationDelete />,
+        element: <LazyEvaluationDelete />,
         loader: async () => {
           const title = COMPLETE_SIDEBAR_DATAS.navMain.menus[4].title;
           setDocumentTitle(title);

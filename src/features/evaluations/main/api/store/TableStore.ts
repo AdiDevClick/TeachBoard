@@ -223,7 +223,7 @@ export function createTableStore<T extends RowItemWithId>(storeName: string) {
               // Modify the name so it can be dynamic for any table store created with the factory
               store.persistMap.idb.setOptions({ name: storeName });
 
-              return (state, error) => {
+              return (_state, error) => {
                 if (error) {
                   console.warn("an error happened during hydration", error);
                 } else {
