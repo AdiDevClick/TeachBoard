@@ -6,7 +6,7 @@ import { useEvaluationsEditFetch } from "@/features/evaluations/edit/hooks/useEv
 import { useEvaluationsHydration } from "@/features/evaluations/edit/hooks/useEvaluationsHydration";
 import type { EvaluationEditProps } from "@/features/evaluations/edit/types/evaluation-edit.types";
 import { usePageTitle } from "@/hooks/usePageTitle";
-import { useEffect } from "react";
+import { useEffect, useEffectEvent } from "react";
 
 const { endpoints, dataReshape } = API_ENDPOINTS.GET.EVALUATIONS;
 const { endPoints, dataReshapeSingle } = API_ENDPOINTS.GET.CLASSES;
@@ -48,14 +48,23 @@ export function EvaluationEdit({
   });
 
   /**
-   * Clear evaluation data from the store to prevent stale data issues when navigating between different evaluations.
+   * Clear up
+   */
+  const clearDataAndRestoreTitle = useEffectEvent(() => {
+    setTitle("default");
+    clearStore(selectedClassDatasMemo?.id as UUID, true);
+  });
+
+  /**
+   * Clear up -
+   *
+   * @description - Clear evaluation data from the store to prevent stale data issues when navigating between different evaluations.
    */
   useEffect(() => {
     return () => {
-      setTitle("default");
-      clearStore(selectedClassDatasMemo?.id as UUID, true);
+      clearDataAndRestoreTitle();
     };
-  }, [selectedClassDatasMemo?.id, clearStore]);
+  }, []);
 
   return <CreateEvaluations />;
 }
