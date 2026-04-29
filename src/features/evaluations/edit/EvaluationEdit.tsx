@@ -56,13 +56,15 @@ export function EvaluationEdit({
   });
 
   /**
-   * Clear up -
+   * Clear evaluation data when leaving the edit route tree.
    *
-   * @description - Clear evaluation data from the store to prevent stale data issues when navigating between different evaluations.
+   * @description Keeps the store intact while navigating between edit steps.
    */
   useEffect(() => {
     return () => {
-      clearDataAndRestoreTitle();
+      if (!window.location.pathname.startsWith("/evaluations/edit/")) {
+        clearDataAndRestoreTitle();
+      }
     };
   }, []);
 
