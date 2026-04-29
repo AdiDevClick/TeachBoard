@@ -4,7 +4,6 @@ import type { CommandItemType } from "@/components/Command/types/command.types.t
 import { PopoverFieldWithCommands } from "@/components/Popovers/exports/popover-field.exports";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import { debugLogs } from "@/configs/app-components.config";
-import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
 import { stepOneInputControllers } from "@/features/evaluations/create/steps/one/forms/step-one-inputs.ts";
 import type { StepOneControllerProps } from "@/features/evaluations/create/steps/one/types/step-one.types.ts";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
@@ -53,14 +52,6 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
 
     if (data || error) {
       toast.dismiss(loadingName);
-      if (DEV_MODE && !NO_QUERY_LOGS) {
-        console.debug("useQueryOnSubmit data", data ?? error);
-      }
-      // You can handle additional side effects here if needed
-    }
-
-    if (error) {
-      // Errors are handled in onError callback
     }
   }, [data, error, isLoading]);
 
