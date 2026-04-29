@@ -11,7 +11,7 @@ import type {
   PromiseStateSettledResult,
 } from "@/utils/types/types.utils.ts";
 import { clsx, type ClassValue } from "clsx";
-import { type ComponentType } from "react";
+import { lazy, type ComponentType } from "react";
 import { twMerge } from "tailwind-merge";
 import type z from "zod";
 
@@ -665,3 +665,37 @@ export const animation = (
 
   return { style: { animation } };
 };
+
+/**
+ * Utility function to lazily import a React component for code-splitting and performance optimization.
+ *
+ * @param path - The path to the module containing the component to import, relative to the src directory (e.g., "@/features/evaluations/main/EvaluationsView").
+ * @param exportName - The name of the exported component to import from the module (optional, defaults to the default export).
+ *
+ * @returns A React component that is loaded lazily using React's `lazy` function.
+ */
+export function lazyImport<T extends ComponentType<any>>(
+  path: string,
+  exportName?: string,
+) {
+  return lazy(async () => {
+    const resolvedModulePath = normalizeLazyModulePath(path);
+
+    if (!resolvedModulePath) {
+      throw new Error(`Unable to resolve lazy import: ${path}`);
+    }
+
+    const module = await import(/* @vite-ignore */ resolvedModulePath);
+    const exported = exportName ? module[exportName] : module;
+
+    return { default: exported as T };
+  });
+}
+
+function normalizeLazyModulePath(path: string) {
+  if (path.startsWith("@/")) {
+    return `/src/${path.slice(2)}`;
+  }
+
+  return path;
+}
