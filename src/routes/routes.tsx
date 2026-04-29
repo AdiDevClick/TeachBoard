@@ -8,7 +8,7 @@ import { inputLoginControllers } from "@/features/auth/components/login/forms/lo
 import { CreateEvaluations } from "@/features/evaluations/create/CreateEvaluations.tsx";
 import { EvaluationDelete } from "@/features/evaluations/delete/EvaluationDelete";
 import { EvaluationEdit } from "@/features/evaluations/edit/EvaluationEdit";
-import { EvaluationDetailDrawerRoute } from "@/features/evaluations/main/components/EvaluationDetailDrawer";
+import { EvaluationDetailDrawerRoute } from "@/features/evaluations/main/components/drawer-detail/EvaluationDetailDrawer";
 import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
 import { EvaluationsView } from "@/features/evaluations/main/EvaluationsView";
 import { About } from "@/pages/About/About.tsx";

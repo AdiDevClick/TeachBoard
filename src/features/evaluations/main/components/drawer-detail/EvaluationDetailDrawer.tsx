@@ -25,7 +25,7 @@ import {
   type PropsWithChildren,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { buttonsData } from "../configs/evaluation-detail-drawer-buttons.configs";
+import { buttonsData } from "../../configs/evaluation-detail-drawer-buttons.configs";
 
 type EvaluationDetailDrawerProps = Readonly<
   {
@@ -142,6 +142,8 @@ function DrawerSection({ title, children }: DrawerSectionProps) {
     </section>
   );
 }
+
+// buttonsData is imported from evaluation-detail-buttons.data
 
 export function EvaluationDetailDrawer({
   evaluation,

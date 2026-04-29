@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { EvaluationDetailDrawer } from "@/features/evaluations/main/components/EvaluationDetailDrawer";
+import { EvaluationDetailDrawer } from "@/features/evaluations/main/components/drawer-detail/EvaluationDetailDrawer";
 import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { useState, type ComponentProps } from "react";
 

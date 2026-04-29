@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import type { EvaluationDetailDrawerButtonProps } from "@/features/evaluations/main/components/types/evaluation-detail-drawer-button";
+import type { EvaluationDetailDrawerButtonProps } from "@/features/evaluations/main/components/drawer-button/types/evaluation-detail-drawer-button";
 import sanitizeDOMProps from "@/utils/props";
 import { Link } from "react-router-dom";
 
