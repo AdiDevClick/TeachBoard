@@ -25,6 +25,8 @@ export function AppDialFooter({
   ...props
 }: AppDialFooterProps) {
   const isDisabled = useMemo(() => {
+    if (!formState) return false;
+
     const hasAnyErrors = Object.keys(formState.errors).length > 0;
 
     return (
