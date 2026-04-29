@@ -156,8 +156,8 @@ export function useStepFourHandler({
         parsedResponse,
       );
 
+      navigate(`/evaluations/${evalId}`, { replace: true });
       clear(selectedClass?.id as UUID, true);
-      navigate(`/evaluations/${evalId}`);
     },
   );
 
