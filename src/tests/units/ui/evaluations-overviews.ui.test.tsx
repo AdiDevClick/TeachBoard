@@ -1,6 +1,6 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
-import { EvaluationDetailDrawerRoute } from "@/features/evaluations/main/components/EvaluationDetailDrawer";
+import { EvaluationDetailDrawerRoute } from "@/features/evaluations/main/components/drawer-detail/EvaluationDetailDrawer";
 import {
   EVALUATION_TABLE_STORE_NAME,
   useEvaluationTableStore,
