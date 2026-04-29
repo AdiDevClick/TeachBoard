@@ -19,7 +19,7 @@ import { zodParseFromObject } from "@/utils/utils";
 import { IconPlus } from "@tabler/icons-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useEffectEvent } from "react";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { useShallow } from "zustand/shallow";
 
 /**
@@ -123,9 +123,11 @@ export function EvaluationsMain({
   return (
     <div className="flex flex-col gap-4 px-4 py-6 lg:px-6">
       <div className="flex items-center justify-between">
-        <Button size="sm">
-          <IconPlus />
-          <span>Nouvelle évaluation</span>
+        <Button size="sm" asChild>
+          <Link to="/evaluations/create">
+            <IconPlus />
+            Nouvelle évaluation
+          </Link>
         </Button>
       </div>
       <EvaluationTable />
