@@ -1,8 +1,10 @@
 import { useAppStore } from "@/api/store/AppStore.ts";
+import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
 import { rightContent } from "@/assets/css/EvaluationPage.module.scss";
 import withTitledCard from "@/components/HOCs/withTitledCard.tsx";
 import { Button } from "@/components/ui/button";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
+import { useStepFourState } from "@/features/evaluations/create/hooks/useStepFourState";
 import {
   STEP_FOUR_CARD_PROPS,
   STEP_FOUR_INPUT_CONTROLLERS,
@@ -14,8 +16,9 @@ import {
 } from "@/features/evaluations/create/steps/four/models/step-four.models";
 import type { StepFourProps } from "@/features/evaluations/create/steps/four/types/step-four.types";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
+import type { ClassModules } from "@/features/evaluations/create/store/types/steps-creation-store.types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, type ComponentProps } from "react";
+import { useEffect, useEffectEvent, type ComponentProps } from "react";
 import { useForm, useFormState } from "react-hook-form";
 import { useLoaderData, useNavigate, useParams } from "react-router-dom";
 
@@ -43,8 +46,10 @@ export function StepFour({
   const mode = useLoaderData().mode;
   const user = useAppStore((state) => state.user);
   const navigate = useNavigate();
-  const { selectedClass, getAttendedModules, title, comments, evaluationDate } =
-    useEvaluationStepsCreationStore();
+  const { selectedClass, modules, title, comments } = useStepFourState();
+  const evaluationDate = useEvaluationStepsCreationStore(
+    (state) => state.evaluationDate,
+  );
 
   const foundTitle =
     title ?? "Evaluation du " + STEP_FOUR_CARD_PROPS.title.description;
@@ -63,14 +68,33 @@ export function StepFour({
     },
   });
 
+  const { isSubmitSuccessful } = useFormState({
+    control: form.control,
+  });
+
+  const triggerNavigationGuard = useEffectEvent(
+    (modules: ClassModules[], selectedClass?: ClassSummaryDto | null) => {
+      if (!selectedClass || modules.length === 0) {
+        navigate("/evaluations/create");
+      }
+    },
+  );
+
   /**
    * INIT - REDIRECT IF NO CLASS OR NO ATTENDED MODULES
    */
   useEffect(() => {
-    if (!selectedClass || getAttendedModules().length === 0) {
-      navigate("/evaluations/create");
+    if (isSubmitSuccessful) {
+      return;
     }
-  }, [getAttendedModules, navigate, selectedClass]);
+
+    triggerNavigationGuard(modules, selectedClass);
+  }, [isSubmitSuccessful, modules, selectedClass]);
+
+  const endpoint =
+    mode === "create"
+      ? API_ENDPOINTS.POST.CREATE_EVALUATION.endpoint
+      : API_ENDPOINTS.PUT.UPDATE_EVALUATION.endpoint(evaluationId as string);
 
   const baseCardProps = {
     pageId,
@@ -81,10 +105,7 @@ export function StepFour({
     card: STEP_FOUR_CARD_PROPS,
     ...props,
     form,
-    submitRoute:
-      mode === "create"
-        ? API_ENDPOINTS.POST.CREATE_EVALUATION.endpoint
-        : API_ENDPOINTS.PUT.UPDATE_EVALUATION.endpoint(evaluationId as string),
+    submitRoute: endpoint,
     submitDataReshapeFn: API_ENDPOINTS.POST.CREATE_EVALUATION.dataReshape,
   } satisfies ComponentProps<typeof ShowSummary>;
 
