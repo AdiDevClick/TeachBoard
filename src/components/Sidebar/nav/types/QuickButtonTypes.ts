@@ -7,4 +7,5 @@ export type NavQuickButtonProps = {
       (typeof sidebarDatas)["navMain"]["menus"][number]["quickButton"]
     >["icon"];
   };
+  enabled?: boolean;
 };

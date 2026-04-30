@@ -5,9 +5,10 @@ import type {
   CollapsibleMenuItemProps,
   NavMainMenuItem,
 } from "@/components/Sidebar/nav/types/NavTypes.ts";
-import { SidebarMenuItem } from "@/components/ui/sidebar.tsx";
+import { SidebarMenuItem, useSidebar } from "@/components/ui/sidebar.tsx";
 import "@css/Collapsible.scss";
 import { Collapsible } from "@radix-ui/react-collapsible";
+import { useEffect, useEffectEvent, useState } from "react";
 
 /**
  * Menu Item component for Sidebar navigation
@@ -20,23 +21,50 @@ export default function CollapsibleMenuItem({
   setStyle,
   ...item
 }: CollapsibleMenuItemProps) {
+  const { open, setOpen: openSidebar } = useSidebar();
   const { quickButton, isActive, subMenus } = item;
+  const [isCollapsibleOpened, setIsCollapsibleOpened] = useState(isActive);
   const isQuickButtonEnabled = quickButton?.enabled;
+
+  /**
+   * Reset collapsible
+   */
+  const resetCollapsible = useEffectEvent(() => {
+    if (isCollapsibleOpened) {
+      setIsCollapsibleOpened(false);
+    }
+  });
+
+  /**
+   * Reset collapsible
+   *
+   * @description When the sidebar is closed
+   */
+  useEffect(() => {
+    if (!open) {
+      resetCollapsible();
+    }
+  }, [open]);
 
   return (
     <Collapsible
       asChild
-      defaultOpen={isActive}
+      open={open && isCollapsibleOpened}
+      onOpenChange={(nextOpen) => {
+        if (!open && nextOpen && subMenus && subMenus.length > 0) {
+          openSidebar(true);
+        }
+
+        setIsCollapsibleOpened(nextOpen);
+      }}
       className="group/collapsible collapsible"
     >
       <SidebarMenuItem
         className={setStyle({ isQuickButtonEnabled, isMenu: true })}
       >
         <CollapsibleMenu item={item as NavMainMenuItem} setStyle={setStyle} />
-
-        {isQuickButtonEnabled && <QuickButton item={quickButton} />}
-
-        {subMenus && <CollapsibleContents subMenus={subMenus} />}
+        <QuickButton enabled={isQuickButtonEnabled} item={quickButton} />
+        <CollapsibleContents subMenus={subMenus ?? []} />
       </SidebarMenuItem>
     </Collapsible>
   );

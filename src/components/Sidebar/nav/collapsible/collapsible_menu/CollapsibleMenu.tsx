@@ -1,7 +1,6 @@
 import SidebarCollapsibleTrigger from "@/components/Sidebar/nav/collapsible/trigger/CollapsibleTrigger";
 import PrimaryMenuButton from "@/components/Sidebar/nav/elements/menu_button/PrimaryMenuButton";
 import type { CollapsibleMenuProps } from "@/components/Sidebar/nav/types/NavTypes.ts";
-import { useRef } from "react";
 
 /**
  * Menu button component for sidebar menu items.
@@ -16,11 +15,9 @@ export default function CollapsibleMenu({
   item,
   setStyle,
 }: Readonly<CollapsibleMenuProps>) {
-  const menuContentRef = useRef<HTMLButtonElement>(null);
-
   return (
     <SidebarCollapsibleTrigger>
-      <PrimaryMenuButton ref={menuContentRef} item={item} setStyle={setStyle} />
+      <PrimaryMenuButton item={item} setStyle={setStyle} />
     </SidebarCollapsibleTrigger>
   );
 }
