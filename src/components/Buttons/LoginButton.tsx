@@ -5,6 +5,7 @@ import {
   debugLogs,
   loginButtonContainsInvalid,
 } from "@/configs/app-components.config.ts";
+import { Link } from "react-router-dom";
 
 /**
  * Login button component
@@ -22,15 +23,41 @@ import {
  */
 export function LoginButton(props: Readonly<LoginButtonProps>) {
   if (loginButtonContainsInvalid(props)) {
-    debugLogs("LoginButton");
+    debugLogs("LoginButton", { type: "propsValidation", props });
     return null;
   }
 
   const { name, path, url, ...buttonProps } = props;
+
+  const authURL = buildAuthURL(url ?? "#");
+
   return (
-    <Button variant="outline" type="button" {...buttonProps}>
-      {path && <Icon iconPath={path} />}
-      {name}
+    <Button asChild variant="outline" type="button" {...buttonProps}>
+      <Link to={authURL} target="_blank" rel="noopener noreferrer">
+        {path && <Icon iconPath={path} />}
+        {name}
+      </Link>
     </Button>
   );
+}
+
+function buildAuthURL(baseURL: string) {
+  const state = crypto.randomUUID();
+  localStorage.setItem("oauth_state", state);
+
+  const params = new URLSearchParams({
+    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_CLIENT_ID",
+    redirect_uri:
+      import.meta.env.VITE_GOOGLE_REDIRECT_URI || "YOUR_REDIRECT_URI",
+    access_type: "online",
+    response_type: "token",
+    scope: "email profile",
+    include_granted_scopes: "true",
+    state,
+  });
+
+  const url = new URL(baseURL);
+  url.search = params.toString();
+
+  return url.toString();
 }

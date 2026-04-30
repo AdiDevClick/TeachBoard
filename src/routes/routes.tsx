@@ -5,6 +5,7 @@ import {
   passwordCreationInputControllers,
 } from "@/data/inputs-controllers.data.ts";
 import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
+import { LazyGoogleOAuth } from "@/features/auth/components/oauth/google/exports/oauth.exports";
 import { LazyCreateEvaluations } from "@/features/evaluations/create/exports/create-evaluations.exports";
 import { LazyEvaluationDelete } from "@/features/evaluations/delete/exports/evaluation-delete.exports";
 import { LazyEvaluationEdit } from "@/features/evaluations/edit/exports/evaluation-edit.exports";
@@ -16,7 +17,6 @@ import {
 import { LazyAbout } from "@/pages/About/exports/about.exports";
 import { LazyEmailValidation } from "@/pages/Email/exports/email-validation.exports";
 import { PageError } from "@/pages/Error/PageError.tsx";
-import { Evaluations } from "@/pages/Evaluations/Evaluations.tsx";
 import { Home } from "@/pages/Home/Home.tsx";
 import { LazyLogin } from "@/pages/Login/exports/login.exports";
 import { LazyPasswordCreation } from "@/pages/Password/exports/password-creation.exports";
@@ -52,6 +52,15 @@ export const ROUTES_CHILDREN: RouteObject[] = [
         pageTitle: "Dashboard",
       };
     },
+  },
+  {
+    path: "auth",
+    children: [
+      {
+        path: "google-callback",
+        element: <LazyGoogleOAuth />,
+      },
+    ],
   },
   {
     path: "login",
@@ -102,20 +111,20 @@ export const ROUTES_CHILDREN: RouteObject[] = [
   {
     path: "evaluations",
     children: [
-      {
-        index: true,
-        element: <Evaluations />,
-        loader: async () => {
-          const menu = COMPLETE_SIDEBAR_DATAS.navMain.menus[2];
-          const { title: pageTitle } = menu;
-          setDocumentTitle(pageTitle);
+      // {
+      //   index: true,
+      //   element: <Evaluations />,
+      //   loader: async () => {
+      //     const menu = COMPLETE_SIDEBAR_DATAS.navMain.menus[2];
+      //     const { title: pageTitle } = menu;
+      //     setDocumentTitle(pageTitle);
 
-          return {
-            pageTitle,
-            loaderData: menu,
-          };
-        },
-      },
+      //     return {
+      //       pageTitle,
+      //       loaderData: menu,
+      //     };
+      //   },
+      // },
       {
         path: ":evaluationId",
         element: <LazyEvaluationsView />,
