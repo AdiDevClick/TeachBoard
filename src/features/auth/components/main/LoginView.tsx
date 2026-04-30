@@ -1,6 +1,4 @@
-import { withStyledForm } from "@/components/HOCs/withStyledForm";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
-import { passwordRecoveryInputControllers } from "@/data/inputs-controllers.data.ts";
 import { LOGIN_CARD } from "@/features/auth/components/login/config/login.configs";
 import { LoginFormController } from "@/features/auth/components/login/controller/LoginFormController";
 import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
@@ -8,16 +6,17 @@ import { inputLoginControllers } from "@/features/auth/components/login/forms/lo
 import {
   loginFormSchema,
   type LoginFormSchema,
-  type LoginInputItem,
 } from "@/features/auth/components/login/models/login.models";
+import { LoginPageView } from "@/features/auth/components/main/exports/login-view.exports";
+import type { LoginViewProps } from "@/features/auth/components/main/types/login-view.types";
 import { PwForgottenController } from "@/features/auth/components/pw-forgotten/controller/PwForgottenController";
+import { passwordRecoveryInputControllers } from "@/features/auth/components/pw-forgotten/forms/pw-recovery.inputs";
 import {
   pwRecoveryFormSchema,
   type PwRecoveryFormSchema,
-} from "@/models/pw-recovery.model";
-import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
+} from "@/features/auth/components/pw-forgotten/models/pw-recovery.model";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { ComponentProps, MouseEvent } from "react";
+import type { MouseEvent } from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -43,7 +42,7 @@ function LoginView({
   className = "grid gap-4",
   inputControllers = inputLoginControllers,
   ...props
-}: Readonly<PageWithControllers<LoginInputItem>>) {
+}: LoginViewProps) {
   const [isPwForgotten, setIsPwForgotten] = useState(false);
 
   const loginForm = useForm<LoginFormSchema>({
@@ -68,54 +67,62 @@ function LoginView({
     setIsPwForgotten((prev) => !prev);
   }
 
-  const sharedProps = {
+  const formIdToUse = isPwForgotten
+    ? `${pageId}-form-pw-recovery`
+    : `${pageId}-form`;
+  const formToUse = isPwForgotten ? recoveryForm : loginForm;
+
+  const defaultProps = {
     pageId,
     className,
+  };
+
+  const sharedProps = {
+    ...defaultProps,
     modalMode,
     setIsPwForgotten,
     isPwForgotten,
     card: LOGIN_CARD,
     onClick: handleTogglePwForgotten,
+    textToDisplay: {
+      defaultText: isPwForgotten ? backToLoginLinkText : forgotPasswordLinkText,
+      pwForgottenLinkTo: isPwForgotten ? loginLinkTo : "/forgot-password",
+      buttonText: isPwForgotten ? resetPasswordButtonText : "Se connecter",
+    },
     ...props,
   };
 
-  const loginProps = {
+  const pageProps = {
     ...sharedProps,
-    formId: `${pageId}-form`,
-    form: loginForm,
-    inputControllers,
-    textToDisplay: {
-      defaultText: forgotPasswordLinkText,
-      pwForgottenLinkTo: "/forgot-password",
-      buttonText: "Se connecter",
-    },
-    submitDataReshapeFn: API_ENDPOINTS.POST.AUTH.LOGIN.dataReshape,
-    submitRoute: API_ENDPOINTS.POST.AUTH.LOGIN.endpoint,
-  } satisfies ComponentProps<typeof LoginForm>;
-
-  const recoveryProps = {
-    ...sharedProps,
-    formId: `${pageId}-form-pw-recovery`,
-    form: recoveryForm,
-    inputControllers: passwordRecoveryInputControllers,
-    textToDisplay: {
-      defaultText: backToLoginLinkText,
-      pwForgottenLinkTo: loginLinkTo,
-      buttonText: resetPasswordButtonText,
-    },
-    submitDataReshapeFn: API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.dataReshape,
-    submitRoute: API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.endpoint,
-  } satisfies ComponentProps<typeof PwForgotten>;
+    formId: formIdToUse,
+    form: formToUse,
+  };
 
   return (
-    <>
-      {isPwForgotten && <PwForgotten {...recoveryProps} />}
-      {!isPwForgotten && <LoginForm {...loginProps} />}
-    </>
+    <LoginPageView {...pageProps}>
+      {isPwForgotten ? (
+        <PwForgottenController
+          {...defaultProps}
+          formId={formIdToUse}
+          form={recoveryForm}
+          inputControllers={passwordRecoveryInputControllers}
+          submitDataReshapeFn={
+            API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.dataReshape
+          }
+          submitRoute={API_ENDPOINTS.POST.AUTH.PASSWORD_RECOVERY.endpoint}
+        />
+      ) : (
+        <LoginFormController
+          {...defaultProps}
+          formId={formIdToUse}
+          form={loginForm}
+          inputControllers={inputControllers}
+          submitDataReshapeFn={API_ENDPOINTS.POST.AUTH.LOGIN.dataReshape}
+          submitRoute={API_ENDPOINTS.POST.AUTH.LOGIN.endpoint}
+        />
+      )}
+    </LoginPageView>
   );
 }
-
-const LoginForm = withStyledForm(LoginFormController);
-const PwForgotten = withStyledForm(PwForgottenController);
 
 export default LoginView;

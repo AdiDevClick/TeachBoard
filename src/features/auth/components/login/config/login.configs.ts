@@ -11,4 +11,5 @@ export const LOGIN_CARD = {
     description: "Connectez-vous à votre compte TeachBoard.",
     className: "text-center",
   },
+  content: { className: "grid gap-6" },
 } satisfies ViewCardContextType;

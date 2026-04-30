@@ -1,4 +1,4 @@
-import LoginView from "@/features/auth/components/login/LoginView";
+import LoginView from "@/features/auth/components/main/LoginView";
 
 /**
  * Login Component Props

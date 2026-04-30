@@ -157,7 +157,7 @@ export const subSkillWithStudentsPropsInvalid = (props: AnyObjectProps) =>
 const WITH_ACCORDION_ITEM_REQUIRES = ["value", "name"];
 
 export const withAccordionItemPropsInvalid = (props: AccordionItemProps) =>
-  checkPropsValidity(props as any, WITH_ACCORDION_ITEM_REQUIRES, []);
+  checkPropsValidity(props, WITH_ACCORDION_ITEM_REQUIRES, []);
 
 //                    ------------
 
@@ -346,7 +346,7 @@ export const evaluationRadioItemPropsInvalid = (
 const DROPDOWN_REQUIRES = ["title"];
 
 export const dropdownPropsInvalid = (props: DropdownsProps) =>
-  checkPropsValidity(props as any, DROPDOWN_REQUIRES, []);
+  checkPropsValidity(props, DROPDOWN_REQUIRES, []);
 
 //                    ------------
 
@@ -390,8 +390,9 @@ export const classCreationControllerPropsInvalid = (
  */
 const LOGIN_FORM_CONTROLLER_REQUIRES = [
   ...BASE_CONTROLLERS_PROPS_REQUIRES,
-  "setIsPwForgotten",
-  "isPwForgotten",
+  "inputControllers",
+  "submitRoute",
+  "submitDataReshapeFn",
 ];
 
 export const loginFormControllerPropsInvalid = (

@@ -1,11 +1,8 @@
-import { LoginButtonList } from "@/components/Buttons/exports/buttons.exports";
 import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
-import { Field, FieldGroup, FieldSeparator } from "@/components/ui/field.tsx";
 import {
   debugLogs,
   loginFormControllerPropsInvalid,
 } from "@/configs/app-components.config";
-import { loginButtonsSvgs } from "@/configs/social.config.ts";
 import type { LoginFormControllerProps } from "@/features/auth/components/login/controller/types/login-form-controller.types";
 import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
 import { useAppForm } from "@/features/auth/hooks/useAppForm";
@@ -42,13 +39,7 @@ export function LoginFormController(props: LoginFormControllerProps) {
     inputControllers = inputLoginControllers,
   } = props;
 
-  const {
-    setRef,
-    data,
-    resetFormAndTriggerNavigation,
-    newItemCallback,
-    onSubmit,
-  } = useAppForm({
+  const { setRef, data, resetFormAndTriggerNavigation, onSubmit } = useAppForm({
     form,
     pageId,
     submitRoute,
@@ -80,11 +71,6 @@ export function LoginFormController(props: LoginFormControllerProps) {
       });
 
       triggerNavigation();
-
-      debugLogs("LoginFormController:LoginSuccess", {
-        type: "queryLogs",
-        data,
-      });
     }
   }, [data]);
 
@@ -95,20 +81,7 @@ export function LoginFormController(props: LoginFormControllerProps) {
       onSubmit={form.handleSubmit(onSubmit)}
       className={className}
     >
-      <FieldGroup>
-        <Field>
-          <LoginButtonList
-            items={loginButtonsSvgs}
-            onClick={(e) => {
-              newItemCallback({ e, task: "apple-login" });
-            }}
-          />
-        </Field>
-        <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-          Ou continuez avec
-        </FieldSeparator>
-        <ControlledInputList items={inputControllers} control={form.control} />
-      </FieldGroup>
+      <ControlledInputList items={inputControllers} control={form.control} />
     </form>
   );
 }

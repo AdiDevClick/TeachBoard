@@ -1,6 +1,6 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import LoginView from "@/features/auth/components/login/LoginView";
+import LoginView from "@/features/auth/components/main/LoginView";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import {

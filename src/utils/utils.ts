@@ -337,7 +337,7 @@ export function handleModalOpening({
  * If `item` is missing or not an object, or if either `title` or `number` is missing from `item`, the function will consider the required keys as missing.
  */
 export function checkPropsValidity(
-  props: Record<string, unknown>,
+  props: object,
   required: (string | Record<string, unknown>)[],
   forbidden: string[],
 ) {
@@ -409,7 +409,7 @@ function findForbiddenKeys(
  * @returns ProbeProxyResult indicating the status of the key probe
  */
 function probeProxyKey(
-  props: Record<string, unknown>,
+  props: object,
   k: PropertyKey,
 ): ProbeProxyResult {
   const notSupportedMessage = "Proxy or Reflect.ownKeys not supported";
