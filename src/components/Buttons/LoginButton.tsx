@@ -50,7 +50,7 @@ function buildAuthURL(baseURL: string) {
     redirect_uri:
       import.meta.env.VITE_GOOGLE_REDIRECT_URI || "YOUR_REDIRECT_URI",
     access_type: "online",
-    response_type: "token",
+    response_type: "code",
     scope: "email profile",
     include_granted_scopes: "true",
     state,

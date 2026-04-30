@@ -18,6 +18,7 @@ import type { LabelledTextAreaProps } from "@/components/TextAreas/types/textare
 import {
   DEV_MODE,
   NO_ANIMATIONS_LOGS,
+  NO_AUTH_LOGS,
   NO_CACHE_LOGS,
   NO_COMPONENT_HANDLER_WARNING_LOGS,
   NO_COMPONENT_PROPS_WARNING_LOGS,
@@ -508,6 +509,7 @@ export const validSearchTeacherOrStudentProps = (props: CommandItemType) => {
 
 export type DebugDetails = {
   type:
+    | "auth"
     | "all"
     | "componentHandler"
     | "sessionCheck"
@@ -535,6 +537,13 @@ export function debugLogs(componentName: string, details?: DebugDetails) {
   let callFn: DebugFnType = "debug";
 
   switch (type) {
+    case "auth": {
+      if (!NO_AUTH_LOGS) {
+        debugType = "Authentication process log.";
+        callFn = "error";
+      }
+      break;
+    }
     case "propsValidation":
       if (!NO_COMPONENT_PROPS_WARNING_LOGS) {
         debugType =
