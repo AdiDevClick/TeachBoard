@@ -57,8 +57,16 @@ export function useAppForm<T extends FieldValues = FieldValues>({
       return;
     }
 
-    const previousUrl = lastActivity?.values().next().value?.previousUrl;
-    navigate(previousUrl || "/", { replace: true });
+    const defaultRedirectUrl = "/";
+    const savedPreviousUrl =
+      lastActivity?.values().next().value?.previousUrl || defaultRedirectUrl;
+
+    const redirectUrl =
+      savedPreviousUrl === "none" ? defaultRedirectUrl : savedPreviousUrl;
+
+    navigate(redirectUrl, {
+      replace: true,
+    });
   };
 
   /**
