@@ -14,7 +14,7 @@ import type { AppControllerInterface } from "@/types/AppControllerInterface";
 export type LoginFormControllerProps = Readonly<
   AppControllerInterface<
     LoginFormSchema,
-    typeof API_ENDPOINTS.POST.AUTH.LOGIN.endpoint,
+    typeof API_ENDPOINTS.POST.AUTH.LOGIN.endpoints.MAIN,
     typeof API_ENDPOINTS.POST.AUTH.LOGIN.dataReshape
   > & {
     inputControllers?: readonly LoginInputItem[];
