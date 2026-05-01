@@ -77,8 +77,6 @@ export function useAppForm<T extends FieldValues = FieldValues>({
   const onSubmit = (variables: T) => {
     submitCallback(variables, {
       method: HTTP_METHODS.POST,
-      endpointUrl: String(submitRoute),
-      dataReshapeFn: submitDataReshapeFn,
       reshapeOptions: { login },
       // Disable default error handling from useQueryOnSubmit
       silent: true,
