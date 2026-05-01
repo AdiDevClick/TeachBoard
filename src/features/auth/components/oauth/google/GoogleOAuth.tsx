@@ -1,4 +1,6 @@
+import { useAppStore } from "@/api/store/AppStore";
 import { Spinner } from "@/components/ui/spinner";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import { debugLogs } from "@/configs/app-components.config";
 import { HTTP_METHODS, type AppModalNames } from "@/configs/app.config";
 import { AUTH_STATE_KEY } from "@/features/auth/components/oauth/configs/oauth.configs";
@@ -10,11 +12,13 @@ import { toast } from "sonner";
 
 export function GoogleOAuth({
   pageId = "google-auth" as AppModalNames,
-  submitRoute = "/auth/google",
-  submitDataReshapeFn = undefined,
+  submitRoute = API_ENDPOINTS.POST.AUTH.LOGIN.endpoints.GOOGLE,
+  submitDataReshapeFn = API_ENDPOINTS.POST.AUTH.LOGIN.dataReshape,
 }: GoogleOAuthProps) {
-  const [params, _setParams] = useSearchParams();
+  const [params] = useSearchParams();
+  const login = useAppStore((state) => state.login);
   const navigate = useNavigate();
+
   const { submitCallback } = useCommandHandler({
     form: null!,
     pageId,
@@ -45,6 +49,7 @@ export function GoogleOAuth({
         { code },
         {
           method: HTTP_METHODS.POST,
+          reshapeOptions: { login },
           onSuccess: () => {
             localStorage.removeItem(AUTH_STATE_KEY);
             navigate("/", { replace: true });
