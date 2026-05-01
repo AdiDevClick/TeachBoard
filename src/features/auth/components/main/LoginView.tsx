@@ -118,7 +118,7 @@ function LoginView({
           form={loginForm}
           inputControllers={inputControllers}
           submitDataReshapeFn={API_ENDPOINTS.POST.AUTH.LOGIN.dataReshape}
-          submitRoute={API_ENDPOINTS.POST.AUTH.LOGIN.endpoint}
+          submitRoute={API_ENDPOINTS.POST.AUTH.LOGIN.endpoints.MAIN}
         />
       )}
     </LoginPageView>
