@@ -36,7 +36,9 @@ setupUiTestState(
       // Ensure no user is logged in for login tests
       useAppStore.getState().logout();
       stubFetchRoutes({
-        postRoutes: [[API_ENDPOINTS.POST.AUTH.LOGIN.endpoint, loginResponse]],
+        postRoutes: [
+          [API_ENDPOINTS.POST.AUTH.LOGIN.endpoints.MAIN, loginResponse],
+        ],
       });
     },
   },
@@ -70,7 +72,10 @@ describe("UI flow: login form", () => {
 
     await expect
       .poll(
-        () => getLastPostJsonBodyByUrl(API_ENDPOINTS.POST.AUTH.LOGIN.endpoint),
+        () =>
+          getLastPostJsonBodyByUrl(
+            API_ENDPOINTS.POST.AUTH.LOGIN.endpoints.MAIN,
+          ),
         {
           timeout: 2000,
         },

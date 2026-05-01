@@ -185,7 +185,12 @@ describe("API_ENDPOINTS full contract", () => {
   it("provides stable base POST endpoints", () => {
     expect(API_ENDPOINTS.POST.CREATE_CLASS.endpoint).toBe("/api/classes");
 
-    expect(API_ENDPOINTS.POST.AUTH.LOGIN.endpoint).toBe("/api/auth/login");
+    expect(API_ENDPOINTS.POST.AUTH.LOGIN.endpoints.MAIN).toBe(
+      "/api/auth/login",
+    );
+    expect(API_ENDPOINTS.POST.AUTH.LOGIN.endpoints.GOOGLE).toBe(
+      "/api/auth/google",
+    );
     expect(API_ENDPOINTS.POST.AUTH.SIGNUP).toBe("/api/auth/signup");
     expect(API_ENDPOINTS.POST.AUTH.PASSWORD_CREATION).toBe(
       "/api/auth/password-creation",
