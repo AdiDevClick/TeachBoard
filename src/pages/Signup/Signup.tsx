@@ -6,6 +6,7 @@ import {
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent } from "@/components/ui/card.tsx";
 import { Field, FieldGroup } from "@/components/ui/field.tsx";
+import { debugLogs } from "@/configs/app-components.config";
 import { inputSignupControllers } from "@/data/inputs-controllers.data.ts";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import { useSignup } from "@/hooks/database/signup/useSignup.ts";
@@ -52,9 +53,12 @@ export function Signup({
       form.reset();
       closeAllDialogs();
     }
-    if (import.meta.env.DEV) {
-      console.debug("Signup Component:", { data, isLoaded, isLoading, error });
-    }
+    debugLogs("Signup Component State:", {
+      type: "auth",
+      data,
+      isLoaded,
+      error,
+    });
   }, [data, isLoaded]);
 
   /**
