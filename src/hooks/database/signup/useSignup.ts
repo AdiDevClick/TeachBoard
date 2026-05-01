@@ -1,5 +1,6 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
+import { debugLogs } from "@/configs/app-components.config";
 import { USER_ACTIVITIES } from "@/configs/app.config.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
 import { toast } from "sonner";
@@ -17,28 +18,22 @@ export function useSignup() {
     {
       url: API_ENDPOINTS.POST.AUTH.SIGNUP,
       method: API_ENDPOINTS.POST.METHOD,
-      successDescription:
-        "Veuillez vérifier votre email pour confirmer votre inscription.",
+      successDescription() {
+        return {
+          type: "success",
+          descriptionMessage:
+            "Veuillez vérifier votre email pour confirmer votre inscription.",
+        };
+      },
       onSuccess(data) {
         signup();
-        // userId: "data.userId",
-        // name: "Adi",
-        // email: "Adi@test.com",
-        // role: "Student",
-        // token: "data.token",
-        // refreshToken: "data.refreshToken",
-        // avatar: "https://i.pravatar.cc/150?img=3",
-        // });
-
-        if (import.meta.env.DEV) {
-          console.debug("Signup onSuccess:", data);
-        }
+        debugLogs("Signup successful:", { type: "auth", data });
       },
       onError(error) {
         if (error.status === 400 || error.status === 401) {
           toast.dismiss();
           toast.error(
-            "Il y a eu un problème lors de l'inscription. Veuillez vérifier vos informations et réessayer."
+            "Il y a eu un problème lors de l'inscription. Veuillez vérifier vos informations et réessayer.",
           );
         }
       },
