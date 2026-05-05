@@ -1,21 +1,8 @@
-import withListMapper from "@/components/HOCs/withListMapper";
-import { withVerticalDrawer } from "@/components/HOCs/withVerticalDrawer";
 import { Badge } from "@/components/ui/badge";
-import { DrawerContent } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
-import { EvaluationDetailDrawerButton } from "@/features/evaluations/main/components/drawer-button/EvaluationDetailDrawerButton";
-import { buttonsData } from "@/features/evaluations/main/configs/evaluation-detail-drawer-buttons.configs";
 import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
-import { usePageTitle } from "@/hooks/usePageTitle";
 import { createDrawerDisplayDate } from "@/utils/utils";
-import { type ComponentProps, type PropsWithChildren } from "react";
-
-type EvaluationDetailDrawerProps = Readonly<
-  {
-    evaluation: DetailedEvaluationView | null;
-    onClose: () => void;
-  } & Omit<ComponentProps<typeof DrawerContent>, "children">
->;
+import { type PropsWithChildren } from "react";
 
 function getScoreColor(score: number) {
   if (score >= 14) return "text-green-600 dark:text-green-400";
@@ -38,7 +25,7 @@ type DetailContentProps = Readonly<{
   evaluation: DetailedEvaluationView;
 }>;
 
-function DetailContent({ evaluation }: DetailContentProps) {
+export function DetailContent({ evaluation }: DetailContentProps) {
   const { evaluations, comments, absentStudents, updatedAt, createdAt } =
     evaluation;
   return (
@@ -129,45 +116,3 @@ function DrawerSection({ title, children }: DrawerSectionProps) {
     </section>
   );
 }
-
-// buttonsData is imported from evaluation-detail-buttons.data
-
-export function EvaluationDetailDrawer({
-  evaluation,
-  onClose,
-  ...props
-}: EvaluationDetailDrawerProps) {
-  usePageTitle(evaluation?.title);
-
-  const drawerProps = {
-    drawerContentProps: props,
-    drawerHeader: {
-      drawerTitle: { label: evaluation?.title ?? "Détail de l'évaluation" },
-      drawerDescription: { label: `— ${evaluation?.className}` },
-    },
-    drawerFooter: { drawerClose: { label: "Fermer" } },
-    drawerContent: {
-      evaluation: evaluation ?? undefined,
-      ...props,
-    },
-    open: evaluation !== null,
-    onClose,
-  } satisfies ComponentProps<typeof EvaluationDrawer>;
-
-  return (
-    <EvaluationDrawer {...drawerProps}>
-      <EvaluationDrawer.Header />
-      {evaluation && <EvaluationDrawer.Content />}
-      <EvaluationDrawer.Footer>
-        <ButtonsGroup
-          items={buttonsData}
-          optional={(button) => ({
-            to: button.getLink(evaluation?.id ?? ""),
-          })}
-        />
-      </EvaluationDrawer.Footer>
-    </EvaluationDrawer>
-  );
-}
-const EvaluationDrawer = withVerticalDrawer(DetailContent);
-const ButtonsGroup = withListMapper(EvaluationDetailDrawerButton);
