@@ -4,7 +4,16 @@ import type {
 } from "@/api/providers/DialogProvider";
 import type { AppDialFooterProps } from "@/components/Footer/types/footer.types.ts";
 import type { HeaderTitleProps } from "@/components/Titles/types/titles.types.ts";
+import type { Button } from "@/components/ui/button";
 import type { Card, CardContent, CardFooter } from "@/components/ui/card.tsx";
+import type {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import type {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,12 +22,9 @@ import type {
 import type { Separator } from "@/components/ui/separator";
 import type { AppModalNames } from "@/configs/app.config.ts";
 import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types";
-import type {
-  AnyObjectProps,
-  PreventDefaultAndStopPropagation,
-} from "@/utils/types/types.utils.ts";
+import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
 import type { useSortable } from "@dnd-kit/sortable";
-import type { ComponentProps } from "react";
+import type { ComponentProps, PropsWithChildren } from "react";
 
 /**
  * Type for Dialog context
@@ -96,13 +102,53 @@ export type DropdownMenuLayoutContextType<C> = {
 export type DraggableRowBindingsContext = Readonly<
   Pick<ReturnType<typeof useSortable>, "attributes" | "listeners">
 >;
+type VerticalDrawerLabel = {
+  /**
+   * The text label to be displayed on the drawer element, such as the title, description, or close button. This is a required property for any drawer element that needs to display text.
+   */
+  label: string;
+};
+
+type VerticalDrawerTitle = VerticalDrawerLabel &
+  ComponentProps<typeof DrawerTitle>;
+type VerticalDrawerDescription = VerticalDrawerLabel &
+  ComponentProps<typeof DrawerDescription>;
+
+export type VerticalDrawerHeaderProps = PropsWithChildren & {
+  /**
+   * Properties for the title of the drawer, which includes a label and any additional props that can be passed to the DrawerTitle component
+   */
+  drawerTitle?: VerticalDrawerTitle;
+  /** Properties for the description of the drawer, which includes a label and any additional props that can be passed to the DrawerDescription component */
+  drawerDescription?: VerticalDrawerDescription;
+} & ComponentProps<typeof DrawerHeader>;
+
+export type VerticalDrawerContentProps<T> = PropsWithChildren & Partial<T>;
+
+export type VerticalDrawerFooterProps = PropsWithChildren & {
+  /**
+   * Properties for the close button in the drawer footer, which includes a label and any additional props that can be passed to the Button component
+   */
+  drawerClose?: VerticalDrawerLabel & ComponentProps<typeof Button>;
+} & ComponentProps<typeof DrawerFooter>;
 
 /**
  * Type definition for the VerticalDrawer context, which includes properties for title, description, header, and content.
  */
-export type VerticalDrawerContext = {
-  title?: string;
-  description?: string;
-  header?: AnyObjectProps;
-  content?: AnyObjectProps;
+export type VerticalDrawerContext<T> = {
+  /** Properties for the content of the drawer. */
+  drawerContent?: VerticalDrawerContentProps<T>;
+  /** Properties for the header of the drawer, including title and description.*/
+  drawerHeader?: VerticalDrawerHeaderProps;
+  /** Properties for the footer of the drawer, including a close button configuration. */
+  drawerFooter?: VerticalDrawerFooterProps;
 };
+
+export type VerticalDrawerProps<T extends object> = PropsWithChildren &
+  VerticalDrawerContext<T> &
+  ComponentProps<typeof Drawer> & {
+    /**
+     * Properties for the content of the drawer.
+     */
+    drawerContentProps?: ComponentProps<typeof DrawerContent>;
+  };

@@ -1,22 +1,14 @@
 import withListMapper from "@/components/HOCs/withListMapper";
+import { withVerticalDrawer } from "@/components/HOCs/withVerticalDrawer";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+import { DrawerContent } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
 import { EvaluationDetailDrawerButton } from "@/features/evaluations/main/components/drawer-button/EvaluationDetailDrawerButton";
+import { buttonsData } from "@/features/evaluations/main/configs/evaluation-detail-drawer-buttons.configs";
 import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import { createDrawerDisplayDate } from "@/utils/utils";
 import { type ComponentProps, type PropsWithChildren } from "react";
-import { buttonsData } from "../../configs/evaluation-detail-drawer-buttons.configs";
 
 type EvaluationDetailDrawerProps = Readonly<
   {
@@ -56,9 +48,9 @@ function DetailContent({ evaluation }: DetailContentProps) {
       {/* Student evaluations */}
       <DrawerSection title="Résultats des élèves">
         <ul className="grid gap-1.5">
-          {evaluations.map((studentEval) => (
+          {evaluations.map((studentEval, index) => (
             <li
-              key={studentEval.id}
+              key={`results-${studentEval.id}-${index}`}
               className="flex items-center justify-between rounded-md p-1.5 even:bg-muted/40"
             >
               <div className="grid items-center gap-2">
@@ -82,8 +74,12 @@ function DetailContent({ evaluation }: DetailContentProps) {
           <Separator />
           <DrawerSection title="Absents">
             <p className="text-muted-foreground">
-              {absentStudents.map((student) => (
-                <Badge key={student.id} variant="outline" className="mr-1 mb-1">
+              {absentStudents.map((student, index) => (
+                <Badge
+                  key={`student-${student.id}-${index}`}
+                  variant="outline"
+                  className="mr-1 mb-1"
+                >
                   {student.name}
                 </Badge>
               ))}
@@ -106,12 +102,12 @@ function DetailContent({ evaluation }: DetailContentProps) {
       <DrawerSection title="Infos">
         {createdAt && (
           <p className="text-muted-foreground text-xs italic">
-            {`Créée le ${new Date(createdAt).toLocaleString("fr-FR").replace(" ", " à ").split(":").slice(0, 2).join(":")} \n`}
+            {`Créée le ${createDrawerDisplayDate(createdAt)} \n`}
           </p>
         )}
         {updatedAt && (
           <p className="text-muted-foreground text-xs italic">
-            {`Dernière mise à jour le ${new Date(updatedAt).toLocaleString("fr-FR").replace(" ", " à ").split(":").slice(0, 2).join(":")}`}
+            {`Dernière mise à jour le ${createDrawerDisplayDate(updatedAt)}`}
           </p>
         )}
       </DrawerSection>
@@ -141,46 +137,37 @@ export function EvaluationDetailDrawer({
   onClose,
   ...props
 }: EvaluationDetailDrawerProps) {
-  const isMobile = useIsMobile();
   usePageTitle(evaluation?.title);
 
+  const drawerProps = {
+    drawerContentProps: props,
+    drawerHeader: {
+      drawerTitle: { label: evaluation?.title ?? "Détail de l'évaluation" },
+      drawerDescription: { label: `— ${evaluation?.className}` },
+    },
+    drawerFooter: { drawerClose: { label: "Fermer" } },
+    drawerContent: {
+      evaluation: evaluation ?? undefined,
+      ...props,
+    },
+    open: evaluation !== null,
+    onClose,
+  } satisfies ComponentProps<typeof EvaluationDrawer>;
+
   return (
-    <Drawer
-      open={evaluation !== null}
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
-      direction={isMobile ? "bottom" : "right"}
-    >
-      <DrawerContent {...props}>
-        <DrawerHeader className="gap-1">
-          <DrawerTitle>
-            {evaluation?.title ?? "Détail de l'évaluation"}
-          </DrawerTitle>
-          <DrawerDescription
-            id="evaluation-detail-description"
-            className="ml-2 text-muted-foreground"
-          >
-            {`— ${evaluation?.className}`}
-          </DrawerDescription>
-        </DrawerHeader>
-
-        {evaluation && <DetailContent evaluation={evaluation} />}
-
-        <DrawerFooter>
-          <ButtonsGroup
-            items={buttonsData}
-            optional={(button) => ({
-              to: button.getLink(evaluation?.id ?? ""),
-            })}
-          />
-          <DrawerClose asChild>
-            <Button variant="outline">Fermer</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+    <EvaluationDrawer {...drawerProps}>
+      <EvaluationDrawer.Header />
+      {evaluation && <EvaluationDrawer.Content />}
+      <EvaluationDrawer.Footer>
+        <ButtonsGroup
+          items={buttonsData}
+          optional={(button) => ({
+            to: button.getLink(evaluation?.id ?? ""),
+          })}
+        />
+      </EvaluationDrawer.Footer>
+    </EvaluationDrawer>
   );
 }
-
+const EvaluationDrawer = withVerticalDrawer(DetailContent);
 const ButtonsGroup = withListMapper(EvaluationDetailDrawerButton);
