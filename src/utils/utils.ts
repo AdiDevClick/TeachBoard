@@ -408,10 +408,7 @@ function findForbiddenKeys(
  *
  * @returns ProbeProxyResult indicating the status of the key probe
  */
-function probeProxyKey(
-  props: object,
-  k: PropertyKey,
-): ProbeProxyResult {
+function probeProxyKey(props: object, k: PropertyKey): ProbeProxyResult {
   const notSupportedMessage = "Proxy or Reflect.ownKeys not supported";
   const returnDetails: ProbeProxyResult = {
     trapAvailable: false,
@@ -698,4 +695,20 @@ function normalizeLazyModulePath(path: string) {
   }
 
   return path;
+}
+
+/**
+ * Create a display string for a date to be shown in a drawer, formatted in French locale and including only the date and time up to minutes.
+ *
+ * @param date - The date string to format
+ * @returns A formatted date string for display in a drawer, or an empty string if the input date is undefined
+ */
+export function createDrawerDisplayDate(date?: string) {
+  if (!date) return "";
+  return new Date(date)
+    .toLocaleString("fr-FR")
+    .replace(" ", " à ")
+    .split(":")
+    .slice(0, 2)
+    .join(":");
 }
