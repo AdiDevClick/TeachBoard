@@ -11,20 +11,11 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
-import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import { EvaluationDetailDrawerButton } from "@/features/evaluations/main/components/drawer-button/EvaluationDetailDrawerButton";
-import { useEvaluationsViewFetch } from "@/features/evaluations/main/hooks/useEvaluationsViewFetch";
 import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePageTitle } from "@/hooks/usePageTitle";
-import { preventDefaultAndStopPropagation } from "@/utils/utils";
-import {
-  useState,
-  type AnimationEvent,
-  type ComponentProps,
-  type PropsWithChildren,
-} from "react";
-import { useNavigate } from "react-router-dom";
+import { type ComponentProps, type PropsWithChildren } from "react";
 import { buttonsData } from "../../configs/evaluation-detail-drawer-buttons.configs";
 
 type EvaluationDetailDrawerProps = Readonly<
@@ -193,28 +184,3 @@ export function EvaluationDetailDrawer({
 }
 
 const ButtonsGroup = withListMapper(EvaluationDetailDrawerButton);
-
-export function EvaluationDetailDrawerRoute() {
-  const [open, setOpen] = useState(true);
-  const { evaluationData } = useEvaluationsViewFetch({
-    task: "evaluation-summary",
-    endpoint: API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID,
-    reshapeFn: API_ENDPOINTS.GET.EVALUATIONS.dataReshape,
-  });
-  const navigate = useNavigate();
-
-  const waitAnimationEnd = (e: AnimationEvent<HTMLDivElement>) => {
-    preventDefaultAndStopPropagation(e);
-    if (!open) navigate("..");
-  };
-
-  const evaluation = open ? (evaluationData ?? null) : null;
-
-  return (
-    <EvaluationDetailDrawer
-      evaluation={evaluation}
-      onClose={() => setOpen(false)}
-      onAnimationEnd={waitAnimationEnd}
-    />
-  );
-}

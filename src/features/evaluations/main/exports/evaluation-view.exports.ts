@@ -17,6 +17,6 @@ export const LazyEvaluationsView = lazyImport(
  * Lazy-loaded version of EvaluationDetailDrawerRoute component for code-splitting and performance optimization
  */
 export const LazyEvaluationDetailDrawerRoute = lazyImport(
-  "@/features/evaluations/main/components/drawer-detail/EvaluationDetailDrawer",
+  "@/features/evaluations/main/EvaluationDrawerRoute",
   "EvaluationDetailDrawerRoute",
 );
