@@ -6,6 +6,7 @@ import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import { parseToUuid } from "@/utils/utils";
 import { useEffect, useEffectEvent } from "react";
 import { useParams } from "react-router-dom";
+import { useShallow } from "zustand/shallow";
 
 /**
  * Hook responsible for fetching and managing the evaluation for the EvaluationsView component.
@@ -22,10 +23,14 @@ export function useEvaluationsViewFetch({
     (state) => state.data.length === 0,
   );
 
-  const { hasHydrated, updateItem } = useEvaluationTableStore();
-  const storeEvaluationData = useEvaluationTableStore((state) =>
-    state.getReadyData(parsedEvalId),
-  );
+  const { hasHydrated, updateItem, storeEvaluationData } =
+    useEvaluationTableStore(
+      useShallow((state) => ({
+        hasHydrated: state.hasHydrated,
+        updateItem: state.updateItem,
+        storeEvaluationData: state.getReadyData(parsedEvalId),
+      })),
+    );
 
   const {
     resultsCallback: evaluationCacheCallback,
