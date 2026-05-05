@@ -1,4 +1,4 @@
-import type { EvaluationDetailDrawerButtonProps } from "@/features/evaluations/main/components/drawer-button/types/evaluation-detail-drawer-button";
+import type { EvaluationDetailDrawerButtonProps } from "@/features/evaluations/preview-view/components/drawer-button/types/evaluation-detail-drawer-button";
 
 /**
  * Data for the buttons displayed in the EvaluationDetailDrawer component

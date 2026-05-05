@@ -9,7 +9,7 @@ import { lazyImport } from "@/utils/utils";
  * Lazy-loaded version of EvaluationsView component for code-splitting and performance optimization
  */
 export const LazyEvaluationsView = lazyImport(
-  "@/features/evaluations/main/EvaluationsView",
+  "@/features/evaluations/full-view/EvaluationsView",
   "EvaluationsView",
 );
 
@@ -17,6 +17,6 @@ export const LazyEvaluationsView = lazyImport(
  * Lazy-loaded version of EvaluationDetailDrawerRoute component for code-splitting and performance optimization
  */
 export const LazyEvaluationDetailDrawerRoute = lazyImport(
-  "@/features/evaluations/main/EvaluationDrawerRoute",
+  "@/features/evaluations/preview-view/EvaluationDrawerRoute",
   "EvaluationDetailDrawerRoute",
 );
