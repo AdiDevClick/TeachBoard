@@ -10,7 +10,7 @@ import type { AuthButtonsProps } from "@/features/auth/components/main/component
  *
  * @param children - The child components to render within the page view.
  */
-export function AuthButtons({ children }: AuthButtonsProps) {
+export function AuthButtons({ children }: Readonly<AuthButtonsProps>) {
   return (
     <FieldGroup>
       <Field>
