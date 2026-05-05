@@ -1,3 +1,4 @@
+import { buildAuthURL } from "@/components/Buttons/functions/login-button.functions";
 import type { LoginButtonProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import { Icon } from "@/components/Icons/Icon.tsx";
 import { Button } from "@/components/ui/button";
@@ -33,31 +34,10 @@ export function LoginButton(props: Readonly<LoginButtonProps>) {
 
   return (
     <Button asChild variant="outline" type="button" {...buttonProps}>
-      <Link to={authURL} target="_blank" rel="noopener noreferrer">
+      <Link to={authURL} rel="noopener noreferrer">
         {path && <Icon iconPath={path} />}
         {name}
       </Link>
     </Button>
   );
-}
-
-function buildAuthURL(baseURL: string) {
-  const state = crypto.randomUUID();
-  localStorage.setItem("oauth_state", state);
-
-  const params = new URLSearchParams({
-    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_CLIENT_ID",
-    redirect_uri:
-      import.meta.env.VITE_GOOGLE_REDIRECT_URI || "YOUR_REDIRECT_URI",
-    access_type: "online",
-    response_type: "code",
-    scope: "email profile",
-    include_granted_scopes: "true",
-    state,
-  });
-
-  const url = new URL(baseURL);
-  url.search = params.toString();
-
-  return url.toString();
 }
