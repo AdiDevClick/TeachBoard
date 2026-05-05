@@ -1,10 +1,10 @@
 import { useSidebar } from "@/components/ui/sidebar";
-import type { TriggerButtonInteractivityArgs } from "@/features/evaluations/create/components/Tabs/types/tabs.types";
 import { useTabContentState } from "@/features/evaluations/create/hooks/tab-handler/useTabContentState";
 import type {
   TabContentHandlerState,
   UseTabContentHandlerProps,
 } from "@/features/evaluations/create/hooks/types/use-tab-content-handler.types";
+import type { TriggerButtonInteractivityArgs } from "@/features/evaluations/main/components/Tabs/types/tabs.types";
 import { useEffect, useEffectEvent, useState, type MouseEvent } from "react";
 
 /**

@@ -1,4 +1,4 @@
-import type { EvaluationsViewProps } from "@/features/evaluations/main/types/evaluations.types";
+import type { EvaluationsViewProps } from "@/features/evaluations/full-view/types/evaluations.types";
 
 /**
  * Props for the useEvaluationsViewFetch hook, combining necessary parameters for fetching evaluation data.

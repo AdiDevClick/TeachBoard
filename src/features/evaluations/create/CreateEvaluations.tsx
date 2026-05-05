@@ -1,7 +1,7 @@
 import { InpageTabs } from "@/components/InPageNavTabs/InpageTabs";
 import { Tabs } from "@/components/ui/tabs";
 import { debugLogs } from "@/configs/app-components.config";
-import { TabContentList } from "@/features/evaluations/create/components/Tabs/exports/tab-content.exports";
+import { TabContentList } from "@/features/evaluations/main/components/Tabs/exports/tab-content.exports";
 import {
   createTabsTriggers,
   resolveNavigation,
