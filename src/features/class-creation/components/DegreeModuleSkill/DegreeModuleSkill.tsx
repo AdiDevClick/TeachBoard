@@ -5,11 +5,11 @@ import {
 } from "@/features/class-creation/components/DegreeModuleSkill/config/degree-module-skill.configs";
 import { DegreeModuleSkillController } from "@/features/class-creation/components/DegreeModuleSkill/controllers/DegreeModuleSkillController.tsx";
 import { degreeSubSkillsCreationInputControllers } from "@/features/class-creation/components/DegreeModuleSkill/forms/degree-module-skill-inputs";
-import type {
-  DegreeModuleSkillFormSchema,
-  DegreeModuleSkillInputItem,
+import {
+  moduleSkillSchema,
+  type DegreeModuleSkillFormSchema,
+  type DegreeModuleSkillInputItem,
 } from "@/features/class-creation/components/DegreeModuleSkill/models/degree-module-skill.model";
-import moduleSkillSchema from "@/features/class-creation/components/DegreeModuleSkill/models/degree-module-skill.model";
 import type { PageWithControllers } from "@/types/AppPagesInterface.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -33,10 +33,11 @@ export function DegreeModuleSkill({
 }: Readonly<PageWithControllers<DegreeModuleSkillInputItem>>) {
   const form = useForm<DegreeModuleSkillFormSchema>({
     resolver: zodResolver(moduleSkillSchema),
-    mode: "onTouched",
+    mode: "all",
     defaultValues: {
       name: "",
       code: "",
+      criteria: [],
     },
   });
 

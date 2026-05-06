@@ -34,7 +34,10 @@ export function withEventEnrichedMetadatas<P extends object>(
 ) {
   function Component(props: WithEnrichedProps<P>) {
     if (withEventEnrichedMetadatasContainsInvalid(props)) {
-      debugLogs("[withEventEnrichedMetadatas]");
+      debugLogs("withEventEnrichedMetadatas", {
+        type: "propsValidation",
+        props,
+      });
     }
 
     const {

@@ -1,14 +1,11 @@
-import { LoginButtonList } from "@/components/Buttons/exports/buttons.exports";
 import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
-import { Field, FieldGroup, FieldSeparator } from "@/components/ui/field.tsx";
 import {
   debugLogs,
   loginFormControllerPropsInvalid,
 } from "@/configs/app-components.config";
-import { DEV_MODE, NO_QUERY_LOGS } from "@/configs/app.config.ts";
-import { loginButtonsSvgs } from "@/configs/social.config.ts";
-import { passwordRecoveryInputControllers } from "@/data/inputs-controllers.data";
+import type { LoginFormControllerProps } from "@/features/auth/components/login/controller/types/login-form-controller.types";
 import type { PwForgottenControllerProps } from "@/features/auth/components/pw-forgotten/controller/types/pw-forgotten-controller.types";
+import { passwordRecoveryInputControllers } from "@/features/auth/components/pw-forgotten/forms/pw-recovery.inputs";
 import { useAppForm } from "@/features/auth/hooks/useAppForm";
 import { useEffect, useEffectEvent, useRef } from "react";
 
@@ -23,8 +20,12 @@ import { useEffect, useEffectEvent, useRef } from "react";
  * @param formId - The ID of the form
  */
 export function PwForgottenController(props: PwForgottenControllerProps) {
-  if (loginFormControllerPropsInvalid(props as any)) {
-    debugLogs("PwForgottenControllerProps", props);
+  if (
+    loginFormControllerPropsInvalid(
+      props as unknown as LoginFormControllerProps,
+    )
+  ) {
+    debugLogs("PwForgottenControllerProps", { type: "propsValidation", props });
   }
 
   const {
@@ -80,10 +81,6 @@ export function PwForgottenController(props: PwForgottenControllerProps) {
 
       sendEmailSuccess();
       triggerNavigation();
-
-      if (DEV_MODE && !NO_QUERY_LOGS) {
-        console.debug("Query success in PwForgottenController", response);
-      }
     }
   }, [response]);
 
@@ -94,20 +91,7 @@ export function PwForgottenController(props: PwForgottenControllerProps) {
       onSubmit={form.handleSubmit(onSubmit)}
       className={className}
     >
-      <FieldGroup>
-        <Field>
-          <LoginButtonList
-            items={loginButtonsSvgs}
-            onClick={(e) => {
-              newItemCallback({ e, task: "apple-login" });
-            }}
-          />
-        </Field>
-        <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-          Ou continuez avec
-        </FieldSeparator>
-        <ControlledInputList items={inputControllers} control={form.control} />
-      </FieldGroup>
+      <ControlledInputList items={inputControllers} control={form.control} />
     </form>
   );
 }

@@ -55,7 +55,7 @@ function withEvaluationRadioItem<T extends object>(
     ]);
 
     if (evaluationRadioItemPropsInvalid(props)) {
-      debugLogs("EvaluationRadioItem", props);
+      debugLogs("EvaluationRadioItem", { type: "propsValidation", props });
       return null;
     }
 

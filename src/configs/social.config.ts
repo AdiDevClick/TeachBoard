@@ -15,7 +15,7 @@ export const loginButtonsSvgs = [
   {
     name: "Se connecter avec Google",
     path: "google",
-    url: "https://twitter.com/AdiDevClick",
+    url: "https://accounts.google.com/o/oauth2/v2/auth",
   },
 ];
 export type LoginButtonsSvgsType = (typeof loginButtonsSvgs)[number];

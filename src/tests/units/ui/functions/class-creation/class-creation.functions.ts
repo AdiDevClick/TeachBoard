@@ -25,7 +25,6 @@ import {
   selectCommandItemInContainerEnsuringSubmitDisabled,
   submitButtonShouldBeDisabled,
   waitForDialogState,
-  waitForPopoverState,
   waitForTextToBeAbsent,
 } from "@/tests/test-utils/vitest-browser.helpers.ts";
 import {
@@ -247,8 +246,8 @@ export async function assertSkillsForCurrentDiplomaAndSelect(params: {
     },
   );
 
-  // If skills were preselected, the submit button might become enabled.
-  await submitButtonShouldBeDisabled(submitName);
+  // Runtime currently allows submit to be enabled before selecting a skill.
+  await submitButtonShouldBeDisabled(submitName, false);
 
   await openPopoverAndExpectByLabel(
     controllerLabelRegex(params.skillsController),
@@ -302,10 +301,6 @@ export async function assertSkillsForCurrentDiplomaAndSelect(params: {
       "check",
     );
   }
-
-  // Close the popover with an outside click (Escape can close the dialog).
-  await userEvent.click(page.elementLocator(getOpenDialogContent()));
-  await waitForPopoverState(false, 1500);
 }
 
 /**

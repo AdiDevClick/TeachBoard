@@ -1,3 +1,4 @@
+import { buildAuthURL } from "@/components/Buttons/functions/login-button.functions";
 import type { LoginButtonProps } from "@/components/Buttons/types/ButtonTypes.ts";
 import { Icon } from "@/components/Icons/Icon.tsx";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,7 @@ import {
   debugLogs,
   loginButtonContainsInvalid,
 } from "@/configs/app-components.config.ts";
+import { Link } from "react-router-dom";
 
 /**
  * Login button component
@@ -22,15 +24,20 @@ import {
  */
 export function LoginButton(props: Readonly<LoginButtonProps>) {
   if (loginButtonContainsInvalid(props)) {
-    debugLogs("LoginButton");
+    debugLogs("LoginButton", { type: "propsValidation", props });
     return null;
   }
 
   const { name, path, url, ...buttonProps } = props;
+
+  const authURL = buildAuthURL(url ?? "#");
+
   return (
-    <Button variant="outline" type="button" {...buttonProps}>
-      {path && <Icon iconPath={path} />}
-      {name}
+    <Button asChild variant="outline" type="button" {...buttonProps}>
+      <Link to={authURL} rel="noopener noreferrer">
+        {path && <Icon iconPath={path} />}
+        {name}
+      </Link>
     </Button>
   );
 }

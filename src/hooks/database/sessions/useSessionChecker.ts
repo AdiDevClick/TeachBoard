@@ -10,6 +10,7 @@ import {
 import type { useSessionCheckerParams } from "@/hooks/database/sessions/types/use-session-checker.types";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useShallow } from "zustand/shallow";
 
 /**
  * Custom hook to check user session.
@@ -28,10 +29,23 @@ export function useSessionChecker({
   );
 
   const secureAllowed = secureAllowedByLocation[location] ?? mode !== "secure";
-  const { clearUserStateOnError, updateSession } = useAppStore();
-  const sessionSynced = useAppStore((state) => state.sessionSynced);
-  const lastUserActivity = useAppStore((state) => state.lastUserActivity);
-  const isLoggedIn = useAppStore((state) => state.isLoggedIn);
+
+  const {
+    sessionSynced,
+    isLoggedIn,
+    lastUserActivity,
+    clearUserStateOnError,
+    updateSession,
+  } = useAppStore(
+    useShallow((state) => ({
+      sessionSynced: state.sessionSynced,
+      isLoggedIn: state.isLoggedIn,
+      lastUserActivity: state.lastUserActivity,
+      clearUserStateOnError: state.clearUserStateOnError,
+      updateSession: state.updateSession,
+    })),
+  );
+
   const safeToDisplay =
     mode !== "secure" || (secureAllowed && (isLoggedIn || sessionSynced));
   const navigate = useNavigate();

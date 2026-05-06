@@ -17,15 +17,22 @@ export function withStyledForm<T extends AnyComponentLike>(Component: T) {
   return function FormComponent(props: WithStyledFormProps<ComponentProps<T>>) {
     const Wrapped = withTitledCard(Component);
 
-    const { textToDisplay, isPwForgotten, setIsPwForgotten, form, formId } =
-      props;
+    const {
+      textToDisplay,
+      isPwForgotten,
+      setIsPwForgotten,
+      form,
+      formId,
+      children,
+    } = props;
 
     return (
       <Wrapped {...props}>
         <Wrapped.Title />
         <Wrapped.Content>
+          {children}
           <AppFieldDescriptionWithLink
-            className="text-left pt-6"
+            className="text-left"
             onClick={(e) =>
               handleRecoverPasswordClick({
                 e,

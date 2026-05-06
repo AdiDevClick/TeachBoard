@@ -3,7 +3,7 @@ import { ModalWithSimpleAlert } from "@/components/Modal/exports/modal.exports";
 import { Modal } from "@/components/Modal/Modal.tsx";
 import { inputSignupControllers } from "@/data/inputs-controllers.data.ts";
 import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
-import LoginView from "@/features/auth/components/login/LoginView";
+import LoginView from "@/features/auth/components/main/LoginView";
 import DegreeItem from "@/features/class-creation/components/DegreeItem/DegreeItem";
 import {
   degreeCreationInputControllersDegree,

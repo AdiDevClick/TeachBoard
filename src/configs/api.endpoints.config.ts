@@ -34,6 +34,7 @@ import type { AnyObjectProps } from "@/utils/types/types.utils";
 const BASE_API_URL = "/api";
 
 const AUTH = `${BASE_API_URL}/auth`;
+const O_AUTH = `${BASE_API_URL}/o-auth`;
 const DEGREES = `${BASE_API_URL}/degrees`;
 const SKILLS = `${BASE_API_URL}/skills`;
 const STUDENTS = `${BASE_API_URL}/students`;
@@ -224,7 +225,7 @@ export const API_ENDPOINTS = Object.freeze({
     },
     AUTH: {
       LOGIN: {
-        endpoint: `${AUTH}/login`,
+        endpoints: { MAIN: `${AUTH}/login`, GOOGLE: `${O_AUTH}/google` },
         dataReshape: (
           data: unknown,
           _cachedDatas: unknown,
@@ -244,26 +245,26 @@ export const API_ENDPOINTS = Object.freeze({
             }) => void;
           },
         ) => {
-          const payload = (data ?? {}) as Record<string, unknown>;
-          const user = (payload.user ?? {}) as Record<string, unknown>;
-          const firstName = user.firstName;
-          const lastName = user.lastName;
+          const { user, session, refreshToken } = (data ?? {}) as Record<
+            string,
+            unknown
+          >;
+          const {
+            firstName = "",
+            lastName = "",
+            id,
+            ...userRest
+          } = user as Record<string, unknown>;
 
+          console.log({ options });
           options.login({
-            userId: user.id,
-            username: user.username,
+            ...userRest,
+            userId: id,
             firstName,
             lastName,
-            name:
-              typeof firstName === "string" && typeof lastName === "string"
-                ? firstName + " " + lastName
-                : "",
-            email: user.email,
-            role: user.role,
-            token: payload.session,
-            refreshToken: payload.refreshToken,
-            avatar: user.avatar,
-            schoolName: user.schoolName,
+            name: firstName + " " + lastName,
+            token: session,
+            refreshToken,
           });
 
           return data;

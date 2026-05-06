@@ -1,4 +1,4 @@
-import type { TabContentProps } from "@/features/evaluations/create/components/Tabs/types/tabs.types";
+import type { TabContentProps } from "@/features/evaluations/main/components/Tabs/types/tabs.types";
 
 /**
  * Types for the useTabContentHandler hook props

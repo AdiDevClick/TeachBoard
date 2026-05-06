@@ -2,6 +2,7 @@ import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
 import type { useStepThreeState } from "@/features/evaluations/create/hooks/useStepThreeState";
 import { useEffect, useEffectEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export type UseStepThreeProps = Readonly<{
   isModuleClicked: boolean;
@@ -36,6 +37,9 @@ export function useStepThree({
    */
   const redirectToStepOneIfNoClassSelected = useEffectEvent(() => {
     if (!selectedClass || getAttendedModules().length === 0) {
+      toast.error(
+        "Veuillez sélectionner une classe avant de créer des évaluations ou assurez- vous de la présence de modules à évaluer.",
+      );
       navigate("/evaluations/create");
     }
   });

@@ -1,10 +1,13 @@
 import type { ClassSummaryDto } from "@/api/types/routes/classes.types";
+import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas";
+import { computeUriSegment } from "@/features/evaluations/create/functions/eval-create-functions";
 import { useEvaluationStepsCreationStore } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
 import type { UseEvaluationEditFetchProps } from "@/features/evaluations/edit/hooks/types/use-evaluations-edit-fetch.types";
 import { useEvaluationsViewFetch } from "@/features/evaluations/main/hooks/useEvaluationsViewFetch";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import { parseFromObject } from "@/utils/utils";
-import { useEffect, useEffectEvent, useMemo } from "react";
+import { useEffect, useEffectEvent, useMemo, useRef } from "react";
+import { useLocation } from "react-router-dom";
 
 /**
  * Hook responsible for fetching and managing the evaluation and class data for the EvaluationEdit component.
@@ -14,6 +17,7 @@ export function useEvaluationsEditFetch({
   endpoints: { evalEndpoint, classEndpoint },
   reshapeFns: { evalDataReshapeFn, classDataReshapeFn },
 }: UseEvaluationEditFetchProps) {
+  const location = useLocation();
   const { evaluationData } = useEvaluationsViewFetch({
     task: evalTask,
     endpoint: evalEndpoint,
@@ -23,12 +27,17 @@ export function useEvaluationsEditFetch({
   const {
     openingCallback: fetchClassCallback,
     resultsCallback: classCacheCallback,
+    isLoading: isClassFetching,
   } = useCommandHandler({
     pageId: classTask,
     form: null!,
   });
 
-  const classData = classCacheCallback();
+  const isPendingFetchRef = useRef(false);
+  const currentPathSegment = computeUriSegment(location);
+  const isClasseRoute =
+    currentPathSegment.toLocaleLowerCase() ===
+    EvaluationPageTabsDatas.step1.name.toLocaleLowerCase();
 
   const selectedClassFromStoreId = useEvaluationStepsCreationStore(
     (state) => state.selectedClass?.id,
@@ -39,7 +48,9 @@ export function useEvaluationsEditFetch({
    */
   const selectedClassDatasMemo = useMemo(() => {
     // Remove proxy before saving to store to avoid hydration issues
-    const parsedClass = parseFromObject(classData) as ClassSummaryDto | null;
+    const parsedClass = parseFromObject(
+      classCacheCallback(),
+    ) as ClassSummaryDto | null;
 
     if (!parsedClass?.id) return null;
 
@@ -47,7 +58,7 @@ export function useEvaluationsEditFetch({
       id: parsedClass.id,
       selectedClass: parsedClass,
     };
-  }, [classData]);
+  }, [classCacheCallback]);
 
   /**
    * Fetch Class details -
@@ -62,10 +73,18 @@ export function useEvaluationsEditFetch({
       return;
     }
 
+    isPendingFetchRef.current = true;
+
     fetchClassCallback(true, {
       apiEndpoint: classEndpoint(classId),
       dataReshapeFn: classDataReshapeFn,
       task: classTask,
+      onSuccess: () => {
+        isPendingFetchRef.current = false;
+      },
+      onError: () => {
+        isPendingFetchRef.current = false;
+      },
     });
   });
 
@@ -76,10 +95,16 @@ export function useEvaluationsEditFetch({
    */
   useEffect(() => {
     const classId = evaluationData?.classId;
-    if (!classId) return;
+    if (
+      !classId ||
+      isClassFetching ||
+      !isClasseRoute ||
+      isPendingFetchRef.current
+    )
+      return;
 
     fetchClassDetails(classId);
-  }, [evaluationData?.classId]);
+  }, [evaluationData?.classId, isClassFetching, isClasseRoute]);
 
   return {
     evaluationData,

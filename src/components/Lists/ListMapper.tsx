@@ -82,6 +82,10 @@ export function ListMapper<
       setIsWaiting(false);
     };
     showLoading();
+
+    return () => {
+      setIsWaiting(false);
+    };
   }, []);
 
   if (listMapperContainsInvalid(props)) {

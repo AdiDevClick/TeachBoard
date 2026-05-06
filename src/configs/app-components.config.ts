@@ -18,6 +18,7 @@ import type { LabelledTextAreaProps } from "@/components/TextAreas/types/textare
 import {
   DEV_MODE,
   NO_ANIMATIONS_LOGS,
+  NO_AUTH_LOGS,
   NO_CACHE_LOGS,
   NO_COMPONENT_HANDLER_WARNING_LOGS,
   NO_COMPONENT_PROPS_WARNING_LOGS,
@@ -157,7 +158,7 @@ export const subSkillWithStudentsPropsInvalid = (props: AnyObjectProps) =>
 const WITH_ACCORDION_ITEM_REQUIRES = ["value", "name"];
 
 export const withAccordionItemPropsInvalid = (props: AccordionItemProps) =>
-  checkPropsValidity(props as any, WITH_ACCORDION_ITEM_REQUIRES, []);
+  checkPropsValidity(props, WITH_ACCORDION_ITEM_REQUIRES, []);
 
 //                    ------------
 
@@ -346,7 +347,7 @@ export const evaluationRadioItemPropsInvalid = (
 const DROPDOWN_REQUIRES = ["title"];
 
 export const dropdownPropsInvalid = (props: DropdownsProps) =>
-  checkPropsValidity(props as any, DROPDOWN_REQUIRES, []);
+  checkPropsValidity(props, DROPDOWN_REQUIRES, []);
 
 //                    ------------
 
@@ -390,8 +391,9 @@ export const classCreationControllerPropsInvalid = (
  */
 const LOGIN_FORM_CONTROLLER_REQUIRES = [
   ...BASE_CONTROLLERS_PROPS_REQUIRES,
-  "setIsPwForgotten",
-  "isPwForgotten",
+  "inputControllers",
+  "submitRoute",
+  "submitDataReshapeFn",
 ];
 
 export const loginFormControllerPropsInvalid = (
@@ -507,6 +509,7 @@ export const validSearchTeacherOrStudentProps = (props: CommandItemType) => {
 
 export type DebugDetails = {
   type:
+    | "auth"
     | "all"
     | "componentHandler"
     | "sessionCheck"
@@ -534,6 +537,13 @@ export function debugLogs(componentName: string, details?: DebugDetails) {
   let callFn: DebugFnType = "debug";
 
   switch (type) {
+    case "auth": {
+      if (!NO_AUTH_LOGS) {
+        debugType = "Authentication process log.";
+        callFn = "error";
+      }
+      break;
+    }
     case "propsValidation":
       if (!NO_COMPONENT_PROPS_WARNING_LOGS) {
         debugType =

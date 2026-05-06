@@ -19,7 +19,7 @@ export type StepFourInputControllers = typeof STEP_FOUR_INPUT_CONTROLLERS;
 export type StepFourControllerProps = AppControllerInterface<
   StepFourFormSchema,
   | typeof API_ENDPOINTS.POST.CREATE_EVALUATION.endpoint
-  | typeof API_ENDPOINTS.PUT.UPDATE_EVALUATION.endpoint,
+  |  ReturnType<typeof API_ENDPOINTS.PUT.UPDATE_EVALUATION.endpoint>,
   typeof API_ENDPOINTS.POST.CREATE_EVALUATION.dataReshape
 > &
   Omit<Parameters<typeof StepFour>[0], "ModalMode" | "inputControllers"> & {

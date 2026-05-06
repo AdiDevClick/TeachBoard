@@ -16,7 +16,10 @@ import sanitizeDOMProps from "@/utils/props";
  */
 export function LabelledTextArea(props: LabelledTextAreaProps) {
   if (labelledTextAreaContainsInvalid(props)) {
-    debugLogs("[LabelledTextArea]");
+    debugLogs("LabelledTextArea", {
+      type: "propsValidation",
+      props,
+    });
     return null;
   }
 

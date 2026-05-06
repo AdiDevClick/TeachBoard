@@ -1,11 +1,11 @@
 import type { FormWithDebugProps } from "@/components/Form/types/form.types";
 import { Button } from "@/components/ui/button";
 import { Item, ItemContent, ItemFooter, ItemTitle } from "@/components/ui/item";
+import { debugLogs } from "@/configs/app-components.config";
 import { DEV_MODE } from "@/configs/app.config";
 import useDebounce from "@/hooks/useDebounce";
 import { cn } from "@/utils/utils";
-import type { FieldValues } from "react-hook-form";
-import { useFormState } from "react-hook-form";
+import { useFormState, type FieldValues } from "react-hook-form";
 
 /**
  * FormWithDebug component is a wrapper around a standard form that provides additional debugging information during development.
@@ -29,22 +29,25 @@ export function FormWithDebug<T extends FieldValues>(
     debounceDelay = 200,
     children,
   } = props;
-  const { errors, isValid } = useFormState({ control: form.control });
+  const { errors } = useFormState(form);
 
   /**
    * VERIFICATION - Triggers the debug validation manually
    */
   const handleVerifyClick = async () => {
     const ok = await form.trigger();
-    console.debug("[FormWithDebug] form.trigger =>", {
+    debugLogs("FormWithDebug - handleVerifyClick", {
+      type: "all",
       ok,
       values: form.getValues(),
       errors,
     });
+
     return ok;
   };
 
   const debouncedSubmit = useDebounce(onValidSubmit, debounceDelay);
+  const shouldDisplayDebug = DEV_MODE && Object.keys(errors).length > 0;
 
   return (
     <form
@@ -53,7 +56,7 @@ export function FormWithDebug<T extends FieldValues>(
       className={className}
       onSubmit={form.handleSubmit(debouncedSubmit, onInvalidSubmit)}
     >
-      {DEV_MODE && !isValid && (
+      {shouldDisplayDebug && (
         <Item
           className={cn(
             "relative mb-4 px-4 py-2 border rounded bg-slate-50 text-slate-700 w-full flex flex-wrap gap-4",

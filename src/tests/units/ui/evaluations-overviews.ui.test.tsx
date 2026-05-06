@@ -1,11 +1,11 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
-import { EvaluationDetailDrawerRoute } from "@/features/evaluations/main/components/EvaluationDetailDrawer";
+import { EvaluationsList } from "@/features/evaluations/listing/EvaluationsList";
 import {
   EVALUATION_TABLE_STORE_NAME,
   useEvaluationTableStore,
 } from "@/features/evaluations/main/configs/evaluations.configs";
-import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
+import { EvaluationDetailDrawerRoute } from "@/features/evaluations/preview-view/EvaluationDrawerRoute";
 import type { EvaluationOverview } from "@/features/evaluations/main/models/evaluations-overviews.models";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import { firsteval } from "@/tests/samples/evaluations-payload.datas.tests";
@@ -44,7 +44,7 @@ function buildRoutes(): RouteObject[] {
   return [
     {
       path: "/evaluations/TP",
-      element: <EvaluationsMain />,
+      element: <EvaluationsList />,
     },
   ];
 }
@@ -53,7 +53,7 @@ function buildRoutesWithDrawer(): RouteObject[] {
   return [
     {
       path: "/evaluations/TP",
-      element: <EvaluationsMain />,
+      element: <EvaluationsList />,
       children: [
         {
           path: "opened/:evaluationId",

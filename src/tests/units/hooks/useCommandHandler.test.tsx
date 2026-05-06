@@ -2,7 +2,7 @@ import { useAppStore } from "@/api/store/AppStore";
 import type { SkillDto } from "@/api/types/routes/skills.types.ts";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 import type { AppModalNames } from "@/configs/app.config.ts";
-import { EvaluationsMain } from "@/features/evaluations/main/Evaluations";
+import { EvaluationsList } from "@/features/evaluations/listing/EvaluationsList";
 import { useEvaluationTableStore } from "@/features/evaluations/main/configs/evaluations.configs";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import type { HandleSelectionCallbackParams } from "@/hooks/database/types/use-command-handler.types.ts";
@@ -437,7 +437,7 @@ describe("useCommandHandler - basic behaviours", () => {
 
     const { container } = await render(
       <AppTestWrapper>
-        <EvaluationsMain />
+        <EvaluationsList />
       </AppTestWrapper>,
     );
 

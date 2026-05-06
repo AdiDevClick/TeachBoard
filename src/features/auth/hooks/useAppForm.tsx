@@ -57,8 +57,16 @@ export function useAppForm<T extends FieldValues = FieldValues>({
       return;
     }
 
-    const previousUrl = lastActivity?.values().next().value?.previousUrl;
-    navigate(previousUrl || "/", { replace: true });
+    const defaultRedirectUrl = "/";
+    const savedPreviousUrl =
+      lastActivity?.values().next().value?.previousUrl || defaultRedirectUrl;
+
+    const redirectUrl =
+      savedPreviousUrl === "none" ? defaultRedirectUrl : savedPreviousUrl;
+
+    navigate(redirectUrl, {
+      replace: true,
+    });
   };
 
   /**
@@ -69,8 +77,6 @@ export function useAppForm<T extends FieldValues = FieldValues>({
   const onSubmit = (variables: T) => {
     submitCallback(variables, {
       method: HTTP_METHODS.POST,
-      endpointUrl: String(submitRoute),
-      dataReshapeFn: submitDataReshapeFn,
       reshapeOptions: { login },
       // Disable default error handling from useQueryOnSubmit
       silent: true,

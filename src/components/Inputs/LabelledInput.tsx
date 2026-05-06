@@ -16,7 +16,7 @@ import { cn } from "@/utils/utils";
  */
 export function LabelledInput(props: LabelledInputProps) {
   if (labelledInputContainsInvalid(props)) {
-    debugLogs("[LabelledInput]");
+    debugLogs("LabelledInput", { type: "propsValidation", props });
     return null;
   }
 

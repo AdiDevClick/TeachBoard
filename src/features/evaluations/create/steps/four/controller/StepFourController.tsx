@@ -2,11 +2,11 @@ import { FormWithDebug } from "@/components/Form/FormWithDebug";
 import { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input.exports";
 import { ControlledDynamicTagList } from "@/components/Tags/exports/dynamic-tags.exports";
 import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/labelled-textarea";
-import { LabelledAccordion } from "@/features/evaluations/create/components/Accordion/LabelledAccordion";
-import { AverageFields } from "@/features/evaluations/create/components/Score/AverageFields";
 import type { StepFourControllerProps } from "@/features/evaluations/create/steps/four/controller/types/step-four-controller.types";
 import { useFormWatchers } from "@/features/evaluations/create/steps/four/hooks/useFormWatchers";
 import { useStepFourHandler } from "@/features/evaluations/create/steps/four/hooks/useStepFourHandler";
+import { LabelledAccordion } from "@/features/evaluations/main/components/Accordion/LabelledAccordion";
+import { AverageFields } from "@/features/evaluations/main/components/score/AverageFields";
 
 /**
  * Step Four Controller.

@@ -117,11 +117,12 @@ export async function checkFormValidityAndSubmit(
   opts?: { timeout?: number },
 ) {
   const rgx = new RegExp(`^${name}$`, "i");
+  const timeout = opts?.timeout ?? 1500;
 
   const submit = page.getByRole("button", { name: rgx });
   expect(submit).toBeEnabled();
 
-  await expectFormToHaveNoErrors(opts?.timeout);
+  await expectFormToHaveNoErrors(timeout);
 
   await userEvent.click(submit);
 }
@@ -1051,11 +1052,14 @@ export async function openPopoverByLabelTextEnsuringSubmitDisabled(
     withinDialog?: boolean;
     items?: RegExp | RegExp[];
     timeout?: number;
+    isSubmitDisabled?: boolean;
   },
 ) {
   return openPopoverByLabelText(label, {
     ...opts,
-    beforeEachSelect: async () => submitButtonShouldBeDisabled(submitName),
+    beforeEachSelect: async () => {
+      await submitButtonShouldBeDisabled(submitName, opts?.isSubmitDisabled);
+    },
   });
 }
 
@@ -1068,8 +1072,9 @@ export async function selectCommandItemInContainerEnsuringSubmitDisabled(
   container: HTMLElement,
   pattern: RegExp,
   timeout = 700,
+  isSubmitDisabled?: boolean,
 ) {
-  await submitButtonShouldBeDisabled(submitName);
+  await submitButtonShouldBeDisabled(submitName, isSubmitDisabled);
   return selectCommandItemInContainer(container, pattern, timeout);
 }
 
@@ -1085,6 +1090,7 @@ export async function selectMultiplePopoversEnsuringSubmitDisabled(
     withinDialog?: boolean;
     timeout?: number;
     tabAfter?: boolean;
+    isSubmitDisabled?: boolean;
   }>,
 ) {
   for (const sel of selections) {
@@ -1092,6 +1098,7 @@ export async function selectMultiplePopoversEnsuringSubmitDisabled(
       withinDialog: sel.withinDialog,
       items: sel.items,
       timeout: sel.timeout,
+      isSubmitDisabled: sel.isSubmitDisabled,
     });
 
     // Default behaviour: tab after selection to trigger onBlur/onTouched if needed.

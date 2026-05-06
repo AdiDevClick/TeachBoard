@@ -1,14 +1,20 @@
 import { FormWithDebug } from "@/components/Form/FormWithDebug";
 import { ControlledInputList } from "@/components/Inputs/exports/labelled-input.exports";
-import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import { HTTP_METHODS } from "@/configs/app.config.ts";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
+import { HTTP_METHODS } from "@/configs/app.config";
+import { DynamicCriteriaList } from "@/features/class-creation/components/DegreeModuleSkill/exports/degree-module-skill-justification.exports";
 import { degreeSubSkillsCreationInputControllers } from "@/features/class-creation/components/DegreeModuleSkill/forms/degree-module-skill-inputs";
+import {
+  degreeSubSkillsCreationCriterionInputControllers,
+  degreeSubSkillsCreationCriterionScoreInputControllers,
+  dynamicCriterionListController,
+} from "@/features/class-creation/components/DegreeModuleSkill/forms/degree-module-skill-justification-inputs";
 import type { DegreeModuleSkillControllerProps } from "@/features/class-creation/components/DegreeModuleSkill/types/degree-module-skill.types.ts";
 import { useDebouncedChecker } from "@/features/class-creation/components/main/hooks/useDebouncedChecker";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
-import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
+import type { MutationVariables } from "@/hooks/database/types/QueriesTypes";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types";
-import type { ChangeEvent } from "react";
+import { type ChangeEvent } from "react";
 
 /**
  * DegreeModuleSkillController component
@@ -85,6 +91,7 @@ export function DegreeModuleSkillController({
       form={form}
       formId={formId}
       pageId={pageId}
+      setRef={setRef}
       className={className}
       onValidSubmit={handleSubmit}
       onInvalidSubmit={invalidSubmitCallback}
@@ -95,6 +102,12 @@ export function DegreeModuleSkillController({
         setRef={setRef}
         observedRefs={observedRefs}
         onChange={handleValueChange}
+      />
+      <DynamicCriteriaList
+        form={form}
+        {...dynamicCriterionListController}
+        scoreProps={degreeSubSkillsCreationCriterionScoreInputControllers}
+        criterionProps={degreeSubSkillsCreationCriterionInputControllers}
       />
     </FormWithDebug>
   );

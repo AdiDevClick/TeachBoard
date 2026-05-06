@@ -11,7 +11,7 @@ import type {
   PromiseStateSettledResult,
 } from "@/utils/types/types.utils.ts";
 import { clsx, type ClassValue } from "clsx";
-import { type ComponentType } from "react";
+import { lazy, type ComponentType } from "react";
 import { twMerge } from "tailwind-merge";
 import type z from "zod";
 
@@ -337,7 +337,7 @@ export function handleModalOpening({
  * If `item` is missing or not an object, or if either `title` or `number` is missing from `item`, the function will consider the required keys as missing.
  */
 export function checkPropsValidity(
-  props: Record<string, unknown>,
+  props: object,
   required: (string | Record<string, unknown>)[],
   forbidden: string[],
 ) {
@@ -408,10 +408,7 @@ function findForbiddenKeys(
  *
  * @returns ProbeProxyResult indicating the status of the key probe
  */
-function probeProxyKey(
-  props: Record<string, unknown>,
-  k: PropertyKey,
-): ProbeProxyResult {
+function probeProxyKey(props: object, k: PropertyKey): ProbeProxyResult {
   const notSupportedMessage = "Proxy or Reflect.ownKeys not supported";
   const returnDetails: ProbeProxyResult = {
     trapAvailable: false,
@@ -665,3 +662,53 @@ export const animation = (
 
   return { style: { animation } };
 };
+
+/**
+ * Utility function to lazily import a React component for code-splitting and performance optimization.
+ *
+ * @param path - The path to the module containing the component to import, relative to the src directory (e.g., "@/features/evaluations/main/EvaluationsView").
+ * @param exportName - The name of the exported component to import from the module (optional, defaults to the default export).
+ *
+ * @returns A React component that is loaded lazily using React's `lazy` function.
+ */
+export function lazyImport<T extends ComponentType<any>>(
+  path: string,
+  exportName?: string,
+) {
+  return lazy(async () => {
+    const resolvedModulePath = normalizeLazyModulePath(path);
+
+    if (!resolvedModulePath) {
+      throw new Error(`Unable to resolve lazy import: ${path}`);
+    }
+
+    const module = await import(/* @vite-ignore */ resolvedModulePath);
+    const exported = exportName ? module[exportName] : module;
+
+    return { default: exported as T };
+  });
+}
+
+function normalizeLazyModulePath(path: string) {
+  if (path.startsWith("@/")) {
+    return `/src/${path.slice(2)}`;
+  }
+
+  return path;
+}
+
+/**
+ * Create a display string for a date to be shown in a drawer, formatted in French locale and including only the date and time up to minutes.
+ *
+ * @param date - The date string to format
+ * @returns A formatted date string for display in a drawer, or an empty string if the input date is undefined
+ */
+export function createDrawerDisplayDate(date?: string) {
+  if (!date) return "";
+  return new Date(date)
+    .toLocaleString("fr-FR")
+    .replace(" ", " à ")
+    .split(":")
+    .slice(0, 2)
+    .join(":");
+}

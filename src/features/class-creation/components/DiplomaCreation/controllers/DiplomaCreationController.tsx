@@ -1,4 +1,5 @@
 import type { CommandSelectionItemProps } from "@/components/Command/types/command.types.ts";
+import { FormWithDebug } from "@/components/Form/FormWithDebug";
 import {
   PopoverFieldWithCommands,
   PopoverFieldWithControllerAndCommandsList,
@@ -10,7 +11,6 @@ import { switchFields } from "@/features/class-creation/components/DiplomaCreati
 import type { DiplomaCreationFormState } from "@/features/class-creation/components/DiplomaCreation/models/diploma-creation.models";
 import type { DiplomaCreationControllerProps } from "@/features/class-creation/components/DiplomaCreation/types/diploma-creation.types.ts";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler.ts";
-import { useQueryClient } from "@tanstack/react-query";
 import { useWatch } from "react-hook-form";
 
 /**
@@ -41,18 +41,22 @@ export function DiplomaCreationController({
     openingCallback,
     selectionCallback,
     resultsCallback,
+    invalidSubmitCallback,
+    queryClient,
   } = useCommandHandler({
     form,
     pageId,
     submitRoute,
     submitDataReshapeFn,
   });
-  const queryClient = useQueryClient();
-  const currentSkills =
-    useWatch<DiplomaCreationFormState, "modulesListDetails">({
-      control: form.control,
-      name: "modulesListDetails",
-    }) || [];
+
+  const currentSkills = useWatch<
+    DiplomaCreationFormState,
+    "modulesListDetails"
+  >({
+    control: form.control,
+    name: "modulesListDetails",
+  });
 
   /**
    * Handle form submission
@@ -118,39 +122,45 @@ export function DiplomaCreationController({
     tagListController: inputControllers[3],
   };
 
+  const commonPropsMemo = {
+    setRef,
+    observedRefs,
+  };
+
   return (
-    <form
-      id={formId}
+    <FormWithDebug
+      {...commonPropsMemo}
+      formId={formId}
+      form={form}
+      pageId={pageId}
       className={className}
-      onSubmit={form.handleSubmit(handleSubmit)}
+      onValidSubmit={handleSubmit}
+      onInvalidSubmit={invalidSubmitCallback}
     >
       <PopoverFieldWithControllerAndCommandsList
+        {...commonPropsMemo}
         items={controllers.popoverControllers}
         control={form.control}
         commandHeadings={resultsCallback()}
         onSelect={onSelectHandler}
         onOpenChange={openingCallback}
-        setRef={setRef}
-        observedRefs={observedRefs}
         onClick={newItemCallback}
       />
       <ControlledDynamicTagList
+        {...commonPropsMemo}
         control={form.control}
-        setRef={setRef}
         {...controllers.tagListController}
-        observedRefs={observedRefs}
-        itemList={currentSkills}
+        itemList={currentSkills ?? []}
       />
       <PopoverFieldWithCommands
+        {...commonPropsMemo}
         multiSelection
-        setRef={setRef}
         onSelect={handleSelection}
         onOpenChange={openingCallback}
-        observedRefs={observedRefs}
         onClick={newItemCallback}
         commandHeadings={resultsCallback()}
         {...controllers.tagListController}
       />
-    </form>
+    </FormWithDebug>
   );
 }

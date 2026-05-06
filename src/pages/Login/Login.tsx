@@ -1,7 +1,8 @@
+import { useAppStore } from "@/api/store/AppStore";
 import { FieldDescription } from "@/components/ui/field.tsx";
 import { useSidebar } from "@/components/ui/sidebar.tsx";
 import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
-import LoginView from "@/features/auth/components/login/LoginView";
+import LoginView from "@/features/auth/components/main/LoginView";
 import { useDialog } from "@/hooks/contexts/useDialog.ts";
 import type { LoginPageProps } from "@/pages/Login/types/login-page.types.ts";
 import {
@@ -14,7 +15,7 @@ import {
 import "@css/GenericPage.scss";
 import { GalleryVerticalEnd } from "lucide-react";
 import { useEffect, useEffectEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 /**
  * Login page component
@@ -26,6 +27,8 @@ export function Login({
 }: LoginPageProps) {
   const { open, setOpen, openMobile, setOpenMobile } = useSidebar();
   const { closeAllDialogs } = useDialog();
+  const navigate = useNavigate();
+  const isLoggedIn = useAppStore((state) => state.isLoggedIn);
 
   /**
    * INIT - Close all dialogs on login
@@ -47,7 +50,15 @@ export function Login({
     closeAllDialogsOnLogin();
   }, []);
 
+  // useLayoutEffect(() => {
+  //   if (isLoggedIn) {
+  //     navigate("/", { replace: true });
+  //   }
+  // }, [isLoggedIn, navigate]);
+
   return (
+    // <>
+    //   {isLoggedIn ? null : (
     <div {...GENERIC_CONTAINER_STYLE}>
       <div {...GENERIC_CONTENT_STYLE}>
         <Link to="/" className={GENERIC_LOGO_STYLE.className}>
@@ -64,5 +75,7 @@ export function Login({
         </FieldDescription>
       </div>
     </div>
+    //   )}
+    // </>
   );
 }

@@ -31,6 +31,8 @@ export const NO_ANIMATIONS_LOGS = true;
 export const ANIMATIONS_LOGS = false;
 export const NO_SESSION_CHECK_LOGS = true;
 
+export const NO_AUTH_LOGS = false;
+
 const HTTP_METHODS_LIST = [
   "GET",
   "POST",
@@ -69,6 +71,7 @@ export const USER_ACTIVITIES = Object.freeze({
   degreeModuleCreation: "degree-module-creation",
   degreeModuleSkillCreation: "new-degree-module-skill",
   evaluationOverview: "evaluation-overview",
+  googleAuth: "google-auth",
 });
 
 /**
@@ -128,6 +131,7 @@ const PUBLIC_PAGES = [
   "/error",
   "/password-creation",
   "/forgot-password",
+  "/auth",
 ] as const;
 
 /**

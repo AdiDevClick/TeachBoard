@@ -5,7 +5,7 @@ import {
   debugLogs,
 } from "@/configs/app-components.config.ts";
 import { createNameForHOC } from "@/utils/utils";
-import type { ComponentType } from "react";
+import { type ComponentType } from "react";
 import { Controller, type ControllerRenderProps } from "react-hook-form";
 
 /**
@@ -32,11 +32,16 @@ import { Controller, type ControllerRenderProps } from "react-hook-form";
 function withController<P extends object>(Wrapped: ComponentType<P>) {
   function Component(props: WithControllerProps<P>) {
     if (controllerPropsInvalid(props)) {
-      debugLogs("withController");
+      debugLogs("withController", { type: "propsValidation", props });
       return null;
     }
 
-    const { name, control, defaultValue, ...restProps } = props;
+    const {
+      name = "",
+      control,
+      defaultValue = undefined,
+      ...restProps
+    } = props;
 
     /**
      * Manage change events for the controlled component, ensuring that both the react-hook-form state and any additional onChange handlers are called appropriately.
@@ -58,14 +63,15 @@ function withController<P extends object>(Wrapped: ComponentType<P>) {
         control={control}
         defaultValue={defaultValue}
         render={({ field, fieldState }) => {
+          const { invalid, error } = fieldState;
+
           const wrappedProps = {
             ...restProps,
             ...field,
-            fieldState,
             controllerMeta: { controllerName: name },
             onChange: makeHandleChange(field),
             onValueChange: makeHandleChange(field),
-            "aria-invalid": fieldState.invalid,
+            "aria-invalid": invalid,
           };
 
           return (
@@ -77,10 +83,10 @@ function withController<P extends object>(Wrapped: ComponentType<P>) {
                   id: `field-${name}`,
                 });
               }}
-              data-invalid={fieldState.invalid}
+              data-invalid={invalid}
             >
               <Wrapped {...(wrappedProps as P)} />
-              <FieldError errors={[fieldState.error]} />
+              <FieldError errors={[error]} />
             </Field>
           );
         }}

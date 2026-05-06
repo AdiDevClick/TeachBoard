@@ -1,4 +1,4 @@
-import type LoginView from "@/features/auth/components/login/LoginView";
+import type LoginView from "@/features/auth/components/main/LoginView";
 
 /** Login page controllers  */
 export const inputLoginControllers = [

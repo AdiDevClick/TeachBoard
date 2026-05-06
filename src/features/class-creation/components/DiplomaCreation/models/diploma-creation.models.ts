@@ -37,8 +37,8 @@ const diplomaSchema = (data: typeof fieldData) => {
       .array(
         z
           .string()
-          .regex(formsRegex.skillId, data.arrayItemRegexMessage)
           .trim()
+          .regex(formsRegex.skillId, data.arrayItemRegexMessage)
           .toUpperCase(),
       )
       .min(data.minArrayLength, data.minArrayLengthMessage)

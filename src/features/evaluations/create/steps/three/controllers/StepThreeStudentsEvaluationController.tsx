@@ -29,7 +29,7 @@ export function StepThreeStudentsEvaluationController(
     return null;
   }
 
-  const { formId, students } = props;
+  const { formId, students, selectedSubSkill } = props;
 
   return (
     <form id={formId}>
@@ -38,6 +38,7 @@ export function StepThreeStudentsEvaluationController(
         optional={(student) => {
           return {
             value: calculatedScoreValue(student.id),
+            criteria: selectedSubSkill?.criteria,
           };
         }}
         onValueChange={handleValueChange}

@@ -25,6 +25,7 @@ export type StepThreeControllerProps = AppControllerInterface<
   inputControllers?: readonly unknown[];
   user: unknown;
   students: StudentWithPresence[];
+  selectedSubSkill: ClassModuleSubSkill | null;
   selectedClass: ClassSummaryDto | null;
   tasks: UniqueSet<ClassTasks["id"], ClassTasks>;
   modules: SelectedClassModulesReturn;

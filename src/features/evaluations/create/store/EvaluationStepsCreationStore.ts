@@ -4,7 +4,6 @@ import type { ClassSummaryDto } from "@/api/types/routes/classes.types.ts";
 import type { SkillsViewDto } from "@/api/types/routes/skills.types.ts";
 import type { NonLabelledGroupItemProps } from "@/components/Selects/types/select.types";
 import { DEV_MODE } from "@/configs/app.config.ts";
-import type { ScoreItem } from "@/features/evaluations/create/components/Score/types/score-types";
 import {
   addNewEvaluationScore,
   filterSubSkillsBasedOnStudentsAvailability,
@@ -28,6 +27,7 @@ import type {
   StudentWithPresence,
   SubskillSelectionType,
 } from "@/features/evaluations/create/store/types/steps-creation-store.types";
+import type { ScoreItem } from "@/features/evaluations/main/components/score/types/score-types";
 import {
   type DetailedEvaluationView,
   detailedEvaluationSchema,

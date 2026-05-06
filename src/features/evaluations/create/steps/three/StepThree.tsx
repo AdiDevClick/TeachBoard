@@ -105,6 +105,7 @@ export function StepThree({
     ...baseCardProps,
     user,
     students: evaluatedStudentsForThisSubskill,
+    selectedSubSkill,
     modules,
     selectedClass: selectedClass ?? null,
     tasks,

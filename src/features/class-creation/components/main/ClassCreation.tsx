@@ -33,7 +33,7 @@ function ClassCreation({
 }: ClassCreationProps) {
   const form = useForm<ClassCreationFormSchema>({
     resolver: zodResolver(classCreationSchema),
-    mode: "onChange",
+    mode: "all",
     defaultValues: {
       name: "",
       description: "",

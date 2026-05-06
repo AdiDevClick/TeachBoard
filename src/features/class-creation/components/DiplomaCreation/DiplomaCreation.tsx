@@ -29,13 +29,13 @@ function DiplomaCreation({
 }: Readonly<PageWithControllers<DiplomaInputItem>>) {
   const form = useForm<DiplomaCreationFormState>({
     resolver: zodResolver(diplomaCreationSchema),
-    mode: "onTouched",
+    mode: "all",
     defaultValues: {
       diplomaFieldId: "",
       yearId: "",
       levelId: "",
-      modulesList: [],
-      modulesListDetails: [],
+      // modulesList: [],
+      // modulesListDetails: [],
     },
   });
 

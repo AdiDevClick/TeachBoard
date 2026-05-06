@@ -1,7 +1,6 @@
 import { AppBreadCrumb } from "@/components/BreadCrumbs/AppBreadCrumb";
 import withListMapper from "@/components/HOCs/withListMapper";
-import { createComponentName } from "@/utils/utils";
-import { lazy } from "react";
+import { createComponentName, lazyImport } from "@/utils/utils";
 
 /**
  * @fileoverview Exports for breadcrumb components
@@ -21,7 +20,7 @@ createComponentName("withListMapper", "BreadCrumbsList", BreadCrumbsList);
 /**
  * Lazy-loaded version of BreadCrumbsList for code-splitting and performance optimization
  */
-export const LazyBreadCrumbsList = lazy(async () => {
-  const Component = await import("./breadcrumbs.exports.ts");
-  return { default: Component.BreadCrumbsList };
-});
+export const LazyBreadCrumbsList = lazyImport(
+  "@/components/BreadCrumbs/exports/breadcrumbs.exports",
+  "BreadCrumbsList",
+);

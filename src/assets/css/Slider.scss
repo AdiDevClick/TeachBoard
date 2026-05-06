@@ -7,7 +7,7 @@
   By using a custom CSS property for the slider progress, we can create dynamic and visually appealing sliders that adapt to different values.
   */
 
-@include property(slider-progress, percentage, true, 25%);
+@include property(slider-progress, percentage, true, 27%);
 @include property('slider-rangeColor', '<color>', true, null);
 
 // Mixin to reuse the four-steps-slider styles across files
@@ -24,7 +24,7 @@
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    @include apply-repeated-linear-gradient-for-slider(90deg, --slider-progress, 0 25 50, 1px);
+    @include apply-repeated-linear-gradient-for-slider(90deg, --slider-progress, 0 23 47, 1px);
     pointer-events: none;
   }
 

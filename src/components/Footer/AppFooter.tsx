@@ -2,7 +2,7 @@ import type { AppDialFooterProps } from "@/components/Footer/types/footer.types.
 import { Button } from "@/components/ui/button.tsx";
 import { CardFooter } from "@/components/ui/card.tsx";
 import { DialogClose, DialogFooter } from "@/components/ui/dialog.tsx";
-import type { ComponentProps } from "react";
+import { useMemo, type ComponentProps } from "react";
 
 /**
  * A Footer component for App Dialogs with a submit button and a cancel button.
@@ -12,32 +12,37 @@ import type { ComponentProps } from "react";
  * @param submitText - Text for the submit button. Defaults to "Créer".
  * @param formId - The id of the form to be submitted.
  * @param displaySubmitButton - Whether to display the submit button. Defaults to true.
- * @param formState - The form state object to determine if the form is valid.
+ * @param formState - The form state object allowing to verify the form's validity.
  */
 export function AppDialFooter({
-  cancelText,
-  submitText,
-  formState,
+  cancelText = "Annuler",
+  submitText = "Créer",
   formId,
+  formState,
   displaySubmitButton = true,
   displayCancelButton = true,
+  children,
   ...props
 }: AppDialFooterProps) {
-  const isValid = formState?.isValid ?? true;
-  const isSubmitting = formState?.isSubmitting ?? false;
-  const isSubmitSuccessful = formState?.isSubmitSuccessful ?? false;
-  const errors = formState?.errors;
-  const cancelTextValue = cancelText || "Annuler";
-  const submitTextValue = submitText || "Créer";
+  const isDisabled = useMemo(() => {
+    if (!formState) return false;
 
-  const hasAnyErrors = errors && Object.keys(errors).length > 0;
-  const isDisabledCondition =
-    isSubmitSuccessful || isSubmitting || hasAnyErrors || !isValid;
+    const hasAnyErrors = Object.keys(formState.errors).length > 0;
+
+    return (
+      formState.isSubmitSuccessful ||
+      formState.isSubmitting ||
+      hasAnyErrors ||
+      !formState.isValid ||
+      formState.isValidating
+    );
+  }, [formState]);
+
   return (
     <DialogFooter {...props}>
       {displayCancelButton && (
         <DialogClose asChild className="justify-end">
-          <Button variant="outline">{cancelTextValue}</Button>
+          <Button variant="outline">{cancelText}</Button>
         </DialogClose>
       )}
       {displaySubmitButton && (
@@ -45,13 +50,13 @@ export function AppDialFooter({
           variant="outline"
           className="justify-end mr-6"
           type="submit"
-          disabled={isDisabledCondition}
+          disabled={isDisabled}
           form={formId}
         >
-          {submitTextValue}
+          {submitText}
         </Button>
       )}
-      {props.children}
+      {children}
     </DialogFooter>
   );
 }

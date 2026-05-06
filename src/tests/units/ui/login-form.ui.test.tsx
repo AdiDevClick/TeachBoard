@@ -1,6 +1,6 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
-import LoginView from "@/features/auth/components/login/LoginView";
+import LoginView from "@/features/auth/components/main/LoginView";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";
 import {
@@ -36,7 +36,9 @@ setupUiTestState(
       // Ensure no user is logged in for login tests
       useAppStore.getState().logout();
       stubFetchRoutes({
-        postRoutes: [[API_ENDPOINTS.POST.AUTH.LOGIN.endpoint, loginResponse]],
+        postRoutes: [
+          [API_ENDPOINTS.POST.AUTH.LOGIN.endpoints.MAIN, loginResponse],
+        ],
       });
     },
   },
@@ -70,7 +72,10 @@ describe("UI flow: login form", () => {
 
     await expect
       .poll(
-        () => getLastPostJsonBodyByUrl(API_ENDPOINTS.POST.AUTH.LOGIN.endpoint),
+        () =>
+          getLastPostJsonBodyByUrl(
+            API_ENDPOINTS.POST.AUTH.LOGIN.endpoints.MAIN,
+          ),
         {
           timeout: 2000,
         },

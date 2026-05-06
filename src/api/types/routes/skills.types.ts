@@ -26,14 +26,22 @@ export interface SkillDto {
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string;
+  criteria?: SkillCriterionDto[];
   subskills?: SkillsType[];
   modules?: SkillsType[];
 }
+
+export type SkillCriterionDto = {
+  id: UUID;
+  score: number;
+  criterion: string;
+};
 
 export type SkillsType = {
   id: UUID;
   code: string;
   name: string;
+  criteria?: SkillCriterionDto[];
 };
 
 export type SkillsFormValues = {

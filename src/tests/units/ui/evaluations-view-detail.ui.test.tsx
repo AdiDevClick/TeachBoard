@@ -1,15 +1,15 @@
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 
+import { PageTitle } from "@/components/Header/PageTitle";
 import {
   DEFAULT_VALUES_STEPS_CREATION_STATE,
   useEvaluationStepsCreationStore,
 } from "@/features/evaluations/create/store/EvaluationStepsCreationStore";
+import { EvaluationsView } from "@/features/evaluations/full-view/EvaluationsView";
 import {
   EVALUATION_TABLE_STORE_NAME,
   useEvaluationTableStore,
 } from "@/features/evaluations/main/configs/evaluations.configs";
-import { EvaluationsView } from "@/features/evaluations/main/EvaluationsView";
-import { PageTitle } from "@/components/Header/PageTitle";
 import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import {

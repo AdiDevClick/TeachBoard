@@ -9,14 +9,20 @@ import { Button } from "@/components/ui/button.tsx";
  * @param onMount - Callback when the button is mounted
  * @returns
  */
-export default function QuickButton({ item }: Readonly<NavQuickButtonProps>) {
+export default function QuickButton({
+  item,
+  enabled = true,
+}: Readonly<NavQuickButtonProps>) {
+  if (!item || !enabled) {
+    return null;
+  }
+
   return (
     <>
       {item && (
         <Button
           size="icon"
           className="sidebarButton--quickbutton"
-          // className="sidebarButton--quickbutton size-8 group-data-[collapsible=icon]:opacity-0"
           variant="outline"
         >
           {item.icon && <item.icon />}

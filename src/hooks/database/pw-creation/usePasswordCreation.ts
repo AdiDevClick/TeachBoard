@@ -25,10 +25,15 @@ export function usePasswordCreation({ token }: { token: string | null }) {
     {
       url: API_ENDPOINTS.POST.AUTH.PASSWORD_CREATION,
       method: API_ENDPOINTS.POST.METHOD,
-      headers: {
+      headers: new Headers({
         Authorization: "Bearer " + token,
+      }),
+      successDescription() {
+        return {
+          type: "success",
+          descriptionMessage: "Votre mot de passe a été créé avec succès.",
+        };
       },
-      successDescription: "Votre mot de passe a été créé avec succès.",
       onSuccess(data) {
         useAuthMemoryStore.getState().clearSignupToken();
         passwordCreation();
@@ -40,7 +45,7 @@ export function usePasswordCreation({ token }: { token: string | null }) {
         if (error.status === 400 || error.status === 401) {
           toast.dismiss();
           toast.error(
-            "Il y a eu un problème lors de la création du mot de passe. Veuillez réessayer."
+            "Il y a eu un problème lors de la création du mot de passe. Veuillez réessayer.",
           );
         }
       },

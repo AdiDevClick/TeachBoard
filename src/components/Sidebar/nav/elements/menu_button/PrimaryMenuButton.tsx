@@ -56,7 +56,7 @@ export default function PrimaryMenuButton(props: MenuContentProps) {
       <SidebarMenuButton
         {...rest}
         className={`sidebarButton--menu ${style} ${rest.className ?? ""}`}
-        title={tooltip}
+        tooltip={tooltip}
       >
         {Icon && <Icon className="sidebarButton--menu-icon" />}
         <p>{title}</p>

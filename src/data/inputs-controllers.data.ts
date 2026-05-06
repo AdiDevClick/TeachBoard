@@ -1,4 +1,3 @@
-import type { PwRecoveryInputItem } from "@/models/pw-recovery.model";
 import type { PasswordCreation } from "@/pages/Password/PasswordCreation.tsx";
 import type { Signup } from "@/pages/Signup/Signup.tsx";
 
@@ -41,14 +40,3 @@ export const passwordCreationInputControllers = [
     placeholder: "********",
   },
 ] satisfies Parameters<typeof PasswordCreation>[0]["inputControllers"];
-
-/** Password recovery page controllers  */
-export const passwordRecoveryInputControllers = [
-  {
-    name: "identifier",
-    title: "Votre adresse e-mail",
-    type: "email",
-    placeholder: "m@example.com",
-    autoComplete: "email",
-  },
-] satisfies PwRecoveryInputItem[];

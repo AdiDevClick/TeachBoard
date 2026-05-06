@@ -4,11 +4,13 @@ import z from "zod";
 
 const fieldData = {
   classIdRequiredMessage: "L'identifiant de la classe est requis.",
-  UUIDValidMessage: "L'identifiant doit être un UUID valide.",
+  UUIDValidMessage: "Votre identifiant ne semble pas valide.",
   commentsInvalidCharsMessage:
     "Les commentaires contiennent des caractères invalides.",
   commentsMaxCharsMessage:
     "Les commentaires ne doivent pas dépasser 512 caractères.",
+  commentsMinCharsMessage:
+    "Les commentaires doivent comporter au moins 4 caractères.",
   absenceInvalidMessage:
     "Au moins un élève doit être sélectionné comme absent ou 'Aucun'.",
   scoreAverageInvalidMinMessage: "La note moyenne ne peut être inférieure à 0.",
@@ -75,6 +77,7 @@ const stepFourSchema = (data: typeof fieldData) =>
       .string()
       .trim()
       .regex(formsRegex.serverDescription, data.commentsInvalidCharsMessage)
+      .min(4, data.commentsMinCharsMessage)
       .max(500, data.commentsMaxCharsMessage)
       .optional()
       .meta({ description: "General comments for the evaluation" }),
