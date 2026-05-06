@@ -3,19 +3,20 @@
  */
 export const loginButtonsSvgs = [
   {
-    name: "Se connecter avec Apple",
-    path: "apple",
+    label: "Se connecter avec Apple",
+    iconPath: "apple",
     url: "https://github.com/AdiDevClick",
   },
   {
-    name: "Se connecter avec Microsoft",
-    path: "microsoft",
+    label: "Se connecter avec Microsoft",
+    iconPath: "microsoft",
     url: "https://linkedin.com/in/adrienquijo",
   },
   {
-    name: "Se connecter avec Google",
-    path: "google",
+    label: "Se connecter avec Google",
+    iconPath: "google",
     url: "https://accounts.google.com/o/oauth2/v2/auth",
+    auth: true,
   },
 ];
 export type LoginButtonsSvgsType = (typeof loginButtonsSvgs)[number];

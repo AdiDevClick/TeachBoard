@@ -1,4 +1,4 @@
-import { LoginButtonList } from "@/components/Buttons/exports/buttons.exports";
+import { LargeButtonList } from "@/components/Buttons/exports/buttons.exports";
 import { Field, FieldGroup, FieldSeparator } from "@/components/ui/field";
 import { loginButtonsSvgs } from "@/configs/social.config";
 import type { AuthButtonsProps } from "@/features/auth/components/main/components/AuthButtons/types/auth-buttons.types";
@@ -14,7 +14,7 @@ export function AuthButtons({ children }: Readonly<AuthButtonsProps>) {
   return (
     <FieldGroup>
       <Field>
-        <LoginButtonList items={loginButtonsSvgs} />
+        <LargeButtonList items={loginButtonsSvgs} />
       </Field>
       <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
         Ou continuez avec

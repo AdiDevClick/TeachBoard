@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import type { EvaluationsMainProps } from "@/features/evaluations/full-view/types/evaluations.types";
-import { EvaluationTable } from "@/features/evaluations/listing/EvaluationTable";
+import { EvaluationTable } from "@/features/evaluations/listing-view/EvaluationTable";
 import { useEvaluationTableStore } from "@/features/evaluations/main/configs/evaluations.configs";
 import { evaluationOverviewsSchema } from "@/features/evaluations/main/models/evaluations-overviews.models";
 import type { DetailedEvaluationView } from "@/features/evaluations/main/models/evaluations-view.models";

@@ -227,14 +227,15 @@ export const listMapperContainsInvalid = (props: AnyObjectProps) =>
 //                    ------------
 
 /**
- * Validation requirements for LoginButton component.
+ * Validation requirements for LargeButtonWithIconAndLink component.
  *
- * {@link import("@/components/Buttons/LoginButton.tsx").LoginButton}
+ * {@link import("@/components/Buttons/LargeButtonWithIconAndLink.tsx").LargeButtonWithIconAndLink}
  */
-const LOGIN_BUTTON_REQUIRES = ["name", "path"];
+const LOGIN_BUTTON_REQUIRES = ["label"];
 
-export const loginButtonContainsInvalid = (props: AnyObjectProps) =>
-  checkPropsValidity(props, LOGIN_BUTTON_REQUIRES, []);
+export const LargeButtonWithIconAndLinkContainsInvalid = (
+  props: AnyObjectProps,
+) => checkPropsValidity(props, LOGIN_BUTTON_REQUIRES, []);
 
 //                    ------------
 

@@ -3,7 +3,7 @@
  * This allows for cleaner and more organized imports in other parts of the application.
  */
 
-import { LoginButton } from "@/components/Buttons/LoginButton";
+import { LargeButtonWithIconAndLink } from "@/components/Buttons/LargeButtonWithIconAndLink";
 import { PaginationButton } from "@/components/Buttons/PaginationButton";
 import { SimpleAddButton } from "@/components/Buttons/SimpleAddButton";
 import withListMapper from "@/components/HOCs/withListMapper";
@@ -13,30 +13,33 @@ import { createComponentName } from "@/utils/utils";
 import { lazy } from "react";
 
 /**
- * Exporting the LoginButton component wrapped with the withListMapper HOC for use in lists.
+ * Exporting the LargeButtonWithIconAndLink component wrapped with the withListMapper HOC for use in lists.
  */
-export const LoginButtonList = withListMapper(LoginButton);
-createComponentName("withListMapper", "LoginButtonList", LoginButtonList);
+export const LargeButtonList = withListMapper(LargeButtonWithIconAndLink);
+createComponentName("withListMapper", "LargeButtonList", LargeButtonList);
 
 /**
  * LAZY-LOADED VERSIONS
  */
 
-export const LazyLoginButton = lazy(async () => {
-  const module = await import("@/components/Buttons/LoginButton");
+export const LazyLargeButtonWithIconAndLink = lazy(async () => {
+  const module =
+    await import("@/components/Buttons/LargeButtonWithIconAndLink");
   return {
-    default: module.LoginButton,
+    default: module.LargeButtonWithIconAndLink,
   };
 });
 
 /**
- * Exporting the lazy-loaded version of the LoginButton component wrapped with the withListMapper HOC for use in lists.
+ * Exporting the lazy-loaded version of the LargeButtonWithIconAndLink component wrapped with the withListMapper HOC for use in lists.
  */
-export const LazyLoginButtonList = withListMapper(LazyLoginButton);
+export const LazyLargeButtonList = withListMapper(
+  LazyLargeButtonWithIconAndLink,
+);
 createComponentName(
   "withListMapper",
-  "LazyLoginButtonList",
-  LazyLoginButtonList,
+  "LazyLargeButtonList",
+  LazyLargeButtonList,
 );
 
 /**

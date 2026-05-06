@@ -7,6 +7,6 @@ import type { ComponentProps } from "react";
 export type EvaluationDetailDrawerButtonProps = Readonly<{
   label: string;
   getLink: (id: number | string) => string;
-  to?: string;
+  url?: string;
 }> &
   ComponentProps<typeof Button>;

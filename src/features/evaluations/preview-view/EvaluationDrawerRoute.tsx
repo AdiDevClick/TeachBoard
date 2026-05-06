@@ -1,10 +1,9 @@
-import withListMapper from "@/components/HOCs/withListMapper";
+import { LargeButtonList as InteractionButtonList } from "@/components/Buttons/exports/buttons.exports";
 import { withVerticalDrawer } from "@/components/HOCs/withVerticalDrawer";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
-import { EvaluationDetailDrawerButton } from "@/features/evaluations/preview-view/components/drawer-button/EvaluationDetailDrawerButton";
-import { DetailContent } from "@/features/evaluations/preview-view/components/drawer-detail/EvaluationDetailDrawer";
 import { buttonsData } from "@/features/evaluations/main/configs/evaluation-detail-drawer-buttons.configs";
 import { useEvaluationsViewFetch } from "@/features/evaluations/main/hooks/useEvaluationsViewFetch";
+import { DetailContent } from "@/features/evaluations/preview-view/components/drawer-detail/EvaluationDetailDrawer";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import props from "@/utils/props";
 import { preventDefaultAndStopPropagation } from "@/utils/utils";
@@ -59,10 +58,10 @@ export function EvaluationDetailDrawerRoute() {
       <EvaluationDrawer.Header />
       {evaluation && <EvaluationDrawer.Content />}
       <EvaluationDrawer.Footer>
-        <ButtonsGroup
+        <InteractionButtonList
           items={buttonsData}
           optional={(button) => ({
-            to: button.getLink(evaluation?.id ?? ""),
+            url: button.getLink(evaluation?.id ?? ""),
           })}
         />
       </EvaluationDrawer.Footer>
@@ -71,4 +70,3 @@ export function EvaluationDetailDrawerRoute() {
 }
 
 const EvaluationDrawer = withVerticalDrawer(DetailContent);
-const ButtonsGroup = withListMapper(EvaluationDetailDrawerButton);
