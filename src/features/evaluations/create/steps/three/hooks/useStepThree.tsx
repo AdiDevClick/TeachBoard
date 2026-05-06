@@ -38,7 +38,7 @@ export function useStepThree({
   const redirectToStepOneIfNoClassSelected = useEffectEvent(() => {
     if (!selectedClass || getAttendedModules().length === 0) {
       toast.error(
-        "Veuillez sélectionner une classe avant de créer des évaluations ou assurez- vous de la présence de modules à évaluer.",
+        "Veuillez sélectionner une classe avant de créer des évaluations ou assurez-vous de la présence de modules à évaluer.",
       );
       navigate("/evaluations/create");
     }

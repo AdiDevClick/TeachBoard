@@ -16,12 +16,11 @@ const fieldData = {
     "Le nom de la compétence ne doit pas contenir de caractères spéciaux.",
   codeRegexMessage:
     "Le code de la compétence ne doit pas contenir de caractères spéciaux.",
-  criterionRequiredMessage:
-    "Un critère est requise pour chaque palier de note.",
+  criterionRequiredMessage: "Un critère est requis pour chaque palier de note.",
   criterionRegexMessage:
     "La description de chaque critère ne peut pas être vide et doit respecter le format requis.",
   criteriaLengthMessage:
-    "Les 5 paliers (100, 75, 50, 25, 0) doivent etre renseignés.",
+    "Les 5 paliers (100, 75, 50, 25, 0) doivent être renseignés.",
   criterionMaxLength: 500,
   criterionMaxLengthMessage: "Un critère ne peut pas dépasser 500 caractères.",
   criterionScoreInvalidMessage:
@@ -37,7 +36,10 @@ const scoreJustificationSchema = (data: typeof fieldData) =>
     score: z
       .number()
       .min(0, data.criterionScoreInvalidMessage)
-      .max(100, data.criterionScoreInvalidMessage),
+      .max(100, data.criterionScoreInvalidMessage)
+      .refine((score) => DEGREE_MODULE_SKILL_REQUIRED_SCORES.includes(score), {
+        message: data.criterionScoreInvalidMessage,
+      }),
     criterion: z
       .string()
       .trim()

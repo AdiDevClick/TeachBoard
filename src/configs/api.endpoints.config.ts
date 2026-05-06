@@ -256,7 +256,6 @@ export const API_ENDPOINTS = Object.freeze({
             ...userRest
           } = user as Record<string, unknown>;
 
-          console.log({ options });
           options.login({
             ...userRest,
             userId: id,

@@ -683,7 +683,7 @@ export function lazyImport<T extends ComponentType<any>>(
     }
 
     const module = await import(/* @vite-ignore */ resolvedModulePath);
-    const exported = exportName ? module[exportName] : module;
+    const exported = exportName ? module[exportName] : module.default;
 
     return { default: exported as T };
   });
