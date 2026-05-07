@@ -125,6 +125,8 @@ export type SessionCheckMode = "publique" | "soft" | "safe" | "secure";
  */
 const PUBLIC_PAGES = [
   "/",
+  "/invitations",
+  "/about",
   "/login",
   "/logout",
   "/signup",
