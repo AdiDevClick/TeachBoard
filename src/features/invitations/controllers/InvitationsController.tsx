@@ -43,8 +43,6 @@ export function InvitationsController({
       bgColor={"#ffffff"}
       fgColor={"#000000"}
       level={"L"}
-      //@ts-expect-error - The `imageSettings` prop is not recognized by the QRCodeCanvas component's type definitions, but it is a valid prop for customizing the embedded image in the QR code.
-      // Not using specific width and height allows the image to scale proportionally within the QR code.
       imageSettings={{
         src: invitationLogoSrc,
         opacity: 1,
