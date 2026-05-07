@@ -16,7 +16,7 @@ export function switchActionsCases(
   canvas: HTMLCanvasElement | null,
   fileName: string,
 ) {
-  let type = "";
+  let type: FileDownloaderState["type"] | undefined;
   let fileNameWithExtension = "";
 
   if (!canvas) {

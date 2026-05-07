@@ -1,7 +1,7 @@
 import type { LargeButtonWithIconAndLinkProps } from "@/components/Buttons/types/ButtonTypes";
 
 /**
- * Determines the type of actions to follows
+ * Determines the type of actions to follow
  */
 export type QRCodeInvitationButtonAction =
   | "export-jpg"
