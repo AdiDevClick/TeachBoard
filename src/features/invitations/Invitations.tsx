@@ -30,6 +30,18 @@ export function Invitations({
   const canvasRef = useRef<HTMLCanvasElement>(null!);
   usePageTitle("Invitations");
 
+  /**
+   * Navigate back to the previous page or to the home page after closing the drawer
+   */
+  const handleDrawerClose = () => {
+    setOpen(false);
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
+
   const drawerProps = {
     drawerHeader: {
       drawerTitle: { label: "Invitations" },
@@ -46,10 +58,7 @@ export function Invitations({
       ref: canvasRef,
     },
     open,
-    onClose: () => {
-      setOpen(false);
-      navigate(-1);
-    },
+    onClose: handleDrawerClose,
   } satisfies ComponentProps<typeof InvitationsPage>;
 
   /**
