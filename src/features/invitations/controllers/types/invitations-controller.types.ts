@@ -1,5 +1,5 @@
 import { defaultQRCodeInvitationLink } from "@/features/invitations/configs/invitations.configs";
-import type { QRCodeCanvas, QRCodeSVG } from "qrcode.react";
+import type { QRCodeCanvas } from "qrcode.react";
 import type { ComponentProps } from "react";
 
 /**
@@ -14,5 +14,5 @@ export type InvitationsControllerProps = Readonly<
     value?: string;
     /** The text to display in the tooltip when the user hovers over the QR code. */
     tooltip?: string;
-  } & (ComponentProps<typeof QRCodeCanvas> | ComponentProps<typeof QRCodeSVG>)
+  } & ComponentProps<typeof QRCodeCanvas>
 >;

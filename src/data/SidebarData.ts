@@ -42,7 +42,7 @@ export const sidebarDatas = {
         title: "Inviter des utilisateurs",
         url: "/invitations",
         icon: IconMail,
-        isActivated: false,
+        isActivated: true,
         showToUserWhenNotConnected: true,
         displayWhenConnected: true,
       },

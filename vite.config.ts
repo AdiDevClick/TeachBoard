@@ -3,13 +3,13 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { playwright } from "@vitest/browser-playwright";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import type { ConfigEnv } from "vite";
 import { defineConfig } from "vite";
 import svgr from "vite-plugin-svgr";
 
 const mainPath = "./src";
 const assetsPath = "./src/assets";
-const bundlePath = "./dist";
 
 const backendUrl = process.env.VITE_BACKEND_URL || "https://localhost:8443";
 
@@ -20,6 +20,7 @@ export default function viteConfig({ mode }: ConfigEnv) {
     : "[name]__[local]___[hash:base64:5]";
 
   return defineConfig({
+    base: isProduction ? "/" : "/",
     plugins: [
       react({
         babel: {
@@ -65,6 +66,7 @@ export default function viteConfig({ mode }: ConfigEnv) {
       },
     },
     server: {
+      origin: "http://localhost:5173",
       proxy: {
         "/api": {
           target: backendUrl,
@@ -92,14 +94,14 @@ export default function viteConfig({ mode }: ConfigEnv) {
       preprocessorOptions: {
         scss: {
           // additionalData: `@use "@/modules" as common;`,
-          importer(...args) {
-            if (args[0] !== "@/modules") {
-              return;
-            }
+          importer: {
+            findFileUrl(url: string) {
+              if (url !== "@/modules") {
+                return null;
+              }
 
-            return {
-              file: `${path.resolve(__dirname, "./src/assets/css")}`,
-            };
+              return pathToFileURL(path.resolve(__dirname, "./src/assets/css"));
+            },
           },
         },
       },

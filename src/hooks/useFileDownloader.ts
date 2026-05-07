@@ -68,6 +68,8 @@ export function useFileDownloader() {
         };
       }
     } else {
+      if (!url) return;
+
       linkElement.href = url;
       linkElement.download = fileState.fileName ?? defaultState.fileName;
       linkElement.click();
