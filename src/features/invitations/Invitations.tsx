@@ -1,18 +1,13 @@
 import { LargeButtonList } from "@/components/Buttons/exports/buttons.exports";
 import { withVerticalDrawer } from "@/components/HOCs/withVerticalDrawer";
+import { debugLogs } from "@/configs/app-components.config";
 import { qrCodeInvitationsButtonsConfig } from "@/features/invitations/configs/invitations.configs";
 import { InvitationsController } from "@/features/invitations/controllers/InvitationsController";
 import type { FileDownloaderState } from "@/hooks/types/use-file-downloader.types.";
 import { useFileDownloader } from "@/hooks/useFileDownloader";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { preventDefaultAndStopPropagation } from "@/utils/utils";
-import {
-  useRef,
-  useState,
-  type ComponentProps,
-  type MouseEvent,
-  type RefObject,
-} from "react";
+import { useRef, useState, type ComponentProps, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 export type InvitationsProps = {
@@ -66,8 +61,12 @@ export function Invitations({
    */
   const handleUserActions = (e: MouseEvent<HTMLButtonElement>) => {
     preventDefaultAndStopPropagation(e);
-
-    switchCases(e.currentTarget.textContent, setFileState, canvasRef, fileName);
+    switchActionsCases(
+      e.currentTarget.textContent,
+      setFileState,
+      canvasRef.current,
+      fileName,
+    );
   };
 
   return (
@@ -94,28 +93,41 @@ const InvivationsPage = withVerticalDrawer(InvitationsController);
  * @param canvasRef - A reference to the canvas element containing the QR code, used to generate the image data for export.
  * @param fileName - The base name for the exported file, which will be appended with the appropriate extension based on the selected format.
  */
-function switchCases(
+function switchActionsCases(
   textContent: string | null,
-  setFileState: (state: FileDownloaderState) => void,
-  canvasRef: RefObject<HTMLCanvasElement>,
+  stateSetter: (state: FileDownloaderState) => void,
+  canvas: HTMLCanvasElement | null,
   fileName: string,
 ) {
+  let type = "";
+  let fileNameWithExtension = "";
+
+  if (!canvas) {
+    debugLogs("Canvas reference is not available. Cannot export QR code.", {
+      type: "propsValidation",
+    });
+    return;
+  }
+
   switch (textContent) {
     case "Exporter en .JPG":
-      setFileState({
-        data: canvasRef.current,
-        type: "image/jpeg",
-        fileName: `${fileName}.jpg`,
-      });
+      type = "image/jpeg";
+      fileNameWithExtension = `${fileName}.jpg`;
       break;
     case "Exporter en .PNG":
-      setFileState({
-        data: canvasRef.current,
-        type: "image/png",
-        fileName: `${fileName}.png`,
-      });
+      type = "image/png";
+      fileNameWithExtension = `${fileName}.png`;
+      break;
+    case "Imprimer":
+      type = "print";
       break;
     default:
       break;
   }
+
+  stateSetter({
+    data: canvas,
+    type,
+    fileName: fileNameWithExtension,
+  });
 }
