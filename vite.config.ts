@@ -20,7 +20,7 @@ export default function viteConfig({ mode }: ConfigEnv) {
     : "[name]__[local]___[hash:base64:5]";
 
   return defineConfig({
-    base: isProduction ? "/" : "/",
+    // base: isProduction ? "/" : "/",
     plugins: [
       react({
         babel: {
@@ -66,7 +66,7 @@ export default function viteConfig({ mode }: ConfigEnv) {
       },
     },
     server: {
-      origin: "http://localhost:5173",
+      // origin: "http://localhost:5173",
       proxy: {
         "/api": {
           target: backendUrl,
