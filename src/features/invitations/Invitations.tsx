@@ -3,7 +3,7 @@ import { withVerticalDrawer } from "@/components/HOCs/withVerticalDrawer";
 import { debugLogs } from "@/configs/app-components.config";
 import { qrCodeInvitationsButtonsConfig } from "@/features/invitations/configs/invitations.configs";
 import { InvitationsController } from "@/features/invitations/controllers/InvitationsController";
-import type { FileDownloaderState } from "@/hooks/types/use-file-downloader.types.";
+import type { FileDownloaderState } from "@/hooks/types/use-file-downloader.types";
 import { useFileDownloader } from "@/hooks/useFileDownloader";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { preventDefaultAndStopPropagation } from "@/utils/utils";
@@ -50,7 +50,7 @@ export function Invitations({
       setOpen(false);
       navigate(-1);
     },
-  } satisfies ComponentProps<typeof InvivationsPage>;
+  } satisfies ComponentProps<typeof InvitationsPage>;
 
   /**
    * Handles user actions for exporting the QR code as an image file.
@@ -70,20 +70,20 @@ export function Invitations({
   };
 
   return (
-    <InvivationsPage {...drawerProps}>
-      <InvivationsPage.Header />
-      <InvivationsPage.Content />
-      <InvivationsPage.Footer>
+    <InvitationsPage {...drawerProps}>
+      <InvitationsPage.Header />
+      <InvitationsPage.Content />
+      <InvitationsPage.Footer>
         <LargeButtonList
           items={qrCodeInvitationsButtonsConfig}
           onClick={handleUserActions}
         />
-      </InvivationsPage.Footer>
-    </InvivationsPage>
+      </InvitationsPage.Footer>
+    </InvitationsPage>
   );
 }
 
-const InvivationsPage = withVerticalDrawer(InvitationsController);
+const InvitationsPage = withVerticalDrawer(InvitationsController);
 
 /**
  * Handles the logic for exporting the QR code as an image file based on the user's selection.
@@ -123,6 +123,14 @@ function switchActionsCases(
       break;
     default:
       break;
+  }
+
+  if (!type) {
+    debugLogs("Unrecognized action", {
+      type: "forbiddenProp",
+      message: `The button text "${textContent}" does not match any expected export options.`,
+    });
+    return;
   }
 
   stateSetter({

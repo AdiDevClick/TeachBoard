@@ -1,4 +1,6 @@
 import { withToolTip } from "@/components/HOCs/withToolTip";
+import { defaultQRCodeInvitationLink } from "@/features/invitations/configs/invitations.configs";
+import type { InvitationsControllerProps } from "@/features/invitations/controllers/types/invitations-controller.types";
 import { QRCodeCanvas, QRCodeSVG } from "qrcode.react";
 import type { ComponentProps } from "react";
 
@@ -17,15 +19,8 @@ const invitationLogoSvg = encodeURIComponent(
 
 const invitationLogoSrc = `data:image/svg+xml;charset=UTF-8,${invitationLogoSvg}`;
 
-type InvitationsControllerProps = Readonly<
-  {
-    value?: string;
-    tooltip?: string;
-  } & (ComponentProps<typeof QRCodeCanvas> | ComponentProps<typeof QRCodeSVG>)
->;
-
 export function InvitationsController({
-  value = "https://localhost:5173/login",
+  value = defaultQRCodeInvitationLink,
   tooltip = "Scannez ce QR code pour rejoindre l'invitation",
   ...props
 }: InvitationsControllerProps) {
@@ -41,10 +36,10 @@ export function InvitationsController({
       bgColor={"#ffffff"}
       fgColor={"#000000"}
       level={"L"}
+      //@ts-expect-error - The `imageSettings` prop is not recognized by the QRCodeCanvas component's type definitions, but it is a valid prop for customizing the embedded image in the QR code.
+      // Not using specific width and height allows the image to scale proportionally within the QR code.
       imageSettings={{
         src: invitationLogoSrc,
-        // width: 24,
-        // height: 24,
         opacity: 1,
         excavate: true,
       }}

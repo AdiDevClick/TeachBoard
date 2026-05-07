@@ -1,5 +1,5 @@
 import { debugLogs } from "@/configs/app-components.config";
-import type { FileDownloaderState } from "@/hooks/types/use-file-downloader.types.";
+import type { FileDownloaderState } from "@/hooks/types/use-file-downloader.types";
 import { safeStringify } from "@/utils/utils";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";

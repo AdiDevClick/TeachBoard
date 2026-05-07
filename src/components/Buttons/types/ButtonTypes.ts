@@ -1,6 +1,5 @@
+import type { Icon } from "@/components/Icons/Icon";
 import type { Button } from "@/components/ui/button.tsx";
-import type { LargeButtonWithIconAndLinksSvgsType } from "@/configs/social.config";
-import type { SafeListMapperProp } from "@/utils/types/types.utils.ts";
 import type { ComponentProps, ComponentType } from "react";
 
 /**
@@ -8,11 +7,21 @@ import type { ComponentProps, ComponentType } from "react";
  */
 
 /** Login button can be used as a regular button or as a child component if props are injected */
-export type LargeButtonWithIconAndLinkProps = ComponentProps<"button"> &
-  (
-    | LargeButtonWithIconAndLinksSvgsType
-    | SafeListMapperProp<LargeButtonWithIconAndLinksSvgsType>
-  );
+export type LargeButtonWithIconAndLinkProps = SimpleAddButtonProps &
+  ComponentProps<typeof Icon> & {
+    /** The text to display on the button */
+    label: string;
+    /**
+     * The URL to navigate to when the button is clicked
+     * @default "#"
+     */
+    url?: string;
+    /**
+     *  Whether the button is used for authentication - This will build the authentication flow URI by using the specified `url` from the props for the specified provider (e.g., Google, Facebook)
+     * @default false
+     */
+    auth?: boolean;
+  };
 
 /** SimpleAddButton types */
 export type SimpleAddButtonProps = ComponentProps<typeof Button>;
@@ -22,7 +31,7 @@ export type PaginationButtonProps = Readonly<
   {
     label: string;
     icon: ComponentType;
-  } & ComponentProps<typeof Button>
+  } & SimpleAddButtonProps
 >;
 
 /**

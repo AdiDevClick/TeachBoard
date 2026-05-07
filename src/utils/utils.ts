@@ -139,7 +139,7 @@ export function waitAndFail(
 
 export function safeStringify(value: unknown) {
   try {
-    return JSON.stringify(value);
+    return JSON.stringify(value) ?? String(value);
   } catch (e) {
     console.warn("Failed to stringify value:", e);
     return String(value);

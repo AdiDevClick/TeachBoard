@@ -21,7 +21,7 @@ export type FileDownloaderState = {
    *
    * @default "application/json"
    */
-  type?: util.MimeTypes;
+  type?: util.MimeTypes | "print";
   /**
    * The data to be downloaded, which can be of any type.
    */
