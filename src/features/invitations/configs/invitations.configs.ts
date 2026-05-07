@@ -1,7 +1,14 @@
 export const qrCodeInvitationsButtonsConfig = [
-  "Partager le lien d'invitation",
-  "Exporter en .JPG",
-  "Exporter en .PDF",
-  "Imprimer",
-  "Fermer",
+  {
+    label: "Partager le lien d'invitation",
+  },
+  {
+    label: "Exporter en .JPG",
+  },
+  {
+    label: "Exporter en .PNG",
+  },
+  {
+    label: "Imprimer",
+  },
 ];
