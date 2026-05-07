@@ -18,7 +18,7 @@ import {
 import { useVerticalDrawer } from "@/hooks/contexts/useVerticalDrawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { createNameForHOC } from "@/utils/utils";
-import type { ComponentType } from "react";
+import { type ComponentType } from "react";
 
 /**
  * Higher-Order Component that wraps a given component with a vertical drawer layout.
@@ -40,7 +40,7 @@ export function withVerticalDrawer<P extends object>(
     drawerHeader,
     drawerContentProps,
     children,
-    open,
+    open = false,
     onClose,
     ...drawer
   }: VerticalDrawerProps<P>) {
@@ -71,8 +71,8 @@ export function withVerticalDrawer<P extends object>(
   VerticalDrawer.Header = function Header(props: VerticalDrawerHeaderProps) {
     const {
       children,
-      drawerTitle: { label = "", ...titleProps },
-      drawerDescription: { label: desc = "", ...descriptionProps },
+      drawerTitle: { label, ...titleProps } = {},
+      drawerDescription: { label: desc, ...descriptionProps } = {},
       ...headerProps
     } = {
       ...useVerticalDrawer().drawerHeader,
@@ -106,7 +106,7 @@ export function withVerticalDrawer<P extends object>(
   VerticalDrawer.Footer = function Footer(props: VerticalDrawerFooterProps) {
     const {
       children,
-      drawerClose: { label: closeLabel = "", ...closeProps },
+      drawerClose: { label: closeLabel = "Fermer", ...closeProps } = {},
       ...footerProps
     } = {
       ...useVerticalDrawer().drawerFooter,

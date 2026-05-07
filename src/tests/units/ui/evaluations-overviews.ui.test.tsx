@@ -1,12 +1,12 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
-import { EvaluationsList } from "@/features/evaluations/listing/EvaluationsList";
+import { EvaluationsList } from "@/features/evaluations/listing-view/EvaluationsList";
 import {
   EVALUATION_TABLE_STORE_NAME,
   useEvaluationTableStore,
 } from "@/features/evaluations/main/configs/evaluations.configs";
-import { EvaluationDetailDrawerRoute } from "@/features/evaluations/preview-view/EvaluationDrawerRoute";
 import type { EvaluationOverview } from "@/features/evaluations/main/models/evaluations-overviews.models";
+import { EvaluationDetailDrawerRoute } from "@/features/evaluations/preview-view/EvaluationDrawerRoute";
 import { AppTestWrapper } from "@/tests/components/AppTestWrapper";
 import { firsteval } from "@/tests/samples/evaluations-payload.datas.tests";
 import { setupUiTestState } from "@/tests/test-utils/class-creation/class-creation.ui.shared";

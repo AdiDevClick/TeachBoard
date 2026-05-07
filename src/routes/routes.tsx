@@ -14,6 +14,7 @@ import {
   LazyEvaluationDetailDrawerRoute,
   LazyEvaluationsView,
 } from "@/features/evaluations/main/exports/evaluation-view.exports";
+import { Invitations } from "@/features/invitations/Invitations";
 import { LazyAbout } from "@/pages/About/exports/about.exports";
 import { LazyEmailValidation } from "@/pages/Email/exports/email-validation.exports";
 import { PageError } from "@/pages/Error/PageError.tsx";
@@ -214,6 +215,10 @@ export const ROUTES_CHILDREN: RouteObject[] = [
   {
     path: "*",
     element: <Navigate to={"/error"} />,
+  },
+  {
+    path: "invitations",
+    element: <Invitations />,
   },
 ];
 

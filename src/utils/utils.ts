@@ -137,6 +137,15 @@ export function waitAndFail(
   });
 }
 
+export function safeStringify(value: unknown) {
+  try {
+    return JSON.stringify(value);
+  } catch (e) {
+    console.warn("Failed to stringify value:", e);
+    return String(value);
+  }
+}
+
 export function parseFromObject<T>(obj: T): T | null {
   try {
     if (typeof obj !== "object" || !obj) {

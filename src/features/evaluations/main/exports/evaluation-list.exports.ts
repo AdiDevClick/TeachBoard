@@ -9,6 +9,6 @@ import { lazyImport } from "@/utils/utils";
  * Lazy-loaded version of EvaluationsList component for code-splitting and performance optimization
  */
 export const LazyEvaluationsList = lazyImport(
-  "@/features/evaluations/listing/EvaluationsList",
+  "@/features/evaluations/listing-view/EvaluationsList",
   "EvaluationsList",
 );

@@ -1,6 +1,6 @@
-import type { LoginButtonsSvgsType } from "@/configs/social.config.ts";
+import type { LargeButtonWithIconAndLinksSvgsType } from "@/configs/social.config.ts";
 import type { HTMLAttributes } from "react";
 
 export type IconPropsTypes = {
-  iconPath: LoginButtonsSvgsType["path"];
+  iconPath: LargeButtonWithIconAndLinksSvgsType["iconPath"];
 } & HTMLAttributes<SVGElement>;

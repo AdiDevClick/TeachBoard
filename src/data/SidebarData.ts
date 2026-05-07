@@ -39,6 +39,14 @@ export const sidebarDatas = {
         displayWhenConnected: true,
       },
       {
+        title: "Inviter des utilisateurs",
+        url: "/invitations",
+        icon: IconMail,
+        isActivated: false,
+        showToUserWhenNotConnected: true,
+        displayWhenConnected: true,
+      },
+      {
         title: "Notifications",
         url: "/settings/notifications",
         icon: IconNotification,
@@ -64,6 +72,7 @@ export const sidebarDatas = {
         displayWhenConnected: true,
       },
     ],
+    // ] satisfies ComponentProps<typeof Dropdown>["userData"]["settings"],
   },
   sidebarHeader: {
     title: "TeachBoard",
