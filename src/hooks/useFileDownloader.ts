@@ -1,5 +1,5 @@
 import { debugLogs } from "@/configs/app-components.config";
-import type { FileDownloaderState } from "@/hooks/types/use-file-downloader.types.";
+import type { FileDownloaderState } from "@/hooks/types/use-file-downloader.types";
 import { safeStringify } from "@/utils/utils";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -91,7 +91,11 @@ function matchElementType(element: unknown, type: string) {
     const blob = new Blob([element], { type });
     url = URL.createObjectURL(blob);
   } else {
-    console.warn("Unsupported image download data", element);
+    toast.error("Données non supportées pour le téléchargement.");
+    debugLogs("Unsupported data type for download", {
+      type: "forbiddenProp",
+      element,
+    });
   }
 
   return url;

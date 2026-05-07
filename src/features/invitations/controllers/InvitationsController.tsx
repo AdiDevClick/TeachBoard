@@ -1,6 +1,7 @@
 import { withToolTip } from "@/components/HOCs/withToolTip";
-import { QRCodeCanvas, QRCodeSVG } from "qrcode.react";
-import type { ComponentProps } from "react";
+import { defaultQRCodeInvitationLink } from "@/features/invitations/configs/invitations.configs";
+import type { InvitationsControllerProps } from "@/features/invitations/controllers/types/invitations-controller.types";
+import { QRCodeCanvas } from "qrcode.react";
 
 const invitationLogoSvg = encodeURIComponent(
   `<svg
@@ -17,15 +18,16 @@ const invitationLogoSvg = encodeURIComponent(
 
 const invitationLogoSrc = `data:image/svg+xml;charset=UTF-8,${invitationLogoSvg}`;
 
-type InvitationsControllerProps = Readonly<
-  {
-    value?: string;
-    tooltip?: string;
-  } & (ComponentProps<typeof QRCodeCanvas> | ComponentProps<typeof QRCodeSVG>)
->;
-
+/**
+ * Controller component for the Invitations feature, responsible for rendering the QR code with the appropriate configurations and handling any related logic.
+ *
+ * @description This component uses the `QRCodeCanvas` from the `qrcode.react` library to generate a QR code based on the provided value. It also incorporates a tooltip for user guidance and includes an embedded logo in the center of the QR code.
+ *
+ * @param value - The value to encode in the QR code, typically a URL for the invitation. Defaults to a predefined link if not provided.
+ * @param tooltip - The text to display in the tooltip when hovering over the QR code, providing instructions or information about the QR code's purpose.
+ */
 export function InvitationsController({
-  value = "https://localhost:5173/login",
+  value = defaultQRCodeInvitationLink,
   tooltip = "Scannez ce QR code pour rejoindre l'invitation",
   ...props
 }: InvitationsControllerProps) {
@@ -41,10 +43,10 @@ export function InvitationsController({
       bgColor={"#ffffff"}
       fgColor={"#000000"}
       level={"L"}
+      //@ts-expect-error - The `imageSettings` prop is not recognized by the QRCodeCanvas component's type definitions, but it is a valid prop for customizing the embedded image in the QR code.
+      // Not using specific width and height allows the image to scale proportionally within the QR code.
       imageSettings={{
         src: invitationLogoSrc,
-        // width: 24,
-        // height: 24,
         opacity: 1,
         excavate: true,
       }}

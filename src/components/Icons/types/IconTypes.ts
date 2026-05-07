@@ -1,6 +1,9 @@
-import type { LargeButtonWithIconAndLinksSvgsType } from "@/configs/social.config.ts";
 import type { HTMLAttributes } from "react";
 
+/**
+ * Props for the Icon component, which renders an SVG icon based on the provided iconPath.
+ */
 export type IconPropsTypes = {
-  iconPath: LargeButtonWithIconAndLinksSvgsType["iconPath"];
+  /** A string representing the name of the icon to display */
+  iconPath: string;
 } & HTMLAttributes<SVGElement>;
