@@ -35,7 +35,7 @@ export function Invitations({
    */
   const handleDrawerClose = () => {
     setOpen(false);
-    if (window.history.length > 1) {
+    if (history.state.idx > 0) {
       navigate(-1);
     } else {
       navigate("/");
@@ -132,6 +132,14 @@ function switchActionsCases(
       break;
     default:
       break;
+  }
+
+  if (!type) {
+    debugLogs("Unsupported action", {
+      type: "forbiddenProp",
+      message: `The button text "${textContent}" does not correspond to a valid export action.`,
+    });
+    return;
   }
 
   stateSetter({
