@@ -1,6 +1,8 @@
+import { debugLogs } from "@/configs/app-components.config";
 import type { FileDownloaderState } from "@/hooks/types/use-file-downloader.types.";
 import { safeStringify } from "@/utils/utils";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 const defaultState = {
   fileName: "download.json",
@@ -42,7 +44,11 @@ export function useFileDownloader() {
         url = matchElementType(fileState.data, "image/png");
         break;
       default:
-        console.warn(`Unsupported file type: ${fileState.type}`);
+        toast.error("Type de fichier non supporté pour le téléchargement.");
+        debugLogs(`Unsupported file type: ${fileState.type}`, {
+          type: "forbiddenProp",
+        });
+        return;
     }
 
     if (fileState.type === "print") {
