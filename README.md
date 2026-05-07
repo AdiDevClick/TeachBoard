@@ -158,6 +158,7 @@ Ou configurez la variable d'environnement dans PowerShell :
 
 ```powershell
 $env:VITE_BACKEND_URL = "https://localhost:8443"
+$env:VITE_APP_BASE_URL = "/teachboard/"
 ```
 
 <!-- --- -->
