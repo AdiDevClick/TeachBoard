@@ -38,15 +38,35 @@ export function useFileDownloader() {
       case "image/jpeg":
         url = matchElementType(fileState.data, fileState.type);
         break;
+      case "print":
+        url = matchElementType(fileState.data, "image/png");
+        break;
       default:
         console.warn(`Unsupported file type: ${fileState.type}`);
     }
 
-    linkElement.href = url;
-    linkElement.download = fileState.fileName ?? defaultState.fileName;
+    if (fileState.type === "print") {
+      const printWindow = window.open("");
+      if (printWindow) {
+        const image = document.createElement("img");
+        image.src = url;
+        printWindow.document.body.appendChild(image);
 
-    linkElement.click();
-    URL.revokeObjectURL(url);
+        image.onload = () => {
+          printWindow.print();
+        };
+
+        printWindow.onafterprint = () => {
+          URL.revokeObjectURL(url);
+          printWindow.close();
+        };
+      }
+    } else {
+      linkElement.href = url;
+      linkElement.download = fileState.fileName ?? defaultState.fileName;
+      linkElement.click();
+      URL.revokeObjectURL(url);
+    }
   }, [fileState]);
 
   return { fileState, setFileState };
