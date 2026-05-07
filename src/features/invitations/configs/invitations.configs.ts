@@ -25,4 +25,4 @@ export const qrCodeInvitationsButtonsConfig = [
 /**
  * The default link encoded in the QR code for invitations. This can be updated to point to the actual invitation URL or a dynamic link generator as needed.
  */
-export const defaultQRCodeInvitationLink = `${globalThis.location.origin ?? "https://localhost:5173"}/login`;
+export const defaultQRCodeInvitationLink = `${import.meta.resolve("/login")}`;
