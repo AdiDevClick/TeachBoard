@@ -1,12 +1,11 @@
-/**
- * Configuration file for the Invitations feature. This file contains constants and configurations related to the invitations functionality, such as button configurations and default links.
- */
-
 import type { LargeButtonWithIconAndLinkProps } from "@/components/Buttons/types/ButtonTypes";
 
 /**
- * Configuration for the buttons used in the QR code invitations page.
- * Each button has a label that indicates its function, such as sharing the invitation link, exporting the QR code as an image, or printing it.
+ * Configuration file for the Invitations feature, containing constants and default values used across the Invitations components and controllers.
+ */
+
+/**
+ * Configuration for the buttons used in the Invitations feature, defining the label and type for each button that allows users to share or export their invitation QR code.
  */
 export const qrCodeInvitationsButtonsConfig = [
   {
@@ -26,4 +25,4 @@ export const qrCodeInvitationsButtonsConfig = [
 /**
  * The default link encoded in the QR code for invitations. This can be updated to point to the actual invitation URL or a dynamic link generator as needed.
  */
-export const defaultQRCodeInvitationLink = "https://localhost:5173/login";
+export const defaultQRCodeInvitationLink = `${globalThis.location.origin ?? "https://localhost:5173"}/login`;
