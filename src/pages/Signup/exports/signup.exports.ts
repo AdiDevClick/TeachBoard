@@ -7,4 +7,7 @@ import { lazyImport } from "@/utils/utils";
 /**
  * Lazy-loaded version of Signup component for code-splitting and performance optimization
  */
-export const LazySignup = lazyImport("@/pages/Signup/Signup", "Signup");
+export const LazySignup = lazyImport(
+  () => import("@/pages/Signup/Signup"),
+  "Signup",
+);

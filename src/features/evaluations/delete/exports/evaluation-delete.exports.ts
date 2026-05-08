@@ -9,6 +9,6 @@ import { lazyImport } from "@/utils/utils";
  * Lazy-loaded version of EvaluationDelete component for code-splitting and performance optimization
  */
 export const LazyEvaluationDelete = lazyImport(
-  "@/features/evaluations/delete/EvaluationDelete",
+  () => import("@/features/evaluations/delete/EvaluationDelete"),
   "EvaluationDelete",
 );

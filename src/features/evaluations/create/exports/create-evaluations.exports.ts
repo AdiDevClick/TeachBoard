@@ -9,6 +9,6 @@ import { lazyImport } from "@/utils/utils";
  * Lazy-loaded version of CreateEvaluations component for code-splitting and performance optimization
  */
 export const LazyCreateEvaluations = lazyImport(
-  "@/features/evaluations/create/CreateEvaluations",
+  () => import("@/features/evaluations/create/CreateEvaluations"),
   "CreateEvaluations",
 );

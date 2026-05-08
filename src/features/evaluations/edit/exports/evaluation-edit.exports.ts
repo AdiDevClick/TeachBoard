@@ -9,6 +9,6 @@ import { lazyImport } from "@/utils/utils";
  * Lazy-loaded version of EvaluationEdit component for code-splitting and performance optimization
  */
 export const LazyEvaluationEdit = lazyImport(
-  "@/features/evaluations/edit/EvaluationEdit",
+  () => import("@/features/evaluations/edit/EvaluationEdit"),
   "EvaluationEdit",
 );

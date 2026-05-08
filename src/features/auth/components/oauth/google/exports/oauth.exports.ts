@@ -12,6 +12,6 @@ import { lazyImport } from "@/utils/utils";
  * @see src/features/auth/components/oauth/google/GoogleOAuth.tsx for the actual component implementation.
  */
 export const LazyGoogleOAuth = lazyImport(
-  "@/features/auth/components/oauth/google/GoogleOAuth",
+  () => import("@/features/auth/components/oauth/google/GoogleOAuth"),
   "GoogleOAuth",
 );

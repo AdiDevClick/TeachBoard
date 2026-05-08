@@ -7,4 +7,7 @@ import { lazyImport } from "@/utils/utils";
 /**
  * Lazy-loaded version of About component for code-splitting and performance optimization
  */
-export const LazyAbout = lazyImport("@/pages/About/About", "About");
+export const LazyAbout = lazyImport(
+  () => import("@/pages/About/About"),
+  "About",
+);

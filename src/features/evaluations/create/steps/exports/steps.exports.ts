@@ -9,7 +9,7 @@ import { lazyImport } from "@/utils/utils";
  * Lazy-loaded versions of step One components for code-splitting and performance optimization
  */
 export const LazyStepOne = lazyImport(
-  "@/features/evaluations/create/steps/one/StepOne",
+  () => import("@/features/evaluations/create/steps/one/StepOne"),
   "StepOne",
 );
 
@@ -17,7 +17,7 @@ export const LazyStepOne = lazyImport(
  * Lazy-loaded versions of step Two components for code-splitting and performance optimization
  */
 export const LazyStepTwo = lazyImport(
-  "@/features/evaluations/create/steps/two/StepTwo",
+  () => import("@/features/evaluations/create/steps/two/StepTwo"),
   "StepTwo",
 );
 
@@ -25,7 +25,7 @@ export const LazyStepTwo = lazyImport(
  * Lazy-loaded versions of step Three components for code-splitting and performance optimization
  */
 export const LazyStepThree = lazyImport(
-  "@/features/evaluations/create/steps/three/StepThree",
+  () => import("@/features/evaluations/create/steps/three/StepThree"),
   "StepThree",
 );
 
@@ -33,6 +33,6 @@ export const LazyStepThree = lazyImport(
  * Lazy-loaded versions of step Four components for code-splitting and performance optimization
  */
 export const LazyStepFour = lazyImport(
-  "@/features/evaluations/create/steps/four/StepFour",
+  () => import("@/features/evaluations/create/steps/four/StepFour"),
   "StepFour",
 );

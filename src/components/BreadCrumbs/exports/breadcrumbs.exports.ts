@@ -21,6 +21,6 @@ createComponentName("withListMapper", "BreadCrumbsList", BreadCrumbsList);
  * Lazy-loaded version of BreadCrumbsList for code-splitting and performance optimization
  */
 export const LazyBreadCrumbsList = lazyImport(
-  "@/components/BreadCrumbs/exports/breadcrumbs.exports",
+  () => import("@/components/BreadCrumbs/exports/breadcrumbs.exports"),
   "BreadCrumbsList",
 );

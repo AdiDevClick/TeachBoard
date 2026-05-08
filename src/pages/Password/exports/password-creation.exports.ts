@@ -8,6 +8,6 @@ import { lazyImport } from "@/utils/utils";
  * Lazy-loaded version of PasswordCreation component for code-splitting and performance optimization
  */
 export const LazyPasswordCreation = lazyImport(
-  "@/pages/Password/PasswordCreation",
+  () => import("@/pages/Password/PasswordCreation"),
   "PasswordCreation",
 );
