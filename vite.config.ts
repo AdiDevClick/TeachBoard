@@ -6,6 +6,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import type { ConfigEnv } from "vite";
 import { defineConfig } from "vite";
+import mkcert from "vite-plugin-mkcert";
 import svgr from "vite-plugin-svgr";
 
 const mainPath = "./src";
@@ -29,6 +30,7 @@ export default function viteConfig({ mode }: ConfigEnv) {
       }),
       svgr(),
       tailwindcss(),
+      mkcert(),
       // sassDts({
       //   // // Generate both in development and production so module declarations exist for editors and CI
       //   // enabledMode: ["development", "production"],
