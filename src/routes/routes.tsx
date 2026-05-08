@@ -5,7 +5,6 @@ import {
   passwordCreationInputControllers,
 } from "@/data/inputs-controllers.data.ts";
 import { inputLoginControllers } from "@/features/auth/components/login/forms/login-inputs";
-import { LazyGoogleOAuth } from "@/features/auth/components/oauth/google/exports/oauth.exports";
 import { LazyCreateEvaluations } from "@/features/evaluations/create/exports/create-evaluations.exports";
 import { LazyEvaluationDelete } from "@/features/evaluations/delete/exports/evaluation-delete.exports";
 import { LazyEvaluationEdit } from "@/features/evaluations/edit/exports/evaluation-edit.exports";
@@ -25,6 +24,7 @@ import { LazySignup } from "@/pages/Signup/exports/signup.exports";
 import {
   ALL_STEPS,
   EVALUATION_PAGE_TITLE,
+  OAUTH_PAGES,
 } from "@/routes/config/routes.configs";
 import { Navigate, type RouteObject } from "react-router-dom";
 
@@ -56,12 +56,7 @@ export const ROUTES_CHILDREN: RouteObject[] = [
   },
   {
     path: "auth",
-    children: [
-      {
-        path: "google-callback",
-        element: <LazyGoogleOAuth />,
-      },
-    ],
+    children: OAUTH_PAGES(),
   },
   {
     path: "login",

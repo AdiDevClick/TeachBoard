@@ -1,4 +1,6 @@
+import { loginButtonsSvgs } from "@/configs/social.config";
 import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas";
+import { LazyGoogleOAuth } from "@/features/auth/components/oauth/google/exports/oauth.exports";
 import {
   LazyStepFour,
   LazyStepOne,
@@ -39,4 +41,18 @@ export const ALL_STEPS = (mode: string) =>
       pageTitle: elem.title ?? EVALUATION_PAGE_TITLE,
       mode,
     }),
+  }));
+
+/**
+ * OAuth pages configuration for routing.
+ *
+ * @description Generates route configurations for OAuth callback pages based on the `loginButtonsSvgs` data.
+ * Each route corresponds to a social login provider (e.g., Google, Microsoft) and renders the appropriate OAuth component.
+ */
+export const OAUTH_PAGES = () =>
+  loginButtonsSvgs.map((button) => ({
+    path: button.routerPath,
+    element: (
+      <LazyGoogleOAuth pageId={button.pageId} provider={button.provider} />
+    ),
   }));
