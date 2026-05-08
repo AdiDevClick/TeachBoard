@@ -42,3 +42,4 @@ src/tests/units/ui/__screenshots__
 src/tests/units/ui/__images__
 .env.development
 .env.dev
+.well-known/*
