@@ -277,5 +277,12 @@ export type PromiseStateSettledResult<T> = Exclude<
   { status: "pending" }
 >;
 
+type Exported<T, K extends keyof T> = K extends keyof T ? T[K] : T;
+
+export type LazyComponent<T, K extends keyof T> =
+  Exported<T, K> extends ComponentType<infer P>
+    ? ComponentType<P>
+    : ComponentType<unknown>;
+
 type _GenericSuccess<T extends ResponseInterface> = T;
 type _GenericError<T extends ApiError> = T;

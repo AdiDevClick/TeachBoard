@@ -5,13 +5,14 @@ import { LANGUAGE, type AppModalNames } from "@/configs/app.config";
 import type {
   AnimationsOptions,
   AnyObjectProps,
+  LazyComponent,
   PreventDefaultAndStopPropagation,
   ProbeProxyResult,
   PromiseStateResult,
   PromiseStateSettledResult,
 } from "@/utils/types/types.utils.ts";
 import { clsx, type ClassValue } from "clsx";
-import { lazy, type ComponentType } from "react";
+import { lazy, type ComponentType, type LazyExoticComponent } from "react";
 import { twMerge } from "tailwind-merge";
 import type z from "zod";
 
@@ -675,35 +676,44 @@ export const animation = (
 /**
  * Utility function to lazily import a React component for code-splitting and performance optimization.
  *
- * @param path - The path to the module containing the component to import, relative to the src directory (e.g., "@/features/evaluations/main/EvaluationsView").
+ * Pass a static loader (`() => import("...")`) to enable full props inference from the exported component.
+ *
+ * @template TModule - The imported module type, inferred from the loader's Promise return.
+ * @template TExportName - The optional export name; defaults to the module's default export.
+ *
+ * @param moduleLoader - A static module loader function that returns the imported module.
  * @param exportName - The name of the exported component to import from the module (optional, defaults to the default export).
  *
  * @returns A React component that is loaded lazily using React's `lazy` function.
+ *
+ * @example
+ * ```tsx
+ * // Props are automatically inferred from the Login component
+ * export const LazyLogin = lazyImport(
+ *   () => import("@/pages/Login/Login"),
+ *   "Login"
+ * );
+ * // <LazyLogin inputControllers={...} /> will have type-safe props
+ * ```
  */
-export function lazyImport<T extends ComponentType<any>>(
-  path: string,
-  exportName?: string,
-) {
+export function lazyImport<
+  T extends Record<PropertyKey, unknown>,
+  K extends keyof T = "default",
+>(moduleLoader: () => Promise<T>, exportName?: K) {
   return lazy(async () => {
-    const resolvedModulePath = normalizeLazyModulePath(path);
-
-    if (!resolvedModulePath) {
-      throw new Error(`Unable to resolve lazy import: ${path}`);
-    }
-
-    const module = await import(/* @vite-ignore */ resolvedModulePath);
+    const module = await moduleLoader();
     const exported = exportName ? module[exportName] : module.default;
 
-    return { default: exported as T };
-  });
+    if (!isComponentFunction(exported)) {
+      throw new TypeError("Lazy import target is not a React component");
+    }
+
+    return { default: exported };
+  }) as LazyExoticComponent<LazyComponent<T, K>>;
 }
 
-function normalizeLazyModulePath(path: string) {
-  if (path.startsWith("@/")) {
-    return `/src/${path.slice(2)}`;
-  }
-
-  return path;
+function isComponentFunction(value: unknown): value is ComponentType<object> {
+  return typeof value === "function";
 }
 
 /**
