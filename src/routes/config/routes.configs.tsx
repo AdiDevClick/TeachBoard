@@ -1,6 +1,6 @@
 import { loginButtonsSvgs } from "@/configs/social.config";
 import { EvaluationPageTabsDatas } from "@/data/EvaluationPageDatas";
-import { LazyGoogleOAuth } from "@/features/auth/components/oauth/google/exports/oauth.exports";
+import { LazyOAuth } from "@/features/auth/components/oauth/exports/oauth.exports";
 import {
   LazyStepFour,
   LazyStepOne,
@@ -52,7 +52,5 @@ export const ALL_STEPS = (mode: string) =>
 export const OAUTH_PAGES = () =>
   loginButtonsSvgs.map((button) => ({
     path: button.routerPath,
-    element: (
-      <LazyGoogleOAuth pageId={button.pageId} provider={button.provider} />
-    ),
+    element: <LazyOAuth pageId={button.pageId} provider={button.provider} />,
   }));
