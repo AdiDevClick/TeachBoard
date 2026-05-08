@@ -225,7 +225,7 @@ export const API_ENDPOINTS = Object.freeze({
     },
     AUTH: {
       LOGIN: {
-        endpoints: { MAIN: `${AUTH}/login`, GOOGLE: `${O_AUTH}/google` },
+        endpoints: { MAIN: `${AUTH}/login`, OAUTH: `${O_AUTH}/login` },
         dataReshape: (
           data: unknown,
           _cachedDatas: unknown,

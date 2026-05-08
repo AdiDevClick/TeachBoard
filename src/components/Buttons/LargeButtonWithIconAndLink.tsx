@@ -33,9 +33,13 @@ export function LargeButtonWithIconAndLink(
 
   const { label, iconPath, url = "#", auth = false, ...buttonProps } = props;
 
-  const sanitizedProps = sanitizeDOMProps(buttonProps, ["getLink"]);
+  const sanitizedProps = sanitizeDOMProps(buttonProps, [
+    "getLink",
+    "pageId",
+    "routerPath",
+  ]);
 
-  const checkedURL = auth ? buildAuthURL(url) : url;
+  const checkedURL = !auth ? url : buildAuthURL(url);
 
   return (
     <Button asChild variant="outline" type="button" {...sanitizedProps}>

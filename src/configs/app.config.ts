@@ -82,7 +82,8 @@ export const USER_ACTIVITIES = Object.freeze({
 export type AppModalNames =
   | "login"
   | "apple-login"
-  | "google-login"
+  | "Google-login"
+  | "Microsoft-login"
   | "logout"
   | "none"
   | "signup"
