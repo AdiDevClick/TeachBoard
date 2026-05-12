@@ -24,7 +24,7 @@ export function buildAuthURL(baseURL: string): string {
     case baseURL.includes("google"):
       paramsObject = {
         client_id: VITE_GOOGLE_CLIENT_ID,
-        redirect_uri: VITE_GOOGLE_REDIRECT_URI,
+        redirect_uri: encodeURI(VITE_GOOGLE_REDIRECT_URI),
         access_type: "online",
         response_type: "code",
         scope: "email profile",
@@ -36,9 +36,10 @@ export function buildAuthURL(baseURL: string): string {
     case baseURL.includes("microsoft"):
       paramsObject = {
         client_id: VITE_MICROSOFT_CLIENT_ID,
-        redirect_uri: VITE_MICROSOFT_REDIRECT_URI,
+        redirect_uri: encodeURI(VITE_MICROSOFT_REDIRECT_URI),
         response_mode: "query",
         response_type: "code",
+        prompt: "select_account",
         scope:
           "openid profile email offline_access https://graph.microsoft.com/.default",
         state,
