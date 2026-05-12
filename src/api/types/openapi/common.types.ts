@@ -18,6 +18,12 @@ export type UUID = z.infer<typeof UUID_SCHEMA>;
 export const OFFSET_DATE_TIME_SCHEMA = z.iso
   .datetime()
   .brand<"OffsetDateTime">();
+
+/**
+ * ISO-8601 date-time string (OpenAPI format: date-time).
+ *
+ * @example: "2023-10-05T14:48:00.000Z"
+ */
 export type OffsetDateTime = z.infer<typeof OFFSET_DATE_TIME_SCHEMA>;
 
 /**
