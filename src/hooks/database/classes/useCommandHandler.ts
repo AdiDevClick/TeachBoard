@@ -229,6 +229,7 @@ export function useCommandHandler<
       searchParams,
       apiEndpoint = "none",
       dataReshapeFn,
+      headers,
     } = metaData ?? {};
 
     let silent = metaData?.silent;
@@ -261,6 +262,7 @@ export function useCommandHandler<
       contentId: task as FetchParams["contentId"],
       abortController: controller,
       silent,
+      headers,
     }));
   }
 
