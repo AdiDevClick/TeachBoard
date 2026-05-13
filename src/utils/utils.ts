@@ -75,6 +75,24 @@ export function formatDate(date: Date) {
 }
 
 /**
+ * Build a pair of UTC ISO strings representing the start and end of the
+ * selected local calendar day.
+ *
+ * @param date - The selected local date.
+ * @returns An object containing UTC start/end instants for Graph calendarView.
+ */
+export function getLocalCalendarViewRange(date: Date) {
+  const instant = date.toTemporalInstant();
+  const options = new Intl.DateTimeFormat().resolvedOptions();
+  const zdt = instant.toZonedDateTimeISO(options.timeZone).startOfDay();
+
+  return {
+    start: zdt.toInstant().toString(),
+    end: zdt.add({ days: 1 }).toInstant().toString(),
+  };
+}
+
+/**
  * Crer une promesse qui se resoudra
  * après un délai défini en paramètre
  * @param duration - La durée de l'attente
