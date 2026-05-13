@@ -1,5 +1,6 @@
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 
+import type { OffsetDateTime } from "@/api/types/openapi/common.types";
 import type {
   ClasseNameAvailabilityResponse,
   ClassesFetch,
@@ -32,6 +33,8 @@ import { debugLogs } from "@/configs/app-components.config";
 import type { AnyObjectProps } from "@/utils/types/types.utils";
 
 const BASE_API_URL = "/api";
+const CALENDAR = `${BASE_API_URL}/calendar`;
+const BASE_MICROSOFT_CALENDAR_URL = "https://graph.microsoft.com/v1.0";
 
 const AUTH = `${BASE_API_URL}/auth`;
 const O_AUTH = `${BASE_API_URL}/o-auth`;
@@ -62,6 +65,18 @@ const TASK_TEMPLATES = `${BASE_API_URL}/task-templates`;
 export const API_ENDPOINTS = Object.freeze({
   GET: {
     METHOD: "GET",
+    CALENDAR_EVENTS: {
+      endPoints: {
+        PROXY_ENDPOINT: `${CALENDAR}/proxy`,
+        ALL_EVENTS: `${BASE_MICROSOFT_CALENDAR_URL}/me/events`,
+        EVENTS_RANGES: (
+          startDateTime: OffsetDateTime,
+          endDateTime: OffsetDateTime,
+        ) =>
+          `${BASE_MICROSOFT_CALENDAR_URL}/me/calendarview?startdatetime=${startDateTime}&enddatetime=${endDateTime}`,
+      },
+      dataReshape: (data: unknown) => data.value,
+    },
     CLASSES: {
       endPoints: {
         ALL: `${CLASSES}/`,
@@ -72,14 +87,12 @@ export const API_ENDPOINTS = Object.freeze({
       dataAvailable: (data: ClasseNameAvailabilityResponse) => data,
       dataReshape: (data: ClassesFetch) =>
         // use "name" and transform to "value" for selects
-        // data.classes is the actual array of classes from the server response
         dataReshaper(data)
           .transformTuplesToGroups("groupTitle", "items")
           .assign([["name", "value"]])
           .newShape(),
       dataReshapeSingle: (data: ClassSummaryDto) =>
         // use "name" and transform to "value" for selects
-        // data
         dataReshaper(data)
           .assign([["name", "value"]])
           .newShape(),
