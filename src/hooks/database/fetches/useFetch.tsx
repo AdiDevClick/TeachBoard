@@ -9,7 +9,6 @@ import {
   cacheFetchResult,
   createSearchParamsEndpoint,
   navigateOnForbiddenError,
-  resolveFetchCacheKey,
 } from "@/hooks/database/fetches/functions/use-fetch.functions";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import { useQueryOnSubmit } from "@/hooks/database/useQueryOnSubmit.ts";
@@ -82,11 +81,25 @@ export function useFetch<
    */
   const newUrl = createSearchParamsEndpoint(fetchParams);
 
+  // !! IMPORTANT !! Capture the cachedFetchKey at request launch time to prevent
+  // stale closures when multiple concurrent requests with different dates resolve out of order.
+  // This ensures cacheFetchResult uses the correct key for THIS request, not the current state.
+  const requestCachedFetchKey = fetchParams.cachedFetchKey ?? [
+    contentId,
+    newUrl,
+  ];
+
+  // Create a request-specific FetchParams snapshot to pass to callbacks
+  const requestFetchParams: FetchParams = {
+    ...fetchParams,
+    cachedFetchKey: requestCachedFetchKey,
+  };
+
   const queryParams = useQueryOnSubmit<S, E>([
     contentId,
     {
       ...params,
-      cachedFetchKey: fetchParams.cachedFetchKey ?? [contentId, newUrl],
+      cachedFetchKey: requestCachedFetchKey,
       url: newUrl,
       onSuccess: (response) => {
         setLastUserActivity(contentId, {
@@ -101,7 +114,7 @@ export function useFetch<
         // Save the fetched (and potentially reshaped) data in the cache and get the reshaped result
         const cachingDatas = cacheFetchResult(
           queryClient,
-          fetchParams,
+          requestFetchParams,
           response as unknown as AnyObjectProps,
         );
 
@@ -114,9 +127,10 @@ export function useFetch<
           message: "Fetch successful",
         });
 
-        queryClient.invalidateQueries({
-          queryKey: resolveFetchCacheKey(fetchParams),
-        });
+        // !! CAUTION !! Do NOT invalidate the cache here as it would defeat the purpose of caching.
+        // queryClient.invalidateQueries({
+        //   queryKey: resolveFetchCacheKey(fetchParams),
+        // });
 
         setViewData(cachingDatas as TViewData);
 
@@ -148,7 +162,11 @@ export function useFetch<
         errorCallback?.(error);
 
         if (error?.data !== undefined) {
-          const cachedData = cacheFetchResult(queryClient, fetchParams, error);
+          const cachedData = cacheFetchResult(
+            queryClient,
+            requestFetchParams,
+            error,
+          );
 
           setViewData(cachedData as TViewData);
 
