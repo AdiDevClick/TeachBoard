@@ -6,6 +6,7 @@ import type {
   User,
 } from "@/api/store/types/app-store.types";
 import { USER_ACTIVITIES } from "@/configs/app.config.ts";
+import type { OAuthProvider } from "@/features/auth/components/oauth/types/oauth.types";
 import { UniqueSet } from "@/utils/UniqueSet";
 import { create } from "zustand";
 import { combine, devtools, persist } from "zustand/middleware";
@@ -16,6 +17,10 @@ const DEFAULT_VALUES: AppStore = {
   lastUserActivity: new UniqueSet(),
   sessionSynced: false,
   isLoggedIn: false,
+  socialsLoggedIn: {
+    microsoft: false,
+    google: false,
+  },
   syncValues: {
     shouldSyncEvaluations: true,
     // shouldSyncClasses: false,
@@ -154,7 +159,7 @@ export const useAppStore = create(
                 state.isLoggedIn = false;
               });
             },
-            login(user: User) {
+            login(user: User & { provider: OAuthProvider }) {
               const usAct = new UniqueSet() as LastUserActivity;
               set((state) => {
                 const lastActivity = state.lastUserActivity?.values().next()
@@ -167,6 +172,9 @@ export const useAppStore = create(
 
                 state.isLoggedIn = true;
                 state.user = user;
+
+                state.socialsLoggedIn.microsoft = user.provider === "microsoft";
+                state.socialsLoggedIn.google = user.provider === "google";
               });
             },
             logout() {
@@ -191,6 +199,8 @@ export const useAppStore = create(
                 state.user = null;
                 state.isLoggedIn = false;
                 state.sessionSynced = false;
+                state.socialsLoggedIn.microsoft = false;
+                state.socialsLoggedIn.google = false;
               });
             },
             setShouldResyncEvals(shouldResync: boolean) {
