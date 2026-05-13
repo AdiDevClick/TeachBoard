@@ -1,5 +1,6 @@
 import type { DialogContextType } from "@/api/contexts/types/context.types.ts";
 import { UUID_SCHEMA } from "@/api/types/openapi/common.types";
+import type { CalendarFetchRange } from "@/components/Sidebar/calendar/hooks/useCalendar";
 import { debugLogs } from "@/configs/app-components.config.ts";
 import { LANGUAGE, type AppModalNames } from "@/configs/app.config";
 import type {
@@ -45,23 +46,68 @@ export function mirrorProperties(
 /**
  * Format a date range for display.
  *
+ * @description If you pass the `isAllDay` flag as true, the function will return an empty string regardless of the actual time range
+ *
  * @param from Start date
  * @param to End date
+ * @param isAllDay Whether the event is an all-day event, which may affect formatting
+ *
  * @returns Formatted date range string
  */
-export function formatRangeCompat(from: Date, to: Date) {
+export function formatRangeCompat(from = "", to = "", isAllDay = false) {
+  const fromDate = Temporal.PlainDateTime.from(from);
+  const toDate = Temporal.PlainDateTime.from(to);
+
   try {
+    if (isAllDay) {
+      return "";
+    }
+
     const dtf = new Intl.DateTimeFormat(LANGUAGE, {
       hour: "numeric",
       minute: "2-digit",
     });
-    if (typeof dtf.formatRange === "function") {
-      return dtf.formatRange(from, to);
-    }
+
+    return dtf.formatRange(fromDate, toDate);
   } catch (e) {
     console.log(e);
     // Some environments may throw if Intl is restricted—ignore and fallback
   }
+}
+
+/**
+ * Calculate the duration of an event from its start and end times, returning a human-readable string.
+ *
+ * @description If you pass the `isAllDay` flag as true, the function will return "Toute la journée" regardless of the actual time range
+ *
+ * @remark This uses Temporal API to calculate the duration and Intl.DurationFormat to format it
+ *
+ * @param from - The start time of the event, as an ISO string
+ * @param to - The end time of the event, as an ISO string
+ * @param isAllDay - Whether the event is an all-day event
+ *
+ * @returns A human-readable string representing the duration of the event (e.g., "2h 30m"), or "Toute la journée" if it's an all-day event
+ */
+export function getDurationFromRange(
+  from: string = "",
+  to: string = "",
+  isAllDay = false,
+) {
+  const fromDate = Temporal.PlainDateTime.from(from);
+  const toDate = Temporal.PlainDateTime.from(to);
+
+  if (isAllDay) {
+    return "Toute la journée";
+  }
+
+  const range = fromDate.until(toDate, { largestUnit: "day" });
+  const rounded = range.round({ largestUnit: "hour", relativeTo: fromDate });
+
+  const formatter = new Intl.DurationFormat("fr", {
+    style: "short",
+  });
+
+  return formatter.format(rounded);
 }
 
 export function formatDate(date: Date) {
@@ -81,14 +127,35 @@ export function formatDate(date: Date) {
  * @param date - The selected local date.
  * @returns An object containing UTC start/end instants for Graph calendarView.
  */
-export function getLocalCalendarViewRange(date: Date) {
+export function getLocalCalendarViewRange(
+  date: Date,
+  viewType?: CalendarFetchRange,
+) {
   const instant = date.toTemporalInstant();
   const options = new Intl.DateTimeFormat().resolvedOptions();
-  const zdt = instant.toZonedDateTimeISO(options.timeZone).startOfDay();
+  const zdt = instant.toZonedDateTimeISO(options.timeZone);
+
+  // Defaults to current day
+  let effectiveZdt = zdt.startOfDay();
+  let endZdt = zdt.add({ days: 1 });
+
+  // Get the day corresponding to the start of the calendar view, depending on the view type (month/week/day)
+
+  // first & last day of the month
+  if (viewType === "month") {
+    effectiveZdt = zdt.with({ day: 1 }).startOfDay();
+    endZdt = effectiveZdt.add({ months: 1 });
+  }
+
+  // first & last day of the selected day week (assuming week starts on Monday)
+  if (viewType === "week") {
+    effectiveZdt = zdt.subtract({ days: (zdt.dayOfWeek + 6) % 7 }).startOfDay();
+    endZdt = effectiveZdt.add({ days: 7 });
+  }
 
   return {
-    start: zdt.toInstant().toString(),
-    end: zdt.add({ days: 1 }).toInstant().toString(),
+    start: effectiveZdt.toInstant().toString(),
+    end: endZdt.toInstant().toString(),
   };
 }
 
