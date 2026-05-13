@@ -1,6 +1,9 @@
 import { ObjectReshape } from "@/utils/ObjectReshape.ts";
 
+import type { useAppStore } from "@/api/store/AppStore";
 import type { OffsetDateTime } from "@/api/types/openapi/common.types";
+import type { AuthLoginSuccess } from "@/api/types/routes/auth.types";
+import type { CalendarEvents } from "@/api/types/routes/calendar.types";
 import type {
   ClasseNameAvailabilityResponse,
   ClassesFetch,
@@ -35,7 +38,6 @@ import type { AnyObjectProps } from "@/utils/types/types.utils";
 const BASE_API_URL = "/api";
 const CALENDAR = `${BASE_API_URL}/calendar`;
 const BASE_MICROSOFT_CALENDAR_URL = "https://graph.microsoft.com/v1.0";
-
 const AUTH = `${BASE_API_URL}/auth`;
 const O_AUTH = `${BASE_API_URL}/o-auth`;
 const DEGREES = `${BASE_API_URL}/degrees`;
@@ -73,9 +75,31 @@ export const API_ENDPOINTS = Object.freeze({
           startDateTime: OffsetDateTime,
           endDateTime: OffsetDateTime,
         ) =>
-          `${BASE_MICROSOFT_CALENDAR_URL}/me/calendarview?startdatetime=${startDateTime}&enddatetime=${endDateTime}`,
+          `${BASE_MICROSOFT_CALENDAR_URL}/me/calendarview?startDateTime=${encodeURIComponent(
+            startDateTime,
+          )}&endDateTime=${encodeURIComponent(endDateTime)}`,
+        EVENTS_RANGES_STARTS: (
+          startDateTime: OffsetDateTime,
+          endDateTime: OffsetDateTime,
+        ) => {
+          const filter = `start/dateTime ge '${startDateTime}' and start/dateTime lt '${endDateTime}'`;
+          return encodeURI(
+            `${BASE_MICROSOFT_CALENDAR_URL}/me/events?$filter=${
+              filter
+            }&$orderby=${"start/dateTime"}`,
+          );
+        },
       },
-      dataReshape: (data: unknown) => data.value,
+      dataReshape: (data: CalendarEvents) => {
+        return data.value;
+        // return dataReshaper(data.value ?? [])
+        //   .assign([
+        //     ["subject", "title"],
+        //     // ["start?.dateTime", "from"],
+        //     // ["end?.dateTime", "to"],
+        //   ])
+        //   .newShape();
+      },
     },
     CLASSES: {
       endPoints: {
@@ -240,43 +264,24 @@ export const API_ENDPOINTS = Object.freeze({
       LOGIN: {
         endpoints: { MAIN: `${AUTH}/login`, OAUTH: `${O_AUTH}/login` },
         dataReshape: (
-          data: unknown,
+          data: AuthLoginSuccess["data"],
           _cachedDatas: unknown,
           options: {
-            login: (payload: {
-              userId?: unknown;
-              username?: unknown;
-              firstName?: unknown;
-              lastName?: unknown;
-              name?: string;
-              email?: unknown;
-              role?: unknown;
-              token?: unknown;
-              refreshToken?: unknown;
-              avatar?: unknown;
-              schoolName?: unknown;
-            }) => void;
+            login: ReturnType<typeof useAppStore.getState>["login"];
           },
         ) => {
-          const { user, session, refreshToken } = (data ?? {}) as Record<
-            string,
-            unknown
-          >;
-          const {
-            firstName = "",
-            lastName = "",
-            id,
-            ...userRest
-          } = user as Record<string, unknown>;
+          const { user, session, refreshToken, provider = "unknown" } = data;
+
+          const { firstName = "", lastName = "", ...userRest } = user;
 
           options.login({
             ...userRest,
-            userId: id,
             firstName,
             lastName,
             name: firstName + " " + lastName,
             token: session,
             refreshToken,
+            provider,
           });
 
           return data;
