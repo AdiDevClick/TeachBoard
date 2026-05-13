@@ -1,0 +1,46 @@
+@use 'mixins' as *;
+
+.calendar-events {
+  overflow: hidden;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  flex-wrap: wrap;
+  place-items: start;
+
+  height: 100%;
+  background-color: var(--muted);
+
+  padding: calc(var(--spacing) * 2);
+  padding-left: calc(var(--spacing) * 6);
+
+  &:hover {
+    cursor: pointer;
+    background-color: var(--primary);
+  }
+
+  &::after {
+    content: var(--tw-content);
+    position: absolute;
+    inset-block: calc(var(--spacing) * 2);
+    border-radius: calc(infinity * 1px);
+    left: calc(var(--spacing) * 2);
+    width: calc(var(--spacing) * 1);
+    background-color: color-mix(in oklab, var(--primary) 70%, transparent);
+  }
+
+  &__title {
+    font-weight: var(--font-weight-medium);
+    color: var(--text);
+  }
+
+  &__time {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+
+    color: var(--muted-foreground);
+    font-size: var(--text-xs);
+  }
+}
