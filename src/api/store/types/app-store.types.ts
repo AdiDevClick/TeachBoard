@@ -12,7 +12,7 @@ export type AppRoles = "ADMIN" | "TEACHER" | "STUDENT" | "STAFF";
  * User information stored in the application store.
  */
 export interface User {
-  userId: UUID;
+  id: UUID;
   name: string;
   email: Email;
   firstName?: string;
@@ -21,7 +21,7 @@ export interface User {
   role: AppRoles;
   token: SessionToken;
   avatar: string;
-  refreshToken: SessionToken;
+  refreshToken?: SessionToken;
   schoolName: string;
 }
 
@@ -65,6 +65,10 @@ export interface AppStore {
   lastUserActivity: LastUserActivity;
   isLoggedIn: boolean;
   user: User | null;
+  socialsLoggedIn: {
+    microsoft: boolean;
+    google: boolean;
+  };
   sessionSynced: boolean;
   syncValues: SyncValues;
 }
