@@ -58,6 +58,7 @@ export const USER_ACTIVITIES = Object.freeze({
   login: "login",
   logout: "logout",
   none: "none",
+  calendar: "calendar",
   sessionCheck: "session-check",
   classes: "classes",
   evaluationClassSelection: "evaluation-class-selection",
