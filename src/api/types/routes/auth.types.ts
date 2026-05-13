@@ -1,8 +1,10 @@
 import type { User } from "@/api/store/types/app-store.types";
+import type { SessionToken } from "@/api/types/openapi/common.types";
+import type { OAuthProvider } from "@/features/auth/components/oauth/types/oauth.types";
 import type { ApiError } from "@/types/AppErrorInterface";
 import type {
-  ApiSuccess,
   AppRouteResponseContract,
+  SuccessWithData,
 } from "@/types/AppResponseInterface";
 
 /**
@@ -19,9 +21,10 @@ export type AuthErrorStatus = 400 | 401 | 403 | 500;
  * Successful response returned by the authentication login endpoint.
  */
 export type AuthLoginSuccess = Extract<
-  ApiSuccess<{
-    // token?: string;
-    // refreshToken?: string;
+  SuccessWithData<{
+    provider?: OAuthProvider;
+    session: SessionToken;
+    refreshToken?: SessionToken;
     user: User;
   }>,
   { status: 200 }
