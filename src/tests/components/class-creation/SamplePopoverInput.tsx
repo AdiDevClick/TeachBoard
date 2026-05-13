@@ -27,7 +27,7 @@ export function SamplePopoverInput({
   readonly options?: Record<string, unknown>;
 }) {
   const form = useForm({ defaultValues: {} });
-  const userId = useAppStore((s) => s.user?.userId);
+  const userId = useAppStore((s) => s.user?.id);
   const { openingCallback, resultsCallback, newItemCallback } =
     useCommandHandler({
       // tests don't submit this form; we just need a RHF instance for the hook.

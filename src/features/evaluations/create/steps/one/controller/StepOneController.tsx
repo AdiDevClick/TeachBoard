@@ -68,7 +68,7 @@ export function StepOneController({ pageId }: StepOneControllerProps) {
       task: rest.task,
     });
 
-    rest.userId = user?.userId;
+    rest.userId = user?.id;
 
     newItemCallback({
       e,

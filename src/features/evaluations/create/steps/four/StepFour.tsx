@@ -58,7 +58,7 @@ export function StepFour({
     resolver: zodResolver(stepFourInputSchema),
     mode: "onTouched",
     defaultValues: {
-      userId: user?.userId,
+      userId: user?.id,
       title: foundTitle,
       evaluations: [],
       overallScore: {},
