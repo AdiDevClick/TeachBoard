@@ -1,3 +1,4 @@
+import { OFFSET_DATE_TIME_SCHEMA } from "@/api/types/openapi/common.types";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config.ts";
 
 import { describe, expect, it, vi } from "vitest";
@@ -22,6 +23,28 @@ describe("API_ENDPOINTS full contract", () => {
     expect(API_ENDPOINTS.GET.CLASSES.endPoints.ALL).toBe("/api/classes/");
     expect(API_ENDPOINTS.GET.CLASSES.endPoints.BY_ID(123)).toBe(
       "/api/classes/123",
+    );
+
+    const start = OFFSET_DATE_TIME_SCHEMA.parse("2026-05-12T00:00:00.000Z");
+    const end = OFFSET_DATE_TIME_SCHEMA.parse("2026-05-13T00:00:00.000Z");
+
+    expect(
+      API_ENDPOINTS.GET.CALENDAR_EVENTS.endPoints.EVENTS_RANGES(start, end),
+    ).toBe(
+      `https://graph.microsoft.com/v1.0/me/calendarview?startDateTime=${encodeURIComponent(
+        start,
+      )}&endDateTime=${encodeURIComponent(end)}`,
+    );
+
+    expect(
+      API_ENDPOINTS.GET.CALENDAR_EVENTS.endPoints.EVENTS_RANGES_STARTS(
+        start,
+        end,
+      ),
+    ).toBe(
+      `https://graph.microsoft.com/v1.0/me/events?$filter=${encodeURIComponent(
+        `start/dateTime ge '${start}' and start/dateTime lt '${end}'`,
+      )}&$orderby=${encodeURIComponent("start/dateTime")}`,
     );
 
     expect(API_ENDPOINTS.GET.SKILLS.endPoints.MODULES).toBe("/api/skills/main");
@@ -104,6 +127,42 @@ describe("API_ENDPOINTS full contract", () => {
 
     expect(list[0].groupTitle).toBe("BTS");
     expect(list[0].items[0].value).toBe("BTS 2024");
+  });
+
+  it("GET.CALENDAR_EVENTS reshaper normalizes Graph payload to calendar view items", () => {
+    const payload = {
+      value: [
+        {
+          subject: "Team Sync",
+          start: { dateTime: "2026-05-12T09:00:00.0000000", timeZone: "UTC" },
+          end: { dateTime: "2026-05-12T10:00:00.0000000", timeZone: "UTC" },
+          isAllDay: false,
+        },
+        {
+          subject: "All day event",
+          start: { dateTime: "2026-05-12T00:00:00.0000000", timeZone: "UTC" },
+          end: { dateTime: "2026-05-13T00:00:00.0000000", timeZone: "UTC" },
+          isAllDay: true,
+        },
+      ],
+    };
+
+    const shaped = API_ENDPOINTS.GET.CALENDAR_EVENTS.dataReshape(payload);
+
+    expect(shaped).toEqual([
+      {
+        title: "Team Sync",
+        from: "2026-05-12T09:00:00.000Z",
+        to: "2026-05-12T10:00:00.000Z",
+        isAllDay: false,
+      },
+      {
+        title: "All day event",
+        from: "2026-05-12T00:00:00.000Z",
+        to: "2026-05-13T00:00:00.000Z",
+        isAllDay: true,
+      },
+    ]);
   });
 
   it("GET.TASKSTEMPLATES reshaper flattens task template and value=name", () => {
