@@ -106,6 +106,51 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     );
   }
 
+  #isRecord(value: unknown): value is Record<string, unknown> {
+    return value !== null && typeof value === "object" && !Array.isArray(value);
+  }
+
+  /**
+   * Split a dot-notated path into segments in order to recursively resolve nested properties.
+   *
+   * @param path - The dot-notated path to normalize (e.g., "start?.dateTime")
+   *
+   * @returns An array of path segments
+   */
+  #normalizePathSegments(path: string): string[] {
+    if (!path) return [];
+    return path.replaceAll("?.", ".").split(".").filter(Boolean);
+  }
+
+  /**
+   * Resolves a value from an object based on a dot-notated path.
+   *
+   * @description Supports optional chaining syntax (e.g., "start?.dateTime") by normalizing it to "start.dateTime".
+   *
+   * @param item - The object to resolve the value from
+   * @param path - The dot-notated path to the desired value to explore (e.g., "start.dateTime" or "start?.dateTime")
+   *
+   * @returns The resolved value and its source key, or undefined if not found
+   */
+  #resolvePathValue(
+    item: Record<string, unknown>,
+    path: string,
+  ): { value: unknown; sourceKey: string } | undefined {
+    const segments = this.#normalizePathSegments(path);
+    if (segments.length === 0) return undefined;
+
+    let current: unknown = item;
+
+    for (const segment of segments) {
+      if (!this.#isRecord(current) || !Object.hasOwn(current, segment)) {
+        return undefined;
+      }
+      current = current[segment];
+    }
+
+    return { value: current, sourceKey: path };
+  }
+
   /**
    * Transforms an object with dynamic keys containing arrays into an array of groups.
    * Each entry becomes an object with specified keys for the group name and items.
@@ -225,6 +270,24 @@ export class ObjectReshape<T extends Record<string, unknown>> {
    *   ObjectReshape.from("name", "test", "label").to("value"),
    *   // "value" -> tries "name", then "test", then "label"
    * ])
+   * ```
+   *
+   * **Syntax 3 - Direct assignment:**
+   * ```ts
+   * .assign([
+   *   ["name", "value"],
+   *   ["description", "label"]
+   * ])
+   * ```
+   *
+   * **Syntax 4 - Direct assignment (with object tree):**
+   * ```ts
+   * .assign([
+   *   ["start.dateTime", "from"],
+   *   ["end.dateTime", "to"]
+   * ])
+   * // This will get { start: { dateTime: ... }, end: { dateTime: ... } }
+   * // Output : { from: dateTime, to: dateTime }
    * ```
    *
    * For simple fallback, use `assignWithFallback()` directly.
@@ -421,9 +484,8 @@ export class ObjectReshape<T extends Record<string, unknown>> {
     sourceKeys: string[],
   ): { value: unknown; sourceKey: string } | undefined {
     for (const sourceKey of sourceKeys) {
-      if (Object.hasOwn(item, sourceKey)) {
-        return { value: item[sourceKey], sourceKey };
-      }
+      const resolved = this.#resolvePathValue(item, sourceKey);
+      if (resolved) return resolved;
     }
     return undefined;
   }
@@ -687,6 +749,12 @@ export class ObjectReshape<T extends Record<string, unknown>> {
             this.#markProxyfied(target, target);
             return { ...desc, enumerable: true, configurable: true };
           }
+          return {
+            configurable: true,
+            enumerable: true,
+            value: resolved.value,
+            writable: true,
+          };
         }
       }
     }
