@@ -45,11 +45,11 @@ describe("ObjectReshape - API config step contracts", () => {
 
   it("createPropertyWithContentFromKeys computes a joined value (via buildItem)", () => {
     const reshaper = new ObjectReshape(
-      [] as any
+      [] as any,
     ).createPropertyWithContentFromKeys(
       ["firstName", "lastName"],
       "fullName",
-      " "
+      " ",
     );
 
     const item = reshaper.buildItem({ firstName: "Alice", lastName: "Doe" });
@@ -59,7 +59,7 @@ describe("ObjectReshape - API config step contracts", () => {
   it("setProxyPropertyWithContent creates a fixed computed value (via buildItem)", () => {
     const reshaper = new ObjectReshape([] as any).setProxyPropertyWithContent(
       "newRole",
-      "Enseignant"
+      "Enseignant",
     );
 
     const item = reshaper.buildItem({});
@@ -76,6 +76,26 @@ describe("ObjectReshape - API config step contracts", () => {
     expect(item.name).toBe("Alice Doe");
   });
 
+  it("assign supports nested path sources (dot or optional chain syntax)", () => {
+    const payload: Array<Record<string, unknown>> = [
+      {
+        id: "evt-1",
+        start: { dateTime: "2024-01-01T10:00:00Z" },
+        end: { dateTime: "2024-01-01T11:00:00Z" },
+      },
+    ];
+
+    const shaped = new ObjectReshape(payload)
+      .assign([
+        ["start.dateTime", "from"],
+        ["end?.dateTime", "to"],
+      ])
+      .newShape();
+
+    expect(shaped[0].from).toBe("2024-01-01T10:00:00Z");
+    expect(shaped[0].to).toBe("2024-01-01T11:00:00Z");
+  });
+
   it("assign can map computed source keys to output keys (proxy usage like API config)", () => {
     const payload = [
       { id: "1", firstName: "Bob", lastName: "Smith", img: "b.png" },
@@ -87,7 +107,7 @@ describe("ObjectReshape - API config step contracts", () => {
       .createPropertyWithContentFromKeys(
         ["firstName", "lastName"],
         "fullName",
-        " "
+        " ",
       )
       .setProxyPropertyWithContent("newRole", "Enseignant")
       .assign([
@@ -167,10 +187,11 @@ describe("ObjectReshape - API config step contracts", () => {
     const shaped = new ObjectReshape(payload as any)
       .assignSourceTo("items")
       .addToRoot({ groupTitle: "Tous" })
-      .createPropertyWithContentFromKeys([
-        "firstName",
-        "lastName",
-      ], "fullName", " ")
+      .createPropertyWithContentFromKeys(
+        ["firstName", "lastName"],
+        "fullName",
+        " ",
+      )
       .assign([["fullName", "value", "name"]])
       .newShape() as any;
 
