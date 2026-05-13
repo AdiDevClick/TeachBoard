@@ -21,7 +21,9 @@ console.error = (...args: unknown[]) => {
   const firstArg = args[0];
   if (typeof firstArg === "string") {
     if (
-      firstArg.startsWith("React does not recognize the `%s` prop on a DOM element") ||
+      firstArg.startsWith(
+        "React does not recognize the `%s` prop on a DOM element",
+      ) ||
       firstArg.startsWith("Unknown event handler property `%s`.") ||
       firstArg.startsWith("Received `%s` for a non-boolean attribute `%s`.")
     ) {
