@@ -1,35 +1,58 @@
-import { ListMapper } from "@/components/Lists/ListMapper";
+import { useAppStore } from "@/api/store/AppStore";
+import { CalendarEventsList } from "@/components/Sidebar/calendar/Event/exports/calendar-event.exports";
+import type { CalendarEventProps } from "@/components/Sidebar/calendar/Event/types/calendar-events.types";
+import { useCalendar } from "@/components/Sidebar/calendar/hooks/useCalendar";
+import type { SidebarCalendarProps } from "@/components/Sidebar/calendar/types/sidebar-calendar.types";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { SidebarGroup } from "@/components/ui/sidebar.tsx";
-import { debugLogs } from "@/configs/app-components.config.ts";
-import { useSidebarDataContext } from "@/hooks/contexts/useSidebarDataContext.ts";
-import { formatDate, formatRangeCompat } from "@/utils/utils";
+import { debugLogs } from "@/configs/app-components.config";
+import { formatDate, preventDefaultAndStopPropagation } from "@/utils/utils";
 import "@css/Calendar.scss";
 import { fr } from "date-fns/locale";
 import { PlusIcon } from "lucide-react";
-import { useState } from "react";
+
+const today = new Date();
 
 /**
  * Sidebar Menu Calendar Component
  *
  * @param props - Additional props for the SidebarGroup (e.g., className)
  */
-export default function SidebarCalendar({ ...props }) {
-  const events = useSidebarDataContext();
-  const [date, setDate] = useState<Date>(new Date(2025, 5, 12));
+export default function SidebarCalendar({
+  className,
+  ...props
+}: SidebarCalendarProps) {
+  const isLoggedToMicrosoft = useAppStore(
+    (state) => state.socialsLoggedIn.microsoft,
+  );
+  const { events, date, setDate } = useCalendar({
+    initialDate: today,
+    fetchRange: {
+      start: today,
+      type: "day",
+    },
+  });
 
-  if (!events) {
-    debugLogs("SidebarCalendar");
-    return null;
-  }
+  const onEventClickHandler = (
+    ...args: Parameters<NonNullable<CalendarEventProps["onClick"]>>
+  ) => {
+    const [e, event] = args;
 
-  const calendarEvents = events.calendarEvents || [];
+    preventDefaultAndStopPropagation(e);
+    debugLogs("SidebarCalendar:onEventClickHandler", {
+      type: "componentHandler",
+      message: `Clicked on event: ${event.subject}`,
+      event,
+    });
+
+    // open the event details
+  };
 
   return (
     <SidebarGroup className={"sidebar-calendar-container"}>
-      <Card className={props.className} {...props}>
+      <Card className={className} {...props}>
         <CardContent className="card-container__content">
           <Calendar
             mode="single"
@@ -44,33 +67,23 @@ export default function SidebarCalendar({ ...props }) {
         <CardFooter className="flex flex-col items-start gap-3 border-t px-4 pt-4!">
           <div className="flex w-full items-center justify-between px-1">
             <div className="text-sm font-medium">{formatDate(date)}</div>
-            <Button
-              variant="ghost"
-              size="icon"
-              // className="size-6"
-              title="Add Event"
-            >
+            <Button variant="ghost" size="icon" title="Add Event">
               <PlusIcon />
               <p className="sr-only">Add Event</p>
             </Button>
           </div>
           <div className="flex w-full flex-col gap-2">
-            <ListMapper items={calendarEvents}>
-              {(event) => (
-                <div
-                  key={event.title}
-                  className="bg-muted after:bg-primary/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full"
-                >
-                  <div className="font-medium">{event.title}</div>
-                  <div className="text-muted-foreground text-xs">
-                    {formatRangeCompat(
-                      new Date(event.from),
-                      new Date(event.to)
-                    )}
-                  </div>
-                </div>
-              )}
-            </ListMapper>
+            {!isLoggedToMicrosoft ? (
+              <Card className="text-center border-2 border-dashed">
+                Loggez-vous à votre compte Microsoft pour afficher vos
+                événements de calendrier
+              </Card>
+            ) : (
+              <CalendarEventsList
+                items={events}
+                onClick={onEventClickHandler}
+              />
+            )}
           </div>
         </CardFooter>
       </Card>
