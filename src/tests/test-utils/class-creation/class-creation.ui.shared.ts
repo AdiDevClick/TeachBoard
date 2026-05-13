@@ -64,7 +64,7 @@ export function setupUiTestState(
     await opts?.beforeEach?.();
 
     const user: User = {
-      userId: "00000000-0000-4000-8000-000000000999",
+      id: "00000000-0000-4000-8000-000000000999",
       name: "Test User",
       email: "test.user@example.com",
       role: "TEACHER",
