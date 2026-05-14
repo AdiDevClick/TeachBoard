@@ -12,6 +12,14 @@ import { DrawerSectionList } from "@/features/evaluations/preview-view/exports/d
  * @param evaluation - The evaluation data to be displayed in the drawer, containing all necessary information for the sections.
  */
 export function DetailContent({ evaluation }: DetailContentProps) {
+  if (!evaluation) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <p className="text-muted-foreground">Aucun détail disponible</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6 overflow-y-auto px-4 py-2 text-sm">
       <DrawerSectionList items={sections(evaluation)} />
