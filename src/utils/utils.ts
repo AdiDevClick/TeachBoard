@@ -55,13 +55,13 @@ export function mirrorProperties(
  * @returns Formatted date range string
  */
 export function formatRangeCompat(from = "", to = "", isAllDay = false) {
-  const fromDate = Temporal.PlainDateTime.from(from);
-  const toDate = Temporal.PlainDateTime.from(to);
-
   try {
-    if (isAllDay) {
+    if (isAllDay || !from || !to) {
       return "";
     }
+
+    const fromDate = Temporal.PlainDateTime.from(from);
+    const toDate = Temporal.PlainDateTime.from(to);
 
     const dtf = new Intl.DateTimeFormat(LANGUAGE, {
       hour: "numeric",
