@@ -7,7 +7,7 @@ import { EvaluationDrawer } from "@/features/evaluations/preview-view/exports/dr
 import type { EvaluationDrawerRouteProps } from "@/features/evaluations/preview-view/types/evaluation-preview.types";
 import { useDrawer } from "@/hooks/useDrawer";
 import { usePageTitle } from "@/hooks/usePageTitle";
-import { AppDrawer } from "@/pages/AllDrawers/AppDrawers";
+import { AppDrawer } from "@/pages/AllDrawers/AppDrawer";
 import { type ComponentProps } from "react";
 
 /**
