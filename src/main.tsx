@@ -9,10 +9,12 @@ import { Toaster } from "@/components/ui/sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { COMPLETE_SIDEBAR_DATAS } from "@/configs/main.configs";
 import { useSessionChecker } from "@/hooks/database/sessions/useSessionChecker.ts";
+import { drawers } from "@/pages/AllDrawers/configs/drawers.configs";
+import { AppDrawers } from "@/pages/AllDrawers/exports/drawers.exports";
 import { AppModals } from "@/pages/AllModals/AppModals.tsx";
 import { PageError } from "@/pages/Error/PageError.tsx";
 import { ROUTES_CHILDREN } from "@/routes/routes";
-import type { RootProps } from "@/types/MainTypes";
+import type { AppContent, AppContentProps, RootProps } from "@/types/MainTypes";
 import "@css/MainContainer.scss";
 import "@css/Toaster.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -61,8 +63,14 @@ createRoot(document.getElementById("root")!).render(
  * @returns
  */
 export function Root({ contentType }: Readonly<RootProps>) {
-  const errorContent = contentType === "error";
   const { safeToDisplay } = useSessionChecker();
+
+  const errorContent = contentType === "error";
+  const renderContent = safeToDisplay ? "app" : "loading";
+
+  const contentToRender: AppContent = errorContent
+    ? contentType
+    : renderContent;
 
   return (
     <SidebarProvider
@@ -81,25 +89,36 @@ export function Root({ contentType }: Readonly<RootProps>) {
           <PageHeader />
           <PageTitle />
           <App>
-            {errorContent ? (
-              <PageError />
-            ) : !safeToDisplay ? (
-              <div className="inset-0 flex fixed justify-center items-center min-w-screen min-h-screen ">
-                <Spinner
-                  role="status"
-                  aria-label="Loading"
-                  className="size-5 animate-spin"
-                />
-              </div>
-            ) : (
-              <Outlet context={COMPLETE_SIDEBAR_DATAS} />
-            )}
+            <AppContent render={contentToRender} />
           </App>
         </PageView>
       </SidebarDataProvider>
       <AppModals />
+      <AppDrawers items={drawers} />
     </SidebarProvider>
   );
 }
 
 const PageView = SidebarInset;
+
+function SpinnerPage() {
+  return (
+    <div className="inset-0 flex fixed justify-center items-center min-w-screen min-h-screen ">
+      <Spinner
+        role="status"
+        aria-label="Loading"
+        className="size-5 animate-spin"
+      />
+    </div>
+  );
+}
+function AppContent({ render }: AppContentProps) {
+  switch (render) {
+    case "error":
+      return <PageError />;
+    case "loading":
+      return <SpinnerPage />;
+    default:
+      return <Outlet context={COMPLETE_SIDEBAR_DATAS} />;
+  }
+}
