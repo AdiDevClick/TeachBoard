@@ -362,10 +362,7 @@ export function Modal({
   }, [observedRefs, modalState.isReady, isNavigationModal, modalName]);
 
   return (
-    <Dialog
-      open={isOpen as boolean}
-      onOpenChange={() => onOpenChangeHandler(modalName)}
-    >
+    <Dialog open={!!isOpen} onOpenChange={() => onOpenChangeHandler(modalName)}>
       {children}
       <DialogContent
         ref={(el) => setRef?.(el, { modalName })}
