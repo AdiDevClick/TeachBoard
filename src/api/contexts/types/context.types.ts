@@ -20,7 +20,7 @@ import type {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { Separator } from "@/components/ui/separator";
-import type { AppModalNames } from "@/configs/app.config.ts";
+import type { AppDialogNames } from "@/configs/app.config.ts";
 import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types";
 import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
 import type { useSortable } from "@dnd-kit/sortable";
@@ -30,25 +30,25 @@ import type { ComponentProps, PropsWithChildren } from "react";
  * Type for Dialog context
  */
 export type DialogContextType = {
-  isDialogOpen: (id: AppModalNames) => boolean;
+  isDialogOpen: (id: AppDialogNames) => boolean;
   openDialog: (
     e: PreventDefaultAndStopPropagation,
-    id: AppModalNames,
+    id: AppDialogNames,
     options?: AppDialogOptions,
   ) => void;
   closeDialog: (
     e: PreventDefaultAndStopPropagation,
-    id?: AppModalNames,
+    id?: AppDialogNames,
   ) => void;
-  onOpenChange: (id: AppModalNames) => void;
-  dialogOptions: (dialog: AppModalNames) => AppDialogOptions | undefined;
+  onOpenChange: (id: AppDialogNames) => void;
+  dialogOptions: (dialog: AppDialogNames) => AppDialogOptions | undefined;
   dialogsOptions: DialogState;
-  setDialogOptions: (id: AppModalNames, options: AppDialogOptions) => void;
+  setDialogOptions: (id: AppDialogNames, options: AppDialogOptions) => void;
   closeAllDialogs: () => void;
-  deleteRef: (id: AppModalNames) => void;
+  deleteRef: (id: AppDialogNames) => void;
   // setRef: (ref: Element | null) => void;
   // observedRefs: UniqueSet<string, { element: Element | null }>;
-  openedDialogs: AppModalNames[];
+  openedDialogs: AppDialogNames[];
 } & UseMutationObserverReturn;
 
 /**
@@ -137,7 +137,7 @@ export type VerticalDrawerFooterProps = PropsWithChildren & {
  */
 export type VerticalDrawerContext<T> = {
   /** Properties for the content of the drawer. */
-  drawerContent?: VerticalDrawerContentProps<T>;
+  drawerContent: T;
   /** Properties for the header of the drawer, including title and description.*/
   drawerHeader?: VerticalDrawerHeaderProps;
   /** Properties for the footer of the drawer, including a close button configuration. */
