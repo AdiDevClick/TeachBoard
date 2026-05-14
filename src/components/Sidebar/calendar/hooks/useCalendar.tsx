@@ -79,7 +79,6 @@ export function useCalendar(options: UseCalendarOptions = {}) {
    */
   useEffect(() => {
     if (!isLoggedToMicrosoft) return;
-
     dateChangeTrigger(date);
   }, [date, isLoggedToMicrosoft]);
 

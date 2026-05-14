@@ -27,6 +27,7 @@ export default function SidebarCalendar({
   const isLoggedToMicrosoft = useAppStore(
     (state) => state.socialsLoggedIn.microsoft,
   );
+
   const { events, date, setDate } = useCalendar({
     initialDate: today,
     fetchRange: {
@@ -73,16 +74,16 @@ export default function SidebarCalendar({
             </Button>
           </div>
           <div className="flex w-full flex-col gap-2">
-            {!isLoggedToMicrosoft ? (
-              <Card className="text-center border-2 border-dashed">
-                Loggez-vous à votre compte Microsoft pour afficher vos
-                événements de calendrier
-              </Card>
-            ) : (
+            {isLoggedToMicrosoft ? (
               <CalendarEventsList
                 items={events}
                 onClick={onEventClickHandler}
               />
+            ) : (
+              <Card className="text-center border-2 border-dashed">
+                Loggez-vous à votre compte Microsoft pour afficher vos
+                événements de calendrier
+              </Card>
             )}
           </div>
         </CardFooter>

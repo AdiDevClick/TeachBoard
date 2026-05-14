@@ -137,7 +137,7 @@ export function getLocalCalendarViewRange(
 
   // Defaults to current day
   let effectiveZdt = zdt.startOfDay();
-  let endZdt = zdt.add({ days: 1 });
+  let endZdt = effectiveZdt.add({ days: 1 });
 
   // Get the day corresponding to the start of the calendar view, depending on the view type (month/week/day)
 
