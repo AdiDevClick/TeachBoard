@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 /**
  * Manage the state and routing of a drawer component.
  *
- * @descrption Use this hook for a navigational drawer. It will handle the opening of the drawer and wait for the close animation to end before navigating back to the previous route.
+ * @description Use this hook for a navigational drawer. It will handle the opening of the drawer and wait for the close animation to end before navigating back to the previous route.
  *
  * @param pageId - The ID for the page/dialog, used for managing the state of the drawer in which the component using this hook is rendered.
  *
