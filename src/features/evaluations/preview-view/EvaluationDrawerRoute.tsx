@@ -1,14 +1,14 @@
 import { LargeButtonList as InteractionButtonList } from "@/components/Buttons/exports/buttons.exports";
-import { withVerticalDrawer } from "@/components/HOCs/withVerticalDrawer";
+import { Spinner } from "@/components/ui/spinner";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import { buttonsData } from "@/features/evaluations/main/configs/evaluation-detail-drawer-buttons.configs";
 import { useEvaluationsViewFetch } from "@/features/evaluations/main/hooks/useEvaluationsViewFetch";
-import { DetailContent } from "@/features/evaluations/preview-view/components/drawer-detail/EvaluationDetailDrawer";
+import { EvaluationDrawer } from "@/features/evaluations/preview-view/exports/drawer.exports";
+import type { EvaluationDrawerRouteProps } from "@/features/evaluations/preview-view/types/evaluation-preview.types";
+import { useDrawer } from "@/hooks/useDrawer";
 import { usePageTitle } from "@/hooks/usePageTitle";
-import props from "@/utils/props";
-import { preventDefaultAndStopPropagation } from "@/utils/utils";
-import { useState, type AnimationEvent, type ComponentProps } from "react";
-import { useNavigate } from "react-router-dom";
+import { AppDrawer } from "@/pages/AllDrawers/AppDrawers";
+import { type ComponentProps } from "react";
 
 /**
  * Manages the state and routing for the EvaluationDetailDrawer
@@ -16,57 +16,69 @@ import { useNavigate } from "react-router-dom";
  * @description It fetches the evaluation data based on the ID in the URL and passes it to the drawer.
  * When the drawer is closed, it navigates back to the previous route.
  */
-export function EvaluationDetailDrawerRoute() {
-  const [open, setOpen] = useState(true);
-  const { evaluationData } = useEvaluationsViewFetch({
-    task: "evaluation-summary",
+export function EvaluationDetailDrawerRoute({
+  pageId = "evaluation-summary",
+  ...props
+}: EvaluationDrawerRouteProps) {
+  const { evaluationData, error } = useEvaluationsViewFetch({
+    task: pageId,
     endpoint: API_ENDPOINTS.GET.EVALUATIONS.endpoints.BY_ID,
     reshapeFn: API_ENDPOINTS.GET.EVALUATIONS.dataReshape,
   });
-  const navigate = useNavigate();
-  const evaluation = open ? (evaluationData ?? null) : null;
+  const { waitAnimationAndNavigate } = useDrawer({ pageId });
+  usePageTitle(evaluationData?.title);
 
-  usePageTitle(evaluation?.title);
+  const drawerContentProps = {
+    className: "justify-center",
+    onAnimationEnd: waitAnimationAndNavigate,
+  } satisfies ComponentProps<typeof AppDrawer>["appDrawerContentProps"];
 
-  /**
-   * Waits for the drawer close animation to end before navigating back to the previous route.
-   *
-   * @param e - The animation event triggered when the drawer's close animation ends.
-   */
-  const waitAnimationEnd = (e: AnimationEvent<HTMLDivElement>) => {
-    preventDefaultAndStopPropagation(e);
-    if (!open) navigate("..");
-  };
+  const message = error
+    ? "Une erreur s'est produite lors du chargement des données. —"
+    : "En cours de récupération...";
 
-  const drawerProps = {
-    drawerContentProps: { onAnimationEnd: waitAnimationEnd },
+  const contentProps = {
     drawerHeader: {
-      drawerTitle: { label: evaluation?.title ?? "Détail de l'évaluation" },
-      drawerDescription: { label: `— ${evaluation?.className}` },
+      drawerTitle: { label: evaluationData?.title ?? "Détail de l'évaluation" },
+      drawerDescription: {
+        label: `— ${evaluationData?.className ?? message}`,
+      },
     },
     drawerFooter: { drawerClose: { label: "Fermer" } },
     drawerContent: {
-      evaluation: evaluation ?? undefined,
       ...props,
+      evaluation: evaluationData,
     },
-    open: evaluation !== null,
-    onClose: () => setOpen(false),
   } satisfies ComponentProps<typeof EvaluationDrawer>;
 
   return (
-    <EvaluationDrawer {...drawerProps}>
-      <EvaluationDrawer.Header />
-      {evaluation && <EvaluationDrawer.Content />}
-      <EvaluationDrawer.Footer>
-        <InteractionButtonList
-          items={buttonsData}
-          optional={(button) => ({
-            url: button.getLink(evaluation?.id ?? ""),
-          })}
-        />
-      </EvaluationDrawer.Footer>
-    </EvaluationDrawer>
+    <AppDrawer
+      appDrawerName={pageId}
+      appDrawerContentProps={drawerContentProps}
+    >
+      <EvaluationDrawer {...contentProps}>
+        <EvaluationDrawer.Header />
+        {!evaluationData && !error && (
+          <Spinner
+            role="status"
+            aria-label="Loading"
+            className="self-center size-6 animate-spin"
+          />
+        )}
+        {evaluationData && (
+          <>
+            <EvaluationDrawer.Content />
+            <EvaluationDrawer.Footer>
+              <InteractionButtonList
+                items={buttonsData}
+                optional={(button) => ({
+                  url: button.getLink(evaluationData?.id ?? ""),
+                })}
+              />
+            </EvaluationDrawer.Footer>
+          </>
+        )}
+      </EvaluationDrawer>
+    </AppDrawer>
   );
 }
-
-const EvaluationDrawer = withVerticalDrawer(DetailContent);

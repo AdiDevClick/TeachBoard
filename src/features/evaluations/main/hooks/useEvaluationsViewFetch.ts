@@ -35,6 +35,7 @@ export function useEvaluationsViewFetch({
   const {
     resultsCallback: evaluationCacheCallback,
     openingCallback: fetchEvaluationCallback,
+    error,
   } = useCommandHandler({
     pageId: task,
     form: null!,
@@ -100,5 +101,6 @@ export function useEvaluationsViewFetch({
 
   return {
     evaluationData: resolvedEvaluationData,
+    error,
   };
 }
