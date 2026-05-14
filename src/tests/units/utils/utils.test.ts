@@ -1,5 +1,12 @@
-import { getLocalCalendarViewRange } from "@/utils/utils";
+import { formatRangeCompat, getLocalCalendarViewRange } from "@/utils/utils";
 import { describe, expect, it } from "vitest";
+
+describe("formatRangeCompat", () => {
+  it("returns undefined when the range is incomplete", () => {
+    expect(formatRangeCompat()).toBe("");
+    expect(formatRangeCompat("", "", false)).toBe("");
+  });
+});
 
 describe("getLocalCalendarViewRange", () => {
   it("returns UTC instants for the selected local day boundaries", () => {
