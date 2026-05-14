@@ -8,6 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { SidebarGroup } from "@/components/ui/sidebar.tsx";
 import { debugLogs } from "@/configs/app-components.config";
+import { useDialog } from "@/hooks/contexts/useDialog";
 import { formatDate, preventDefaultAndStopPropagation } from "@/utils/utils";
 import "@css/Calendar.scss";
 import { fr } from "date-fns/locale";
@@ -28,6 +29,7 @@ export default function SidebarCalendar({
     (state) => state.socialsLoggedIn.microsoft,
   );
 
+  const { openDialog } = useDialog();
   const { events, date, setDate } = useCalendar({
     initialDate: today,
     fetchRange: {
@@ -49,6 +51,7 @@ export default function SidebarCalendar({
     });
 
     // open the event details
+    openDialog(null, "event-view", { event });
   };
 
   return (
