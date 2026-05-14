@@ -11,9 +11,11 @@ import { useMemo } from "react";
  * @param selectedValue - Currently selected value
  * @param children - Child components that will have access to the context
  */
-export function PopoverFieldProvider(props: PopoverFieldContextType) {
-  const { onSelect, selectedValue } = props;
-
+export function PopoverFieldProvider({
+  onSelect,
+  selectedValue,
+  children,
+}: PopoverFieldContextType) {
   const value = useMemo(
     () => ({ onSelect, selectedValue }),
     [onSelect, selectedValue],
@@ -21,7 +23,7 @@ export function PopoverFieldProvider(props: PopoverFieldContextType) {
 
   return (
     <PopoverFieldContext.Provider value={value}>
-      {props.children}
+      {children}
     </PopoverFieldContext.Provider>
   );
 }
