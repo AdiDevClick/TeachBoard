@@ -37,6 +37,7 @@ export function LargeButtonWithIconAndLink(
     "getLink",
     "pageId",
     "routerPath",
+    "action",
   ]);
 
   const checkedURL = !auth ? url : buildAuthURL(url);
