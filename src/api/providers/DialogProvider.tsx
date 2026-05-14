@@ -1,5 +1,5 @@
 import { DialogContext } from "@/api/contexts/Dialog.context";
-import type { AppModalNames } from "@/configs/app.config.ts";
+import type { AppDialogNames } from "@/configs/app.config.ts";
 import { useMutationObserver } from "@/hooks/useMutationObserver.ts";
 import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
 import { UniqueSet } from "@/utils/UniqueSet.ts";
@@ -10,7 +10,7 @@ export type AppDialogOptions = {
   onClose?: () => void;
   [key: string]: unknown;
 };
-export type DialogState = UniqueSet<AppModalNames, AppDialogOptions>;
+export type DialogState = UniqueSet<AppDialogNames, AppDialogOptions>;
 
 /**
  * Provider for Dialog component.
@@ -27,7 +27,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
   const { setRef, observedRefs, deleteRef } = useMutationObserver({});
 
   const closeDialog = useCallback(
-    (e: PreventDefaultAndStopPropagation, id?: AppModalNames) => {
+    (e: PreventDefaultAndStopPropagation, id?: AppDialogNames) => {
       preventDefaultAndStopPropagation(e);
       setOpenDialogs((prev) => {
         const next = prev.clone();
@@ -55,7 +55,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
   }, [openDialogs]);
 
   const isDialogOpen = useCallback(
-    (id: AppModalNames) => {
+    (id: AppDialogNames) => {
       return openDialogs.has(id);
     },
     [openDialogs],
@@ -64,7 +64,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
   const openDialog = useCallback(
     (
       e: PreventDefaultAndStopPropagation,
-      id: AppModalNames,
+      id: AppDialogNames,
       options?: AppDialogOptions,
     ) => {
       preventDefaultAndStopPropagation(e);
@@ -81,7 +81,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
   );
 
   const onOpenChange = useCallback(
-    (id: AppModalNames) => {
+    (id: AppDialogNames) => {
       openDialogs.get(id)?.onClose?.();
 
       setOpenDialogs((prev) => {
@@ -94,7 +94,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
   );
 
   const setDialogOptions = useCallback(
-    (id: AppModalNames, options: AppDialogOptions) => {
+    (id: AppDialogNames, options: AppDialogOptions) => {
       setOpenDialogs((prev) => {
         const next = prev.clone();
         if (next.has(id)) {
@@ -114,7 +114,7 @@ export function DialogProvider({ children }: Readonly<PropsWithChildren>) {
   }, [openDialogs]);
 
   const dialogOptions = useCallback(
-    (dialog: AppModalNames) => {
+    (dialog: AppDialogNames) => {
       return openDialogs.get(dialog);
     },
     [openDialogs],
