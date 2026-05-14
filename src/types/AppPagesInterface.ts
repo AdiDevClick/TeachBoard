@@ -1,4 +1,4 @@
-import type { AppModalNames } from "@/configs/app.config.ts";
+import type { AppDialogNames } from "@/configs/app.config.ts";
 import type { ComponentProps } from "react";
 
 /**
@@ -9,7 +9,7 @@ import type { ComponentProps } from "react";
 export interface PageWithControllers<
   T = unknown,
 > extends ComponentProps<"div"> {
-  pageId?: AppModalNames;
+  pageId?: AppDialogNames;
   inputControllers?: readonly T[];
   className?: string;
   modalMode?: boolean;

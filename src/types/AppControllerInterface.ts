@@ -1,4 +1,4 @@
-import type { AppModalNames } from "@/configs/app.config.ts";
+import type { AppDialogNames } from "@/configs/app.config.ts";
 import type { UseCommandHandlerParams } from "@/hooks/database/types/use-command-handler.types.ts";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
 
@@ -19,7 +19,7 @@ export interface AppControllerInterface<
   className: string;
   formId: string;
   form: UseFormReturn<TForm>;
-  pageId: AppModalNames;
+  pageId: AppDialogNames;
   submitRoute?: TSubmitRoute;
   submitDataReshapeFn?: TSubmitReshapeFn;
 }
