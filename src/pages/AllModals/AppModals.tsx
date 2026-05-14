@@ -60,18 +60,6 @@ const modals = defineStrictModalsList([
     },
   },
   {
-    modalName: "apple-login",
-    type: Modal,
-    modalContent: LoginView,
-    modalProps: {
-      isNavigationModal: false,
-    },
-    contentProps: {
-      inputControllers: inputLoginControllers,
-      modalMode: true,
-    },
-  },
-  {
     modalName: "pw-recovery-email-sent",
     type: ModalWithSimpleAlert,
     modalProps: {
