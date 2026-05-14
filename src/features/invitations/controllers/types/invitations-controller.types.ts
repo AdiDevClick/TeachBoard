@@ -14,5 +14,5 @@ export type InvitationsControllerProps = Readonly<
     value?: string;
     /** The text to display in the tooltip when the user hovers over the QR code. */
     tooltip?: string;
-  } & ComponentProps<typeof QRCodeCanvas>
+  } & Omit<ComponentProps<typeof QRCodeCanvas>, "value">
 >;

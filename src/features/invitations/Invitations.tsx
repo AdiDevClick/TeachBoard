@@ -1,15 +1,15 @@
 import { LargeButtonList } from "@/components/Buttons/exports/buttons.exports";
-import { withVerticalDrawer } from "@/components/HOCs/withVerticalDrawer";
 import { qrCodeInvitationsButtonsConfig } from "@/features/invitations/configs/invitations.configs";
 import type { QRCodeInvitationButtonAction } from "@/features/invitations/configs/types/invitations-configs.types";
 import { switchActionsCases } from "@/features/invitations/controllers/functions/invitations-controller.functions";
-import { InvitationsController } from "@/features/invitations/controllers/InvitationsController";
+import { InvitationsPage } from "@/features/invitations/exports/invitations.exports";
 import type { InvitationsProps } from "@/features/invitations/types/invitations.types";
+import { useDrawer } from "@/hooks/useDrawer";
 import { useFileDownloader } from "@/hooks/useFileDownloader";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import { AppDrawer } from "@/pages/AllDrawers/AppDrawer";
 import { preventDefaultAndStopPropagation } from "@/utils/utils";
-import { useRef, useState, type ComponentProps, type MouseEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRef, type ComponentProps, type MouseEvent } from "react";
 
 /**
  * Component for managing invitations via QR code.
@@ -19,25 +19,18 @@ import { useNavigate } from "react-router-dom";
  * @param fileName - Optional name for the exported QR code image, `@default="TeachBoard_QR_Code_Invitation"`.
  */
 export function Invitations({
+  pageId = "invitations",
   fileName = "TeachBoard_QR_Code_Invitation",
 }: InvitationsProps) {
-  const [open, setOpen] = useState(true);
-  const navigate = useNavigate();
   const { setFileState } = useFileDownloader();
   const canvasRef = useRef<HTMLCanvasElement>(null!);
   usePageTitle("Invitations");
+  const { waitAnimationAndNavigate } = useDrawer({ pageId });
 
-  /**
-   * Navigate back to the previous page or to the home page after closing the drawer
-   */
-  function handleDrawerClose() {
-    setOpen(false);
-    if (history.state.idx > 0) {
-      navigate(-1);
-    } else {
-      navigate("/");
-    }
-  }
+  const drawerContentProps = {
+    className: "justify-center",
+    onAnimationEnd: waitAnimationAndNavigate,
+  } satisfies ComponentProps<typeof AppDrawer>["appDrawerContentProps"];
 
   const drawerProps = {
     drawerHeader: {
@@ -54,8 +47,6 @@ export function Invitations({
     drawerContent: {
       ref: canvasRef,
     },
-    open,
-    onClose: handleDrawerClose,
   } satisfies ComponentProps<typeof InvitationsPage>;
 
   /**
@@ -75,19 +66,22 @@ export function Invitations({
   };
 
   return (
-    <InvitationsPage {...drawerProps}>
-      <InvitationsPage.Header />
-      <InvitationsPage.Content />
-      <InvitationsPage.Footer>
-        <LargeButtonList
-          items={qrCodeInvitationsButtonsConfig}
-          optional={(button) => ({
-            onClick: (e) => handleUserActions(e, button.action),
-          })}
-        />
-      </InvitationsPage.Footer>
-    </InvitationsPage>
+    <AppDrawer
+      appDrawerName={pageId}
+      appDrawerContentProps={drawerContentProps}
+    >
+      <InvitationsPage {...drawerProps}>
+        <InvitationsPage.Header />
+        <InvitationsPage.Content />
+        <InvitationsPage.Footer>
+          <LargeButtonList
+            items={qrCodeInvitationsButtonsConfig}
+            optional={(button) => ({
+              onClick: (e) => handleUserActions(e, button.action),
+            })}
+          />
+        </InvitationsPage.Footer>
+      </InvitationsPage>
+    </AppDrawer>
   );
 }
-
-const InvitationsPage = withVerticalDrawer(InvitationsController);
