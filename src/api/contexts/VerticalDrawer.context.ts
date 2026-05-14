@@ -4,4 +4,6 @@ import { createContext } from "react";
 /**
  * Context for managing the state of the VerticalDrawer component.
  */
-export const VerticalDrawer = createContext<VerticalDrawerContext>(null!);
+export const VerticalDrawer = createContext<VerticalDrawerContext<object>>(
+  null!,
+);
