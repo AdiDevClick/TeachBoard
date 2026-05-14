@@ -115,6 +115,10 @@ export type AppModalNames =
   | "evaluation-overview"
   | "availability";
 
+export type AppDrawerNames = "invitations" | "event-view";
+
+export type AppDialogNames = AppModalNames | AppDrawerNames;
+
 /**
  * Session check modes for page categories.
  */
