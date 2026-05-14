@@ -192,6 +192,9 @@ export const useAppStore = create(
                   url: "/logout",
                   previousUrl: lastActivity,
                 });
+
+                state.socialsLoggedIn.microsoft = false;
+                state.socialsLoggedIn.google = false;
               });
             },
             clearUserStateOnError() {
