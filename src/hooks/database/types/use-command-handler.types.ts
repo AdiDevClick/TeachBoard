@@ -1,6 +1,6 @@
 import type { UUID } from "@/api/types/openapi/common.types";
 import type { CommandSelectionItemProps } from "@/components/Command/types/command.types.ts";
-import type { AppModalNames } from "@/configs/app.config.ts";
+import type { AppDialogNames } from "@/configs/app.config.ts";
 import type { FetchParams } from "@/hooks/database/fetches/types/useFetch.types.ts";
 import type { MutationVariables } from "@/hooks/database/types/QueriesTypes.ts";
 import type { AppInputControllerMeta } from "@/types/AppInputControllerInterface";
@@ -65,7 +65,7 @@ export interface UseCommandHandlerParams<
   TFieldValues extends FieldValues = FieldValues,
   TRoute = unknown,
   TSubmitReshapeFn = never,
-  TPageId extends AppModalNames = AppModalNames,
+  TPageId extends AppDialogNames = AppDialogNames,
 > {
   /** Zod validated form instance */
   form: UseFormReturn<TFieldValues>;
