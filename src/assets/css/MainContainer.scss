@@ -13,7 +13,11 @@
 }
 
 html {
-  // scrollbar-gutter: stable;
+
+  // Make sure the scrollbar keep its space when it appears, to prevent layout shifts - Only on non-collapsed sidebar
+  :is([data-slot="sidebar"]):not([data-state="collapsed"]) [data-slot="sidebar-content"] {
+    scrollbar-gutter: stable;
+  }
 }
 
 body {
