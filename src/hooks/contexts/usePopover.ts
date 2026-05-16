@@ -8,7 +8,9 @@ import { useContext } from "react";
 export function usePopoverFieldContext() {
   const context = useContext(PopoverFieldContext);
   if (!context) {
-    throw new Error("usePopoverFieldContext must be used within a PopoverField");
+    throw new Error(
+      "usePopoverFieldContext must be used within a PopoverField",
+    );
   }
   return context;
 }
