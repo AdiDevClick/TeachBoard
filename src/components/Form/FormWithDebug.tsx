@@ -15,20 +15,17 @@ import { useFormState, type FieldValues } from "react-hook-form";
  * @param onValidSubmit - Callback function to handle form submission when the form is valid.
  * @param onInvalidSubmit - Callback function to handle form submission when the form is invalid.
  */
-export function FormWithDebug<T extends FieldValues>(
-  props: FormWithDebugProps<T>,
-) {
-  const {
-    formId,
-    setRef,
-    form,
-    pageId,
-    className,
-    onValidSubmit,
-    onInvalidSubmit,
-    debounceDelay = 200,
-    children,
-  } = props;
+export function FormWithDebug<T extends FieldValues>({
+  formId,
+  setRef,
+  form,
+  pageId,
+  className,
+  onValidSubmit,
+  onInvalidSubmit,
+  debounceDelay = 200,
+  children,
+}: FormWithDebugProps<T>) {
   const { errors } = useFormState(form);
 
   /**
@@ -54,7 +51,7 @@ export function FormWithDebug<T extends FieldValues>(
       id={formId}
       ref={(el) => setRef?.(el, { name: pageId, formId })}
       className={className}
-      onSubmit={form.handleSubmit(debouncedSubmit, onInvalidSubmit)}
+      onSubmit={form?.handleSubmit(debouncedSubmit, onInvalidSubmit)}
     >
       {shouldDisplayDebug && (
         <Item
