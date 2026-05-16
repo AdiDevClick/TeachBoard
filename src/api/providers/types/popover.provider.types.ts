@@ -14,4 +14,11 @@ export type PopoverFieldContextType = {
    * The currently selected value(s). This should be a string for single selection mode, or a Set of strings for multi-selection mode
    */
   selectedValue?: PopoverSelectionValue;
+  /**
+   * Optional function to request the Popover to close.
+   * Use this when the consumer wants to close the Popover without
+   * invoking the selection/update handler (or when it cannot provide
+   * the full selection payload expected by `onSelect`).
+   */
+  close?: () => void;
 } & PropsWithChildren;

@@ -14,11 +14,12 @@ import { useMemo } from "react";
 export function PopoverFieldProvider({
   onSelect,
   selectedValue,
+  close,
   children,
 }: PopoverFieldContextType) {
   const value = useMemo(
-    () => ({ onSelect, selectedValue }),
-    [onSelect, selectedValue],
+    () => ({ onSelect, selectedValue, close }),
+    [onSelect, selectedValue, close],
   );
 
   return (
