@@ -1,10 +1,10 @@
 import { ListMapper } from "@/components/Lists/ListMapper";
 import { SubMenuButton } from "@/components/Sidebar/nav/elements/sub_menu_button/SubMenuButton";
 import { calendarEvents } from "@/data/CalendarData";
-import { formatRangeCompat } from "@/utils/utils";
+import { formatRangeCompat } from "@/utils/dates/datetime";
+import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render } from "vitest-browser-react";
-import { MemoryRouter } from "react-router-dom";
 
 /**
  * This test suite verifies the TypeScript typings of the `ListMapper`.

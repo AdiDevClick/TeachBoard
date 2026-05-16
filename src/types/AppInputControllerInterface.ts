@@ -1,5 +1,5 @@
 import type { UUID } from "@/api/types/openapi/common.types";
-import type { AppDialogNames, AppModalNames } from "@/configs/app.config.ts";
+import type { AppDialogNames } from "@/configs/app.config";
 import type { HTMLInputTypeAttribute } from "react";
 import type { FieldValues, Path } from "react-hook-form";
 
@@ -83,7 +83,7 @@ export type AppInputControllerWithCommands<
 > = AppInputControllerInterface<TFieldValues> &
   AppInputControllerLabel & {
     useCommands: true;
-    task: AppModalNames;
+    task: AppDialogNames;
   };
 
 export type AppInputControllerWithoutCommands<
@@ -91,7 +91,7 @@ export type AppInputControllerWithoutCommands<
 > = AppInputControllerInterface<TFieldValues> &
   AppInputControllerLabel & {
     useCommands?: false;
-    task?: AppModalNames;
+    task?: AppDialogNames;
   };
 
 export type AppInputControllerItem<

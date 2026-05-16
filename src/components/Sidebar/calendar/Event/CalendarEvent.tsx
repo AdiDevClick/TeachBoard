@@ -1,12 +1,12 @@
 import type { CalendarEventProps } from "@/components/Sidebar/calendar/Event/types/calendar-events.types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import sanitizeDOMProps from "@/utils/props";
 import {
   formatRangeCompat,
   getDurationFromRange,
-  preventDefaultAndStopPropagation,
-} from "@/utils/utils";
+} from "@/utils/dates/datetime";
+import sanitizeDOMProps from "@/utils/props";
+import { preventDefaultAndStopPropagation } from "@/utils/utils";
 import {
   calendarEvents,
   calendarEventsTime,

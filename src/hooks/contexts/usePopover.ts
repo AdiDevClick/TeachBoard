@@ -1,16 +1,14 @@
 import { PopoverFieldContext } from "@/api/contexts/Popover.context.ts";
-import { use } from "react";
+import { useContext } from "react";
 
 /**
  * Popover field context hook
  * @throws Error if used outside of PopoverField context
  */
 export function usePopoverFieldContext() {
-  const context = use(PopoverFieldContext);
+  const context = useContext(PopoverFieldContext);
   if (!context) {
-    throw new Error(
-      "usePopoverFieldContext must be used within a PopoverField"
-    );
+    throw new Error("usePopoverFieldContext must be used within a PopoverField");
   }
   return context;
 }
@@ -20,5 +18,5 @@ export function usePopoverFieldContext() {
  * Use this when CommandItems may be used outside of PopoverField
  */
 export function usePopoverFieldContextSafe() {
-  return use(PopoverFieldContext);
+  return useContext(PopoverFieldContext);
 }

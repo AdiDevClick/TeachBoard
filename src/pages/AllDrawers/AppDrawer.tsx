@@ -7,6 +7,7 @@ import {
   cloneElement,
   createElement,
   isValidElement,
+  type ComponentProps,
   type ComponentType,
 } from "react";
 
@@ -37,7 +38,7 @@ export function AppDrawer<T extends ComponentType>({
   const mergedProps = {
     ...appDrawerProps,
     direction: isMobile ? "bottom" : appDrawerProps?.direction || "right",
-  };
+  } satisfies ComponentProps<typeof Drawer>;
 
   let renderedChildren;
 

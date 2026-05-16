@@ -1,4 +1,7 @@
-import { formatRangeCompat, getLocalCalendarViewRange } from "@/utils/utils";
+import {
+  formatRangeCompat,
+  getLocalCalendarViewRange,
+} from "@/utils/dates/datetime";
 import { describe, expect, it } from "vitest";
 
 describe("formatRangeCompat", () => {

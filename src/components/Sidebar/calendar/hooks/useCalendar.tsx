@@ -3,7 +3,7 @@ import { OFFSET_DATE_TIME_SCHEMA } from "@/api/types/openapi/common.types";
 import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import { USER_ACTIVITIES } from "@/configs/app.config";
 import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
-import { getLocalCalendarViewRange } from "@/utils/utils";
+import { getLocalCalendarViewRange } from "@/utils/dates/datetime";
 import type { Event } from "@microsoft/microsoft-graph-types";
 import { useEffect, useEffectEvent, useMemo, useState } from "react";
 export type CalendarFetchRange = "month" | "week" | "day";

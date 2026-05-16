@@ -1,7 +1,7 @@
 import { LazyEventView } from "@/features/calendar/event-view/exports/event-view.exports";
-import type { AppDrawerProps } from "@/pages/AllDrawers/types/drawers.types";
-import type { AppDrawer } from "@/pages/AllDrawers/AppDrawer";
 import type { useDrawer } from "@/hooks/useDrawer";
+import type { AppDrawer } from "@/pages/AllDrawers/AppDrawer";
+import type { AppDrawerProps } from "@/pages/AllDrawers/types/drawers.types";
 
 /**
  * List of drawer configurations for the application, used to render AppDrawer components with specific content based on the appDrawerName.

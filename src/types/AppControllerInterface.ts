@@ -16,7 +16,7 @@ export interface AppControllerInterface<
   TSubmitRoute = ApiEndpointType,
   TSubmitReshapeFn = DataReshapeFn,
 > {
-  className: string;
+  className?: string;
   formId: string;
   form: UseFormReturn<TForm>;
   pageId: AppDialogNames;

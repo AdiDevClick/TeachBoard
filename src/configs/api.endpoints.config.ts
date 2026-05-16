@@ -246,6 +246,11 @@ export const API_ENDPOINTS = Object.freeze({
   },
   POST: {
     METHOD: "POST",
+    CALENDAR_EVENT: {
+      endpoints: {
+        MAIN: `${CALENDAR}/events`,
+      },
+    },
     CREATE_CLASS: {
       endpoint: `${CLASSES}`,
       dataReshape: (

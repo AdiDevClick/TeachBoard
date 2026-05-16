@@ -1,5 +1,5 @@
 import type { DateTextProps } from "@/features/evaluations/preview-view/components/dates/types/dates.types";
-import { createDrawerDisplayDate } from "@/utils/utils";
+import { createDrawerDisplayDate } from "@/utils/dates/datetime";
 
 /**
  * Component used to display a date with a specific text, typically used in the evaluation detail drawer to show the creation and update dates of an evaluation.

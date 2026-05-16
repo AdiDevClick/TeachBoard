@@ -52,6 +52,7 @@ export function VerticalFieldSelect({
   observedRefs,
   id: containerId,
   triggerProps,
+  triggerContent,
   labelProps,
   ...props
 }: VerticalSelectProps) {
@@ -148,18 +149,15 @@ export function VerticalFieldSelect({
           role={role}
           {...triggerProps}
           className={cn(
-            "max-w-70.5 [&_[data-slot=select-value]]:block [&_[data-slot=select-value]]:truncate",
+            "max-w-70.5 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate",
             fullWidth ? "w-full" : "w-fit",
             triggerProps?.className,
           )}
           size="default"
         >
-          <SelectValue placeholder={placeholder} />
+          <SelectValue placeholder={placeholder}>{triggerContent}</SelectValue>
         </SelectTrigger>
-        <SelectContent
-          side={side}
-          className="w-[var(--radix-select-trigger-width)]"
-        >
+        <SelectContent side={side} className="w-(--radix-select-trigger-width)">
           {children}
         </SelectContent>
       </Select>
