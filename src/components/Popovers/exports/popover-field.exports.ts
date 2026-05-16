@@ -58,3 +58,10 @@ createComponentName(
   "PopoverFieldWithControllerAndCommandsList",
   PopoverFieldWithControllerAndCommandsList,
 );
+
+export const ControlledPopoverField = withController(PopoverField);
+createComponentName(
+  "withController",
+  "ControlledPopoverField",
+  ControlledPopoverField,
+);

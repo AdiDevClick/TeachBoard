@@ -39,7 +39,6 @@ export function PopoverField({
   children,
   role,
   multiSelection,
-  triggerContent,
   ...rest
 }: PopoverFieldProps) {
   const { getValue, resetByKey, updateValue, setValue, resetValues } =
@@ -92,7 +91,6 @@ export function PopoverField({
   const selectValue = multiSelection
     ? placeholder
     : (selectedValue ?? placeholder);
-  const displayValue = triggerContent ?? selectValue;
 
   return (
     <div
@@ -121,7 +119,7 @@ export function PopoverField({
                 : "text-muted-foreground font-normal",
             )}
           >
-            {displayValue}
+            {selectValue}
             <LucideChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>

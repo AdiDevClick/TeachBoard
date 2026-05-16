@@ -1,4 +1,4 @@
-import type { CommandSelectionItemProps } from "@/components/Command/types/command.types";
+import type { CommandItemType } from "@/components/Command/types/command.types";
 import type { PopoverSelectionValue } from "@/components/Popovers/types/popover.types";
 import type { PropsWithChildren } from "react";
 
@@ -9,7 +9,7 @@ export type PopoverFieldContextType = {
   /**
    * This allows consumers to handle the selection event and update their state accordingly.
    */
-  onSelect: CommandSelectionItemProps["onSelect"];
+  onSelect: (value: string, commandItem?: CommandItemType) => void;
   /**
    * The currently selected value(s). This should be a string for single selection mode, or a Set of strings for multi-selection mode
    */
