@@ -20,5 +20,5 @@ export type PopoverFieldContextType = {
    * invoking the selection/update handler (or when it cannot provide
    * the full selection payload expected by `onSelect`).
    */
-  close?: () => void;
+  onClose?: () => void;
 } & PropsWithChildren;
