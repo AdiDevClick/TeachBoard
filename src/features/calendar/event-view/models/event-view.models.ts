@@ -20,71 +20,86 @@ const fieldData = {
     "Le format de l'heure est invalide. Utilisez le format HH:mm (ex: 14:30).",
 };
 
-const dateTimeLocalRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
-
 const schema = (data: typeof fieldData) =>
-  z.object({
-    subject: z
-      .string()
-      .min(1, data.nameRequiredMessage)
-      .max(255, data.maxLengthExceededMessage)
-      .trim()
-      .regex(formsRegex.serverName, data.nameRegexMessage)
-      .meta({ description: "Event Subject" }),
-    isAllDay: z
-      .boolean()
-      .optional()
-      .meta({ description: "Indicates if the event is an all-day event" }),
-    date: z
-      .object({
-        single: z
-          .string()
-          .regex(dateTimeLocalRegex, data.dateTimeInvalidMessage)
-          .nonempty()
-          .meta({ description: "Optional, the date of the event" }),
-        range: z
-          .object({
-            from: z
-              .string()
-              .regex(dateTimeLocalRegex, data.dateInvalidMessage)
-              .nonempty()
-              .meta({ description: "Optional, the start date of the event" }),
-            to: z
-              .string()
-              .regex(dateTimeLocalRegex, data.dateInvalidMessage)
-              .nonempty()
-              .meta({ description: "Optional, the end date of the event" }),
-          })
-          .optional()
-          .meta({ description: "Optional, the date range of the event" }),
-      })
-      .nonoptional()
-      .meta({
-        description: "Either a single date or a date range for the event",
-      }),
-    start: z.iso
-      .time(data.dateTimeInvalidMessage)
-      .optional()
-      .meta({ description: "Optional, the start time of the event" }),
-    end: z.iso
-      .time(data.dateTimeInvalidMessage)
-      .optional()
-      .meta({ description: "Optional, the end time of the event" }),
-    body: z
-      .object({
-        content: z
-          .string()
-          .trim()
-          .max(500, data.descriptionMaxLengthMessage)
-          .regex(formsRegex.serverDescription, data.descriptionRegexMessage)
-          .optional()
-          .meta({ description: "Optional event body" }),
-      })
-      .optional()
-      .meta({
-        description: "For Microsoft, content is wrapped inside the body object",
-      }),
-  });
+  z
+    .object({
+      subject: z
+        .string()
+        .min(1, data.nameRequiredMessage)
+        .max(255, data.maxLengthExceededMessage)
+        .trim()
+        .regex(formsRegex.serverName, data.nameRegexMessage)
+        .meta({ description: "Event Subject" }),
+      isAllDay: z
+        .boolean()
+        .optional()
+        .meta({ description: "Indicates if the event is an all-day event" }),
+      date: z
+        .object({
+          single: z.iso
+            .date(data.dateInvalidMessage)
+            .nonempty()
+            .meta({ description: "Optional, the date of the event" }),
+          range: z
+            .object({
+              from: z.iso
+                .date(data.dateInvalidMessage)
+                .nonempty()
+                .meta({ description: "Optional, the start date of the event" }),
+              to: z.iso
+                .date(data.dateInvalidMessage)
+                .nonempty()
+                .meta({ description: "Optional, the end date of the event" }),
+            })
+            .optional()
+            .meta({ description: "Optional, the date range of the event" }),
+        })
+        .nonoptional()
+        .meta({
+          description: "Either a single date or a date range for the event",
+        }),
+      start: z.iso
+        .time(data.dateTimeInvalidMessage)
+        .optional()
+        .meta({ description: "Optional, the start time of the event" }),
+      end: z.iso
+        .time(data.dateTimeInvalidMessage)
+        .optional()
+        .meta({ description: "Optional, the end time of the event" }),
+
+      body: z
+        .object({
+          content: z
+            .string()
+            .trim()
+            .max(500, data.descriptionMaxLengthMessage)
+            .regex(formsRegex.serverDescription, data.descriptionRegexMessage)
+            .optional()
+            .meta({ description: "Optional event body" }),
+        })
+        .optional()
+        .meta({
+          description:
+            "For Microsoft, content is wrapped inside the body object",
+        }),
+    })
+    .superRefine((obj, ctx) => {
+      const { start, end } = obj;
+      if (!start || !end) return;
+
+      if (end <= start) {
+        ctx.addIssue({
+          code: "custom",
+          message: "L'heure de fin doit être supérieure à l'heure de début.",
+          path: ["end"],
+        });
+        ctx.addIssue({
+          code: "custom",
+          message: "L'heure de début doit être inférieure à l'heure de fin.",
+          path: ["start"],
+        });
+      }
+    });
 
 export const eventViewSchema = schema(fieldData);
 export type EventViewFormSchema = z.infer<typeof eventViewSchema>;

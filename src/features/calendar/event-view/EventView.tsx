@@ -12,6 +12,7 @@ import type { ComponentProps } from "react";
 import { useForm } from "react-hook-form";
 
 const now = Temporal.Now.plainDateTimeISO();
+const today = Temporal.Now.plainDateISO();
 const defaultStart = now.toString({ smallestUnit: "minute" });
 const defaultEnd = now
   .add({ minutes: 30 })
@@ -29,11 +30,13 @@ export function EventView({
   inputControllers = eventInputs,
 }: EventViewProps) {
   const form = useForm<EventViewFormSchema>({
+    reValidateMode: "onChange",
     resolver: zodResolver(eventViewSchema),
     mode: "all",
     defaultValues: {
       subject: "",
       isAllDay: false,
+      date: { single: today.toString() },
       start: defaultStart,
       end: defaultEnd,
       body: {

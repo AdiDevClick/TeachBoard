@@ -1,38 +1,33 @@
 import { FormWithDebug } from "@/components/Form/FormWithDebug";
+import { withInlineItemAndSwitchSelection } from "@/components/HOCs/withInlineItemAndSwitchSelection";
 import { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input.exports";
 import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/labelled-textarea";
 import { EventScheduleFields } from "@/features/calendar/event-view/components/EventScheduleFields";
-import type { EventViewFormSchema } from "@/features/calendar/event-view/models/event-view.models";
-import type { EventViewProps } from "@/features/calendar/event-view/types/event-view.types";
+import type { EventViewControllerProps } from "@/features/calendar/event-view/controllers/types/event-view.controller.types";
 import { useDialog } from "@/hooks/contexts/useDialog";
-import type { AppControllerInterface } from "@/types/AppControllerInterface";
 import { formatRangeCompat } from "@/utils/dates/datetime";
 import type { Event } from "@microsoft/microsoft-graph-types";
+import { useState } from "react";
 
-export type EventViewControllerProps = Readonly<
-  AppControllerInterface<EventViewFormSchema> & {
-    inputControllers: Exclude<EventViewProps["inputControllers"], undefined>;
-  }
->;
-
-function omitTask<T extends { task?: unknown }>(value: T): Omit<T, "task"> {
-  const rest = { ...value };
-
-  delete rest.task;
-
-  return rest;
-}
-
+/**
+ * Controller for the EventView component, which displays the details of a calendar event in a vertical drawer.
+ *
+ * @description Manages the state and logic for the EventView component, including form handling and event data retrieval.
+ *
+ * @param form - The react-hook-form instance for managing the event form state and validation.
+ * @param inputControllers - The configuration for the form inputs, including their names and labels.
+ * @param pageId - The ID of the page, used to retrieve the event data from the dialog options.
+ * @param formId - The ID of the form, used for debugging purposes in the FormWithDebug component.
+ */
 export function EventViewController({
   form,
   inputControllers,
   pageId,
   formId,
 }: EventViewControllerProps) {
+  const [isRanged, setIsRanged] = useState(false);
   const event = useDialog().dialogOptions(pageId)?.event as Event;
   const { start, end, isAllDay } = event ?? {};
-  const subject = omitTask(inputControllers.subject);
-  const bodyContent = omitTask(inputControllers.bodyContent);
 
   let range = "No date information available";
 
@@ -48,24 +43,20 @@ export function EventViewController({
     control: form.control,
   };
 
+  /**
+   * Handles the submission of the event form.
+   * @TODO
+   */
   function handleValidSubmit() {
     const values = form.getValues();
 
-    const payload: Record<string, unknown> = {
+    return {
       subject: values.subject,
       body: values.body ? { content: values.body.content } : undefined,
       start: values.start ? { dateTime: values.start } : undefined,
       end: values.end ? { dateTime: values.end } : undefined,
       isAllDay: values.isAllDay ?? false,
     };
-
-    // Exemple : prêt à être envoyé au serveur. Adapter selon l'API.
-    // Remarque : `values.start` et `values.end` sont des ISO strings (yyyy-MM-ddTHH:mm)
-    // si les champs de date/heure ont été composés par `EventScheduleFields`.
-    // Ici on les logue pour vérification avant envoi réel.
-    // Exemple: appeler la fonction API d'envoi ici (ex. api.createEvent(payload)).
-    console.log("Prepared event payload:", payload);
-    return payload;
   }
 
   return (
@@ -76,15 +67,28 @@ export function EventViewController({
       onValidSubmit={handleValidSubmit}
       onInvalidSubmit={() => undefined}
     >
-      <ControlledLabelledInput {...subject} {...sharedProps} />
+      <ControlledLabelledInput {...inputControllers.subject} {...sharedProps} />
+      <InlineSwitch
+        title="Range"
+        isSelected={isRanged}
+        onSwitchClick={() => setIsRanged(!isRanged)}
+      />
       <EventScheduleFields
         {...sharedProps}
         form={form}
         timeRange={inputControllers.timeRange}
-        dateInput={inputControllers.date}
+        dateInput={{
+          ...inputControllers.date,
+          mode: isRanged ? "range" : "single",
+        }}
       />
-      <ControlledLabelledTextArea {...bodyContent} {...sharedProps} />
+      <ControlledLabelledTextArea
+        {...inputControllers.bodyContent}
+        {...sharedProps}
+      />
       <p>{range}</p>
     </FormWithDebug>
   );
 }
+
+const InlineSwitch = withInlineItemAndSwitchSelection(() => null);
