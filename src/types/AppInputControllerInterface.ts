@@ -1,6 +1,6 @@
-import type { UUID } from "@/api/types/openapi/common.types";
+import type { Input } from "@/components/ui/input";
 import type { AppDialogNames } from "@/configs/app.config";
-import type { HTMLInputTypeAttribute } from "react";
+import type { ComponentProps } from "react";
 import type { FieldValues, Path } from "react-hook-form";
 
 export type ApiEndpointType =
@@ -34,14 +34,14 @@ export type AppInputControllerMeta = Readonly<{
 
 type AppInputControllerIdentity<TFieldValues extends FieldValues> = {
   name: Path<TFieldValues>;
-  type?: HTMLInputTypeAttribute;
-  placeholder?: string;
-  autoComplete?: string;
-  required?: boolean;
-  className?: string;
-  defaultValue?: string;
-  id?: UUID | string;
-};
+  // type?: HTMLInputTypeAttribute;
+  // placeholder?: string;
+  // autoComplete?: string;
+  // required?: boolean;
+  // className?: string;
+  // defaultValue?: string;
+  // id?: UUID | string;
+} & ComponentProps<typeof Input>;
 
 type AppInputControllerLabel =
   | {
