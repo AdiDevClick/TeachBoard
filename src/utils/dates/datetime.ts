@@ -183,11 +183,15 @@ export function getDurationFromRange(
   to: string = "",
   isAllDay = false,
 ) {
-  const fromDate = Temporal.PlainDateTime.from(from);
-  const toDate = Temporal.PlainDateTime.from(to);
+  const fromDate = parsePlainDateTime(from);
+  const toDate = parsePlainDateTime(to);
 
   if (isAllDay) {
     return "Toute la journée";
+  }
+
+  if (!fromDate || !toDate) {
+    return "";
   }
 
   const range = fromDate.until(toDate, { largestUnit: "day" });
