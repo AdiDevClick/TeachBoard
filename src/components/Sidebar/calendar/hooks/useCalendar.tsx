@@ -61,6 +61,7 @@ export function useCalendar(options: UseCalendarOptions = {}) {
 
     setFetchParams((prev) => ({
       ...prev,
+      enabled: isLoggedToMicrosoft,
       contentId: USER_ACTIVITIES.calendar,
       method: API_ENDPOINTS.GET.METHOD,
       url: API_ENDPOINTS.GET.CALENDAR_EVENTS.endPoints.PROXY_ENDPOINT,
