@@ -1,6 +1,7 @@
 import { useAppStore } from "@/api/store/AppStore";
 import { CalendarEventsList } from "@/components/Sidebar/calendar/Event/exports/calendar-event.exports";
 import type { CalendarEventProps } from "@/components/Sidebar/calendar/Event/types/calendar-events.types";
+import { resolvedCalendarEvent } from "@/components/Sidebar/calendar/functions/sidebar-calendar.functions";
 import { useCalendar } from "@/components/Sidebar/calendar/hooks/useCalendar";
 import type { SidebarCalendarProps } from "@/components/Sidebar/calendar/types/sidebar-calendar.types";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,14 @@ export default function SidebarCalendar({
     },
   });
 
+  /**
+   * Handles the click event on a calendar event
+   *
+   * @remark This will open the event details drawer when a calendar event is clicked and pass the event data to the dialog context.
+   *
+   * @param e - The mouse event triggered by the click on the calendar event.
+   * @param event - The calendar event data associated with the clicked event.
+   */
   const onEventClickHandler = (
     ...args: Parameters<NonNullable<CalendarEventProps["onClick"]>>
   ) => {
@@ -47,13 +56,15 @@ export default function SidebarCalendar({
     preventDefaultAndStopPropagation(e);
     debugLogs("SidebarCalendar:onEventClickHandler", {
       type: "componentHandler",
-      message: `Clicked on event: ${event.subject}`,
+      message: `Clicked on event: ${event?.subject}`,
       event,
     });
 
     // open the event details
     openDialog(null, "event-view", { event });
   };
+
+  const resolvedEvents = resolvedCalendarEvent(isLoggedToMicrosoft, events);
 
   return (
     <SidebarGroup className={"sidebar-calendar-container"}>
@@ -78,17 +89,10 @@ export default function SidebarCalendar({
             </Button>
           </div>
           <div className="flex w-full flex-col gap-2">
-            {isLoggedToMicrosoft ? (
-              <CalendarEventsList
-                items={events}
-                onClick={onEventClickHandler}
-              />
-            ) : (
-              <Card className="text-center border-2 border-dashed">
-                Loggez-vous à votre compte Microsoft pour afficher vos
-                événements de calendrier
-              </Card>
-            )}
+            <CalendarEventsList
+              items={resolvedEvents}
+              onClick={onEventClickHandler}
+            />
           </div>
         </CardFooter>
       </Card>
