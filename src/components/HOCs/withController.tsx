@@ -72,6 +72,7 @@ function withController<P extends object>(Wrapped: ComponentType<P>) {
             onChange: makeHandleChange(field),
             onValueChange: makeHandleChange(field),
             "aria-invalid": invalid,
+            control,
           };
 
           return (
