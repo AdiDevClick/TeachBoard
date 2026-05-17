@@ -11,13 +11,14 @@ import { Temporal } from "@js-temporal/polyfill";
 import type { ComponentProps } from "react";
 import { useForm } from "react-hook-form";
 
-const now = Temporal.Now.plainDateTimeISO();
+const now = Temporal.Now.plainTimeISO();
 const today = Temporal.Now.plainDateISO();
+
+// Build HH:mm string for default time values
 const defaultStart = now.toString({ smallestUnit: "minute" });
 const defaultEnd = now
   .add({ minutes: 30 })
   .toString({ smallestUnit: "minute" });
-
 /**
  * Event View for detailed view of calendar events
  *
@@ -30,7 +31,6 @@ export function EventView({
   inputControllers = eventInputs,
 }: EventViewProps) {
   const form = useForm<EventViewFormSchema>({
-    reValidateMode: "onChange",
     resolver: zodResolver(eventViewSchema),
     mode: "all",
     defaultValues: {
