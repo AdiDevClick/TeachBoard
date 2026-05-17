@@ -127,7 +127,7 @@ export function PopoverField({
           <PopoverFieldProvider
             onSelect={setSelectedValueCallback}
             selectedValue={selectedValue}
-            close={() => setState(false)}
+            onClose={() => setState(false)}
           >
             {children}
           </PopoverFieldProvider>
