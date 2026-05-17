@@ -19,13 +19,23 @@ import type { MouseEvent } from "react";
  *
  * @description Includes a title, a time range, and a duration badge.
  *
- * @remark The time range is formatted based on whether the event is all-day or not.
+ * @remark If you pass a children prop, it will be rendered instead of the default event content.
+ * Use this to customize the event display (e.g., for loading states or error messages). In this case, the `event` prop will be ignored.
+ *
+ * @remark2 The time range is formatted based on whether the event is all-day or not.
  *
  * @param event - All properties for the calendar event
  * @param ...props - All the button properties
  */
-export function CalendarEvent(props: CalendarEventProps) {
-  const { event, ...buttonRest } = props;
+export function CalendarEvent({
+  children,
+  event = {},
+  ...buttonRest
+}: CalendarEventProps) {
+  if (children) {
+    return children;
+  }
+
   const { subject, start, end, isAllDay = false } = event;
 
   const safeButtonProps = sanitizeDOMProps(buttonRest, ["index"]);
