@@ -72,6 +72,8 @@ export type VerticalSelectProps = Omit<SelectRootProps, "onValueChange"> & {
   role?: string;
   /** Extra props forwarded to the SelectTrigger element */
   triggerProps?: ComponentProps<"button">;
+  /** Content to display inside the SelectTrigger element - Useful to bypass default value */
+  triggerContent?: ReactNode;
   labelProps?: ComponentProps<typeof Label>;
   fullWidth?: boolean;
   className?: string;
