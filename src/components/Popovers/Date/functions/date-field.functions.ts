@@ -20,12 +20,14 @@ import { fromLocalDate, toLocalDateFromValue } from "@/utils/dates/datetime";
 export function deserializeFormValueToDateState(
   value?: DateFieldProps["value"],
 ): DateFieldState {
-  const from = toLocalDateFromValue(value?.range?.from);
-  const to = toLocalDateFromValue(value?.range?.to);
+  const { from: fromValue, to: toValue } = value?.range ?? {};
+
+  const from = toLocalDateFromValue(String(fromValue));
+  const to = toLocalDateFromValue(String(toValue));
   const range = from || to ? { from, to } : undefined;
 
   return {
-    single: toLocalDateFromValue(value?.single),
+    single: toLocalDateFromValue(String(value?.single)),
     range,
   };
 }
