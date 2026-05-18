@@ -1,5 +1,6 @@
 import type { VerticalSelectProps } from "@/components/Selects/types/select.types.ts";
 import type { CommandHandlerFieldMeta } from "@/hooks/database/types/use-command-handler.types.ts";
+import type { ElementType } from "react";
 import type { ButtonProps } from "react-day-picker";
 
 export type PopoverBaseProps = Omit<
@@ -10,6 +11,7 @@ export type PopoverBaseProps = Omit<
   role?: ButtonProps["role"];
   /** When this key changes, the selectedValue state will be reset */
   resetKey?: string | number;
+  icon?: ElementType;
 };
 
 export type PopoverSingleValue = string | undefined;

@@ -39,10 +39,12 @@ export function PopoverField({
   children,
   role,
   multiSelection,
+  icon: Icon = LucideChevronDown,
   ...rest
 }: PopoverFieldProps) {
+  const storeName = `${rest.name ?? "default"}:${multiSelection ? "multi" : "single"}`;
   const { getValue, resetByKey, updateValue, setValue, resetValues } =
-    useFieldStore(multiSelection, resetKey, rest.name);
+    useFieldStore(multiSelection, resetKey, storeName);
   const [state, setState] = useState(false);
 
   const selectedValue = getValue(rest.defaultValue);
@@ -120,7 +122,7 @@ export function PopoverField({
             )}
           >
             {selectValue}
-            <LucideChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <Icon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent side={side} className="p-0">
