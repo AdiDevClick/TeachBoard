@@ -52,15 +52,13 @@ export function withVerticalDrawer<P extends AnyObjectProps>(
   }
 
   VerticalDrawer.Header = function Header(props: VerticalDrawerHeaderProps) {
-    const drawerHeader = useVerticalDrawer().drawerHeader ?? {};
-
     const {
       children,
       drawerTitle: { label, ...titleProps } = {},
       drawerDescription: { label: desc, ...descriptionProps } = {},
       ...headerProps
     } = {
-      ...drawerHeader,
+      ...useVerticalDrawer().drawerHeader,
       ...props,
     };
 
@@ -78,21 +76,19 @@ export function withVerticalDrawer<P extends AnyObjectProps>(
   VerticalDrawer.Content = function Content(
     props: VerticalDrawerContentProps<P>,
   ) {
-    const contextProps = useVerticalDrawer();
-
     const { children, drawerContent, ...contentProps } = {
-      ...contextProps,
+      ...useVerticalDrawer(),
       ...props,
-    };
-
-    const builtProps = {
-      ...drawerContent,
-      ...contentProps,
     };
 
     return (
       <>
-        <WrappedContent {...(builtProps as P)} />
+        <WrappedContent
+          {...({
+            ...drawerContent,
+            ...contentProps,
+          } as P)}
+        />
         {children}
       </>
     );
