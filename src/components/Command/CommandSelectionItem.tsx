@@ -104,5 +104,5 @@ export function CommandSelectionItem(props: CommandSelectionItemProps) {
 function restaureScrollBehavior(
   e: WheelEvent<HTMLDivElement> | TouchEvent<HTMLDivElement>,
 ) {
-  preventDefaultAndStopPropagation(e);
+  e.stopPropagation();
 }
