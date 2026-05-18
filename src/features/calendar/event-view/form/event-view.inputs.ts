@@ -46,7 +46,7 @@ const eventTimeRange = {
   end: EventViewInputItem;
 };
 
-const date = {
+const date: EventViewInputItem & Omit<DateFieldProps, "control"> = {
   name: "date",
   label: "Date",
   mode: "single",
@@ -56,7 +56,7 @@ const date = {
   // apiEndpoint: API_ENDPOINTS.POST.CALENDAR_EVENT.endpoints.MAIN,
   // task: "event-date",
   required: false,
-} satisfies EventViewInputItem & Omit<DateFieldProps, "control">;
+};
 
 const bodyContent = {
   name: "body.content",
