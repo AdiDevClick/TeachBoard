@@ -1,13 +1,10 @@
 import { FormWithDebug } from "@/components/Form/FormWithDebug";
-import { withInlineItemAndSwitchSelection } from "@/components/HOCs/withInlineItemAndSwitchSelection";
 import { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input.exports";
 import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/labelled-textarea";
+import { Item, ItemGroup } from "@/components/ui/item";
 import { EventScheduleFields } from "@/features/calendar/event-view/components/EventScheduleFields";
 import type { EventViewControllerProps } from "@/features/calendar/event-view/controllers/types/event-view.controller.types";
-import { useDialog } from "@/hooks/contexts/useDialog";
 import { formatRangeCompat } from "@/utils/dates/datetime";
-import type { Event } from "@microsoft/microsoft-graph-types";
-import { useState } from "react";
 
 /**
  * Controller for the EventView component, which displays the details of a calendar event in a vertical drawer.
@@ -24,9 +21,8 @@ export function EventViewController({
   inputControllers,
   pageId,
   formId,
+  event,
 }: EventViewControllerProps) {
-  const [isRanged, setIsRanged] = useState(false);
-  const event = useDialog().dialogOptions(pageId)?.event as Event;
   const { start, end, isAllDay } = event ?? {};
 
   let range = "No date information available";
@@ -67,28 +63,27 @@ export function EventViewController({
       onValidSubmit={handleValidSubmit}
       onInvalidSubmit={() => undefined}
     >
-      <ControlledLabelledInput {...inputControllers.subject} {...sharedProps} />
-      <InlineSwitch
-        title="Range"
-        isSelected={isRanged}
-        onSwitchClick={() => setIsRanged(!isRanged)}
-      />
-      <EventScheduleFields
-        {...sharedProps}
-        form={form}
-        timeRange={inputControllers.timeRange}
-        dateInput={{
-          ...inputControllers.date,
-          mode: isRanged ? "range" : "single",
-        }}
-      />
-      <ControlledLabelledTextArea
-        {...inputControllers.bodyContent}
-        {...sharedProps}
-      />
-      <p>{range}</p>
+      <ItemGroup>
+        <Item>
+          <ControlledLabelledInput
+            {...inputControllers.subject}
+            {...sharedProps}
+          />
+        </Item>
+        <EventScheduleFields
+          {...sharedProps}
+          form={form}
+          timeRange={inputControllers.timeRange}
+          dateInput={inputControllers.date}
+        />
+        <Item>
+          <ControlledLabelledTextArea
+            {...inputControllers.bodyContent}
+            {...sharedProps}
+          />
+          <p>{range}</p>
+        </Item>
+      </ItemGroup>
     </FormWithDebug>
   );
 }
-
-const InlineSwitch = withInlineItemAndSwitchSelection(() => null);
