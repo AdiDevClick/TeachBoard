@@ -1,7 +1,6 @@
+import type { UseDisabledForSubmitOptions } from "@/hooks/types/use-disabled-for-submit.types";
 import { useMemo } from "react";
-import type { UseFormReturn } from "react-hook-form";
 
-export type UseDisabledForSubmitOptions = UseFormReturn["formState"];
 /**
  * Custom hook to determine if a submit button should be disabled based on the form state.
  *
