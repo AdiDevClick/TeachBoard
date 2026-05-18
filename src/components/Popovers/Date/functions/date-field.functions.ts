@@ -3,7 +3,32 @@ import {
   isSingleDateSelection,
 } from "@/components/Calendar/functions/calendar.functions";
 import type { DateSelection } from "@/components/Calendar/types/calendar.types";
+import type {
+  DateFieldProps,
+  DateFieldState,
+} from "@/components/Popovers/Date/types/date-field.types";
 import type { EventViewFormSchema } from "@/features/calendar/event-view/models/event-view.models";
+import { fromLocalDate, toLocalDateFromValue } from "@/utils/dates/datetime";
+
+/**
+ * Deserializes a form value (ISO strings) into DateFieldState (Date objects) for internal calendar state.
+ *
+ * @param value - Form value containing ISO date strings (single or range)
+ *
+ * @returns DateFieldState with local Date objects, or empty state if no value
+ */
+export function deserializeFormValueToDateState(
+  value?: DateFieldProps["value"],
+): DateFieldState {
+  const from = toLocalDateFromValue(value?.range?.from);
+  const to = toLocalDateFromValue(value?.range?.to);
+  const range = from || to ? { from, to } : undefined;
+
+  return {
+    single: toLocalDateFromValue(value?.single),
+    range,
+  };
+}
 
 /**
  * Serializes a DateSelection (either a single date or a date range) into the format expected by the EventViewFormSchema's date field.
@@ -38,7 +63,7 @@ export function serializeRangeDateSelection(
  * Convert a Date object to ISO date string (YYYY-MM-DD)
  */
 function dateToIsoString(date: Date): string {
-  return date.toISOString().split("T")[0];
+  return fromLocalDate(date).toString();
 }
 
 /**
