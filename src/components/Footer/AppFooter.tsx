@@ -2,7 +2,8 @@ import type { AppDialFooterProps } from "@/components/Footer/types/footer.types.
 import { Button } from "@/components/ui/button.tsx";
 import { CardFooter } from "@/components/ui/card.tsx";
 import { DialogClose, DialogFooter } from "@/components/ui/dialog.tsx";
-import { useMemo, type ComponentProps } from "react";
+import { useDisabledForSubmit } from "@/hooks/useDisabledForSubmit";
+import { type ComponentProps } from "react";
 
 /**
  * A Footer component for App Dialogs with a submit button and a cancel button.
@@ -24,19 +25,7 @@ export function AppDialFooter({
   children,
   ...props
 }: AppDialFooterProps) {
-  const isDisabled = useMemo(() => {
-    if (!formState) return false;
-
-    const hasAnyErrors = Object.keys(formState.errors).length > 0;
-
-    return (
-      formState.isSubmitSuccessful ||
-      formState.isSubmitting ||
-      hasAnyErrors ||
-      !formState.isValid ||
-      formState.isValidating
-    );
-  }, [formState]);
+  const isDisabled = useDisabledForSubmit(formState);
 
   return (
     <DialogFooter {...props}>
