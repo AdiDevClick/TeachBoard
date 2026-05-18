@@ -1,9 +1,12 @@
 import withController from "@/components/HOCs/withController";
+import { withInlineItemAndSwitchSelection } from "@/components/HOCs/withInlineItemAndSwitchSelection";
 import { DateField } from "@/components/Popovers/Date/DateField";
+import type { DateFieldProps } from "@/components/Popovers/Date/types/date-field.types";
 import { TimeField } from "@/components/Time/TimeField";
+import { Item } from "@/components/ui/item";
 import type { EventScheduleFieldsProps } from "@/features/calendar/event-view/components/types/event-schedule-field.types";
 import { eventInputs } from "@/features/calendar/event-view/form/event-view.inputs";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
 
 /**
@@ -25,10 +28,17 @@ export function EventScheduleFields({
   timeRange = eventInputs.timeRange,
   dateInput = eventInputs.date,
 }: EventScheduleFieldsProps) {
+  const [isRanged, setIsRanged] = useState(dateInput.mode === "range");
+
+  const inputNamesMemo = useMemo(
+    () => [timeRange.start.name, timeRange.end.name],
+    [timeRange],
+  );
+
   // Watch start and end to revalidate both when either changes
   const [start, end] = useWatch({
     control: form.control,
-    name: [timeRange.start.name, timeRange.end.name],
+    name: inputNamesMemo,
   });
 
   /**
@@ -43,26 +53,40 @@ export function EventScheduleFields({
       return;
     }
 
+    const errors = form.formState.errors;
+
     if (
-      (start <= end && form.formState.errors.start?.type === "custom") ||
-      form.formState.errors.end?.type === "custom"
+      (start <= end && errors.start?.type === "custom") ||
+      errors.end?.type === "custom"
     ) {
-      form.trigger([timeRange.start.name, timeRange.end.name]);
+      form.trigger(inputNamesMemo);
     }
-  }, [start, end, form, timeRange.end.name, timeRange.start.name]);
+  }, [start, end, form, inputNamesMemo]);
+
+  const enrichedDateInput = {
+    ...dateInput,
+    mode: isRanged ? "range" : ("single" as DateFieldProps["mode"]),
+    className: "w-full",
+  };
 
   return (
-    <div className="space-y-4 rounded-lg border bg-muted/20 p-3">
-      <div className="space-y-2">
-        <ControlledDateField {...dateInput} control={form.control} />
+    <Item className="space-y-4">
+      <div className="relative w-full">
+        <ControlledDateField {...enrichedDateInput} control={form.control} />
+        <InlineSwitch
+          id="event-date-range-switch"
+          className="absolute grid-cols-2! -top-1! inset-0 w-fit items-start place-items-end justify-self-end mb-5"
+          title="Range"
+          isSelected={isRanged}
+          onSwitchClick={() => setIsRanged(!isRanged)}
+        />
       </div>
-      <div className="grid gap-3 lg:grid-cols-2">
-        <ControlledTimeField {...timeRange.start} control={form.control} />
-        <ControlledTimeField {...timeRange.end} control={form.control} />
-      </div>
-    </div>
+      <ControlledTimeField {...timeRange.start} control={form.control} />
+      <ControlledTimeField {...timeRange.end} control={form.control} />
+    </Item>
   );
 }
 
 const ControlledDateField = withController(DateField);
 const ControlledTimeField = withController(TimeField);
+const InlineSwitch = withInlineItemAndSwitchSelection(() => null);
