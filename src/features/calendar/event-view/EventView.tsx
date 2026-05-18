@@ -40,9 +40,10 @@ export function EventView({
   const startDate = getSelectedDate(start?.dateTime);
   const endDate = getSelectedDate(end?.dateTime);
 
-  const transformedStart =
-    transformToTimeString(start?.dateTime) ?? defaultStart;
-  const transformedEnd = transformToTimeString(end?.dateTime) ?? defaultEnd;
+  const time = {
+    start: transformToTimeString(start?.dateTime) ?? defaultStart,
+    end: transformToTimeString(end?.dateTime) ?? defaultEnd,
+  };
 
   const form = useForm<EventViewFormSchema>({
     resolver: zodResolver(eventViewSchema),
@@ -57,8 +58,7 @@ export function EventView({
           to: endDate,
         },
       },
-      start: transformedStart,
-      end: transformedEnd,
+      ...time,
       body: {
         content: body?.content ?? undefined,
       },
