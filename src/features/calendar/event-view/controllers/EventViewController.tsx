@@ -4,6 +4,7 @@ import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/label
 import { Item, ItemGroup } from "@/components/ui/item";
 import { EventScheduleFields } from "@/features/calendar/event-view/components/EventScheduleFields";
 import type { EventViewControllerProps } from "@/features/calendar/event-view/controllers/types/event-view.controller.types";
+import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
 import { formatRangeCompat } from "@/utils/dates/datetime";
 
 /**
@@ -22,8 +23,16 @@ export function EventViewController({
   pageId,
   formId,
   event,
+  submitRoute,
+  submitDataReshapeFn,
 }: EventViewControllerProps) {
   const { start, end, isAllDay } = event ?? {};
+  const { submitCallback } = useCommandHandler({
+    form,
+    pageId,
+    submitRoute,
+    submitDataReshapeFn,
+  });
 
   let range = "No date information available";
 
