@@ -161,7 +161,9 @@ export function getTimeValue(value?: string) {
 export function transformToTimeString(dateTime?: string) {
   if (!dateTime) return undefined;
 
-  return Temporal.PlainTime.from(dateTime).toString({ smallestUnit: "minute" });
+  return parseToPlainTemporal(dateTime, { type: "time" })?.toString({
+    smallestUnit: "minute",
+  });
 }
 
 export function getSelectedDate(date?: string) {
@@ -187,8 +189,8 @@ export function formatRangeCompat(from = "", to = "", isAllDay = false) {
       return "";
     }
 
-    const fromDate = Temporal.PlainDateTime.from(from);
-    const toDate = Temporal.PlainDateTime.from(to);
+    const fromDate = parseToPlainTemporal(from, { type: "datetime" });
+    const toDate = parseToPlainTemporal(to, { type: "datetime" });
 
     const dtf = new Intl.DateTimeFormat(LANGUAGE, {
       hour: "numeric",
