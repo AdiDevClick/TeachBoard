@@ -2,11 +2,13 @@ import type { UUID } from "@/api/types/openapi/common.types.ts";
 import type { MouseEvent, SetStateAction } from "react";
 
 export type InlineItemAndSwitchSelectionPayload = {
-  id: UUID | string;
+  id?: UUID | string;
   title: string;
   isSelected: boolean;
-  index: string | number;
+  index?: string | number;
   setIsSelected: (selected: SetStateAction<boolean>) => void;
+  /** Styles for the container */
+  className?: string;
 };
 
 /**
