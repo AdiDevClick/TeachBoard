@@ -17,5 +17,10 @@ export type DateFieldProps = Readonly<
   {
     onSelect?: (date: Date | DateRange | undefined) => void;
     mode?: CalendarForPopoverProps["mode"];
+    /**
+     * Form value from react-hook-form containing the selected date(s).
+     * Can be in ISO date format (YYYY-MM-DD) or a DateFieldState object.
+     */
+    value?: DateFieldState;
   } & Omit<ComponentProps<typeof ControlledPopoverField>, "triggerContent">
 >;
