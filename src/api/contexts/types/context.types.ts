@@ -7,8 +7,6 @@ import type { HeaderTitleProps } from "@/components/Titles/types/titles.types.ts
 import type { Button } from "@/components/ui/button";
 import type { Card, CardContent, CardFooter } from "@/components/ui/card.tsx";
 import type {
-  Drawer,
-  DrawerContent,
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
@@ -22,9 +20,12 @@ import type {
 import type { Separator } from "@/components/ui/separator";
 import type { AppDialogNames } from "@/configs/app.config.ts";
 import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types";
+import type { AppControllerInterface } from "@/types/AppControllerInterface";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
 import type { useSortable } from "@dnd-kit/sortable";
 import type { ComponentProps, PropsWithChildren } from "react";
+import type { FieldValues, UseFormReturn } from "react-hook-form";
 
 /**
  * Type for Dialog context
@@ -130,25 +131,39 @@ export type VerticalDrawerFooterProps = PropsWithChildren & {
    * Properties for the close button in the drawer footer, which includes a label and any additional props that can be passed to the Button component
    */
   drawerClose?: VerticalDrawerLabel & ComponentProps<typeof Button>;
+  /**
+   * Whether to display the submit button in the drawer footer. This is an optional property that can be used to conditionally render a submit button based on the context of the drawer's content.
+   * @default false
+   */
+  displaySubmitButton?: boolean;
+  /**
+   * Properties for the submit button in the drawer footer, which includes a label and any additional props that can be passed to the Button component
+   */
+  drawerSubmit?: VerticalDrawerLabel & ComponentProps<typeof Button>;
 } & ComponentProps<typeof DrawerFooter>;
 
 /**
  * Type definition for the VerticalDrawer context, which includes properties for title, description, header, and content.
  */
-export type VerticalDrawerContext<T> = {
+export type VerticalDrawerContext<
+  TContent extends AnyObjectProps = AnyObjectProps,
+  TFormValues extends FieldValues = FieldValues,
+> = {
   /** Properties for the content of the drawer. */
-  drawerContent: T;
+  drawerContent?: TContent;
   /** Properties for the header of the drawer, including title and description.*/
   drawerHeader?: VerticalDrawerHeaderProps;
   /** Properties for the footer of the drawer, including a close button configuration. */
   drawerFooter?: VerticalDrawerFooterProps;
-};
+  /** Properties for the form within the drawer. */
+  form?: UseFormReturn<TFormValues>;
+  /**
+   * An optional form ID that can be used to link a submit button in the drawer footer to a form in the drawer content.
+   */
+  formId?: string;
+} & TContent;
 
-export type VerticalDrawerProps<T extends object> = PropsWithChildren &
-  VerticalDrawerContext<T> &
-  ComponentProps<typeof Drawer> & {
-    /**
-     * Properties for the content of the drawer.
-     */
-    drawerContentProps?: ComponentProps<typeof DrawerContent>;
-  };
+export type VerticalDrawerProps<
+  TContent extends AnyObjectProps = AnyObjectProps,
+  TFormValues extends FieldValues = FieldValues,
+> = PropsWithChildren & VerticalDrawerContext<TContent, TFormValues>;

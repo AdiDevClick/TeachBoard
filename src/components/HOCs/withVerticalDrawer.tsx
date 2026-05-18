@@ -14,8 +14,12 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { useVerticalDrawer } from "@/hooks/contexts/useVerticalDrawer";
+import { useDisabledForSubmit } from "@/hooks/useDisabledForSubmit";
+import type { AppControllerInterface } from "@/types/AppControllerInterface";
+import type { AnyObjectProps } from "@/utils/types/types.utils";
 import { createNameForHOC } from "@/utils/utils";
 import { type ComponentType } from "react";
+import type { FieldValues } from "react-hook-form";
 
 /**
  * Higher-Order Component that wraps a given component with a vertical drawer layout.
@@ -29,32 +33,34 @@ import { type ComponentType } from "react";
  * @param drawerFooter - Props for the DrawerFooter component, including a close button configuration.
  * @param children - The content to be rendered inside the drawer, typically the wrapped component.
  */
-export function withVerticalDrawer<P extends object>(
+export function withVerticalDrawer<P extends AnyObjectProps>(
   WrappedContent: ComponentType<P>,
 ) {
+  // Extract form values type from controller interface if applicable
+  type TFormValues =
+    P extends AppControllerInterface<infer TFormValues>
+      ? TFormValues
+      : FieldValues;
+
   function VerticalDrawer({
-    drawerContent,
-    drawerFooter,
-    drawerHeader,
     children,
-  }: VerticalDrawerProps<P>) {
+    ...props
+  }: VerticalDrawerProps<Partial<P>, TFormValues>) {
     return (
-      <VerticalDrawerProvider
-        value={{ drawerContent, drawerHeader, drawerFooter }}
-      >
-        {children}
-      </VerticalDrawerProvider>
+      <VerticalDrawerProvider value={props}>{children}</VerticalDrawerProvider>
     );
   }
 
   VerticalDrawer.Header = function Header(props: VerticalDrawerHeaderProps) {
+    const drawerHeader = useVerticalDrawer().drawerHeader ?? {};
+
     const {
       children,
       drawerTitle: { label, ...titleProps } = {},
       drawerDescription: { label: desc, ...descriptionProps } = {},
       ...headerProps
     } = {
-      ...useVerticalDrawer().drawerHeader,
+      ...drawerHeader,
       ...props,
     };
 
@@ -72,13 +78,21 @@ export function withVerticalDrawer<P extends object>(
   VerticalDrawer.Content = function Content(
     props: VerticalDrawerContentProps<P>,
   ) {
-    const { children, ...contentProps } = {
-      ...useVerticalDrawer().drawerContent,
+    const contextProps = useVerticalDrawer();
+
+    const { children, drawerContent, ...contentProps } = {
+      ...contextProps,
       ...props,
     };
+
+    const builtProps = {
+      ...drawerContent,
+      ...contentProps,
+    };
+
     return (
       <>
-        <WrappedContent {...(contentProps as P)} />
+        <WrappedContent {...(builtProps as P)} />
         {children}
       </>
     );
@@ -86,11 +100,21 @@ export function withVerticalDrawer<P extends object>(
 
   VerticalDrawer.Footer = function Footer(props: VerticalDrawerFooterProps) {
     const {
+      drawerFooter = {},
+      form: { formState } = {},
+      formId,
+    } = useVerticalDrawer();
+
+    const isDisabled = useDisabledForSubmit(formState);
+
+    const {
       children,
       drawerClose: { label: closeLabel = "Fermer", ...closeProps } = {},
+      drawerSubmit: { label: submitText = "Enregistrer", ...submitProps } = {},
+      displaySubmitButton = false,
       ...footerProps
     } = {
-      ...useVerticalDrawer().drawerFooter,
+      ...drawerFooter,
       ...props,
     };
 
@@ -101,6 +125,17 @@ export function withVerticalDrawer<P extends object>(
             {closeLabel}
           </Button>
         </DrawerClose>
+        {displaySubmitButton && (
+          <Button
+            variant="outline"
+            type="submit"
+            disabled={isDisabled}
+            form={formId}
+            {...submitProps}
+          >
+            {submitText}
+          </Button>
+        )}
         {children}
       </DrawerFooter>
     );
