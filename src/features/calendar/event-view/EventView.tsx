@@ -1,4 +1,5 @@
 import { withVerticalDrawer } from "@/components/HOCs/withVerticalDrawer";
+import type { DateFieldProps } from "@/components/Popovers/Date/types/date-field.types";
 import { EventViewController } from "@/features/calendar/event-view/controllers/EventViewController";
 import { eventInputs } from "@/features/calendar/event-view/form/event-view.inputs";
 import {
@@ -6,13 +7,15 @@ import {
   type EventViewFormSchema,
 } from "@/features/calendar/event-view/models/event-view.models";
 import type { EventViewProps } from "@/features/calendar/event-view/types/event-view.types";
+import { useDialog } from "@/hooks/contexts/useDialog";
+import { getSelectedDate, transformToTimeString } from "@/utils/dates/datetime";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Temporal } from "@js-temporal/polyfill";
+import type { Event } from "@microsoft/microsoft-graph-types";
 import type { ComponentProps } from "react";
 import { useForm } from "react-hook-form";
 
 const now = Temporal.Now.plainTimeISO();
-const today = Temporal.Now.plainDateISO();
 
 // Build HH:mm string for default time values
 const defaultStart = now.toString({ smallestUnit: "minute" });
@@ -30,38 +33,65 @@ export function EventView({
   pageId = "event-view",
   inputControllers = eventInputs,
 }: EventViewProps) {
+  const event = useDialog().dialogOptions(pageId)?.event as Event;
+
+  const { subject, isAllDay, start, end, body } = event ?? {};
+
+  const startDate = getSelectedDate(start?.dateTime);
+  const endDate = getSelectedDate(end?.dateTime);
+
+  const transformedStart =
+    transformToTimeString(start?.dateTime) ?? defaultStart;
+  const transformedEnd = transformToTimeString(end?.dateTime) ?? defaultEnd;
+
   const form = useForm<EventViewFormSchema>({
     resolver: zodResolver(eventViewSchema),
     mode: "all",
     defaultValues: {
-      subject: "",
-      isAllDay: false,
-      date: { single: today.toString() },
-      start: defaultStart,
-      end: defaultEnd,
+      subject: subject ?? "",
+      isAllDay: isAllDay ?? false,
+      date: {
+        single: startDate,
+        range: {
+          from: startDate,
+          to: endDate,
+        },
+      },
+      start: transformedStart,
+      end: transformedEnd,
       body: {
-        content: undefined,
+        content: body?.content ?? undefined,
       },
     },
   });
 
+  const isSameDay = startDate === endDate;
+  const resolvedMode: DateFieldProps["mode"] = isSameDay ? "single" : "range";
+
+  const hydratedControllers = {
+    ...inputControllers,
+    date: {
+      ...inputControllers.date,
+      mode: resolvedMode,
+    },
+  };
+
   const eventProps = {
+    form,
+    formId: `${pageId}-form`,
+    pageId,
+    inputControllers: hydratedControllers,
+    event,
     drawerHeader: {
       drawerTitle: { label: "Evènement" },
-      // drawerTitle: { label: subject ?? "Event Details" },
-      // drawerDescription: { label: range },
       drawerDescription: {
         label: "Voir ou modifier l'événement",
       },
     },
     drawerFooter: {
       drawerClose: { label: "Fermer" },
-    },
-    drawerContent: {
-      form,
-      pageId,
-      inputControllers,
-      formId: `${pageId}-form`,
+      displaySubmitButton: true,
+      drawerSubmit: { label: "Enregistrer" },
     },
   } satisfies ComponentProps<typeof EventDetails>;
 
