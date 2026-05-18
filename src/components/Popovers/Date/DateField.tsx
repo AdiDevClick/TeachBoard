@@ -1,7 +1,7 @@
-import { useFieldStore } from "@/api/store/FieldStore";
 import { CalendarForPopover } from "@/components/Calendar/CalendarForPopover";
 import { formatSelectString } from "@/components/Calendar/functions/calendar.functions";
 import {
+  deserializeFormValueToDateState,
   getType,
   serializeRangeDateSelection,
 } from "@/components/Popovers/Date/functions/date-field.functions";
@@ -10,6 +10,7 @@ import type {
   DateFieldState,
 } from "@/components/Popovers/Date/types/date-field.types";
 import { ControlledPopoverField } from "@/components/Popovers/exports/popover-field.exports";
+import { Calendar } from "lucide-react";
 import { useState } from "react";
 import type { DateRange } from "react-day-picker";
 
@@ -26,13 +27,15 @@ export function DateField({
   onSelect,
   onValueChange,
   mode = "single",
+  value,
   ...props
 }: DateFieldProps) {
-  const { getValue } = useFieldStore(false, props.resetKey, props.name);
-  const [date, setDate] = useState<DateFieldState>({
-    range: undefined,
-    single: undefined,
-  });
+  const [localDate, setLocalDate] = useState<DateFieldState>(() =>
+    deserializeFormValueToDateState(value),
+  );
+  const isControlled = value !== undefined;
+  const hydratedDate = deserializeFormValueToDateState(value);
+  const date = isControlled ? hydratedDate : localDate;
   /**
    * Handles the selection of a date or date range from the calendar popover, updating the internal state and notifying parent components through callbacks.
    *
@@ -42,29 +45,30 @@ export function DateField({
     if (!date) return;
 
     const type = getType(date);
+    if (!type) return;
 
-    setDate((prev) => {
-      if (!type) return prev;
-      return { ...prev, [type]: date };
-    });
+    if (!isControlled) {
+      setLocalDate((prev) => ({ ...prev, [type]: date }));
+    }
 
     onValueChange?.(serializeRangeDateSelection(date), { mode });
     onSelect?.(date);
   };
 
-  const selectedValue = getValue()
-    ? formatSelectString(date.range ?? date.single)
-    : undefined;
+  const selection = mode === "range" ? date.range : date.single;
+  const selectedValue = selection ? formatSelectString(selection) : undefined;
 
   const placeholder =
-    mode === "range" ? "Sélectionnez une date de début" : props.placeholder;
+    selectedValue ??
+    (mode === "range" ? "Sélectionnez une date de début" : props.placeholder);
 
   return (
     <ControlledPopoverField
       {...props}
       name={props.name ?? "event-date"}
       multiSelection={mode === "range"}
-      placeholder={selectedValue ?? placeholder}
+      placeholder={placeholder}
+      icon={Calendar}
     >
       <CalendarForPopover
         mode={mode}
