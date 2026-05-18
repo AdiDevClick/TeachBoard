@@ -19,7 +19,7 @@ import {
   debugLogs,
   inlineItemAndSwitchSelectionPropsInvalid,
 } from "@/configs/app-components.config.ts";
-import { preventDefaultAndStopPropagation } from "@/utils/utils.ts";
+import { cn, preventDefaultAndStopPropagation } from "@/utils/utils.ts";
 import {
   useEffect,
   useState,
@@ -100,7 +100,7 @@ export function withInlineItemAndSwitchSelection<T extends object>(
     };
 
     return (
-      <Item className={labelledSwitchWithSelection}>
+      <Item className={cn(labelledSwitchWithSelection, props.className)}>
         <ItemContent className={label}>
           <ItemTitle>{props.title}</ItemTitle>
         </ItemContent>
