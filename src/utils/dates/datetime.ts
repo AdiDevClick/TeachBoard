@@ -1,19 +1,62 @@
 import type { CalendarFetchRange } from "@/components/Sidebar/calendar/hooks/useCalendar";
 import { LANGUAGE } from "@/configs/app.config";
+import type {
+  ParsingConfig,
+  ParsingResultMap,
+} from "@/utils/dates/types/date-time.types";
+import type { Temporal as TemporalType } from "@js-temporal/polyfill";
 import { Temporal } from "@js-temporal/polyfill";
 
-export function parsePlainDateTime(value?: string) {
+/**
+ * Generic utility function to parse a date/time string into a Temporal object based on the specified type.
+ *
+ * @param value - The date/time string to parse
+ * @param options - The parsing configuration specifying the expected type
+ *
+ * @returns The parsed Temporal object or null if parsing fails
+ */
+export function parseToPlainTemporal<
+  T extends ParsingResultMap,
+  K extends keyof T,
+>(value?: string, options?: ParsingConfig<K>): T[K] | null {
   if (!value) return null;
 
   try {
-    return Temporal.PlainDateTime.from(value);
+    switch (options?.type) {
+      case "date":
+        return Temporal.PlainDate.from(value) as T[K];
+      case "time":
+        return Temporal.PlainTime.from(value) as T[K];
+      case "instant":
+        return Temporal.Instant.from(value) as T[K];
+      case "date-iso":
+        return Temporal.Instant.from(value).toLocaleString(LANGUAGE) as T[K];
+      default:
+        return Temporal.PlainDateTime.from(value) as T[K];
+    }
   } catch {
     return null;
   }
 }
 
-export function toLocalDate(value: Temporal.PlainDate) {
+export function toLocalDate(value: TemporalType.PlainDate) {
   return new Date(value.year, value.month - 1, value.day);
+}
+
+export function toLocalDateFromValue(value?: string) {
+  if (!value) return undefined;
+
+  const parsedDateTime = parseToPlainTemporal(value, { type: "date" });
+
+  if (parsedDateTime) {
+    return toLocalDate(parsedDateTime);
+  }
+
+  try {
+    return toLocalDate(Temporal.PlainDate.from(value));
+  } catch {
+    return undefined;
+  }
 }
 
 /**
@@ -35,6 +78,27 @@ export function formatDate(date: Date) {
     day: "2-digit",
     month: "long",
     year: "numeric",
+  });
+}
+
+/**
+ * Convert a local Date object to a Temporal.PlainDate, which represents a date without time or timezone information, based on the local calendar date.
+ *
+ * @param value - The local Date object to convert
+ * @returns A Temporal.PlainDate representing the same date as the input Date, but without time or timezone information
+ *
+ * @example
+ * ```ts
+ * const localDate = new Date(2024, 0, 1); // January 1, 2024
+ * const plainDate = fromLocalDate(localDate);
+ * console.log(plainDate.toString()); // "2024-01-01"
+ * ```
+ */
+export function fromLocalDate(value: Date) {
+  return Temporal.PlainDate.from({
+    year: value.getFullYear(),
+    month: value.getMonth() + 1,
+    day: value.getDate(),
   });
 }
 
@@ -77,16 +141,8 @@ export function getLocalCalendarViewRange(
   };
 }
 
-export function fromLocalDate(value: Date) {
-  return Temporal.PlainDate.from({
-    year: value.getFullYear(),
-    month: value.getMonth() + 1,
-    day: value.getDate(),
-  });
-}
-
 export function getTimeValue(value?: string) {
-  const parsed = parsePlainDateTime(value);
+  const parsed = parseToPlainTemporal(value, { type: "datetime" });
 
   if (!parsed) return "";
 
@@ -95,42 +151,23 @@ export function getTimeValue(value?: string) {
   ).padStart(2, "0")}`;
 }
 
-export function composeDateTime(date: Temporal.PlainDate, time?: string) {
-  if (!time) return undefined;
+/**
+ * Transform an ISO date-time string into a time string formatted as "HH:mm", using Temporal API for parsing and formatting.
+ *
+ * @param dateTime - An ISO date-time string (e.g., "2024-12-31T14:30:00Z")
+ *
+ * @returns A time string formatted as "HH:mm" (e.g., "14:30"), or undefined if the input is not a valid date-time string
+ */
+export function transformToTimeString(dateTime?: string) {
+  if (!dateTime) return undefined;
 
-  const [hourText, minuteText] = time.split(":");
-  const hour = Number(hourText);
-  const minute = Number(minuteText);
-
-  if (
-    Number.isNaN(hour) ||
-    Number.isNaN(minute) ||
-    hour < 0 ||
-    hour > 23 ||
-    minute < 0 ||
-    minute > 59
-  ) {
-    return undefined;
-  }
-
-  return Temporal.PlainDateTime.from({
-    year: date.year,
-    month: date.month,
-    day: date.day,
-    hour,
-    minute,
-  }).toString({ smallestUnit: "minute" });
+  return Temporal.PlainTime.from(dateTime).toString({ smallestUnit: "minute" });
 }
 
-export function getSelectedDate(start?: string, end?: string) {
-  const parsedStart = parsePlainDateTime(start);
-  const parsedEnd = parsePlainDateTime(end);
+export function getSelectedDate(date?: string) {
+  const parsedDate = parseToPlainTemporal(date, { type: "date" });
 
-  return (
-    parsedStart?.toPlainDate() ??
-    parsedEnd?.toPlainDate() ??
-    Temporal.Now.plainDateISO()
-  );
+  return parsedDate?.toString() ?? Temporal.Now.plainDateISO().toString();
 }
 
 /**
@@ -183,8 +220,8 @@ export function getDurationFromRange(
   to: string = "",
   isAllDay = false,
 ) {
-  const fromDate = parsePlainDateTime(from);
-  const toDate = parsePlainDateTime(to);
+  const fromDate = parseToPlainTemporal(from, { type: "datetime" });
+  const toDate = parseToPlainTemporal(to, { type: "datetime" });
 
   if (isAllDay) {
     return "Toute la journée";
