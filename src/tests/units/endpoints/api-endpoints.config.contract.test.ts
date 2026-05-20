@@ -144,6 +144,17 @@ describe("API_ENDPOINTS full contract", () => {
           end: { dateTime: "2026-05-13T00:00:00.0000000", timeZone: "UTC" },
           isAllDay: true,
         },
+        {
+          subject: "HTML body event",
+          start: { dateTime: "2026-05-12T11:00:00.0000000", timeZone: "UTC" },
+          end: { dateTime: "2026-05-12T12:00:00.0000000", timeZone: "UTC" },
+          isAllDay: false,
+          body: {
+            contentType: "html",
+            content:
+              '<html><head><style>.EmailQuote { color: red; }</style></head><body><div class="PlainText">test du content pour le 21</div></body></html>',
+          },
+        },
       ],
     };
 
@@ -151,16 +162,44 @@ describe("API_ENDPOINTS full contract", () => {
 
     expect(shaped).toEqual([
       {
-        title: "Team Sync",
-        from: "2026-05-12T09:00:00.000Z",
-        to: "2026-05-12T10:00:00.000Z",
+        subject: "Team Sync",
+        start: {
+          dateTime: "2026-05-12T09:00:00.0000000",
+          timeZone: "UTC",
+        },
+        end: {
+          dateTime: "2026-05-12T10:00:00.0000000",
+          timeZone: "UTC",
+        },
         isAllDay: false,
       },
       {
-        title: "All day event",
-        from: "2026-05-12T00:00:00.000Z",
-        to: "2026-05-13T00:00:00.000Z",
+        subject: "All day event",
+        start: {
+          dateTime: "2026-05-12T00:00:00.0000000",
+          timeZone: "UTC",
+        },
+        end: {
+          dateTime: "2026-05-13T00:00:00.0000000",
+          timeZone: "UTC",
+        },
         isAllDay: true,
+      },
+      {
+        subject: "HTML body event",
+        start: {
+          dateTime: "2026-05-12T11:00:00.0000000",
+          timeZone: "UTC",
+        },
+        end: {
+          dateTime: "2026-05-12T12:00:00.0000000",
+          timeZone: "UTC",
+        },
+        isAllDay: false,
+        body: {
+          contentType: "html",
+          content: "test du content pour le 21",
+        },
       },
     ]);
   });
