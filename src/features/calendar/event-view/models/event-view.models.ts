@@ -84,10 +84,10 @@ const schema = (data: typeof fieldData) =>
         }),
     })
     .superRefine((obj, ctx) => {
-      const { start, end } = obj;
+      const { start, end, isAllDay } = obj;
       if (!start || !end) return;
 
-      if (end <= start) {
+      if (end <= start && !isAllDay) {
         ctx.addIssue({
           code: "custom",
           message: "L'heure de fin doit être supérieure à l'heure de début.",
@@ -97,6 +97,17 @@ const schema = (data: typeof fieldData) =>
           code: "custom",
           message: "L'heure de début doit être inférieure à l'heure de fin.",
           path: ["start"],
+        });
+      }
+      const isMidnightStart = start === "00:00";
+      const isMidnightEnd = end === "00:00";
+
+      if (isAllDay && !(isMidnightStart && isMidnightEnd)) {
+        ctx.addIssue({
+          code: "custom",
+          message:
+            "Pour les événements toute la journée, les heures de début et de fin doivent être à 00:00.",
+          path: ["start", "end"],
         });
       }
     });
