@@ -16,6 +16,7 @@ import { useMemo, type ChangeEvent } from "react";
  * @param step - The interval in seconds for the time slots (e.g., 900 for 15-minute intervals)
  * @param value - The current value of the time field in "HH:mm" format
  * @param onValueChange - Callback function to handle changes to the time value
+ * @param disabled - Whether the time field is disabled
  */
 export function TimeField({
   label,
@@ -71,6 +72,7 @@ export function TimeField({
           triggerContent={null}
           triggerProps={{ className: "gap-0" }}
           onValueChange={onValueChange}
+          disabled={props.disabled}
         >
           {Array.from(timeSlotsMemo).map((slot) => (
             <SelectItem key={slot} value={slot}>
