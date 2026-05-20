@@ -6,7 +6,7 @@ import { TimeField } from "@/components/Time/TimeField";
 import { Item } from "@/components/ui/item";
 import type { EventScheduleFieldsProps } from "@/features/calendar/event-view/components/types/event-schedule-field.types";
 import { eventInputs } from "@/features/calendar/event-view/form/event-view.inputs";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
 
 /**
@@ -28,25 +28,32 @@ export function EventScheduleFields({
   timeRange = eventInputs.timeRange,
   dateInput = eventInputs.date,
 }: EventScheduleFieldsProps) {
-  const [isRanged, setIsRanged] = useState(dateInput.mode === "range");
+  const [isRanged, setIsRanged] = useState(
+    !form.getValues("isAllDay") && dateInput.mode === "range",
+  );
 
   const inputNamesMemo = useMemo(
-    () => [timeRange.start.name, timeRange.end.name],
+    () => [timeRange.start.name, timeRange.end.name, "isAllDay"] as const,
     [timeRange],
   );
 
-  // Watch start and end to revalidate both when either changes
-  const [start, end] = useWatch({
+  const [start, end, isAllDay] = useWatch({
     control: form.control,
     name: inputNamesMemo,
   });
 
+  const closeRangeWhenAllDayIsEnabled = useEffectEvent(() => {
+    if (isAllDay && isRanged) {
+      setIsRanged(false);
+    }
+  });
+
   /**
    * Effect to validate the time range whenever start or end changes. If either start or end is missing, it will not trigger validation.
-   * 
+   *
    * @description Each time an error of type "custom" is present for either start or end and the errors are solved (i.e., start and end are in a valid range)
-
-    * @remark It will trigger validation for both fields to clear the errors.
+   *
+   * @remark It will trigger validation for both fields to clear the errors.
    */
   useEffect(() => {
     if (!start || !end) {
@@ -63,8 +70,13 @@ export function EventScheduleFields({
     }
   }, [start, end, form, inputNamesMemo]);
 
+  useEffect(() => {
+    closeRangeWhenAllDayIsEnabled();
+  }, [isRanged, isAllDay]);
+
   const enrichedDateInput = {
     ...dateInput,
+    // value: form.getValues(dateInput.name),
     mode: isRanged ? "range" : ("single" as DateFieldProps["mode"]),
     className: "w-full",
   };
@@ -78,11 +90,28 @@ export function EventScheduleFields({
           className="absolute grid-cols-2! -top-1! inset-0 w-fit items-start place-items-end justify-self-end mb-5"
           title="Range"
           isSelected={isRanged}
-          onSwitchClick={() => setIsRanged(!isRanged)}
+          onSwitchClick={(_, payload) => {
+            if (payload.isSelected) {
+              form.setValue("isAllDay", false, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+            }
+
+            setIsRanged(payload.isSelected);
+          }}
         />
       </div>
-      <ControlledTimeField {...timeRange.start} control={form.control} />
-      <ControlledTimeField {...timeRange.end} control={form.control} />
+      <ControlledTimeField
+        {...timeRange.start}
+        disabled={isAllDay}
+        control={form.control}
+      />
+      <ControlledTimeField
+        {...timeRange.end}
+        disabled={isAllDay}
+        control={form.control}
+      />
     </Item>
   );
 }
