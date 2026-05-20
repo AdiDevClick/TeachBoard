@@ -29,7 +29,12 @@ import {
 
 /**
  * Wrap a component to be displayed inline within an Item with a Switch.
- * @param Wrapped - The component to be wrapped.
+ *
+ * @param Wrapped - The component to wrap and display inline with the switch.
+ *
+ * @returns A new component that renders the Wrapped component inline with a switch to toggle its selection state.
+ *
+ * @description This HOC is designed for use in contexts like lists or tables where you want to have an inline item with a switch to toggle its selection, and the wrapped component will be disabled when not selected. The switch's state can be controlled both internally and externally (e.g., by a parent controller or an "All ON/OFF" action).
  *
  * @example
  * ```tsx
@@ -40,23 +45,25 @@ import {
  *   {...otherSelectProps}
  * />
  * ```
+ 
  */
 export function withInlineItemAndSwitchSelection<T extends object>(
   Wrapped: ComponentType<T>,
 ) {
   return function Component(props: T & InlineItemAndSwitchSelectionProps) {
-    const [isSelected, setIsSelected] = useState(props.isSelected ?? false);
+    const selectedFromProps = props.isSelected ?? props.value;
+    const [isSelected, setIsSelected] = useState(selectedFromProps ?? false);
 
     /**
-     * Handle the switch click event.
+     * Handles the case where a selection change is triggered from outside the component (e.g., by the controller or by an All ON/OFF action).
      *
-     * @description In the case of the All ON/OFF, this needs to be handled
+     * @description Keep the local selection in sync with controller-driven values.
      */
     useEffect(() => {
-      if (props.isSelected !== isSelected) {
-        setIsSelected(props.isSelected);
+      if (selectedFromProps !== isSelected) {
+        setIsSelected(selectedFromProps);
       }
-    }, [props.isSelected, isSelected]);
+    }, [selectedFromProps, isSelected]);
 
     if (inlineItemAndSwitchSelectionPropsInvalid(props)) {
       debugLogs("withInlineItemAndSwitchSelection");
@@ -66,36 +73,26 @@ export function withInlineItemAndSwitchSelection<T extends object>(
     const { onSwitchClick } = props;
 
     /**
-     * Handle the switch click event.
+     * Toggle the local state, then forward the change to the controller and caller.
      *
-     * @remarks The event is prevented from propagating by default.
+     * @param e - The click event from the switch button.
      *
-     * @description If you pass an onSwitchClick prop, the internal state will already be changed before this handler is called.
-     * The click is enriched with a payload containing the current local setter and item details.
-     *
-     * @param e - The mouse event triggered by clicking the switch.
-     *
-     * @example
-     * ```tsx
-     * const handleSwitchClick = (e, payload) => {
-     *   console.log("Switch clicked for item:", payload.title, "New state:", payload.isSelected);
-     *   // You can also use payload.setIsSelected to change the state from here if needed
-     *  payload.setIsSelected(!payload.isSelected); // Force the reverse of the current state
-     * }
-     * ```
+     * @remark The payload includes the new selection state and other relevant info for the parent component to handle the change (e.g., update the selection state for all items if "All ON/OFF" is triggered).
      */
     const handleSwitchClick = (e: MouseEvent<HTMLButtonElement>) => {
       preventDefaultAndStopPropagation(e);
-      setIsSelected(!isSelected);
+      const nextIsSelected = !isSelected;
 
       const payload: InlineItemAndSwitchSelectionPayload = {
         id: props.id ?? "unknown-id",
         title: props.title,
-        isSelected: !isSelected,
+        isSelected: nextIsSelected,
         index: props.index ?? "unknown-index",
         setIsSelected,
       };
 
+      setIsSelected(nextIsSelected);
+      props.onChange?.(nextIsSelected, payload);
       onSwitchClick?.(e, payload);
     };
 
