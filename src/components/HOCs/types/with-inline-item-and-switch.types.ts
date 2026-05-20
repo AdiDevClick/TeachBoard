@@ -18,6 +18,11 @@ export type InlineItemAndSwitchSelectionProps = Omit<
   InlineItemAndSwitchSelectionPayload,
   "setIsSelected"
 > & {
+  value?: boolean;
+  onChange?: (
+    selected: boolean,
+    payload: InlineItemAndSwitchSelectionPayload,
+  ) => void;
   onSwitchClick?: (
     e: MouseEvent<HTMLButtonElement>,
     payload: InlineItemAndSwitchSelectionPayload,
