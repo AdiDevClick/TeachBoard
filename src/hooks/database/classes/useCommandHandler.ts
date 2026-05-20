@@ -442,7 +442,9 @@ export function useCommandHandler<
     if (isLoading || hasStartedCreation.current) return;
     const fetchType = fetchParams.method ?? "GET";
 
-    if (fetchType === "POST" || fetchType === "PUT" || fetchType === "DELETE") {
+    const fetchTypesSelection = ["POST", "PUT", "PATCH", "DELETE"];
+
+    if (fetchTypesSelection.includes(fetchType)) {
       // With viarables
       if (postVariables.current) {
         hasStartedCreation.current = true;
