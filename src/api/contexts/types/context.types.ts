@@ -20,7 +20,6 @@ import type {
 import type { Separator } from "@/components/ui/separator";
 import type { AppDialogNames } from "@/configs/app.config.ts";
 import type { UseMutationObserverReturn } from "@/hooks/types/use-mutation-observer.types";
-import type { AppControllerInterface } from "@/types/AppControllerInterface";
 import type { AnyObjectProps } from "@/utils/types/types.utils";
 import type { PreventDefaultAndStopPropagation } from "@/utils/types/types.utils.ts";
 import type { useSortable } from "@dnd-kit/sortable";
