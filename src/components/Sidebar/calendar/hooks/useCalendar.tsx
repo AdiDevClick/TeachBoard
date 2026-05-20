@@ -21,12 +21,16 @@ export function useCalendar(options: UseCalendarOptions = {}) {
   const isLoggedToMicrosoft = useAppStore(
     (state) => state.socialsLoggedIn.microsoft,
   );
-  const { setFetchParams, resultsCallback } = useCommandHandler({
-    form: null!,
-    pageId: "none",
-  });
+  const { setFetchParams, resultsCallback, submitCallback } = useCommandHandler(
+    {
+      form: null!,
+      pageId: options?.pageId ?? "none",
+      submitRoute: options?.submitRoute,
+      submitDataReshapeFn: options?.submitDataReshapeFn,
+    },
+  );
 
-  const [date, setDate] = useState<Date>(options.initialDate || new Date());
+  const [date, setDate] = useState<Date>(options.initialDate || null!);
 
   /**
    * Wraps each event into an event object
@@ -76,7 +80,7 @@ export function useCalendar(options: UseCalendarOptions = {}) {
    * @description Each time the user clicks on a calendar's date
    */
   useEffect(() => {
-    if (!isLoggedToMicrosoft) return;
+    if (!isLoggedToMicrosoft || !date) return;
     dateChangeTrigger(date);
   }, [date, isLoggedToMicrosoft]);
 
@@ -84,5 +88,6 @@ export function useCalendar(options: UseCalendarOptions = {}) {
     date,
     events,
     setDate,
+    submitCallback,
   };
 }
