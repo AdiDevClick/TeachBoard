@@ -1,4 +1,4 @@
-import type { CalendarFetchRange } from "@/components/Sidebar/calendar/hooks/useCalendar";
+import type { CalendarFetchRange } from "@/components/Sidebar/calendar/hooks/types/use-calendar.types";
 import { LANGUAGE } from "@/configs/app.config";
 import type {
   ParsingConfig,
@@ -18,7 +18,7 @@ import { Temporal } from "@js-temporal/polyfill";
 export function parseToPlainTemporal<
   T extends ParsingResultMap,
   K extends keyof T,
->(value?: string, options?: ParsingConfig<K>): T[K] | null {
+>(value?: string | object, options?: ParsingConfig<K>): T[K] | null {
   if (!value) return null;
 
   try {
@@ -79,6 +79,38 @@ export function formatDate(date: Date) {
     month: "long",
     year: "numeric",
   });
+}
+
+export function buildDateTimeString(date?: string, time?: string) {
+  const datePart = parseToPlainTemporal(date, { type: "date" });
+  const timePart = parseToPlainTemporal(time, { type: "time" });
+  const builtFromTemporal = parseToPlainTemporal(
+    {
+      year: datePart?.year,
+      month: datePart?.month,
+      day: datePart?.day,
+      hour: timePart?.hour,
+      minute: timePart?.minute,
+    },
+    { type: "datetime" },
+  );
+
+  // const utcOffset = getISOOffset();
+  return {
+    dateTime: builtFromTemporal?.toString(),
+    // timeZone: `UTC${utcOffset}`,
+    timeZone: "UTC",
+  };
+}
+
+function getISOOffset() {
+  const offset = -new Date().getTimezoneOffset();
+  const sign = offset >= 0 ? "+" : "-";
+  const abs = Math.abs(offset);
+  const hours = String(Math.floor(abs / 60)).padStart(2, "0");
+  const minutes = String(abs % 60).padStart(2, "0");
+
+  return `${sign}${hours}:${minutes}`;
 }
 
 /**
