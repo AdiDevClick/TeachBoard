@@ -115,6 +115,28 @@ export function safeStringify(value: unknown) {
   }
 }
 
+/**
+ * Strip HTML markup and return normalized plain text.
+ *
+ * @param value - HTML content or raw text.
+ * @returns Plain text content with whitespace collapsed.
+ */
+export function stripHtmlToPlainText(value?: string | null) {
+  if (!value) {
+    return "";
+  }
+
+  if (typeof DOMParser !== "undefined") {
+    const parsedDocument = new DOMParser().parseFromString(value, "text/html");
+    return (parsedDocument.body.textContent ?? "").replace(/\s+/g, " ").trim();
+  }
+  const stripHtmlRegex =
+    /<[^>]+>|<head[\s\S]*?<\/head>|<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|&nbsp;|&amp;|&lt;|&gt;|&quot;|&#39;/gi;
+  const striped = value.replace(stripHtmlRegex, " ");
+
+  return striped.replace(/\s+/g, " ").trim();
+}
+
 export function parseFromObject<T>(obj: T): T | null {
   try {
     if (typeof obj !== "object" || !obj) {
