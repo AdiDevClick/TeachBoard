@@ -1,5 +1,6 @@
 import { withVerticalDrawer } from "@/components/HOCs/withVerticalDrawer";
 import type { DateFieldProps } from "@/components/Popovers/Date/types/date-field.types";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
 import { EventViewController } from "@/features/calendar/event-view/controllers/EventViewController";
 import { eventInputs } from "@/features/calendar/event-view/form/event-view.inputs";
 import {
@@ -40,11 +41,6 @@ export function EventView({
   const startDate = getSelectedDate(start?.dateTime);
   const endDate = getSelectedDate(end?.dateTime);
 
-  const time = {
-    start: transformToTimeString(start?.dateTime) ?? defaultStart,
-    end: transformToTimeString(end?.dateTime) ?? defaultEnd,
-  };
-
   const form = useForm<EventViewFormSchema>({
     resolver: zodResolver(eventViewSchema),
     mode: "all",
@@ -58,7 +54,8 @@ export function EventView({
           to: endDate,
         },
       },
-      ...time,
+      start: transformToTimeString(start?.dateTime) ?? defaultStart,
+      end: transformToTimeString(end?.dateTime) ?? defaultEnd,
       body: {
         content: body?.content ?? undefined,
       },
@@ -82,6 +79,8 @@ export function EventView({
     pageId,
     inputControllers: hydratedControllers,
     event,
+    submitRoute: API_ENDPOINTS.POST.CALENDAR_EVENT.endpoints.PROXY_ENDPOINT,
+    submitDataReshapeFn: API_ENDPOINTS.POST.CALENDAR_EVENT.dataReshape,
     drawerHeader: {
       drawerTitle: { label: "Evènement" },
       drawerDescription: {
