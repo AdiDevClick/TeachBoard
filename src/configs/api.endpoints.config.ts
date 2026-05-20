@@ -34,6 +34,7 @@ import type {
 import type { TeachersFetch } from "@/api/types/routes/teachers.types";
 import { debugLogs } from "@/configs/app-components.config";
 import type { AnyObjectProps } from "@/utils/types/types.utils";
+import { stripHtmlToPlainText } from "@/utils/utils";
 
 const BASE_API_URL = "/api";
 const CALENDAR = `${BASE_API_URL}/calendar`;
@@ -91,14 +92,21 @@ export const API_ENDPOINTS = Object.freeze({
         },
       },
       dataReshape: (data: CalendarEvents) => {
-        return data.value;
-        // return dataReshaper(data.value ?? [])
-        //   .assign([
-        //     ["subject", "title"],
-        //     // ["start?.dateTime", "from"],
-        //     // ["end?.dateTime", "to"],
-        //   ])
-        //   .newShape();
+        return data.value.map((event) => {
+          const { content, contentType } = event.body || {};
+
+          if (!content) {
+            return event;
+          }
+
+          return {
+            ...event,
+            body: {
+              contentType,
+              content: stripHtmlToPlainText(content),
+            },
+          };
+        });
       },
     },
     CLASSES: {
@@ -248,8 +256,10 @@ export const API_ENDPOINTS = Object.freeze({
     METHOD: "POST",
     CALENDAR_EVENT: {
       endpoints: {
-        MAIN: `${CALENDAR}/events`,
+        PROXY_ENDPOINT: `${CALENDAR}/proxy`,
+        MAIN: `${BASE_MICROSOFT_CALENDAR_URL}/me/events`,
       },
+      dataReshape: (data: CalendarEvents) => data.value,
     },
     CREATE_CLASS: {
       endpoint: `${CLASSES}`,
@@ -418,6 +428,15 @@ export const API_ENDPOINTS = Object.freeze({
     UPDATE_EVALUATION: {
       endpoint: (id: number | string) => `${EVALUATIONS}/${id}`,
       dataReshape: evaluationDataReshape,
+    },
+  },
+  PATCH: {
+    METHOD: "PATCH",
+    CALENDAR_EVENT: {
+      endpoints: {
+        PROXY_ENDPOINT: `${CALENDAR}/proxy`,
+        MAIN: `${BASE_MICROSOFT_CALENDAR_URL}/me/events`,
+      },
     },
   },
   DELETE: {
