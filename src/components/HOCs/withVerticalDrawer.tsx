@@ -19,7 +19,7 @@ import type { AppControllerInterface } from "@/types/AppControllerInterface";
 import type { AnyObjectProps } from "@/utils/types/types.utils";
 import { createNameForHOC } from "@/utils/utils";
 import { type ComponentType } from "react";
-import type { FieldValues } from "react-hook-form";
+import { type FieldValues } from "react-hook-form";
 
 /**
  * Higher-Order Component that wraps a given component with a vertical drawer layout.
@@ -95,13 +95,10 @@ export function withVerticalDrawer<P extends AnyObjectProps>(
   };
 
   VerticalDrawer.Footer = function Footer(props: VerticalDrawerFooterProps) {
-    const {
-      drawerFooter = {},
-      form: { formState } = {},
-      formId,
-    } = useVerticalDrawer();
-
-    const isDisabled = useDisabledForSubmit(formState);
+    const { drawerFooter = {}, form, formId } = useVerticalDrawer();
+    const isDisabled = useDisabledForSubmit(form, {
+      forceSubscribe: true,
+    });
 
     const {
       children,
