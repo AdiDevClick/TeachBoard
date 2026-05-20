@@ -13,7 +13,7 @@ import { type ComponentProps } from "react";
  * @param submitText - Text for the submit button. Defaults to "Créer".
  * @param formId - The id of the form to be submitted.
  * @param displaySubmitButton - Whether to display the submit button. Defaults to true.
- * @param formState - The form state object allowing to verify the form's validity.
+ * @param form - The form object from react-hook-form.
  */
 export function AppDialFooter({
   cancelText = "Annuler",
