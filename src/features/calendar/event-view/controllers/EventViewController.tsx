@@ -1,11 +1,16 @@
 import { FormWithDebug } from "@/components/Form/FormWithDebug";
+import withController from "@/components/HOCs/withController";
+import { withInlineItemAndSwitchSelection } from "@/components/HOCs/withInlineItemAndSwitchSelection";
 import { ControlledLabelledInput } from "@/components/Inputs/exports/labelled-input.exports";
+import { useCalendar } from "@/components/Sidebar/calendar/hooks/useCalendar";
 import { ControlledLabelledTextArea } from "@/components/TextAreas/exports/labelled-textarea";
 import { Item, ItemGroup } from "@/components/ui/item";
+import { API_ENDPOINTS } from "@/configs/api.endpoints.config";
+import { HTTP_METHODS } from "@/configs/app.config";
 import { EventScheduleFields } from "@/features/calendar/event-view/components/EventScheduleFields";
+import { buildPOSTData } from "@/features/calendar/event-view/controllers/functions/event-view.controller.functions";
 import type { EventViewControllerProps } from "@/features/calendar/event-view/controllers/types/event-view.controller.types";
-import { useCommandHandler } from "@/hooks/database/classes/useCommandHandler";
-import { formatRangeCompat } from "@/utils/dates/datetime";
+import type { EventViewFormSchema } from "@/features/calendar/event-view/models/event-view.models";
 
 /**
  * Controller for the EventView component, which displays the details of a calendar event in a vertical drawer.
@@ -26,23 +31,12 @@ export function EventViewController({
   submitRoute,
   submitDataReshapeFn,
 }: EventViewControllerProps) {
-  const { start, end, isAllDay } = event ?? {};
-  const { submitCallback } = useCommandHandler({
-    form,
+  const { id } = event ?? {};
+  const { submitCallback } = useCalendar({
     pageId,
     submitRoute,
     submitDataReshapeFn,
   });
-
-  let range = "No date information available";
-
-  if (isAllDay) {
-    range = "Toute la journée";
-  } else {
-    range =
-      formatRangeCompat(start?.dateTime, end?.dateTime, Boolean(isAllDay)) ??
-      range;
-  }
 
   const sharedProps = {
     control: form.control,
@@ -50,18 +44,19 @@ export function EventViewController({
 
   /**
    * Handles the submission of the event form.
-   * @TODO
+   *
+   * @description This function is called when the form is submitted with valid data. It reshapes the form data into the format expected by the API and triggers the submit callback with the appropriate HTTP method (POST for creating a new event, PATCH for updating an existing event).
+   *
+   * @param variables - The form data submitted by the user, which includes the event details such as subject, date, time, and body content.
    */
-  function handleValidSubmit() {
-    const values = form.getValues();
-
-    return {
-      subject: values.subject,
-      body: values.body ? { content: values.body.content } : undefined,
-      start: values.start ? { dateTime: values.start } : undefined,
-      end: values.end ? { dateTime: values.end } : undefined,
-      isAllDay: values.isAllDay ?? false,
-    };
+  function onSubmit(variables: EventViewFormSchema) {
+    const data = buildPOSTData(variables);
+    submitCallback(data, {
+      method: HTTP_METHODS.PATCH,
+      headers: new Headers({
+        "x-target-url": `${API_ENDPOINTS.POST.CALENDAR_EVENT.endpoints.MAIN}/${id}`,
+      }),
+    });
   }
 
   return (
@@ -69,7 +64,7 @@ export function EventViewController({
       form={form}
       formId={formId}
       pageId={pageId}
-      onValidSubmit={handleValidSubmit}
+      onValidSubmit={onSubmit}
       onInvalidSubmit={() => undefined}
     >
       <ItemGroup>
@@ -77,6 +72,13 @@ export function EventViewController({
           <ControlledLabelledInput
             {...inputControllers.subject}
             {...sharedProps}
+          />
+        </Item>
+        <Item>
+          <ControlledSwitch
+            {...sharedProps}
+            {...inputControllers.isAllDay}
+            className="grid-cols-2! w-fit!"
           />
         </Item>
         <EventScheduleFields
@@ -90,9 +92,12 @@ export function EventViewController({
             {...inputControllers.bodyContent}
             {...sharedProps}
           />
-          <p>{range}</p>
         </Item>
       </ItemGroup>
     </FormWithDebug>
   );
 }
+
+const ControlledSwitch = withController(
+  withInlineItemAndSwitchSelection(() => null),
+);
